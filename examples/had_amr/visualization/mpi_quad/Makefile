@@ -13,7 +13,7 @@ CXX = /home/manderson/mpich2/bin/mpic++
 F90 = /home/manderson/mpich2/bin/mpif90
 
 # Where to find the include files:
-INCLUDE = -I/home/manderson/rnpl/include -I/home/manderson/mpfr/include
+INCLUDE = -I/home/manderson/rnpl/include -I/home/manderson/mpfr/include -I./
 
 # library directory
 LIB_DIR = -L/home/manderson/rnpl/lib -L/usr/lib64 
@@ -33,7 +33,7 @@ CFLAGS = -O3  $(INCLUDE) $(LIB_DIR)
 PROG = mytest
 
 # Object files that go into the final executable
-OBJS = test.o parse.o mpreal.o
+OBJS = test.o parse.o mpreal.o dlmalloc.o
 
 # Header files 
 HDRS =

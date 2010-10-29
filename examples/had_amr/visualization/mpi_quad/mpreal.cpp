@@ -1,10 +1,18 @@
 /*
-	Multi-precision real number class. C++ wrapper fo MPFR library.
+	Multi-precision real number class. C++ interface fo MPFR library.
 	Project homepage: http://www.holoborodko.com/pavel/
 	Contact e-mail:   pavel@holoborodko.com
 
-	Copyright (c) 2008-2009 Pavel Holoborodko
+	Copyright (c) 2008-2010 Pavel Holoborodko
 
+	Core Developers: 
+	Pavel Holoborodko, Dmitriy Gubanov, Konstantin Holoborodko. 
+
+	Contributors:
+	Brian Gladman, Helmut Jarausch, Fokko Beekhof, Ulrich Mutze, 
+	Heinz van Saanen, Pere Constans.
+
+	****************************************************************************
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
 	License as published by the Free Software Foundation; either
@@ -19,13 +27,48 @@
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-	Contributors:
-	Brain Gladman, Helmut Jarausch, Fokko Beekhof, Ulrich Mutze, Heinz van Saanen.
+	****************************************************************************
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions
+	are met:
+	
+	1. Redistributions of source code must retain the above copyright
+	notice, this list of conditions and the following disclaimer.
+	
+	2. Redistributions in binary form must reproduce the above copyright
+	notice, this list of conditions and the following disclaimer in the
+	documentation and/or other materials provided with the distribution.
+	
+	3. Redistributions of any form whatsoever must retain the following
+	acknowledgment:
+	"
+         This product includes software developed by Pavel Holoborodko
+         Web: http://www.holoborodko.com/pavel/
+         e-mail: pavel@holoborodko.com
+	"
+
+	4. This software cannot be, by any means, used for any commercial 
+	purpose without the prior permission of the copyright holder.
+	
+	Any of the above conditions can be waived if you get permission from 
+	the copyright holder. 
+
+	THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+	FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+	DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+	OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+	LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+	OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+	SUCH DAMAGE.
 */
 
 #include <cstring>
-#include <sstream>
 #include "mpreal.h"
+#include "dlmalloc.h"
 
 using std::ws;
 using std::cerr;
@@ -40,46 +83,54 @@ mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();
 mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();	
 int		   mpreal::default_base = 10;
 int        mpreal::double_bits = -1;
+bool       mpreal::is_custom_malloc = false;
 
 // Default constructor: creates mp number and initializes it to 0.
 mpreal::mpreal() 
 { 
+	set_custom_malloc();
 	mpfr_init2(mp,default_prec); 
 	mpfr_set_ui(mp,0,default_rnd);
 }
 
 mpreal::mpreal(const mpreal& u) 
 {
+	set_custom_malloc();
 	mpfr_init2(mp,mpfr_get_prec(u.mp));
 	mpfr_set(mp,u.mp,default_rnd);
 }
 
 mpreal::mpreal(const mpfr_t u)
 {
+	set_custom_malloc();
 	mpfr_init2(mp,mpfr_get_prec(u));
 	mpfr_set(mp,u,default_rnd);
 }
 
 mpreal::mpreal(const mpf_t u)
 {
+	set_custom_malloc();
 	mpfr_init2(mp,mpf_get_prec(u));
 	mpfr_set_f(mp,u,default_rnd);
 }
 
 mpreal::mpreal(const mpz_t u, mp_prec_t prec, mp_rnd_t mode)
 {
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
-	mpfr_set_z(mp,u,default_rnd);
+	mpfr_set_z(mp,u,mode);
 }
 
 mpreal::mpreal(const mpq_t u, mp_prec_t prec, mp_rnd_t mode)
 {
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
-	mpfr_set_q(mp,u,default_rnd);
+	mpfr_set_q(mp,u,mode);
 }
 
 mpreal::mpreal(const double u, mp_prec_t prec, mp_rnd_t mode)
 {
+	set_custom_malloc();
     if(double_bits == -1 || fits_in_bits(u, double_bits))
     {
     	mpfr_init2(mp,prec);
@@ -91,52 +142,61 @@ mpreal::mpreal(const double u, mp_prec_t prec, mp_rnd_t mode)
 
 mpreal::mpreal(const long double u, mp_prec_t prec, mp_rnd_t mode)
 { 
+	set_custom_malloc();
     mpfr_init2(mp,prec);
 	mpfr_set_ld(mp,u,mode);
 }
 
 mpreal::mpreal(const unsigned long int u, mp_prec_t prec, mp_rnd_t mode)
 { 
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
 	mpfr_set_ui(mp,u,mode);
 }
 
 mpreal::mpreal(const unsigned int u, mp_prec_t prec, mp_rnd_t mode)
 { 
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
 	mpfr_set_ui(mp,u,mode);
 }
 
 mpreal::mpreal(const long int u, mp_prec_t prec, mp_rnd_t mode)
 { 
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
 	mpfr_set_si(mp,u,mode);
 }
 
 mpreal::mpreal(const int u, mp_prec_t prec, mp_rnd_t mode)
 { 
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
 	mpfr_set_si(mp,u,mode);
 }
 
 mpreal::mpreal(const char* s, mp_prec_t prec, int base, mp_rnd_t mode)
 {
+	set_custom_malloc();
 	mpfr_init2(mp,prec);
 	mpfr_set_str(mp, s, base, mode); 
 }
 
 mpreal::~mpreal() 
 { 
-	mpfr_clear(mp); 
+	mpfr_clear(mp);
 }                           
 
 // Operators - Assignment
 mpreal& mpreal::operator=(const char* s)
 {
 	mpfr_t t;
+	
+	set_custom_malloc();
+
 	if(0==mpfr_init_set_str(t,s,default_base,default_rnd))
 	{
-		mpfr_set(mp,t,mpreal::default_rnd);				
+		mpfr_set(mp,t,mpreal::default_rnd);
 		mpfr_clear(t);
 	}else{
 		mpfr_clear(t);
@@ -257,13 +317,20 @@ std::string to_string(T t, std::ios_base & (*f)(std::ios_base&))
 	return oss.str();
 }
 
+mpreal::operator std::string() const
+{
+	return to_string();
+}
+
 string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
 {
 	char *s, *ns = NULL;	
 	size_t slen, nslen;
 	mp_exp_t exp;
 	string out;
-
+	
+	set_custom_malloc();
+	
 	if(mpfr_inf_p(mp))
 	{ 
 		if(mpfr_sgn(mp)>0) return "+@Inf@";
@@ -272,7 +339,6 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
 
 	if(mpfr_zero_p(mp)) return "0";
 	if(mpfr_nan_p(mp))  return "@NaN@";
-
 		
 	s  = mpfr_get_str(NULL,&exp,b,0,mp,mode);
 	ns = mpfr_get_str(NULL,&exp,b,n,mp,mode);
@@ -360,7 +426,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
 // I/O
 ostream& operator<<(ostream& os, const mpreal& v)
 {
-	return os<<v.to_string(os.precision());
+	return os<<v.to_string(static_cast<size_t>(os.precision()));
 }
 
 istream& operator>>(istream &is, mpreal& v)
@@ -368,7 +434,9 @@ istream& operator>>(istream &is, mpreal& v)
 	char c;	
 	string s = "";
 	mpfr_t t;
-
+	
+	mpreal::set_custom_malloc();
+	
 	if(is.good())
 	{
 		is>>ws;
@@ -385,7 +453,8 @@ istream& operator>>(istream &is, mpreal& v)
 		if(s.size() != 0)
 		{
 			// Protect current value from alternation in case of input error
-			// so some error handling(roll back) procedure can be used 
+			// so some error handling(roll back) procedure can be used 			
+
 			if(0==mpfr_init_set_str(t,s.c_str(),mpreal::default_base,mpreal::default_rnd))
 			{
 				mpfr_set(v.mp,t,mpreal::default_rnd);				
@@ -400,4 +469,30 @@ istream& operator>>(istream &is, mpreal& v)
 	}
 	return is;
 }
+
+// Optimized dynamic memory allocation/(re-)deallocation.
+void * mpreal::mpreal_allocate(size_t alloc_size)
+{
+	return(dlmalloc(alloc_size));
 }
+
+void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
+{
+	return(dlrealloc(ptr,new_size));
+}
+
+void mpreal::mpreal_free(void *ptr, size_t size)
+{
+	dlfree(ptr);
+}
+
+inline void mpreal::set_custom_malloc(void)
+{
+	if(!is_custom_malloc)
+	{
+		mp_set_memory_functions(mpreal_allocate,mpreal_reallocate,mpreal_free);
+		is_custom_malloc = true;
+	}
+}
+}
+
