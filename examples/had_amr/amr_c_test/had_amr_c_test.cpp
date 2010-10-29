@@ -12,6 +12,8 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
+#define UGLIFY 1
+
 ///////////////////////////////////////////////////////////////////////////////
 // windows needs to initialize MPFR in each shared library
 #if defined(BOOST_WINDOWS) 
@@ -157,29 +159,38 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
       calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-      //  work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
+#ifndef UGLIFY
+        work.phi[1][i] = vecval[j+compute_index].phi[0][i] + rhs.phi[0][i]*dt;
+#else
         // uglify
         work.phi[1][i] = dt;
         work.phi[1][i] *= rhs.phi[0][i];
         work.phi[1][i] += vecval[j+compute_index].phi[0][i];
+#endif
       }
       result->value_[j] = work;
 
     }
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      //result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-      //                             -c_1_3*result->value_[2].phi[1][0];
+#ifndef UGLIFY
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+                                   -c_1_3*result->value_[2].phi[1][0];
+#else
       // uglify
       result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
       result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+#endif
 
       // Pi
-      //result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-      //                             -c_1_3*result->value_[2].phi[1][2];
+#ifndef UGLIFY
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+                                   -c_1_3*result->value_[2].phi[1][2];
+#else
       // uglify
       result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
       result->value_[0].phi[1][2] -= -c_1_3*result->value_[2].phi[1][2];
+#endif
 
       // Phi
       result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
@@ -192,8 +203,10 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
         work.phi[0][i] = vecval[j+compute_index].phi[0][i];
-        //work.phi[1][i] = c_0_75*vecval[j+compute_index].phi[0][i]
-        //                +c_0_25*vecval[j+compute_index].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+#ifndef UGLIFY
+        work.phi[1][i] = c_0_75*vecval[j+compute_index].phi[0][i]
+                        +c_0_25*vecval[j+compute_index].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+#else
         // uglify
         tmp = dt;
         tmp *= c_0_25;
@@ -204,24 +217,31 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
         tmp = c_0_75;
         tmp *= vecval[j+compute_index].phi[0][i];
         work.phi[1][i] += tmp;
+#endif
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      //result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-      //                             -c_1_3*result->value_[2].phi[1][0];
+#ifndef UGLIFY
+      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
+                                   -c_1_3*result->value_[2].phi[1][0];
+#else
       // uglify
       result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
       result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+#endif
 
       // Pi
-      //result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-      //                             -c_1_3*result->value_[2].phi[1][2];
+#ifndef UGLIFY
+      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
+                                   -c_1_3*result->value_[2].phi[1][2];
+#else
       // uglify
       result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
       result->value_[0].phi[1][2] -= c_1_3*result->value_[2].phi[1][2];
+#endif
 
       // Phi
       result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
@@ -233,8 +253,10 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
     for (int j=0; j<result->granularity; j++) {
       calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
-        //work.phi[0][i] = c_1_3*vecval[j+compute_index].phi[0][i]
-        //                +c_2_3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+#ifndef UGLIFY
+        work.phi[0][i] = c_1_3*vecval[j+compute_index].phi[0][i]
+                        +c_2_3*(vecval[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+#else
         // uglify
         tmp = c_1_3;
         tmp *= vecval[j+compute_index].phi[0][i];
@@ -243,34 +265,44 @@ int rkupdate(std::vector< nodedata > const& vecval, stencil_data* result,
         work.phi[0][i] += vecval[j+compute_index].phi[1][i];
         work.phi[0][i] *= c_2_3;
         work.phi[0][i] += tmp;
+#endif
       }
       result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
       // chi
-      //result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0]
-      //                             -c_1_3*result->value_[2].phi[0][0];
+#ifndef UGLIFY
+      result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0]
+                                   -c_1_3*result->value_[2].phi[0][0];
+#else
       // uglify
       result->value_[0].phi[0][0] = c_4_3*result->value_[1].phi[0][0];
       result->value_[0].phi[0][0] -= c_1_3*result->value_[2].phi[0][0];
+#endif
       // Pi
-      //result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2]
-      //                             -c_1_3*result->value_[2].phi[0][2];
+#ifndef UGLIFY
+      result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2]
+                                   -c_1_3*result->value_[2].phi[0][2];
+#else
       // uglify
       result->value_[0].phi[0][2] = c_4_3*result->value_[1].phi[0][2];
       result->value_[0].phi[0][2] -= c_1_3*result->value_[2].phi[0][2];
+#endif
       // Phi
       result->value_[1].phi[0][1] = c_0_5*result->value_[2].phi[0][1];
     } 
 
     // timestep update
-    //result->timestep_ = timestep + 1.0/pow(2.0,level);
+#ifndef UGLIFY
+    result->timestep_ = timestep + 1.0/pow(2.0,level);
+#else
     // uglify
     tmp = pow(c_2,level);
     result->timestep_ = c_1;
     result->timestep_ /= tmp;
     result->timestep_ += timestep;
+#endif
   } 
   else {
     printf(" PROBLEM : invalid iter flag %d\n",iter);
@@ -314,13 +346,15 @@ void calcrhs(struct nodedata * rhs,
 
   // Add  dissipation if size = 7
   if ( compute_index + 3 < size && compute_index - 3 >= 0 ) { 
-    //diss_chi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][0]
-    //                         +c_6*vecval[compute_index-2].phi[flag][0]
-    //                        -c_15*vecval[compute_index-1].phi[flag][0]
-    //                        +c_20*chi //vecval[compute_index  ].phi[flag][0]
-    //                        -c_15*vecval[compute_index+1].phi[flag][0]
-    //                         +c_6*vecval[compute_index+2].phi[flag][0]
-    //                             -vecval[compute_index+3].phi[flag][0] );
+#ifndef UGLIFY
+    diss_chi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][0]
+                             +c_6*vecval[compute_index-2].phi[flag][0]
+                            -c_15*vecval[compute_index-1].phi[flag][0]
+                            +c_20*chi //vecval[compute_index  ].phi[flag][0]
+                            -c_15*vecval[compute_index+1].phi[flag][0]
+                             +c_6*vecval[compute_index+2].phi[flag][0]
+                                 -vecval[compute_index+3].phi[flag][0] );
+#else
     // uglify
     diss_chi -= vecval[compute_index+3].phi[flag][0];
     tmp = vecval[compute_index+2].phi[flag][0];
@@ -342,14 +376,17 @@ void calcrhs(struct nodedata * rhs,
     diss_chi *= c_m1;
     diss_chi /= c_64;
     diss_chi /= dr;
+#endif
     
-    //diss_Phi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][1]
-    //                         +c_6*vecval[compute_index-2].phi[flag][1]
-    //                        -c_15*vecval[compute_index-1].phi[flag][1]
-    //                        +c_20*Phi //vecval[compute_index  ].phi[flag][1]
-    //                        -c_15*vecval[compute_index+1].phi[flag][1]
-    //                         +c_6*vecval[compute_index+2].phi[flag][1]
-    //                             -vecval[compute_index+3].phi[flag][1] );
+#ifndef UGLIFY
+    diss_Phi = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][1]
+                             +c_6*vecval[compute_index-2].phi[flag][1]
+                            -c_15*vecval[compute_index-1].phi[flag][1]
+                            +c_20*Phi //vecval[compute_index  ].phi[flag][1]
+                            -c_15*vecval[compute_index+1].phi[flag][1]
+                             +c_6*vecval[compute_index+2].phi[flag][1]
+                                 -vecval[compute_index+3].phi[flag][1] );
+#else
     // uglify
     diss_Phi -= vecval[compute_index+3].phi[flag][1];
     tmp = vecval[compute_index+2].phi[flag][1];
@@ -371,14 +408,17 @@ void calcrhs(struct nodedata * rhs,
     diss_Phi *= c_m1;
     diss_Phi /= c_64;
     diss_Phi /= dr;
+#endif
 
-    //diss_Pi  = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][2]
-    //                         +c_6*vecval[compute_index-2].phi[flag][2]
-    //                        -c_15*vecval[compute_index-1].phi[flag][2]
-    //                        +c_20*Pi //vecval[compute_index  ].phi[flag][2]
-    //                        -c_15*vecval[compute_index+1].phi[flag][2]
-    //                         +c_6*vecval[compute_index+2].phi[flag][2]
-    //                             -vecval[compute_index+3].phi[flag][2] );
+#ifndef UGLIFY
+    diss_Pi  = c_m1/(c_64*dr)*(  -vecval[compute_index-3].phi[flag][2]
+                             +c_6*vecval[compute_index-2].phi[flag][2]
+                            -c_15*vecval[compute_index-1].phi[flag][2]
+                            +c_20*Pi //vecval[compute_index  ].phi[flag][2]
+                            -c_15*vecval[compute_index+1].phi[flag][2]
+                             +c_6*vecval[compute_index+2].phi[flag][2]
+                                 -vecval[compute_index+3].phi[flag][2] );
+#else
     // uglify
     diss_Pi -= vecval[compute_index+3].phi[flag][2];
     tmp = vecval[compute_index+2].phi[flag][2];
@@ -400,6 +440,7 @@ void calcrhs(struct nodedata * rhs,
     diss_Pi *= c_m1;
     diss_Pi /= c_64;
     diss_Pi /= dr;
+#endif
   }
 
 
@@ -408,11 +449,14 @@ void calcrhs(struct nodedata * rhs,
     had_double_type const& chi_np1 = vecval[compute_index+1].phi[flag][0];
     had_double_type const& chi_nm1 = vecval[compute_index-1].phi[flag][0];
 
-    //rhs->phi[0][0] = Pi + par.eps*diss_chi; // chi rhs
+#ifndef UGLIFY
+    rhs->phi[0][0] = Pi + par.eps*diss_chi; // chi rhs
+#else
     // uglify
     rhs->phi[0][0] = diss_chi;
     rhs->phi[0][0] *= par.eps;
     rhs->phi[0][0] += Pi;
+#endif
 
     had_double_type const& Pi_np1 = vecval[compute_index+1].phi[flag][2];
     had_double_type const& Pi_nm1 = vecval[compute_index-1].phi[flag][2];
@@ -420,7 +464,9 @@ void calcrhs(struct nodedata * rhs,
     had_double_type const& Phi_np1 = vecval[compute_index+1].phi[flag][1];
     had_double_type const& Phi_nm1 = vecval[compute_index-1].phi[flag][1];
 
-    //rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(c_2*dr) + par.eps*diss_Phi; // Phi rhs
+#ifndef UGLIFY
+    rhs->phi[0][1] = (Pi_np1 - Pi_nm1)/(c_2*dr) + par.eps*diss_Phi; // Phi rhs
+#else
     // uglify
     rhs->phi[0][1] = diss_Phi;
     rhs->phi[0][1] *= par.eps;
@@ -429,26 +475,35 @@ void calcrhs(struct nodedata * rhs,
     tmp /= c_2;
     tmp /= dr;
     rhs->phi[0][1] += tmp;
+#endif
 
+#ifndef UGLIFY
+    had_double_type const& r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
+#else
     //uglify
     tmp = r;
     tmp += dr;
     tmp1 = tmp;
     tmp1 *= tmp;
     tmp1 *= Phi_np1;
-    //had_double_type const& r2_Phi_np1 = (r+dr)*(r+dr)*Phi_np1;
     had_double_type const& r2_Phi_np1 = tmp1;
+#endif
 
+#ifndef UGLIFY
+    had_double_type const& r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
+#else
     // uglify
     tmp2 = r;
     tmp2 -= dr;
     tmp3 = tmp2;
     tmp3 *= tmp2;
     tmp3 *= Phi_nm1;
-    //had_double_type const& r2_Phi_nm1 = (r-dr)*(r-dr)*Phi_nm1;
     had_double_type const& r2_Phi_nm1 = tmp3;
+#endif
 
-    //rhs->phi[0][2] = c_3*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
+#ifndef UGLFIY
+    rhs->phi[0][2] = c_3*( r2_Phi_np1 - r2_Phi_nm1 )/( pow(r+dr,3) - pow(r-dr,3) ) + pow(chi,par.PP) + par.eps*diss_Pi; // Pi rhs
+#else
     // uglify
     rhs->phi[0][2] = diss_Pi;
     rhs->phi[0][2] *= par.eps;
@@ -464,6 +519,7 @@ void calcrhs(struct nodedata * rhs,
     tmp /= tmp3;
     tmp *= c_3;
     rhs->phi[0][2] += tmp;
+#endif
 
     rhs->phi[0][3] = c_0; // Energy rhs
 
@@ -496,7 +552,9 @@ void calcrhs(struct nodedata * rhs,
 
       // we are at the right boundary 
       rhs->phi[0][0] = Pi;  // chi rhs
-      //rhs->phi[0][1] = -(c_3*Phi - c_4*Phi_nm1 + Phi_nm2)/(c_2*dr) - Phi/r;    // Phi rhs
+#ifndef UGLIFY
+      rhs->phi[0][1] = -(c_3*Phi - c_4*Phi_nm1 + Phi_nm2)/(c_2*dr) - Phi/r;    // Phi rhs
+#else
       // uglify
       rhs->phi[0][1] = Phi;
       rhs->phi[0][1] *= c_3;
@@ -510,8 +568,11 @@ void calcrhs(struct nodedata * rhs,
       tmp = Phi;
       tmp /= r;
       rhs->phi[0][1] -= tmp;
+#endif
 
-      //rhs->phi[0][2] = -Pi/r - (c_3*Pi - c_4*Pi_nm1 + Pi_nm2)/(c_2*dr);      // Pi rhs
+#ifndef UGLIFY
+      rhs->phi[0][2] = -Pi/r - (c_3*Pi - c_4*Pi_nm1 + Pi_nm2)/(c_2*dr);      // Pi rhs
+#else
       // uglify
       rhs->phi[0][2] = Pi;
       rhs->phi[0][2] *= c_3;
@@ -525,6 +586,7 @@ void calcrhs(struct nodedata * rhs,
       tmp = Pi;
       tmp /= r;
       rhs->phi[0][2] -= tmp;
+#endif
 
       rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
     }
