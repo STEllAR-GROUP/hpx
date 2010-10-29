@@ -23,6 +23,10 @@ if(GMP_FOUND)
     if(MPFR_FOUND)
         add_definitions(-DMPFR_FOUND)
         include_directories(${MPFR_INCLUDE_DIR})
+
+		# allow the mpreal class to take advantage of move semantics
+		add_definitions(-DMPFR_USE_BOOST_MOVE)
+		include_directories(${hpx_SOURCE_DIR}/external/plugin)
     endif()
 endif()
 
