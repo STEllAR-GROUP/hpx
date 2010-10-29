@@ -9,9 +9,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="My Amplifier Results">
-      <UniqueIdentifier>{c7bfbb88-33ae-4ee2-a190-f422b6a06f0d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\had_amr\amr_client.cpp">
@@ -20,35 +17,6 @@
     <ClCompile Include="..\..\..\examples\had_amr\mpreal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="My Amplifier Results\r000hs\r000hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r001cc\r001cc.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r002lw\r002lw.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r003hs\r003hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r004hs\r004hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r005hs\r005hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r006hs\r006hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r007lw\r007lw.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r008lw\r008lw.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h">

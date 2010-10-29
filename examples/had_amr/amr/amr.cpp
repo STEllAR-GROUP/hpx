@@ -9,3 +9,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+
+///////////////////////////////////////////////////////////////////////////////
+// initialize mpreal default precision
+#if defined(MPFR_FOUND)
+#include "../mpreal.h"
+
+struct init_mpfr
+{
+    init_mpfr()
+    {
+        mpfr::mpreal::set_default_prec(128);
+    }
+};
+init_mpfr init_mpfr_;
+#endif

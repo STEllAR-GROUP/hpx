@@ -12,6 +12,22 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
+///////////////////////////////////////////////////////////////////////////////
+// initialize mpreal default precision
+#if defined(MPFR_FOUND)
+#include "../mpreal.h"
+
+struct init_mpfr
+{
+    init_mpfr()
+    {
+        mpfr::mpreal::set_default_prec(128);
+    }
+};
+init_mpfr init_mpfr_;
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // local functions
 inline int floatcmp(had_double_type const& x1, had_double_type const& x2) 
 {

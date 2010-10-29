@@ -50,4 +50,18 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_REGISTER_ACTION_EX(had_logging_type::logentry_action, logentry_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(had_logging_type);
 
+///////////////////////////////////////////////////////////////////////////////
+// initialize mpreal default precision
+#if defined(MPFR_FOUND)
+#include "../mpreal.h"
+
+struct init_mpfr
+{
+    init_mpfr()
+    {
+        mpfr::mpreal::set_default_prec(128);
+    }
+};
+init_mpfr init_mpfr_;
+#endif
 
