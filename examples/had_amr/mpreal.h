@@ -34,6 +34,20 @@
 
 #include <mpfr.h>
 
+#if MPREAL_USE_BOOST_MOVE != 0
+#include <boost/move/move.hpp>
+#endif
+
+#if !defined(MPFR_PREC)
+#define MPFR_PREC(x)      ((x)->_mpfr_prec)
+#endif
+#if !defined(MPFR_EXP)
+#define MPFR_EXP(x)       ((x)->_mpfr_exp)
+#endif
+#if !defined(MPFR_MANT)
+#define MPFR_MANT(x)      ((x)->_mpfr_d)
+#endif
+
 // Detect compiler using signatures from http://predef.sourceforge.net/
 #if defined(__GNUC__) && defined(__INTEL_COMPILER)
   #define IsInf(x) isinf(x)                                // GNU C/C++ + Intel ICC compiler
@@ -53,6 +67,9 @@ namespace mpfr {
 class mpreal {
 private:
   mpfr_t mp;
+#if MPREAL_USE_BOOST_MOVE != 0
+  BOOST_COPYABLE_AND_MOVABLE(mpreal)
+#endif
 
 public:
   static mp_rnd_t		default_rnd;	
@@ -64,6 +81,9 @@ public:
   // Constructors && type conversion
   mpreal();
   mpreal(const mpreal& u);
+#if MPREAL_USE_BOOST_MOVE != 0
+  mpreal(BOOST_RV_REF(mpreal));            // Move constructor
+#endif
 
   mpreal(const mpfr_t u);	
   mpreal(const mpf_t u);	
@@ -87,7 +107,12 @@ public:
   // <, >, ==, <=, >=
 
   // =
+#if MPREAL_USE_BOOST_MOVE != 0
+  mpreal& operator=(BOOST_COPY_ASSIGN_REF(mpreal));     // Copy assignment
+  mpreal& operator=(BOOST_RV_REF(mpreal));              // Move assignment
+#else
   mpreal& operator=(const mpreal& v);
+#endif
   mpreal& operator=(const mpf_t v);
   mpreal& operator=(const mpz_t v);
   mpreal& operator=(const mpq_t v);
@@ -639,14 +664,43 @@ const mpreal pow(const double a, const int b, mp_rnd_t rnd_mode = mpreal::defaul
 //////////////////////////////////////////////////////////////////////////
 // Implementation of inline functions
 //////////////////////////////////////////////////////////////////////////
+#if MPREAL_USE_BOOST_MOVE != 0
+inline mpreal::mpreal(BOOST_RV_REF(mpreal) u)            // Move constructor
+{
+  MPFR_PREC(mp) = MPFR_PREC(u.mp);
+  MPFR_SIGN(mp) = MPFR_SIGN(u.mp);
+  MPFR_EXP(mp) = MPFR_EXP(u.mp);
+  MPFR_MANT(mp) = MPFR_MANT(u.mp);
+  MPFR_MANT(u.mp) = (mp_limb_t *)0;
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // Operators - Assignment
+#if MPREAL_USE_BOOST_MOVE != 0
+inline mpreal& mpreal::operator=(BOOST_COPY_ASSIGN_REF(mpreal) v)     // Copy assignment
+{
+  if (this!= &v)	mpfr_set(mp,v.mp,default_rnd);
+  return *this;
+}
+inline mpreal& mpreal::operator=(BOOST_RV_REF(mpreal) v)              // Move assignment
+{
+  if (this!= &v) {
+    MPFR_PREC(mp) = MPFR_PREC(v.mp);
+    MPFR_SIGN(mp) = MPFR_SIGN(v.mp);
+    MPFR_EXP(mp) = MPFR_EXP(v.mp);
+    MPFR_MANT(mp) = MPFR_MANT(v.mp);
+    MPFR_MANT(v.mp) = (mp_limb_t *)0;
+  }
+  return *this;
+}
+#else
 inline mpreal& mpreal::operator=(const mpreal& v)
 {
   if (this!= &v)	mpfr_set(mp,v.mp,default_rnd);
   return *this;
 }
+#endif
 
 inline mpreal& mpreal::operator=(const mpf_t v)
 {
@@ -2733,7 +2787,7 @@ inline void mpreal::set_default_rnd(mp_rnd_t rnd_mode)
 
 inline mp_rnd_t mpreal::get_default_rnd()
 { 
-  return mpfr_get_default_rounding_mode();
+  return mp_rnd_t(mpfr_get_default_rounding_mode());
 }
 
 inline void mpreal::set_double_bits(int dbits)

@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Macro BOOST_MOVE_OPTIMIZED_EMULATION</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Chapter 1. Boost.Move">
+<link rel="up" href="move/reference.html#header.boost.move.move_hpp" title="Header &lt;boost/move/move.hpp&gt;">
+<link rel="prev" href="boost/uninitialized_copy_or_move.html" title="Function template uninitialized_copy_or_move">
+<link rel="next" href="BOOST_MOVABLE_BUT_NOT_COPYABLE.html" title="Macro BOOST_MOVABLE_BUT_NOT_COPYABLE">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="boost/uninitialized_copy_or_move.html"><img src="../../../../doc/html/images/prev.png" alt="Prev"></a><a accesskey="u" href="move/reference.html#header.boost.move.move_hpp"><img src="../../../../doc/html/images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="../../../../doc/html/images/home.png" alt="Home"></a><a accesskey="n" href="BOOST_MOVABLE_BUT_NOT_COPYABLE.html"><img src="../../../../doc/html/images/next.png" alt="Next"></a>
+</div>
+<div class="refentry" lang="en">
+<a name="BOOST_MOVE_OPTIMIZED_EMULATION"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Macro BOOST_MOVE_OPTIMIZED_EMULATION</span></h2>
+<p>BOOST_MOVE_OPTIMIZED_EMULATION &#8212; </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="emphasis"><em>// In header: &lt;<a href="move/reference.html#header.boost.move.move_hpp" title="Header &lt;boost/move/move.hpp&gt;">boost/move/move.hpp</a>&gt;
+
+</em></span>BOOST_MOVE_OPTIMIZED_EMULATION</pre></div>
+<div class="refsect1" lang="en">
+<a name="id586360"></a><h2>Description</h2>
+<p>Defining or undefining this macro will change Boost.Move behaviour for copyable and movable classes when assigning from non-const rvalues: </p>
+<pre class="programlisting"> copyable_and_movable produce(){ return copyable_and_movable(); }
+</pre>
+<p> If the macro is NOT defined: </p>
+<pre class="programlisting"> copyable_and_movable cm;
+ cm = copyable_and_movable(); //object is COPIED (missed optimization)
+</pre>
+<p> If the macro IS defined: </p>
+<pre class="programlisting"> copyable_and_movable cm;
+ cm = copyable_and_movable(); //object is MOVED
+</pre>
+<p> However, the second option has also some downsides. See documentation for more details. </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright © 2008 -2010 Ion Gaztanaga<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="boost/uninitialized_copy_or_move.html"><img src="../../../../doc/html/images/prev.png" alt="Prev"></a><a accesskey="u" href="move/reference.html#header.boost.move.move_hpp"><img src="../../../../doc/html/images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="../../../../doc/html/images/home.png" alt="Home"></a><a accesskey="n" href="BOOST_MOVABLE_BUT_NOT_COPYABLE.html"><img src="../../../../doc/html/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -9,7 +9,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(HPX_MPIR_ROOT)/dll/x64/$(Configuration);$(HPX_MPFR_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MPFR_FOUND=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MPFR_FOUND=1;MPREAL_USE_BOOST_MOVE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(HPX_MPIR_ROOT)/dll/x64/$(Configuration);$(HPX_MPFR_ROOT)/build.vc10/dll/x64/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

@@ -1,0 +1,140 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Chapter 1. Boost.Move</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Chapter 1. Boost.Move">
+<link rel="next" href="move/introduction.html" title=" Introduction">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td>
+<td align="center"><a href="../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="move/introduction.html"><img src="../../../../doc/html/images/next.png" alt="Next"></a></div>
+<div class="chapter" lang="en">
+<div class="titlepage"><div>
+<div><h2 class="title">
+<a name="move"></a>Chapter 1. Boost.Move</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Ion</span> <span class="surname">Gaztanaga</span>
+</h3></div></div>
+<div><p class="copyright">Copyright © 2008 -2010 Ion Gaztanaga</p></div>
+<div><div class="legalnotice">
+<a name="id563521"></a><p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></div>
+</div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="move/introduction.html"> Introduction</a></span></dt>
+<dt><span class="section"><a href="move/implementing_movable_classes.html"> Implementing copyable
+    and movable classes</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="move/implementing_movable_classes.html#move.implementing_movable_classes.copyable_and_movable_cpp0x">
+      Copyable and movable classes in C++0x</a></span></dt>
+<dt><span class="section"><a href="move/implementing_movable_classes.html#move.implementing_movable_classes.copyable_and_movable_cpp03">
+      Copyable and movable classes in portable syntax for both C++03 and C++0x compilers</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="move/composition_inheritance.html"> Composition or inheritance</a></span></dt>
+<dt><span class="section"><a href="move/movable_only_classes.html"> Movable but Non-Copyable Types</a></span></dt>
+<dt><span class="section"><a href="move/move_and_containers.html"> Containers and move semantics</a></span></dt>
+<dt><span class="section"><a href="move/construct_forwarding.html"> Constructor Forwarding</a></span></dt>
+<dt><span class="section"><a href="move/move_iterator.html"> Move iterators</a></span></dt>
+<dt><span class="section"><a href="move/move_inserters.html"> Move inserters</a></span></dt>
+<dt><span class="section"><a href="move/move_algorithms.html"> Move algorithms</a></span></dt>
+<dt><span class="section"><a href="move/emulation_limitations.html"> Emulation limitations</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="move/emulation_limitations.html#move.emulation_limitations.emulation_limitations_base">
+      Initializing base classes</a></span></dt>
+<dt><span class="section"><a href="move/emulation_limitations.html#move.emulation_limitations.template_parameters"> Template
+      parameters for perfect forwarding</a></span></dt>
+<dt><span class="section"><a href="move/emulation_limitations.html#move.emulation_limitations.emulation_limitations_binding">
+      Binding of rvalue references to lvalues</a></span></dt>
+<dt><span class="section"><a href="move/emulation_limitations.html#move.emulation_limitations.emulation_limitations_modes">
+      Further limitations depending on the emulation mode</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="move/two_emulation_modes.html"> Two emulation modes</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="move/two_emulation_modes.html#move.two_emulation_modes.optimized_mode"> Optimized mode</a></span></dt>
+<dt><span class="section"><a href="move/two_emulation_modes.html#move.two_emulation_modes.non_optimized_mode"> Non-optimized
+      mode</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="move/how_the_emulation_works.html"> How the emulation works</a></span></dt>
+<dt><span class="section"><a href="move/thanks_to.html"> Thanks and credits</a></span></dt>
+<dt><span class="section"><a href="move/reference.html">Reference</a></span></dt>
+<dd><dl><dt><span class="section"><a href="move/reference.html#header.boost.move.move_hpp">Header &lt;boost/move/move.hpp&gt;</a></span></dt></dl></dd>
+</dl>
+</div>
+<div class="warning"><table border="0" summary="Warning">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="../../../../doc/html/images/warning.png"></td>
+<th align="left">Warning</th>
+</tr>
+<tr><td colspan="2" align="left" valign="top"><p>
+      This library is NOT an official Boost library
+    </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../doc/html/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td colspan="2" align="left" valign="top"><p>
+      <span class="bold"><strong><span class="emphasis"><em>For reviewers</em></span></strong></span> This library
+      has two operating modes, depending on the macro <code class="computeroutput"><a href="BOOST_MOVE_OPTIMIZED_EMULATION.html" title="Macro BOOST_MOVE_OPTIMIZED_EMULATION">BOOST_MOVE_OPTIMIZED_EMULATION</a></code>.
+      In the review, one of these modes should be chosen as the desired move emulation
+      node. See chapter <a href="move/two_emulation_modes.html" title=" Two emulation modes">Two emulation modes</a>
+      for more details about pros and cons of each operating mode
+    </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../doc/html/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td colspan="2" align="left" valign="top"><p>
+      <span class="bold"><strong><span class="emphasis"><em>For reviewers</em></span></strong></span> If you
+      want to know how the emulation works behind the scenes to propose improvements
+      or corrections, please see chapter <a href="move/how_the_emulation_works.html" title=" How the emulation works">How
+      the emulation works</a> for more details
+    </p></td></tr>
+</table></div>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../../doc/html/images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td colspan="2" align="left" valign="top"><p>
+      To be able to use containers of movable values you will need an special version
+      of <span class="bold"><strong>Boost.Container</strong></span> bundled with this library
+    </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../doc/html/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td colspan="2" align="left" valign="top"><p>
+      Tested compilers: MSVC-7.1, 8.0, 9.0, GCC 4.3-MinGW in C++03 and C++0x modes,
+      Intel 10.1
+    </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"><p><small>Last revised: April 25, 2010 at 11:36:15 GMT</small></p></td>
+<td align="right"><div class="copyright-footer"></div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="move/introduction.html"><img src="../../../../doc/html/images/next.png" alt="Next"></a></div>
+</body>
+</html>

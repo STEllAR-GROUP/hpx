@@ -36,7 +36,7 @@ using std::istream;
 
 namespace mpfr{
 
-mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();	
+mp_rnd_t   mpreal::default_rnd  = mp_rnd_t(mpfr_get_default_rounding_mode());	
 mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();	
 int		   mpreal::default_base = 10;
 int        mpreal::double_bits = -1;
@@ -127,7 +127,8 @@ mpreal::mpreal(const char* s, mp_prec_t prec, int base, mp_rnd_t mode)
 
 mpreal::~mpreal() 
 { 
-  mpfr_clear(mp); 
+  if (MPFR_MANT(mp))
+    mpfr_clear(mp); 
 }                           
 
 // Operators - Assignment
@@ -137,9 +138,12 @@ mpreal& mpreal::operator=(const char* s)
   if(0==mpfr_init_set_str(t,s,default_base,default_rnd))
   {
     mpfr_set(mp,t,mpreal::default_rnd);				
-    mpfr_clear(t);
-  }else{
-    mpfr_clear(t);
+    if (MPFR_MANT(mp))
+      mpfr_clear(t);
+  }
+  else{
+    if (MPFR_MANT(mp))
+      mpfr_clear(t);
     // cerr<<"fail to convert string"<<endl;
   }
 
@@ -389,10 +393,13 @@ istream& operator>>(istream &is, mpreal& v)
       if(0==mpfr_init_set_str(t,s.c_str(),mpreal::default_base,mpreal::default_rnd))
       {
         mpfr_set(v.mp,t,mpreal::default_rnd);				
-        mpfr_clear(t);
+        if (MPFR_MANT(t))
+          mpfr_clear(t);
 
-      }else{
-        mpfr_clear(t);
+      }
+      else{
+        if (MPFR_MANT(t))
+          mpfr_clear(t);
         cerr<<"error reading from istream"<<endl;
         // throw an exception
       }
