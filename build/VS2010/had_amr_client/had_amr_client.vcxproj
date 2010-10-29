@@ -122,6 +122,12 @@
     <ClInclude Include="..\..\..\examples\had_amr\init_mpfr.hpp" />
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="My Amplifier Results\r009hs\r009hs.ampl" />
+    <None Include="My Amplifier Results\r010hs\r010hs.ampl" />
+    <None Include="My Amplifier Results\r011cc\r011cc.ampl" />
+    <None Include="My Amplifier Results\r012lw\r012lw.ampl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

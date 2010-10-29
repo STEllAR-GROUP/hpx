@@ -62,8 +62,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HPX Tests", "HPX Tests", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mutex_tests", "mutex_tests\mutex_tests.vcxproj", "{7C54E45D-FF70-4FF2-9A97-3E7631D2B0C5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_mpfr", "..\..\..\mpfr\build.vc10\dll_mpfr\dll_mpfr.vcxproj", "{8A1EB575-B721-4891-B5BD-17CC45D0103C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -278,20 +276,6 @@ Global
 		{7C54E45D-FF70-4FF2-9A97-3E7631D2B0C5}.Release|Win32.ActiveCfg = Release|x64
 		{7C54E45D-FF70-4FF2-9A97-3E7631D2B0C5}.Release|x64.ActiveCfg = Release|x64
 		{7C54E45D-FF70-4FF2-9A97-3E7631D2B0C5}.Release|x64.Build.0 = Release|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|Mixed Platforms.Build.0 = Debug|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|Win32.Build.0 = Debug|Win32
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|x64.ActiveCfg = Debug|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Debug|x64.Build.0 = Debug|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|Any CPU.ActiveCfg = Release|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|Mixed Platforms.ActiveCfg = Release|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|Mixed Platforms.Build.0 = Release|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|Win32.ActiveCfg = Release|Win32
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|Win32.Build.0 = Release|Win32
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|x64.ActiveCfg = Release|x64
-		{8A1EB575-B721-4891-B5BD-17CC45D0103C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,7 +68,7 @@
 
 #include <cstring>
 #include "mpreal.h"
-#include "dlmalloc.h"
+// #include "dlmalloc.h"
 
 using std::ws;
 using std::cerr;
