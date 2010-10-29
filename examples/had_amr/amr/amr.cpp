@@ -11,16 +11,15 @@
 HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
 
 ///////////////////////////////////////////////////////////////////////////////
-// initialize mpreal default precision
-#if defined(MPFR_FOUND)
-#include "../mpreal.h"
+// windows needs to initialize MPFR in each shared library
+#if defined(BOOST_WINDOWS) 
 
-struct init_mpfr
+#include "../init_mpfr.hpp"
+
+namespace hpx { namespace components { namespace amr 
 {
-    init_mpfr()
-    {
-        mpfr::mpreal::set_default_prec(128);
-    }
-};
-init_mpfr init_mpfr_;
+    // initialize mpreal default precision
+    init_mpfr init_;
+}}}
 #endif
+

@@ -21,6 +21,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HAD AMR", "HAD AMR", "{AC834C9E-17C6-475A-9470-16E43A8ED003}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\examples\had_amr\CMakeLists.txt = ..\..\examples\had_amr\CMakeLists.txt
+		..\..\examples\had_amr\init_mpfr.hpp = ..\..\examples\had_amr\init_mpfr.hpp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hpx_runtime", "hpx_runtime\hpx_runtime.vcxproj", "{7A1A51F1-6629-41DB-94AD-E7420EE0F894}"

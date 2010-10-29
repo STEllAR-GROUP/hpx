@@ -13,6 +13,7 @@
 #include <boost/thread.hpp>
 
 //#include "amr/stencil_value.hpp"
+#include "init_mpfr.hpp"
 #include "amr/dynamic_stencil_value.hpp"
 #include "amr/functional_component.hpp"
 #include "amr/unigrid_mesh.hpp"
@@ -24,6 +25,13 @@
 namespace po = boost::program_options;
 
 using namespace hpx;
+
+///////////////////////////////////////////////////////////////////////////////
+// initialize mpreal default precision
+namespace hpx { namespace components { namespace amr 
+{
+    init_mpfr init_;
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
@@ -173,10 +181,6 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> local_r
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-#if defined(MPFR_FOUND)
-    mpfr::mpreal::set_default_prec(128);
-#endif
-
     try {
         // analyze the command line
         po::variables_map vm;

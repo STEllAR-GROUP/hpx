@@ -119,6 +119,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\examples\had_amr\init_mpfr.hpp" />
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
