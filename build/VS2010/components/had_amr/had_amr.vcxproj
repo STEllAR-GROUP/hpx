@@ -109,6 +109,7 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\server\functional_component.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\dynamic_stencil_value.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\amr\stubs\functional_component.hpp" />
+    <ClInclude Include="..\..\..\..\examples\had_amr\init_mpfr.hpp" />
     <ClInclude Include="..\..\..\..\examples\had_amr\mpreal.h" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.h" />
     <ClInclude Include="..\..\..\..\examples\had_amr\parameter.hpp" />

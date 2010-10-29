@@ -43,6 +43,9 @@
     <ClInclude Include="..\..\..\..\examples\had_amr\mpreal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\had_amr\init_mpfr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\examples\had_amr\amr_c\CMakeLists.txt" />

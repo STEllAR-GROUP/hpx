@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\examples\had_amr\amr_c_test\rand.hpp" />
+    <ClInclude Include="..\..\..\..\..\examples\had_amr\init_mpfr.hpp" />
     <ClInclude Include="..\..\..\..\..\examples\had_amr\mpreal.h" />
   </ItemGroup>
   <ItemGroup>
