@@ -464,17 +464,17 @@ public:
 
 private:
   // Optimized dynamic memory allocation/(re-)deallocation.
-//   static bool is_custom_malloc;
-//   static void *mpreal_allocate			(size_t alloc_size);
-//   static void *mpreal_reallocate			(void *ptr, size_t old_size, size_t new_size);
-//   static void mpreal_free					(void *ptr, size_t size);
+   static bool is_custom_malloc;
+   static void *mpreal_allocate			(size_t alloc_size);
+   static void *mpreal_reallocate			(void *ptr, size_t old_size, size_t new_size);
+   static void mpreal_free					(void *ptr, size_t size);
   inline static void set_custom_malloc	(void)
   {
-//     if(!is_custom_malloc)
-//     {
-//       mp_set_memory_functions(mpreal_allocate,mpreal_reallocate,mpreal_free);
-//       is_custom_malloc = true;
-//     }
+     if(!is_custom_malloc)
+     {
+       mp_set_memory_functions(mpreal_allocate,mpreal_reallocate,mpreal_free);
+       is_custom_malloc = true;
+     }
   }
 };
 

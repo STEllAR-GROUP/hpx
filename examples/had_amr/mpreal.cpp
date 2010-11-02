@@ -68,6 +68,7 @@
 
 #include <cstring>
 #include "mpreal.h"
+#include "nedmalloc.c"
 // #include "dlmalloc.h"
 
 using std::ws;
@@ -83,7 +84,7 @@ mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();
 mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();	
 int		     mpreal::default_base = 10;
 int        mpreal::double_bits = -1;
-// bool       mpreal::is_custom_malloc = false;
+ bool       mpreal::is_custom_malloc = false;
 
 // Default constructor: creates mp number and initializes it to 0.
 mpreal::mpreal() 
@@ -473,20 +474,23 @@ istream& operator>>(istream &is, mpreal& v)
 }
 
 // Optimized dynamic memory allocation/(re-)deallocation.
-// void * mpreal::mpreal_allocate(size_t alloc_size)
-// {
-//   return(dlmalloc(alloc_size));
-// }
-// 
-// void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
-// {
-//   return(dlrealloc(ptr,new_size));
-// }
-// 
-// void mpreal::mpreal_free(void *ptr, size_t size)
-// {
-//   dlfree(ptr);
-// }
+ void * mpreal::mpreal_allocate(size_t alloc_size)
+ {
+   //return(dlmalloc(alloc_size));
+   return(nedalloc::nedmalloc(alloc_size));
+ }
+ 
+ void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
+ {
+   //return(dlrealloc(ptr,new_size));
+   return(nedalloc::nedrealloc(ptr,new_size));
+ }
+ 
+ void mpreal::mpreal_free(void *ptr, size_t size)
+ {
+   //dlfree(ptr);
+   nedalloc::nedfree(ptr);
+ }
 
 }
 
