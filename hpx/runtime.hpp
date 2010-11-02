@@ -71,6 +71,12 @@ namespace hpx
             return localities_[here_lid_];
         }
 
+        // Return the index of this locality
+        std::size_t here_index() const
+        {
+            return here_lid_;
+        }
+
         // Return the GID of the locality with the given logical ID 
         naming::gid_type there(std::size_t lid) const
         {

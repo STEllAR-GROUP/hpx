@@ -6,6 +6,7 @@
 # Set examples to build by default
 set(example_SUBDIRS 
     quickstart
+    accumulator
    )
 
 # Pick up additional examples for this build set using
