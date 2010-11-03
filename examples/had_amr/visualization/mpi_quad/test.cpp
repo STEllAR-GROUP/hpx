@@ -15,9 +15,9 @@ typedef mpfr::mpreal had_double_type;
 
 using namespace std;
 
-int quad_send(int dst,had_double_type n);
-int quad_isend(int dst,had_double_type n,MPI_Request &r1, MPI_Request &r2);
-int quad_receive(int src,had_double_type &n);
+int quad_send(int dst,had_double_type n,int tag);
+int quad_isend(int dst,had_double_type n,MPI_Request &r1, MPI_Request &r2,int tag);
+int quad_receive(int src,had_double_type &n,int tag);
 
 int initial_data(int offset,
                  int numprocs,
@@ -41,7 +41,7 @@ int calc_rhs(int numprocs,
 int communicate(int numprocs,
                 int myid,
              std::vector<had_double_type> &r,
-             std::vector<had_double_type> &field);
+             std::vector<had_double_type> &field,int tag);
 
 int finer_mesh(int numprocs,
                int myid,
@@ -382,9 +382,9 @@ int main(int argc,char* argv[]) {
      }
 
      //---------------------------------- iter 2
-     communicate(numprocs,myid,r[0],chi_np1[0]);
-     communicate(numprocs,myid,r[0],Phi_np1[0]);
-     communicate(numprocs,myid,r[0],Pi_np1[0]);
+     communicate(numprocs,myid,r[0],chi_np1[0],100*i+10);
+     communicate(numprocs,myid,r[0],Phi_np1[0],100*i+20);
+     communicate(numprocs,myid,r[0],Pi_np1[0],100*i+30);
      calc_rhs(numprocs,myid,r[0],chi_np1[0],Phi_np1[0],Pi_np1[0],rhs_chi[0],rhs_Phi[0],rhs_Pi[0],PP,eps);
 
      for (j=lower[0];j<upper[0];j++) {
@@ -401,9 +401,9 @@ int main(int argc,char* argv[]) {
      }
 
      //---------------------------------- iter 3
-     communicate(numprocs,myid,r[0],chi_np1[0]);
-     communicate(numprocs,myid,r[0],Phi_np1[0]);
-     communicate(numprocs,myid,r[0],Pi_np1[0]);
+     communicate(numprocs,myid,r[0],chi_np1[0],100*i+40);
+     communicate(numprocs,myid,r[0],Phi_np1[0],100*i+50);
+     communicate(numprocs,myid,r[0],Pi_np1[0],100*i+60);
      calc_rhs(numprocs,myid,r[0],chi_np1[0],Phi_np1[0],Pi_np1[0],rhs_chi[0],rhs_Phi[0],rhs_Pi[0],PP,eps);
 
      for (j=lower[0];j<upper[0];j++) {
@@ -430,9 +430,9 @@ int main(int argc,char* argv[]) {
     Phi[0].swap(Phi_np1[0]);
     Pi[0].swap(Pi_np1[0]);
 
-    communicate(numprocs,myid,r[0],chi[0]);
-    communicate(numprocs,myid,r[0],Phi[0]);
-    communicate(numprocs,myid,r[0],Pi[0]);
+    communicate(numprocs,myid,r[0],chi[0],100*i+70);
+    communicate(numprocs,myid,r[0],Phi[0],100*i+80);
+    communicate(numprocs,myid,r[0],Pi[0],100*i+90);
 
     if ( i%output_every == 0 ) {
       for (int level=0;level<nlevels;level++) {
@@ -548,20 +548,20 @@ int finer_mesh(int numprocs,
             buffer[4] = Phi[level-1][mm+1-myid*nx[level-1]+gz_offset];
             buffer[5] = Pi[level-1][mm+1-myid*nx[level-1]+gz_offset];
             //MPI_Send(buffer,6,MPI_DOUBLE,fine_id[level][j],tag,MPI_COMM_WORLD);
-            quad_send(fine_id[level][j],buffer[0]);
-            quad_send(fine_id[level][j],buffer[1]);
-            quad_send(fine_id[level][j],buffer[2]);
-            quad_send(fine_id[level][j],buffer[3]);
-            quad_send(fine_id[level][j],buffer[4]);
-            quad_send(fine_id[level][j],buffer[5]);
+            quad_send(fine_id[level][j],buffer[0],28);
+            quad_send(fine_id[level][j],buffer[1],30);
+            quad_send(fine_id[level][j],buffer[2],32);
+            quad_send(fine_id[level][j],buffer[3],34);
+            quad_send(fine_id[level][j],buffer[4],36);
+            quad_send(fine_id[level][j],buffer[5],38);
           } else if ( myid == fine_id[level][j] ) {
             // receive info from coarse_id
-            quad_receive(coarse_id[level][j],rbuffer[0]);
-            quad_receive(coarse_id[level][j],rbuffer[1]);
-            quad_receive(coarse_id[level][j],rbuffer[2]);
-            quad_receive(coarse_id[level][j],rbuffer[3]);
-            quad_receive(coarse_id[level][j],rbuffer[4]);
-            quad_receive(coarse_id[level][j],rbuffer[5]);
+            quad_receive(coarse_id[level][j],rbuffer[0],28);
+            quad_receive(coarse_id[level][j],rbuffer[1],30);
+            quad_receive(coarse_id[level][j],rbuffer[2],32);
+            quad_receive(coarse_id[level][j],rbuffer[3],34);
+            quad_receive(coarse_id[level][j],rbuffer[4],36);
+            quad_receive(coarse_id[level][j],rbuffer[5],38);
 
             //MPI_Recv(rbuffer,6,MPI_DOUBLE,coarse_id[level][j],tag,MPI_COMM_WORLD,&status);
             chi[level][m-1-myid*nx[level]+gz_offset] = rbuffer[0];
@@ -583,9 +583,9 @@ int finer_mesh(int numprocs,
      // Finer mesh evolution {{{
      // ------------------------------- iter 1
      // communicate because of filling ghostzones
-     communicate(numprocs,myid,r[level],chi[level]);
-     communicate(numprocs,myid,r[level],Phi[level]);
-     communicate(numprocs,myid,r[level],Pi[level]);
+     communicate(numprocs,myid,r[level],chi[level],15);
+     communicate(numprocs,myid,r[level],Phi[level],25);
+     communicate(numprocs,myid,r[level],Pi[level],35);
      calc_rhs(numprocs,myid,r[level],chi[level],Phi[level],Pi[level],rhs_chi[level],rhs_Phi[level],rhs_Pi[level],PP,eps);
 
      for (j=lower[level];j<upper[level];j++) {
@@ -603,9 +603,9 @@ int finer_mesh(int numprocs,
      }
 
      //---------------------------------- iter 2
-     communicate(numprocs,myid,r[level],chi_np1[level]);
-     communicate(numprocs,myid,r[level],Phi_np1[level]);
-     communicate(numprocs,myid,r[level],Pi_np1[level]);
+     communicate(numprocs,myid,r[level],chi_np1[level],45);
+     communicate(numprocs,myid,r[level],Phi_np1[level],55);
+     communicate(numprocs,myid,r[level],Pi_np1[level],65);
      calc_rhs(numprocs,myid,r[level],chi_np1[level],Phi_np1[level],Pi_np1[level],rhs_chi[level],rhs_Phi[level],rhs_Pi[level],PP,eps);
 
      for (j=lower[level];j<upper[level];j++) {
@@ -622,9 +622,9 @@ int finer_mesh(int numprocs,
      }
 
      //---------------------------------- iter 3
-     communicate(numprocs,myid,r[level],chi_np1[level]);
-     communicate(numprocs,myid,r[level],Phi_np1[level]);
-     communicate(numprocs,myid,r[level],Pi_np1[level]);
+     communicate(numprocs,myid,r[level],chi_np1[level],75);
+     communicate(numprocs,myid,r[level],Phi_np1[level],85);
+     communicate(numprocs,myid,r[level],Pi_np1[level],95);
      calc_rhs(numprocs,myid,r[level],chi_np1[level],Phi_np1[level],Pi_np1[level],rhs_chi[level],rhs_Phi[level],rhs_Pi[level],PP,eps);
 
      for (j=lower[level];j<upper[level];j++) {
@@ -653,9 +653,9 @@ int finer_mesh(int numprocs,
       Pi[level].swap(Pi_np1[level]);
 
 
-      communicate(numprocs,myid,r[level],chi[level]);
-      communicate(numprocs,myid,r[level],Phi[level]);
-      communicate(numprocs,myid,r[level],Pi[level]);
+      communicate(numprocs,myid,r[level],chi[level],2100);
+      communicate(numprocs,myid,r[level],Phi[level],1115);
+      communicate(numprocs,myid,r[level],Pi[level],1125);
 #if 0
       sprintf(basename,"chi%d",level);
       sprintf(filename,"%d%s",myid,basename);
@@ -684,9 +684,9 @@ int finer_mesh(int numprocs,
          Pi_np1[level-1][count-myid*nx[level-1]+gz_offset] = Pi[level][j-myid*nx[level]+gz_offset];
       } else {
         if ( myid == restrict_coarse[level][count] ) {
-          quad_receive(restrict_fine[level][j],rbuffer[0]);
-          quad_receive(restrict_fine[level][j],rbuffer[1]);
-          quad_receive(restrict_fine[level][j],rbuffer[2]);
+          quad_receive(restrict_fine[level][j],rbuffer[0],17);
+          quad_receive(restrict_fine[level][j],rbuffer[1],18);
+          quad_receive(restrict_fine[level][j],rbuffer[2],19);
           // MPI_Recv(rbuffer,3,MPI_DOUBLE,restrict_fine[level][j],tag2,MPI_COMM_WORLD,&status);
            chi_np1[level-1][count-myid*nx[level-1]+gz_offset] = rbuffer[0];
            Phi_np1[level-1][count-myid*nx[level-1]+gz_offset] = rbuffer[1];
@@ -696,9 +696,9 @@ int finer_mesh(int numprocs,
            buffer[1] = Phi[level][j-myid*nx[level]+gz_offset];
            buffer[2] = Pi[level][j-myid*nx[level]+gz_offset];
           // MPI_Send(buffer,3,MPI_DOUBLE,restrict_coarse[level][count],tag2,MPI_COMM_WORLD);
-           quad_send(restrict_coarse[level][count],buffer[0]);
-           quad_send(restrict_coarse[level][count],buffer[1]);
-           quad_send(restrict_coarse[level][count],buffer[2]);
+           quad_send(restrict_coarse[level][count],buffer[0],17);
+           quad_send(restrict_coarse[level][count],buffer[1],18);
+           quad_send(restrict_coarse[level][count],buffer[2],19);
         }
       }
       count++;
@@ -838,13 +838,13 @@ int calc_rhs(int numprocs,
 int communicate(int numprocs,
                 int myid,
              std::vector<had_double_type> &r,
-             std::vector<had_double_type> &field)
+             std::vector<had_double_type> &field,int tag)
 {
  
   had_double_type buffer[3],buffer1[3],buffer2[3],rbuffer[3],rbuffer2[3];
   MPI_Status status;
   MPI_Request request;
-  int tag = 99;
+  //int tag = 99;
   int j;
 
   if ( numprocs > 1 ) {
@@ -858,26 +858,26 @@ int communicate(int numprocs,
     }    
 
     //MPI_Request request;
-    int tag = 99;
+    //int tag = 99;
     if (myid == 0) {
-      quad_send(myid+1,buffer[0]);
-      quad_send(myid+1,buffer[1]);
-      quad_send(myid+1,buffer[2]);
+      quad_send(myid+1,buffer[0],tag);
+      quad_send(myid+1,buffer[1],tag+2);
+      quad_send(myid+1,buffer[2],tag+4);
       //MPI_Send(buffer,3,MPI_DOUBLE,myid+1,tag,MPI_COMM_WORLD);
     } else if ( myid == numprocs-1 ) {
-      quad_receive(myid-1,rbuffer[0]);
-      quad_receive(myid-1,rbuffer[1]);
-      quad_receive(myid-1,rbuffer[2]);
+      quad_receive(myid-1,rbuffer[0],tag);
+      quad_receive(myid-1,rbuffer[1],tag+2);
+      quad_receive(myid-1,rbuffer[2],tag+4);
       //MPI_Recv(rbuffer,3,MPI_DOUBLE,myid-1,tag,MPI_COMM_WORLD,&status);
     } else {
       MPI_Request r1,r2,r3,r4,r5,r6;
-      quad_isend(myid+1,buffer2[0],r1,r2);
-      quad_isend(myid+1,buffer2[1],r3,r4);
-      quad_isend(myid+1,buffer2[2],r5,r6);
+      quad_isend(myid+1,buffer2[0],r1,r2,tag);
+      quad_isend(myid+1,buffer2[1],r3,r4,tag+2);
+      quad_isend(myid+1,buffer2[2],r5,r6,tag+4);
 
-      quad_receive(myid-1,rbuffer[0]);
-      quad_receive(myid-1,rbuffer[1]);
-      quad_receive(myid-1,rbuffer[2]);
+      quad_receive(myid-1,rbuffer[0],tag);
+      quad_receive(myid-1,rbuffer[1],tag+2);
+      quad_receive(myid-1,rbuffer[2],tag+4);
     //  MPI_Isend(buffer2,3,MPI_DOUBLE,myid+1,tag,MPI_COMM_WORLD,&request);
     //  MPI_Recv(rbuffer,3,MPI_DOUBLE,myid-1,tag,MPI_COMM_WORLD,&status);
     //  MPI_Wait(&request,&status);
@@ -891,24 +891,24 @@ int communicate(int numprocs,
 
     // communicate other way now
     if (myid == 0) {
-      quad_receive(myid+1,rbuffer[0]);
-      quad_receive(myid+1,rbuffer[1]);
-      quad_receive(myid+1,rbuffer[2]);
+      quad_receive(myid+1,rbuffer[0],tag+6);
+      quad_receive(myid+1,rbuffer[1],tag+8);
+      quad_receive(myid+1,rbuffer[2],tag+10);
       //MPI_Recv(rbuffer,3,MPI_DOUBLE,myid+1,tag,MPI_COMM_WORLD,&status);
     } else if ( myid == numprocs-1 ) {
-      quad_send(myid-1,buffer[0]);
-      quad_send(myid-1,buffer[1]);
-      quad_send(myid-1,buffer[2]);
+      quad_send(myid-1,buffer[0],tag+6);
+      quad_send(myid-1,buffer[1],tag+8);
+      quad_send(myid-1,buffer[2],tag+10);
       //MPI_Send(buffer,3,MPI_DOUBLE,myid-1,tag,MPI_COMM_WORLD);
     } else {
       MPI_Request r1,r2,r3,r4,r5,r6;
-      quad_isend(myid-1,buffer1[0],r1,r2);
-      quad_isend(myid-1,buffer1[1],r3,r4);
-      quad_isend(myid-1,buffer1[2],r5,r6);
+      quad_isend(myid-1,buffer1[0],r1,r2,tag+6);
+      quad_isend(myid-1,buffer1[1],r3,r4,tag+8);
+      quad_isend(myid-1,buffer1[2],r5,r6,tag+10);
 
-      quad_receive(myid+1,rbuffer2[0]);
-      quad_receive(myid+1,rbuffer2[1]);
-      quad_receive(myid+1,rbuffer2[2]);
+      quad_receive(myid+1,rbuffer2[0],tag+6);
+      quad_receive(myid+1,rbuffer2[1],tag+8);
+      quad_receive(myid+1,rbuffer2[2],tag+10);
 
       //MPI_Isend(buffer1,3,MPI_DOUBLE,myid-1,tag,MPI_COMM_WORLD,&request);
       //MPI_Recv(rbuffer2,3,MPI_DOUBLE,myid+1,tag,MPI_COMM_WORLD,&status);
@@ -943,38 +943,42 @@ int communicate(int numprocs,
   return 0;
 }
 
-int quad_send(int dst,had_double_type n)
+int quad_send(int dst,had_double_type n,int tag)
 {
-  int tag = 99;
+  //int tag = 99;
   std::string s= n.to_string();
   char const *word = s.c_str();
   int length = s.size();
 
   MPI_Send(&length,1,MPI_INT,dst,tag,MPI_COMM_WORLD);  // send the length of the string
-  MPI_Send((void*) word,length+1,MPI_CHAR,dst,tag,MPI_COMM_WORLD);
+  MPI_Send((void*) word,length+1,MPI_CHAR,dst,tag+1,MPI_COMM_WORLD);
 }
 
-int quad_isend(int dst,had_double_type n,MPI_Request &r1, MPI_Request &r2)
+int quad_isend(int dst,had_double_type n,MPI_Request &r1, MPI_Request &r2,int tag)
 {
     //  MPI_Isend(buffer2,3,MPI_DOUBLE,myid+1,tag,MPI_COMM_WORLD,&request);
-  int tag = 99;
+  //int tag = 99;
   std::string s= n.to_string();
   char const *word = s.c_str();
   int length = s.size();
 
   MPI_Isend(&length,1,MPI_INT,dst,tag,MPI_COMM_WORLD,&r1);  // send the length of the string
-  MPI_Isend((void*) word,length+1,MPI_CHAR,dst,tag,MPI_COMM_WORLD,&r2);
+  MPI_Isend((void*) word,length+1,MPI_CHAR,dst,tag+1,MPI_COMM_WORLD,&r2);
 }
 
-int quad_receive(int src,had_double_type &n)
+int quad_receive(int src,had_double_type &n,int tag)
 {
   MPI_Status status;
-  int tag = 99;
+  //int tag = 99;
   int length;
   char* word;
+
   MPI_Recv(&length,1,MPI_INT,src,tag,MPI_COMM_WORLD,&status);
+
+  length = 100;
+
   word = (char *)malloc(sizeof(char)*length+1);
-  MPI_Recv(word,length+1,MPI_CHAR,src,tag,MPI_COMM_WORLD,&status);
+  MPI_Recv(word,length+1,MPI_CHAR,src,tag+1,MPI_COMM_WORLD,&status);
 
   n = word;
   free(word);
