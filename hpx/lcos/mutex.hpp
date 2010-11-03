@@ -22,6 +22,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/intrusive/slist.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/xtime.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 // Description of the mutex algorithm is explained here:
 // http://lists.boost.org/Archives/boost/2006/09/110367.php

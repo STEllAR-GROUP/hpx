@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_HAD_CONFIG_FEB_08_2010_0226PM)
 #define HPX_COMPONENTS_HAD_CONFIG_FEB_08_2010_0226PM
 
-#if defined(MPFR_FOUND)
+#if MPFR_FOUND != 0
 #include "mpreal.h"
 #include "serialize_mpreal.hpp"
 

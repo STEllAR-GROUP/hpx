@@ -68,8 +68,43 @@
 
 #include <cstring>
 #include "mpreal.h"
+#if MPFR_USE_NED_ALLOCATOR != 0
+
+// #include <hpx/lcos/mutex.hpp>
+// 
+// inline int lock_hpx_mutex(hpx::lcos::mutex& mtx)
+// {
+//     if (hpx::threads::get_self_ptr())
+//         mtx.lock();
+//     return 0;
+// }
+// inline void unlock_hpx_mutex(hpx::lcos::mutex& mtx)
+// {
+//     if (hpx::threads::get_self_ptr())
+//         mtx.unlock();
+// }
+// inline bool try_lock_hpx_mutex(hpx::lcos::mutex& mtx)
+// {
+//     if (hpx::threads::get_self_ptr())
+//         return mtx.try_lock();
+//     return true;
+// }
+// 
+// #define ABORT_ON_ASSERT_FAILURE 0
+// #define USE_LOCKS 2
+// #define CURRENT_THREAD        GetCurrentThreadId()
+// #define MLOCK_T               hpx::lcos::mutex
+// #define INITIAL_LOCK(s)       !(new (s) hpx::lcos::mutex())
+// #define ACQUIRE_LOCK(s)       lock_hpx_mutex(*(s))
+// #define RELEASE_LOCK(s)       unlock_hpx_mutex(*(s))
+// #define TRY_LOCK(s)           try_lock_hpx_mutex(*(s))
+// 
+// static MLOCK_T malloc_global_mutex;
+
+// #define USE_SPIN_LOCKS 0
+
 #include "nedmalloc.c"
-// #include "dlmalloc.h"
+#endif
 
 using std::ws;
 using std::cerr;
@@ -84,7 +119,9 @@ mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();
 mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();	
 int		     mpreal::default_base = 10;
 int        mpreal::double_bits = -1;
- bool       mpreal::is_custom_malloc = false;
+#if !defined(_WIN32) && MPFR_USE_NED_ALLOCATOR != 0
+bool       mpreal::is_custom_malloc = false;
+#endif
 
 // Default constructor: creates mp number and initializes it to 0.
 mpreal::mpreal() 
@@ -473,24 +510,23 @@ istream& operator>>(istream &is, mpreal& v)
   return is;
 }
 
+#if MPFR_USE_NED_ALLOCATOR != 0
 // Optimized dynamic memory allocation/(re-)deallocation.
- void * mpreal::mpreal_allocate(size_t alloc_size)
- {
-   //return(dlmalloc(alloc_size));
-   return(nedalloc::nedmalloc(alloc_size));
- }
+void * mpreal::mpreal_allocate(size_t alloc_size)
+{
+  return(nedalloc::nedmalloc(alloc_size));
+}
  
- void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
- {
-   //return(dlrealloc(ptr,new_size));
-   return(nedalloc::nedrealloc(ptr,new_size));
- }
+void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
+{
+  return(nedalloc::nedrealloc(ptr,new_size));
+}
  
- void mpreal::mpreal_free(void *ptr, size_t size)
- {
-   //dlfree(ptr);
-   nedalloc::nedfree(ptr);
- }
+void mpreal::mpreal_free(void *ptr, size_t size)
+{
+  nedalloc::nedfree(ptr);
+}
+#endif
 
 }
 

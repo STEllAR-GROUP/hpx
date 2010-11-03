@@ -33,5 +33,20 @@
     <None Include="My Amplifier Results\r009hs\r009hs.ampl">
       <Filter>My Amplifier Results</Filter>
     </None>
+    <None Include="My Amplifier Results\r010hs\r010hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r011cc\r011cc.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r012lw\r012lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r013lw\r013lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r015lw\r015lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
   </ItemGroup>
 </Project>

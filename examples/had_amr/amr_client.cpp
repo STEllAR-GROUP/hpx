@@ -30,7 +30,7 @@ using namespace hpx;
 // initialize mpreal default precision
 namespace hpx { namespace components { namespace amr 
 {
-    init_mpfr init_;
+    init_mpfr init_(true);
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,11 +60,11 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
             do_logging ? logging_type : components::component_invalid,par);
         printf("Elapsed time: %f s\n", t.elapsed());
-		
-		// provide some wait time to read the elapsed time measurement
-		//std::cout << " Hit return " << std::endl;
-		//int junk;
-		//std::cin >> junk;
+    
+    // provide some wait time to read the elapsed time measurement
+    //std::cout << " Hit return " << std::endl;
+    //int junk;
+    //std::cin >> junk;
 
         // get some output memory_block_data instances
         /*

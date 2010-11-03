@@ -10,16 +10,3 @@
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
 
-///////////////////////////////////////////////////////////////////////////////
-// windows needs to initialize MPFR in each shared library
-#if defined(BOOST_WINDOWS) 
-
-#include "../init_mpfr.hpp"
-
-namespace hpx { namespace components { namespace amr 
-{
-    // initialize mpreal default precision
-    init_mpfr init_;
-}}}
-#endif
-

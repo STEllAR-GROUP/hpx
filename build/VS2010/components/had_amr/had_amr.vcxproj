@@ -80,6 +80,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Full</Optimization>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -94,7 +96,9 @@
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\dynamic_stencil_value.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\functional_component.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\stencil_value_out_adaptor.cpp" />
-    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp" />
+    <ClCompile Include="..\..\..\..\examples\had_amr\amr\server\unigrid_mesh.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\examples\had_amr\mpreal.cpp" />
     <ClCompile Include="..\..\..\..\examples\had_amr\serialize_mpreal.cpp" />
   </ItemGroup>

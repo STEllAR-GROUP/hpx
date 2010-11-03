@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       return boost::lexical_cast<std::string>(d);
     }
 
-#if defined(MPFR_FOUND)
+#if MPFR_FOUND != 0
     inline std::string convert(mpfr::mpreal const & d)
     {
       return d.to_string();

@@ -495,7 +495,9 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #endif  /* WIN32 */
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
+#if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x403
+#endif
 #include <windows.h>
 #define HAVE_MMAP 1
 #define HAVE_MORECORE 0
@@ -1773,7 +1775,7 @@ static FORCEINLINE int win32_acquire_lock (MLOCK_T *sl) {
     else {
       if (!interlockedexchange(&sl->l, 1)) {
         assert(!sl->threadid);
-		sl->c=CURRENT_THREAD;
+    sl->c=CURRENT_THREAD;
         sl->threadid = CURRENT_THREAD;
         sl->c = 1;
         return 0;
@@ -1831,7 +1833,7 @@ static MLOCK_T malloc_global_mutex = PTHREAD_MUTEX_INITIALIZER;
 #ifdef linux
 #ifndef PTHREAD_MUTEX_RECURSIVE
 extern int pthread_mutexattr_setkind_np __P ((pthread_mutexattr_t *__attr,
-					   int __kind));
+             int __kind));
 #define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
 #define pthread_mutexattr_settype(x,y) pthread_mutexattr_setkind_np(x,y)
 #endif

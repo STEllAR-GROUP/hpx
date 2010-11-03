@@ -452,7 +452,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 #endif
-		return result_data;
+        return result_data;
 
     }
 

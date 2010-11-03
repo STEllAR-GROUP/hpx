@@ -4,10 +4,25 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+
+#if MPFR_FOUND != 0
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include "serialize_mpreal.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+// windows needs to initialize MPFR in each shared library
+#if defined(BOOST_WINDOWS) 
+
+#include "init_mpfr.hpp"
+
+namespace hpx { namespace components { namespace amr 
+{
+    // initialize mpreal default precision
+    init_mpfr init_;
+}}}
+#endif
 
 namespace boost { namespace serialization 
 {
@@ -45,3 +60,4 @@ namespace boost { namespace serialization
 #endif
 }}
 
+#endif
