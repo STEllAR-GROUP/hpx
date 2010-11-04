@@ -418,6 +418,8 @@ class Environment:
   def __init__(self):
     self.path = "export PATH=$PATH"
     self.ld_library_path = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+    self.hpx_ini = "export HPX_INI=$HPX_INI"
+    self.cd_pwd = "cd $PWD"
 
     self.silent_mode = None
     self.is_virtual = None
@@ -431,6 +433,8 @@ class Environment:
     if not self.is_virtual:
       str += "%s; " % (self.path)
       str += "%s; " % (self.ld_library_path)
+      str += "%s; " % (self.hpx_ini)
+      str += "%s; " % (self.cd_pwd)
 
     if self.hpx_loglevel:
       str += "%s; " % (self.__hpx_logging())
