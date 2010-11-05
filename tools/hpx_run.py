@@ -65,7 +65,7 @@ class Locality:
     self.schedule_policy = None
 
   def __str__(self):
-    str = "L%d - %d OS threads, with %s scheduling" % (self.id, self.num_threads, self.schedule_policy)
+    str = "L%s - %s OS threads, with %s scheduling" % (self.id, self.num_threads, self.schedule_policy)
 
     return str
 
@@ -356,7 +356,8 @@ class LocalRuntime:
       env = str(self.environment)
 
       cmd = '\\"'.join(cmd.split('"'))
-      run = "ssh %s \"%s %s\"" % (prefix, env, cmd)
+      output = "2> run_%s.err > run_%s.out" % (self.id, self.id)
+      run = "ssh %s \"%s %s %s\"" % (prefix, env, cmd, output)
       if not self.environment.silent_mode:
         print "$ %s" % (run)
       self.process = subprocess.Popen(run,shell=True,stdout=subprocess.PIPE)
