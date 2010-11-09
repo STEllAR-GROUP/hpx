@@ -120,25 +120,41 @@ namespace hpx { namespace components { namespace amr
         std::vector< had_double_type > vecx;
         std::vector< nodedata > vecval;
  
-        std::size_t count = 0;
-        std::size_t adj_index = -1;
-        for (int i = 0; i < val.size(); i++) {
-          for (int j = 0; j < val[i]->granularity; j++) {
-            vecval.push_back(val[i]->value_[j]);
-            vecx.push_back(val[i]->x_[j]);
-            if ( i == compute_index && adj_index == -1 ) {
-              adj_index = count; 
-            }
-            count++;
-          }
+        //    hpx::util::high_resolution_timer t;
+
+        std::size_t adj_index;
+        if ( compute_index == 1 ) adj_index = val[0]->granularity;
+        else {
+          BOOST_ASSERT(compute_index == 0);
+          adj_index = 0;
         }
 
-        resultval->x_.resize(0);
-        for (int j = 0; j < val[compute_index]->granularity; j++) {
-          resultval->x_.push_back(val[compute_index]->x_[j]);
+        vecval = val[0]->value_;
+        vecx = val[0]->x_;
+        vecval.insert(vecval.end(),val[1]->value_.begin(),val[1]->value_.end());
+        vecx.insert(vecx.end(),val[1]->x_.begin(),val[1]->x_.end());
+        if ( val.size() == 3 ) {
+          vecval.insert(vecval.end(),val[2]->value_.begin(),val[2]->value_.end());
+          vecx.insert(vecx.end(),val[2]->x_.begin(),val[2]->x_.end());
         }
+//#if 0
+//        std::size_t count = 0;
+//        std::size_t adj_index = -1;
+//        for (int i = 0; i < val.size(); i++) {
+//          for (int j = 0; j < val[i]->granularity; j++) {
+//            vecval.push_back(val[i]->value_[j]);
+//            vecx.push_back(val[i]->x_[j]);
+//            if ( i == compute_index && adj_index == -1 ) {
+//              adj_index = count; 
+//            }
+//            count++;
+//          }
+//        }
+//#endif
+         //   std::cout << t.elapsed() << std::endl;
 
         // copy over critical info
+        resultval->x_ = val[compute_index]->x_;
         resultval->granularity = val[compute_index]->granularity;
         resultval->level_ = val[compute_index]->level_;
         resultval->cycle_ = val[compute_index]->cycle_ + 1;
