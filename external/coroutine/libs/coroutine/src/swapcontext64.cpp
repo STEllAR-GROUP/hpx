@@ -53,6 +53,13 @@
 #else
 #define VOLATILE volatile
 #endif
+#if defined(__APPLE__)
+//#define BOOST_COROUTINE_ALIGNMENT "4"
+#define BOOST_COROUTINE_TYPE_DIRECTIVE(name)
+#else
+//#define BOOST_COROUTINE_ALIGNMENT "16"
+#define BOOST_COROUTINE_TYPE_DIRECTIVE(name) ".type " #name ", @function\n\t"
+#endif
 
 // Note: .align 4 below means alignment at 2^4 boundary (16 bytes
 
@@ -61,7 +68,7 @@
         ".text \n\t"                                                          \
         ".align 4\n"                                                          \
         ".globl " #name "\n\t"                                                \
-        ".type " #name ", @function\n\t"                                      \
+        BOOST_COROUTINE_TYPE_DIRECTIVE(name)                                  \
     #name ":\n\t"                                                             \
         "movq  64(%rsi), %rcx\n\t"                                            \
         "pushq %rbp\n\t"                                                      \
