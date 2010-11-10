@@ -149,8 +149,10 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread_state_enum execute()
         {
-            thread_state_ex_enum current_state_ex = get_state_ex();
-            set_state_ex(wait_signaled);
+            thread_state_ex current_state_ex = get_state_ex();
+	    current_state_ex_.store(thread_state_ex(wait_signaled,
+			current_state_ex.get_tag() + 1),
+		    boost::memory_order_release);
             return coroutine_(current_state_ex);
         }
 
