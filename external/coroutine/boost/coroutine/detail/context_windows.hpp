@@ -81,7 +81,7 @@ namespace boost {namespace coroutines {
      */
     inline bool is_fiber() {
 #if _WIN32_WINNT >= 0x0600 
-      return IsThreadAFiber();
+      return IsThreadAFiber() ? true : false;
 #else
       fiber_ptr current = GetCurrentFiber();
       return current != 0 && current != fiber_magic;
