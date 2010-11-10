@@ -9,7 +9,7 @@
 #include <string>
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/logging/format/named_write_fwd.hpp>
+#include <boost/logging/format/named_write.hpp>
 #include <boost/logging/format_fwd.hpp>
 
 BOOST_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
