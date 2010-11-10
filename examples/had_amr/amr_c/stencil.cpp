@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace amr
             BOOST_ASSERT(compute_index == 1);
             BOOST_ASSERT(adj_index == val[0]->granularity);
 
-            had_double_type dx = vecx[1] - vecx[0];
+            had_double_type dx = *vecx[1] - *vecx[0];
 
             resultval->g_startx_ = val[compute_index]->x_[0];
             resultval->g_endx_ = val[compute_index]->x_[val[compute_index]->granularity-1];
