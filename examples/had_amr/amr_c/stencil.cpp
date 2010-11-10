@@ -117,11 +117,9 @@ namespace hpx { namespace components { namespace amr
         std::vector< nodedata > alt_vecval;
 
         // put all data into a single array
-        std::vector< had_double_type > vecx;
-        std::vector< nodedata > vecval;
+        std::vector< had_double_type* > vecx;
+        std::vector< nodedata* > vecval;
  
-        //    hpx::util::high_resolution_timer t;
-
         std::size_t adj_index;
         if ( compute_index == 1 ) adj_index = val[0]->granularity;
         else {
@@ -129,29 +127,19 @@ namespace hpx { namespace components { namespace amr
           adj_index = 0;
         }
 
-        vecval = val[0]->value_;
-        vecx = val[0]->x_;
-        vecval.insert(vecval.end(),val[1]->value_.begin(),val[1]->value_.end());
-        vecx.insert(vecx.end(),val[1]->x_.begin(),val[1]->x_.end());
+        std::vector<had_double_type>::iterator iter;
+        for (iter=val[0]->x_.begin();iter!=val[0]->x_.end();++iter) vecx.push_back( &(*iter) ); 
+        for (iter=val[1]->x_.begin();iter!=val[1]->x_.end();++iter) vecx.push_back( &(*iter) ); 
         if ( val.size() == 3 ) {
-          vecval.insert(vecval.end(),val[2]->value_.begin(),val[2]->value_.end());
-          vecx.insert(vecx.end(),val[2]->x_.begin(),val[2]->x_.end());
+          for (iter=val[2]->x_.begin();iter!=val[2]->x_.end();++iter) vecx.push_back( &(*iter) ); 
         }
-//#if 0
-//        std::size_t count = 0;
-//        std::size_t adj_index = -1;
-//        for (int i = 0; i < val.size(); i++) {
-//          for (int j = 0; j < val[i]->granularity; j++) {
-//            vecval.push_back(val[i]->value_[j]);
-//            vecx.push_back(val[i]->x_[j]);
-//            if ( i == compute_index && adj_index == -1 ) {
-//              adj_index = count; 
-//            }
-//            count++;
-//          }
-//        }
-//#endif
-         //   std::cout << t.elapsed() << std::endl;
+
+        std::vector<nodedata>::iterator n_iter;
+        for (n_iter=val[0]->value_.begin();n_iter!=val[0]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+        for (n_iter=val[1]->value_.begin();n_iter!=val[1]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+        if ( val.size() == 3 ) {
+          for (n_iter=val[2]->value_.begin();n_iter!=val[2]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+        }
 
         // copy over critical info
         resultval->x_ = val[compute_index]->x_;
@@ -196,25 +184,25 @@ namespace hpx { namespace components { namespace amr
 
               // no interpolation needed for points in val[0] and the first point in val[1]
               for (int j=0;j<=adj_index;j++) {
-                alt_vecx[j] = vecx[j];
-                alt_vecval[j] = vecval[j];
+                alt_vecx[j] = *vecx[j];
+                alt_vecval[j] = *vecval[j];
               }
 
               // set up the new 'x' vector
               for (int j=adj_index+1;j<alt_vecx.size();j++) {
-                alt_vecx[j] = vecx[adj_index] + (j-adj_index)*dx;
+                alt_vecx[j] = *vecx[adj_index] + (j-adj_index)*dx;
               }
 
               // set up the new 'values' vector
               int count = 1;
               for (int j=adj_index+1;j<alt_vecx.size();j++) {
                 if ( count%2 == 0 ) {
-                  alt_vecval[j] = vecval[adj_index+count/2];
+                  alt_vecval[j] = *vecval[adj_index+count/2];
                 } else {
                   // linear interpolation
                   for (int i=0;i<num_eqns;i++) {
-                    alt_vecval[j].phi[0][i] = 0.5*vecval[adj_index+(count-1)/2].phi[0][i] 
-                                            + 0.5*vecval[adj_index+(count+1)/2].phi[0][i];
+                    alt_vecval[j].phi[0][i] = 0.5*vecval[adj_index+(count-1)/2]->phi[0][i] 
+                                            + 0.5*vecval[adj_index+(count+1)/2]->phi[0][i];
                     // note that we do not interpolate the phi[1] variables since interpolation
                     // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
                   }
@@ -234,8 +222,12 @@ namespace hpx { namespace components { namespace amr
               bbox[0] = 0;
               bbox[1] = 1;
 
-              vecx.swap(alt_vecx);
-              vecval.swap(alt_vecval);
+              vecx.resize(0);
+              vecval.resize(0);
+              //vecx.swap(alt_vecx);
+              //vecval.swap(alt_vecval);
+              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
 
             } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_ ) {
               BOOST_ASSERT(val[2]->ghostwidth_ == 1);
@@ -249,25 +241,25 @@ namespace hpx { namespace components { namespace amr
               std::size_t start;
               start = val[0]->granularity+val[1]->granularity;
               for (int j=0;j<=start;j++) {
-                alt_vecx[j] = vecx[j];
-                alt_vecval[j] = vecval[j];
+                alt_vecx[j] = *vecx[j];
+                alt_vecval[j] = *vecval[j];
               }
 
               // set up the new 'x' vector
               for (int j=start;j<alt_vecx.size();j++) {
-                alt_vecx[j] = vecx[start] + (j-start)*dx;
+                alt_vecx[j] = *vecx[start] + (j-start)*dx;
               }
 
               // set up the new 'values' vector
               int count = 1;
               for (int j=start+1;j<alt_vecx.size();j++) {
                 if ( count%2 == 0 ) {
-                  alt_vecval[j] = vecval[start+count/2];
+                  alt_vecval[j] = *vecval[start+count/2];
                 } else {
                   // linear interpolation
                   for (int i=0;i<num_eqns;i++) {
-                    alt_vecval[j].phi[0][i] = 0.5*vecval[start+(count-1)/2].phi[0][i] 
-                                            + 0.5*vecval[start+(count+1)/2].phi[0][i];
+                    alt_vecval[j].phi[0][i] = 0.5*vecval[start+(count-1)/2]->phi[0][i] 
+                                            + 0.5*vecval[start+(count+1)/2]->phi[0][i];
                     // note that we do not interpolate the phi[1] variables since interpolation
                     // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
                   }
@@ -275,8 +267,12 @@ namespace hpx { namespace components { namespace amr
                 count++;
               }
 
-              vecx.swap(alt_vecx);
-              vecval.swap(alt_vecval);
+              vecx.resize(0);
+              vecval.resize(0);
+              //vecx.swap(alt_vecx);
+              //vecval.swap(alt_vecval);
+              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
             } else {
               // the case of interpolating val[0] and val[2] but not va[1] should not happen
               BOOST_ASSERT(false);
@@ -299,7 +295,7 @@ namespace hpx { namespace components { namespace amr
             adj_index = 0;
 
             for (int j = 0; j < resultval->granularity; j++) {
-              resultval->x_[j] = vecx[j];
+              resultval->x_[j] = *vecx[j];
             }
 
             // treat the point as a left artificial boundary as per tapering

@@ -19,8 +19,8 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int rkupdate(std::vector< nodedata > const& val, 
-    stencil_data* result, std::vector< had_double_type > const& vecx, int size, 
+HPX_COMPONENT_EXPORT int rkupdate(std::vector< nodedata* > const& val, 
+    stencil_data* result, std::vector< had_double_type* > const& vecx, int size, 
     bool boundary, int *bbox, int compute_index, 
     had_double_type const&, had_double_type const&, had_double_type const&,
     int iter, int level, Par const& par);
