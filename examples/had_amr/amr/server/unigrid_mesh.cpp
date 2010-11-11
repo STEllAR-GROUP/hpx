@@ -83,10 +83,21 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-            //std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-            //if ( dst_size(static_step,column,0) == 1 ) {
-            //  std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
-            //}
+#if 0       // DEBUG
+            std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+            if ( dst_size(static_step,column,0) > 0 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 1 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,1) << " in column " << dst_src(static_step,column,1) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 2 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,2) << " in column " << dst_src(static_step,column,2) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 3 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
+            }
+#endif
 
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
@@ -253,11 +264,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        double tmp = 3*pow(2.0,par->allowedl);
+        double tmp = 2*pow(2.0,par->allowedl);
         int num_rows = (int) tmp;
 
         // Each row potentially has a different number of points depending on the
-        // number of levels of refinement.  There are 3*2^nlevel rows each timestep.
+        // number of levels of refinement.  There are 2^(nlevel) rows each timestep;
+        // this mesh is set up to take two timesteps at a time (i.e. nt0 must be even).
         // The rowsize vector computes how many points are in a row which includes
         // a specified number of levels.  For example, rowsize[0] indicates the total
         // number of points in a row that includes all levels down to the coarsest, level=0; 
@@ -266,40 +278,36 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // vectors level_begin and level_end indicate the level to which a particular index belongs
 
-        // The vector each_row connects the rowsize vector with each of the 3*2^nlevel rows.
+        // The vector each_row connects the rowsize vector with each of the 2^nlevel rows.
         // The pattern is as follows: 
         //     For 0 levels of refinement--
-        //       there are 3 rows:    2  rowsize[0]
+        //       there are 2 rows:    
         //                            1  rowsize[0]
         //                            0  rowsize[0]
         //  
         //     For 1 level of refinement--
-        //       there are 6 rows:    5  rowsize[1]
-        //                            4  rowsize[1]
+        //       there are 4 rows:  
         //                            3  rowsize[1]
         //                            2  rowsize[0]
-        //                            1  rowsize[0]
+        //                            1  rowsize[1]
         //                            0  rowsize[0]
         // 
         //     For 2 levels of refinement--
-        //       there are 12 rows:   11 rowsize[2]
-        //                            10 rowsize[2]
-        //                             9 rowsize[2]
-        //                             8 rowsize[1]
-        //                             7 rowsize[1]
+        //       there are 8 rows: 
+        //                             7 rowsize[2]
         //                             6 rowsize[1]
         //                             5 rowsize[2]
-        //                             4 rowsize[2]
+        //                             4 rowsize[0]
         //                             3 rowsize[2]
-        //                             2 rowsize[0]
-        //                             1 rowsize[0]
+        //                             2 rowsize[1]
+        //                             1 rowsize[2]
         //                             0 rowsize[0]
         //
-        //  This structure is designed so that every 3 rows the timestep is the same for every point in that row
+        //  This structure is designed so that every 2 rows the timestep is the same for every point in that row
 
         std::vector<std::size_t> each_row;
         std::vector<std::size_t> level_row;
-        for (int i=0;i<num_rows;i=i+3) {
+        for (int i=0;i<num_rows;i++) {
           int level = -1;
           for (int j=par->allowedl;j>=0;j--) {
             tmp = pow(2.0,j);
@@ -307,13 +315,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             if ( i%tmp2 == 0 ) {
               level = par->allowedl-j;
               level_row.push_back(level);
-              level_row.push_back(level);
-              level_row.push_back(level);
               break;
             }
           }
-          each_row.push_back(par->rowsize[level]);
-          each_row.push_back(par->rowsize[level]);
           each_row.push_back(par->rowsize[level]);
         }
 
@@ -461,7 +465,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                                   std::vector<std::size_t> &each_row,std::vector<std::size_t> &level_row,
                                   Parameter const& par)
     {
-      int i,j;
+      int i,j,k;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -484,47 +488,93 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (i=0;i<each_row[step];i++) {
           counter = 0;
 
-          dst = step+1;
-          if ( dst == num_rows ) dst = 0;
-
-          if ( i >= each_row[dst] ) {
-            // sanity check -- this should only happen on the coarse meshes
-            BOOST_ASSERT(level_row[step] < par->allowedl);
-            // this point needs to go to a different row.
-            // Find the next row that coincides with this refinement level.
-            found = 0;
-            for (j=step+1;j<num_rows;j++) {
-              if ( i < each_row[j] ) {
-                found = 1;
-                dst = j;
-                break;
-              }
-            }
-            if ( found == 0 ) {
-              // wrap the output around to the input
-              dst = 0;
+          // discover what level to which this point belongs
+          int level = -1;
+          for (j=0;j<=par->allowedl;j++) {
+            if ( i >= par->level_begin[j] && i < par->level_end[j] ) {
+              level = j;
+              break;
             }
           }
+          BOOST_ASSERT(level >= 0);
 
-          // three 
-          if ( step%3 == 0 || par->allowedl == 0 ) {
+          // communicate three 
+          if ( step%2 == 0 || par->allowedl == 0 ) {
             // every column in the row is at the same timestep at this point
+            // communicate three points:
             for (j=i-1;j<i+2;j++) {
-              if ( j >=0 && j < each_row[step] ) {
+
+              // Discover what the destination of this point is:
+              //  'step' is the source row; 'i' is the source column; 'j' is the destination column;
+              //  'dst' (what we are searching for here) is the destination row.
+              found = 0;
+              for (k=step+1;k<num_rows;k++) {
+                if ( j < each_row[k] ) {
+                  found = 1;
+                  dst = k;
+                  break;
+                }
+              }
+              if ( found == 0 ) {
+                // wrap the output around to the input
+                dst = 0;
+              }
+
+              // verify that, if we are sending data to a different level, 
+              // there are two finer mesh timesteps between the source row and destination row: 
+              int level_j = -1;
+              for (k=0;k<=par->allowedl;k++) {
+                if ( j >= par->level_begin[k] && j < par->level_end[k] ) {
+                  level_j = k;
+                  break;
+                }
+              }
+  
+              if ( level >= 0 && level_j >= 0 ) {
+                // If level == level_j, no verification is needed (the source and destination level are
+                // the same).  
+                if (level != level_j) {
+                  // But if the two levels are different, the number of rows between them must be
+                  // the equivalent of two finer mesh timesteps.
+                  int difference = dst - step;
+                  if ( dst == 0 ) difference = num_rows - step;
+
+                  double tmp = pow(2.0,par->allowedl-level);
+                  int cmp = (int) tmp;
+                  if ( difference != 2*cmp ) {
+                    dst = -1; 
+                  }
+
+                }
+              }
+
+              //std::cout << " TEST src row " << step << " src column " << i << " dst column " << j << " dst row " << dst << " Limits : " << each_row[dst] <<  std::endl;
+              if ( j >=0 && j < each_row[dst] && dst != -1 ) {
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                 counter++;
               }
             }
+            
           } else {
-            // discover what level to which this point belongs
-            int level = -1;
-            for (j=0;j<=par->allowedl;j++) {
-              if ( i >= par->level_begin[j] && i < par->level_end[j] ) {
-                level = j;
-                break;
+            dst = step+1;
+            if ( dst == num_rows ) dst = 0;
+
+            if ( i >= each_row[dst] ) {
+              // this point needs to go to a different row.
+              // Find the next row that coincides with this refinement level.
+              found = 0;
+              for (j=dst+1;j<num_rows;j++) {
+                if ( i < each_row[j] ) {
+                  found = 1;
+                  dst = j;
+                  break;
+                }
+              }
+              if ( found == 0 ) {
+                // wrap the output around to the input
+                dst = 0;
               }
             }
-            BOOST_ASSERT(level >= 0);
 
             // only communicate between points on the same level
             for (j=i-1;j<i+2;j++) {
@@ -556,7 +606,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       }
 
       // sort the src step (or row) in descending order
-      int t1,k,kk;
+      int t1,kk;
       int column;
       for (j=0;j<vsrc_step.size();j++) {
         step = vstep[j];

@@ -69,13 +69,6 @@ namespace hpx { namespace components { namespace amr
         // lock all user defined data elements, will be unlocked at function exit
         scoped_values_lock<lcos::mutex> l(resultval, val);
 
-        // TEST mode
-        //resultval.get() = val[0].get();
-        //resultval->cycle_ += 1;
-        //int t = resultval->cycle_;
-        //int r = numsteps_ - t;
-        //return r;
-
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         bool boundary = false;
@@ -111,6 +104,36 @@ namespace hpx { namespace components { namespace amr
         } else {
           compute_index = (val.size()-1)/2;
         }
+
+// ------------------------------------------------------
+// TEST mode
+        resultval.get() = val[compute_index].get();
+        resultval->x_ = val[compute_index]->x_;
+        resultval->granularity = val[compute_index]->granularity;
+        resultval->level_ = val[compute_index]->level_;
+        resultval->cycle_ = val[compute_index]->cycle_ + 1;
+
+        resultval->max_index_ = val[compute_index]->max_index_;
+        resultval->granularity = val[compute_index]->granularity;
+        resultval->index_ = val[compute_index]->index_;
+
+        resultval->g_startx_ = val[compute_index]->g_startx_;
+        resultval->g_endx_ = val[compute_index]->g_endx_;
+        resultval->g_dx_ = val[compute_index]->g_dx_;
+        resultval->ghostwidth_ = val[compute_index]->ghostwidth_;
+        resultval->timestep_ = val[compute_index]->timestep_ + 1.0/pow(2.0,resultval->level_);
+        if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+          stencil_data data (resultval.get());
+
+          unlock_scoped_values_lock<lcos::mutex> ul(l);
+          stubs::logging::logentry(log_, data, row, 0, par);
+        }
+        //if ( val[compute_index]->timestep_ >= par->nt0-1 ) {
+        //  return 0;
+        //}
+        return 1;
+// END TEST mode
+// ------------------------------------------------------
 
         // these vectors are used for ghostwidth treatment
         std::vector< had_double_type > alt_vecx;
