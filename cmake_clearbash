@@ -8,6 +8,6 @@
 rm -rf CMakeFiles/
 rm cmake_install.cmake
 rm CMakeCache.txt
-rm src/CMakeFiles/ -rf
+rm -rf src/CMakeFiles/
 rm src/cmake_install.cmake
 
