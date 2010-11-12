@@ -68,7 +68,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->index_ = item;
     val->timestep_ = 0;
     val->cycle_ = 0;
-    val->iter_ = 0;
     val->gw_iter_ = 0;
     val->ghostwidth_ = 0;
 
@@ -137,10 +136,16 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   std::vector< had_double_type* > const& vecx, int size, bool boundary,
   int *bbox, int compute_index, 
   had_double_type const& dt, had_double_type const& dx, had_double_type const& timestep,
-  int iter, int level, Par const& par)
+  int level, Par const& par)
 {
   // allocate some temporary arrays for calculating the rhs
-  nodedata rhs,work;
+  nodedata rhs;
+  std::vector<nodedata> work;
+  std::vector<nodedata* > pwork;
+  work.resize(vecval.size());
+
+  bool fake_boundary = true;
+  int  fake_bbox[2] = { 1, 1 };
 
   static had_double_type const c_1 = 1.;
   static had_double_type const c_2 = 2.;
@@ -154,120 +159,118 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 
   had_double_type tmp;
 
-  if ( iter == 0 ) {
-    for (int j=0;  j<result->granularity;j++) {
-      calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j+compute_index,par);
+  // -------------------------------------------------------------------------
+  // iter 0
+    for (int j=0;  j<vecval.size();j++) {
+      calcrhs(&rhs,vecval,vecx,0,dx,size,fake_boundary,fake_bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
-        work.phi[0][i] = vecval[j+compute_index]->phi[0][i];
+        work[j].phi[0][i] = vecval[j]->phi[0][i];
 #ifndef UGLIFY
-        work.phi[1][i] = vecval[j+compute_index]->phi[0][i] + rhs.phi[0][i]*dt;
+        work[j].phi[1][i] = vecval[j]->phi[0][i] + rhs.phi[0][i]*dt;
 #else
         // uglify
-        work.phi[1][i] = dt;
-        work.phi[1][i] *= rhs.phi[0][i];
-        work.phi[1][i] += vecval[j+compute_index]->phi[0][i];
+        work[j].phi[1][i] = dt;
+        work[j].phi[1][i] *= rhs.phi[0][i];
+        work[j].phi[1][i] += vecval[j]->phi[0][i];
 #endif
       }
-      result->value_[j] = work;
-
     }
-    if ( boundary && bbox[0] == 1 ) {
+    if ( fake_boundary && fake_bbox[0] == 1 ) {
       // chi
 #ifndef UGLIFY
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-                                   -c_1_3*result->value_[2].phi[1][0];
+      work[0].phi[1][0] = c_4_3*work[1].phi[1][0]
+                                   -c_1_3*work[2].phi[1][0];
 #else
       // uglify
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
-      result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+      work[0].phi[1][0] = c_4_3*work[1].phi[1][0];
+      work[0].phi[1][0] -= c_1_3*work[2].phi[1][0];
 #endif
 
       // Pi
 #ifndef UGLIFY
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-                                   -c_1_3*result->value_[2].phi[1][2];
+      work[0].phi[1][2] = c_4_3*work[1].phi[1][2]
+                                   -c_1_3*work[2].phi[1][2];
 #else
       // uglify
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
-      result->value_[0].phi[1][2] -= -c_1_3*result->value_[2].phi[1][2];
+      work[0].phi[1][2] = c_4_3*work[1].phi[1][2];
+      work[0].phi[1][2] -= -c_1_3*work[2].phi[1][2];
 #endif
 
       // Phi
-      result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
+      work[1].phi[1][1] = c_0_5*work[2].phi[1][1];
     }
-    // no timestep update-- this is just a part of an rk subcycle
-    result->timestep_ = timestep;
-  } 
-  else if ( iter == 1 ) {
-    for (int j=0; j<result->granularity; j++) {
-      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
+
+    std::vector<nodedata>::iterator n_iter;
+    for (n_iter=work.begin();n_iter!=work.end();++n_iter) pwork.push_back( &(*n_iter) );
+
+  //----------------------------------------------------------------------
+  // iter 1
+    for (int j=0; j<vecval.size(); j++) {
+      calcrhs(&rhs,pwork,vecx,1,dx,size,fake_boundary,fake_bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
-        work.phi[0][i] = vecval[j+compute_index]->phi[0][i];
+     //   work[j].phi[0][i] = work[j].phi[0][i];
 #ifndef UGLIFY
-        work.phi[1][i] = c_0_75*vecval[j+compute_index]->phi[0][i]
-                        +c_0_25*vecval[j+compute_index]->phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+        work[j].phi[1][i] = c_0_75*work[j].phi[0][i]
+                        +c_0_25*work[j].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
 #else
         // uglify
         tmp = dt;
         tmp *= c_0_25;
         tmp *= rhs.phi[0][i];
-        work.phi[1][i] = vecval[j+compute_index]->phi[1][i];
-        work.phi[1][i] *= c_0_25;
-        work.phi[1][i] += tmp;
+      //  work[j].phi[1][i] = work[j].phi[1][i];
+        work[j].phi[1][i] *= c_0_25;
+        work[j].phi[1][i] += tmp;
         tmp = c_0_75;
-        tmp *= vecval[j+compute_index]->phi[0][i];
-        work.phi[1][i] += tmp;
+        tmp *= work[j].phi[0][i];
+        work[j].phi[1][i] += tmp;
 #endif
       }
-      result->value_[j] = work;
     }
 
-    if ( boundary && bbox[0] == 1 ) {
+    if ( fake_boundary && fake_bbox[0] == 1 ) {
       // chi
 #ifndef UGLIFY
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0]
-                                   -c_1_3*result->value_[2].phi[1][0];
+      work[0].phi[1][0] = c_4_3*work[1].phi[1][0]
+                                   -c_1_3*work[2].phi[1][0];
 #else
       // uglify
-      result->value_[0].phi[1][0] = c_4_3*result->value_[1].phi[1][0];
-      result->value_[0].phi[1][0] -= c_1_3*result->value_[2].phi[1][0];
+      work[0].phi[1][0] = c_4_3*work[1].phi[1][0];
+      work[0].phi[1][0] -= c_1_3*work[2].phi[1][0];
 #endif
 
       // Pi
 #ifndef UGLIFY
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2]
-                                   -c_1_3*result->value_[2].phi[1][2];
+      work[0].phi[1][2] = c_4_3*work[1].phi[1][2]
+                                   -c_1_3*work[2].phi[1][2];
 #else
       // uglify
-      result->value_[0].phi[1][2] = c_4_3*result->value_[1].phi[1][2];
-      result->value_[0].phi[1][2] -= c_1_3*result->value_[2].phi[1][2];
+      work[0].phi[1][2] = c_4_3*work[1].phi[1][2];
+      work[0].phi[1][2] -= c_1_3*work[2].phi[1][2];
 #endif
 
       // Phi
-      result->value_[1].phi[1][1] = c_0_5*result->value_[2].phi[1][1];
+      work[1].phi[1][1] = c_0_5*work[2].phi[1][1];
     }
-    // no timestep update-- this is just a part of an rk subcycle
-    result->timestep_ = timestep;
-  } 
-  else if ( iter == 2 ) {
+
+  //----------------------------------------------------------------------
+  // iter 2
     for (int j=0; j<result->granularity; j++) {
-      calcrhs(&rhs,vecval,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
+      calcrhs(&rhs,pwork,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
 #ifndef UGLIFY
-        work.phi[0][i] = c_1_3*vecval[j+compute_index]->phi[0][i]
-                        +c_2_3*(vecval[j+compute_index]->phi[1][i] + rhs.phi[0][i]*dt);
+        result->value_[j].phi[0][i] = c_1_3*work[j+compute_index].phi[0][i]
+                        +c_2_3*(work[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
 #else
         // uglify
         tmp = c_1_3;
-        tmp *= vecval[j+compute_index]->phi[0][i];
-        work.phi[0][i] = dt;
-        work.phi[0][i] *= rhs.phi[0][i];
-        work.phi[0][i] += vecval[j+compute_index]->phi[1][i];
-        work.phi[0][i] *= c_2_3;
-        work.phi[0][i] += tmp;
+        tmp *= work[j+compute_index].phi[0][i];
+        result->value_[j].phi[0][i] = dt;
+        result->value_[j].phi[0][i] *= rhs.phi[0][i];
+        result->value_[j].phi[0][i] += work[j+compute_index].phi[1][i];
+        result->value_[j].phi[0][i] *= c_2_3;
+        result->value_[j].phi[0][i] += tmp;
 #endif
       }
-      result->value_[j] = work;
     }
 
     if ( boundary && bbox[0] == 1 ) {
@@ -303,11 +306,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
     result->timestep_ /= tmp;
     result->timestep_ += timestep;
 #endif
-  } 
-  else {
-    printf(" PROBLEM : invalid iter flag %d\n",iter);
-    return 0;
-  }
+
   return 1;
 }
 

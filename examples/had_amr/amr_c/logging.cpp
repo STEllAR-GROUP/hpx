@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         mutex_type::scoped_lock l(mtx_);
         int i;
 
-        if ( par->output_stdout == 1 && val.iter_ == 0 ) {
+        if ( par->output_stdout == 1 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6) {
             for (i=0;i<val.granularity;i++) {
               std::cout << " AMR Level: " << val.level_ 
@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         FILE *fdata;
         std::vector<double> x,Phi,chi,Pi,energy;
         double datatime;
-        if ( logcode == 0 && val.iter_ == 0 ) {
+        if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<val.granularity;i++) {
               x.push_back(val.x_[i]);
