@@ -165,12 +165,14 @@ namespace hpx { namespace threads { namespace policies
 
                 // result should be true if we found only suspended threads
                 if (collect_suspended) {
-                    if (state.get_state() == threads::suspended) {
-                        result = true;    // at least one is suspended
-                    }
-                    else if (state.get_state() == threads::active) {
-                        result = false;   // one is active, no deadlock (yet)
-                        collect_suspended = false;
+		    switch(state.get_state()) {
+			case threads::suspended:
+			    result = true;    // at least one is suspended
+			    break;
+			case threads::active:
+			    result = false;   // one is active, no deadlock (yet)
+			    collect_suspended = false;
+			    break;
                     }
                 }
             }

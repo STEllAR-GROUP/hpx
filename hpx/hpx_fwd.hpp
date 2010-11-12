@@ -124,36 +124,40 @@ namespace hpx
             typename NotificationPolicy = threads::policies::callback_notifier> 
         class HPX_API_EXPORT threadmanager_impl;
 
-        ///////////////////////////////////////////////////////////////////////
-        /// \enum thread_state_enum
-        ///
-        /// The \a thread_state_enum enumerator encodes the current state of a 
-        /// \a thread instance
+        /**********************************************************************
+         * \enum thread_state_enum
+         *
+         * The \a thread_state_enum enumerator encodes the current state of a
+         * \a thread instance
+         */
         enum thread_state_enum
         {
             unknown = 0,
-            init = 1,       ///< thread is initializing
-            active = 2,     ///< thread is currently active (running,
-                            ///< has resources)
-            pending = 3,    ///< thread is pending (ready to run, but 
-                            ///< no hardware resource available)
-            suspended = 4,  ///< thread has been suspended (waiting for 
-                            ///< synchronization event, but still known 
-                            ///< and under control of the threadmanager)
-            depleted = 5,   ///< thread has been depleted (deeply 
-                            ///< suspended, it is not known to the thread 
-                            ///< manager)
-            terminated = 6  ///< thread has been stopped an may be garbage 
-                            ///< collected
+            active = 1,             /*!< thread is currently active (running,
+                                         has resources) */
+            pending = 2,	    /*!< thread is pending (ready to run, but
+                                         no hardware resource available) */
+            suspended = 3,	    /*!< thread has been suspended (waiting for
+                                         synchronization event, but still
+                                         known and under control of the
+                                         threadmanager) */
+            depleted = 4,	    /*!< thread has been depleted (deeply
+                                         suspended, it is not known to the
+                                         thread manager) */
+            terminated = 5,         /*!< thread has been stopped an may be
+                                         garbage collected */
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
 
         HPX_API_EXPORT char const* const get_thread_state_name(thread_state_enum state);
 
-        ///////////////////////////////////////////////////////////////////////
-        /// \enum thread_state_ex_enum
-        ///
+        /**********************************************************************
+         * \enum thread_state_ex_enum
+         *
+         * The \a thread_state_ex_enum enumerator encodes the reason why a
+         * thread is being restarted
+         */
         enum thread_state_ex_enum
         {
             wait_unknown = -1,

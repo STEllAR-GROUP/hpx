@@ -29,7 +29,6 @@ namespace hpx { namespace threads
         char const* const thread_state_names[] = 
         {
             "unknown",
-            "init",
             "active",
             "pending",
             "suspended",
@@ -40,7 +39,7 @@ namespace hpx { namespace threads
 
     char const* const get_thread_state_name(thread_state_enum state)
     {
-        if (state < init || state > terminated)
+        if (state < pending || state > terminated)
             return "unknown";
         return strings::thread_state_names[state];
     }
@@ -95,16 +94,21 @@ namespace hpx { namespace threads
         }
 
         // verify parameters
-        if (initial_state != pending && initial_state != suspended)
-        {
-            HPX_OSSTREAM strm;
-            strm << "invalid initial state: " 
-                 << get_thread_state_name(initial_state);
-            HPX_THROWS_IF(ec, bad_parameter,
-                "threadmanager_impl::register_thread",
-                HPX_OSSTREAM_GETSTRING(strm));
-            return invalid_thread_id;
-        }
+	switch (initial_state) {
+	    case pending:
+	    case suspended:
+		break;
+	    default:
+		{
+		    HPX_OSSTREAM strm;
+		    strm << "invalid initial state: " 
+			<< get_thread_state_name(initial_state);
+		    HPX_THROWS_IF(ec, bad_parameter,
+			    "threadmanager_impl::register_thread",
+			    HPX_OSSTREAM_GETSTRING(strm));
+		    return invalid_thread_id;
+		}
+	}
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -153,16 +157,21 @@ namespace hpx { namespace threads
         }
 
         // verify parameters
-        if (initial_state != pending && initial_state != suspended)
-        {
-            HPX_OSSTREAM strm;
-            strm << "invalid initial state: " 
-                 << get_thread_state_name(initial_state);
-            HPX_THROWS_IF(ec, bad_parameter,
-                "threadmanager_impl::register_work",
-                HPX_OSSTREAM_GETSTRING(strm));
-            return;
-        }
+	switch (initial_state) {
+	    case pending:
+	    case suspended:
+		break;
+	    default:
+		{
+		    HPX_OSSTREAM strm;
+		    strm << "invalid initial state: " 
+			<< get_thread_state_name(initial_state);
+		    HPX_THROWS_IF(ec, bad_parameter,
+			    "threadmanager_impl::register_work",
+			    HPX_OSSTREAM_GETSTRING(strm));
+		    return;
+		}
+	}
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
