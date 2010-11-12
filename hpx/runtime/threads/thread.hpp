@@ -391,7 +391,7 @@ namespace hpx { namespace threads
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
         inline thread(thread_init_data const& init_data, thread_pool& pool, 
-            thread_state_enum new_state = init);
+            thread_state_enum new_state);
 
         ~thread() 
         {
