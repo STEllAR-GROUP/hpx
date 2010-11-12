@@ -105,6 +105,7 @@ namespace hpx { namespace components { namespace amr
           compute_index = (val.size()-1)/2;
         }
 
+#if 0
 // ------------------------------------------------------
 // TEST mode
         resultval.get() = val[compute_index].get();
@@ -134,6 +135,7 @@ namespace hpx { namespace components { namespace amr
         return 1;
 // END TEST mode
 // ------------------------------------------------------
+#endif
 
         // these vectors are used for ghostwidth treatment
         std::vector< had_double_type > alt_vecx;
@@ -303,7 +305,7 @@ namespace hpx { namespace components { namespace amr
           }
           // }}}
         }
-        if ( val[compute_index]->iter_ == 0 && val.size() == 3 ) {
+        if ( val.size() == 3 ) {
           // more ghostwidth {{{
           if ( val[0]->level_ == val[1]->level_ && val[1]->level_ == val[2]->level_ && val[0]->ghostwidth_ == 1 ) {
             BOOST_ASSERT(compute_index == 1);
@@ -355,45 +357,39 @@ namespace hpx { namespace components { namespace amr
             // call rk update 
             int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
-                                 val[compute_index]->iter_,level,*par.p);
+                                 level,*par.p);
 
             BOOST_ASSERT(gft);
 
-            // increase the iteration counter
-            if ( val[compute_index]->iter_ == 2 ) {
-                resultval->iter_ = 0;
-
-                if ( resultval->granularity != par->granularity ) {
-                  BOOST_ASSERT(val.size() == 2);
-                  if ( bbox[0] == 1 ) { // left boundary
-                    // ghostwidth resizing
-                    // tapering {{{
-                    int count = 0;
-                    for (int j=resultval->x_.size()-1;j>=0;j--) {
-                      if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 && count < par->granularity) {
-                        count++;
-                      }  else {
-                        resultval->x_.erase(resultval->x_.begin()+j);
-                        resultval->value_.erase(resultval->value_.begin()+j);
-                      }
-                    }
-
-                    resultval->granularity = par->granularity;
-
-                    BOOST_ASSERT(floatcmp(resultval->x_[0],resultval->g_startx_) == 1);
-                    BOOST_ASSERT(floatcmp(resultval->x_[par->granularity-1],resultval->g_endx_) == 1);
-                    BOOST_ASSERT(resultval->x_.size() == par->granularity);
-                    // }}}
+            if ( resultval->granularity != par->granularity ) {
+              //if ( val.size() != 2 ) {
+              //  std::cout << " TEST row " << row << " " << column << " size: " << val.size() << " result gran " << resultval->granularity << std::endl;
+              //}
+              BOOST_ASSERT(val.size() == 2);
+              if ( bbox[0] == 1 ) { // left boundary
+                // ghostwidth resizing
+                // tapering {{{
+                int count = 0;
+                for (int j=resultval->x_.size()-1;j>=0;j--) {
+                  if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 && count < par->granularity) {
+                    count++;
+                  }  else {
+                    resultval->x_.erase(resultval->x_.begin()+j);
+                    resultval->value_.erase(resultval->value_.begin()+j);
                   }
                 }
-               
-            } 
-            else {
-                resultval->iter_ = val[compute_index]->iter_ + 1;
+
+                resultval->granularity = par->granularity;
+
+                BOOST_ASSERT(floatcmp(resultval->x_[0],resultval->g_startx_) == 1);
+                BOOST_ASSERT(floatcmp(resultval->x_[par->granularity-1],resultval->g_endx_) == 1);
+                BOOST_ASSERT(resultval->x_.size() == par->granularity);
+                // }}}
+              }
             }
 
             // ghostwidth resizing
-            if ( val[compute_index]->gw_iter_ == 5 ) {
+            if ( val[compute_index]->gw_iter_ == 1 ) {
                 resultval->gw_iter_ = 0;
 
                 if ( resultval->granularity != par->granularity ) {
@@ -434,7 +430,7 @@ namespace hpx { namespace components { namespace amr
         }
         // set return value difference between actual and required number of
         // timesteps (>0: still to go, 0: last step, <0: overdone)
-        if ( val[compute_index]->timestep_ >= par->nt0-1 ) {
+        if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
           return 0;
         }
         return 1;
