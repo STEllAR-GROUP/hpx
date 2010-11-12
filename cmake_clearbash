@@ -6,8 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 rm -rf CMakeFiles/
-rm cmake_install.cmake
-rm CMakeCache.txt
+rm -f cmake_install.cmake
+rm -f CMakeCache.txt
 rm -rf src/CMakeFiles/
-rm src/cmake_install.cmake
+rm -f src/cmake_install.cmake
 
