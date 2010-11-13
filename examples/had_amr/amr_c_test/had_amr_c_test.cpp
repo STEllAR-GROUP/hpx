@@ -68,7 +68,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->index_ = item;
     val->timestep_ = 0;
     val->cycle_ = 0;
-    val->gw_iter_ = 0;
     val->ghostwidth_ = 0;
 
     val->granularity = par.granularity;
@@ -161,7 +160,14 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 
   // -------------------------------------------------------------------------
   // iter 0
-    for (int j=0;  j<vecval.size();j++) {
+    std::size_t start,end;
+    if ( compute_index-4 > 0 ) start = compute_index-4;
+    else start = 0;
+
+    if ( compute_index+result->granularity+4 < vecval.size() ) end = compute_index+result->granularity+4; 
+    else end = vecval.size();
+
+    for (int j=start;  j<end;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,fake_boundary,fake_bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
         work[j].phi[0][i] = vecval[j]->phi[0][i];
@@ -205,7 +211,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 
   //----------------------------------------------------------------------
   // iter 1
-    for (int j=0; j<vecval.size(); j++) {
+    for (int j=start; j<end; j++) {
       calcrhs(&rhs,pwork,vecx,1,dx,size,fake_boundary,fake_bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
      //   work[j].phi[0][i] = work[j].phi[0][i];
