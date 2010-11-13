@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-//#if 0       // DEBUG
+#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             if ( dst_size(static_step,column,0) > 3 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
             }
-//#endif
+#endif
 
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
