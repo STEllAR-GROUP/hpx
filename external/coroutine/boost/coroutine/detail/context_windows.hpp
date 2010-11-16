@@ -40,7 +40,9 @@
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
+#if HPX_EMULATE_SWAP_CONTEXT != 0
 extern "C" void switch_to_fiber(void* lpFiber) throw();
+#endif
 
 namespace boost {namespace coroutines {
 
@@ -129,9 +131,11 @@ namespace boost {namespace coroutines {
           from.m_ctx = ConvertThreadToFiber(0);
           BOOST_ASSERT(from.m_ctx != 0);
 
+#if HPX_EMULATE_SWAP_CONTEXT != 0
           switch_to_fiber(to.m_ctx); 
-//          SwitchToFiber(to.m_ctx); 
-
+#else
+          SwitchToFiber(to.m_ctx); 
+#endif
           BOOL result = ConvertFiberToThread();
           BOOST_ASSERT(result);
           (void)result;
@@ -140,8 +144,11 @@ namespace boost {namespace coroutines {
           bool call_from_main = from.m_ctx == 0;
           if(call_from_main)
             from.m_ctx = GetCurrentFiber();
+#if HPX_EMULATE_SWAP_CONTEXT != 0
           switch_to_fiber(to.m_ctx); 
-//          SwitchToFiber(to.m_ctx); 
+#else
+          SwitchToFiber(to.m_ctx); 
+#endif
           if(call_from_main)
             from.m_ctx = 0;
         }
