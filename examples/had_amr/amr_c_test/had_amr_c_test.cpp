@@ -161,10 +161,10 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   // -------------------------------------------------------------------------
   // iter 0
     std::size_t start,end;
-    if ( compute_index-5 > 0 ) start = compute_index-5;
+    if ( compute_index-7 > 0 ) start = compute_index-7;
     else start = 0;
 
-    if ( compute_index+result->granularity+5 < vecval.size() ) end = compute_index+result->granularity+5; 
+    if ( compute_index+result->granularity+7 < vecval.size() ) end = compute_index+result->granularity+7; 
     else end = vecval.size();
 
     for (int j=start;  j<end;j++) {
