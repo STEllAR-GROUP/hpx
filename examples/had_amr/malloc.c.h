@@ -1487,13 +1487,28 @@ static int dev_zero_fd = -1; /* Cached file descriptor for /dev/zero. */
 
 /* Win32 MMAP via VirtualAlloc */
 static FORCEINLINE void* win32mmap(size_t size) {
-  void* ptr = VirtualAlloc(0, size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+  void* ptr = 0;
+#if defined(NUMA_NODE_NUMBER)
+  int node_number = NUMA_NODE_NUMBER();
+  if (-1 != node_number)
+    ptr = VirtualAllocExNuma(GetCurrentProcess(), 0, size, 
+      MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE, node_number);
+  if (0 == ptr)
+#endif
+    ptr = VirtualAlloc(0, size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
   return (ptr != 0)? ptr: MFAIL;
 }
 
 /* For direct MMAP, use MEM_TOP_DOWN to minimize interference */
 static FORCEINLINE void* win32direct_mmap(size_t size) {
-  void* ptr = VirtualAlloc(0, size, MEM_RESERVE|MEM_COMMIT|MEM_TOP_DOWN,
+  void* ptr = 0;
+#if defined(NUMA_NODE_NUMBER)
+  int node_number = NUMA_NODE_NUMBER();
+    ptr = VirtualAllocExNuma(GetCurrentProcess(), 0, size, 
+      MEM_RESERVE|MEM_COMMIT|MEM_TOP_DOWN, PAGE_READWRITE, node_number);
+  if (0 == ptr)
+#endif
+    ptr = VirtualAlloc(0, size, MEM_RESERVE|MEM_COMMIT|MEM_TOP_DOWN,
                            PAGE_READWRITE);
   return (ptr != 0)? ptr: MFAIL;
 }

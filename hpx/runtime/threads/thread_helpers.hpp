@@ -160,6 +160,9 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
 //     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Return the number of the NUMA node the current thread is running on
+    HPX_API_EXPORT int get_numa_node_number();
 }}
 
 #endif

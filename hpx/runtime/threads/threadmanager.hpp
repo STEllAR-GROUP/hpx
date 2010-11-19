@@ -232,6 +232,16 @@ namespace hpx { namespace threads
         /// this notifies the thread manager that there is some more work 
         /// available 
         virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
+
+    public:
+        static std::size_t get_thread_num(bool* numa_sensitive = 0);
+
+        void init_tss(std::size_t thread_num, bool numa_sensitive);
+        void deinit_tss();
+
+    private:
+        // the TSS holds the number associated with a given OS thread
+        static boost::thread_specific_ptr<std::size_t> thread_num_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -497,16 +507,6 @@ namespace hpx { namespace threads
         thread_state_enum at_timer (TimeType const& expire, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex);
 
-    public:
-        static std::size_t get_thread_num();
-
-        void init_tss(std::size_t thread_num);
-        void deinit_tss();
-
-    private:
-        // the TSS holds the number associated with a given OS thread
-        static boost::thread_specific_ptr<std::size_t> thread_num_;
-
     private:
         /// this thread manager has exactly as much threads as requested
         mutable mutex_type mtx_;                    ///< mutex protecting the members
@@ -525,8 +525,6 @@ namespace hpx { namespace threads
         scheduling_policy_type& scheduler_;
         notification_policy_type& notifier_;
     };
-
-///////////////////////////////////////////////////////////////////////////////
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

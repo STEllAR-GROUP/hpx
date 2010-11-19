@@ -68,8 +68,8 @@
 
 #include <cstring>
 #include "mpreal.h"
-#if MPFR_USE_NED_ALLOCATOR != 0
 
+#if MPFR_USE_NED_ALLOCATOR != 0
 // #include <hpx/lcos/mutex.hpp>
 // 
 // inline int lock_hpx_mutex(hpx::lcos::mutex& mtx)
@@ -103,8 +103,15 @@
 
 // #define USE_SPIN_LOCKS 0
 
-#include "nedmalloc.c"
+#define ABORT_ON_ASSERT_FAILURE 0
+
+#if defined(_WIN32)
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#define NUMA_NODE_NUMBER() hpx::threads::get_numa_node_number()
 #endif
+
+#include "nedmalloc.c"
+#endif // MPFR_USE_NED_ALLOCATOR
 
 using std::ws;
 using std::cerr;
@@ -115,9 +122,9 @@ using std::istream;
 
 namespace mpfr{
 
-mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();	
-mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();	
-int		     mpreal::default_base = 10;
+mp_rnd_t   mpreal::default_rnd  = mpfr_get_default_rounding_mode();
+mp_prec_t  mpreal::default_prec = mpfr_get_default_prec();
+int        mpreal::default_base = 10;
 int        mpreal::double_bits = -1;
 #if !defined(_WIN32) && MPFR_USE_NED_ALLOCATOR != 0
 bool       mpreal::is_custom_malloc = false;
@@ -235,7 +242,7 @@ mpreal& mpreal::operator=(const char* s)
 
   if(0==mpfr_init_set_str(t,s,default_base,default_rnd))
   {
-    mpfr_set(mp,t,mpreal::default_rnd);				
+    mpfr_set(mp,t,mpreal::default_rnd);
     if (MPFR_MANT(mp))
       mpfr_clear(t);
   }
@@ -322,7 +329,7 @@ const mpreal sum (const mpreal tab[], unsigned long int n, mp_rnd_t rnd_mode)
 }
 
 const mpreal remainder (const mpreal& x, const mpreal& y, mp_rnd_t rnd_mode)
-{	
+{
   mpreal a;
   mp_prec_t yp, xp;
 
@@ -361,7 +368,7 @@ std::string to_string(T t, std::ios_base & (*f)(std::ios_base&))
 
 string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
 {
-  char *s, *ns = NULL;	
+  char *s, *ns = NULL;
   size_t slen, nslen;
   mp_exp_t exp;
   string out;
@@ -371,7 +378,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
   if(mpfr_inf_p(mp))
   { 
     if(mpfr_sgn(mp)>0) return "+@Inf@";
-    else			   return "-@Inf@";
+    else               return "-@Inf@";
   }
 
   if(mpfr_zero_p(mp)) return "0";
@@ -404,7 +411,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
         while (*ptr=='0' && ptr>s+exp) ptr--; 
 
         if(ptr==s+exp) out = string(s,exp+1);
-        else		   out = string(s,exp+1)+'.'+string(s+exp+1,ptr-(s+exp+1)+1);
+        else           out = string(s,exp+1)+'.'+string(s+exp+1,ptr-(s+exp+1)+1);
 
         //out = string(s,exp+1)+'.'+string(s+exp+1);
       }
@@ -415,7 +422,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
         while (*ptr=='0' && ptr>s+exp-1) ptr--; 
 
         if(ptr==s+exp-1) out = string(s,exp);
-        else		     out = string(s,exp)+'.'+string(s+exp,ptr-(s+exp)+1);
+        else             out = string(s,exp)+'.'+string(s+exp,ptr-(s+exp)+1);
 
         //out = string(s,exp)+'.'+string(s+exp);
       }
@@ -428,7 +435,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
         while (*ptr=='0' && ptr>s+1) ptr--; 
 
         if(ptr==s+1) out = string(s,2);
-        else		 out = string(s,2)+'.'+string(s+2,ptr-(s+2)+1);
+        else         out = string(s,2)+'.'+string(s+2,ptr-(s+2)+1);
 
         //out = string(s,2)+'.'+string(s+2);
       }
@@ -439,7 +446,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
         while (*ptr=='0' && ptr>s) ptr--; 
 
         if(ptr==s) out = string(s,1);
-        else	   out = string(s,1)+'.'+string(s+1,ptr-(s+1)+1);
+        else       out = string(s,1)+'.'+string(s+1,ptr-(s+1)+1);
 
         //out = string(s,1)+'.'+string(s+1);
       }
@@ -448,7 +455,7 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
       if(--exp)
       {
         if(exp>0) out += "e+"+mpfr::to_string<mp_exp_t>(exp,std::dec);
-        else 	  out += "e"+mpfr::to_string<mp_exp_t>(exp,std::dec);
+        else      out += "e"+mpfr::to_string<mp_exp_t>(exp,std::dec);
       }
     }
 
@@ -468,7 +475,7 @@ ostream& operator<<(ostream& os, const mpreal& v)
 
 istream& operator>>(istream &is, mpreal& v)
 {
-  char c;	
+  char c;
   string s = "";
   mpfr_t t;
   
@@ -490,11 +497,10 @@ istream& operator>>(istream &is, mpreal& v)
     if(s.size() != 0)
     {
       // Protect current value from alternation in case of input error
-      // so some error handling(roll back) procedure can be used 			
-
+      // so some error handling(roll back) procedure can be used 
       if(0==mpfr_init_set_str(t,s.c_str(),mpreal::default_base,mpreal::default_rnd))
       {
-        mpfr_set(v.mp,t,mpreal::default_rnd);				
+        mpfr_set(v.mp,t,mpreal::default_rnd);
         if (MPFR_MANT(t))
           mpfr_clear(t);
 

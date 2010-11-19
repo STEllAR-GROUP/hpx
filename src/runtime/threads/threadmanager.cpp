@@ -94,21 +94,23 @@ namespace hpx { namespace threads
         }
 
         // verify parameters
-	switch (initial_state) {
-	    case pending:
-	    case suspended:
-		break;
-	    default:
-		{
-		    HPX_OSSTREAM strm;
-		    strm << "invalid initial state: " 
-			<< get_thread_state_name(initial_state);
-		    HPX_THROWS_IF(ec, bad_parameter,
-			    "threadmanager_impl::register_thread",
-			    HPX_OSSTREAM_GETSTRING(strm));
-		    return invalid_thread_id;
-		}
-	}
+        switch (initial_state) {
+        case pending:
+        case suspended:
+            break;
+
+        default:
+            {
+                HPX_OSSTREAM strm;
+                strm << "invalid initial state: " 
+                     << get_thread_state_name(initial_state);
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "threadmanager_impl::register_thread",
+                    HPX_OSSTREAM_GETSTRING(strm));
+                return invalid_thread_id;
+            }
+        }
+
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -157,21 +159,23 @@ namespace hpx { namespace threads
         }
 
         // verify parameters
-	switch (initial_state) {
-	    case pending:
-	    case suspended:
-		break;
-	    default:
-		{
-		    HPX_OSSTREAM strm;
-		    strm << "invalid initial state: " 
-			<< get_thread_state_name(initial_state);
-		    HPX_THROWS_IF(ec, bad_parameter,
-			    "threadmanager_impl::register_work",
-			    HPX_OSSTREAM_GETSTRING(strm));
-		    return;
-		}
-	}
+        switch (initial_state) {
+        case pending:
+        case suspended:
+            break;
+
+        default:
+            {
+                HPX_OSSTREAM strm;
+                strm << "invalid initial state: " 
+                     << get_thread_state_name(initial_state);
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "threadmanager_impl::register_work",
+                    HPX_OSSTREAM_GETSTRING(strm));
+                return;
+            }
+        }
+
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -545,10 +549,11 @@ namespace hpx { namespace threads
     {
         typedef threadmanager_impl<SP, NP> threadmanager_type;
 
-        init_tss_helper(threadmanager_type& tm, std::size_t thread_num)
+        init_tss_helper(threadmanager_type& tm, std::size_t thread_num, 
+                bool numa_sensitive)
           : tm_(tm)
         {
-            tm_.init_tss(thread_num);
+            tm_.init_tss(thread_num, numa_sensitive);
         }
         ~init_tss_helper()
         {
@@ -590,7 +595,7 @@ namespace hpx { namespace threads
 
         // manage the number of this thread in its TSS
         init_tss_helper<SchedulingPolicy, NotificationPolicy> 
-            tss_helper(*this, num_thread);
+            tss_helper(*this, num_thread, scheduler_.numa_sensitive());
 
         // needs to be done as the first thing, otherwise logging won't work
         notifier_.on_start_thread(num_thread);       // notify runtime system of started thread
@@ -1028,7 +1033,7 @@ namespace hpx { namespace threads
             timer_pool_.run(false);
             
             // the main thread needs to have a unique thread_num
-            init_tss(thread_num);
+            init_tss(thread_num, scheduler_.numa_sensitive());
             startup_->wait();
         }
         catch (std::exception const& e) {
@@ -1092,35 +1097,47 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    boost::thread_specific_ptr<std::size_t> 
-    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::thread_num_;
+    boost::thread_specific_ptr<std::size_t> threadmanager_base::thread_num_;
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        init_tss(std::size_t thread_num)
+    void threadmanager_base::init_tss(std::size_t thread_num, bool numa_sensitive)
     {
-        BOOST_ASSERT(NULL == threadmanager_impl::thread_num_.get());    // shouldn't be initialized yet
-        threadmanager_impl::thread_num_.reset(new std::size_t(thread_num));
+        BOOST_ASSERT(NULL == threadmanager_base::thread_num_.get());    // shouldn't be initialized yet
+        threadmanager_base::thread_num_.reset(
+            new std::size_t(thread_num | (std::size_t(0x1) << 31)));
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
+    void threadmanager_base::deinit_tss()
     {
-        threadmanager_impl::thread_num_.reset();
+        threadmanager_base::thread_num_.reset();
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::size_t 
-    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::get_thread_num()
+    std::size_t threadmanager_base::get_thread_num(bool* numa_sensitive)
     {
-        if (NULL != threadmanager_impl::thread_num_.get())
-            return *threadmanager_impl::thread_num_;
+        if (NULL != threadmanager_base::thread_num_.get())
+        {
+            std::size_t result = *threadmanager_base::thread_num_;
+            if (std::size_t(-1) != result) 
+            {
+                if (numa_sensitive)
+                    *numa_sensitive = (result & (std::size_t(0x1) << 31)) ? true : false;
+                return result & ~(std::size_t(0x1) << 31);
+            }
+        }
 
         // some OS threads are not managed by the threadmanager
+        if (numa_sensitive)
+            *numa_sensitive = false;
         return std::size_t(-1);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Return the number of the NUMA node the current thread is running on
+    int get_numa_node_number()
+    {
+        bool numa_sensitive = false;
+        std::size_t thread_num = threadmanager_base::get_thread_num(&numa_sensitive);
+        return get_numa_node(thread_num, numa_sensitive);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

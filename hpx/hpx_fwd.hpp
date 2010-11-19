@@ -133,19 +133,19 @@ namespace hpx
         enum thread_state_enum
         {
             unknown = 0,
-            active = 1,             /*!< thread is currently active (running,
-                                         has resources) */
-            pending = 2,	    /*!< thread is pending (ready to run, but
-                                         no hardware resource available) */
-            suspended = 3,	    /*!< thread has been suspended (waiting for
-                                         synchronization event, but still
-                                         known and under control of the
-                                         threadmanager) */
-            depleted = 4,	    /*!< thread has been depleted (deeply
-                                         suspended, it is not known to the
-                                         thread manager) */
-            terminated = 5,         /*!< thread has been stopped an may be
-                                         garbage collected */
+            active = 1,         /*!< thread is currently active (running,
+                                     has resources) */
+            pending = 2,        /*!< thread is pending (ready to run, but
+                                     no hardware resource available) */
+            suspended = 3,      /*!< thread has been suspended (waiting for
+                                     synchronization event, but still
+                                     known and under control of the
+                                     threadmanager) */
+            depleted = 4,       /*!< thread has been depleted (deeply
+                                     suspended, it is not known to the
+                                     thread manager) */
+            terminated = 5,     /*!< thread has been stopped an may be
+                                     garbage collected */
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
