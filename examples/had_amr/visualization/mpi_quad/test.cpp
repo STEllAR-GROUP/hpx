@@ -199,7 +199,8 @@ int main(int argc,char* argv[]) {
 
   for (i=1;i<nlevels;i++) {
     if ( refine_level[i-1] > -100.0 ) {
-      int tmp = (int) fabs(refine_level[i-1])*global_nx[i-1];
+      double tmp2 = -refine_level[i-1]*global_nx[i-1];
+      int tmp = (int) tmp2;
       if ( tmp%2 == 0 ) {
         global_nx[i] = tmp+1;
       } else {
