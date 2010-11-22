@@ -123,9 +123,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       node.phi[0][0] = chi;
       node.phi[0][1] = Phi;
       node.phi[0][2] = Pi;
-      node.phi[0][3] = Energy;
 
       val->value_[i] = node;
+      val->value_[i].energy = Energy;
     }
 
     return 1;
@@ -156,7 +156,9 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
-  had_double_type tmp;
+#ifdef UGLIFY
+  had_double_type tmp,tmp2;
+#endif
 
   // -------------------------------------------------------------------------
   // iter 0
@@ -301,6 +303,30 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
       // Phi
       result->value_[1].phi[0][1] = c_0_5*result->value_[2].phi[0][1];
     } 
+
+    // Calculate the energy
+    for (int j=0; j<result->granularity; j++) {
+#ifndef UGLIFY
+        result->value_[j].energy = c_0_5*(*vecx[j])*(*vecx[j])*(
+                                  result->value_[j].phi[0][2]*result->value_[j].phi[0][2] // Pi^2
+                                + result->value_[j].phi[0][1]*result->value_[j].phi[0][1]) // Phi^2  
+                                   -(*vecx[j])*(*vecx[j])*pow(result->value_[j].phi[0][0],par.PP+1)/(par.PP+1);
+#else
+        tmp = *vecx[j];
+        tmp *= *vecx[j];
+        result->value_[j].energy = result->value_[j].phi[0][2];
+        result->value_[j].energy *= result->value_[j].phi[0][2];
+        tmp2 = result->value_[j].phi[0][1];
+        tmp2 *= result->value_[j].phi[0][1];
+        result->value_[j].energy += tmp2;
+        result->value_[j].energy *= tmp;
+        result->value_[j].energy *= c_0_5;
+        tmp2 = pow(result->value_[j].phi[0][0],par.PP+1);
+        tmp2 /= par.PP+1;
+        tmp2 *= tmp;
+        result->value_[j].energy -= tmp2;
+#endif
+    }
 
     // timestep update
 #ifndef UGLIFY
@@ -526,15 +552,12 @@ void calcrhs(struct nodedata * rhs,
     rhs->phi[0][2] += tmp;
 #endif
 
-    rhs->phi[0][3] = c_0; // Energy rhs
-
   } 
   else {
     // tapered point or boundary ( boundary case taken care of below )
     rhs->phi[0][0] = c_0; // chi rhs -- chi is set by quadratic fit
     rhs->phi[0][1] = c_0; // Phi rhs -- Phi-dot is always zero at r=0
     rhs->phi[0][2] = c_0; // Pi rhs -- chi is set by quadratic fit
-    rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
   }
 
   if (boundary ) {
@@ -545,7 +568,6 @@ void calcrhs(struct nodedata * rhs,
       rhs->phi[0][0] = c_0; // chi rhs -- chi is set by quadratic fit
       rhs->phi[0][1] = c_0; // Phi rhs -- Phi-dot is always zero at r=0
       rhs->phi[0][2] = c_0; // Pi rhs -- chi is set by quadratic fit
-      rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
     }
     if (bbox[1] == 1 && compute_index == size-1) {
 
@@ -592,8 +614,6 @@ void calcrhs(struct nodedata * rhs,
       tmp /= r;
       rhs->phi[0][2] -= tmp;
 #endif
-
-      rhs->phi[0][3] = c_0; // Energy rhs -- analysis variable
     }
   }
 }

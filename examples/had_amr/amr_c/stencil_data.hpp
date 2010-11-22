@@ -17,6 +17,7 @@
 struct nodedata
 {
     had_double_type phi[2][num_eqns];
+    had_double_type energy;
  
 private:
     // serialization support
@@ -25,7 +26,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & phi;
+        ar & phi & energy;
     }
 };
 

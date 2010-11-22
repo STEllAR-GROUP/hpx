@@ -64,14 +64,14 @@ namespace hpx { namespace components { namespace amr { namespace server
               chi.push_back(val.value_[i].phi[0][0]);
               Phi.push_back(val.value_[i].phi[0][1]);
               Pi.push_back(val.value_[i].phi[0][2]);
-              energy.push_back(val.value_[i].phi[0][3]);
+              energy.push_back(val.value_[i].energy);
               datatime = val.timestep_*par->dx0*par->lambda;
 
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
               std::string Phi_str = convert(val.value_[i].phi[0][1]);
               std::string Pi_str = convert(val.value_[i].phi[0][2]);
-              std::string energy_str = convert(val.value_[i].phi[0][3]);
+              std::string energy_str = convert(val.value_[i].energy);
               std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
               fdata = fopen("chi.dat","a");

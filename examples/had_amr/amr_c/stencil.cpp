@@ -330,7 +330,23 @@ namespace hpx { namespace components { namespace amr
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                  level,*par.p);
 
+            // Test for singularity
+            if ( resultval->value_[0].phi[0][0] < 1.e17 ) {
+            } else {
+              FILE *fdata;
+              std::cout << " BLACKHOLE " << std::endl;
+              fdata = fopen("BLACKHOLE","w");
+              fprintf(fdata,"\n");
+              fclose(fdata);
+              BOOST_ASSERT(false);
+            }
             BOOST_ASSERT(gft);
+
+           // if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+           //     stencil_data data (resultval.get());
+           //     unlock_scoped_values_lock<lcos::mutex> ul(l);
+           //     stubs::logging::logentry(log_, data, row, 0, par);
+           // }
 
             // ghostwidth resizing
             if ( val.size() == 2 ) {
@@ -358,7 +374,6 @@ namespace hpx { namespace components { namespace amr
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
                 stencil_data data (resultval.get());
-
                 unlock_scoped_values_lock<lcos::mutex> ul(l);
                 stubs::logging::logentry(log_, data, row, 0, par);
             }
