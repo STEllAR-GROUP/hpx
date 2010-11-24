@@ -201,7 +201,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 #else
       // uglify
       work[0].phi[1][2] = c_4_3*work[1].phi[1][2];
-      work[0].phi[1][2] -= -c_1_3*work[2].phi[1][2];
+      work[0].phi[1][2] -= c_1_3*work[2].phi[1][2];
 #endif
 
       // Phi
