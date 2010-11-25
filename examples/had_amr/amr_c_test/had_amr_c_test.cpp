@@ -133,9 +133,6 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   std::vector<nodedata* > pwork;
   work.resize(vecval.size());
 
-  bool fake_boundary = false;
-  int  fake_bbox[2] = { 0, 0 };
-
   static had_double_type const c_1 = 1.;
   static had_double_type const c_2 = 2.;
   static had_double_type const c_0_75 = 0.75;
@@ -160,7 +157,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
     else end = vecval.size();
 
     for (int j=start;  j<end;j++) {
-      calcrhs(&rhs,vecval,vecx,0,dx,size,fake_boundary,fake_bbox,j,par);
+      calcrhs(&rhs,vecval,vecx,0,dx,size,boundary,bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
         work[j].phi[0][i] = vecval[j]->phi[0][i];
 #ifndef UGLIFY
@@ -173,7 +170,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 #endif
       }
     }
-    if ( fake_boundary && fake_bbox[0] == 1 ) {
+    if ( boundary && bbox[0] == 1 ) {
       // chi
 #ifndef UGLIFY
       work[0].phi[1][0] = c_4_3*work[1].phi[1][0]
@@ -204,7 +201,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   //----------------------------------------------------------------------
   // iter 1
     for (int j=start; j<end; j++) {
-      calcrhs(&rhs,pwork,vecx,1,dx,size,fake_boundary,fake_bbox,j,par);
+      calcrhs(&rhs,pwork,vecx,1,dx,size,boundary,bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
      //   work[j].phi[0][i] = work[j].phi[0][i];
 #ifndef UGLIFY
@@ -225,7 +222,7 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
       }
     }
 
-    if ( fake_boundary && fake_bbox[0] == 1 ) {
+    if ( boundary && bbox[0] == 1 ) {
       // chi
 #ifndef UGLIFY
       work[0].phi[1][0] = c_4_3*work[1].phi[1][0]
