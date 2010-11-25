@@ -61,8 +61,6 @@ struct Par {
       int extra_nx;
       std::vector<std::size_t> rowsize;
       std::vector<std::size_t> level_begin, level_end;
-      std::vector<std::size_t> alt_level_begin, alt_level_end;
-      std::vector<std::size_t> ghostwidth_array;
 };
 
 #if defined(__cplusplus)

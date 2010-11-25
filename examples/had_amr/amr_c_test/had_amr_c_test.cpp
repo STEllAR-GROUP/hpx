@@ -68,7 +68,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->index_ = item;
     val->timestep_ = 0;
     val->cycle_ = 0;
-    val->ghostwidth_ = 0;
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);
@@ -85,15 +84,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
         break;
       }    
     }
-
-    // identify the ghostwidth points
-    for (int i=0;i<par.ghostwidth_array.size();i++) {
-      if ( item == par.ghostwidth_array[i] ) {
-        val->ghostwidth_ = 1; 
-        level--;
-        break;
-      }
-    }
     BOOST_ASSERT(level >= 0);
 
     val->level_= level;
@@ -101,9 +91,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     had_double_type r_start = 0.0;
     for (int j=par.allowedl;j>level;j--) {
-      r_start += (par.alt_level_end[j]-par.alt_level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
+      r_start += (par.level_end[j]-par.level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
     }
-    for (int j=par.alt_level_begin[level];j<item;j++) {
+    for (int j=par.level_begin[level];j<item;j++) {
       r_start += dx*par.granularity;
     }
 
@@ -143,8 +133,8 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   std::vector<nodedata* > pwork;
   work.resize(vecval.size());
 
-  bool fake_boundary = true;
-  int  fake_bbox[2] = { 1, 1 };
+  bool fake_boundary = false;
+  int  fake_bbox[2] = { 0, 0 };
 
   static had_double_type const c_1 = 1.;
   static had_double_type const c_2 = 2.;

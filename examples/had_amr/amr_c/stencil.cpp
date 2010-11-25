@@ -121,7 +121,6 @@ namespace hpx { namespace components { namespace amr
         resultval->g_startx_ = val[compute_index]->g_startx_;
         resultval->g_endx_ = val[compute_index]->g_endx_;
         resultval->g_dx_ = val[compute_index]->g_dx_;
-        resultval->ghostwidth_ = val[compute_index]->ghostwidth_;
         resultval->timestep_ = val[compute_index]->timestep_ + 1.0/pow(2.0,resultval->level_);
         if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
           stencil_data data (resultval.get());
@@ -179,7 +178,6 @@ namespace hpx { namespace components { namespace amr
         resultval->g_startx_ = val[compute_index]->g_startx_;
         resultval->g_endx_ = val[compute_index]->g_endx_;
         resultval->g_dx_ = val[compute_index]->g_dx_;
-        resultval->ghostwidth_ = val[compute_index]->ghostwidth_;
 
         if ( val.size() == 3 ) {
           // ghostwidth {{{
@@ -197,55 +195,37 @@ namespace hpx { namespace components { namespace amr
             resultval->g_endx_ = val[compute_index]->x_[val[compute_index]->granularity-1];
             resultval->g_dx_ = val[compute_index]->x_[1]-val[compute_index]->x_[0];
 
-            // There are two cases:  you either have to interpolate val[1] and val[2] or just val[1]
+            // There are two cases:  you either have to downsample val[0] or interpolate val[2]
             if ( val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) {
-              // this is a ghostwidth point
-              BOOST_ASSERT(val[compute_index]->ghostwidth_ == 1);
+
               // CASE I
               // -------------------------------
-              // interpolate val[1] and val[2]
-              alt_vecval.resize(val[0]->granularity + 2*val[1]->granularity + 2*val[2]->granularity-1);
-              alt_vecx.resize(val[0]->granularity + 2*val[1]->granularity + 2*val[2]->granularity-1);
-
-              // no interpolation needed for points in val[0] and the first point in val[1]
-              for (int j=0;j<=adj_index;j++) {
-                alt_vecx[j] = *vecx[j];
-                alt_vecval[j] = *vecval[j];
+              // down-sample val[0]
+              int half;
+              if ( val[0]->granularity%2 == 0 ) {
+                half = val[0]->granularity/2;
+              } else {
+                half = (val[0]->granularity-1)/2;
               }
+              alt_vecval.resize(half + val[1]->granularity + val[2]->granularity);
+              alt_vecx.resize(half + val[1]->granularity + val[2]->granularity);
 
-              // set up the new 'x' vector
-              for (int j=adj_index+1;j<alt_vecx.size();j++) {
-                alt_vecx[j] = *vecx[adj_index] + (j-adj_index)*dx;
-              }
-
-              // set up the new 'values' vector
-              int count = 1;
-              for (int j=adj_index+1;j<alt_vecx.size();j++) {
-                if ( count%2 == 0 ) {
-                  alt_vecval[j] = *vecval[adj_index+count/2];
-                } else {
-                  // linear interpolation
-                  for (int i=0;i<num_eqns;i++) {
-                    alt_vecval[j].phi[0][i] = 0.5*vecval[adj_index+(count-1)/2]->phi[0][i] 
-                                            + 0.5*vecval[adj_index+(count+1)/2]->phi[0][i];
-                    // note that we do not interpolate the phi[1] variables since interpolation
-                    // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
-                  }
-                }
+              // points in val[1] and val[2] remain the same
+              int count = half;
+              for (int j=adj_index;j<vecx.size();j++) {
+                alt_vecx[count] = *vecx[j];
+                alt_vecval[count] = *vecval[j];
                 count++;
               }
 
-              // temporarily change granularity size
-              resultval->granularity = 2*val[1]->granularity + 2*val[2]->granularity-1;
-              resultval->x_.resize(resultval->granularity);
-              for (int j = 0; j < resultval->granularity; j++) {
-                resultval->x_[j] = alt_vecx[j+adj_index];
+              count = half-1;
+              for (int j=adj_index-2;j>=0;j=j-2) {
+                alt_vecx[count] = *vecx[j];
+                alt_vecval[count] = *vecval[j];
+                count--;
               }
 
-              // treat the point as a right artificial boundary as per tapering
-              boundary = true;
-              bbox[0] = 0;
-              bbox[1] = 1;
+              adj_index = half;
 
               vecx.resize(0);
               vecval.resize(0);
@@ -253,7 +233,7 @@ namespace hpx { namespace components { namespace amr
               for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
 
             } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_ ) {
-              BOOST_ASSERT(val[2]->ghostwidth_ == 1);
+
               // CASE II
               // -------------------------------
               // interpolate val[2]
@@ -290,16 +270,29 @@ namespace hpx { namespace components { namespace amr
                 count++;
               }
 
+              // temporarily change the resultval->granularity
+              resultval->granularity = val[1]->granularity + 2*val[2]->granularity-1;
+              resultval->x_.resize(resultval->granularity);
+              for (int j = 0; j < resultval->granularity; j++) {
+                resultval->x_[j] = alt_vecx[j+adj_index];
+              }
+
               vecx.resize(0);
               vecval.resize(0);
               for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
               for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
             } else {
-              // the case of interpolating val[0] and val[2] but not va[1] should not happen
+              // this case should not occur
               BOOST_ASSERT(false);
             }
           }
           // }}}
+        }
+        if ( val.size() == 2 ) {
+          if ( val[0]->level_ != val[1]->level_ ) {
+            // This protects the user from picking a granularity too large with nx0 too small
+            BOOST_ASSERT(floatcmp(*vecx[1] - *vecx[0],*vecx[vecx.size()-1]-*vecx[vecx.size()-2]));
+          }
         }
 
         // DEBUG
@@ -318,12 +311,16 @@ namespace hpx { namespace components { namespace amr
             resultval->value_.resize(resultval->granularity);
 
             int level = val[compute_index]->level_;
-            if ( val[compute_index]->ghostwidth_ == 1 ) {
-              level++;
-            }
 
             had_double_type dt = par->dt0/pow(2.0,level);
             had_double_type dx = par->dx0/pow(2.0,level); 
+
+            // TEST
+            for (int j=0;j<vecx.size()-1;j++) {
+              if ( floatcmp(*vecx[j+1]-*vecx[j],dx) == 0 ) {
+                 BOOST_ASSERT(false);
+              }
+            }
 
             // call rk update 
             int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
@@ -341,12 +338,6 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
             BOOST_ASSERT(gft);
-
-           // if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
-           //     stencil_data data (resultval.get());
-           //     unlock_scoped_values_lock<lcos::mutex> ul(l);
-           //     stubs::logging::logentry(log_, data, row, 0, par);
-           // }
 
             // ghostwidth resizing
             if ( val.size() == 2 ) {

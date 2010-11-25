@@ -356,9 +356,6 @@ int main(int argc, char* argv[])
         }
         par->nx0 = nx0/par->granularity;
 
-        if ( par->allowedl == 0 ) par->extra_nx = 0; // no ghostwidth need for unigrid
-        else par->extra_nx = 1;
-
         par->nx[0] = par->nx0;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
@@ -382,32 +379,13 @@ int main(int argc, char* argv[])
           par->level_end.push_back(par->rowsize[j]);
         }
 
-        //std::vector<std::size_t> alt_level_begin,alt_level_end;
-        for (int j=0;j<=par->allowedl;j++) {
-          if ( j != par->allowedl ) par->alt_level_begin.push_back(par->rowsize[j+1]-par->extra_nx);
-          else par->alt_level_begin.push_back(0);
-          if ( j != 0 ) par->alt_level_end.push_back(par->rowsize[j]-par->extra_nx);
-          else par->alt_level_end.push_back(par->rowsize[j]);
-        }
-
-        // identify ghostwidth points
-        for (int i=0;i<par->rowsize[0];i++) {
-          for (int j=0;j<par->allowedl;j++) {
-            if ( i >= par->alt_level_begin[j] && i < par->alt_level_begin[j]+par->extra_nx ) {
-              // this point is a ghostwidth point
-              par->ghostwidth_array.push_back(i);
-              break;
-            }
-          }
-        }
-
         // Compute dx
         had_double_type tmp = 0.0;
         for (int j=par->allowedl;j>0;j--) {
-          tmp += (par->alt_level_end[j]-par->alt_level_begin[j])*par->granularity/pow(2.0,j);
+          tmp += (par->level_end[j]-par->level_begin[j])*par->granularity/pow(2.0,j);
         }
 
-        for (int j=par->alt_level_begin[0];j<par->rowsize[0]-1;j++) {
+        for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
           tmp += par->granularity;
         }
 
