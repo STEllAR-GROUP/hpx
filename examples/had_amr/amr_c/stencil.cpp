@@ -99,7 +99,6 @@ namespace hpx { namespace components { namespace amr
           if ( found == 0 ) {
             BOOST_ASSERT(false);
           }
-        //  std::cout << " TEST Boundary : " << column << " index " << compute_index << std::endl;
 
         } else {
           compute_index = (val.size()-1)/2;
@@ -315,12 +314,12 @@ namespace hpx { namespace components { namespace amr
             had_double_type dt = par->dt0/pow(2.0,level);
             had_double_type dx = par->dx0/pow(2.0,level); 
 
-            // TEST
-            for (int j=0;j<vecx.size()-1;j++) {
-              if ( floatcmp(*vecx[j+1]-*vecx[j],dx) == 0 ) {
-                 BOOST_ASSERT(false);
-              }
-            }
+            // DEBUG
+            //for (int j=0;j<vecx.size()-1;j++) {
+            //  if ( floatcmp(*vecx[j+1]-*vecx[j],dx) == 0 ) {
+            //     BOOST_ASSERT(false);
+            //  }
+            //}
 
             // call rk update 
             int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
