@@ -246,7 +246,6 @@ int main(int argc, char* argv[])
           par->refine_level[i] = 1.5;
         }
 
-        par->linearbounds = 1;
         int scheduler = 1;  // 0: global scheduler
                             // 1: parallel scheduler
         std::string parfile;
@@ -279,10 +278,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("output_level") ) {
                 std::string tmp = sec->get_entry("output_level");
                 par->output_level = atoi(tmp.c_str());
-              }
-              if ( sec->has_entry("linearbounds") ) {
-                std::string tmp = sec->get_entry("linearbounds");
-                par->linearbounds = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
@@ -359,10 +354,6 @@ int main(int argc, char* argv[])
         par->nx[0] = par->nx0;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
-        }
-        // account for ghostwidth
-        for (int i=1;i<par->allowedl+1;i++) {
-          par->nx[i] += par->extra_nx; 
         }
 
         for (int j=0;j<=par->allowedl;j++) {

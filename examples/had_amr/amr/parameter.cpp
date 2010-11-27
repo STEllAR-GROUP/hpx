@@ -26,7 +26,6 @@ namespace hpx { namespace components { namespace amr
         ar & loglevel;
         ar & output;
         ar & output_stdout;
-        ar & linearbounds;
         ar & nt0;
         ar & nx0;
         ar & nx;
@@ -43,7 +42,6 @@ namespace hpx { namespace components { namespace amr
         ar & output_level;
         ar & PP;
         ar & granularity;
-        ar & extra_nx;
         ar & rowsize;
         ar & level_begin;
         ar & level_end;
