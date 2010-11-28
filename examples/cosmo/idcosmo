@@ -1,0 +1,24 @@
+[cosmo_amr]
+nx0         = 50
+nt0         = 1000
+granularity = 10
+
+maxx0       =  15.0;
+minx0       =  -5.0;
+
+cfl         = 0.01
+eps         = 0.3
+
+lambda      = 1.0
+v           = 0.1
+id_amp      = 0.0001
+id_x0       = 10.0
+id_sigma    = 0.9
+
+allowedl     = 0
+loglevel     = 2
+output       = 1.0
+output_level = 0
+output_stdout = 1
+
+scheduler = 1
