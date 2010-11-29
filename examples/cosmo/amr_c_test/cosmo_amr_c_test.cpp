@@ -149,7 +149,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       // pi = phi,t
       node.phi[0][1] = c_0;
 
-      node.phi[0][2] = initial_dchi(x1,r,par); // this is the derivative of variable 0
+      node.phi[0][2] = initial_dphi(x1,r,par); // this is the derivative of variable 0
 
       // a
       node.phi[0][3] = invH;

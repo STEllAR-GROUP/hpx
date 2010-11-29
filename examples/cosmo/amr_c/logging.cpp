@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             for (i=0;i<val.granularity;i++) {
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
-                        << " Time: " << val.timestep_*par->dx0*par->lambda  
+                        << " Time: " << val.timestep_*par->dx0*par->cfl  
                         << " row: " << row 
                         << " index: " << val.index_ 
                         << " Value: " << val.value_[i].phi[0][0] 
@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               phi.push_back(val.value_[i].phi[0][0]);
               Pi.push_back(val.value_[i].phi[0][1]);
               chi.push_back(val.value_[i].phi[0][2]);
-              datatime = val.timestep_*par->dx0*par->lambda;
+              datatime = val.timestep_*par->dx0*par->cfl;
 
               std::string x_str = convert(val.x_[i]);
               std::string phi_str = convert(val.value_[i].phi[0][0]);
@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               std::string b_str = convert(val.value_[i].phi[0][6]);
               std::string q_str = convert(val.value_[i].phi[0][7]);
               std::string r_str = convert(val.value_[i].phi[0][8]);
-              std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+              std::string time_str = convert(val.timestep_*par->dx0*par->cfl);
 
               fdata = fopen("phi.dat","a");
               fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),phi_str.c_str());
