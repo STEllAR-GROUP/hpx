@@ -83,10 +83,14 @@ inline had_double_type initial_dphi(had_double_type const& x1,had_double_type co
 {
   static had_double_type const c_0_5 = 0.5;
   static had_double_type const dx = 1.e-10; 
+  static had_double_type const c_inv_dx = had_double_type(1)/dx;
   static had_double_type const c_0_5_inv_dx = c_0_5/dx;
-  had_double_type chi_p1 = initial_phi(x1,r+dx,par);
-  had_double_type chi_m1 = initial_phi(x1,r-dx,par);
-  return c_0_5_inv_dx*(chi_p1 - chi_m1); 
+  had_double_type phi_p1 = initial_phi(x1,r+dx,par);
+  had_double_type phi = initial_phi(x1,r,par);
+  had_double_type phi_m1 = initial_phi(x1,r-dx,par);
+  if ( r < -4.999 ) return c_inv_dx*(phi_p1 - phi);
+  else if ( r > 14.999999) return c_inv_dx*(phi-phi_m1);
+  else return c_0_5_inv_dx*(phi_p1 - phi_m1); 
 }
 
 ///////////////////////////////////////////////////////////////////////////
