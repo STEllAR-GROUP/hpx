@@ -318,7 +318,7 @@ void calcrhs(struct nodedata * rhs,
   had_double_type const q   = vecval[compute_index]->phi[flag][7];
   had_double_type const r   = vecval[compute_index]->phi[flag][8];
   had_double_type const VV  = c_0_25*par.lambda*pow(phi*phi-par.v*par.v,2);
-  had_double_type const dphiVV  = par.lambda*phi*(phi*phi-par.v*par.v,2);
+  had_double_type const dphiVV  = par.lambda*phi*(phi*phi-par.v*par.v);
 
   had_double_type const dzPi  = derivs(vecval,compute_index,flag,1,dx);
   had_double_type const dzchi = derivs(vecval,compute_index,flag,2,dx);
@@ -332,7 +332,7 @@ void calcrhs(struct nodedata * rhs,
                    +  (a/b)*(a/b)*dzchi - a*a*dphiVV );
   rhs->phi[0][2] = dzPi;
   rhs->phi[0][3] = f;
-  rhs->phi[0][4] = a*( -(f*g)/(a*b)
+  rhs->phi[0][4] = a*( -(f*q)/(a*b)
                   + (c_2*g*g/(b*b) - a*g*r/(b*b*b)
                   +  a*dzg/(b*b) + a*a*VV));
   rhs->phi[0][5] = dzf;
