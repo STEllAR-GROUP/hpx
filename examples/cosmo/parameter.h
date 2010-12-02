@@ -44,12 +44,14 @@ struct Par {
       int nx0;
       int nt0;
       int nx[maxlevels];
-      double refine_level[maxlevels];
       had_double_type minx0;
       had_double_type maxx0;
       had_double_type dx0;
       had_double_type dt0;
-      had_double_type ethreshold;
+      had_double_type x1;
+      had_double_type x2;
+      had_double_type x3;
+      had_double_type x4;
       had_double_type id_amp;
       had_double_type id_x0;
       had_double_type id_sigma;
@@ -59,7 +61,8 @@ struct Par {
       int output_level;
       int granularity;
       std::vector<std::size_t> rowsize;
-      std::vector<std::size_t> level_begin, level_end;
+      std::vector<std::size_t> level_row;
+      std::vector<std::size_t> level_begin, level_end,level_index,offset;
 };
 
 #if defined(__cplusplus)

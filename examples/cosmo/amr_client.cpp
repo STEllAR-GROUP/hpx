@@ -233,7 +233,10 @@ int main(int argc, char* argv[])
         par->nt0         = numsteps;
         par->minx0       =   0.0;
         par->maxx0       =  15.0;
-        par->ethreshold  =  0.005;
+        par->x1  =  -2.5;
+        par->x2  =   3.5;
+        par->x3  =   6.5;
+        par->x4  =   12.5;
         par->id_x0          =  10.0;
         par->id_sigma       =  0.9;
         par->id_amp         =  0.0001;
@@ -242,10 +245,6 @@ int main(int argc, char* argv[])
         par->eps         =  0.0;
         par->output_level =  0;
         par->granularity =  3;
-        for (int i=0;i<maxlevels;i++) {
-          // default
-          par->refine_level[i] = 1.5;
-        }
 
         int scheduler = 1;  // 0: global scheduler
                             // 1: parallel scheduler
@@ -311,10 +310,6 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("minx0");
                 par->minx0 = atof(tmp.c_str());
               }
-              if ( sec->has_entry("ethreshold") ) {
-                std::string tmp = sec->get_entry("ethreshold");
-                par->ethreshold = atof(tmp.c_str());
-              }
               if ( sec->has_entry("id_amp") ) {
                 std::string tmp = sec->get_entry("id_amp");
                 par->id_amp = atof(tmp.c_str());
@@ -339,18 +334,24 @@ int main(int argc, char* argv[])
                //   BOOST_ASSERT(false);
                // }
               }
-              for (int i=0;i<par->allowedl;i++) {
-                char tmpname[80];
-                sprintf(tmpname,"refine_level_%d",i);
-                if ( sec->has_entry(tmpname) ) {
-                  std::string tmp = sec->get_entry(tmpname);
-                  par->refine_level[i] = atof(tmp.c_str());
-                }
+              if ( sec->has_entry("x1") ) {
+                std::string tmp = sec->get_entry("x1");
+                par->x1 = atof(tmp.c_str());
               }
-
+              if ( sec->has_entry("x2") ) {
+                std::string tmp = sec->get_entry("x2");
+                par->x2 = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("x3") ) {
+                std::string tmp = sec->get_entry("x3");
+                par->x3 = atof(tmp.c_str());
+              }
+              if ( sec->has_entry("x4") ) {
+                std::string tmp = sec->get_entry("x4");
+                par->x4 = atof(tmp.c_str());
+              }
             }
         }
-
         
         // derived parameters
         if ( nx0%par->granularity != 0 ) {
@@ -361,38 +362,105 @@ int main(int argc, char* argv[])
         par->nx0 = nx0/par->granularity;
 
         par->nx[0] = par->nx0;
-        for (int i=1;i<par->allowedl+1;i++) {
-          par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
+        
+        BOOST_ASSERT(par->x2 > par->x1);
+
+        // estimate how many px threads we will need to cover these two regions
+        had_double_type est_dx0 = (par->maxx0 - par->minx0)/(nx0-1);
+
+        had_double_type tt1 = (par->x2 - par->x1)/(est_dx0/pow(2.0,par->allowedl))/par->granularity;
+        double t1 = tt1;
+        int est_r1 = (int) t1;
+
+        par->nx[par->allowedl] = est_r1;
+        for (int i=par->allowedl-1;i>0;i--) {
+          par->nx[i] = par->nx[i+1] + 6;
+        }
+        // the number of coarse px threads
+        had_double_type cr1;
+        cr1 = par->x1;
+        for (int j=par->allowedl-1;j>0;j--) {
+          cr1 -= 3*par->granularity*est_dx0/pow(2.0,j);
         }
 
+        had_double_type cr2;
+        cr2 = par->x2;
+        for (int j=par->allowedl-1;j>0;j--) {
+          cr2 += 3*par->granularity*est_dx0/pow(2.0,j);
+        }
+
+
+        had_double_type d_t0 = (cr1-par->minx0)/est_dx0/par->granularity;
+        had_double_type d_t1 = (par->maxx0 - cr2)/est_dx0/par->granularity;
+        double s0 = d_t0;
+        double s1 = d_t1;
+        int c0 = (int) s0;
+        int c1 = (int) s1;
+
+        par->level_begin.push_back(0);
+        par->level_end.push_back(c0-3*(par->allowedl-1));
+        par->level_index.push_back(0);
+        par->offset.push_back(0);
+        for (int j=1;j<par->allowedl;j++) {
+          par->level_begin.push_back( c0-3*(par->allowedl-j) );
+          par->level_end.push_back(c0 -3*(par->allowedl-j) + 3);
+          par->level_index.push_back(j);
+          par->offset.push_back(c0-3*(par->allowedl-j));
+        }
+        par->level_begin.push_back( c0 );
+        par->level_end.push_back(c0 + est_r1);
+        par->level_index.push_back(par->allowedl);
+        par->offset.push_back(c0);
+        for (int j=par->allowedl-1;j>0;j--) {
+          par->level_begin.push_back(c0 + 3*(par->allowedl-1-j) + est_r1);
+          par->level_end.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+          par->level_index.push_back(j);
+        }
+        par->level_begin.push_back( c0 + 3*(par->allowedl-1) + est_r1 );
+        par->level_end.push_back(c0 + 3*(par->allowedl-1) + est_r1 + c1);
+        par->level_index.push_back(0);
+
+        par->nx[0] = c0 + 3*(par->allowedl-1) + est_r1 + c1;
         for (int j=0;j<=par->allowedl;j++) {
-          par->rowsize.push_back(par->nx[par->allowedl]);
-          for (int i=par->allowedl-1;i>=j;i--) {
-            // remove duplicates
-            par->rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
+          par->rowsize.push_back(par->nx[j]);
+        }
+
+        int num_rows = (int) pow(2,par->allowedl);
+        num_rows *= 2; // we take two timesteps in the mesh
+        for (int i=0;i<num_rows;i++) {
+          int level = -1;
+          for (int j=par->allowedl;j>=0;j--) {
+            int tmp = (int) pow(2,j); 
+            if ( i%tmp == 0 ) {
+              level = par->allowedl-j;
+              par->level_row.push_back(level);
+              break;
+            }
           }
         }
 
-        for (int j=0;j<=par->allowedl;j++) {
-          if ( j != par->allowedl ) par->level_begin.push_back(par->rowsize[j+1]);
-          else par->level_begin.push_back(0);
-          par->level_end.push_back(par->rowsize[j]);
-        }
-
+        //std::cout << " TEST TEST " << est_r1 << std::endl;
+        //for (int j=0;j<par->level_begin.size();j++) {
+        //  std::cout << " TEST begin " << par->level_begin[j] << " end " << par->level_end[j] << " level " << par->level_index[j] << std::endl;
+        //}
+        //for (int j=0;j<=par->allowedl;j++) {
+        //  std::cout << " TEST rowsize " << par->rowsize[j] << std::endl;
+        //}
 
         // Compute dx
-        had_double_type tmp = 0.0;
-        for (int j=par->allowedl;j>0;j--) {
-          tmp += (par->level_end[j]-par->level_begin[j])*par->granularity/pow(2.0,j);
-        }
+        //had_double_type tmp = 0.0;
+        //for (int j=par->allowedl;j>0;j--) {
+        //  tmp += (par->level_end[j]-par->level_begin[j])*par->granularity/pow(2.0,j);
+        //}
 
-        for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
-          tmp += par->granularity;
-        }
+        //for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
+        //  tmp += par->granularity;
+        //}
 
-        par->dx0 = (par->maxx0 - par->minx0)/(tmp + par->granularity-1);
+        //par->dx0 = (par->maxx0 - par->minx0)/(tmp + par->granularity-1);
 
         //par->dx0 = (par->maxx0 - par->minx0)/((par->nx0-1)*par->granularity);
+        par->dx0 = est_dx0;
         par->dt0 = par->cfl*par->dx0;
 
         // figure out the number of points

@@ -29,12 +29,14 @@ namespace hpx { namespace components { namespace amr
         ar & nt0;
         ar & nx0;
         ar & nx;
-        ar & refine_level;
         ar & minx0;
         ar & maxx0;
         ar & dx0;
         ar & dt0;
-        ar & ethreshold;
+        ar & x1;
+        ar & x2;
+        ar & x3;
+        ar & x4;
         ar & id_amp;
         ar & id_x0;
         ar & id_sigma;
@@ -46,6 +48,9 @@ namespace hpx { namespace components { namespace amr
         ar & rowsize;
         ar & level_begin;
         ar & level_end;
+        ar & level_index;
+        ar & offset;
+        ar & level_row;
     }
 
     // explicit instantiation for the correct archive types
