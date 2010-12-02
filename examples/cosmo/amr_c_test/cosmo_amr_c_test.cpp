@@ -110,18 +110,32 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     //number of values per stencil_data
     nodedata node;
 
-    // find out what level we are at
-    std::size_t level = -1;
-    for (int j=0;j<=par.allowedl;j++) {
-      if (item >= par.level_begin[j] && item < par.level_end[j] ) {
-        level = j; 
-        break;
-      }    
+    // discover the level to which this point belongs 
+    int level = -1;
+    int ll = par.level_row[row];
+    if ( ll == 0 ) {
+      for (int j=0;j<par.level_begin.size();j++) {
+        if ( item >= par.level_begin[j] && item < par.level_end[j] ) {
+          level = par.level_index[j];
+          break;
+        }
+      }
+    } else if ( ll == par.allowedl ) {
+      level = ll;
+    } else {
+      for (int j=0;j<par.level_begin.size();j++) {
+        if ( par.level_index[j] >= ll && 
+             item >= par.level_begin[j]-par.offset[ll] && 
+             item < par.level_end[j]-par.offset[ll] ) {
+          level = par.level_index[j];
+          break;
+        }
+      }
     }
     BOOST_ASSERT(level >= 0);
 
     val->level_= level;
-    had_double_type dx = par.dx0/pow(2.0,(int) level);
+    had_double_type dx = par.dx0/pow(2.0,level);
 
     had_double_type r_start = par.minx0;
     for (int j=par.allowedl;j>level;j--) {
