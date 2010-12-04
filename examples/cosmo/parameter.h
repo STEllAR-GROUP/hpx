@@ -62,6 +62,8 @@ struct Par {
       int granularity;
       std::vector<std::size_t> rowsize;
       std::vector<std::size_t> level_row;
+      std::vector<std::size_t> ghostpoint,cghostpoint;
+      std::vector<std::size_t> ghostpoint_LoR,cghostpoint_LoR;
       std::vector<std::size_t> level_begin, level_end,level_index,offset;
 };
 

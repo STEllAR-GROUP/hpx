@@ -51,6 +51,10 @@ namespace hpx { namespace components { namespace amr
         ar & level_index;
         ar & offset;
         ar & level_row;
+        ar & ghostpoint;
+        ar & ghostpoint_LoR;
+        ar & cghostpoint;
+        ar & cghostpoint_LoR;
     }
 
     // explicit instantiation for the correct archive types

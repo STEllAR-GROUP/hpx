@@ -473,8 +473,13 @@ namespace hpx { namespace components { namespace amr { namespace server
       std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
 
       int counter;
-      int step,dst;
+      int step,dst,dst2;
       int found;
+      int ghostpoint,ghostpoint_ok;
+      int cghostpoint,cghostpoint_LoR;
+      int ghostpoint2;
+      int ghostpoint_LoR;
+      int ghostpoint2_LoR;
 
       for (step=0;step<num_rows;step = step + 1) {
         for (i=0;i<each_row[step];i++) {
@@ -502,7 +507,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
           BOOST_ASSERT(level >= 0);
 
-          std::cout << " TEST preports row " << step << " column " << i << " level " << level << std::endl;
+          //std::cout << " TEST preports row " << step << " column " << i << " level " << level << std::endl;
 
           // communicate three 
           if ( step%2 == 0 || par->allowedl == 0 ) {
@@ -517,13 +522,72 @@ namespace hpx { namespace components { namespace amr { namespace server
             if ( dst >= num_rows ) dst = 0;
 
             //std::cout << " TEST for row " << step << " column " << i << " level " << level << " dst " << dst << std::endl;
+ 
+            // Check if point 'i' is a ghostpoint
+            ghostpoint = 0;
+            ghostpoint_LoR = -1;
+            ghostpoint2_LoR = -1;
+            for (j=0;j<par->ghostpoint.size();j++) {
+              if ( i + par->offset[par->level_row[step]] == par->ghostpoint[j] 
+                    && i != 0 && i != each_row[step]-1 ) {
+                ghostpoint = 1;
+                ghostpoint_LoR = par->ghostpoint_LoR[j];
+                break;
+              } 
+            }
+            if (ghostpoint == 1) {
+              dst2 = step;
+              dst2 += (int) pow(2,par->allowedl-(level-1));
+              if ( dst2 >= num_rows ) dst2 = 0;
+            }
+            ghostpoint2 = 0;
+            for (j=0;j<par->ghostpoint.size();j++) {
+              if ( i + par->offset[par->level_row[step]] == par->ghostpoint[j] ) {
+                ghostpoint2 = 1;
+                ghostpoint2_LoR = par->ghostpoint_LoR[j];
+                break;
+              } 
+            }
+            // Check if point 'i' is a coarse ghostpoint (cghostpoint)
+            cghostpoint = 0;
+            cghostpoint_LoR = -1;
+            for (j=0;j<par->cghostpoint.size();j++) {
+              if ( i + par->offset[par->level_row[step]] == par->cghostpoint[j] ) {
+                cghostpoint = 1;
+                cghostpoint_LoR = par->cghostpoint_LoR[j];
+                break;
+              } 
+            }
+            if (cghostpoint == 1) {
+              dst2 = step;
+              dst2 += (int) pow(2,par->allowedl-(level+1));
+              if ( dst2 >= num_rows ) dst2 = 0;
+            }
 
             // communicate three px threads:
             for (j=i-1;j<i+2;j++) {
               // the meaning of 'j' depends upon both the destination row and the src row.
               adj_j = j - (par->offset[par->level_row[dst]]-par->offset[par->level_row[step]]);
-              if ( adj_j >=0 && adj_j < each_row[dst] ) {
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(adj_j);vport.push_back(counter);
+
+              ghostpoint_ok = 1;
+              if ( ghostpoint2 == 1 ) {
+                if ( ghostpoint2_LoR == 0 && j == i-1) {
+                  ghostpoint_ok = 0;
+                } else if ( ghostpoint2_LoR == 1 && j == i+1 ) {
+                  ghostpoint_ok = 0;
+                }
+              }
+               
+              if ( adj_j >=0 && adj_j < each_row[dst] && ghostpoint_ok == 1 ) {
+                if ( cghostpoint == 1 && cghostpoint_LoR == 0 && j==i+1 ) {
+                  adj_j = j - (par->offset[par->level_row[dst2]]-par->offset[par->level_row[step]]);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(adj_j);vport.push_back(counter);
+                } else if (cghostpoint == 1 && cghostpoint_LoR == 1 && j==i-1 ) {
+                  adj_j = j - (par->offset[par->level_row[dst2]]-par->offset[par->level_row[step]]);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(adj_j);vport.push_back(counter);
+                } else {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(adj_j);vport.push_back(counter);
+                }
                 counter++;
               } else if (level == 0 ) {
                 adj_j = j - (par->offset[par->level_row[dst]]-par->offset[par->level_row[step]]);
@@ -537,25 +601,17 @@ namespace hpx { namespace components { namespace amr { namespace server
                 }
               }
 
-#if 0
-              dst = step+1;
-              if ( step+1 == num_rows ) dst = 0;
-
-              if ( j >=0 && j < each_row[dst] ) {
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              } else {
-                if ( j == -1 ) {
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(each_row[dst]-1);vport.push_back(counter);
-                  counter++;
-                }
-                if ( j == each_row[dst] ) {
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(0);vport.push_back(counter);
-                  counter++;
-                }
-              }
-#endif
             }
+            if ( ghostpoint == 1 ) {
+              if ( ghostpoint_LoR == 0 ) j=i-1;
+              else j = i+1;
+              adj_j = j - (par->offset[par->level_row[dst2]]-par->offset[par->level_row[step]]);
+              if ( adj_j >=0 && adj_j < each_row[dst2] ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst2);vcolumn.push_back(adj_j);vport.push_back(counter);
+                counter++;
+              }
+            }
+
             
           } else {
             // the destination is the next immediate row
@@ -563,11 +619,32 @@ namespace hpx { namespace components { namespace amr { namespace server
             if ( dst == num_rows ) dst = 0;
 
             //std::cout << " TEST for row " << step << " column " << i << " level " << level << " dst " << dst << std::endl;
+            ghostpoint = 0;
+            ghostpoint_LoR = -1;
+            ghostpoint2_LoR = -1;
+            for (j=0;j<par->ghostpoint.size();j++) {
+              if ( i + par->offset[par->level_row[step]] == par->ghostpoint[j] ) {
+                ghostpoint = 1;
+                ghostpoint_LoR = par->ghostpoint_LoR[j];
+                break;
+              } 
+            }
+
             // only communicate between points on the same level
             for (j=i-1;j<i+2;j++) {
               // the meaning of 'j' depends upon both the destination row and the src row.
               adj_j = j - (par->offset[par->level_row[dst]]-par->offset[par->level_row[step]]);
-              if ( adj_j >=0 && adj_j < each_row[dst] ) {
+
+              ghostpoint_ok = 1;
+              if ( ghostpoint == 1 ) {
+                if ( ghostpoint_LoR == 0 && j == i-1) {
+                  ghostpoint_ok = 0;
+                } else if ( ghostpoint_LoR == 1 && j == i+1 ) {
+                  ghostpoint_ok = 0;
+                }
+              }
+
+              if ( adj_j >=0 && adj_j < each_row[dst] && ghostpoint_ok == 1 ) {
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(adj_j);vport.push_back(counter);
                 counter++;
               }

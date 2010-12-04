@@ -399,21 +399,37 @@ int main(int argc, char* argv[])
 
         par->level_begin.push_back(0);
         par->level_end.push_back(c0-3*(par->allowedl-1));
+        par->ghostpoint.push_back(c0-3*(par->allowedl-1));
+        par->ghostpoint_LoR.push_back(0);
+        par->cghostpoint.push_back(c0-3*(par->allowedl-1)-1);
+        par->cghostpoint_LoR.push_back(0);
         par->level_index.push_back(0);
         par->offset.push_back(0);
         for (int j=1;j<par->allowedl;j++) {
           par->level_begin.push_back( c0-3*(par->allowedl-j) );
           par->level_end.push_back(c0 -3*(par->allowedl-j) + 3);
+          par->ghostpoint.push_back(c0 -3*(par->allowedl-j) + 3);
+          par->ghostpoint_LoR.push_back(0);
+          par->cghostpoint.push_back(c0 -3*(par->allowedl-j) + 3-1);
+          par->cghostpoint_LoR.push_back(0);
           par->level_index.push_back(j);
           par->offset.push_back(c0-3*(par->allowedl-j));
         }
         par->level_begin.push_back( c0 );
         par->level_end.push_back(c0 + est_r1);
+        par->ghostpoint.push_back(c0 + est_r1-1);
+        par->ghostpoint_LoR.push_back(1);
+        par->cghostpoint.push_back(c0 + est_r1);
+        par->cghostpoint_LoR.push_back(1);
         par->level_index.push_back(par->allowedl);
         par->offset.push_back(c0);
         for (int j=par->allowedl-1;j>0;j--) {
           par->level_begin.push_back(c0 + 3*(par->allowedl-1-j) + est_r1);
           par->level_end.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+          par->ghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1-1);
+          par->ghostpoint_LoR.push_back(1);
+          par->cghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+          par->cghostpoint_LoR.push_back(1);
           par->level_index.push_back(j);
         }
         par->level_begin.push_back( c0 + 3*(par->allowedl-1) + est_r1 );
