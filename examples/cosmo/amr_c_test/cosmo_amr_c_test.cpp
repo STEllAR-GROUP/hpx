@@ -120,30 +120,32 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
           break;
         }
       }
-    } else if ( ll == par.allowedl ) {
-      level = ll;
     } else {
-      for (int j=0;j<par.level_begin.size();j++) {
-        if ( par.level_index[j] >= ll && 
-             item >= par.level_begin[j]-par.offset[ll] && 
-             item < par.level_end[j]-par.offset[ll] ) {
-          level = par.level_index[j];
-          break;
-        }
-      }
+      BOOST_ASSERT(false);
     }
     BOOST_ASSERT(level >= 0);
 
+    had_double_type r_start = par.minx0;
+    int left_level,oleft_level;
+    had_double_type left_dx;
+    oleft_level = 0;
+    for (int i=0;i<item;i++) {
+      // sum up the points to the left of this one
+      for (int j=0;j<par.level_begin.size();j++) {
+        if ( i >= par.level_begin[j] && i < par.level_end[j] ) {
+          left_level = par.level_index[j];
+          break;
+        }
+      }
+      left_dx = par.dx0/pow(2.0,left_level);
+      if ( left_level < oleft_level ) {
+        r_start -= left_dx; 
+      }
+      r_start += left_dx*par.granularity; 
+    }
+
     val->level_= level;
     had_double_type dx = par.dx0/pow(2.0,level);
-
-    had_double_type r_start = par.minx0;
-    for (int j=par.allowedl;j>level;j--) {
-      r_start += (par.level_end[j]-par.level_begin[j])*par.granularity*par.dx0/pow(2.0,j);
-    }
-    for (int j=par.level_begin[level];j<item;j++) {
-      r_start += dx*par.granularity;
-    }
 
     static had_double_type const c_0 = 0.0;
     static had_double_type const c_1 = 1.0;
@@ -232,12 +234,15 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
     else {
       BOOST_ASSERT(false);
     } 
-
     if ( compute_index+result->granularity+7 < vecval.size() ) end = compute_index+result->granularity+7;
     else {
       BOOST_ASSERT(false);
     }
 
+
+
+    // TEST
+    std::cout << " TEST start " << start << " " << end << std::endl;
     for (int j=start;  j<end;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,j,par);
       for (int i=0; i<num_eqns; i++) {

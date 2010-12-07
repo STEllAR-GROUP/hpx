@@ -72,7 +72,20 @@ namespace hpx { namespace components { namespace amr
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
 
-        compute_index = (val.size()-1)/2;
+        if ( val.size() == 3 ) {
+          compute_index = (val.size()-1)/2;
+        } else if ( val.size() == 2 ) {
+          had_double_type mid = 0.5*(par->x1 + par->x2);
+          if ( val[0]->x_[0] < mid ) {
+            compute_index = 0;
+          } else if ( val[1]->x_[0] > mid ) {
+            compute_index = 1;
+          } else {
+            BOOST_ASSERT(false);
+          }
+        } else {
+          BOOST_ASSERT(false);
+        }
 
 #if 0
 // ------------------------------------------------------
@@ -116,8 +129,7 @@ namespace hpx { namespace components { namespace amr
         std::size_t adj_index;
         if ( compute_index == 1 ) adj_index = val[0]->granularity;
         else {
-          BOOST_ASSERT(compute_index == 0);
-          adj_index = 0;
+          adj_index = 4;
         }
 
         std::vector<had_double_type>::iterator iter;
@@ -154,105 +166,194 @@ namespace hpx { namespace components { namespace amr
           // During other iterations, points are treated as artificial boundaries and eventually tapered.
           if ( val[0]->level_ != val[1]->level_ || val[1]->level_ != val[2]->level_ ) {
             // sanity checks
-            BOOST_ASSERT(val[0]->level_ > val[2]->level_);
             BOOST_ASSERT(compute_index == 1);
             BOOST_ASSERT(adj_index == val[0]->granularity);
-
-            had_double_type dx = *vecx[1] - *vecx[0];
 
             resultval->g_startx_ = val[compute_index]->x_[0];
             resultval->g_endx_ = val[compute_index]->x_[val[compute_index]->granularity-1];
             resultval->g_dx_ = val[compute_index]->x_[1]-val[compute_index]->x_[0];
 
-            // There are two cases:  you either have to downsample val[0] or interpolate val[2]
-            if ( val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) {
-
-              // CASE I
-              // -------------------------------
-              // down-sample val[0]
-              int half;
-              if ( val[0]->granularity%2 == 0 ) {
-                half = val[0]->granularity/2;
-              } else {
-                half = (val[0]->granularity-1)/2;
-              }
-              alt_vecval.resize(half + val[1]->granularity + val[2]->granularity);
-              alt_vecx.resize(half + val[1]->granularity + val[2]->granularity);
-
-              // points in val[1] and val[2] remain the same
-              int count = half;
-              for (int j=adj_index;j<vecx.size();j++) {
-                alt_vecx[count] = *vecx[j];
-                alt_vecval[count] = *vecval[j];
-                count++;
-              }
-
-              count = half-1;
-              for (int j=adj_index-2;j>=0;j=j-2) {
-                alt_vecx[count] = *vecx[j];
-                alt_vecval[count] = *vecval[j];
-                count--;
-              }
-
-              adj_index = half;
-
-              vecx.resize(0);
-              vecval.resize(0);
-              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
-              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-
-            } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_ ) {
-
-              // CASE II
-              // -------------------------------
-              // interpolate val[2]
-              alt_vecval.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
-              alt_vecx.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
-
-              // no interpolation needed for points in val[0], val[1], and the first point in val[2]
-              std::size_t start;
-              start = val[0]->granularity+val[1]->granularity;
-              for (int j=0;j<=start;j++) {
-                alt_vecx[j] = *vecx[j];
-                alt_vecval[j] = *vecval[j];
-              }
-
-              // set up the new 'x' vector
-              for (int j=start;j<alt_vecx.size();j++) {
-                alt_vecx[j] = *vecx[start] + (j-start)*dx;
-              }
-
-              // set up the new 'values' vector
-              int count = 1;
-              for (int j=start+1;j<alt_vecx.size();j++) {
-                if ( count%2 == 0 ) {
-                  alt_vecval[j] = *vecval[start+count/2];
+            // There are four cases:  each involve either a downsampling or interpolation
+            if (val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) { 
+              if ( val[0]->level_ > val[1]->level_ ) {
+                // Case I {{{
+                had_double_type dx = *vecx[1] - *vecx[0];
+                // downsample val[0]
+                int half;
+                if ( val[0]->granularity%2 == 0 ) {
+                  half = val[0]->granularity/2;
                 } else {
-                  // linear interpolation
-                  for (int i=0;i<num_eqns;i++) {
-                    alt_vecval[j].phi[0][i] = 0.5*vecval[start+(count-1)/2]->phi[0][i] 
-                                            + 0.5*vecval[start+(count+1)/2]->phi[0][i];
-                    // note that we do not interpolate the phi[1] variables since interpolation
-                    // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
-                  }
+                  half = (val[0]->granularity-1)/2;
                 }
-                count++;
-              }
+                alt_vecval.resize(half + val[1]->granularity + val[2]->granularity);
+                alt_vecx.resize(half + val[1]->granularity + val[2]->granularity);
 
-              // temporarily change the resultval->granularity
-              resultval->granularity = val[1]->granularity + 2*val[2]->granularity-1;
-              resultval->x_.resize(resultval->granularity);
-              for (int j = 0; j < resultval->granularity; j++) {
-                resultval->x_[j] = alt_vecx[j+adj_index];
-              }
+                // points in val[1] and val[2] remain the same
+                int count = half;
+                for (int j=adj_index;j<vecx.size();j++) {
+                  alt_vecx[count] = *vecx[j];
+                  alt_vecval[count] = *vecval[j];
+                  count++;
+                }
 
-              vecx.resize(0);
-              vecval.resize(0);
-              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
-              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-            } else {
-              // this case should not occur
-              BOOST_ASSERT(false);
+                count = half-1;
+                for (int j=adj_index-1;j>=0;j=j-2) {
+                  alt_vecx[count] = *vecx[j];
+                  alt_vecval[count] = *vecval[j];
+                  count--;
+                }
+
+                adj_index = half;
+
+                vecx.resize(0);
+                vecval.resize(0);
+                for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+                for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+                // }}}
+              } else if ( val[0]->level_ < val[1]->level_ ) {
+                // Case II {{{
+                // interpolate val[0]
+                had_double_type dx = *vecx[vecx.size()-1] - *vecx[vecx.size()-2];
+
+                alt_vecval.resize(2*val[0]->granularity-1 + val[1]->granularity + val[2]->granularity);
+                alt_vecx.resize(2*val[0]->granularity-1 + val[1]->granularity + val[2]->granularity);
+
+                // no interpolation needed for points in val[1], and the first point in val[2]
+                std::size_t start;
+                std::size_t offset;
+                start = val[0]->granularity+val[1]->granularity-1;
+                offset = 2*val[0]->granularity-1;
+                for (int j=0;j<=start;j++) {
+                  alt_vecx[j+offset] = *vecx[j+val[0]->granularity];
+                  alt_vecval[j+offset] = *vecval[j+val[0]->granularity];
+                }
+
+                // set up the new 'x' vector
+                for (int j=0;j<offset;j++) {
+                  alt_vecx[j] = *vecx[0] + j*dx;
+                }
+
+                // set up the new 'values' vector
+                int count = 1;
+                for (int j=1;j<offset;j++) {
+                  if ( count%2 == 0 ) {
+                    alt_vecval[j] = *vecval[count/2];
+                  } else {
+                    // linear interpolation
+                    for (int i=0;i<num_eqns;i++) {
+                      alt_vecval[j].phi[0][i] = 0.5*vecval[(count-1)/2]->phi[0][i] 
+                                              + 0.5*vecval[(count+1)/2]->phi[0][i];
+                      // note that we do not interpolate the phi[1] variables since interpolation
+                      // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
+                    }
+                  }
+                  count++;
+                }
+ 
+                adj_index = 2*val[0]->granularity-1;
+
+                // temporarily change the resultval->granularity
+                resultval->granularity = 2*val[0]->granularity-1 + val[1]->granularity;
+                resultval->x_.resize(resultval->granularity);
+                for (int j = 0; j < resultval->granularity; j++) {
+                  resultval->x_[j] = alt_vecx[j];
+                }
+
+                vecx.resize(0);
+                vecval.resize(0);
+                for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+                for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+                // }}}
+              } else {
+                BOOST_ASSERT(false);
+              }
+            } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_) {
+              if ( val[2]->level_ < val[1]->level_ ) {
+                // Case III {{{
+                had_double_type dx = *vecx[1] - *vecx[0];
+
+                // interpolate val[2]
+                alt_vecval.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
+                alt_vecx.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
+
+                // no interpolation needed for points in val[0], val[1], and the first point in val[2]
+                std::size_t start;
+                start = val[0]->granularity+val[1]->granularity-1;
+                for (int j=0;j<=start;j++) {
+                  alt_vecx[j] = *vecx[j];
+                  alt_vecval[j] = *vecval[j];
+                }
+
+                // set up the new 'x' vector
+                for (int j=start;j<alt_vecx.size();j++) {
+                  alt_vecx[j] = *vecx[start] + (j-start)*dx;
+                }
+
+                // set up the new 'values' vector
+                int count = 1;
+                for (int j=start+1;j<alt_vecx.size();j++) {
+                  if ( count%2 == 0 ) {
+                    alt_vecval[j] = *vecval[start+count/2];
+                  } else {
+                    // linear interpolation
+                    for (int i=0;i<num_eqns;i++) {
+                      alt_vecval[j].phi[0][i] = 0.5*vecval[start+(count-1)/2]->phi[0][i] 
+                                              + 0.5*vecval[start+(count+1)/2]->phi[0][i];
+                      // note that we do not interpolate the phi[1] variables since interpolation
+                      // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
+                    }
+                  }
+                  count++;
+                }
+
+                // temporarily change the resultval->granularity
+                resultval->granularity = val[1]->granularity + 2*val[2]->granularity-1;
+                resultval->x_.resize(resultval->granularity);
+                for (int j = 0; j < resultval->granularity; j++) {
+                  resultval->x_[j] = alt_vecx[j+adj_index];
+                }
+
+                vecx.resize(0);
+                vecval.resize(0);
+                for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+                for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+                // }}}
+              } else if ( val[2]->level_ > val[1]->level_ ) {
+                // Case IV {{{
+                // downsample val[2]
+                had_double_type dx = *vecx[vecx.size()-1] - *vecx[vecx.size()-2];
+
+                int half;
+                if ( val[2]->granularity%2 == 0 ) {
+                  half = val[2]->granularity/2;
+                } else {
+                  half = (val[2]->granularity-1)/2;
+                }
+                alt_vecval.resize(val[0]->granularity + val[1]->granularity + half);
+                alt_vecx.resize(val[0]->granularity + val[1]->granularity + half);
+
+                // points in val[0] and val[1] remain the same
+                std::size_t start = val[0]->granularity + val[1]->granularity;
+                for (int j=0;j<start;j++) {
+                  alt_vecx[j] = *vecx[j];
+                  alt_vecval[j] = *vecval[j];
+                }
+
+                std::size_t count = start;
+                for (int j=start;j<vecx.size();j=j+2) {
+                  alt_vecx[count] = *vecx[j];
+                  alt_vecval[count] = *vecval[j];
+                  count++;
+                }
+
+                vecx.resize(0);
+                vecval.resize(0);
+                for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
+                for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
+                // }}}
+              } else {
+                BOOST_ASSERT(false);
+              }
             }
           }
           // }}}
@@ -292,6 +393,7 @@ namespace hpx { namespace components { namespace amr
             //}
 
             // call rk update 
+            std::cout << " TEST TEST " << vecval.size() << " " << val.size() << std::endl;
             int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
                                  adj_index,dt,dx,val[compute_index]->timestep_,
                                  level,*par.p);
