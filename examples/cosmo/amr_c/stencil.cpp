@@ -128,8 +128,10 @@ namespace hpx { namespace components { namespace amr
  
         std::size_t adj_index;
         if ( compute_index == 1 ) adj_index = val[0]->granularity;
-        else {
-          adj_index = 4;
+        else if ( compute_index == 0 ) {
+          adj_index = 2;
+        } else {
+          BOOST_ASSERT(false);
         }
 
         std::vector<had_double_type>::iterator iter;
@@ -250,7 +252,7 @@ namespace hpx { namespace components { namespace amr
                   count++;
                 }
  
-                adj_index = 2*val[0]->granularity-1;
+                adj_index = 2;
 
                 // temporarily change the resultval->granularity
                 resultval->granularity = 2*val[0]->granularity-1 + val[1]->granularity;
@@ -393,7 +395,6 @@ namespace hpx { namespace components { namespace amr
             //}
 
             // call rk update 
-            std::cout << " TEST TEST " << vecval.size() << " " << val.size() << std::endl;
             int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
                                  adj_index,dt,dx,val[compute_index]->timestep_,
                                  level,*par.p);

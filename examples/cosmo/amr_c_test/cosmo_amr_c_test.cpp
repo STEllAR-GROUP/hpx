@@ -226,23 +226,12 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   //    result->value_[j].phi[0][i] = vecval[j+compute_index]->phi[0][i];
   //  }
   //}
-
     // -------------------------------------------------------------------------
     // iter 0
     std::size_t start,end;
-    if ( compute_index-7 > 0 ) start = compute_index-7;
-    else {
-      BOOST_ASSERT(false);
-    } 
-    if ( compute_index+result->granularity+7 < vecval.size() ) end = compute_index+result->granularity+7;
-    else {
-      BOOST_ASSERT(false);
-    }
+    start = 2;
+    end = size-3;
 
-
-
-    // TEST
-    std::cout << " TEST start " << start << " " << end << std::endl;
     for (int j=start;  j<end;j++) {
       calcrhs(&rhs,vecval,vecx,0,dx,size,j,par);
       for (int i=0; i<num_eqns; i++) {
@@ -329,41 +318,43 @@ void calcrhs(struct nodedata * rhs,
   static had_double_type const c_3 = 3.0;
   static had_double_type const c_m3 = -3.0;
   static had_double_type const c_2 = 2.0;
+  static had_double_type const c_0 = 0.0;
 
-  had_double_type const x = *vecx[compute_index];
-  had_double_type const phi = vecval[compute_index]->phi[flag][0];
-  had_double_type const Pi  = vecval[compute_index]->phi[flag][1];
-  had_double_type const chi = vecval[compute_index]->phi[flag][2];
-  had_double_type const a   = vecval[compute_index]->phi[flag][3];
-  had_double_type const f   = vecval[compute_index]->phi[flag][4];
-  had_double_type const g   = vecval[compute_index]->phi[flag][5];
-  had_double_type const b   = vecval[compute_index]->phi[flag][6];
-  had_double_type const q   = vecval[compute_index]->phi[flag][7];
-  had_double_type const r   = vecval[compute_index]->phi[flag][8];
-  had_double_type const VV  = c_0_25*par.lambda*pow(phi*phi-par.v*par.v,2);
-  had_double_type const dphiVV  = par.lambda*phi*(phi*phi-par.v*par.v);
+  if ( compute_index-2 >= 0 && compute_index+2 < size ) {
+    had_double_type const x = *vecx[compute_index];
+    had_double_type const phi = vecval[compute_index]->phi[flag][0];
+    had_double_type const Pi  = vecval[compute_index]->phi[flag][1];
+    had_double_type const chi = vecval[compute_index]->phi[flag][2];
+    had_double_type const a   = vecval[compute_index]->phi[flag][3];
+    had_double_type const f   = vecval[compute_index]->phi[flag][4];
+    had_double_type const g   = vecval[compute_index]->phi[flag][5];
+    had_double_type const b   = vecval[compute_index]->phi[flag][6];
+    had_double_type const q   = vecval[compute_index]->phi[flag][7];
+    had_double_type const r   = vecval[compute_index]->phi[flag][8];
+    had_double_type const VV  = c_0_25*par.lambda*pow(phi*phi-par.v*par.v,2);
+    had_double_type const dphiVV  = par.lambda*phi*(phi*phi-par.v*par.v);
 
-  had_double_type const dzPi  = derivs(vecval,compute_index,flag,1,dx);
-  had_double_type const dzchi = derivs(vecval,compute_index,flag,2,dx);
-  had_double_type const dzf   = derivs(vecval,compute_index,flag,4,dx);
-  had_double_type const dzg   = derivs(vecval,compute_index,flag,5,dx);
-  had_double_type const dzq   = derivs(vecval,compute_index,flag,7,dx);
+    had_double_type const dzPi  = derivs(vecval,compute_index,flag,1,dx);
+    had_double_type const dzchi = derivs(vecval,compute_index,flag,2,dx);
+    had_double_type const dzf   = derivs(vecval,compute_index,flag,4,dx);
+    had_double_type const dzg   = derivs(vecval,compute_index,flag,5,dx);
+    had_double_type const dzq   = derivs(vecval,compute_index,flag,7,dx);
 
-  rhs->phi[0][0] = Pi;
-  rhs->phi[0][1] = -Pi*(f/a +q/b) 
-                   +( (c_3*a*g/(b*b) -a*a*r/(b*b*b) )*chi
-                   +  (a/b)*(a/b)*dzchi - a*a*dphiVV );
-  rhs->phi[0][2] = dzPi;
-  rhs->phi[0][3] = f;
-  rhs->phi[0][4] = a*( -(f*q)/(a*b)
-                  + (c_2*g*g/(b*b) - a*g*r/(b*b*b)
-                  +  a*dzg/(b*b) + a*a*VV));
-  rhs->phi[0][5] = dzf;
-  rhs->phi[0][6] = q;
-  rhs->phi[0][7] = b*( -(f*q)/(a*b)
-                  +(c_m3*a*g*r/(b*b*b)
-                   +c_3*a*dzg/(b*b)
-                   +(a*chi/b)*(a*chi/b) + a*a*VV));
-  rhs->phi[0][8] = dzq;
-
+    rhs->phi[0][0] = Pi;
+    rhs->phi[0][1] = -Pi*(f/a +q/b) 
+                     +( (c_3*a*g/(b*b) -a*a*r/(b*b*b) )*chi
+                     +  (a/b)*(a/b)*dzchi - a*a*dphiVV );
+    rhs->phi[0][2] = dzPi;
+    rhs->phi[0][3] = f;
+    rhs->phi[0][4] = a*( -(f*q)/(a*b)
+                    + (c_2*g*g/(b*b) - a*g*r/(b*b*b)
+                    +  a*dzg/(b*b) + a*a*VV));
+    rhs->phi[0][5] = dzf;
+    rhs->phi[0][6] = q;
+    rhs->phi[0][7] = b*( -(f*q)/(a*b)
+                    +(c_m3*a*g*r/(b*b*b)
+                     +c_3*a*dzg/(b*b)
+                     +(a*chi/b)*(a*chi/b) + a*a*VV));
+    rhs->phi[0][8] = dzq;
+  }
 }

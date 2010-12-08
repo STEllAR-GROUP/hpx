@@ -40,8 +40,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         if ( par->output_stdout == 1 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6) {
-            for (i=0;i<val.granularity;i++) {
-            //for (i=0;i<1;i++) {
+            //for (i=0;i<val.granularity;i++) {
+            for (i=0;i<1;i++) {
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
                         << " Time: " << val.timestep_*par->dx0*par->cfl  

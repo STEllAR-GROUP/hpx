@@ -366,7 +366,7 @@ int main(int argc, char* argv[])
         BOOST_ASSERT(par->x2 > par->x1);
 
         // estimate how many px threads we will need to cover these two regions
-        for (int dxstep=0;dxstep<2;dxstep++) 
+        for (int dxstep=0;dxstep<1;dxstep++) 
         {
           par->level_begin.resize(0);
           par->level_end.resize(0);
@@ -404,9 +404,9 @@ int main(int argc, char* argv[])
 
           had_double_type cr2;
           cr2 = par->x2;
-          //for (int j=par->allowedl-1;j>0;j--) {
-          //  cr2 += 3*par->granularity*est_dx0/pow(2.0,j);
-          //}
+          for (int j=par->allowedl-1;j>0;j--) {
+            cr2 += 3*par->granularity*est_dx0/pow(2.0,j);
+          }
 
 
           had_double_type d_t0 = (cr1-par->minx0)/est_dx0/par->granularity;
@@ -416,46 +416,55 @@ int main(int argc, char* argv[])
           int c0 = (int) s0;
           int c1 = (int) s1;
 
-          par->level_begin.push_back(0);
-          par->level_end.push_back(c0-3*(par->allowedl-1));
-          par->ghostpoint.push_back(c0-3*(par->allowedl-1));
-          par->ghostpoint_LoR.push_back(0);
-          par->cghostpoint.push_back(c0-3*(par->allowedl-1)-1);
-          par->cghostpoint_LoR.push_back(0);
-          par->level_index.push_back(0);
-          par->offset.push_back(0);
-          for (int j=1;j<par->allowedl;j++) {
-            par->level_begin.push_back( c0-3*(par->allowedl-j) );
-            par->level_end.push_back(c0 -3*(par->allowedl-j) + 3);
-            par->ghostpoint.push_back(c0 -3*(par->allowedl-j) + 3);
+          if ( par->allowedl > 0 ) {
+            par->level_begin.push_back(0);
+            par->level_end.push_back(c0-3*(par->allowedl-1));
+            par->ghostpoint.push_back(c0-3*(par->allowedl-1));
             par->ghostpoint_LoR.push_back(0);
-            par->cghostpoint.push_back(c0 -3*(par->allowedl-j) + 3-1);
+            par->cghostpoint.push_back(c0-3*(par->allowedl-1)-1);
             par->cghostpoint_LoR.push_back(0);
-            par->level_index.push_back(j);
-            par->offset.push_back(c0-3*(par->allowedl-j));
-          }
-          par->level_begin.push_back( c0 );
-          par->level_end.push_back(c0 + est_r1);
-          par->ghostpoint.push_back(c0 + est_r1-1);
-          par->ghostpoint_LoR.push_back(1);
-          par->cghostpoint.push_back(c0 + est_r1);
-          par->cghostpoint_LoR.push_back(1);
-          par->level_index.push_back(par->allowedl);
-          par->offset.push_back(c0);
-          for (int j=par->allowedl-1;j>0;j--) {
-            par->level_begin.push_back(c0 + 3*(par->allowedl-1-j) + est_r1);
-            par->level_end.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
-            par->ghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1-1);
+            par->level_index.push_back(0);
+            par->offset.push_back(0);
+            for (int j=1;j<par->allowedl;j++) {
+              par->level_begin.push_back( c0-3*(par->allowedl-j) );
+              par->level_end.push_back(c0 -3*(par->allowedl-j) + 3);
+              par->ghostpoint.push_back(c0 -3*(par->allowedl-j) + 3);
+              par->ghostpoint_LoR.push_back(0);
+              par->cghostpoint.push_back(c0 -3*(par->allowedl-j) + 3-1);
+              par->cghostpoint_LoR.push_back(0);
+              par->level_index.push_back(j);
+              par->offset.push_back(c0-3*(par->allowedl-j));
+            }
+            par->level_begin.push_back( c0 );
+            par->level_end.push_back(c0 + est_r1);
+            par->ghostpoint.push_back(c0 + est_r1-1);
             par->ghostpoint_LoR.push_back(1);
-            par->cghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+            par->cghostpoint.push_back(c0 + est_r1);
             par->cghostpoint_LoR.push_back(1);
-            par->level_index.push_back(j);
-          }
-          par->level_begin.push_back( c0 + 3*(par->allowedl-1) + est_r1 );
-          par->level_end.push_back(c0 + 3*(par->allowedl-1) + est_r1 + c1);
-          par->level_index.push_back(0);
+            par->level_index.push_back(par->allowedl);
+            par->offset.push_back(c0);
+            for (int j=par->allowedl-1;j>0;j--) {
+              par->level_begin.push_back(c0 + 3*(par->allowedl-1-j) + est_r1);
+              par->level_end.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+              par->ghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1-1);
+              par->ghostpoint_LoR.push_back(1);
+              par->cghostpoint.push_back(c0 + 3*(par->allowedl-1-j) + 3 + est_r1);
+              par->cghostpoint_LoR.push_back(1);
+              par->level_index.push_back(j);
+            }
+            par->level_begin.push_back( c0 + 3*(par->allowedl-1) + est_r1 );
+            par->level_end.push_back(c0 + 3*(par->allowedl-1) + est_r1 + c1);
+            par->level_index.push_back(0);
 
-          par->nx[0] = c0 + 3*(par->allowedl-1) + est_r1 + c1;
+            par->nx[0] = c0 + 3*(par->allowedl-1) + est_r1 + c1;
+          } else {
+            par->nx[0] = nx0/par->granularity;
+            par->level_begin.push_back(0);
+            par->level_end.push_back(par->nx[0]);
+            par->level_index.push_back(0);
+            par->offset.push_back(0);
+          }
+
           for (int j=0;j<=par->allowedl;j++) {
             par->rowsize.push_back(par->nx[j]);
           }
