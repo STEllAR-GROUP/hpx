@@ -20,6 +20,7 @@ a destructor, and access operators.
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
 #include <boost/foreach.hpp>
+#include <boost/random/linear_congruential.hpp>
 #include "LUblock.hpp"
 
 namespace hpx { namespace components { namespace server
@@ -57,7 +58,7 @@ namespace hpx { namespace components { namespace server
 
     private:
 	void allocate();
-	int assign(unsigned int row, unsigned int offset, bool complete);
+	int assign(unsigned int row, unsigned int offset, bool complete, unsigned int seed);
 	void pivot();
 	int swap(unsigned int brow, unsigned int bcol);
 	void LUgausscorner(unsigned int iter);
@@ -96,8 +97,8 @@ namespace hpx { namespace components { namespace server
 	typedef actions::action0<HPLMatreX, hpl_destruct,
 		&HPLMatreX::destruct> destruct_action;
 	 //the assign function
-	typedef actions::result_action3<HPLMatreX, int, hpl_assign, unsigned int,
-		unsigned int, bool, &HPLMatreX::assign> assign_action;
+	typedef actions::result_action4<HPLMatreX, int, hpl_assign, unsigned int,
+		unsigned int, bool, unsigned int, &HPLMatreX::assign> assign_action;
 	//the get function
 	typedef actions::result_action2<HPLMatreX, double, hpl_get, unsigned int,
         	unsigned int, &HPLMatreX::get> get_action;
@@ -170,6 +171,8 @@ namespace hpx { namespace components { namespace server
 
 	int i,j; 			 //just counting variable
 	unsigned int offset = 1; //the initial offset used for the memory handling algorithm
+	boost::rand48 gen;	 //random generator used for seeding other generators
+	gen.seed(time(NULL));
 
 	central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
 	left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
@@ -178,7 +181,6 @@ namespace hpx { namespace components { namespace server
 	factordata = (double**) std::malloc(h*sizeof(double*));
 	truedata = (double**) std::malloc(h*sizeof(double*));
 	pivotarr = (int*) std::malloc(h*sizeof(int));
-	srand(time(NULL));
 
 	//by making offset a power of two, the assign functions
 	//are much simpler than they would be otherwise
@@ -189,7 +191,7 @@ namespace hpx { namespace components { namespace server
 
 	//here we initialize the the matrix
 	lcos::eager_future<server::HPLMatreX::assign_action>
-		assign_future(gid,(unsigned int)0,offset,false);
+		assign_future(gid,(unsigned int)0,offset,false,gen());
 	//initialize the pivot array
 	for(i=0;i<rows;i++){pivotarr[i]=i;}
 	for(i=0;i<brows;i++){
@@ -218,30 +220,32 @@ namespace hpx { namespace components { namespace server
     }
 
     //assign gives values to the empty elements of the array
-    int HPLMatreX::assign(unsigned int row, unsigned int offset, bool complete){
+    int HPLMatreX::assign(unsigned int row, unsigned int offset, bool complete, unsigned int seed){
         //futures is used to allow this thread to continue spinning off new threads
         //while other threads work, and is checked at the end to make certain all
         //threads are completed before returning.
         std::vector<assign_future> futures;
+	boost::rand48 gen;
+	gen.seed(seed);
 
 	//create multiple futures which in turn create more futures
         while(!complete){
             if(offset <= 1){
                 if(row + offset < rows){
-                    futures.push_back(assign_future(_gid,row+offset,offset,true));
+                    futures.push_back(assign_future(_gid,row+offset,offset,true,gen()));
                 }
                 complete = true;
             }
             else{
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,
-			(unsigned int)(offset*.5),false));
+			(unsigned int)(offset*.5),false,gen()));
                 }
                 offset = (unsigned int)(offset*.5);
             }
         }
 	for(unsigned int i=0;i<columns;i++){
-	    truedata[row][i] = (double) (rand() % 1000);
+	    truedata[row][i] = (double) (gen() % 1000);
 	}
 
 	//once all spun off futures are complete we are done
