@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace server
 	double** truedata;		//the original unaltered data
         double* solution;		//for storing the solution
 	int* pivotarr;			//array for storing pivot elements
-					//(maps original rows to pivoted rows)
+					//(maps original rows to pivoted/reordered rows)
 	lcos::mutex mtex;		//mutex
 
     public:
@@ -157,23 +157,26 @@ namespace hpx { namespace components { namespace server
 		unsigned int ab, unsigned int bs){
 // / / /initialize class variables/ / / / / / / / / / / /
 	if(ab > std::ceil(((float)h)*.5)){
-		allocblock=(int)std::ceil(((float)h)*.5);}
-	else{allocblock=ab;}
+		allocblock = (int)std::ceil(((float)h)*.5);
+	}
+	else{ allocblock = ab;}
 	if(bs > h){
-		blocksize=h;}
-	else{blocksize=bs;}
-	rows=h;
-	brows=(int)std::floor((float)h/blocksize);
-	columns=w;
+		blocksize = h;
+	}
+	else{ blocksize = bs;}
+	rows = h;
+	brows = (int)std::floor((float)h/blocksize);
+	columns = w;
 	_gid = gid;
 
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-	int i,j; 			 //just counting variable
+	int i,j; 		 //just counting variables
 	unsigned int offset = 1; //the initial offset used for the memory handling algorithm
 	boost::rand48 gen;	 //random generator used for seeding other generators
 	gen.seed(time(NULL));
 
+	/*allocate memory for the various arrays that will be used*/
 	central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
 	left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
 	top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
@@ -182,18 +185,26 @@ namespace hpx { namespace components { namespace server
 	truedata = (double**) std::malloc(h*sizeof(double*));
 	pivotarr = (int*) std::malloc(h*sizeof(int));
 
-	//by making offset a power of two, the assign functions
-	//are much simpler than they would be otherwise
-	h=(unsigned int)std::ceil(((float)h)*.5);
-	while(offset < h){offset *= 2;}
+	allocate();	//allocate memory for the elements of the array
 
-	allocate();
+	//By making offset a power of two, the assign functions
+	//are much simpler than they would be otherwise.
+	//The result of the below computation is that offset will be
+	//the greatest power of two less than or equal to the number
+	//of rows in the matrix
+	h = (unsigned int)std::ceil(((float)h)*.5);
+	while(offset < h){
+		offset *= 2;
+	}
 
 	//here we initialize the the matrix
 	lcos::eager_future<server::HPLMatreX::assign_action>
 		assign_future(gid,(unsigned int)0,offset,false,gen());
+
 	//initialize the pivot array
 	for(i=0;i<rows;i++){pivotarr[i]=i;}
+
+	//initialize the arrays of futures
 	for(i=0;i<brows;i++){
 		central_futures[i] = NULL;
 		for(j=0;j<i;j++){
@@ -202,7 +213,9 @@ namespace hpx { namespace components { namespace server
 		for(j=0;j<brows-i-1;j++){
 			top_futures[i][j] = NULL;
 	}	}
+
 	//make sure that everything has been allocated their memory
+	//and initialized
 	return assign_future.get();
     }
 
@@ -219,7 +232,13 @@ namespace hpx { namespace components { namespace server
 	}
     }
 
-    //assign gives values to the empty elements of the array
+    /*assign gives values to the empty elements of the array.
+    The idea behind this algorithm is that the initial thread produces threads with offsets
+    of each power of 2 less than (or equal to) the number of rows in the matrix.  Each of the
+    generated threads repeats the process using its assigned row as the base and the new set
+    of offsets is each power of two that will not overlap with other threads' assigned rows.
+    After each thread has produced all of its child threads, that thread initializes the data
+    of its assigned row and waits for the child threads to complete before returning.*/
     int HPLMatreX::assign(unsigned int row, unsigned int offset, bool complete, unsigned int seed){
         //futures is used to allow this thread to continue spinning off new threads
         //while other threads work, and is checked at the end to make certain all
@@ -230,12 +249,14 @@ namespace hpx { namespace components { namespace server
 
 	//create multiple futures which in turn create more futures
         while(!complete){
+	    //there is only one more child thread left to produce
             if(offset <= 1){
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,offset,true,gen()));
                 }
                 complete = true;
             }
+	    //there are at least two more child threads to produce
             else{
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,
@@ -244,6 +265,7 @@ namespace hpx { namespace components { namespace server
                 offset = (unsigned int)(offset*.5);
             }
         }
+	//initialize the assigned row
 	for(unsigned int i=0;i<columns;i++){
 	    truedata[row][i] = (double) (gen() % 1000);
 	}
@@ -322,20 +344,26 @@ namespace hpx { namespace components { namespace server
 
 	//allocate memory space to store the solution
 	solution = (double*) std::malloc(rows*sizeof(double));
+
+	//create a future to perform back substitution
 	bsubst_future bsub(_gid);
 
 	unsigned int h = (unsigned int)std::ceil(((float)rows)*.5);
 	unsigned int offset = 1;
 	while(offset < h){offset *= 2;}
+
+	//confirm back substitution is completed before continuing
 	bsub.get();
+
+	//create a future to check the accuracy of the generated solution
 	check_future chk(_gid,0,offset,false);
 	return chk.get();
-	return 1;
+//	return 1;
     }
 
     //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
-    //the swapping can occur in parallel
+    //the swapping is simplified
     void HPLMatreX::pivot(){
 	unsigned int max, max_row;
 	unsigned int temp_piv;
@@ -358,6 +386,7 @@ namespace hpx { namespace components { namespace server
 	    pivotarr[max_row] = temp_piv;
 	}
 
+	//call the swap function for each datablock in the matrix
 	for(int i=0;i<brows;i++){
 		for(int j=0;j<brows;j++){
 			swap(i,j);
@@ -388,11 +417,12 @@ namespace hpx { namespace components { namespace server
 	//if the following conditional is true, then there is nothing to do
 	if(type == 0 && (brow == 0 || bcol == 0) || iter < 0){return 1;}
 
-	//used to decide if a new future needs to be made or not
-	bool made = true;
 	//we will need to create a future to perform LUgausstrail regardless
 	//of what this current function instance will compute
 	gmain_future trail_future(_gid,brow,bcol,iter-1,0);
+
+	//below decides what other futures need to be created in order to complete all
+	//necessary computations before we can return
 	if(type == 1){
 		trail_future.get();
 		LUgausscorner(iter);
