@@ -250,7 +250,7 @@ namespace hpx { namespace components { namespace server
 	//create multiple futures which in turn create more futures
         while(!complete){
 	    //there is only one more child thread left to produce
-            if(offset <= 1){
+            if(offset <= allocblock){
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,offset,true,gen()));
                 }
@@ -266,8 +266,11 @@ namespace hpx { namespace components { namespace server
             }
         }
 	//initialize the assigned row
-	for(unsigned int i=0;i<columns;i++){
-	    truedata[row][i] = (double) (gen() % 1000);
+	unsigned int temp = std::min((int)offset, (int)(rows - row));
+	for(unsigned int i=0;i<temp;i++){
+	    for(unsigned int j=0;j<columns;j++){
+		truedata[row+i][j] = (double) (gen() % 1000);
+	    }
 	}
 
 	//once all spun off futures are complete we are done
