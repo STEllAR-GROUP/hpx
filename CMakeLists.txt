@@ -57,8 +57,8 @@ set(Boost_COMPONENTS_NEEDED
     thread)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_ADDITIONAL_VERSIONS 
-    "1.44.0" "1.44" "1.44.0" "1.44" "1.43.0" "1.43" "1.42.0" "1.42" 
-    "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39")
+    "1.46.0" "1.46" "1.45.0" "1.45" "1.44.0" "1.44" "1.43.0" "1.43" 
+    "1.42.0" "1.42" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39")
 
 find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
 
@@ -82,7 +82,9 @@ link_directories(${Boost_LIBRARY_DIR})
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
-include_directories(${hpx_SOURCE_DIR}/external/chrono)
+if(${Boost_MINOR_VERSION} LESS 46)
+    include_directories(${hpx_SOURCE_DIR}/external/chrono)
+endif()
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${Boost_MINOR_VERSION} LESS 36)
@@ -142,7 +144,9 @@ add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
 # Boost.Chrono gets linked in directly (at least for now)
-add_definitions(-DBOOST_CHRONO_NO_LIB)
+if(${Boost_MINOR_VERSION} LESS 46)
+    add_definitions(-DBOOST_CHRONO_NO_LIB)
+endif()
 
 # compiler/platform specific configuration
 if(MSVC)
@@ -253,11 +257,13 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE)
-install(
-    DIRECTORY external/chrono/boost
-    DESTINATION include
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE)
+if(${Boost_MINOR_VERSION} LESS 46)
+    install(
+        DIRECTORY external/chrono/boost
+        DESTINATION include
+        FILES_MATCHING PATTERN "*.hpp"
+        PATTERN ".svn" EXCLUDE)
+endif()
 install(
     DIRECTORY external/coroutine/boost
     DESTINATION include

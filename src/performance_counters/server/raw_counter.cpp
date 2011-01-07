@@ -9,6 +9,11 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 
+#include <boost/version.hpp>
+#if BOOST_VERSION < 104600 && !defined(BOOST_CHRONO_NO_LIB)
+#define BOOST_CHRONO_NO_LIB
+#endif
+
 #include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

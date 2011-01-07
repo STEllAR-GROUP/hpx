@@ -126,7 +126,11 @@ namespace hpx { namespace util
 
                     // read and merge the ini file into the main ini hierarchy
                     try {
-                        ini.merge ((*dir).string ());
+#if BOOST_FILESYSTEM_VERSION == 3
+                        ini.merge ((*dir).path().string());
+#else
+                        ini.merge ((*dir).string());
+#endif
                     }
                     catch (hpx::exception const& /*e*/) {
                         ;

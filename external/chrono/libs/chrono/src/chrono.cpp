@@ -10,6 +10,9 @@
 #define BOOST_CHRONO_SOURCE 
 
 #include <boost/version.hpp>
+
+#if BOOST_VERSION < 104600
+
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
@@ -369,3 +372,5 @@ namespace chrono
 }  // namespace boost
 
 #endif  // POSIX
+
+#endif // BOOST_VERSION

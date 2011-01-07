@@ -79,14 +79,16 @@ namespace detail {
                 : m_name_prefix(name_prefix), m_flags(flags), m_cur_idx(0) {
 
             namespace fs = boost::filesystem;
-            if ( fs::path::default_name_check_writable() )
+#if BOOST_FILESYSTEM_VERSION == 2
+            if ( fs::path::default_name_check_writable() ) {
                 // so that we don't get exceptions
 #if BOOST_VERSION >= 104400
                 fs::path::default_name_check( boost::filesystem2::no_check);
 #else
                 fs::path::default_name_check( fs::no_check);
 #endif
-
+            }
+#endif
             restart();
         }
 

@@ -278,8 +278,7 @@ source_group ("Source Files"
 
 # lcos
 set (hpxlib_lcos_SOURCES
-    ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp
-    )
+    ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
 source_group ("Source Files\\lcos" 
     FILES ${hpxlib_lcos_SOURCES})
 
@@ -397,9 +396,11 @@ if (CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
 endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)
-set (hpxlib_SOURCES 
-     ${hpxlib_SOURCES}
-     ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+if(${Boost_MINOR_VERSION} LESS 46)
+    set (hpxlib_SOURCES 
+         ${hpxlib_SOURCES}
+         ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+endif()
 
 # yes, the main shared library contains components as well
 add_definitions(-DHPX_COMPONENT_NAME=hpx)

@@ -29,4 +29,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="My Amplifier Results\r016lw\r016lw.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+  </ItemGroup>
 </Project>
