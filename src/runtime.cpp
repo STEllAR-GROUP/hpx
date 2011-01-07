@@ -538,6 +538,16 @@ namespace hpx
 //         return (NULL == rt) ? 0 : rt->get_instance_number();
         return get_runtime().get_instance_number();
     }
+
+    std::string get_config_entry(std::string const& key, std::string const& dflt)
+    {
+        return get_runtime().get_config().get_entry(key, dflt);
+    }
+
+    std::string get_config_entry(std::string const& key, std::size_t dflt)
+    {
+        return get_runtime().get_config().get_entry(key, dflt);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -53,11 +53,10 @@
 #else
 #define VOLATILE volatile
 #endif
+
 #if defined(__APPLE__)
-//#define BOOST_COROUTINE_ALIGNMENT "4"
 #define BOOST_COROUTINE_TYPE_DIRECTIVE(name)
 #else
-//#define BOOST_COROUTINE_ALIGNMENT "16"
 #define BOOST_COROUTINE_TYPE_DIRECTIVE(name) ".type " #name ", @function\n\t"
 #endif
 
