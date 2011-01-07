@@ -215,6 +215,11 @@ namespace hpx
 
     class HPX_API_EXPORT runtime;
 
+    HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
+        std::string const& dflt);
+    HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
+        std::size_t dflt);
+
     template <
         typename SchedulingPolicy, 
         typename NotificationPolicy = threads::policies::callback_notifier> 

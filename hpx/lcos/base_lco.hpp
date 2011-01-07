@@ -214,7 +214,6 @@ namespace hpx { namespace lcos
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
     };
-
 }}
 
 #endif

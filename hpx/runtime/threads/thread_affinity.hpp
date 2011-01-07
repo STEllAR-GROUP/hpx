@@ -232,19 +232,16 @@ namespace hpx { namespace threads
         std::size_t num_cores = num_of_cores;
 
         num_blocks = boost::lexical_cast<std::size_t>(
-            get_runtime().get_config().get_entry("system_topology.num_blocks",
-                                                 num_blocks));
+            get_config_entry("system_topology.num_blocks", num_blocks));
         num_cores = boost::lexical_cast<std::size_t>(
-            get_runtime().get_config().get_entry("system_topology.num_cores",
-                                                 num_cores));
+            get_config_entry("system_topology.num_cores", num_cores));
 
         // Check sanity
         assert(num_blocks * num_cores == num_of_cores);
 
         // Choose thread mapping function and determine affinity
         std::string thread_map = "linear";
-        thread_map = get_runtime().get_config().get_entry(
-            "system_topology.thread_map", thread_map);
+        thread_map = get_config_entry("system_topology.thread_map", thread_map);
 
         std::size_t affinity;
         if (thread_map == "linear")
