@@ -1,0 +1,37 @@
+[had_amr]
+nx0         = 50
+nt0         = 10
+granularity = 10
+
+maxx0       =  15.0;
+minx0       = -15.0;
+
+lambda      = 0.0375
+
+amp = 0.172101
+delta  = 1.0
+R0     = 8.0
+PP     = 7
+
+ethreshold  = 0.005
+eps         = 0.3
+
+allowedl     = 0
+linearbounds = 0
+loglevel     = 2
+output       = 1.0
+output_level = 0
+output_stdout = 1
+
+refine_level_0 = 1.5
+refine_level_1 = 1.9
+refine_level_2 = 1.9
+refine_level_3 = 1.9
+refine_level_4 = 1.9
+refine_level_5 = 1.9
+refine_level_6 = 1.9
+refine_level_7 = 1.9
+refine_level_8 = 1.9
+refine_level_9 = 1.9
+
+scheduler = 1
