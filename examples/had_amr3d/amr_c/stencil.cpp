@@ -85,14 +85,14 @@ namespace hpx { namespace components { namespace amr
         if ( val.size() == 7 ) {
           compute_index = (val.size()-1)/2;
         } else {
-          had_double_type dxg = par->dxg;
+          had_double_type dx = par->dx0;
           int tmp_index = column/par->nx0;
           int c = tmp_index/par->nx0;
           int b = tmp_index%par->nx0;
           int a = column - par->nx0*(b+c*par->nx0);
-          had_double_type x = par->minx0 + a*dxg;
-          had_double_type y = par->minx0 + b*dxg;
-          had_double_type z = par->minx0 + c*dxg;
+          had_double_type x = par->minx0 + a*dx*par->granularity;
+          had_double_type y = par->minx0 + b*dx*par->granularity;
+          had_double_type z = par->minx0 + c*dx*par->granularity;
           compute_index = -1;
           for (int i=0;i<val.size();i++) {
             if ( floatcmp(x,val[i]->x_[0]) == 1 && 

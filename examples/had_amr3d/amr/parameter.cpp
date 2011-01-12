@@ -33,7 +33,6 @@ namespace hpx { namespace components { namespace amr
         ar & minx0;
         ar & maxx0;
         ar & dx0;
-        ar & dxg;
         ar & dt0;
         ar & ethreshold;
         ar & R0;

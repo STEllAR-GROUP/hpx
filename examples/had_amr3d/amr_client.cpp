@@ -385,7 +385,6 @@ int main(int argc, char* argv[])
         }
 
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
-        par->dxg = (par->maxx0 - par->minx0)/par->nx0;
 
         //par->dx0 = (par->maxx0 - par->minx0)/((par->nx0-1)*par->granularity);
         par->dt0 = par->lambda*par->dx0;

@@ -80,7 +80,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     val->level_= 0;
     had_double_type dx = par.dx0;
-    had_double_type dxg = par.dxg;
 
     int tmp_index = item/par.nx0;
     int c = tmp_index/par.nx0;
@@ -94,9 +93,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     for (int k=0;k<par.granularity;k++) {
     for (int j=0;j<par.granularity;j++) {
     for (int i=0;i<par.granularity;i++) {
-      had_double_type x = par.minx0 + a*dxg + i*dx;
-      had_double_type y = par.minx0 + b*dxg + j*dx;
-      had_double_type z = par.minx0 + c*dxg + k*dx;
+      had_double_type x = par.minx0 + a*dx*par.granularity + i*dx;
+      had_double_type y = par.minx0 + b*dx*par.granularity + j*dx;
+      had_double_type z = par.minx0 + c*dx*par.granularity + k*dx;
 
       had_double_type r = sqrt(x*x+y*y+z*z);
 
