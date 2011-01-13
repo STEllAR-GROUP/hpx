@@ -327,7 +327,7 @@ namespace hpx { namespace components { namespace amr
                     mutexes[6].get());
                 break;
 
-            case 7:
+            case 8:
                 boost::lock(
                     mutexes[0].get(), mutexes[1].get(), mutexes[2].get(), 
                     mutexes[3].get(), mutexes[4].get(), mutexes[5].get(), 
