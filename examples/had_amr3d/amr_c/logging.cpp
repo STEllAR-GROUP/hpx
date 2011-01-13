@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // output to file "output.dat"
         FILE *fdata;
-        std::vector<double> x,y,z,Phi,chi,Pi,energy;
+        std::vector<double> x,y,z,Phi,chi,Pi;
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
@@ -71,16 +71,13 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
             for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
               chi.push_back(val.value_[i].phi[0][0]);
-              Phi.push_back(val.value_[i].phi[0][1]);
-              Pi.push_back(val.value_[i].phi[0][2]);
-              energy.push_back(val.value_[i].energy);
+              Phi.push_back(val.value_[i].phi[0][4]);
               datatime = val.timestep_*par->dx0*par->lambda;
 #if 0
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
               std::string Phi_str = convert(val.value_[i].phi[0][1]);
               std::string Pi_str = convert(val.value_[i].phi[0][2]);
-              std::string energy_str = convert(val.value_[i].energy);
               std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
               fdata = fopen("chi.dat","a");
@@ -95,9 +92,6 @@ namespace hpx { namespace components { namespace amr { namespace server
               fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
               fclose(fdata);
 
-              fdata = fopen("energy.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),energy_str.c_str());
-              fclose(fdata);
 #endif
             }
 #if defined(SDF_FOUND)
@@ -106,10 +100,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             shape[0] = par->granularity;
             shape[1] = par->granularity;
             shape[2] = par->granularity;
-            gft_out_full("chi",datatime,shape,cnames,3,&*x.begin(),&*chi.begin());
-            gft_out_full("Phi",datatime,shape,cnames,3,&*x.begin(),&*Phi.begin());
-            gft_out_full("Pi",datatime,shape,cnames,3,&*x.begin(),&*Pi.begin());
-            gft_out_full("energy",datatime,shape,cnames,3,&*x.begin(),&*energy.begin());
+            gft_out_full("phi",datatime,shape,cnames,3,&*x.begin(),&*chi.begin());
+            gft_out_full("d4phi",datatime,shape,cnames,3,&*x.begin(),&*Phi.begin());
 #endif
           }
         }

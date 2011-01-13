@@ -236,6 +236,7 @@ int main(int argc, char* argv[])
         par->ethreshold  =  0.005;
         par->R0          =  8.0;
         par->amp         =  0.1;
+        par->amp_dot     =  0.1;
         par->delta       =  1.0;
         par->PP          =  7;
         par->eps         =  0.0;
@@ -318,6 +319,10 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("amp");
                 par->amp = atof(tmp.c_str());
               }
+              if ( sec->has_entry("amp_dot") ) {
+                std::string tmp = sec->get_entry("amp_dot");
+                par->amp_dot = atof(tmp.c_str());
+              }
               if ( sec->has_entry("PP") ) {
                 std::string tmp = sec->get_entry("PP");
                 par->PP = atoi(tmp.c_str());
@@ -356,6 +361,8 @@ int main(int argc, char* argv[])
         par->nx0 = nx0/par->granularity;
 
         par->nx[0] = par->nx0*par->nx0*par->nx0;
+        par->rowsize.push_back(par->nx[par->allowedl]);
+#if 0
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
         }
@@ -383,10 +390,9 @@ int main(int argc, char* argv[])
         for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
           tmp += par->granularity;
         }
-
+#endif
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
 
-        //par->dx0 = (par->maxx0 - par->minx0)/((par->nx0-1)*par->granularity);
         par->dt0 = par->lambda*par->dx0;
 
         // figure out the number of points
@@ -407,10 +413,6 @@ int main(int argc, char* argv[])
         fclose(fdata);
 
         fdata = fopen("Pi.dat","w");
-        fprintf(fdata,"\n");
-        fclose(fdata);
-
-        fdata = fopen("energy.dat","w");
         fprintf(fdata,"\n");
         fclose(fdata);
 

@@ -17,7 +17,6 @@
 struct nodedata
 {
     had_double_type phi[2][num_eqns];
-    had_double_type energy;
  
 private:
     // serialization support
@@ -26,16 +25,20 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & phi & energy;
+        ar & phi;
     }
 };
+
+typedef std::vector< nodedata* > nodedata1D;
+typedef std::vector< nodedata1D > nodedata2D;
+typedef std::vector< nodedata2D > nodedata3D;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct stencil_data 
 {
     stencil_data() 
       : max_index_(0), index_(0), timestep_(0), cycle_(0), granularity(0),
-        level_(0), g_startx_(0),g_endx_(0),g_dx_(0)
+        level_(0)
     {}
     ~stencil_data() {}
 
@@ -43,8 +46,7 @@ struct stencil_data
       : max_index_(rhs.max_index_), index_(rhs.index_), 
         timestep_(rhs.timestep_), cycle_(rhs.cycle_), 
         granularity(rhs.granularity), level_(rhs.level_), 
-        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_),
-        g_startx_(rhs.g_startx_),g_endx_(rhs.g_endx_),g_dx_(rhs.g_dx_)
+        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -62,9 +64,6 @@ struct stencil_data
             x_ = rhs.x_; 
             y_ = rhs.y_; 
             z_ = rhs.z_; 
-            g_startx_= rhs.g_startx_; 
-            g_endx_= rhs.g_endx_; 
-            g_dx_= rhs.g_dx_; 
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;
@@ -82,9 +81,6 @@ struct stencil_data
     std::vector< had_double_type > x_;      // x coordinate value
     std::vector< had_double_type > y_;      // x coordinate value
     std::vector< had_double_type > z_;      // x coordinate value
-    had_double_type g_startx_;
-    had_double_type g_endx_;
-    had_double_type g_dx_;
 
 private:
     // serialization support
@@ -94,7 +90,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & cycle_ & granularity & level_ & value_;
-        ar & x_ & y_ & z_ & g_startx_ & g_endx_ & g_dx_;
+        ar & x_ & y_ & z_;
     }
 };
 

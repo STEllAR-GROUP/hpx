@@ -69,6 +69,42 @@ namespace boost
             l1.release();
             return 0;
         }
+
+        template <typename MutexType1, typename MutexType2, typename MutexType3,
+            typename MutexType4, typename MutexType5, typename MutexType6,
+            typename MutexType7>
+        unsigned try_lock_internal(MutexType1& m1, MutexType2& m2, MutexType3& m3,
+                                   MutexType4& m4, MutexType5& m5, MutexType6& m6,
+                                   MutexType7& m7)
+        {
+            boost::unique_lock<MutexType1> l1(m1, boost::try_to_lock);
+            if(!l1)
+            {
+                return 1;
+            }
+            if(unsigned const failed_lock=try_lock_internal(m2, m3, m4, m5, m6, m7))
+            {
+                return failed_lock+1;
+            }
+            l1.release();
+            return 0;
+        }
+
+        template <typename MutexType1, typename MutexType2, typename MutexType3,
+            typename MutexType4, typename MutexType5, typename MutexType6,
+            typename MutexType7, typename MutexType8>
+        unsigned lock_helper(MutexType1& m1, MutexType2& m2, MutexType3& m3,
+                             MutexType4& m4, MutexType5& m5, MutexType6& m6,
+                             MutexType7& m7, MutexType8& m8)
+        {
+            boost::unique_lock<MutexType1> l1(m1);
+            if (unsigned const failed_lock = try_lock_internal(m2, m3, m4, m5, m6, m7, m8))
+            {
+                return failed_lock;
+            }
+            l1.release();
+            return 0;
+        }
     }
 
     template <typename MutexType1, typename MutexType2, typename MutexType3,
@@ -178,6 +214,70 @@ namespace boost
             }
         }
     }
+
+    template <typename MutexType1, typename MutexType2, typename MutexType3,
+        typename MutexType4, typename MutexType5, typename MutexType6,
+        typename MutexType7, typename MutexType8>
+    void lock(MutexType1& m1, MutexType2& m2, MutexType3& m3,
+              MutexType4& m4, MutexType5& m5, MutexType6& m6,
+              MutexType7& m7, MutexType8& m8)
+    {
+        unsigned const lock_count = 8;
+        unsigned lock_first = 0;
+        for (;;)
+        {
+            switch (lock_first)
+            {
+            case 0:
+                lock_first=detail::lock_helper(m1, m2, m3, m4, m5, m6, m7, m8);
+                if (!lock_first)
+                    return;
+                break;
+            case 1:
+                lock_first = detail::lock_helper(m2, m3, m4, m5, m6, m7, m8, m1);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+1) % lock_count;
+                break;
+            case 2:
+                lock_first = detail::lock_helper(m3, m4, m5, m6, m7, m8, m1, m2);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+2) % lock_count;
+                break;
+            case 3:
+                lock_first = detail::lock_helper(m4, m5, m6, m7, m8, m1, m2, m3);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+3) % lock_count;
+                break;
+            case 4:
+                lock_first = detail::lock_helper(m5, m6, m7, m8, m1, m2, m3, m4);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+4) % lock_count;
+                break;
+            case 5:
+                lock_first = detail::lock_helper(m6, m7, m8, m1, m2, m3, m4, m5);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+5) % lock_count;
+                break;
+            case 6:
+                lock_first = detail::lock_helper(m7, m8, m1, m2, m3, m4, m5, m6);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+6) % lock_count;
+                break;
+            case 7:
+                lock_first = detail::lock_helper(m8, m7, m1, m2, m3, m4, m5, m6);
+                if (!lock_first)
+                    return;
+                lock_first = (lock_first+7) % lock_count;
+                break;
+            }
+        }
+    }
 }
 
 namespace hpx { namespace components { namespace amr 
@@ -227,8 +327,14 @@ namespace hpx { namespace components { namespace amr
                     mutexes[6].get());
                 break;
 
+            case 8:
+                boost::lock(
+                    mutexes[0].get(), mutexes[1].get(), mutexes[2].get(), 
+                    mutexes[3].get(), mutexes[4].get(), mutexes[5].get(), 
+                    mutexes[6].get(), mutexes[7].get());
+                break;
+
             default:
-                std::cout << " TEST mutex size " << mutexes.size() << std::endl;
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "hpx::components::amr::detail::lock", 
                     "invalid number of arguments");

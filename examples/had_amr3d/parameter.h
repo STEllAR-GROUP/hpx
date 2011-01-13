@@ -53,12 +53,12 @@ struct Par {
       had_double_type R0;
       had_double_type delta;
       had_double_type amp;
+      had_double_type amp_dot;
       had_double_type eps;
       int output_level;
       int PP;
       int granularity;
       std::vector<std::size_t> rowsize;
-      std::vector<std::size_t> level_begin, level_end;
 };
 
 #if defined(__cplusplus)

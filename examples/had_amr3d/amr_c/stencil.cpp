@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace amr
             get_memory_block_async(val, gids, result);
 
         // lock all user defined data elements, will be unlocked at function exit
-        //scoped_values_lock<lcos::mutex> l(resultval, val);
+        scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -107,7 +107,7 @@ namespace hpx { namespace components { namespace amr
           }
         } 
 
-//#if 0
+#if 0
 // ------------------------------------------------------
 // TEST mode
         resultval.get() = val[compute_index].get();
@@ -138,9 +138,8 @@ namespace hpx { namespace components { namespace amr
         return 1;
 // END TEST mode
 // ------------------------------------------------------
-//#endif
-#if 0
-
+#endif
+//#if 0
         // these vectors are used for ghostwidth treatment
         std::vector< had_double_type > alt_vecx;
         std::vector< nodedata > alt_vecval;
@@ -148,20 +147,53 @@ namespace hpx { namespace components { namespace amr
         // put all data into a single array
         std::vector< had_double_type* > vecx;
         std::vector< nodedata* > vecval;
- 
-        std::size_t adj_index;
-        if ( compute_index == 1 ) adj_index = val[0]->granularity;
-        else {
-          BOOST_ASSERT(compute_index == 0);
-          adj_index = 0;
+//#if 0
+        nodedata3D valcube;
+        std::vector<nodedata>::iterator niter;
+        valcube.resize(3*par->granularity);
+        for (int i=0;i< valcube.size();i++) {
+          valcube[i].resize(3*par->granularity);
+          for (int j=0;j< valcube[i].size(); j++) {
+            valcube[i][j].resize(3*par->granularity);
+          }
         }
 
-        std::vector<had_double_type>::iterator iter;
-        for (iter=val[0]->x_.begin();iter!=val[0]->x_.end();++iter) vecx.push_back( &(*iter) ); 
-        for (iter=val[1]->x_.begin();iter!=val[1]->x_.end();++iter) vecx.push_back( &(*iter) ); 
-        if ( val.size() == 3 ) {
-          for (iter=val[2]->x_.begin();iter!=val[2]->x_.end();++iter) vecx.push_back( &(*iter) ); 
+        for (int i=0;i<val.size();i++) {
+          int ii,jj,kk;
+          if ( i == compute_index-3 ) {
+            ii = 0; jj = 0; kk = -1;
+          } else if ( i == compute_index-2 ) {
+            ii = 0; jj = -1; kk = 0;
+          } else if ( i == compute_index-1 ) {
+            ii = -1; jj = 0; kk = 0;
+          } else if ( i == compute_index ) {
+            ii = 0; jj = 0; kk = 0;
+          } else if ( i == compute_index+1 ) {
+            ii = 1; jj = 0; kk = 0;
+          } else if ( i == compute_index+2 ) {
+            ii = 0; jj = 1; kk = 0;
+          } else if ( i == compute_index+3 ) {
+            ii = 0; jj = 0; kk = 1;
+          }
+
+          int count = 0;
+          for (niter=val[i]->value_.begin();niter!=val[i]->value_.end();++niter) {
+            int tmp_index = count/par->granularity;
+            int c = tmp_index/par->granularity;
+            int b = tmp_index%par->granularity;
+            int a = count - par->granularity*(b+c*par->granularity);
+
+           // if ( a+(ii+1)*par->granularity == par->granularity-1 ) {
+           //   std::cout << " FOUND TEST " << b+(jj+1)*par->granularity << " " << c+(kk+1)*par->granularity << std::endl;
+           // }
+  
+            valcube[a+(ii+1)*par->granularity][b+(jj+1)*par->granularity][c+(kk+1)*par->granularity] = &(*niter); 
+            count++;
+          }
         }
+
+        //  std::cout << " TEST " << valcube[par->granularity-1][par->granularity][par->granularity]->phi[0][4] << std::endl;
+//#endif
 
         std::vector<nodedata>::iterator n_iter;
         for (n_iter=val[0]->value_.begin();n_iter!=val[0]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
@@ -172,6 +204,8 @@ namespace hpx { namespace components { namespace amr
 
         // copy over critical info
         resultval->x_ = val[compute_index]->x_;
+        resultval->y_ = val[compute_index]->y_;
+        resultval->z_ = val[compute_index]->z_;
         resultval->granularity = val[compute_index]->granularity;
         resultval->level_ = val[compute_index]->level_;
         resultval->cycle_ = val[compute_index]->cycle_ + 1;
@@ -180,193 +214,21 @@ namespace hpx { namespace components { namespace amr
         resultval->granularity = val[compute_index]->granularity;
         resultval->index_ = val[compute_index]->index_;
 
-        resultval->g_startx_ = val[compute_index]->g_startx_;
-        resultval->g_endx_ = val[compute_index]->g_endx_;
-        resultval->g_dx_ = val[compute_index]->g_dx_;
-
-        if ( val.size() == 3 ) {
-          // ghostwidth {{{
-          // ghostwidth interpolation can only occur when rows contain aligned timesteps are aligned
-          // During other iterations, points are treated as artificial boundaries and eventually tapered.
-          if ( val[0]->level_ != val[1]->level_ || val[1]->level_ != val[2]->level_ ) {
-            // sanity checks
-            BOOST_ASSERT(val[0]->level_ > val[2]->level_);
-            BOOST_ASSERT(compute_index == 1);
-            BOOST_ASSERT(adj_index == val[0]->granularity);
-
-            had_double_type dx = *vecx[1] - *vecx[0];
-
-            resultval->g_startx_ = val[compute_index]->x_[0];
-            resultval->g_endx_ = val[compute_index]->x_[val[compute_index]->granularity-1];
-            resultval->g_dx_ = val[compute_index]->x_[1]-val[compute_index]->x_[0];
-
-            // There are two cases:  you either have to downsample val[0] or interpolate val[2]
-            if ( val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) {
-
-              // CASE I
-              // -------------------------------
-              // down-sample val[0]
-              int half;
-              if ( val[0]->granularity%2 == 0 ) {
-                half = val[0]->granularity/2;
-              } else {
-                half = (val[0]->granularity-1)/2;
-              }
-              alt_vecval.resize(half + val[1]->granularity + val[2]->granularity);
-              alt_vecx.resize(half + val[1]->granularity + val[2]->granularity);
-
-              // points in val[1] and val[2] remain the same
-              int count = half;
-              for (int j=adj_index;j<vecx.size();j++) {
-                alt_vecx[count] = *vecx[j];
-                alt_vecval[count] = *vecval[j];
-                count++;
-              }
-
-              count = half-1;
-              for (int j=adj_index-2;j>=0;j=j-2) {
-                alt_vecx[count] = *vecx[j];
-                alt_vecval[count] = *vecval[j];
-                count--;
-              }
-
-              adj_index = half;
-
-              vecx.resize(0);
-              vecval.resize(0);
-              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
-              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-
-            } else if (val[2]->level_ != val[1]->level_ && val[0]->level_ == val[1]->level_ ) {
-
-              // CASE II
-              // -------------------------------
-              // interpolate val[2]
-              alt_vecval.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
-              alt_vecx.resize(val[0]->granularity + val[1]->granularity + 2*val[2]->granularity-1);
-
-              // no interpolation needed for points in val[0], val[1], and the first point in val[2]
-              std::size_t start;
-              start = val[0]->granularity+val[1]->granularity;
-              for (int j=0;j<=start;j++) {
-                alt_vecx[j] = *vecx[j];
-                alt_vecval[j] = *vecval[j];
-              }
-
-              // set up the new 'x' vector
-              for (int j=start;j<alt_vecx.size();j++) {
-                alt_vecx[j] = *vecx[start] + (j-start)*dx;
-              }
-
-              // set up the new 'values' vector
-              int count = 1;
-              for (int j=start+1;j<alt_vecx.size();j++) {
-                if ( count%2 == 0 ) {
-                  alt_vecval[j] = *vecval[start+count/2];
-                } else {
-                  // linear interpolation
-                  for (int i=0;i<num_eqns;i++) {
-                    alt_vecval[j].phi[0][i] = 0.5*vecval[start+(count-1)/2]->phi[0][i] 
-                                            + 0.5*vecval[start+(count+1)/2]->phi[0][i];
-                    // note that we do not interpolate the phi[1] variables since interpolation
-                    // only occurs after the 3 rk steps (i.e. rk_iter = 0).  phi[1] has not impact at rk_iter=0.
-                  }
-                }
-                count++;
-              }
-
-              // temporarily change the resultval->granularity
-              resultval->granularity = val[1]->granularity + 2*val[2]->granularity-1;
-              resultval->x_.resize(resultval->granularity);
-              for (int j = 0; j < resultval->granularity; j++) {
-                resultval->x_[j] = alt_vecx[j+adj_index];
-              }
-
-              vecx.resize(0);
-              vecval.resize(0);
-              for (iter=alt_vecx.begin();iter!=alt_vecx.end();++iter) vecx.push_back( &(*iter) ); 
-              for (n_iter=alt_vecval.begin();n_iter!=alt_vecval.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-            } else {
-              // this case should not occur
-              BOOST_ASSERT(false);
-            }
-          }
-          // }}}
-        }
-        if ( val.size() == 2 ) {
-          if ( val[0]->level_ != val[1]->level_ ) {
-            // This protects the user from picking a granularity too large with nx0 too small
-            BOOST_ASSERT(floatcmp(*vecx[1] - *vecx[0],*vecx[vecx.size()-1]-*vecx[vecx.size()-2]));
-          }
-        }
-
-        // DEBUG
-        //char description[80];
-        //double dasx = (double) resultval->x_[0];
-        //double dast = (double) resultval->timestep_;
-        //snprintf(description,sizeof(description),"x: %g t: %g level: %d",dasx,dast,val[0]->level_);
-        //threads::thread_self& self = threads::get_self();
-        //threads::thread_id_type id = self.get_thread_id();
-        //threads::set_thread_description(id,description);
-
         if (val[compute_index]->timestep_ < (int)numsteps_) {
-
-            // copy over critical info
-            resultval->x_.resize(resultval->granularity);
-            resultval->value_.resize(resultval->granularity);
 
             int level = val[compute_index]->level_;
 
             had_double_type dt = par->dt0/pow(2.0,level);
             had_double_type dx = par->dx0/pow(2.0,level); 
 
-            // DEBUG
-            //for (int j=0;j<vecx.size()-1;j++) {
-            //  if ( floatcmp(*vecx[j+1]-*vecx[j],dx) == 0 ) {
-            //     BOOST_ASSERT(false);
-            //  }
-            //}
+             // TEST
+             resultval.get() = val[compute_index].get();
 
             // call rk update 
-            int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
+            int adj_index = 0;
+            int gft = rkupdate(valcube,resultval.get_ptr(),
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                  level,*par.p);
-
-            // Test for singularity
-            if ( resultval->value_[0].phi[0][0] < 1.e17 ) {
-            } else {
-              FILE *fdata;
-              std::cout << " BLACKHOLE " << std::endl;
-              fdata = fopen("BLACKHOLE","w");
-              fprintf(fdata,"\n");
-              fclose(fdata);
-              BOOST_ASSERT(false);
-            }
-            BOOST_ASSERT(gft);
-
-            // ghostwidth resizing
-            if ( val.size() == 2 ) {
-              if ( resultval->granularity != par->granularity ) {
-                  // tapering {{{
-
-                  int count = 0;
-                  for (int j=resultval->x_.size()-1;j>=0;j--) {
-                    if ( floatcmp(resultval->x_[j],resultval->g_endx_ - count*resultval->g_dx_) == 1 ) {
-                      count++;
-                    }  else {
-                      resultval->x_.erase(resultval->x_.begin()+j);
-                      resultval->value_.erase(resultval->value_.begin()+j);
-                    }
-                  }
-
-                  resultval->granularity = par->granularity;
-
-                  BOOST_ASSERT(floatcmp(resultval->x_[0],resultval->g_startx_) == 1);
-                  BOOST_ASSERT(floatcmp(resultval->x_[par->granularity-1],resultval->g_endx_) == 1);
-                  BOOST_ASSERT(resultval->x_.size() == par->granularity);
-                  // }}}
-              }
-            }
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
                 stencil_data data (resultval.get());
@@ -384,7 +246,8 @@ namespace hpx { namespace components { namespace amr
           return 0;
         }
         return 1;
-#endif
+
+//#endif
     }
 
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
