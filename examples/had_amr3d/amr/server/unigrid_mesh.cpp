@@ -334,7 +334,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 8;
+        std::size_t memsize = 28;
         Array3D dst_port(num_rows,each_row[0],memsize);
         Array3D dst_src(num_rows,each_row[0],memsize);
         Array3D dst_step(num_rows,each_row[0],memsize);
@@ -500,34 +500,17 @@ namespace hpx { namespace components { namespace amr { namespace server
           a = i - par->nx0*(b+c*par->nx0);
           BOOST_ASSERT(i == a + par->nx0*(b+c*par->nx0));
           
-          vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(counter);
-          counter++;
-
-          for (int kk=c-1;kk<c+2;kk = kk+2) {
-            if ( kk >=0 && kk < par->nx0 ) {
-              j = a + par->nx0*(b+kk*par->nx0);
+          for (int kk=c-1;kk<c+2;kk++) {
+          for (int jj=b-1;jj<b+2;jj++) {
+          for (int ii=a-1;ii<a+2;ii++) {
+            if ( kk >=0 && kk < par->nx0 &&
+                 jj >=0 && jj < par->nx0 &&
+                 ii >=0 && ii < par->nx0 ) {
+              j = ii + par->nx0*(jj+kk*par->nx0);
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             }
-          }
-
-          for (int jj=b-1;jj<b+2;jj = jj+2) {
-            if ( jj >=0 && jj < par->nx0 ) {
-              j = a + par->nx0*(jj+c*par->nx0);
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-
-          for (int ii=a-1;ii<a+2;ii = ii+2) {
-            if ( ii >=0 && ii < par->nx0 ) {
-              j = ii + par->nx0*(b+c*par->nx0);
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }
-          }
-
-
+          }}}
         }
       }
 

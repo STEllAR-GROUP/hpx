@@ -29,10 +29,6 @@ private:
     }
 };
 
-typedef std::vector< nodedata* > nodedata1D;
-typedef std::vector< nodedata1D > nodedata2D;
-typedef std::vector< nodedata2D > nodedata3D;
-
 ///////////////////////////////////////////////////////////////////////////////
 struct stencil_data 
 {

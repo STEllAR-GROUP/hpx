@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace amr
             get_memory_block_async(val, gids, result);
 
         // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(resultval, val); 
+        //scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -80,9 +80,9 @@ namespace hpx { namespace components { namespace amr
           compute_index = (val.size()-1)/2;
         }
 #endif
-        compute_index = 0;
 
-        if ( val.size() == 7 ) {
+        compute_index = -1;
+        if ( val.size() == 27 ) {
           compute_index = (val.size()-1)/2;
         } else {
           had_double_type dx = par->dx0;
@@ -94,51 +94,12 @@ namespace hpx { namespace components { namespace amr
           had_double_type y = par->minx0 + b*dx*par->granularity;
           had_double_type z = par->minx0 + c*dx*par->granularity;
           compute_index = -1;
-          bbox[0] = 1; bbox[1] = 1; bbox[2] = 1;
-          bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
           for (int i=0;i<val.size();i++) {
-            // figure out bounding box
-            if ( x > val[i]->x_[0] && 
-                 floatcmp(y,val[i]->y_[0]) == 1 && 
-                 floatcmp(z,val[i]->z_[0]) == 1 ) {
-              bbox[0] = 0;
-            }
-
-            if ( x < val[i]->x_[0] && 
-                 floatcmp(y,val[i]->y_[0]) == 1 && 
-                 floatcmp(z,val[i]->z_[0]) == 1 ) {
-              bbox[1] = 0;
-            }
-
-            if ( floatcmp(x,val[i]->x_[0]) && 
-                 y > val[i]->y_[0]  && 
-                 floatcmp(z,val[i]->z_[0]) == 1 ) {
-              bbox[2] = 0;
-            }
-
-            if ( floatcmp(x,val[i]->x_[0]) && 
-                 y < val[i]->y_[0]  && 
-                 floatcmp(z,val[i]->z_[0]) == 1 ) {
-              bbox[3] = 0;
-            }
-
-            if ( floatcmp(x,val[i]->x_[0]) && 
-                 floatcmp(y,val[i]->y_[0]) == 1 && 
-                 z > val[i]->z_[0] ) {
-              bbox[4] = 0;
-            }
-
-            if ( floatcmp(x,val[i]->x_[0]) && 
-                 floatcmp(y,val[i]->y_[0]) == 1 && 
-                 z < val[i]->z_[0] ) {
-              bbox[5] = 0;
-            }
-
-
             if ( floatcmp(x,val[i]->x_[0]) == 1 && 
                  floatcmp(y,val[i]->y_[0]) == 1 && 
                  floatcmp(z,val[i]->z_[0]) == 1 ) {
               compute_index = i;
+              break;
             }
           }
           if ( compute_index == -1 ) {
@@ -162,9 +123,6 @@ namespace hpx { namespace components { namespace amr
         resultval->granularity = val[compute_index]->granularity;
         resultval->index_ = val[compute_index]->index_;
 
-        resultval->g_startx_ = val[compute_index]->g_startx_;
-        resultval->g_endx_ = val[compute_index]->g_endx_;
-        resultval->g_dx_ = val[compute_index]->g_dx_;
         resultval->timestep_ = val[compute_index]->timestep_ + 1.0/pow(2.0,resultval->level_);
         if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
           stencil_data data (resultval.get());
@@ -176,44 +134,80 @@ namespace hpx { namespace components { namespace amr
         //  return 0;
         //}
         return 1;
-// END TEST mode
+ END TEST mode
 // ------------------------------------------------------
 #endif
-//#if 0
-        // these vectors are used for ghostwidth treatment
-        std::vector< had_double_type > alt_vecx;
-        std::vector< nodedata > alt_vecval;
-
-        // put all data into a single array
-        std::vector< had_double_type* > vecx;
-        std::vector< nodedata* > vecval;
-//#if 0
-        nodedata3D valcube;
+        std::vector<nodedata* > vecval;
         std::vector<nodedata>::iterator niter;
-        valcube.resize(3*par->granularity);
-        for (int i=0;i< valcube.size();i++) {
-          valcube[i].resize(3*par->granularity);
-          for (int j=0;j< valcube[i].size(); j++) {
-            valcube[i][j].resize(3*par->granularity);
-          }
-        }
+        // this is really a 3d array
+        vecval.resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
 
+        int count_i = 0;
+        int count_j = 0;
+        if ( boundary ) {
+          bbox[0] = 1; bbox[1] = 1; bbox[2] = 1;
+          bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
+        }
         for (int i=0;i<val.size();i++) {
           int ii,jj,kk;
-          if ( i == compute_index-3 ) {
-            ii = 0; jj = 0; kk = -1;
-          } else if ( i == compute_index-2 ) {
-            ii = 0; jj = -1; kk = 0;
-          } else if ( i == compute_index-1 ) {
-            ii = -1; jj = 0; kk = 0;
-          } else if ( i == compute_index ) {
-            ii = 0; jj = 0; kk = 0;
-          } else if ( i == compute_index+1 ) {
-            ii = 1; jj = 0; kk = 0;
-          } else if ( i == compute_index+2 ) {
-            ii = 0; jj = 1; kk = 0;
-          } else if ( i == compute_index+3 ) {
-            ii = 0; jj = 0; kk = 1;
+          if ( val.size() == 27 ) {
+            kk = i/9 - 1;
+            jj = count_j - 1;
+            ii = count_i - 1;
+            count_i++;
+            if ( count_i%3 == 0 ) {
+              count_i = 0; 
+              count_j++;
+            }
+            if ( count_j%3 == 0 ) count_j = 0;
+          } else {
+            had_double_type x = val[compute_index]->x_[0];
+            had_double_type y = val[compute_index]->y_[0];
+            had_double_type z = val[compute_index]->z_[0];
+
+            bool xchk = floatcmp(x,val[i]->x_[0]);
+            bool ychk = floatcmp(y,val[i]->y_[0]);
+            bool zchk = floatcmp(z,val[i]->z_[0]);
+
+            if ( xchk ) ii = 0;
+            else if ( x > val[i]->x_[0] ) ii = -1;
+            else if ( x < val[i]->x_[0] ) ii = 1;
+            else BOOST_ASSERT(false);
+
+            if ( ychk ) jj = 0;
+            else if ( y > val[i]->y_[0] ) jj = -1;
+            else if ( y < val[i]->y_[0] ) jj = 1;
+            else BOOST_ASSERT(false);
+
+            if ( zchk ) kk = 0;
+            else if ( z > val[i]->z_[0] ) kk = -1;
+            else if ( z < val[i]->z_[0] ) kk = 1;
+            else BOOST_ASSERT(false);
+
+            // figure out bounding box
+            if ( x > val[i]->x_[0] && ychk && zchk ) {
+              bbox[0] = 0;
+            }
+
+            if ( x < val[i]->x_[0] && ychk && zchk ) {
+              bbox[1] = 0;
+            }
+
+            if ( xchk && y > val[i]->y_[0]  && zchk ) {
+              bbox[2] = 0;
+            }
+
+            if ( xchk && y < val[i]->y_[0]  && zchk ) {
+              bbox[3] = 0;
+            }
+
+            if ( xchk && ychk && z > val[i]->z_[0] ) {
+              bbox[4] = 0;
+            }
+
+            if ( xchk && ychk && z < val[i]->z_[0] ) {
+              bbox[5] = 0;
+            }
           }
 
           int count = 0;
@@ -223,13 +217,13 @@ namespace hpx { namespace components { namespace amr
             int b = tmp_index%par->granularity;
             int a = count - par->granularity*(b+c*par->granularity);
 
-            valcube[a+(ii+1)*par->granularity][b+(jj+1)*par->granularity][c+(kk+1)*par->granularity] = &(*niter); 
+            vecval[a+(ii+1)*par->granularity 
+                      + 3*par->granularity*( 
+                           (b+(jj+1)*par->granularity)
+                              +3*par->granularity*(c+(kk+1)*par->granularity) )] = &(*niter); 
             count++;
           }
         }
-
-        //std::cout << " TEST " << valcube[par->granularity][par->granularity][par->granularity]->phi[0][4] << std::endl;
-//#endif
 
         // copy over critical info
         resultval->x_ = val[compute_index]->x_;
@@ -253,13 +247,13 @@ namespace hpx { namespace components { namespace amr
 
             // call rk update 
             int adj_index = 0;
-            int gft = rkupdate(valcube,resultval.get_ptr(),
+            int gft = rkupdate(vecval,resultval.get_ptr(),
                                  boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                  level,*par.p);
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
                 stencil_data data (resultval.get());
-                unlock_scoped_values_lock<lcos::mutex> ul(l);
+            //    unlock_scoped_values_lock<lcos::mutex> ul(l);
                 stubs::logging::logentry(log_, data, row, 0, par);
             }
         }

@@ -27,6 +27,11 @@ namespace hpx { namespace components { namespace amr
 }}}
 #endif
 
+void calcrhs(struct nodedata * rhs,
+             std::vector< nodedata* > const& vecval,
+             int flag, had_double_type const& dx,
+             bool boundary,int i,int j,int k, Par const& par);
+
 ///////////////////////////////////////////////////////////////////////////////
 // local functions
 inline int floatcmp(had_double_type const& x1, had_double_type const& x2) 
@@ -40,12 +45,6 @@ inline int floatcmp(had_double_type const& x1, had_double_type const& x2)
     return 0;
   }
 }
-
-void calcrhs(struct nodedata * rhs,
-               std::vector< nodedata* > const& vecval,
-               std::vector< had_double_type* > const& vecx,
-                int flag, had_double_type const& dx, int size,
-                bool boundary, int *bbox,int compute_index, Par const& par);
 
 inline had_double_type initial_chi(had_double_type const& r,Par const& par) 
 {
@@ -145,7 +144,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(nodedata3D const& vecval, stencil_data* result, 
+int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result, 
   bool boundary,
   int *bbox, int compute_index, 
   had_double_type const& dt, had_double_type const& dx, had_double_type const& timestep,
@@ -153,9 +152,18 @@ int rkupdate(nodedata3D const& vecval, stencil_data* result,
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
-  std::vector<nodedata> work;
-  std::vector<nodedata* > pwork;
+  std::vector<nodedata> work,work2;
+  std::vector<nodedata* > pwork, pwork2;
+  static had_double_type const c_0_75 = 0.75;
+  static had_double_type const c_0_25 = 0.25;
+  static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
+  static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
+
   work.resize(vecval.size());
+  work2.resize(vecval.size());
+
+  int n = 3*par.granularity;
+  int n2 = par.granularity;
 
   // -------------------------------------------------------------------------
   // iter 0
@@ -163,35 +171,49 @@ int rkupdate(nodedata3D const& vecval, stencil_data* result,
     start = par.granularity;
     end = 2*par.granularity;
 
-    //Euler for starters
-    int ii,jj,kk;
     for (int k=start; k<end;k++) {
     for (int j=start; j<end;j++) {
     for (int i=start; i<end;i++) {
-      ii = i-par.granularity;
-      jj = j-par.granularity;
-      kk = k-par.granularity;
-      if ( !boundary ) {
-        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][0] = 
-                 vecval[i][j][k]->phi[0][0] + vecval[i][j][k]->phi[0][4]*dt;
+      calcrhs(&rhs,vecval,0,dx,boundary,i,j,k,par); 
+      for (int ll=0;ll<num_eqns;ll++) {
+        work[i+n*(j+n*k)].phi[0][ll] = vecval[i+n*(j+n*k)]->phi[0][ll];
+        work[i+n*(j+n*k)].phi[1][ll] = vecval[i+n*(j+n*k)]->phi[0][ll] + rhs.phi[0][ll]*dt; 
+      }
+    }}}
 
-        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][1] = 
-                 vecval[i][j][k]->phi[0][1] 
-           - dt*0.5*(vecval[i+1][j][k]->phi[0][4] - vecval[i-1][j][k]->phi[0][4])/dx;
-  
-        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][2] = 
-                 vecval[i][j][k]->phi[0][2] 
-           - dt*0.5*(vecval[i][j+1][k]->phi[0][4] - vecval[i][j+1][k]->phi[0][4])/dx;
-  
-        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][3] = 
-                 vecval[i][j][k]->phi[0][3] 
-           - dt*0.5*(vecval[i][j][k+1]->phi[0][4] - vecval[i][j][k-1]->phi[0][4])/dx;
-  
-        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][4] = 
-                 vecval[i][j][k]->phi[0][4] 
-           - dt*0.5*(vecval[i+1][j][k]->phi[0][1] - vecval[i-1][j][k]->phi[0][1])/dx
-           - dt*0.5*(vecval[i][j+1][k]->phi[0][2] - vecval[i][j-1][k]->phi[0][2])/dx
-           - dt*0.5*(vecval[i][j][k+1]->phi[0][3] - vecval[i][j][k-1]->phi[0][3])/dx;
+    std::vector<nodedata>::iterator n_iter;
+    for (n_iter=work.begin();n_iter!=work.end();++n_iter) pwork.push_back( &(*n_iter) );
+
+  // -------------------------------------------------------------------------
+  // iter 1
+    for (int k=start; k<end;k++) {
+    for (int j=start; j<end;j++) {
+    for (int i=start; i<end;i++) {
+      calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
+      for (int ll=0;ll<num_eqns;ll++) {
+        work2[i+n*(j+n*k)].phi[1][ll] = c_0_75*work[i+n*(j+n*k)].phi[0][ll] + 
+                                        c_0_25*work[i+n*(j+n*k)].phi[1][ll] + 
+                                        c_0_25*rhs.phi[0][ll]*dt;
+      }
+    }}}
+
+    for (n_iter=work2.begin();n_iter!=work2.end();++n_iter) pwork2.push_back( &(*n_iter) );
+
+  // -------------------------------------------------------------------------
+  // iter 2
+    int ii,jj,kk;
+    for (int k=n2; k<2*n2;k++) {
+    for (int j=n2; j<2*n2;j++) {
+    for (int i=n2; i<2*n2;i++) {
+      calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
+
+      ii = i - n2;
+      jj = j - n2;
+      kk = k - n2;
+      for (int ll=0;ll<num_eqns;ll++) {
+        result->value_[ii + n2*(jj + n2*kk)].phi[0][ll] = 
+                                   c_1_3*work[i+n*(j+n*k)].phi[0][ll]  
+                                 + c_2_3*(work2[i+n*(j+n*k)].phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }}}
 
@@ -203,8 +225,27 @@ int rkupdate(nodedata3D const& vecval, stencil_data* result,
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
                std::vector< nodedata* > const& vecval,
-               std::vector< had_double_type* > const& vecx,
-                int flag, had_double_type const& dx, int size,
-                bool boundary, int *bbox,int compute_index, Par const& par)
+                int flag, had_double_type const& dx,
+                bool boundary,int i,int j,int k, Par const& par)
 {
+
+  int n = 3*par.granularity;
+
+  if ( !boundary ) {
+    rhs->phi[0][0] = vecval[i+n*(j+n*k)]->phi[flag][4]; 
+    rhs->phi[0][1] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][4] - vecval[i-1+n*(j+n*k)]->phi[flag][4])/dx;
+    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][4] - vecval[i+n*(j+1+n*k)]->phi[flag][4])/dx;
+    rhs->phi[0][3] = - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][4] - vecval[i+n*(j+n*(k-1))]->phi[flag][4])/dx;
+    rhs->phi[0][4] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][1] - vecval[i-1+n*(j+n*k)]->phi[flag][1])/dx
+                - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][2] - vecval[i+n*(j-1+n*k)]->phi[flag][2])/dx
+                - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][3] - vecval[i+n*(j+n*(k-1))]->phi[flag][3])/dx;
+  } else {
+    // dirichlet
+    rhs->phi[0][0] = 0.0;
+    rhs->phi[0][1] = 0.0;
+    rhs->phi[0][2] = 0.0;
+    rhs->phi[0][3] = 0.0;
+    rhs->phi[0][4] = 0.0;
+  }
+  return;
 }
