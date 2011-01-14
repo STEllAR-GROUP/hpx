@@ -72,7 +72,7 @@ namespace hpx { namespace components { namespace amr
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         bool boundary = false;
-        int bbox[2] = { 0, 0 };   // initialize bounding box
+        int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
 #if 0
         if ( val.size()%2 == 0 ) {
           compute_index = (val.size())/2;
@@ -94,17 +94,57 @@ namespace hpx { namespace components { namespace amr
           had_double_type y = par->minx0 + b*dx*par->granularity;
           had_double_type z = par->minx0 + c*dx*par->granularity;
           compute_index = -1;
+          bbox[0] = 1; bbox[1] = 1; bbox[2] = 1;
+          bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
           for (int i=0;i<val.size();i++) {
+            // figure out bounding box
+            if ( x > val[i]->x_[0] && 
+                 floatcmp(y,val[i]->y_[0]) == 1 && 
+                 floatcmp(z,val[i]->z_[0]) == 1 ) {
+              bbox[0] = 0;
+            }
+
+            if ( x < val[i]->x_[0] && 
+                 floatcmp(y,val[i]->y_[0]) == 1 && 
+                 floatcmp(z,val[i]->z_[0]) == 1 ) {
+              bbox[1] = 0;
+            }
+
+            if ( floatcmp(x,val[i]->x_[0]) && 
+                 y > val[i]->y_[0]  && 
+                 floatcmp(z,val[i]->z_[0]) == 1 ) {
+              bbox[2] = 0;
+            }
+
+            if ( floatcmp(x,val[i]->x_[0]) && 
+                 y < val[i]->y_[0]  && 
+                 floatcmp(z,val[i]->z_[0]) == 1 ) {
+              bbox[3] = 0;
+            }
+
+            if ( floatcmp(x,val[i]->x_[0]) && 
+                 floatcmp(y,val[i]->y_[0]) == 1 && 
+                 z > val[i]->z_[0] ) {
+              bbox[4] = 0;
+            }
+
+            if ( floatcmp(x,val[i]->x_[0]) && 
+                 floatcmp(y,val[i]->y_[0]) == 1 && 
+                 z < val[i]->z_[0] ) {
+              bbox[5] = 0;
+            }
+
+
             if ( floatcmp(x,val[i]->x_[0]) == 1 && 
                  floatcmp(y,val[i]->y_[0]) == 1 && 
                  floatcmp(z,val[i]->z_[0]) == 1 ) {
               compute_index = i;
-              break;
             }
           }
           if ( compute_index == -1 ) {
             BOOST_ASSERT(false);
           }
+          boundary = true;
         } 
 
 #if 0
@@ -183,29 +223,19 @@ namespace hpx { namespace components { namespace amr
             int b = tmp_index%par->granularity;
             int a = count - par->granularity*(b+c*par->granularity);
 
-           // if ( a+(ii+1)*par->granularity == par->granularity-1 ) {
-           //   std::cout << " FOUND TEST " << b+(jj+1)*par->granularity << " " << c+(kk+1)*par->granularity << std::endl;
-           // }
-  
             valcube[a+(ii+1)*par->granularity][b+(jj+1)*par->granularity][c+(kk+1)*par->granularity] = &(*niter); 
             count++;
           }
         }
 
-        //  std::cout << " TEST " << valcube[par->granularity-1][par->granularity][par->granularity]->phi[0][4] << std::endl;
+        //std::cout << " TEST " << valcube[par->granularity][par->granularity][par->granularity]->phi[0][4] << std::endl;
 //#endif
-
-        std::vector<nodedata>::iterator n_iter;
-        for (n_iter=val[0]->value_.begin();n_iter!=val[0]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-        for (n_iter=val[1]->value_.begin();n_iter!=val[1]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-        if ( val.size() == 3 ) {
-          for (n_iter=val[2]->value_.begin();n_iter!=val[2]->value_.end();++n_iter) vecval.push_back( &(*n_iter) ); 
-        }
 
         // copy over critical info
         resultval->x_ = val[compute_index]->x_;
         resultval->y_ = val[compute_index]->y_;
         resultval->z_ = val[compute_index]->z_;
+        resultval->value_.resize(val[compute_index]->value_.size());
         resultval->granularity = val[compute_index]->granularity;
         resultval->level_ = val[compute_index]->level_;
         resultval->cycle_ = val[compute_index]->cycle_ + 1;
@@ -220,9 +250,6 @@ namespace hpx { namespace components { namespace amr
 
             had_double_type dt = par->dt0/pow(2.0,level);
             had_double_type dx = par->dx0/pow(2.0,level); 
-
-             // TEST
-             resultval.get() = val[compute_index].get();
 
             // call rk update 
             int adj_index = 0;

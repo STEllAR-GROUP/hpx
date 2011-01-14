@@ -164,29 +164,35 @@ int rkupdate(nodedata3D const& vecval, stencil_data* result,
     end = 2*par.granularity;
 
     //Euler for starters
+    int ii,jj,kk;
     for (int k=start; k<end;k++) {
     for (int j=start; j<end;j++) {
     for (int i=start; i<end;i++) {
-      result->value_[i+par.granularity*(j+k*par.granularity)].phi[0][0] = 
-               vecval[i][j][k]->phi[0][0] + vecval[i][j][k]->phi[0][4]*dt;
+      ii = i-par.granularity;
+      jj = j-par.granularity;
+      kk = k-par.granularity;
+      if ( !boundary ) {
+        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][0] = 
+                 vecval[i][j][k]->phi[0][0] + vecval[i][j][k]->phi[0][4]*dt;
 
-      result->value_[i+par.granularity*(j+k*par.granularity)].phi[0][1] = 
-               vecval[i][j][k]->phi[0][1] 
-         - dt*0.5*(vecval[i+1][j][k]->phi[0][4] - vecval[i-1][j][k]->phi[0][4])/dx;
-
-      result->value_[i+par.granularity*(j+k*par.granularity)].phi[0][2] = 
-               vecval[i][j][k]->phi[0][2] 
-         - dt*0.5*(vecval[i][j+1][k]->phi[0][4] - vecval[i][j+1][k]->phi[0][4])/dx;
-
-      result->value_[i+par.granularity*(j+k*par.granularity)].phi[0][3] = 
-               vecval[i][j][k]->phi[0][3] 
-         - dt*0.5*(vecval[i][j][k+1]->phi[0][4] - vecval[i][j][k-1]->phi[0][4])/dx;
-
-      result->value_[i+par.granularity*(j+k*par.granularity)].phi[0][4] = 
-               vecval[i][j][k]->phi[0][4] 
-         - dt*0.5*(vecval[i+1][j][k]->phi[0][1] - vecval[i-1][j][k]->phi[0][1])/dx
-         - dt*0.5*(vecval[i][j+1][k]->phi[0][2] - vecval[i][j-1][k]->phi[0][2])/dx
-         - dt*0.5*(vecval[i][j][k+1]->phi[0][3] - vecval[i][j][k-1]->phi[0][3])/dx;
+        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][1] = 
+                 vecval[i][j][k]->phi[0][1] 
+           - dt*0.5*(vecval[i+1][j][k]->phi[0][4] - vecval[i-1][j][k]->phi[0][4])/dx;
+  
+        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][2] = 
+                 vecval[i][j][k]->phi[0][2] 
+           - dt*0.5*(vecval[i][j+1][k]->phi[0][4] - vecval[i][j+1][k]->phi[0][4])/dx;
+  
+        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][3] = 
+                 vecval[i][j][k]->phi[0][3] 
+           - dt*0.5*(vecval[i][j][k+1]->phi[0][4] - vecval[i][j][k-1]->phi[0][4])/dx;
+  
+        result->value_[ii+par.granularity*(jj+kk*par.granularity)].phi[0][4] = 
+                 vecval[i][j][k]->phi[0][4] 
+           - dt*0.5*(vecval[i+1][j][k]->phi[0][1] - vecval[i-1][j][k]->phi[0][1])/dx
+           - dt*0.5*(vecval[i][j+1][k]->phi[0][2] - vecval[i][j-1][k]->phi[0][2])/dx
+           - dt*0.5*(vecval[i][j][k+1]->phi[0][3] - vecval[i][j][k-1]->phi[0][3])/dx;
+      }
     }}}
 
     result->timestep_ = timestep + 1.0/pow(2.0,level);
