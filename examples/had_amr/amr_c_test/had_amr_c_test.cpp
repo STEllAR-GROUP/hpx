@@ -130,8 +130,11 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
   std::vector<nodedata> work;
+  std::vector<nodedata> work2;
   std::vector<nodedata* > pwork;
+  std::vector<nodedata* > pwork2;
   work.resize(vecval.size());
+  work2.resize(vecval.size());
 
   static had_double_type const c_1 = 1.;
   static had_double_type const c_2 = 2.;
@@ -203,21 +206,21 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
     for (int j=start; j<end; j++) {
       calcrhs(&rhs,pwork,vecx,1,dx,size,boundary,bbox,j,par);
       for (int i=0; i<num_eqns; i++) {
-     //   work[j].phi[0][i] = work[j].phi[0][i];
+        work2[j].phi[0][i] = work[j].phi[0][i];
 #ifndef UGLIFY
-        work[j].phi[1][i] = c_0_75*work[j].phi[0][i]
-                        +c_0_25*work[j].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
+        work2[j].phi[1][i] = c_0_75*work[j].phi[0][i]
+                            +c_0_25*work[j].phi[1][i] + c_0_25*rhs.phi[0][i]*dt;
 #else
         // uglify
         tmp = dt;
         tmp *= c_0_25;
         tmp *= rhs.phi[0][i];
-      //  work[j].phi[1][i] = work[j].phi[1][i];
-        work[j].phi[1][i] *= c_0_25;
-        work[j].phi[1][i] += tmp;
+        work2[j].phi[1][i] = work[j].phi[1][i];
+        work2[j].phi[1][i] *= c_0_25;
+        work2[j].phi[1][i] += tmp;
         tmp = c_0_75;
         tmp *= work[j].phi[0][i];
-        work[j].phi[1][i] += tmp;
+        work2[j].phi[1][i] += tmp;
 #endif
       }
     }
@@ -225,43 +228,46 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
     if ( boundary && bbox[0] == 1 ) {
       // chi
 #ifndef UGLIFY
-      work[0].phi[1][0] = c_4_3*work[1].phi[1][0]
-                                   -c_1_3*work[2].phi[1][0];
+      work2[0].phi[1][0] = c_4_3*work[1].phi[1][0]
+                          -c_1_3*work[2].phi[1][0];
 #else
       // uglify
-      work[0].phi[1][0] = c_4_3*work[1].phi[1][0];
-      work[0].phi[1][0] -= c_1_3*work[2].phi[1][0];
+      work2[0].phi[1][0] = c_4_3*work[1].phi[1][0];
+      work2[0].phi[1][0] -= c_1_3*work[2].phi[1][0];
 #endif
 
       // Pi
 #ifndef UGLIFY
-      work[0].phi[1][2] = c_4_3*work[1].phi[1][2]
-                                   -c_1_3*work[2].phi[1][2];
+      work2[0].phi[1][2] = c_4_3*work[1].phi[1][2]
+                          -c_1_3*work[2].phi[1][2];
 #else
       // uglify
-      work[0].phi[1][2] = c_4_3*work[1].phi[1][2];
-      work[0].phi[1][2] -= c_1_3*work[2].phi[1][2];
+      work2[0].phi[1][2] = c_4_3*work[1].phi[1][2];
+      work2[0].phi[1][2] -= c_1_3*work[2].phi[1][2];
 #endif
 
       // Phi
-      work[1].phi[1][1] = c_0_5*work[2].phi[1][1];
+      work2[1].phi[1][1] = c_0_5*work[2].phi[1][1];
     }
+
+    std::vector<nodedata>::iterator n_iter2;
+    for (n_iter2=work2.begin();n_iter2!=work2.end();++n_iter2) pwork2.push_back( &(*n_iter2) );
 
   //----------------------------------------------------------------------
   // iter 2
     for (int j=0; j<result->granularity; j++) {
-      calcrhs(&rhs,pwork,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
+      calcrhs(&rhs,pwork2,vecx,1,dx,size,boundary,bbox,j+compute_index,par);
       for (int i=0; i<num_eqns; i++) {
 #ifndef UGLIFY
-        result->value_[j].phi[0][i] = c_1_3*work[j+compute_index].phi[0][i]
-                        +c_2_3*(work[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
+        result->value_[j].phi[0][i] = c_1_3*work2[j+compute_index].phi[0][i]
+                                     +c_2_3*(work2[j+compute_index].phi[1][i] + rhs.phi[0][i]*dt);
 #else
         // uglify
         tmp = c_1_3;
-        tmp *= work[j+compute_index].phi[0][i];
+        tmp *= work2[j+compute_index].phi[0][i];
         result->value_[j].phi[0][i] = dt;
         result->value_[j].phi[0][i] *= rhs.phi[0][i];
-        result->value_[j].phi[0][i] += work[j+compute_index].phi[1][i];
+        result->value_[j].phi[0][i] += work2[j+compute_index].phi[1][i];
         result->value_[j].phi[0][i] *= c_2_3;
         result->value_[j].phi[0][i] += tmp;
 #endif
