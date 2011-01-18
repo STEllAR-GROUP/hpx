@@ -5,7 +5,9 @@
 
 # Set examples to build by default
 set(example_SUBDIRS 
-    quickstart
+	quickstart
+	#bh
+	#had_amr
    )
 
 # Pick up additional examples for this build set using
