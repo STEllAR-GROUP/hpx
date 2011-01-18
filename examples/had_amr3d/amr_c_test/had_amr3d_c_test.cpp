@@ -167,13 +167,37 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 
   // -------------------------------------------------------------------------
   // iter 0
-    std::size_t start,end;
-    start = par.granularity;
-    end = 2*par.granularity;
+    std::size_t i_start,i_end,j_start,j_end,k_start,k_end;
+    if ( !boundary ) {
+      i_start = n2-3;
+      i_end = 2*n2+3;
+      j_start = i_start;
+      j_end = i_end;
+      k_start = i_start;
+      k_end = i_end;
+    } else {
+      if ( bbox[0] == 1 ) i_start = n2;
+      else i_start = n2-3;
 
-    for (int k=start; k<end;k++) {
-    for (int j=start; j<end;j++) {
-    for (int i=start; i<end;i++) {
+      if ( bbox[1] == 1 ) i_end = 2*n2;
+      else i_end = 2*n2+3;
+
+      if ( bbox[2] == 1 ) j_start = n2;
+      else j_start = n2-3;
+
+      if ( bbox[3] == 1 ) j_end = 2*n2;
+      else j_end = 2*n2+3;
+
+      if ( bbox[4] == 1 ) k_start = n2;
+      else k_start = n2-3;
+
+      if ( bbox[5] == 1 ) k_end = 2*n2;
+      else k_end = 2*n2+3;
+    }
+
+    for (int k=k_start; k<k_end;k++) {
+    for (int j=j_start; j<j_end;j++) {
+    for (int i=i_start; i<i_end;i++) {
       calcrhs(&rhs,vecval,0,dx,boundary,i,j,k,par); 
       for (int ll=0;ll<num_eqns;ll++) {
         work[i+n*(j+n*k)].phi[0][ll] = vecval[i+n*(j+n*k)]->phi[0][ll];
@@ -186,9 +210,9 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
 
   // -------------------------------------------------------------------------
   // iter 1
-    for (int k=start; k<end;k++) {
-    for (int j=start; j<end;j++) {
-    for (int i=start; i<end;i++) {
+    for (int k=k_start; k<k_end;k++) {
+    for (int j=j_start; j<j_end;j++) {
+    for (int i=i_start; i<i_end;i++) {
       calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
       for (int ll=0;ll<num_eqns;ll++) {
         work2[i+n*(j+n*k)].phi[1][ll] = c_0_75*work[i+n*(j+n*k)].phi[0][ll] + 
