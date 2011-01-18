@@ -102,11 +102,11 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     }
 
     for (int k=0;k<par.granularity;k++) {
+      had_double_type z = val->z_[k];
     for (int j=0;j<par.granularity;j++) {
+      had_double_type y = val->y_[j];
     for (int i=0;i<par.granularity;i++) {
       had_double_type x = val->x_[i];
-      had_double_type y = val->y_[j];
-      had_double_type z = val->z_[k];
 
       had_double_type r = sqrt(x*x+y*y+z*z);
 
@@ -124,7 +124,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
                                  z/(r*r)/pow(par.delta,8);
         had_double_type D4Phi = par.amp_dot*pow((r-par.R0)*(r-par.R0)-par.delta*par.delta,3)*
                                 c_8*(par.R0-r)/pow(par.delta,8)/r; 
-  
+
         node.phi[0][0] = Phi;
         node.phi[0][1] = D1Phi;
         node.phi[0][2] = D2Phi;
@@ -257,9 +257,13 @@ void calcrhs(struct nodedata * rhs,
 
   if ( !boundary ) {
     rhs->phi[0][0] = vecval[i+n*(j+n*k)]->phi[flag][4]; 
+
     rhs->phi[0][1] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][4] - vecval[i-1+n*(j+n*k)]->phi[flag][4])/dx;
-    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][4] - vecval[i+n*(j+1+n*k)]->phi[flag][4])/dx;
+
+    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][4] - vecval[i+n*(j-1+n*k)]->phi[flag][4])/dx;
+
     rhs->phi[0][3] = - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][4] - vecval[i+n*(j+n*(k-1))]->phi[flag][4])/dx;
+
     rhs->phi[0][4] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][1] - vecval[i-1+n*(j+n*k)]->phi[flag][1])/dx
                 - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][2] - vecval[i+n*(j-1+n*k)]->phi[flag][2])/dx
                 - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][3] - vecval[i+n*(j+n*(k-1))]->phi[flag][3])/dx;

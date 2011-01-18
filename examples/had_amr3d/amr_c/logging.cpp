@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         // output to file "output.dat"
         FILE *fdata;
-        std::vector<double> x,y,z,Phi,chi,Pi;
+        std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
@@ -70,8 +70,11 @@ namespace hpx { namespace components { namespace amr { namespace server
               x.push_back(val.z_[0]+i*par->dx0);
             }
             for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
-              chi.push_back(val.value_[i].phi[0][0]);
-              Phi.push_back(val.value_[i].phi[0][4]);
+              phi.push_back(val.value_[i].phi[0][0]);
+              d1phi.push_back(val.value_[i].phi[0][1]);
+              d2phi.push_back(val.value_[i].phi[0][2]);
+              d3phi.push_back(val.value_[i].phi[0][3]);
+              d4phi.push_back(val.value_[i].phi[0][4]);
               datatime = val.timestep_*par->dx0*par->lambda;
 #if 0
               std::string x_str = convert(val.x_[i]);
@@ -100,8 +103,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             shape[0] = par->granularity;
             shape[1] = par->granularity;
             shape[2] = par->granularity;
-            gft_out_full("phi",datatime,shape,cnames,3,&*x.begin(),&*chi.begin());
-            gft_out_full("d4phi",datatime,shape,cnames,3,&*x.begin(),&*Phi.begin());
+            gft_out_full("phi",datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+            gft_out_full("d1phi",datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+            gft_out_full("d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+            gft_out_full("d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+            gft_out_full("d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
 #endif
           }
         }
