@@ -44,6 +44,9 @@ namespace hpx { namespace components { namespace amr
         ar & PP;
         ar & granularity;
         ar & rowsize;
+        ar & level_row;
+        ar & level_begin;
+        ar & level_end;
     }
 
     // explicit instantiation for the correct archive types

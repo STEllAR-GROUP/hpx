@@ -360,43 +360,71 @@ int main(int argc, char* argv[])
         }
         par->nx0 = nx0/par->granularity;
 
-        par->nx[0] = par->nx0*par->nx0*par->nx0;
-        par->rowsize.push_back(par->nx[par->allowedl]);
-#if 0
+        // step up refinement centered around the middle of the grid
+        par->nx[0] = par->nx0;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
+          if ( par->nx[i]%2 == 0 ) par->nx[i]+1;
+          if ( par->nx[i] > 2*par->nx[i-1] - 5 ) par->nx[i] = 2*par->nx[i-1] - 5;
         }
 
+        // remove duplicates
         for (int j=0;j<=par->allowedl;j++) {
           par->rowsize.push_back(par->nx[par->allowedl]);
           for (int i=par->allowedl-1;i>=j;i--) {
             // remove duplicates
-            par->rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
+            if ( par->nx[i+1]%2 == 0 ) {
+              par->rowsize[j] += par->nx[i] - (par->nx[i+1])/2;
+            } else {
+              par->rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
+            }
           }
         }
 
-        for (int j=0;j<=par->allowedl;j++) {
-          if ( j != par->allowedl ) par->level_begin.push_back(par->rowsize[j+1]);
-          else par->level_begin.push_back(0);
-          par->level_end.push_back(par->rowsize[j]);
+        // TEST
+        //for (int j=0;j<=par->allowedl;j++) {
+        //  std::cout << " TEST level " << j << " " << par->rowsize[j] << " nx " << par->nx[j] << std::endl;
+        //}
+
+        // Account for 3-D
+        //for (int j=0;j<=par->allowedl;j++) {
+        //  par->rowsize[j] = par->rowsize[j]*par->rowsize[j]*par->rowsize[j];
+        //}
+
+        //std::cout << " TEST A " << par->nx[0]/2 - par->nx[1]/2 << " " << par->nx[0]/2 - par->nx[1]/2 + par->rowsize[1] << std::endl;
+        //std::cout << " TEST B " << (par->rowsize[0]-1)/2 - par->rowsize[3]/2 << std::endl;
+        //std::cout << " TEST C " << (par->rowsize[0]-1)/2 - par->rowsize[2]/2 << std::endl;
+        //std::cout << " TEST D " << (par->rowsize[0]-1)/2 - par->rowsize[1]/2 << std::endl;
+
+        par->level_begin.resize( par->allowedl+1);
+        par->level_end.resize(par->allowedl+1);
+        par->level_begin[0] = 0;
+        par->level_end[0] = par->rowsize[0];
+        for (int j=1;j<=par->allowedl;j++) {
+          par->level_begin[j] = (par->rowsize[0]-1)/2 - par->rowsize[j]/2;
+          par->level_end[j] = (par->rowsize[0]-1)/2 - par->rowsize[j]/2 + par->rowsize[j];
         }
 
-        // Compute dx
-        had_double_type tmp = 0.0;
-        for (int j=par->allowedl;j>0;j--) {
-          tmp += (par->level_end[j]-par->level_begin[j])*par->granularity/pow(2.0,j);
+        // for each row, record what the lowest level on the row is
+        int num_rows = (int) pow(2,par->allowedl);
+        num_rows *= 2; // we take two timesteps in the mesh
+        for (int i=0;i<num_rows;i++) {
+          int level = -1;
+          for (int j=par->allowedl;j>=0;j--) {
+            int tmp = (int) pow(2,j);
+            if ( i%tmp == 0 ) {
+              level = par->allowedl-j;
+              par->level_row.push_back(level);
+              break;
+            }
+          }
         }
 
-        for (int j=par->level_begin[0];j<par->rowsize[0]-1;j++) {
-          tmp += par->granularity;
-        }
-#endif
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
-
         par->dt0 = par->lambda*par->dx0;
 
         // figure out the number of points
-        numvals = par->rowsize[0];
+        numvals = par->rowsize[0]*par->rowsize[0]*par->rowsize[0];
 
         //had_double_type tmp2 = 3*pow(2,par->allowedl);
         //int num_rows = (int) tmp2;

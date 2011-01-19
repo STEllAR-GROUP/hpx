@@ -318,7 +318,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               break;
             }
           }
-          each_row.push_back(par->rowsize[level]);
+          each_row.push_back(par->rowsize[level]*par->rowsize[level]*par->rowsize[level]);
         }
 
         std::vector<result_type> stencils;
@@ -480,37 +480,69 @@ namespace hpx { namespace components { namespace amr { namespace server
       int step,dst;
       int found;
 
-      //for (step=0;step<num_rows;step = step + 1) {
-      //  std::cout << " TEST in prep_ports " << step << " level " << level_row[step] << std::endl;
-      //}
-
       int a,b,c,tmp_index;
       for (step=0;step<num_rows;step = step + 1) {
+        int ll = par->level_row[step];
         for (i=0;i<each_row[step];i++) {
           counter = 0;
 
-          dst = step + 1;
-          if ( dst >= num_rows ) dst = 0;
-
           // get 3D coordinates from 'i' value
           // i.e. i = a + nx*(b+c*nx);
-          tmp_index = i/par->nx0;
-          c = tmp_index/par->nx0;
-          b = tmp_index%par->nx0;
-          a = i - par->nx0*(b+c*par->nx0);
-          BOOST_ASSERT(i == a + par->nx0*(b+c*par->nx0));
-          
-          for (int kk=c-1;kk<c+2;kk++) {
-          for (int jj=b-1;jj<b+2;jj++) {
-          for (int ii=a-1;ii<a+2;ii++) {
-            if ( kk >=0 && kk < par->nx0 &&
-                 jj >=0 && jj < par->nx0 &&
-                 ii >=0 && ii < par->nx0 ) {
-              j = ii + par->nx0*(jj+kk*par->nx0);
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
+          tmp_index = i/par->rowsize[ll];
+          c = tmp_index/par->rowsize[ll];
+          b = tmp_index%par->rowsize[ll];
+          a = i - par->rowsize[ll]*(b+c*par->rowsize[ll]);
+          BOOST_ASSERT(i == a + par->rowsize[ll]*(b+c*par->rowsize[ll]));
+
+          // discover what level to which this point belongs
+          int level = -1;
+          if ( ll == par->allowedl ) {
+            level = par->allowedl;
+          } else {
+            for (j=par->allowedl;j>=ll;j--) {
+              if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] &&
+                   b >= par->level_begin[j]-par->level_begin[ll] && b < par->level_end[j]-par->level_begin[ll] &&
+                   c >= par->level_begin[j]-par->level_begin[ll] && c < par->level_end[j]-par->level_begin[ll] 
+                 ) {
+                level = j;
+                break;
+              }
             }
-          }}}
+          }
+          BOOST_ASSERT(level >= 0);
+          
+          // communicate three
+          if ( step%2 == 0 || par->allowedl == 0 ) { 
+            dst = step;
+            dst += (int) pow(2,par->allowedl-level);
+            if ( dst >= num_rows ) dst = 0;
+ 
+            for (int kk=c-1;kk<c+2;kk++) {
+            for (int jj=b-1;jj<b+2;jj++) {
+            for (int ii=a-1;ii<a+2;ii++) {
+              if ( kk >=0 && kk < par->rowsize[0] &&
+                   jj >=0 && jj < par->rowsize[0] &&
+                   ii >=0 && ii < par->rowsize[0] ) {
+                j = ii + par->rowsize[0]*(jj+kk*par->rowsize[0]);
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }}}
+          } else {
+            // only communicate between points on the same level
+            for (int kk=c-1;kk<c+2;kk++) {
+            for (int jj=b-1;jj<b+2;jj++) {
+            for (int ii=a-1;ii<a+2;ii++) {
+              if ( kk >=0 && kk < par->nx0 &&
+                   jj >=0 && jj < par->nx0 &&
+                   ii >=0 && ii < par->nx0 ) {
+                j = ii + par->nx0*(jj+kk*par->nx0);
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }}}
+          }
+
         }
       }
 
@@ -567,7 +599,6 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
         }
       }
-
     }
 
 }}}}

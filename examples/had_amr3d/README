@@ -5,45 +5,4 @@ svn merge -rHEAD:1937 stencil.cpp
 svn.cct.lsu.edu/trac/hpx
 
 Versions:
-Working 1-D advection equation using Euler update: revision 2056
-
-rk3 1-D advection equation, unigrid working with stencilsize 9, AMR not, Euler still working: revision 2094
-
-rk3 1-D advection equation, AMR working : 2125
-
-memory management change : 2128
-
-Working post-memory management for 1-D advection equation: 2141
-
-Working prior to global barrier input: 2238
-
-Novel parameter treatment (causes seg fault): 2359
-
-working parameter treatment: 2356
-
-Prior to major change in boundary treatment and dissipation: 2407
-
-Major change in boundary treatment and dissipation working and tested: 2429
-
-Major change to add user control for granularity: 2433
-
-User granularity control working for unigrid: 2453
-
-Prior to switch forcing granularity to be 3 or greater: 2572
-
-AMR duplicated using stand-alone C++ code: 2620
-
-svn.cct.lsu.edu/trac/hpx
-
-prior to major findpoint change: 2730
-
-Prior to getting rid of findpoint: 2733
-
-Revert to working version 2730: 2748
-
-Prior to major overhaul: 2812
-
-Code working; code benchmarks comparing with MPI conducted: 2890.  In this version, communication is
-made each rk iteration.   
-
-Prior to noise removal: 2911
+Working 3-D wave equation, unigrid, rk3: 3025
