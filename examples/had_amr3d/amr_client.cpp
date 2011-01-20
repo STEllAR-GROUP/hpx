@@ -381,21 +381,6 @@ int main(int argc, char* argv[])
           }
         }
 
-        // TEST
-        //for (int j=0;j<=par->allowedl;j++) {
-        //  std::cout << " TEST level " << j << " " << par->rowsize[j] << " nx " << par->nx[j] << std::endl;
-        //}
-
-        // Account for 3-D
-        //for (int j=0;j<=par->allowedl;j++) {
-        //  par->rowsize[j] = par->rowsize[j]*par->rowsize[j]*par->rowsize[j];
-        //}
-
-        //std::cout << " TEST A " << par->nx[0]/2 - par->nx[1]/2 << " " << par->nx[0]/2 - par->nx[1]/2 + par->rowsize[1] << std::endl;
-        //std::cout << " TEST B " << (par->rowsize[0]-1)/2 - par->rowsize[3]/2 << std::endl;
-        //std::cout << " TEST C " << (par->rowsize[0]-1)/2 - par->rowsize[2]/2 << std::endl;
-        //std::cout << " TEST D " << (par->rowsize[0]-1)/2 - par->rowsize[1]/2 << std::endl;
-
         par->level_begin.resize( par->allowedl+1);
         par->level_end.resize(par->allowedl+1);
         par->level_begin[0] = 0;

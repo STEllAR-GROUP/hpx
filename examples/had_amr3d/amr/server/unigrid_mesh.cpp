@@ -307,6 +307,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         std::vector<std::size_t> each_row;
         std::vector<std::size_t> level_row;
+        each_row.resize(num_rows);
         for (int i=0;i<num_rows;i++) {
           int level = -1;
           for (int j=par->allowedl;j>=0;j--) {
@@ -318,7 +319,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               break;
             }
           }
-          each_row.push_back(par->rowsize[level]*par->rowsize[level]*par->rowsize[level]);
+          each_row[i] = par->rowsize[level]*par->rowsize[level]*par->rowsize[level];
         }
 
         std::vector<result_type> stencils;
@@ -495,21 +496,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           BOOST_ASSERT(i == a + par->rowsize[ll]*(b+c*par->rowsize[ll]));
 
           // discover what level to which this point belongs
-          int level = -1;
-          if ( ll == par->allowedl ) {
-            level = par->allowedl;
-          } else {
-            for (j=par->allowedl;j>=ll;j--) {
-              if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] &&
-                   b >= par->level_begin[j]-par->level_begin[ll] && b < par->level_end[j]-par->level_begin[ll] &&
-                   c >= par->level_begin[j]-par->level_begin[ll] && c < par->level_end[j]-par->level_begin[ll] 
-                 ) {
-                level = j;
-                break;
-              }
-            }
-          }
-          BOOST_ASSERT(level >= 0);
+          int level = findlevel3D(step,a,b,c,par);
           
           // communicate three
           if ( step%2 == 0 || par->allowedl == 0 ) { 
@@ -517,26 +504,39 @@ namespace hpx { namespace components { namespace amr { namespace server
             dst += (int) pow(2,par->allowedl-level);
             if ( dst >= num_rows ) dst = 0;
  
+            // This covers most of the communication patter except for points at the interface between mesh levels
             for (int kk=c-1;kk<c+2;kk++) {
             for (int jj=b-1;jj<b+2;jj++) {
             for (int ii=a-1;ii<a+2;ii++) {
-              if ( kk >=0 && kk < par->rowsize[0] &&
-                   jj >=0 && jj < par->rowsize[0] &&
-                   ii >=0 && ii < par->rowsize[0] ) {
-                j = ii + par->rowsize[0]*(jj+kk*par->rowsize[0]);
+              // the destination depends up the level represented by the point (ii,jj,kk) on the *src* step
+
+              int tii = translate(step,dst,ii,level,false,par);
+              int tjj = translate(step,dst,jj,level,false,par);
+              int tkk = translate(step,dst,kk,level,false,par);
+              int dst_ll = par->level_row[dst];
+              if ( tii != -1 && tjj != -1 && tkk != -1 ) {
+                j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                 counter++;
               }
             }}}
+
+            // Points at the interface of mesh levels need to communicate to different destinations than those given by 'dst'
+            
+
           } else {
-            // only communicate between points on the same level
+            // this portion of the code only occurs for the finest mesh
+            dst = step+1;
+
             for (int kk=c-1;kk<c+2;kk++) {
             for (int jj=b-1;jj<b+2;jj++) {
             for (int ii=a-1;ii<a+2;ii++) {
-              if ( kk >=0 && kk < par->nx0 &&
-                   jj >=0 && jj < par->nx0 &&
-                   ii >=0 && ii < par->nx0 ) {
-                j = ii + par->nx0*(jj+kk*par->nx0);
+              int tii = translate(step,dst,ii,level,true,par);
+              int tjj = translate(step,dst,jj,level,true,par);
+              int tkk = translate(step,dst,kk,level,true,par);
+              int dst_ll = par->level_row[dst];
+              if ( tii != -1 && tjj != -1 && tkk != -1 ) {
+                j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
                 vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                 counter++;
               }
@@ -599,6 +599,88 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
         }
       }
+    }
+
+    // This routine finds the level of a specified point given its row (step) and column (point)
+    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t a, std::size_t b, std::size_t c, Parameter const& par)
+    {
+      int ll = par->level_row[step];
+      // discover what level to which this point belongs
+      int level = -1;
+      if ( ll == par->allowedl ) {
+        level = par->allowedl;
+      } else {
+        for (int j=par->allowedl;j>=ll;j--) {
+          if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] &&
+               b >= par->level_begin[j]-par->level_begin[ll] && b < par->level_end[j]-par->level_begin[ll] &&
+               c >= par->level_begin[j]-par->level_begin[ll] && c < par->level_end[j]-par->level_begin[ll] 
+             ) {
+            level = j;
+            break;
+          }
+        }
+      }
+      BOOST_ASSERT(level >= 0);
+      return level;
+    }
+
+    // This routine finds the level of a specified point given its row (step) and column (point)
+    std::size_t unigrid_mesh::findlevel1D(std::size_t step, std::size_t a, Parameter const& par)
+    {
+      int ll = par->level_row[step];
+      // discover what level to which this point belongs
+      int level = -1;
+      if ( ll == par->allowedl ) {
+        level = par->allowedl;
+      } else {
+        for (int j=par->allowedl;j>=ll;j--) {
+          if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] ) {
+            level = j;
+            break;
+          }
+        }
+      }
+      BOOST_ASSERT(level >= 0);
+      return level;
+    }
+
+    // This routine translates indices between rows of potentially different levels of refinement
+    std::size_t unigrid_mesh::translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
+                                        std::size_t level_src_point, bool enforce_same_level, Parameter const& par) 
+    {
+      std::size_t src_level = par->level_row[src_step];
+      std::size_t dst_level = par->level_row[dst_step];
+      std::size_t dst = -1;
+      if ( src_level == dst_level ) {
+        dst = src; 
+      } else if ( src_level < dst_level ) {
+        // in this case, the dst point that corresponds to the src point will be smaller
+        dst = src - par->level_begin[dst_level] + par->level_begin[src_level]; 
+      } else if ( src_level > dst_level ) {
+        // in this case, the dst point that corresponds to the src point will be larger
+        dst = src + par->level_begin[dst_level] - par->level_begin[src_level]; 
+      } else {
+        BOOST_ASSERT(false);
+      }
+
+      if (dst >= 0 && dst < par->rowsize[dst_level]) {
+        if ( enforce_same_level ) {
+          // in this case, the dst point must be at the same level as the src point level specified
+          // Find the level of the point dst at step dst_step 
+          int level = findlevel1D(dst_step,dst,par);
+          if ( level == level_src_point ) {
+            return dst;
+          } else {
+            return -1;
+          }
+        } else {
+          return dst;
+        }
+      } else {
+        return -1;
+      }
+
+
     }
 
 }}}}

@@ -116,6 +116,12 @@ namespace hpx { namespace components { namespace amr { namespace server
                                     std::vector<std::size_t> &each_row, std::vector<std::size_t> &level_row,
                                     Parameter const& par);
 
+        static std::size_t findlevel3D(std::size_t step, std::size_t a, std::size_t b, std::size_t c, Parameter const& par);
+        static std::size_t findlevel1D(std::size_t step, std::size_t a, Parameter const& par);
+
+        static std::size_t translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
+                                     std::size_t level_src_point, bool enforce_same_level, Parameter const& par);
+
     private:
     };
 
