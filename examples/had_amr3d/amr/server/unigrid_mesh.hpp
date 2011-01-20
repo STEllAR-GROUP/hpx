@@ -120,7 +120,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         static std::size_t findlevel1D(std::size_t step, std::size_t a, Parameter const& par);
 
         static std::size_t translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
-                                     std::size_t level_src_point, bool enforce_same_level, Parameter const& par);
+                                     Parameter const& par);
 
     private:
     };

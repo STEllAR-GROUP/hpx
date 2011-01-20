@@ -495,24 +495,35 @@ namespace hpx { namespace components { namespace amr { namespace server
           a = i - par->rowsize[ll]*(b+c*par->rowsize[ll]);
           BOOST_ASSERT(i == a + par->rowsize[ll]*(b+c*par->rowsize[ll]));
 
-          // discover what level to which this point belongs
-          int level = findlevel3D(step,a,b,c,par);
-          
           // communicate three
           if ( step%2 == 0 || par->allowedl == 0 ) { 
-            dst = step;
-            dst += (int) pow(2,par->allowedl-level);
-            if ( dst >= num_rows ) dst = 0;
- 
-            // This covers most of the communication patter except for points at the interface between mesh levels
-            for (int kk=c-1;kk<c+2;kk++) {
-            for (int jj=b-1;jj<b+2;jj++) {
-            for (int ii=a-1;ii<a+2;ii++) {
-              // the destination depends up the level represented by the point (ii,jj,kk) on the *src* step
+            int kstart = c-1;
+            if ( kstart < 0 ) kstart = 0;
+            int kend = c+2;
+            if ( kend > par->rowsize[ll] ) kend = par->rowsize[ll];
 
-              int tii = translate(step,dst,ii,level,false,par);
-              int tjj = translate(step,dst,jj,level,false,par);
-              int tkk = translate(step,dst,kk,level,false,par);
+            int jstart = b-1;
+            if ( jstart < 0 ) jstart = 0;
+            int jend = b+2;
+            if ( jend > par->rowsize[ll] ) jend = par->rowsize[ll];
+
+            int istart = a-1;
+            if ( istart < 0 ) istart = 0;
+            int iend = a+2;
+            if ( iend > par->rowsize[ll] ) iend = par->rowsize[ll];
+
+            for (int kk=kstart;kk<kend;kk++) {
+            for (int jj=jstart;jj<jend;jj++) {
+            for (int ii=istart;ii<iend;ii++) {
+              // the destination depends up the level represented by the point (ii,jj,kk) on the *src* step
+              int nlevel = findlevel3D(step,ii,jj,kk,par);
+              dst = step;
+              dst += (int) pow(2,par->allowedl-nlevel);
+              if ( dst >= num_rows ) dst = 0;
+
+              int tii = translate(step,dst,ii,par);
+              int tjj = translate(step,dst,jj,par);
+              int tkk = translate(step,dst,kk,par);
               int dst_ll = par->level_row[dst];
               if ( tii != -1 && tjj != -1 && tkk != -1 ) {
                 j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
@@ -527,13 +538,29 @@ namespace hpx { namespace components { namespace amr { namespace server
           } else {
             // this portion of the code only occurs for the finest mesh
             dst = step+1;
+            if ( dst == num_rows ) dst = 0;
 
-            for (int kk=c-1;kk<c+2;kk++) {
-            for (int jj=b-1;jj<b+2;jj++) {
-            for (int ii=a-1;ii<a+2;ii++) {
-              int tii = translate(step,dst,ii,level,true,par);
-              int tjj = translate(step,dst,jj,level,true,par);
-              int tkk = translate(step,dst,kk,level,true,par);
+            int kstart = c-1;
+            if ( kstart < 0 ) kstart = 0;
+            int kend = c+2;
+            if ( kend > par->rowsize[ll] ) kend = par->rowsize[ll];
+
+            int jstart = b-1;
+            if ( jstart < 0 ) jstart = 0;
+            int jend = b+2;
+            if ( jend > par->rowsize[ll] ) jend = par->rowsize[ll];
+
+            int istart = a-1;
+            if ( istart < 0 ) istart = 0;
+            int iend = a+2;
+            if ( iend > par->rowsize[ll] ) iend = par->rowsize[ll];
+
+            for (int kk=kstart;kk<kend;kk++) {
+            for (int jj=jstart;jj<jend;jj++) {
+            for (int ii=istart;ii<iend;ii++) {
+              int tii = translate(step,dst,ii,par);
+              int tjj = translate(step,dst,jj,par);
+              int tkk = translate(step,dst,kk,par);
               int dst_ll = par->level_row[dst];
               if ( tii != -1 && tjj != -1 && tkk != -1 ) {
                 j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
@@ -646,36 +673,19 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     // This routine translates indices between rows of potentially different levels of refinement
     std::size_t unigrid_mesh::translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
-                                        std::size_t level_src_point, bool enforce_same_level, Parameter const& par) 
+                                        Parameter const& par) 
     {
       std::size_t src_level = par->level_row[src_step];
       std::size_t dst_level = par->level_row[dst_step];
       std::size_t dst = -1;
       if ( src_level == dst_level ) {
         dst = src; 
-      } else if ( src_level < dst_level ) {
-        // in this case, the dst point that corresponds to the src point will be smaller
-        dst = src - par->level_begin[dst_level] + par->level_begin[src_level]; 
-      } else if ( src_level > dst_level ) {
-        // in this case, the dst point that corresponds to the src point will be larger
-        dst = src + par->level_begin[dst_level] - par->level_begin[src_level]; 
       } else {
-        BOOST_ASSERT(false);
+        dst = src - par->level_begin[dst_level] + par->level_begin[src_level]; 
       }
 
       if (dst >= 0 && dst < par->rowsize[dst_level]) {
-        if ( enforce_same_level ) {
-          // in this case, the dst point must be at the same level as the src point level specified
-          // Find the level of the point dst at step dst_step 
-          int level = findlevel1D(dst_step,dst,par);
-          if ( level == level_src_point ) {
-            return dst;
-          } else {
-            return -1;
-          }
-        } else {
-          return dst;
-        }
+        return dst;
       } else {
         return -1;
       }
