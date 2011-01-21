@@ -217,9 +217,6 @@ int hpx_main(po::variables_map &vm)
     }
     
     
-    
-    
-    
     //cout << "num iterations " << num_iterations << endl; 
     for (iter = 0; iter < num_iterations; ++iter) 
     { 

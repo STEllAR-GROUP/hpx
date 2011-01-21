@@ -13,14 +13,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::managed_component<hpx::components::server::IntrTreeNode>, 
-    IntrTreeNode);
+
+typedef hpx::components::managed_component<
+    hpx::components::server::IntrTreeNode
+> IntrTreeNode_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(IntrTreeNode_type, IntrTreeNode);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::IntrTreeNode::newNode_action,
-    IntrTreeNode_newNode_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::IntrTreeNode);
+   IntrTreeNode_type::wrapped_type::newNode_action, 
+   IntrTreeNode_newNode_action);
 
-
+HPX_DEFINE_GET_COMPONENT_TYPE(IntrTreeNode_type::wrapped_type);
 
