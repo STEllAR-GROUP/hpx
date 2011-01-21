@@ -364,30 +364,8 @@ int main(int argc, char* argv[])
         par->nx[0] = par->nx0;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
-          if ( par->nx[i]%2 == 0 ) par->nx[i]+1;
+          if ( par->nx[i]%2 == 0 ) par->nx[i] += 1;
           if ( par->nx[i] > 2*par->nx[i-1] - 5 ) par->nx[i] = 2*par->nx[i-1] - 5;
-        }
-
-        // remove duplicates
-        for (int j=0;j<=par->allowedl;j++) {
-          par->rowsize.push_back(par->nx[par->allowedl]);
-          for (int i=par->allowedl-1;i>=j;i--) {
-            // remove duplicates
-            if ( par->nx[i+1]%2 == 0 ) {
-              par->rowsize[j] += par->nx[i] - (par->nx[i+1])/2;
-            } else {
-              par->rowsize[j] += par->nx[i] - (par->nx[i+1]+1)/2;
-            }
-          }
-        }
-
-        par->level_begin.resize( par->allowedl+1);
-        par->level_end.resize(par->allowedl+1);
-        par->level_begin[0] = 0;
-        par->level_end[0] = par->rowsize[0];
-        for (int j=1;j<=par->allowedl;j++) {
-          par->level_begin[j] = (par->rowsize[0]-1)/2 - par->rowsize[j]/2;
-          par->level_end[j] = (par->rowsize[0]-1)/2 - par->rowsize[j]/2 + par->rowsize[j];
         }
 
         // for each row, record what the lowest level on the row is
@@ -408,8 +386,23 @@ int main(int argc, char* argv[])
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
         par->dt0 = par->lambda*par->dx0;
 
-        // figure out the number of points
-        numvals = par->rowsize[0]*par->rowsize[0]*par->rowsize[0];
+        par->min.resize(par->allowedl+1);
+        par->min[0] = par->minx0;
+        for (int i=par->allowedl;i>0;i--) {
+          par->min[i] = 0.5*(par->maxx0 - par->minx0) + par->minx0  
+                            - (par->nx[i]-1)/2 * par->dx0/pow(2.0,i) * par->granularity;
+        }
+
+        par->rowsize.resize(par->allowedl+1);
+        for (int i=0;i<=par->allowedl;i++) {
+          par->rowsize[i] = 0;
+          for (int j=par->allowedl;j>=i;j--) {
+            par->rowsize[i] += par->nx[j]*par->nx[j]*par->nx[j];
+          }
+        }
+
+        // figure out the number of points for row 0
+        numvals = par->rowsize[0];
 
         //had_double_type tmp2 = 3*pow(2,par->allowedl);
         //int num_rows = (int) tmp2;

@@ -83,8 +83,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-#if 0       // DEBUG
+//#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -319,7 +320,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               break;
             }
           }
-          each_row[i] = par->rowsize[level]*par->rowsize[level]*par->rowsize[level];
+          each_row[i] = par->rowsize[level];
         }
 
         std::vector<result_type> stencils;
@@ -481,95 +482,46 @@ namespace hpx { namespace components { namespace amr { namespace server
       int step,dst;
       int found;
 
-      int a,b,c,tmp_index;
+      std::size_t a,b,c;
       for (step=0;step<num_rows;step = step + 1) {
-        int ll = par->level_row[step];
         for (i=0;i<each_row[step];i++) {
           counter = 0;
 
           // get 3D coordinates from 'i' value
           // i.e. i = a + nx*(b+c*nx);
-          tmp_index = i/par->rowsize[ll];
-          c = tmp_index/par->rowsize[ll];
-          b = tmp_index%par->rowsize[ll];
-          a = i - par->rowsize[ll]*(b+c*par->rowsize[ll]);
-          BOOST_ASSERT(i == a + par->rowsize[ll]*(b+c*par->rowsize[ll]));
+          int level = findlevel3D(step,i,a,b,c,par);
 
-          // communicate three
-          if ( step%2 == 0 || par->allowedl == 0 ) { 
-            int kstart = c-1;
-            if ( kstart < 0 ) kstart = 0;
-            int kend = c+2;
-            if ( kend > par->rowsize[ll] ) kend = par->rowsize[ll];
+          // communicate 27
+          int kstart = c-1;
+          if ( kstart < 0 ) kstart = 0;
+          int kend = c+2;
+          if ( kend >= par->nx[level] ) kend = par->nx[level]-1;
 
-            int jstart = b-1;
-            if ( jstart < 0 ) jstart = 0;
-            int jend = b+2;
-            if ( jend > par->rowsize[ll] ) jend = par->rowsize[ll];
+          int jstart = b-1;
+          if ( jstart < 0 ) jstart = 0;
+          int jend = b+2;
+          if ( jend >= par->nx[level] ) jend = par->nx[level]-1;
 
-            int istart = a-1;
-            if ( istart < 0 ) istart = 0;
-            int iend = a+2;
-            if ( iend > par->rowsize[ll] ) iend = par->rowsize[ll];
+          int istart = a-1;
+          if ( istart < 0 ) istart = 0;
+          int iend = a+2;
+          if ( iend >= par->nx[level] ) iend = par->nx[level]-1;
 
-            for (int kk=kstart;kk<kend;kk++) {
-            for (int jj=jstart;jj<jend;jj++) {
-            for (int ii=istart;ii<iend;ii++) {
-              // the destination depends up the level represented by the point (ii,jj,kk) on the *src* step
-              int nlevel = findlevel3D(step,ii,jj,kk,par);
-              dst = step;
-              dst += (int) pow(2,par->allowedl-nlevel);
-              if ( dst >= num_rows ) dst = 0;
+          dst = step;
+          dst += (int) pow(2,par->allowedl-level);
+          if ( dst >= num_rows ) dst = 0;
 
-              int tii = translate(step,dst,ii,par);
-              int tjj = translate(step,dst,jj,par);
-              int tkk = translate(step,dst,kk,par);
-              int dst_ll = par->level_row[dst];
-              if ( tii != -1 && tjj != -1 && tkk != -1 ) {
-                j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              }
-            }}}
+          for (int kk=kstart;kk<kend;kk++) {
+          for (int jj=jstart;jj<jend;jj++) {
+          for (int ii=istart;ii<iend;ii++) {
+            j = ii + par->nx[level]*(jj+kk*par->nx[level]);
 
-            // Points at the interface of mesh levels need to communicate to different destinations than those given by 'dst'
-            
-
-          } else {
-            // this portion of the code only occurs for the finest mesh
-            dst = step+1;
-            if ( dst == num_rows ) dst = 0;
-
-            int kstart = c-1;
-            if ( kstart < 0 ) kstart = 0;
-            int kend = c+2;
-            if ( kend > par->rowsize[ll] ) kend = par->rowsize[ll];
-
-            int jstart = b-1;
-            if ( jstart < 0 ) jstart = 0;
-            int jend = b+2;
-            if ( jend > par->rowsize[ll] ) jend = par->rowsize[ll];
-
-            int istart = a-1;
-            if ( istart < 0 ) istart = 0;
-            int iend = a+2;
-            if ( iend > par->rowsize[ll] ) iend = par->rowsize[ll];
-
-            for (int kk=kstart;kk<kend;kk++) {
-            for (int jj=jstart;jj<jend;jj++) {
-            for (int ii=istart;ii<iend;ii++) {
-              int tii = translate(step,dst,ii,par);
-              int tjj = translate(step,dst,jj,par);
-              int tkk = translate(step,dst,kk,par);
-              int dst_ll = par->level_row[dst];
-              if ( tii != -1 && tjj != -1 && tkk != -1 ) {
-                j = tii + par->rowsize[dst_ll]*(tjj+tkk*par->rowsize[dst_ll]);
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              }
-            }}}
-          }
-
+            if ( level != par->allowedl ) {
+              j += par->rowsize[level+1];
+            }
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }}}
         }
       }
 
@@ -629,43 +581,36 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     // This routine finds the level of a specified point given its row (step) and column (point)
-    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t a, std::size_t b, std::size_t c, Parameter const& par)
+    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
     {
       int ll = par->level_row[step];
       // discover what level to which this point belongs
       int level = -1;
       if ( ll == par->allowedl ) {
-        level = par->allowedl;
+        level = ll;
+        // get 3D coordinates from 'i' value
+        // i.e. i = a + nx*(b+c*nx);
+        int tmp_index = item/par->nx[ll];
+        c = tmp_index/par->nx[ll];
+        b = tmp_index%par->nx[ll];
+        a = item - par->nx[ll]*(b+c*par->nx[ll]);
+        BOOST_ASSERT(item == a + par->nx[ll]*(b+c*par->nx[ll]));
       } else {
-        for (int j=par->allowedl;j>=ll;j--) {
-          if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] &&
-               b >= par->level_begin[j]-par->level_begin[ll] && b < par->level_end[j]-par->level_begin[ll] &&
-               c >= par->level_begin[j]-par->level_begin[ll] && c < par->level_end[j]-par->level_begin[ll] 
-             ) {
-            level = j;
-            break;
+        if ( item < par->rowsize[par->allowedl] ) {
+          level = par->allowedl;
+        } else {
+          for (int j=par->allowedl-1;j>=ll;j--) {
+            if ( item < par->rowsize[j] && item >= par->rowsize[j+1] ) { 
+              level = j;
+              break;
+            }
           }
         }
-      }
-      BOOST_ASSERT(level >= 0);
-      return level;
-    }
-
-    // This routine finds the level of a specified point given its row (step) and column (point)
-    std::size_t unigrid_mesh::findlevel1D(std::size_t step, std::size_t a, Parameter const& par)
-    {
-      int ll = par->level_row[step];
-      // discover what level to which this point belongs
-      int level = -1;
-      if ( ll == par->allowedl ) {
-        level = par->allowedl;
-      } else {
-        for (int j=par->allowedl;j>=ll;j--) {
-          if ( a >= par->level_begin[j]-par->level_begin[ll] && a < par->level_end[j]-par->level_begin[ll] ) {
-            level = j;
-            break;
-          }
-        }
+        int tmp_index = (item - par->rowsize[level+1])/par->nx[level];
+        c = tmp_index/par->nx[level];
+        b = tmp_index%par->nx[level];
+        a = (item-par->rowsize[level+1]) - par->nx[level]*(b+c*par->nx[level]);
+        BOOST_ASSERT(item-par->rowsize[level+1] == a + par->nx[level]*(b+c*par->nx[level]));
       }
       BOOST_ASSERT(level >= 0);
       return level;

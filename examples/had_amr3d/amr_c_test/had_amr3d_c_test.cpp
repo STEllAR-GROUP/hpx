@@ -58,6 +58,44 @@ inline had_double_type initial_Phi(had_double_type const& r,Par const& par)
   return par.amp*exp( -(r-par.R0)*(r-par.R0)/(par.delta*par.delta) ) * ( c_m2*(r-par.R0)/(par.delta*par.delta) );
 }
 
+inline std::size_t findlevel3D(std::size_t step, std::size_t item, 
+                               std::size_t &a, std::size_t &b, std::size_t &c, Par const& par)
+{
+  int ll = par.level_row[step];
+  // discover what level to which this point belongs
+  int level = -1;
+  if ( ll == par.allowedl ) {
+    level = ll;
+    // get 3D coordinates from 'i' value
+    // i.e. i = a + nx*(b+c*nx);
+    int tmp_index = item/par.nx[ll];
+    c = tmp_index/par.nx[ll];
+    b = tmp_index%par.nx[ll];
+    a = item - par.nx[ll]*(b+c*par.nx[ll]);
+    BOOST_ASSERT(item == a + par.nx[ll]*(b+c*par.nx[ll]));
+  } else {
+    if ( item < par.rowsize[par.allowedl] ) {
+      level = par.allowedl;
+    } else {
+      for (int j=par.allowedl-1;j>=ll;j--) {
+        if ( item < par.rowsize[j] && item >= par.rowsize[j+1] ) {
+          level = j;
+          break;
+        }
+      }
+    }
+
+    int tmp_index = (item - par.rowsize[level+1])/par.nx[level];
+    c = tmp_index/par.nx[level];
+    b = tmp_index%par.nx[level];
+    a = (item-par.rowsize[level+1]) - par.nx[level]*(b+c*par.nx[level]);
+    BOOST_ASSERT(item-par.rowsize[level+1] == a + par.nx[level]*(b+c*par.nx[level]));
+  }
+  BOOST_ASSERT(level >= 0);
+  return level;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     Par const& par)
@@ -77,14 +115,15 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     //number of values per stencil_data
     nodedata node;
 
-    val->level_= 0;
-    had_double_type dx = par.dx0;
+    // find out the step row are dealing with 
+    int ll = par.level_row[row];
 
-    int tmp_index = item/par.nx0;
-    int c = tmp_index/par.nx0;
-    int b = tmp_index%par.nx0;
-    int a = item - par.nx0*(b+c*par.nx0);
-    BOOST_ASSERT(item == a + par.nx0*(b+c*par.nx0));
+    // find out the level we are at
+    std::size_t a,b,c;
+    val->level_ = findlevel3D(row,item,a,b,c,par);    
+
+    int level = val->level_;
+    had_double_type dx = par.dx0/pow(2.0,level);
 
     static had_double_type const c_0 = 0.0;
     static had_double_type const c_7 = 7.0;
@@ -92,9 +131,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     static had_double_type const c_8 = 8.0;
 
     for (int i=0;i<par.granularity;i++) {
-      had_double_type x = par.minx0 + a*dx*par.granularity + i*dx;
-      had_double_type y = par.minx0 + b*dx*par.granularity + i*dx;
-      had_double_type z = par.minx0 + c*dx*par.granularity + i*dx;
+      had_double_type x = par.min[level] + (a*par.granularity + i)*dx;
+      had_double_type y = par.min[level] + (b*par.granularity + i)*dx;
+      had_double_type z = par.min[level] + (c*par.granularity + i)*dx;
 
       val->x_[i] = x;
       val->y_[i] = y;

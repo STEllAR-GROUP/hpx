@@ -60,6 +60,7 @@ struct Par {
       int granularity;
       std::vector<std::size_t> rowsize,level_row;
       std::vector<std::size_t> level_begin, level_end;
+      std::vector<had_double_type> min;
 };
 
 #if defined(__cplusplus)

@@ -37,6 +37,43 @@ namespace hpx { namespace components { namespace amr
         return false;
       }
     }
+
+    inline std::size_t stencil::findlevel3D(std::size_t step, std::size_t item, 
+                                            std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
+    {
+      int ll = par->level_row[step];
+      // discover what level to which this point belongs
+      int level = -1;
+      if ( ll == par->allowedl ) {
+        level = ll;
+        // get 3D coordinates from 'i' value
+        // i.e. i = a + nx*(b+c*nx);
+        int tmp_index = item/par->nx[ll];
+        c = tmp_index/par->nx[ll];
+        b = tmp_index%par->nx[ll];
+        a = item - par->nx[ll]*(b+c*par->nx[ll]);
+        BOOST_ASSERT(item == a + par->nx[ll]*(b+c*par->nx[ll]));
+      } else {
+        if ( item < par->rowsize[par->allowedl] ) {
+          level = par->allowedl;
+        } else {
+          for (int j=par->allowedl-1;j>=ll;j--) {
+            if ( item < par->rowsize[j] && item >= par->rowsize[j+1] ) {
+              level = j;
+              break;
+            }
+          }
+        }
+        int tmp_index = (item - par->rowsize[level+1])/par->nx[level];
+        c = tmp_index/par->nx[level];
+        b = tmp_index%par->nx[level];
+        a = (item-par->rowsize[level+1]) - par->nx[level]*(b+c*par->nx[level]);
+        BOOST_ASSERT(item-par->rowsize[level+1] == a + par->nx[level]*(b+c*par->nx[level]));
+      }
+      BOOST_ASSERT(level >= 0);
+      return level;
+    }
+
         
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
@@ -85,14 +122,12 @@ namespace hpx { namespace components { namespace amr
         if ( val.size() == 27 ) {
           compute_index = (val.size()-1)/2;
         } else {
-          had_double_type dx = par->dx0;
-          int tmp_index = column/par->nx0;
-          int c = tmp_index/par->nx0;
-          int b = tmp_index%par->nx0;
-          int a = column - par->nx0*(b+c*par->nx0);
-          had_double_type x = par->minx0 + a*dx*par->granularity;
-          had_double_type y = par->minx0 + b*dx*par->granularity;
-          had_double_type z = par->minx0 + c*dx*par->granularity;
+          std::size_t a,b,c;
+          int level = findlevel3D(row,column,a,b,c,par);
+          had_double_type dx = par->dx0/pow(2.0,level);
+          had_double_type x = par->min[level] + a*dx*par->granularity;
+          had_double_type y = par->min[level] + b*dx*par->granularity;
+          had_double_type z = par->min[level] + c*dx*par->granularity;
           compute_index = -1;
           for (int i=0;i<val.size();i++) {
             if ( floatcmp(x,val[i]->x_[0]) == 1 && 
