@@ -227,6 +227,9 @@ int hpx_main(po::variables_map &vm)
         IntrTreeNode bht_root;
         bht_root.create(naming::id_type(prefix,naming::id_type::unmanaged));
         bht_root.newNode(center_position[0], center_position[1], center_position[2]);
+//        cout << "bht_root " << bht_root.p[0] << " " << bht_root.p[1] <<" " << bht_root.p[2] << endl;
+        bht_root.print();
+    	bht_root.free();
     }
 
 

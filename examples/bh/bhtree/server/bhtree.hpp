@@ -23,10 +23,8 @@ namespace hpx { namespace components { namespace server
     public:
         enum {
             newNode_func_code = 0,
+            IntrTreeNode_print = 1
         } func_codes;
-        int node_type;
-        double mass;
-        double p[3];
         //static IntrTreeNode *newNode(double pos_buf[]); 
         
         IntrTreeNode()
@@ -52,11 +50,27 @@ namespace hpx { namespace components { namespace server
 
             return 0;
         }
+        
+        void print()
+        {
+            applier::applier& appl = applier::get_applier();
+            std::cout << appl.get_runtime_support_gid() << " > "
+                    << p[0] << " " << p[1] << " " << p[2] << " " << std::flush 
+                    << std::endl;
+        }
 
         typedef hpx::actions::result_action3<
             IntrTreeNode, int, newNode_func_code, double, double, double,&IntrTreeNode::newNode
         > newNode_action;
-
+        
+        typedef hpx::actions::action0<
+            IntrTreeNode, IntrTreeNode_print, &IntrTreeNode::print
+        >print_action;
+        
+   private:
+        int node_type;
+        double mass;
+        double p[3];
     };
 }}}
 #endif

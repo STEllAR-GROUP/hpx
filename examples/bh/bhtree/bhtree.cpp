@@ -24,5 +24,9 @@ HPX_REGISTER_ACTION_EX(
    IntrTreeNode_type::wrapped_type::newNode_action, 
    IntrTreeNode_newNode_action);
 
+HPX_REGISTER_ACTION_EX(
+    IntrTreeNode_type::wrapped_type::print_action,
+    IntrTreeNode_print_action);
+    
 HPX_DEFINE_GET_COMPONENT_TYPE(IntrTreeNode_type::wrapped_type);
 

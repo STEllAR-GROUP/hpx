@@ -19,7 +19,11 @@ namespace hpx { namespace components { namespace stubs
         {
             applier::apply<server::IntrTreeNode::newNode_action>(gid, px, py, pz);
         }
-
+        
+        static void print(naming::id_type gid) 
+        {
+            applier::apply<server::IntrTreeNode::print_action>(gid);
+        }
     };
 
 }}}

@@ -33,6 +33,12 @@ namespace hpx { namespace components
             BOOST_ASSERT(gid_);
             this->base_type::newNode(gid_, px, py, pz);
         }
+        /// Print the current value of the accumulator
+        void print() 
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::print(gid_);
+        }
 
     };
 }}
