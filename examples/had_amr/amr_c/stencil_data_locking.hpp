@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@
 
 namespace hpx { namespace components { namespace amr 
 {
-#define HPX_LOCK_MUTEX(z, n, _) mutexes[n].get()
+#define HPX_LOCK_MUTEX(z, n, _) BOOST_PP_COMMA_IF(n) mutexes[n].get()
 #define HPX_LOCK_MUTEXES(z, n, _)                                             \
     case n:                                                                   \
         boost::lock(BOOST_PP_REPEAT_ ## z(n, HPX_LOCK_MUTEX, _));             \

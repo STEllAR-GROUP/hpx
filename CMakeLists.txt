@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 Hartmut Kaiser
+# Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2007-2008 Chirag Dekate
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
@@ -70,6 +70,17 @@ else()
     message(FATAL ": Boost installation not found. Please specify the Boost\n"
            "       installation directory using -DBOOST_ROOT=...\n"
            "Reason for error:\n" ${Boost_ERROR_REASON})
+endif()
+
+if(NOT ${Boost_MINOR_VERSION} LESS 46)
+    # add Boost.Chrono to the list of required libraries, if needed
+    find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED} chrono)
+
+    if(NOT Boost_FOUND)
+        message(FATAL ": Boost installation not found. Please specify the Boost\n"
+               "       installation directory using -DBOOST_ROOT=...\n"
+               "Reason for error:\n" ${Boost_ERROR_REASON})
+    endif()
 endif()
 
 include_directories(${Boost_INCLUDE_DIR})

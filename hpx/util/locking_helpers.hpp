@@ -44,7 +44,7 @@ namespace boost
     BOOST_PP_COMMA_IF(BOOST_PP_DEC(n)) BOOST_PP_CAT(m, n)                     \
     /**/
 #define HPX_ENUM_FROM_1_TO_N()                                                \
-    BOOST_PP_REPEAT_FROM_TO(1, N, HPX_ENUM_MUTEX_ARG, _))                     \
+    BOOST_PP_REPEAT_FROM_TO(1, N, HPX_ENUM_MUTEX_ARG, _)                      \
     /**/
 
     namespace detail
@@ -53,7 +53,7 @@ namespace boost
         inline unsigned lock_helper(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
         {
             boost::unique_lock<MutexType0> l0(m0);
-            if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N())
+            if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N()))
             {
                 return failed_lock;
             }
@@ -115,7 +115,6 @@ namespace boost
             }
         }
     }
-}
 
 #undef HPX_ROTATE_ARGS
 #undef HPX_ENUM_MUTEX_ARG2
