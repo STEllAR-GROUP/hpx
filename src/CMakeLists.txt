@@ -228,6 +228,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/init_ini_data.hpp
     ${hpx_SOURCE_DIR}/hpx/util/itt_notify.hpp
     ${hpx_SOURCE_DIR}/hpx/util/io_service_pool.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/locking_helpers.hpp
     ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
     ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
     ${hpx_SOURCE_DIR}/hpx/util/performance_counters.hpp
