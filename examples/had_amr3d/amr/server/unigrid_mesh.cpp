@@ -83,9 +83,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-//#if 0       // DEBUG
+#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -495,22 +494,27 @@ namespace hpx { namespace components { namespace amr { namespace server
           int kstart = c-1;
           if ( kstart < 0 ) kstart = 0;
           int kend = c+2;
-          if ( kend >= par->nx[level] ) kend = par->nx[level]-1;
+          if ( kend > par->nx[level] ) kend = par->nx[level];
 
           int jstart = b-1;
           if ( jstart < 0 ) jstart = 0;
           int jend = b+2;
-          if ( jend >= par->nx[level] ) jend = par->nx[level]-1;
+          if ( jend > par->nx[level] ) jend = par->nx[level];
 
           int istart = a-1;
           if ( istart < 0 ) istart = 0;
           int iend = a+2;
-          if ( iend >= par->nx[level] ) iend = par->nx[level]-1;
+          if ( iend > par->nx[level] ) iend = par->nx[level];
 
           dst = step;
           dst += (int) pow(2,par->allowedl-level);
           if ( dst >= num_rows ) dst = 0;
 
+          int tmp2 = a + par->nx[level]*(b+c*par->nx[level]);
+          if ( level != par->allowedl ) {
+            tmp2 += par->rowsize[level+1];
+          }
+        
           for (int kk=kstart;kk<kend;kk++) {
           for (int jj=jstart;jj<jend;jj++) {
           for (int ii=istart;ii<iend;ii++) {
@@ -606,11 +610,19 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
           }
         }
-        int tmp_index = (item - par->rowsize[level+1])/par->nx[level];
-        c = tmp_index/par->nx[level];
-        b = tmp_index%par->nx[level];
-        a = (item-par->rowsize[level+1]) - par->nx[level]*(b+c*par->nx[level]);
-        BOOST_ASSERT(item-par->rowsize[level+1] == a + par->nx[level]*(b+c*par->nx[level]));
+ 
+        if ( level < par->allowedl ) {
+          int tmp_index = (item - par->rowsize[level+1])/par->nx[level];
+          c = tmp_index/par->nx[level];
+          b = tmp_index%par->nx[level];
+          a = (item-par->rowsize[level+1]) - par->nx[level]*(b+c*par->nx[level]);
+          BOOST_ASSERT(item-par->rowsize[level+1] == a + par->nx[level]*(b+c*par->nx[level]));
+        } else {
+          int tmp_index = item/par->nx[level];
+          c = tmp_index/par->nx[level];
+          b = tmp_index%par->nx[level];
+          a = item - par->nx[level]*(b+c*par->nx[level]);
+        }
       }
       BOOST_ASSERT(level >= 0);
       return level;

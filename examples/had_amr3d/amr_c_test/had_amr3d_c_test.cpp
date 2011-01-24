@@ -85,11 +85,18 @@ inline std::size_t findlevel3D(std::size_t step, std::size_t item,
       }
     }
 
-    int tmp_index = (item - par.rowsize[level+1])/par.nx[level];
-    c = tmp_index/par.nx[level];
-    b = tmp_index%par.nx[level];
-    a = (item-par.rowsize[level+1]) - par.nx[level]*(b+c*par.nx[level]);
-    BOOST_ASSERT(item-par.rowsize[level+1] == a + par.nx[level]*(b+c*par.nx[level]));
+    if ( level < par.allowedl ) {
+      int tmp_index = (item - par.rowsize[level+1])/par.nx[level];
+      c = tmp_index/par.nx[level];
+      b = tmp_index%par.nx[level];
+      a = (item-par.rowsize[level+1]) - par.nx[level]*(b+c*par.nx[level]);
+      BOOST_ASSERT(item-par.rowsize[level+1] == a + par.nx[level]*(b+c*par.nx[level]));
+    } else {
+      int tmp_index = item/par.nx[level];
+      c = tmp_index/par.nx[level];
+      b = tmp_index%par.nx[level];
+      a = item - par.nx[level]*(b+c*par.nx[level]);
+    }
   }
   BOOST_ASSERT(level >= 0);
   return level;
