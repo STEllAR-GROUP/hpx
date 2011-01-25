@@ -149,6 +149,24 @@ namespace hpx { namespace actions
         {
             return construct_thread_function(cont, lva);
         }
+
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked without continuations.
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const& arg) const
+        {
+            return construct_thread_function(lva);
+        }
+
+        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// function for an action which has to be invoked with continuations.
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const& arg) const
+        {
+            return construct_thread_function(cont, lva);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -382,6 +400,20 @@ namespace hpx { namespace actions
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
+        {
+            return construct_thread_function(cont, lva);
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const& arg) const
+        {
+            return construct_thread_function(lva);
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const& arg) const
         {
             return construct_thread_function(cont, lva);
         }

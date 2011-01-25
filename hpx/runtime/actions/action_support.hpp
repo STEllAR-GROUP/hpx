@@ -14,6 +14,7 @@
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/fusion/include/any.hpp>
+#include <boost/fusion/include/at_c.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/function.hpp>
@@ -163,13 +164,38 @@ namespace hpx { namespace actions
         base_action::enum_gid_handler_type f_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Arguments>
+    class base_argument_action : public base_action
+    {
+    public:
+        typedef Arguments arguments_type;
+
+        virtual boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const& args) const = 0;
+
+        virtual boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva,
+            arguments_type const& args) const = 0;
+
+    public:
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<base_argument_action, base_action>();
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Arguments, 
         typename Derived>
-    class action : public base_action
+    class action : public base_argument_action<Arguments>
     {
     public:
         typedef Component component_type;
-        typedef Arguments arguments_type;
         typedef Derived derived_type;
         typedef util::unused_type result_type;
 
@@ -313,7 +339,7 @@ namespace hpx { namespace actions
         static void register_base()
         {
             using namespace boost::serialization;
-            void_cast_register<action, base_action>();
+            void_cast_register<action, base_argument_action<Arguments> >();
         }
 
     private:

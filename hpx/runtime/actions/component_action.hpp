@@ -112,6 +112,20 @@ namespace hpx { namespace actions
             return construct_thread_function(cont, lva);
         }
 
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const&) const
+        {
+            return construct_thread_function(lva);
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const&) const
+        {
+            return construct_thread_function(cont, lva);
+        }
+
     private:
         // serialization support    
         friend class boost::serialization::access;
@@ -350,6 +364,20 @@ namespace hpx { namespace actions
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
+        {
+            return construct_thread_function(cont, lva);
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const&) const
+        {
+            return construct_thread_function(lva);
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const&) const
         {
             return construct_thread_function(cont, lva);
         }

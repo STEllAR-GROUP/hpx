@@ -29,7 +29,10 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
-#define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) this->get<n>()
+#define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) data.get<n>()
+#define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
+        BOOST_PP_COMMA_IF(n) boost::fusion::at_c<n>(data)                     \
+    /**/
 #define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
@@ -130,7 +133,7 @@
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva, 
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
         // This get_thread_function will be invoked to retrieve the thread 
@@ -140,7 +143,23 @@
             naming::address::address_type lva) const
         {
             return construct_thread_function(cont, lva, 
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const& arg) const
+        {
+            return construct_thread_function(lva, 
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const& arg) const
+        {
+            return construct_thread_function(cont, lva, 
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
     private:
@@ -215,7 +234,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva, 
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -229,7 +248,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -305,7 +324,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -319,7 +338,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_result_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -430,20 +449,37 @@
         }
 
     private:
+        ///
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva, 
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        ///
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
             return construct_thread_function(cont, lva, 
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
+        }
+
+        ///
+        boost::function<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva,
+            arguments_type const& arg) const
+        {
+            return construct_thread_function(lva, 
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+        }
+
+        boost::function<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva, arguments_type const& arg) const
+        {
+            return construct_thread_function(cont, lva, 
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
     private:
@@ -515,7 +551,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -529,7 +565,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -617,7 +653,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -631,7 +667,7 @@
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, _));
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<BOOST_PP_CAT(direct_action, N)>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
@@ -640,6 +676,7 @@
     };
 
 #undef HPX_REMOVE_QUALIFIERS
+#undef HPX_ACTION_DIRECT_ARGUMENT
 #undef HPX_ACTION_ARGUMENT
 #undef N
 
