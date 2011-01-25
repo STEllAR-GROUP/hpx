@@ -85,6 +85,14 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+
+            // Follow up TEST
+            if ( dst_size(static_step,column,0) == 0 ) {
+              // figure out the index and level of this point
+              std::size_t a,b,c;
+              int level = findlevel3D(static_step,column,a,b,c,par);
+              std::cout << "                 PROBLEM: level " << level << " index " << a << " " << b << " " << c << std::endl;
+            } 
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -501,7 +509,15 @@ namespace hpx { namespace components { namespace amr { namespace server
           bool prolongation;
           dst = step;
           if ( (step+3)%3 != 0 || par->allowedl == 0 ) {
-            dst += (int) pow(2,par->allowedl-level);
+            // anytime there is a difference of more than one level between src and dst rows,
+            // you need to account for the prolongation/restriction rows going on inbetween them.
+            // That is given by 2^{L-l-1}-1
+            int intermediate = (int) pow(2,par->allowedl-level) ;
+            if ( par->allowedl-level > 1 ) {
+              dst += intermediate + intermediate/2 - 1;
+            } else {
+              dst += intermediate;
+            }
             prolongation = false;
           } else {
             dst += 1; // this is a prolongation/restriction step
