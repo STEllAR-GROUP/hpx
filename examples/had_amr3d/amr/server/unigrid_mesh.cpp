@@ -264,8 +264,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        double tmp = 2*pow(2.0,par->allowedl);
-        int num_rows = (int) tmp;
+        int num_rows = (int) pow(2,par->allowedl);
+        if ( par->allowedl > 0 ) {
+          num_rows += (int) pow(2,par->allowedl)/2;
+        }
+        num_rows *= 2; // we take two steps
 
         // Each row potentially has a different number of points depending on the
         // number of levels of refinement.  There are 2^(nlevel) rows each timestep;
@@ -306,20 +309,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         //  This structure is designed so that every 2 rows the timestep is the same for every point in that row
 
         std::vector<std::size_t> each_row;
-        std::vector<std::size_t> level_row;
         each_row.resize(num_rows);
         for (int i=0;i<num_rows;i++) {
-          int level = -1;
-          for (int j=par->allowedl;j>=0;j--) {
-            tmp = pow(2.0,j);
-            int tmp2 = (int) tmp; 
-            if ( i%tmp2 == 0 ) {
-              level = par->allowedl-j;
-              level_row.push_back(level);
-              break;
-            }
-          }
-          each_row[i] = par->rowsize[level];
+          each_row[i] = par->rowsize[par->level_row[i]];
         }
 
         std::vector<result_type> stencils;
@@ -342,7 +334,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         Array3D dst_size(num_rows,each_row[0],1);
         Array3D src_size(num_rows,each_row[0],1);
         prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,
-                   num_rows,each_row,level_row,par);
+                   num_rows,each_row,par);
 
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i) 
@@ -463,7 +455,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     void unigrid_mesh::prep_ports(Array3D &dst_port,Array3D &dst_src,
                                   Array3D &dst_step,Array3D &dst_size,Array3D &src_size,std::size_t num_rows,
-                                  std::vector<std::size_t> &each_row,std::vector<std::size_t> &level_row,
+                                  std::vector<std::size_t> &each_row,
                                   Parameter const& par)
     {
       int i,j,k;
@@ -506,26 +498,34 @@ namespace hpx { namespace components { namespace amr { namespace server
           int iend = a+2;
           if ( iend > par->nx[level] ) iend = par->nx[level];
 
+          bool prolongation;
           dst = step;
-          dst += (int) pow(2,par->allowedl-level);
+          if ( (step+3)%3 != 0 || par->allowedl == 0 ) {
+            dst += (int) pow(2,par->allowedl-level);
+            prolongation = false;
+          } else {
+            dst += 1; // this is a prolongation/restriction step
+            prolongation = true;
+          }
           if ( dst >= num_rows ) dst = 0;
 
-          int tmp2 = a + par->nx[level]*(b+c*par->nx[level]);
-          if ( level != par->allowedl ) {
-            tmp2 += par->rowsize[level+1];
-          }
-        
-          for (int kk=kstart;kk<kend;kk++) {
-          for (int jj=jstart;jj<jend;jj++) {
-          for (int ii=istart;ii<iend;ii++) {
-            j = ii + par->nx[level]*(jj+kk*par->nx[level]);
+          if ( prolongation == false ) {
+            for (int kk=kstart;kk<kend;kk++) {
+            for (int jj=jstart;jj<jend;jj++) {
+            for (int ii=istart;ii<iend;ii++) {
+              j = ii + par->nx[level]*(jj+kk*par->nx[level]);
 
-            if ( level != par->allowedl ) {
-              j += par->rowsize[level+1];
-            }
+              if ( level != par->allowedl ) {
+                j += par->rowsize[level+1];
+              }
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            }}}
+          } else {
+            j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
-          }}}
+          }
         }
       }
 
@@ -626,28 +626,6 @@ namespace hpx { namespace components { namespace amr { namespace server
       }
       BOOST_ASSERT(level >= 0);
       return level;
-    }
-
-    // This routine translates indices between rows of potentially different levels of refinement
-    std::size_t unigrid_mesh::translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
-                                        Parameter const& par) 
-    {
-      std::size_t src_level = par->level_row[src_step];
-      std::size_t dst_level = par->level_row[dst_step];
-      std::size_t dst = -1;
-      if ( src_level == dst_level ) {
-        dst = src; 
-      } else {
-        dst = src - par->level_begin[dst_level] + par->level_begin[src_level]; 
-      }
-
-      if (dst >= 0 && dst < par->rowsize[dst_level]) {
-        return dst;
-      } else {
-        return -1;
-      }
-
-
     }
 
 }}}}

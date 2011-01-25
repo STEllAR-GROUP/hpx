@@ -113,13 +113,10 @@ namespace hpx { namespace components { namespace amr { namespace server
         static void prep_ports(Array3D &dst_port,Array3D &dst_src,
                                     Array3D &dst_step,Array3D &dst_size,
                                     Array3D &src_size,std::size_t num_rows,
-                                    std::vector<std::size_t> &each_row, std::vector<std::size_t> &level_row,
+                                    std::vector<std::size_t> &each_row,
                                     Parameter const& par);
 
         static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par);
-
-        static std::size_t translate(std::size_t src_step, std::size_t dst_step, std::size_t src,
-                                     Parameter const& par);
 
     private:
     };
