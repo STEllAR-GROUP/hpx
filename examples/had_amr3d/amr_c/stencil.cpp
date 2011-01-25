@@ -112,7 +112,7 @@ namespace hpx { namespace components { namespace amr
             get_memory_block_async(val, gids, result);
 
         // lock all user defined data elements, will be unlocked at function exit
-        //scoped_values_lock<lcos::mutex> l(resultval, val); 
+        scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -296,7 +296,7 @@ namespace hpx { namespace components { namespace amr
 
             if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
                 stencil_data data (resultval.get());
-            //    unlock_scoped_values_lock<lcos::mutex> ul(l);
+                unlock_scoped_values_lock<lcos::mutex> ul(l);
                 stubs::logging::logentry(log_, data, row, 0, par);
             }
         }
