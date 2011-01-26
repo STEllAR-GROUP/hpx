@@ -242,6 +242,7 @@ int main(int argc, char* argv[])
         par->eps         =  0.0;
         par->output_level =  0;
         par->granularity =  3;
+        par->ghostwidth  =  10;
         for (int i=0;i<maxlevels;i++) {
           // default
           par->refine_level[i] = 1.5;
@@ -283,6 +284,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
                 nx0 = atoi(tmp.c_str());
+              }
+              if ( sec->has_entry("ghostwidth") ) {
+                std::string tmp = sec->get_entry("ghostwidth");
+                par->ghostwidth = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
@@ -358,10 +363,9 @@ int main(int argc, char* argv[])
           std::cerr << " nx0 " << nx0 << " granularity " << par->granularity << std::endl;
           BOOST_ASSERT(false);
         }
-        par->nx0 = nx0/par->granularity;
 
         // step up refinement centered around the middle of the grid
-        par->nx[0] = par->nx0;
+        par->nx[0] = nx0/par->granularity;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
           if ( par->nx[i]%2 == 0 ) par->nx[i] += 1;

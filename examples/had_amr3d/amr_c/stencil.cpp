@@ -119,10 +119,40 @@ namespace hpx { namespace components { namespace amr
         bool boundary = false;
         int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
 
+        if ( val.size() == 0 ) {
+          // This should not happen
+          BOOST_ASSERT(false);
+        }
+
         // Check if this is a prolongation/restriction step
         if ( (row+5)%3 == 0 ) {
           // This is a prolongation/restriction step
-          resultval.get() = val[0].get();
+          if ( val.size() == 1 ) {
+            // no restriction needed
+            resultval.get() = val[0].get();
+          } else {
+            // restriction needed
+            std::size_t a,b,c;
+            int level = findlevel3D(row,column,a,b,c,par);
+            had_double_type dx = par->dx0/pow(2.0,level);
+            had_double_type x = par->min[level] + a*dx*par->granularity;
+            had_double_type y = par->min[level] + b*dx*par->granularity;
+            had_double_type z = par->min[level] + c*dx*par->granularity;
+            compute_index = -1;
+            for (int i=0;i<val.size();i++) {
+              if ( floatcmp(x,val[i]->x_[0]) == 1 && 
+                   floatcmp(y,val[i]->y_[0]) == 1 && 
+                   floatcmp(z,val[i]->z_[0]) == 1 ) {
+                compute_index = i;
+                break;
+              }
+            }
+            if ( compute_index == -1 ) {
+              std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
+              BOOST_ASSERT(false);
+            }
+            resultval.get() = val[compute_index].get();
+          }
           if ( val[0]->timestep_ >= par->nt0-2 ) {
             return 0;
           }

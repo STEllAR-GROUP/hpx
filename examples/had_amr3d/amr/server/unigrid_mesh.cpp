@@ -538,9 +538,84 @@ namespace hpx { namespace components { namespace amr { namespace server
               counter++;
             }}}
           } else {
-            j = i;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
+            if ( level == par->level_row[step] ) { 
+              // no restriction
+              j = i;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+            } else {
+              // send data to all levels less than this one (for restriction)
+              had_double_type dx = par->dx0/pow(2.0,level);
+              had_double_type xmin = par->min[level] + a*par->granularity*dx;
+              had_double_type xmax = par->min[level] + (a*par->granularity+par->granularity-1)*dx; 
+              had_double_type ymin = par->min[level] + b*par->granularity*dx;  
+              had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
+              had_double_type zmin = par->min[level] + c*par->granularity*dx;  
+              had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
+              had_double_type cxmin,cxmax,cymin,cymax,czmin,czmax,cdx; 
+              had_double_type ca,cb,cc;
+              for (int ii=par->level_row[step];ii<level;ii++) {
+                // determine which coarser mesh cube overlaps this finer mesh cube
+                cdx = par->dx0/pow(2.0,ii);
+                ca = (xmin - par->min[ii])/(par->granularity*cdx);
+                cb = (ymin - par->min[ii])/(par->granularity*cdx);
+                cc = (zmin - par->min[ii])/(par->granularity*cdx);
+
+                int starta = (int) floor(ca);
+                int startb = (int) floor(cb);
+                int startc = (int) floor(cc);
+                for (int sk=startc;sk<=startc+1;sk++) {
+                for (int sj=startb;sj<=startb+1;sj++) {
+                for (int si=starta;si<=starta+1;si++) {
+                  // check if there is any overlap
+                  if ( (  (par->min[ii] + si*par->granularity*cdx <= xmin && 
+                           par->min[ii] + (si*par->granularity+par->granularity-1)*cdx >= xmin) ||
+                          (par->min[ii] + si*par->granularity*cdx <= xmax && 
+                           par->min[ii] + (si*par->granularity+par->granularity-1)*cdx >= xmax) 
+                       ) &&
+                       (  (par->min[ii] + sj*par->granularity*cdx <= ymin && 
+                           par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx >= ymin) ||
+                          (par->min[ii] + sj*par->granularity*cdx <= ymax && 
+                           par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx >= ymax) 
+                       ) &&
+                       (  (par->min[ii] + sk*par->granularity*cdx <= zmin && 
+                           par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx >= zmin) ||
+                          (par->min[ii] + sk*par->granularity*cdx <= zmax && 
+                           par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx >= zmax) 
+                       ) 
+                     ) 
+                  {
+
+#if 0
+                    // DEBUG
+                    std::cout << " " << std::endl;
+                    std::cout << " DEBUG coarse: x " << par->min[ii] + si*par->granularity*cdx << " " << par->min[ii] + (si*par->granularity+par->granularity-1)*cdx << std::endl;
+                    std::cout << " DEBUG coarse: y " << par->min[ii] + sj*par->granularity*cdx << " " << par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx << std::endl;
+                    std::cout << " DEBUG coarse: z " << par->min[ii] + sk*par->granularity*cdx << " " << par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx << std::endl;
+                    std::cout << " DEBUG fine: x " << xmin << " " << xmax << std::endl;
+                    std::cout << " DEBUG fine: y " << ymin << " " << ymax << std::endl;
+                    std::cout << " DEBUG fine: z " << zmin << " " << zmax << std::endl;
+#endif
+
+                    // there is overlap -- some points from the specified finer mesh
+                    // need to be sent to this particular coarse mesh
+                    j = si + par->nx[ii]*(sj+sk*par->nx[ii]);
+
+                    if ( ii != par->allowedl ) {
+                      j += par->rowsize[ii+1];
+                    }
+                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                    counter++;
+
+                  } 
+                }}}
+
+                // original value still needs to be passed (in the case of no restriction needed) 
+                j = i;
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+            }
           }
         }
       }

@@ -27,7 +27,6 @@ namespace hpx { namespace components { namespace amr
         ar & output;
         ar & output_stdout;
         ar & nt0;
-        ar & nx0;
         ar & nx;
         ar & refine_level;
         ar & minx0;
@@ -48,6 +47,7 @@ namespace hpx { namespace components { namespace amr
         ar & level_begin;
         ar & level_end;
         ar & min;
+        ar & ghostwidth;
     }
 
     // explicit instantiation for the correct archive types

@@ -41,7 +41,6 @@ struct Par {
       int loglevel;
       had_double_type output;
       int output_stdout;
-      int nx0;
       int nt0;
       int nx[maxlevels];
       double refine_level[maxlevels];
@@ -58,6 +57,7 @@ struct Par {
       int output_level;
       int PP;
       int granularity;
+      int ghostwidth;
       std::vector<std::size_t> rowsize,level_row;
       std::vector<std::size_t> level_begin, level_end;
       std::vector<had_double_type> min;
