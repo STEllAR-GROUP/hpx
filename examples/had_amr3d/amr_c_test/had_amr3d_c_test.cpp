@@ -111,7 +111,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
-    val->cycle_ = 0;
 
     val->granularity = par.granularity;
     val->x_.resize(par.granularity);

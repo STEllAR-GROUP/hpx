@@ -544,6 +544,11 @@ namespace hpx { namespace components { namespace amr { namespace server
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
               counter++;
             } else {
+              // original value still needs to be passed (in the case of no restriction needed) 
+              j = i;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+              counter++;
+
               // send data to all levels less than this one (for restriction)
               had_double_type dx = par->dx0/pow(2.0,level);
               had_double_type xmin = par->min[level] + a*par->granularity*dx;
@@ -609,11 +614,6 @@ namespace hpx { namespace components { namespace amr { namespace server
 
                   } 
                 }}}
-
-                // original value still needs to be passed (in the case of no restriction needed) 
-                j = i;
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
               }
             }
           }

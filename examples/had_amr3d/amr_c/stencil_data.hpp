@@ -33,14 +33,14 @@ private:
 struct stencil_data 
 {
     stencil_data() 
-      : max_index_(0), index_(0), timestep_(0), cycle_(0), granularity(0),
+      : max_index_(0), index_(0), timestep_(0), granularity(0),
         level_(0)
     {}
     ~stencil_data() {}
 
     stencil_data(stencil_data const& rhs)
       : max_index_(rhs.max_index_), index_(rhs.index_), 
-        timestep_(rhs.timestep_), cycle_(rhs.cycle_), 
+        timestep_(rhs.timestep_),
         granularity(rhs.granularity), level_(rhs.level_), 
         value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_)
     {
@@ -53,7 +53,6 @@ struct stencil_data
             max_index_ = rhs.max_index_;
             index_ = rhs.index_;
             timestep_ = rhs.timestep_;
-            cycle_ = rhs.cycle_; 
             granularity = rhs.granularity;
             level_ = rhs.level_;
             value_ = rhs.value_;
@@ -70,7 +69,6 @@ struct stencil_data
     size_t max_index_;   // overall number of data points
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     had_double_type timestep_;    // current time step
-    size_t cycle_; // counts the number of subcycles
     size_t granularity;
     size_t level_;    // refinement level
     std::vector< nodedata > value_;            // current value
@@ -85,7 +83,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & max_index_ & index_ & timestep_ & cycle_ & granularity & level_ & value_;
+        ar & max_index_ & index_ & timestep_ & granularity & level_ & value_;
         ar & x_ & y_ & z_;
     }
 };
