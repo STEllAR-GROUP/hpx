@@ -54,10 +54,11 @@
             Derived>
     {
     private:
+        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            arguments_type,
             Derived> base_type;
 
     public:
@@ -379,10 +380,12 @@
             Derived>
     {
     private:
+        
+        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_action_arg, N), 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            arguments_type,
             Derived> base_type;
 
     public:

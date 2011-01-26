@@ -51,10 +51,8 @@
             Derived>
     {
     private:
-        typedef action<
-            Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
-            Derived> base_type;
+        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef action<Component, Action, arguments_type, Derived> base_type;
 
     public:
         BOOST_PP_CAT(base_result_action, N)() 
@@ -372,10 +370,8 @@
             Derived>
     {
     private:
-        typedef action<
-            Component, Action, 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
-            Derived> base_type;
+        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef action<Component, Action, arguments_type, Derived> base_type;
 
     public:
         BOOST_PP_CAT(base_action, N)() 

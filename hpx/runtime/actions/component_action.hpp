@@ -41,7 +41,8 @@ namespace hpx { namespace actions
     class base_result_action0 
       : public action<Component, Action, boost::fusion::vector<>, Derived>
     {
-        typedef action<Component, Action, boost::fusion::vector<>, Derived> 
+        typedef boost::fusion::vector<> arguments_type;
+        typedef action<Component, Action, arguments_type, Derived> 
             base_type;
 
     public:
@@ -298,7 +299,8 @@ namespace hpx { namespace actions
       : public action<Component, Action, boost::fusion::vector<>, Derived>
     {
     private:
-        typedef action<Component, Action, boost::fusion::vector<>, Derived> 
+        typedef boost::fusion::vector<> arguments_type;
+        typedef action<Component, Action, arguments_type, Derived> 
             base_type;
 
     public:

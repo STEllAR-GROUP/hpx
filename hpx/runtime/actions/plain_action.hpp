@@ -67,9 +67,10 @@ namespace hpx { namespace actions
             components::server::plain_function<Derived>, 
             function_result_action_arg0, boost::fusion::vector<>, Derived>
     {
+        typedef boost::fusion::vector<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
-            function_result_action_arg0, boost::fusion::vector<>, Derived
+            function_result_action_arg0, arguments_type, Derived
         > base_type;
 
     public:
@@ -336,9 +337,10 @@ namespace hpx { namespace actions
         >
     {
     private:
+        typedef boost::fusion::vector<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
-            function_action_arg0, boost::fusion::vector<>, Derived> base_type;
+            function_action_arg0, arguments_type, Derived> base_type;
 
     public:
         plain_base_action0()

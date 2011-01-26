@@ -146,6 +146,9 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     struct enum_gid_handler
     {
+        /// Enumerate all GIDs which stored as arguments
+        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
+
         enum_gid_handler(base_action::enum_gid_handler_type f)
           : f_(f)
         {}
@@ -198,6 +201,10 @@ namespace hpx { namespace actions
         typedef Component component_type;
         typedef Derived derived_type;
         typedef util::unused_type result_type;
+        typedef Arguments arguments_type;
+
+        /// Enumerate all GIDs which stored as arguments
+        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
 
         // This is the action code (id) of this action. It is exposed to allow 
         // generic handling of actions.
