@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef simple_component_base<logging> base_type;
 
     public:
-        logging() {}
+        logging() { count = 0;}
 
         enum actions
         {
@@ -52,6 +52,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     private:
         typedef lcos::mutex mutex_type;
         static mutex_type mtx_;
+        std::size_t count;
     };
 
 }}}}

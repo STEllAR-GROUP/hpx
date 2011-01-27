@@ -154,32 +154,9 @@ namespace hpx { namespace components { namespace amr
               std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
               BOOST_ASSERT(false);
             }
+
+            // TEST
             resultval.get() = val[compute_index].get();
-            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
-              return 0;
-            }
-            return 1;
-#if 0
-            // restriction needed
-            std::size_t a,b,c;
-            int level = findlevel3D(row,column,a,b,c,par);
-            had_double_type dx = par->dx0/pow(2.0,level);
-            had_double_type x = par->min[level] + a*dx*par->granularity;
-            had_double_type y = par->min[level] + b*dx*par->granularity;
-            had_double_type z = par->min[level] + c*dx*par->granularity;
-            compute_index = -1;
-            for (int i=0;i<val.size();i++) {
-              if ( floatcmp(x,val[i]->x_[0]) == 1 && 
-                   floatcmp(y,val[i]->y_[0]) == 1 && 
-                   floatcmp(z,val[i]->z_[0]) == 1 ) {
-                compute_index = i;
-                break;
-              }
-            }
-            if ( compute_index == -1 ) {
-              std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
-              BOOST_ASSERT(false);
-            }
 
             // copy over critical info
             resultval->x_ = val[compute_index]->x_;
@@ -188,9 +165,7 @@ namespace hpx { namespace components { namespace amr
             resultval->value_.resize(val[compute_index]->value_.size());
             resultval->granularity = val[compute_index]->granularity;
             resultval->level_ = val[compute_index]->level_;
-  
             resultval->max_index_ = val[compute_index]->max_index_;
-            resultval->granularity = val[compute_index]->granularity;
             resultval->index_ = val[compute_index]->index_;
 
             // restriction
@@ -259,7 +234,6 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(bb != -1); 
               BOOST_ASSERT(cc != -1); 
               
-              // restriction
               for (int ll=0;ll<num_eqns;ll++) {
                 resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
               }
@@ -268,7 +242,6 @@ namespace hpx { namespace components { namespace amr
               return 0;
             }
             return 1;
-#endif
           }
         } else {
           compute_index = -1;
