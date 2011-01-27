@@ -242,7 +242,6 @@ int main(int argc, char* argv[])
         par->eps         =  0.0;
         par->output_level =  0;
         par->granularity =  3;
-        par->ghostwidth  =  10;
         for (int i=0;i<maxlevels;i++) {
           // default
           par->refine_level[i] = 1.5;
@@ -284,10 +283,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("nx0") ) {
                 std::string tmp = sec->get_entry("nx0");
                 nx0 = atoi(tmp.c_str());
-              }
-              if ( sec->has_entry("ghostwidth") ) {
-                std::string tmp = sec->get_entry("ghostwidth");
-                par->ghostwidth = atoi(tmp.c_str());
               }
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
@@ -403,6 +398,12 @@ int main(int argc, char* argv[])
         for (int i=par->allowedl;i>0;i--) {
           par->min[i] = 0.5*(par->maxx0 - par->minx0) + par->minx0  
                             - (par->nx[i]-1)/2 * par->dx0/pow(2.0,i) * par->granularity;
+        }
+
+        par->max.resize(par->allowedl+1);
+        par->max[0] = par->maxx0;
+        for (int i=par->allowedl;i>0;i--) {
+          par->max[i] = par->min[i] + par->nx[i]*par->granularity*par->dx0/pow(2.0,i);
         }
 
         par->rowsize.resize(par->allowedl+1);

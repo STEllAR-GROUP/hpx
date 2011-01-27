@@ -541,7 +541,76 @@ namespace hpx { namespace components { namespace amr { namespace server
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
+            if ( level != par->allowedl ) { 
+#if 0
+              // prolongation {{{
+              // send data to higher level boundary points
+              // determine which, if any, finer mesh cube share a common border with this coarser mesh cube
+
+              // here is the bounding box of the coarser mesh cube
+              had_double_type dx = par->dx0/pow(2.0,level);
+              had_double_type fdx = par->dx0/pow(2.0,level+1);
+              had_double_type xmin = par->min[level] + a*par->granularity*dx;
+              had_double_type xmax = par->min[level] + (a*par->granularity+par->granularity-1)*dx; 
+              had_double_type ymin = par->min[level] + b*par->granularity*dx;  
+              had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
+              had_double_type zmin = par->min[level] + c*par->granularity*dx;  
+              had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
+
+              // see if this overlap a border region the next finest level
+              if (  
+                    (  (par->min[level+1]-fdx*par->granularity < xmin 
+                     && par->max[level+1]+fdx*par->granularity > xmin) || 
+                       (par->min[level+1]-fdx*par->granularity < xmax 
+                     && par->max[level+1]+fdx*par->granularity > xmax) ||
+                        floatcmp(par->min[level+1]-fdx*par->granularity,xmin) ||
+                        floatcmp(par->max[level+1],xmin) ||
+                        floatcmp(par->min[level+1],xmax) ||
+                        floatcmp(par->max[level+1]+fdx*par->granularity,xmax)  ) &&
+
+                    (  (par->min[level+1]-fdx*par->granularity < ymin 
+                     && par->max[level+1]+fdx*par->granularity > ymin) || 
+                       (par->min[level+1]-fdx*par->granularity < ymax 
+                     && par->max[level+1]+fdx*par->granularity > ymax) ||
+                        floatcmp(par->min[level+1]-fdx*par->granularity,ymin) ||
+                        floatcmp(par->max[level+1],ymin) ||
+                        floatcmp(par->min[level+1],ymax) ||
+                        floatcmp(par->min[level+1]+fdx*par->granularity,ymax)  ) &&
+
+                    (  (par->min[level+1]-fdx*par->granularity < zmin 
+                     && par->max[level+1]+fdx*par->granularity > zmin) || 
+                       (par->min[level+1]-fdx*par->granularity < zmax 
+                     && par->max[level+1]+fdx*par->granularity > zmax) ||
+                        floatcmp(par->min[level+1]-fdx*par->granularity,zmin) ||
+                        floatcmp(par->max[level+1],zmin) ||
+                        floatcmp(par->min[level+1],zmax) ||
+                        floatcmp(par->max[level+1]+fdx*par->granularity,zmax)  )  ) 
+              {
+                // there is overlap; find out which PX thread has the border and send the data there
+                // there could be multiple borders to send to
+                std::cout << "        " << std::endl;
+                std::cout << "        " << std::endl;
+                std::cout << " TEST : " << xmin << " " << xmax << std::endl;
+                std::cout << "        " << ymin << " " << ymax << std::endl;
+                std::cout << "        " << zmin << " " << zmax << std::endl;
+                std::cout << "        " << std::endl;
+                std::cout << " BIG    : " << par->min[level+1]-fdx*par->granularity << " " << par->max[level+1]+fdx*par->granularity  << std::endl;
+                std::cout << " LITTLE : " << par->min[level+1] << " " << par->max[level+1] << std::endl;
+
+                //j = si + par->nx[ii]*(sj+sk*par->nx[ii]);
+                //if ( ii != par->allowedl ) {
+                //  j += par->rowsize[ii+1];
+                //}
+                //vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                //counter++;
+              } 
+
+
+              // }}}
+#endif
+            }
             if ( level != par->level_row[step] ) { 
+              // restriction {{{
               // send data to all levels less than this one (for restriction)
               had_double_type dx = par->dx0/pow(2.0,level);
               had_double_type xmin = par->min[level] + a*par->granularity*dx;
@@ -606,8 +675,9 @@ namespace hpx { namespace components { namespace amr { namespace server
                     counter++;
 
                   } 
-                }}}
+                } } }
               }
+            // }}}
             }
           }
         }
@@ -665,6 +735,17 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
           }
         }
+      }
+    }
+
+    bool unigrid_mesh::floatcmp(had_double_type const& x1, had_double_type const& x2) {
+      // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return true;
+      } else {
+        return false;
       }
     }
 
