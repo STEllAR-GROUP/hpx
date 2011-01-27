@@ -125,12 +125,41 @@ namespace hpx { namespace components { namespace amr
         }
 
         // Check if this is a prolongation/restriction step
-        if ( (row+5)%3 == 0 ) {
+        if ( (row+5)%3 == 0 && par->allowedl != 0 ) {
           // This is a prolongation/restriction step
           if ( val.size() == 1 ) {
             // no restriction needed
             resultval.get() = val[0].get();
+            if ( val[0]->timestep_ >= par->nt0-2 ) {
+              return 0;
+            } 
+            return 1;
           } else {
+            std::size_t a,b,c;
+            int level = findlevel3D(row,column,a,b,c,par);
+            had_double_type dx = par->dx0/pow(2.0,level);
+            had_double_type x = par->min[level] + a*dx*par->granularity;
+            had_double_type y = par->min[level] + b*dx*par->granularity;
+            had_double_type z = par->min[level] + c*dx*par->granularity;
+            compute_index = -1;
+            for (int i=0;i<val.size();i++) {
+              if ( floatcmp(x,val[i]->x_[0]) == 1 && 
+                   floatcmp(y,val[i]->y_[0]) == 1 && 
+                   floatcmp(z,val[i]->z_[0]) == 1 ) {
+                compute_index = i;
+                break;
+              }
+            }
+            if ( compute_index == -1 ) {
+              std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
+              BOOST_ASSERT(false);
+            }
+            resultval.get() = val[compute_index].get();
+            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+              return 0;
+            }
+            return 1;
+#if 0
             // restriction needed
             std::size_t a,b,c;
             int level = findlevel3D(row,column,a,b,c,par);
@@ -235,11 +264,12 @@ namespace hpx { namespace components { namespace amr
                 resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
               }
             }}}
+            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+              return 0;
+            }
+            return 1;
+#endif
           }
-          if ( val[0]->timestep_ >= par->nt0-2 ) {
-            return 0;
-          }
-          return 1;
         } else {
           compute_index = -1;
           if ( val.size() == 27 ) {
@@ -261,6 +291,9 @@ namespace hpx { namespace components { namespace amr
               }
             }
             if ( compute_index == -1 ) {
+              for (int i=0;i<val.size();i++) {
+                std::cout << " DEBUG " << val[i]->x_[0] << " " << val[i]->y_[0] << " "<< val[i]->z_[0] << std::endl;
+              }
               std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
               BOOST_ASSERT(false);
             }

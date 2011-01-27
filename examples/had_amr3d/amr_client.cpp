@@ -381,7 +381,7 @@ int main(int argc, char* argv[])
         num_rows *= 2; // we take two timesteps in the mesh
         int ii = -1; 
         for (int i=0;i<num_rows;i++) {
-          if (  (i+5)%3 != 0 ) {
+          if (  (i+5)%3 != 0 || par->allowedl == 0 ) {
             ii++;
           } 
           int level = -1;
