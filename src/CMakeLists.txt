@@ -219,6 +219,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/block_profiler.hpp
     ${hpx_SOURCE_DIR}/hpx/util/connection_cache.hpp
     ${hpx_SOURCE_DIR}/hpx/util/container_device.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/filesystem_compatibility.hpp
     ${hpx_SOURCE_DIR}/hpx/util/full_empty_memory.hpp
     ${hpx_SOURCE_DIR}/hpx/util/full_empty_store.hpp
     ${hpx_SOURCE_DIR}/hpx/util/future.hpp
