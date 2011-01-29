@@ -115,7 +115,7 @@ namespace hpx { namespace util
         {
             try {
                 fs::directory_iterator nodir;
-                fs::path this_path (hpx::util::create_path(*it);
+                fs::path this_path (hpx::util::create_path(*it));
 
                 if (!fs::exists(this_path)) 
                     continue;
