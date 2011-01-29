@@ -9,6 +9,7 @@
 #include <hpx/util/util.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 
 #include <string>
@@ -48,9 +49,9 @@ namespace hpx { namespace util
         if (NULL != env) {
             namespace fs = boost::filesystem;
 
-            fs::path inipath (env, fs::native);
+            fs::path inipath (hpx::util::create_path(env));
             if (NULL != file_suffix)
-                inipath /= fs::path(file_suffix, fs::native);
+                inipath /= hpx::util::create_path(file_suffix);
 
             return handle_ini_file(ini, inipath.string());
         }
@@ -114,7 +115,7 @@ namespace hpx { namespace util
         {
             try {
                 fs::directory_iterator nodir;
-                fs::path this_path (*it, fs::native);
+                fs::path this_path (hpx::util::create_path(*it);
 
                 if (!fs::exists(this_path)) 
                     continue;
@@ -152,7 +153,7 @@ namespace hpx { namespace util
 
         try {
             fs::directory_iterator nodir;
-            fs::path libs_path (libs, fs::native);
+            fs::path libs_path (hpx::util::create_path(libs));
 
             if (!fs::exists(libs_path)) 
                 return;     // give directory doesn't exist

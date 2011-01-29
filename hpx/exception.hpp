@@ -13,6 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/util.hpp>
+#include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/throw_exception.hpp>
@@ -301,7 +302,7 @@ namespace boost { namespace system
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
         std::string __s;                                                      \
-        boost::filesystem::path __p(__FILE__, boost::filesystem::native);     \
+        boost::filesystem::path __p(hpx::util::create_path(__FILE__));        \
         if (LHPX_ENABLED(debug))                                              \
         {                                                                     \
             __s = hpx::util::leaf(__p);                                       \

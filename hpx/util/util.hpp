@@ -59,21 +59,6 @@ namespace hpx { namespace util
         return name;    // nothing to do here
     }
 #endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline std::string leaf(boost::filesystem::path const& p)
-    {
-#if BOOST_FILESYSTEM_VERSION == 3
-        return p.filename().string();
-#else
-#if BOOST_VERSION >= 103600
-        return p.empty() ? std::string() : *--p.end();
-#else
-        return p.leaf();
-#endif
-#endif
-    }
-
 }}
 
 #endif

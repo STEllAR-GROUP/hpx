@@ -8,6 +8,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/util.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/filesystem_compatibility.hpp>
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -423,14 +424,14 @@ namespace hpx { namespace components { namespace server
             fs::path lib;
             try {
                 if (i->second.has_entry("path"))
-                    lib = fs::path(i->second.get_entry("path"), fs::native);
+                    lib = hpx::util::create_path(i->second.get_entry("path"));
                 else
-                    lib = fs::path(HPX_DEFAULT_COMPONENT_PATH, fs::native);
+                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
                 if (!load_component(ini, instance, component, lib, prefix, agas_client, isdefault)) {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
-                    lib /= fs::path(libname, fs::native);
+                    lib /= hpx::util::create_path(libname);
                     if (!load_component (ini, instance, component, lib, prefix, agas_client, isdefault))
                         continue;   // next please :-P
                 }

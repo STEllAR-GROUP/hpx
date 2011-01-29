@@ -69,7 +69,11 @@ namespace boost { namespace plugin {
             // map_name defaults to dll base name
             namespace fs = boost::filesystem;
 
+#if BOOST_FILESYSTEM_VERSION == 2
             fs::path dll_path(dll_name, fs::native);
+#else
+            fs::path dll_path(dll_name);
+#endif
             map_name = fs::basename(dll_path);
 
             LoadLibrary();
