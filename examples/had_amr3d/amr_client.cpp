@@ -403,7 +403,7 @@ int main(int argc, char* argv[])
         par->max.resize(par->allowedl+1);
         par->max[0] = par->maxx0;
         for (int i=par->allowedl;i>0;i--) {
-          par->max[i] = par->min[i] + par->nx[i]*par->granularity*par->dx0/pow(2.0,i);
+          par->max[i] = par->min[i] + ((par->nx[i]-1)*par->granularity + par->granularity-1)*par->dx0/pow(2.0,i);
         }
 
         par->rowsize.resize(par->allowedl+1);

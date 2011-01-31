@@ -168,76 +168,95 @@ namespace hpx { namespace components { namespace amr
             resultval->max_index_ = val[compute_index]->max_index_;
             resultval->index_ = val[compute_index]->index_;
 
-            // restriction
-            int n = par->granularity;
-            int last_time = -1;
-            bool found = false;
-            had_double_type xx,yy,zz;
-            for (int k=0;k<n;k++) {
-              zz = z + k*dx;
-            for (int j=0;j<n;j++) {
-              yy = y + j*dx;
-            for (int i=0;i<n;i++) {
-              xx = x + i*dx;
-              found = false;
+            // We may be dealing with either restriction or prolongation (both are performed at the same time)
+            bool restriction = false;
+            bool prolongation = false;
+            for (int i=0;i<val.size();i++) {
+              if ( resultval->level_ < val[i]->level_ ) restriction = true;
+              if ( resultval->level_ > val[i]->level_ ) prolongation = true;
+            }
 
-              // NOTE:: be sure you are getting the highest level of the point available
-              // this still needs to be implemented
+            if ( prolongation ) {
+            // Do nothing for the moment
+            }
 
-              if ( last_time != -1 ) {
-                // this might save some time -- see if the point is here
-                if ( xx >= val[last_time]->x_[0] && xx <= val[last_time]->x_[par->granularity-1] &&
-                     yy >= val[last_time]->y_[0] && yy <= val[last_time]->y_[par->granularity-1] &&
-                     zz >= val[last_time]->z_[0] && zz <= val[last_time]->z_[par->granularity-1] ) {
-                  found = true;
-                }
-              }
+            if ( restriction ) {
+              // restriction {{{
+              int n = par->granularity;
+              int last_time = -1;
+              bool found = false;
+              had_double_type xx,yy,zz;
+              for (int k=0;k<n;k++) {
+                zz = z + k*dx;
+              for (int j=0;j<n;j++) {
+                yy = y + j*dx;
+              for (int i=0;i<n;i++) {
+                xx = x + i*dx;
+                found = false;
 
-              if ( !found ) {
-                // find who has this point
-                for (int ii=0;ii<val.size();ii++) {
-                  if ( (xx >= val[ii]->x_[0] || floatcmp(xx,val[ii]->x_[0])==1) && 
-                       (xx <= val[ii]->x_[par->granularity-1] || floatcmp(xx,val[ii]->x_[par->granularity-1])==1) &&
-                       (yy >= val[ii]->y_[0] || floatcmp(yy,val[ii]->y_[0])==1)  && 
-                       (yy <= val[ii]->y_[par->granularity-1] || floatcmp(yy,val[ii]->y_[par->granularity-1])==1) &&
-                       (zz >= val[ii]->z_[0] || floatcmp(zz,val[ii]->z_[0])==1) && 
-                       (zz <= val[ii]->z_[par->granularity-1] || floatcmp(zz,val[ii]->z_[par->granularity-1])==1) ) {
-                    found = true;
-                    last_time = ii;
-                    break;
+                //if ( last_time != -1 ) {
+                  // this might save some time -- see if the point is here
+                //  if ( xx >= val[last_time]->x_[0] && xx <= val[last_time]->x_[par->granularity-1] &&
+                //       yy >= val[last_time]->y_[0] && yy <= val[last_time]->y_[par->granularity-1] &&
+                //       zz >= val[last_time]->z_[0] && zz <= val[last_time]->z_[par->granularity-1] &&
+                //       val[last_time]->level_ >= resultval->level_) {
+                //    found = true;
+                //  }
+                //}
+
+                int highest_level = resultval->level_;
+                if ( !found ) {
+                  // find the highest level who has this point
+                  highest_level -= 1;
+                  for (int ii=0;ii<val.size();ii++) {
+                    if ( (xx >= val[ii]->x_[0] || floatcmp(xx,val[ii]->x_[0])==1) && 
+                         (xx <= val[ii]->x_[par->granularity-1] || floatcmp(xx,val[ii]->x_[par->granularity-1])==1) &&
+                         (yy >= val[ii]->y_[0] || floatcmp(yy,val[ii]->y_[0])==1)  && 
+                         (yy <= val[ii]->y_[par->granularity-1] || floatcmp(yy,val[ii]->y_[par->granularity-1])==1) &&
+                         (zz >= val[ii]->z_[0] || floatcmp(zz,val[ii]->z_[0])==1) && 
+                         (zz <= val[ii]->z_[par->granularity-1] || floatcmp(zz,val[ii]->z_[par->granularity-1])==1) ) {
+                      int val_level = val[ii]->level_;
+                      if ( val_level > highest_level ) {
+                        found = true;
+                        last_time = ii;
+                        highest_level = val_level;
+                      }
+                    }
                   }
                 }
-              }
 
-              if ( !found ) {
-                std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
-                for (int ii=0;ii<val.size();ii++) {
-                  std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
-                  std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
-                  std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
-                  std::cout << " " << std::endl;
+                if ( !found ) {
+                  std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
+                  for (int ii=0;ii<val.size();ii++) {
+                    std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
+                    std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
+                    std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
+                    std::cout << " DEBUG level: " << val[ii]->level_ << std::endl;
+                    std::cout << " " << std::endl;
+                  }
                 }
-              }
-              BOOST_ASSERT(found);
+                BOOST_ASSERT(found);
 
-              // identify the finer mesh index
-              int aa = -1;
-              int bb = -1;
-              int cc = -1;
-              for (int ii=0;ii<par->granularity;ii++) {
-                if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
-                if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
-                if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
-                if ( aa != -1 && bb != -1 && cc != -1 ) break;
-              }
-              BOOST_ASSERT(aa != -1); 
-              BOOST_ASSERT(bb != -1); 
-              BOOST_ASSERT(cc != -1); 
-              
-              for (int ll=0;ll<num_eqns;ll++) {
-                resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
-              }
-            }}}
+                // identify the finer mesh index
+                int aa = -1;
+                int bb = -1;
+                int cc = -1;
+                for (int ii=0;ii<par->granularity;ii++) {
+                  if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
+                  if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
+                  if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
+                  if ( aa != -1 && bb != -1 && cc != -1 ) break;
+                }
+                BOOST_ASSERT(aa != -1); 
+                BOOST_ASSERT(bb != -1); 
+                BOOST_ASSERT(cc != -1); 
+                
+                for (int ll=0;ll<num_eqns;ll++) {
+                  resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                }
+              } } }
+              // }}}
+            }
             if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
               return 0;
             }

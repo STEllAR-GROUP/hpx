@@ -93,6 +93,8 @@ namespace hpx { namespace components { namespace amr { namespace server
               int level = findlevel3D(static_step,column,a,b,c,par);
               std::cout << "                 PROBLEM: level " << level << " index " << a << " " << b << " " << c << std::endl;
             } 
+#endif
+#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -542,7 +544,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
             if ( level != par->allowedl ) { 
-#if 0
               // prolongation {{{
               // send data to higher level boundary points
               // determine which, if any, finer mesh cube share a common border with this coarser mesh cube
@@ -556,58 +557,119 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
               had_double_type zmin = par->min[level] + c*par->granularity*dx;  
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
+#if 0
+              std::cout << " PROLONGATION : " << par->min[level+1]-dx*par->granularity << " " << par->max[level+1]+dx*par->granularity << std::endl;
+              std::cout << "              : " << xmin << " " << xmax << std::endl;
+              std::cout << "              : " << ymin << " " << ymax << std::endl;
+              std::cout << "              : " << zmin << " " << zmax << std::endl;
+              std::cout << "     " << std::endl;
+#endif
 
               // see if this overlap a border region the next finest level
-              if (  
-                    (  (par->min[level+1]-fdx*par->granularity < xmin 
-                     && par->max[level+1]+fdx*par->granularity > xmin) || 
-                       (par->min[level+1]-fdx*par->granularity < xmax 
-                     && par->max[level+1]+fdx*par->granularity > xmax) ||
-                        floatcmp(par->min[level+1]-fdx*par->granularity,xmin) ||
-                        floatcmp(par->max[level+1],xmin) ||
-                        floatcmp(par->min[level+1],xmax) ||
-                        floatcmp(par->max[level+1]+fdx*par->granularity,xmax)  ) &&
+              if ( ( 
+                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,xmin) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,xmin)) || 
+                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,xmax) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,xmax)) ) &&
 
-                    (  (par->min[level+1]-fdx*par->granularity < ymin 
-                     && par->max[level+1]+fdx*par->granularity > ymin) || 
-                       (par->min[level+1]-fdx*par->granularity < ymax 
-                     && par->max[level+1]+fdx*par->granularity > ymax) ||
-                        floatcmp(par->min[level+1]-fdx*par->granularity,ymin) ||
-                        floatcmp(par->max[level+1],ymin) ||
-                        floatcmp(par->min[level+1],ymax) ||
-                        floatcmp(par->min[level+1]+fdx*par->granularity,ymax)  ) &&
+                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,ymin) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,ymin)) || 
+                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,ymax) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,ymax)) ) &&
 
-                    (  (par->min[level+1]-fdx*par->granularity < zmin 
-                     && par->max[level+1]+fdx*par->granularity > zmin) || 
-                       (par->min[level+1]-fdx*par->granularity < zmax 
-                     && par->max[level+1]+fdx*par->granularity > zmax) ||
-                        floatcmp(par->min[level+1]-fdx*par->granularity,zmin) ||
-                        floatcmp(par->max[level+1],zmin) ||
-                        floatcmp(par->min[level+1],zmax) ||
-                        floatcmp(par->max[level+1]+fdx*par->granularity,zmax)  )  ) 
+                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,zmin) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,zmin)) || 
+                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,zmax) 
+                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,zmax)) ) ) &&
+                  !( par->min[level+1] < xmin && par->max[level+1] > xmax &&
+                     par->min[level+1] < ymin && par->max[level+1] > ymax &&
+                     par->min[level+1] < zmin && par->max[level+1] > zmax 
+                   ) ) 
               {
-                // there is overlap; find out which PX thread has the border and send the data there
+                // there is overlap with the prolongation region; 
+                // find out which PX thread has the border and send the data there
                 // there could be multiple borders to send to
-                std::cout << "        " << std::endl;
-                std::cout << "        " << std::endl;
-                std::cout << " TEST : " << xmin << " " << xmax << std::endl;
-                std::cout << "        " << ymin << " " << ymax << std::endl;
-                std::cout << "        " << zmin << " " << zmax << std::endl;
-                std::cout << "        " << std::endl;
-                std::cout << " BIG    : " << par->min[level+1]-fdx*par->granularity << " " << par->max[level+1]+fdx*par->granularity  << std::endl;
-                std::cout << " LITTLE : " << par->min[level+1] << " " << par->max[level+1] << std::endl;
-
-                //j = si + par->nx[ii]*(sj+sk*par->nx[ii]);
-                //if ( ii != par->allowedl ) {
-                //  j += par->rowsize[ii+1];
-                //}
-                //vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                //counter++;
-              } 
-
-
-              // }}}
+#if 0
+              std::cout << " OVERLAP      : " << std::endl;
+              std::cout << "              : " << xmin << " " << xmax << std::endl;
+              std::cout << "              : " << ymin << " " << ymax << std::endl;
+              std::cout << "              : " << zmin << " " << zmax << std::endl;
+              std::cout << "     " << std::endl;
 #endif
+
+                bool pfound = false;
+
+                // find out which of the level+1 px threads overlap with this px thread
+                for (int sk=0;sk<par->nx[level+1];sk++) {
+                for (int sj=0;sj<par->nx[level+1];sj++) {
+                for (int si=0;si<par->nx[level+1];si++) {
+                  if ( si == 0 || si == par->nx[level+1]-1 ||
+                       sj == 0 || sj == par->nx[level+1]-1 ||
+                       sk == 0 || sk == par->nx[level+1]-1 ) {
+#if 0
+                      std::cout << "        " << std::endl;
+                      std::cout << "        " << std::endl;
+                      std::cout << " DEBUG  : " << xmin << " " << xmax << std::endl;
+                      std::cout << "        " << ymin << " " << ymax << std::endl;
+                      std::cout << "        " << zmin << " " << zmax << std::endl;
+                      std::cout << "        " << std::endl;
+                      std::cout << "    fdx  " << fdx << std::endl;
+                      std::cout << "        " << std::endl;
+                      std::cout << " FINER MESH    : " << par->min[level+1] + si*par->granularity*fdx << " " << par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx << std::endl;
+                      std::cout << "               : " << par->min[level+1] + sj*par->granularity*fdx << " " << par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx << std::endl;
+                      std::cout << "               : " << par->min[level+1] + sk*par->granularity*fdx << " " << par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx << std::endl;
+#endif
+
+                    // Check for overlap 
+                    if ( (  (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - fdx,xmin) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+fdx,xmin)) ||
+                            (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - fdx,xmax) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+fdx,xmax)) 
+                         ) &&
+                         (  (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - fdx,ymin) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + fdx,ymin)) ||
+                            (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - fdx,ymax) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + fdx,ymax)) 
+                         ) &&
+                         (  (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - fdx,zmin) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + fdx,zmin)) ||
+                            (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - fdx,zmax) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + fdx,zmax)) 
+                         ) 
+                       ) 
+                    {
+                      pfound = true;
+                      // This finer mesh point overlaps the coarse mesh point which contains the necessary prolongation info
+#if 0
+                      std::cout << "        " << std::endl;
+                      std::cout << "        " << std::endl;
+                      std::cout << " DEBUG A: " << xmin << " " << xmax << std::endl;
+                      std::cout << "        " << ymin << " " << ymax << std::endl;
+                      std::cout << "        " << zmin << " " << zmax << std::endl;
+                      std::cout << "        " << std::endl;
+                      std::cout << " FINER MESH A  : " << par->min[level+1] + si*par->granularity*fdx << " " << par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx << std::endl;
+                      std::cout << "               : " << par->min[level+1] + sj*par->granularity*fdx << " " << par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx << std::endl;
+                      std::cout << "               : " << par->min[level+1] + sk*par->granularity*fdx << " " << par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx << std::endl;
+                      std::cout << " si sj sk        " << si << " " << sj << " " << sk << std::endl;
+#endif
+                      // Figure out which px thread this should be sent to
+                      j = si + par->nx[level+1]*(sj+sk*par->nx[level+1]);
+                      if ( level+1 != par->allowedl ) {
+                        j += par->rowsize[level+1];
+                      }
+                      vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                      counter++;
+                    }
+                  }
+                } } }
+
+                if ( pfound == false ) {
+                  std::cout << " PROBLEM: overlap point not found " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << zmin << " " << zmax << std::endl;
+                  std::cout << " BBOX : " << par->min[level+1]-dx*par->granularity << " " << par->max[level+1]+dx*par->granularity << std::endl;
+                  std::cout << "  " << std::endl;
+                }
+              } 
+              // }}}
             }
             if ( level != par->level_row[step] ) { 
               // restriction {{{
@@ -635,20 +697,20 @@ namespace hpx { namespace components { namespace amr { namespace server
                 for (int sj=startb;sj<=startb+1;sj++) {
                 for (int si=starta;si<=starta+1;si++) {
                   // check if there is any overlap
-                  if ( (  (par->min[ii] + si*par->granularity*cdx <= xmin && 
-                           par->min[ii] + (si*par->granularity+par->granularity-1)*cdx >= xmin) ||
-                          (par->min[ii] + si*par->granularity*cdx <= xmax && 
-                           par->min[ii] + (si*par->granularity+par->granularity-1)*cdx >= xmax) 
+                  if ( (  (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmin) && 
+                           floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmin)) ||
+                          (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmax) && 
+                           floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmax)) 
                        ) &&
-                       (  (par->min[ii] + sj*par->granularity*cdx <= ymin && 
-                           par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx >= ymin) ||
-                          (par->min[ii] + sj*par->granularity*cdx <= ymax && 
-                           par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx >= ymax) 
+                       (  (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymin) && 
+                           floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymin)) ||
+                          (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymax) && 
+                           floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymax)) 
                        ) &&
-                       (  (par->min[ii] + sk*par->granularity*cdx <= zmin && 
-                           par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx >= zmin) ||
-                          (par->min[ii] + sk*par->granularity*cdx <= zmax && 
-                           par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx >= zmax) 
+                       (  (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmin) && 
+                           floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmin)) ||
+                          (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmax) && 
+                           floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmax)) 
                        ) 
                      ) 
                   {
@@ -741,6 +803,34 @@ namespace hpx { namespace components { namespace amr { namespace server
     bool unigrid_mesh::floatcmp(had_double_type const& x1, had_double_type const& x2) {
       // compare two floating point numbers
       static had_double_type const epsilon = 1.e-8;
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    bool unigrid_mesh::floatcmp_ge(had_double_type const& x1, had_double_type const& x2) {
+      // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
+
+      if ( x1 > x2 ) return true;
+
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    bool unigrid_mesh::floatcmp_le(had_double_type const& x1, had_double_type const& x2) {
+      // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
+
+      if ( x1 < x2 ) return true;
+
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
         // the numbers are close enough for coordinate comparison
         return true;
