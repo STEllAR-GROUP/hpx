@@ -64,7 +64,7 @@ inline void yield( unsigned k )
     {
     }
 #if defined( BOOST_SMT_PAUSE )
-    else if( k < 64 )
+    else //if( k < 64 )
     {
         BOOST_SMT_PAUSE
     }
@@ -73,10 +73,10 @@ inline void yield( unsigned k )
 //     {
 //         Sleep( 0 );
 //     }
-    else
-    {
-        Sleep( 0 );
-    }
+//     else
+//     {
+//         Sleep( 0 );
+//     }
 }
 
 } // namespace detail

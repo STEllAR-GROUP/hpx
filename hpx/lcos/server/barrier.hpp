@@ -31,10 +31,10 @@ namespace hpx { namespace lcos { namespace server
     ///         synchronize a given number of \a threads.
     class barrier 
       : public lcos::base_lco
-      , public components::detail::managed_component_base<barrier> 
+      , public components::managed_component_base<barrier> 
     {
     private:
-        typedef components::detail::managed_component_base<barrier> base_type;
+        typedef components::managed_component_base<barrier> base_type;
 
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;

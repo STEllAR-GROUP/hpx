@@ -16,9 +16,9 @@ namespace hpx { namespace performance_counters { namespace server
 {
     class HPX_EXPORT raw_counter 
       : public base_performance_counter,
-        public components::detail::managed_component_base<raw_counter> 
+        public components::managed_component_base<raw_counter> 
     {
-        typedef components::detail::managed_component_base<raw_counter> base_type;
+        typedef components::managed_component_base<raw_counter> base_type;
 
     public:
         typedef raw_counter type_holder;

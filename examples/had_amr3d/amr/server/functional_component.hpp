@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 
 #include "../../parameter.hpp"
 
@@ -19,10 +19,10 @@ namespace hpx { namespace components { namespace amr { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT functional_component
-      : public simple_component_base<functional_component>
+      : public managed_component_base<functional_component>
     {
     private:
-        typedef simple_component_base<functional_component> base_type;
+        typedef managed_component_base<functional_component> base_type;
 
     public:
         functional_component()
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
-        typedef amr::server::functional_component wrapping_type;
+        typedef managed_component<amr::server::functional_component> wrapping_type;
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class

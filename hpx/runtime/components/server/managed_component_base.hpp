@@ -24,53 +24,57 @@
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Wrapper = detail::this_type>
+    class managed_component_base 
+      : public detail::managed_component_tag, boost::noncopyable
+    {
+    private:
+        static component_type value;
+
+    public:
+        // components must contain a typedef for wrapping_type defining the
+        // managed_component type used to encapsulate instances of this 
+        // component
+        typedef managed_component<Component, Wrapper> wrapping_type;
+
+        // This is the component id. Every component needs to have an embedded
+        // enumerator 'value' which is used by the generic action implementation
+        // to associate this component with a given action.
+        static component_type get_component_type()
+        {
+            return value;
+        }
+        static void set_component_type(component_type type)
+        {
+            value = type;
+        }
+
+        /// \brief finalize() will be called just before the instance gets 
+        ///        destructed
+        void finalize() {}
+
+        template <typename ManagedType>
+        naming::id_type const& get_gid(ManagedType* p) const
+        {
+            if (!id_) 
+                id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
+            return id_;
+        }
+
+    private:
+        mutable naming::id_type id_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Wrapper>
+    component_type managed_component_base<Component, Wrapper>::value = 
+        component_invalid;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename Component, typename Wrapper = this_type>
-        class managed_component_base 
-          : public managed_component_tag, boost::noncopyable
-        {
-        private:
-            static component_type value;
-
-        public:
-            // components must contain a typedef for wrapping_type defining the
-            // managed_component type used to encapsulate instances of this 
-            // component
-            typedef managed_component<Component, Wrapper> wrapping_type;
-
-            // This is the component id. Every component needs to have an embedded
-            // enumerator 'value' which is used by the generic action implementation
-            // to associate this component with a given action.
-            static component_type get_component_type()
-            {
-                return value;
-            }
-            static void set_component_type(component_type type)
-            {
-                value = type;
-            }
-
-            /// \brief finalize() will be called just before the instance gets 
-            ///        destructed
-            void finalize() {}
-
-            template <typename ManagedType>
-            naming::id_type const& get_gid(ManagedType* p) const
-            {
-                if (!id_) 
-                    id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
-                return id_;
-            }
-
-        private:
-            mutable naming::id_type id_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////////
-        template <typename Component, typename Wrapper>
-        component_type managed_component_base<Component, Wrapper>::value = 
-            component_invalid;
+        // for backwards compatibility only
+        using components::managed_component_base;
     }
 
     ///////////////////////////////////////////////////////////////////////////

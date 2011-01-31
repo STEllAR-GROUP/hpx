@@ -21,7 +21,7 @@ typedef hpx::components::managed_component<
 > had_stencil_value_out_adaptor_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    had_stencil_value_out_adaptor_type, had_stencil_value_out_adaptor);
+    had_stencil_value_out_adaptor_type, had_stencil_value_out_adaptor_3d);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
