@@ -31,7 +31,7 @@ HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action,
     had_unigrid_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh);
+    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh3d);
 HPX_DEFINE_GET_COMPONENT_TYPE(had_unigrid_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////

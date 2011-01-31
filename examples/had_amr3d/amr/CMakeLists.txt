@@ -53,7 +53,7 @@ set(had_amr3d_SOURCES
 
 ###############################################################################
 set(had_amr3d_INI
-    had_amr3d.ini)
+    )
 source_group("" 
     FILES ${had_amr3d_INI})
 

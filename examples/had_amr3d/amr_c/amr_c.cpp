@@ -45,7 +45,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_type);
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_logging_type>, had_logging);
+    hpx::components::simple_component<had_logging_type>, had_logging3d);
 
 HPX_REGISTER_ACTION_EX(had_logging_type::logentry_action, logentry_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(had_logging_type);

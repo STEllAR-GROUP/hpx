@@ -16,7 +16,7 @@ set(had_amr3d_c_SOURCES
     stencil.cpp)
 
 set(had_amr3d_c_INI
-    had_amr3d_c.ini)
+    )
 
 add_hpx_component(had_amr3d_c
     SOURCES ${had_amr3d_c_SOURCES} 
