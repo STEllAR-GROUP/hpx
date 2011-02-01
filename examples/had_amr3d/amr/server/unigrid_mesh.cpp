@@ -274,9 +274,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = (int) pow(2.,par->allowedl);
+        int num_rows = (int) pow(2,par->allowedl);
         if ( par->allowedl > 0 ) {
-          num_rows += (int) pow(2.,par->allowedl)/2;
+          num_rows += (int) pow(2,par->allowedl)/2;
         }
         num_rows *= 2; // we take two steps
 
@@ -481,7 +481,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
       int counter;
       int step,dst;
-//      int found;
+      int found;
 
       std::size_t a,b,c;
       for (step=0;step<num_rows;step = step + 1) {
@@ -514,7 +514,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // anytime there is a difference of more than one level between src and dst rows,
             // you need to account for the prolongation/restriction rows going on inbetween them.
             // That is given by 2^{L-l-1}-1
-            int intermediate = (int) pow(2.,par->allowedl-level) ;
+            int intermediate = (int) pow(2,par->allowedl-level) ;
             if ( par->allowedl-level > 1 ) {
               dst += intermediate + intermediate/2 - 1;
             } else {
@@ -681,7 +681,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
               had_double_type zmin = par->min[level] + c*par->granularity*dx;  
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
-              had_double_type /*cxmin,cxmax,cymin,cymax,czmin,czmax,*/cdx; 
+              had_double_type cxmin,cxmax,cymin,cymax,czmin,czmax,cdx; 
               had_double_type ca,cb,cc;
               for (int ii=par->level_row[step];ii<level;ii++) {
                 // determine which coarser mesh cube overlaps this finer mesh cube

@@ -42,7 +42,8 @@ struct stencil_data
       : max_index_(rhs.max_index_), index_(rhs.index_), 
         timestep_(rhs.timestep_),
         granularity(rhs.granularity), level_(rhs.level_), 
-        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_)
+        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_),
+        pvalue_(rhs.pvalue_), px_(rhs.px_), py_(rhs.py_), pz_(rhs.pz_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -59,6 +60,10 @@ struct stencil_data
             x_ = rhs.x_; 
             y_ = rhs.y_; 
             z_ = rhs.z_; 
+            pvalue_ = rhs.pvalue_;
+            px_ = rhs.px_; 
+            py_ = rhs.py_; 
+            pz_ = rhs.pz_; 
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;
@@ -76,6 +81,11 @@ struct stencil_data
     std::vector< had_double_type > y_;      // x coordinate value
     std::vector< had_double_type > z_;      // x coordinate value
 
+    std::vector< nodedata > pvalue_;            // current value
+    std::vector< had_double_type > px_;      // x coordinate value
+    std::vector< had_double_type > py_;      // x coordinate value
+    std::vector< had_double_type > pz_;      // x coordinate value
+
 private:
     // serialization support
     friend class boost::serialization::access;
@@ -84,7 +94,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & granularity & level_ & value_;
-        ar & x_ & y_ & z_;
+        ar & x_ & y_ & z_ & pvalue_ & px_ & py_ & pz_ ;
     }
 };
 

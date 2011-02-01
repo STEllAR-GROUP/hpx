@@ -64,19 +64,19 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // output to file "output.dat"
-//         FILE *fdata;
+        FILE *fdata;
         std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<val.granularity;i++) {
-              x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+              x.push_back(val.x_[0]+i*par->dx0/pow(2.0,val.level_));
             }
             for (i=0;i<val.granularity;i++) {
-              x.push_back(val.y_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+              x.push_back(val.y_[0]+i*par->dx0/pow(2.0,val.level_));
             }
             for (i=0;i<val.granularity;i++) {
-              x.push_back(val.z_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+              x.push_back(val.z_[0]+i*par->dx0/pow(2.0,val.level_));
             }
             for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
               phi.push_back(val.value_[i].phi[0][0]);

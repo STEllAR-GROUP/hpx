@@ -38,6 +38,36 @@ namespace hpx { namespace components { namespace amr
       }
     }
 
+    inline bool 
+    stencil::floatcmp_le(had_double_type const& x1, had_double_type const& x2) {
+      // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
+
+      if ( x1 < x2 ) return true;
+
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    inline bool 
+    stencil::floatcmp_ge(had_double_type const& x1, had_double_type const& x2) {
+      // compare two floating point numbers
+      static had_double_type const epsilon = 1.e-8;
+
+      if ( x1 > x2 ) return true;
+
+      if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+        // the numbers are close enough for coordinate comparison
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     inline std::size_t stencil::findlevel3D(std::size_t step, std::size_t item, 
                                             std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
     {
@@ -118,6 +148,7 @@ namespace hpx { namespace components { namespace amr
         int compute_index;
         bool boundary = false;
         int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
+        int pbox[6] = {0,0,0,0,0,0};   // initialize bounding box
 
         if ( val.size() == 0 ) {
           // This should not happen
@@ -174,10 +205,567 @@ namespace hpx { namespace components { namespace amr
             for (int i=0;i<val.size();i++) {
               if ( resultval->level_ < val[i]->level_ ) restriction = true;
               if ( resultval->level_ > val[i]->level_ ) prolongation = true;
+              if ( restriction && prolongation ) break;
             }
 
             if ( prolongation ) {
-            // Do nothing for the moment
+              // prolongation {{{
+              // interpolation
+              had_double_type xmin = val[compute_index]->x_[0];
+              had_double_type xmax = val[compute_index]->x_[par->granularity-1];
+              had_double_type ymin = val[compute_index]->y_[0];
+              had_double_type ymax = val[compute_index]->y_[par->granularity-1];
+              had_double_type zmin = val[compute_index]->z_[0];
+              had_double_type zmax = val[compute_index]->z_[par->granularity-1];
+
+              if ( floatcmp(xmin,par->min[level]) == 1 ) {
+                pbox[0] = 1;
+              }
+              if ( floatcmp(xmax,par->max[level]) == 1 ) {
+                pbox[1] = 1;
+              }
+              if ( floatcmp(ymin,par->min[level]) == 1 ) {
+                pbox[2] = 1;
+              }
+              if ( floatcmp(ymax,par->max[level]) == 1 ) {
+                pbox[3] = 1;
+              }
+              if ( floatcmp(zmin,par->min[level]) == 1 ) {
+                pbox[4] = 1;
+              }
+              if ( floatcmp(zmax,par->max[level]) == 1 ) {
+                pbox[5] = 1;
+              }
+
+              if ( pbox[0] == 0 && pbox[1] == 0 &&
+                   pbox[2] == 0 && pbox[3] == 0 &&
+                   pbox[4] == 0 && pbox[5] == 0 ) {
+                // no prolongation needed in this case.  Something somewhere has gone wrong
+                BOOST_ASSERT(false);
+              }
+
+              // an alternative 3D vector with all the prolongation data in the right place
+              if ( (pbox[0] == 1 && pbox[1] == 1) || (pbox[2] == 1 && pbox[3] == 1) || (pbox[4] == 1 && pbox[5] == 1) ) {
+                // this shouldn't happen
+                BOOST_ASSERT(false);
+              }
+
+              // 27 cases {{{
+              if (        pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  if (i >= 0) {
+                    resultval->py_[i] = ymin + i*dx;
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=0;i<2*par->granularity;i++) {
+                  resultval->px_[i] = xmin + i*dx;
+                  if ( i < par->granularity ) {
+                    resultval->py_[i] = ymin + i*dx;
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=0;i<2*par->granularity;i++) {
+                  resultval->py_[i] = ymin + i*dx;
+                  if ( i < par->granularity ) {
+                    resultval->px_[i] = xmin + i*dx;
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=0;i<2*par->granularity;i++) {
+                  resultval->pz_[i] = zmin + i*dx;
+                  if ( i < par->granularity ) {
+                    resultval->px_[i] = xmin + i*dx;
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+//
+//
+//
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  if (i >= 0) {
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                  if (i >= 0) {
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+//
+//
+//
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  if (i >= 0) {
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->pz_[i] = zmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                  if (i >= 0) {
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->py_[i] = ymin + i*dx;
+                  }
+                }
+                // }}}
+//
+//
+//
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                  }
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                  if (i >= 0) {
+                    resultval->px_[i] = xmin + i*dx;
+                  }
+                }
+                // }}}
+//
+//
+//
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + i*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                }
+                // }}}
+//
+//
+//
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + i*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + i*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                }
+                // }}}
+              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
+                // {{{
+                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
+                resultval->px_.resize(2*par->granularity);
+                resultval->py_.resize(2*par->granularity);
+                resultval->pz_.resize(2*par->granularity);
+                for (int i=-par->granularity;i<par->granularity;i++) {
+                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
+                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
+                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
+                }
+                // }}}
+              } else {
+                std::cout << " PROBLEM " << pbox[0] << " " << pbox[1] << std::endl;
+                std::cout << "         " << pbox[2] << " " << pbox[3] << std::endl;
+                std::cout << "         " << pbox[4] << " " << pbox[5] << std::endl;
+                BOOST_ASSERT(false);
+              }
+              // }}}
+
+              // interpolate
+              int nx = resultval->px_.size();
+              int ny = resultval->py_.size();
+              int nz = resultval->pz_.size();
+              int n = par->granularity;
+              for (int k=0;k<nz;k++) {
+              for (int j=0;j<ny;j++) {
+              for (int i=0;i<nx;i++) {
+                had_double_type xt =  resultval->px_[i];              
+                had_double_type yt =  resultval->py_[j];              
+                had_double_type zt =  resultval->pz_[k];              
+ 
+                bool found = false;
+                // check compute_index first to see if this point is contained in it
+                if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                     floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                     floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
+                  // no interp need -- just grap the point  
+                  // figure out the index to grab
+                  had_double_type daa =  (xt-xmin)/dx + 0.5;
+                  had_double_type dbb =  (yt-ymin)/dx + 0.5;
+                  had_double_type dcc =  (zt-zmin)/dx + 0.5;
+                  int aa = (int) floor(daa); 
+                  int bb = (int) floor(dbb); 
+                  int cc = (int) floor(dcc); 
+                  BOOST_ASSERT( floatcmp(xt,val[compute_index]->x_[aa] ) );
+                  BOOST_ASSERT( floatcmp(yt,val[compute_index]->y_[bb] ) );
+                  BOOST_ASSERT( floatcmp(zt,val[compute_index]->z_[cc] ) );
+                //  for (int ll=0;ll<num_eqns;ll++) {
+                //    resultval->value_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                //  }
+                } else {
+                  // check the other input
+                  found = false; 
+                  for (int ii=0;ii<val.size();ii++) {
+                    if ( ii != compute_index ) {
+                      if ( floatcmp_ge(xt,val[ii]->x_[0])  && floatcmp_le(xt,val[ii]->x_[par->granularity-1]) &&
+                           floatcmp_ge(yt,val[ii]->y_[0])  && floatcmp_le(yt,val[ii]->y_[par->granularity-1]) &&
+                           floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[par->granularity-1]) ) {
+                        found = true;
+                        // interpolate
+                        break;
+                      }
+                    }
+                  }
+                  if ( !found ) {
+                    // the point we seek might lie in the no-man's land between two of the inputs patches
+                    for (int ii=0;ii<val.size();ii++) {
+                    for (int jj=ii+1;jj<val.size();jj++) {
+                      // inf's and sup's {{{
+                      had_double_type hxmin,hxmax; 
+                      had_double_type hymin,hymax; 
+                      had_double_type hzmin,hzmax; 
+                      had_double_type ixmin,ixmax; 
+                      had_double_type iymin,iymax; 
+                      had_double_type izmin,izmax; 
+                      if ( val[ii]->x_[0] > val[jj]->x_[0] ) {
+                        hxmin = val[ii]->x_[0];
+                        ixmin = val[jj]->x_[0];
+                      } else {
+                        hxmin = val[jj]->x_[0];
+                        ixmin = val[ii]->x_[0];
+                      }
+
+                      if ( val[ii]->y_[0] > val[jj]->y_[0] ) {
+                        hymin = val[ii]->y_[0];
+                        iymin = val[jj]->y_[0];
+                      } else {
+                        hymin = val[jj]->y_[0];
+                        iymin = val[ii]->y_[0];
+                      }
+
+                      if ( val[ii]->z_[0] > val[jj]->z_[0] ) {
+                        hzmin = val[ii]->z_[0];
+                        izmin = val[jj]->z_[0];
+                      } else {
+                        hzmin = val[jj]->z_[0];
+                        izmin = val[ii]->z_[0];
+                      }
+
+                      if ( val[ii]->x_[par->granularity-1] < val[jj]->x_[par->granularity-1] ) {
+                        hxmax = val[ii]->x_[par->granularity-1];
+                        ixmax = val[jj]->x_[par->granularity-1];
+                      } else {
+                        hxmax = val[jj]->x_[par->granularity-1];
+                        ixmax = val[ii]->x_[par->granularity-1];
+                      }
+
+                      if ( val[ii]->y_[par->granularity-1] < val[jj]->y_[par->granularity-1] ) {
+                        hymax = val[ii]->y_[par->granularity-1];
+                        iymax = val[jj]->y_[par->granularity-1];
+                      } else {
+                        hymax = val[jj]->y_[par->granularity-1];
+                        iymax = val[ii]->y_[par->granularity-1];
+                      }
+
+                      if ( val[ii]->z_[par->granularity-1] < val[jj]->z_[par->granularity-1] ) {
+                        hzmax = val[ii]->z_[par->granularity-1];
+                        izmax = val[jj]->z_[par->granularity-1];
+                      } else {
+                        hzmax = val[jj]->z_[par->granularity-1];
+                        izmax = val[ii]->z_[par->granularity-1];
+                      }
+                      // }}}
+
+                      if ( floatcmp_ge(xt,ixmin)  && floatcmp_le(xt,ixmax) &&
+                           floatcmp_ge(yt,hymin)  && floatcmp_le(yt,hymax) &&
+                           floatcmp_ge(zt,hzmin)  && floatcmp_le(zt,hzmax) ) {
+                        found = true;
+                        break;
+                      }
+
+                      if ( floatcmp_ge(xt,hxmin)  && floatcmp_le(xt,hxmax) &&
+                           floatcmp_ge(yt,iymin)  && floatcmp_le(yt,iymax) &&
+                           floatcmp_ge(zt,hzmin)  && floatcmp_le(zt,hzmax) ) {
+                        found = true;
+                        break;
+                      }
+
+                      if ( floatcmp_ge(xt,hxmin)  && floatcmp_le(xt,hxmax) &&
+                           floatcmp_ge(yt,hymin)  && floatcmp_le(yt,hymax) &&
+                           floatcmp_ge(zt,izmin)  && floatcmp_le(zt,izmax) ) {
+                        found = true;
+                        break;
+                      }
+
+                    } }
+                  }
+
+                  if ( !found ) {
+                    std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
+                    std::cout << " Available data: " << std::endl;
+                    for (int ii=0;ii<val.size();ii++) {
+                      std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
+                      std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
+                      std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
+                      std::cout << " " << std::endl;
+                    }
+                    BOOST_ASSERT(false);
+                  }
+
+                }
+              } } }
+              // }}}
             }
 
             if ( restriction ) {

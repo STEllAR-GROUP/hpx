@@ -368,10 +368,10 @@ int main(int argc, char* argv[])
         }
 
         // for each row, record what the lowest level on the row is
-        int num_rows = (int) pow(2.,par->allowedl);
+        int num_rows = (int) pow(2,par->allowedl);
         // account for prolongation and restriction (which is done every other step
         if ( par->allowedl > 0 ) {
-          num_rows += (int) pow(2.,par->allowedl)/2;
+          num_rows += (int) pow(2,par->allowedl)/2;
         }
         num_rows *= 2; // we take two timesteps in the mesh
         int ii = -1; 
@@ -381,7 +381,7 @@ int main(int argc, char* argv[])
           } 
           int level = -1;
           for (int j=par->allowedl;j>=0;j--) {
-            int tmp = (int) pow(2.,j);
+            int tmp = (int) pow(2,j);
             if ( ii%tmp == 0 ) {
               level = par->allowedl-j;
               par->level_row.push_back(level);

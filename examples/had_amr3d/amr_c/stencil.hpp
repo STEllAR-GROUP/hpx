@@ -59,6 +59,8 @@ namespace hpx { namespace components { namespace amr
 
         /// floating point comparison (for coordinates)
         static bool floatcmp(had_double_type const& x1,had_double_type const& x2);
+        static bool floatcmp_le(had_double_type const& x1,had_double_type const& x2);
+        static bool floatcmp_ge(had_double_type const& x1,had_double_type const& x2);
    
         static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par);
 

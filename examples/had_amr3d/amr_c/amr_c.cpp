@@ -35,8 +35,8 @@ typedef hpx::components::amr::server::logging had_logging_type;
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::managed_component<had_stencil_type>, 
-    had_stencil3d, "had_functional_component");
+    hpx::components::simple_component<had_stencil_type>, 
+    had_stencil, "had_functional_component");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_type);
 
