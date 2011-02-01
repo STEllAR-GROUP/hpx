@@ -1,5 +1,0 @@
-Edit 2 places to run anywhere
-
-run.sh -- edit the $LD_LIBRARY_PATH to point to the right place
-
-IntrTreeNode.ini -- edit the location to the component libraries
