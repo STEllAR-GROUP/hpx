@@ -752,15 +752,15 @@ namespace hpx { namespace components { namespace amr
                   }
 
                   if ( !found ) {
-                    std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
-                    std::cout << " Available data: " << std::endl;
-                    for (int ii=0;ii<val.size();ii++) {
-                      std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
-                      std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
-                      std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
-                      std::cout << " " << std::endl;
-                    }
-                    BOOST_ASSERT(false);
+//                     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
+//                     std::cout << " Available data: " << std::endl;
+//                     for (int ii=0;ii<val.size();ii++) {
+//                       std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
+//                       std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
+//                       std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
+//                       std::cout << " " << std::endl;
+//                     }
+//                     BOOST_ASSERT(false);
                   }
 
                 }
