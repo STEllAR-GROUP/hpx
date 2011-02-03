@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -32,9 +34,6 @@ namespace hpx { namespace components
     template <typename Action>
     struct plain_component_factory : public component_factory_base
     {
-        /// 
-        static char const* const unique_component_name;
-
         /// \brief Construct a new factory instance
         ///
         /// \param global   [in] The pointer to a \a hpx#util#section instance
@@ -75,7 +74,8 @@ namespace hpx { namespace components
             {
                 // first call to get_component_type, ask AGAS for a unique id
                 components::set_component_type<type_holder>(
-                    agas_client.register_factory(prefix, unique_component_name));
+                    agas_client.register_factory(prefix,
+                        unique_component_name<plain_component_factory>::call()));
             }
             return components::get_component_type<type_holder>();
         }
@@ -88,7 +88,7 @@ namespace hpx { namespace components
         ///         error.
         std::string get_component_name() const
         {
-            return unique_component_name;
+            return unique_component_name<plain_component_factory>::call();
         }
 
         /// \brief  The function \a get_factory_properties is used to 
@@ -146,13 +146,15 @@ namespace hpx { namespace components
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::plain_component_factory<plain_action>,           \
             plain_action_name);                                               \
-        template struct hpx::components::plain_component_factory<plain_action>; \
-        template<> char const* const                                          \
-            hpx::components::plain_component_factory<plain_action>            \
-                ::unique_component_name = BOOST_PP_STRINGIZE(plain_action_name); \
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(                              \
-            server::plain_function<plain_action>, plain_action_name)          \
-                                                                              \
+    }}                                                                        \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        hpx::components::plain_component_factory<plain_action>,               \
+        plain_action_name)                                                    \
+    template struct hpx::components::plain_component_factory<plain_action>;   \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(                                  \
+        hpx::components::server::plain_function<plain_action>,                \
+        plain_action_name)                                                    \
+    namespace hpx { namespace components {                                    \
         template <> HPX_ALWAYS_EXPORT component_type                          \
         get_component_type<server::plain_function<plain_action> >()           \
             { return server::plain_function<plain_action>::get_component_type(); } \
@@ -168,3 +170,4 @@ namespace hpx { namespace components
     /**/
 
 #endif
+

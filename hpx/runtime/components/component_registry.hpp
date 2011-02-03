@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 
@@ -31,9 +33,6 @@ namespace hpx { namespace components
     template <typename Component>
     struct component_registry : public component_registry_base
     {
-        /// 
-        static char const* const unique_component_name;
-
         ///
         ~component_registry() {}
 
@@ -51,7 +50,7 @@ namespace hpx { namespace components
         {
             using namespace boost::assign;
             fillini += std::string("[hpx.components.") + 
-                unique_component_name + "]";
+                unique_component_name<component_registry>::call() + "]";
             fillini += std::string("name = ") + 
                 BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME);
             fillini += "path = $[hpx.location]/lib";
@@ -67,10 +66,10 @@ namespace hpx { namespace components
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
             hpx::components::component_registry<ComponentType>,               \
             componentname);                                                   \
+        HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
+            hpx::components::component_registry<ComponentType>,               \
+            componentname)                                                    \
         template struct hpx::components::component_registry<ComponentType>;   \
-        template<> char const* const                                          \
-            hpx::components::component_registry<ComponentType>::              \
-                unique_component_name = BOOST_PP_STRINGIZE(componentname);    \
     /**/
 
 #endif

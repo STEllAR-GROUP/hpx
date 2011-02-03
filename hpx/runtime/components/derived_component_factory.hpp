@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -41,10 +43,6 @@ namespace hpx { namespace components
     template <typename Component>
     struct derived_component_factory : public component_factory_base
     {
-        /// 
-        static char const* const unique_base_component_name;
-        static char const* const unique_component_name;
-
         /// \brief Construct a new factory instance
         ///
         /// \param global   [in] The pointer to a \a hpx#util#section instance
@@ -94,9 +92,9 @@ namespace hpx { namespace components
             {
                 // first call to get_component_type, ask AGAS for a unique id
                 component_type base_type = agas_client.get_component_id(
-                    unique_base_component_name);
+                    unique_component_name<derived_component_factory, base_name>::call());
                 component_type this_type = agas_client.register_factory(
-                    prefix, unique_component_name);
+                    prefix, unique_component_name<derived_component_factory>::call());
 
                 components::set_component_type<type_holder>(
                     derived_component_type(this_type, base_type));
@@ -112,7 +110,7 @@ namespace hpx { namespace components
         ///         error.
         std::string get_component_name() const
         {
-            return unique_component_name;
+            return unique_component_name<derived_component_factory>::call();
         }
 
         /// \brief  The function \a get_factory_properties is used to 
@@ -185,14 +183,11 @@ namespace hpx { namespace components
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::derived_component_factory<ComponentType>,        \
             componentname);                                                   \
+        HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(                                \
+            hpx::components::derived_component_factory<ComponentType>,        \
+            componentname, basecomponentname)                                 \
         template struct                                                       \
             hpx::components::derived_component_factory<ComponentType>;        \
-        template<> char const* const                                          \
-            hpx::components::derived_component_factory<ComponentType>::       \
-                unique_component_name = BOOST_PP_STRINGIZE(componentname);    \
-        template<> char const* const                                          \
-            hpx::components::derived_component_factory<ComponentType>::       \
-                unique_base_component_name = basecomponentname;               \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
     /**/
 
