@@ -597,7 +597,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type zmin = par->min[level] + c*par->granularity*dx;  
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
 #if 0
-              std::cout << " PROLONGATION : " << par->min[level+1]-dx*par->granularity << " " << par->max[level+1]+dx*par->granularity << std::endl;
+//              std::cout << " PROLONGATION : " << par->min[level+1]-fdx*par->granularity << " " << par->max[level+1]+fdx*par->granularity << std::endl;
               std::cout << "              : " << xmin << " " << xmax << std::endl;
               std::cout << "              : " << ymin << " " << ymax << std::endl;
               std::cout << "              : " << zmin << " " << zmax << std::endl;
@@ -605,25 +605,28 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
               // see if this overlap a border region the next finest level
+              had_double_type extension1 = 1.0;
+              had_double_type extension2 = 1.0;
               if ( ( 
-                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,xmin) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,xmin)) || 
-                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,xmax) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,xmax)) ) &&
+                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,xmin) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,xmin)) || 
+                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,xmax) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,xmax)) ) &&
 
-                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,ymin) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,ymin)) || 
-                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,ymax) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,ymax)) ) &&
+                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,ymin) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,ymin)) || 
+                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,ymax) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,ymax)) ) &&
 
-                    (  (floatcmp_le(par->min[level+1]-fdx*par->granularity,zmin) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,zmin)) || 
-                       (floatcmp_le(par->min[level+1]-fdx*par->granularity,zmax) 
-                     && floatcmp_ge(par->max[level+1]+fdx*par->granularity,zmax)) ) ) &&
+                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,zmin) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,zmin)) || 
+                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,zmax) 
+                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,zmax)) ) ) &&
                   !( par->min[level+1] < xmin && par->max[level+1] > xmax &&
                      par->min[level+1] < ymin && par->max[level+1] > ymax &&
                      par->min[level+1] < zmin && par->max[level+1] > zmax 
-                   ) ) 
+                   ) 
+                       ) 
               {
                 // there is overlap with the prolongation region; 
                 // find out which PX thread has the border and send the data there
@@ -660,20 +663,20 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
                     // Check for overlap 
-                    if ( (  (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - fdx,xmin) && 
-                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+fdx,xmin)) ||
-                            (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - fdx,xmax) && 
-                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+fdx,xmax)) 
+                    if ( (  (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - extension2*dx*par->granularity,xmin) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+extension2*dx*par->granularity,xmin)) ||
+                            (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - extension2*dx*par->granularity,xmax) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+extension2*dx*par->granularity,xmax)) 
                          ) &&
-                         (  (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - fdx,ymin) && 
-                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + fdx,ymin)) ||
-                            (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - fdx,ymax) && 
-                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + fdx,ymax)) 
+                         (  (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - extension2*dx*par->granularity,ymin) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,ymin)) ||
+                            (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - extension2*dx*par->granularity,ymax) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,ymax)) 
                          ) &&
-                         (  (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - fdx,zmin) && 
-                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + fdx,zmin)) ||
-                            (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - fdx,zmax) && 
-                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + fdx,zmax)) 
+                         (  (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - extension2*dx*par->granularity,zmin) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,zmin)) ||
+                            (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - extension2*dx*par->granularity,zmax) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,zmax)) 
                          ) 
                        ) 
                     {

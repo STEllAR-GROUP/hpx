@@ -627,12 +627,48 @@ namespace hpx { namespace components { namespace amr
               int ny = resultval->py_.size();
               int nz = resultval->pz_.size();
               int n = par->granularity;
+
+              // get the bounding box of the input
+              had_double_type vxmin,vymin,vzmin,vxmax,vymax,vzmax; 
+              vxmin = 9999;
+              vymin = 9999;
+              vzmin = 9999;
+              vxmax = -9999;
+              vymax = -9999;
+              vzmax = -9999;
+              for (int ii=0;ii<val.size();ii++) {
+                if ( val[ii]->x_[0] < vxmin ) vxmin = val[ii]->x_[0]; 
+                if ( val[ii]->y_[0] < vymin ) vymin = val[ii]->y_[0]; 
+                if ( val[ii]->z_[0] < vzmin ) vzmin = val[ii]->z_[0]; 
+                if ( val[ii]->x_[par->granularity-1] > vxmax ) vxmax = val[ii]->x_[par->granularity-1];
+                if ( val[ii]->y_[par->granularity-1] > vymax ) vymax = val[ii]->y_[par->granularity-1];
+                if ( val[ii]->z_[par->granularity-1] > vzmax ) vzmax = val[ii]->z_[par->granularity-1];
+              }
+
+              // sanity check
+              if ( vxmin > resultval->px_[0] || vymin > resultval->py_[0] || vzmin > resultval->pz_[0] ||
+                   vxmax < resultval->px_[nx-1] || vymax < resultval->py_[ny-1] || vzmax < resultval->pz_[nz-1] ) {
+                std::cout << " PROBLEM COARSE INPUT      x " << vxmin << " " << vxmax << std::endl;
+                std::cout << "                           y " << vymin << " " << vymax << std::endl;
+                std::cout << "                           z " << vzmin << " " << vzmax << std::endl;
+                std::cout << " PROBLEM FINE MESH FILL    x " << resultval->px_[0]  << " " << resultval->px_[nx-1] << std::endl;
+                std::cout << "                           y " << resultval->py_[0]  << " " << resultval->py_[ny-1] << std::endl;
+                std::cout << "                           z " << resultval->pz_[0]  << " " << resultval->pz_[nz-1] << std::endl;
+                std::cout << " " << std::endl;
+                BOOST_ASSERT(false);
+              }
+
+              // Put all input into one contiguous 3d array for interpolation simplicity
+              for (int ii=0;ii<val.size();ii++) {
+                
+              }
+
               for (int k=0;k<nz;k++) {
+                had_double_type zt =  resultval->pz_[k];              
               for (int j=0;j<ny;j++) {
+                had_double_type yt =  resultval->py_[j];              
               for (int i=0;i<nx;i++) {
                 had_double_type xt =  resultval->px_[i];              
-                had_double_type yt =  resultval->py_[j];              
-                had_double_type zt =  resultval->pz_[k];              
  
                 bool found = false;
                 // check compute_index first to see if this point is contained in it
@@ -666,89 +702,6 @@ namespace hpx { namespace components { namespace amr
                         break;
                       }
                     }
-                  }
-                  if ( !found ) {
-                    // the point we seek might lie in the no-man's land between two of the inputs patches
-                    for (int ii=0;ii<val.size();ii++) {
-                    for (int jj=ii+1;jj<val.size();jj++) {
-                      // inf's and sup's {{{
-                      had_double_type hxmin,hxmax; 
-                      had_double_type hymin,hymax; 
-                      had_double_type hzmin,hzmax; 
-                      had_double_type ixmin,ixmax; 
-                      had_double_type iymin,iymax; 
-                      had_double_type izmin,izmax; 
-                      if ( val[ii]->x_[0] > val[jj]->x_[0] ) {
-                        hxmin = val[ii]->x_[0];
-                        ixmin = val[jj]->x_[0];
-                      } else {
-                        hxmin = val[jj]->x_[0];
-                        ixmin = val[ii]->x_[0];
-                      }
-
-                      if ( val[ii]->y_[0] > val[jj]->y_[0] ) {
-                        hymin = val[ii]->y_[0];
-                        iymin = val[jj]->y_[0];
-                      } else {
-                        hymin = val[jj]->y_[0];
-                        iymin = val[ii]->y_[0];
-                      }
-
-                      if ( val[ii]->z_[0] > val[jj]->z_[0] ) {
-                        hzmin = val[ii]->z_[0];
-                        izmin = val[jj]->z_[0];
-                      } else {
-                        hzmin = val[jj]->z_[0];
-                        izmin = val[ii]->z_[0];
-                      }
-
-                      if ( val[ii]->x_[par->granularity-1] < val[jj]->x_[par->granularity-1] ) {
-                        hxmax = val[ii]->x_[par->granularity-1];
-                        ixmax = val[jj]->x_[par->granularity-1];
-                      } else {
-                        hxmax = val[jj]->x_[par->granularity-1];
-                        ixmax = val[ii]->x_[par->granularity-1];
-                      }
-
-                      if ( val[ii]->y_[par->granularity-1] < val[jj]->y_[par->granularity-1] ) {
-                        hymax = val[ii]->y_[par->granularity-1];
-                        iymax = val[jj]->y_[par->granularity-1];
-                      } else {
-                        hymax = val[jj]->y_[par->granularity-1];
-                        iymax = val[ii]->y_[par->granularity-1];
-                      }
-
-                      if ( val[ii]->z_[par->granularity-1] < val[jj]->z_[par->granularity-1] ) {
-                        hzmax = val[ii]->z_[par->granularity-1];
-                        izmax = val[jj]->z_[par->granularity-1];
-                      } else {
-                        hzmax = val[jj]->z_[par->granularity-1];
-                        izmax = val[ii]->z_[par->granularity-1];
-                      }
-                      // }}}
-
-                      if ( floatcmp_ge(xt,ixmin)  && floatcmp_le(xt,ixmax) &&
-                           floatcmp_ge(yt,hymin)  && floatcmp_le(yt,hymax) &&
-                           floatcmp_ge(zt,hzmin)  && floatcmp_le(zt,hzmax) ) {
-                        found = true;
-                        break;
-                      }
-
-                      if ( floatcmp_ge(xt,hxmin)  && floatcmp_le(xt,hxmax) &&
-                           floatcmp_ge(yt,iymin)  && floatcmp_le(yt,iymax) &&
-                           floatcmp_ge(zt,hzmin)  && floatcmp_le(zt,hzmax) ) {
-                        found = true;
-                        break;
-                      }
-
-                      if ( floatcmp_ge(xt,hxmin)  && floatcmp_le(xt,hxmax) &&
-                           floatcmp_ge(yt,hymin)  && floatcmp_le(yt,hymax) &&
-                           floatcmp_ge(zt,izmin)  && floatcmp_le(zt,izmax) ) {
-                        found = true;
-                        break;
-                      }
-
-                    } }
                   }
 
                   if ( !found ) {
