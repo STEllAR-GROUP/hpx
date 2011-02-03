@@ -1,4 +1,5 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -120,7 +121,7 @@ macro(ADD_HPX_COMPONENT name)
 
     target_link_libraries(${name}_component 
         ${${name}_DEPENDENCIES}
-        ${hpx_LIBRARIES} ${Boost_LIBRARIES})
+        ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
 
     # install binary
     install(TARGETS ${name}_component
@@ -181,7 +182,7 @@ endif()
     target_link_libraries(
         ${name}_exe                           # executable
         ${${name}_DEPENDENCIES}               # components it depends on
-        ${hpx_LIBRARIES} ${Boost_LIBRARIES}   # libraries it depends on
+        ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES}   # libraries it depends on
         ${pxaccel_LIBRARIES})
 
     # installation instructions

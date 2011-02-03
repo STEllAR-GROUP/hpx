@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2007-2008 Chirag Dekate
+# Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +30,24 @@ list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 
 # include additional macro definitions
 include(HpxUtils)
+include(FindBoost)
+
+find_boost_library(date_time)
+find_boost_library(filesystem)
+find_boost_library(program_options)
+find_boost_library(regex)
+find_boost_library(serialization)
+find_boost_library(system)
+find_boost_library(signals)
+find_boost_library(thread)
+
+# Chrono is not in 1.46 release
+if(NOT ${BOOST_MINOR_VERSION} LESS 47)
+  find_boost_library(chrono)
+endif()
+
+include_directories(${BOOST_INCLUDE_DIR})
+link_directories(${BOOST_LIB_DIR})
 
 # set default cmake build type to RelWithDebInfo (None Debug Release RelWithDebInfo MinSizeRel)
 if(NOT CMAKE_BUILD_TYPE)
@@ -41,51 +60,6 @@ if("$ENV{HPX_TESTS}" STREQUAL "all")
     ENABLE_TESTING()
 endif("$ENV{HPX_TESTS}" STREQUAL "all")
 
-# We need to use Boost, namely the following Boost libraries
-set(Boost_FIND_VERSION_EXACT OFF)
-#set(Boost_FIND_VERSION_MAJOR 1)
-#set(Boost_FIND_VERSION_MINOR 39)
-#set(Boost_FIND_VERSION_PATCH 0)
-set(Boost_COMPONENTS_NEEDED
-    date_time
-    filesystem
-    program_options
-    regex
-    serialization
-    system
-    signals
-    thread)
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_ADDITIONAL_VERSIONS 
-    "1.46.0" "1.46" "1.45.0" "1.45" "1.44.0" "1.44" "1.43.0" "1.43" 
-    "1.42.0" "1.42" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39")
-
-find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED})
-
-if(Boost_FOUND)
-    message(STATUS "Boost version found: " 
-        ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
-        " (${Boost_INCLUDE_DIR})")
-else()
-    message(FATAL ": Boost installation not found. Please specify the Boost\n"
-           "       installation directory using -DBOOST_ROOT=...\n"
-           "Reason for error:\n" ${Boost_ERROR_REASON})
-endif()
-
-if(NOT ${Boost_MINOR_VERSION} LESS 46)
-    # add Boost.Chrono to the list of required libraries, if needed
-    find_package(Boost 1.33.1 COMPONENTS ${Boost_COMPONENTS_NEEDED} chrono)
-
-    if(NOT Boost_FOUND)
-        message(FATAL ": Boost installation not found. Please specify the Boost\n"
-               "       installation directory using -DBOOST_ROOT=...\n"
-               "Reason for error:\n" ${Boost_ERROR_REASON})
-    endif()
-endif()
-
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIR})
-
 # We need Intels Thread Building Blocks library as well
 #find_package(TBB)
 
@@ -93,12 +67,12 @@ link_directories(${Boost_LIBRARY_DIR})
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
-if(${Boost_MINOR_VERSION} LESS 46)
+if(${BOOST_MINOR_VERSION} LESS 47)
     include_directories(${hpx_SOURCE_DIR}/external/chrono)
 endif()
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
-if(${Boost_MINOR_VERSION} LESS 36)
+if(${BOOST_MINOR_VERSION} LESS 36)
     include_directories(${hpx_SOURCE_DIR}/external/exception)
 endif()
 include_directories(${hpx_SOURCE_DIR}/external/logging)
@@ -155,7 +129,7 @@ add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
 # Boost.Chrono gets linked in directly (at least for now)
-if(${Boost_MINOR_VERSION} LESS 46)
+if(${BOOST_MINOR_VERSION} LESS 47)
     add_definitions(-DBOOST_CHRONO_NO_LIB)
 endif()
 
@@ -268,7 +242,7 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE)
-if(${Boost_MINOR_VERSION} LESS 46)
+if(${BOOST_MINOR_VERSION} LESS 47)
     install(
         DIRECTORY external/chrono/boost
         DESTINATION include
@@ -290,7 +264,7 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE)
-if(${Boost_MINOR_VERSION} LESS 36)
+if(${BOOST_MINOR_VERSION} LESS 36)
     install(
         DIRECTORY external/exception/boost
         DESTINATION include
@@ -319,3 +293,4 @@ cmake_export_build_settings("${PROJECT_NAME}BuildSettings.cmake")
 
 # export library dependencies (keep this as the last line in the file)
 export_library_dependencies("${PROJECT_NAME}LibDeps.cmake")
+

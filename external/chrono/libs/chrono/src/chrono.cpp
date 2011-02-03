@@ -11,7 +11,7 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 104600
+#if BOOST_VERSION < 104700
 
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/system_error.hpp>

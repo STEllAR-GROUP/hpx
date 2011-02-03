@@ -7,8 +7,9 @@
 set(example_SUBDIRS 
 	quickstart
 	#bh
-	##had_amr
-   )
+  accumulator
+	#had_amr3d
+  )
 
 # Pick up additional examples for this build set using
 # -DHPX_WITH_EXAMPLES="ex1;ex2;ex3"

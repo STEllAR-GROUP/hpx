@@ -15,7 +15,7 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 104600
+#if BOOST_VERSION < 104700
 
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/process_times.hpp>

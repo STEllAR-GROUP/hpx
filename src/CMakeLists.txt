@@ -1,4 +1,5 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -398,7 +399,7 @@ if (CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
 endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)
-if(${Boost_MINOR_VERSION} LESS 46)
+if(${BOOST_MINOR_VERSION} LESS 47)
     set (hpxlib_SOURCES 
          ${hpxlib_SOURCES}
          ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
@@ -433,7 +434,7 @@ set_target_properties(hpx_serialization PROPERTIES
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
     OUTPUT_NAME hpx_serialization)
-target_link_libraries(hpx_serialization ${Boost_LIBRARIES})
+target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
 
 # build instructions for main shared HPX library
 add_library(hpx SHARED 
@@ -444,7 +445,7 @@ set_target_properties(hpx PROPERTIES
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
     OUTPUT_NAME hpx)
-target_link_libraries(hpx hpx_serialization ${Boost_LIBRARIES})
+target_link_libraries(hpx hpx_serialization ${BOOST_FOUND_LIBRARIES})
 
 # installation instructions
 install(TARGETS hpx hpx_serialization
