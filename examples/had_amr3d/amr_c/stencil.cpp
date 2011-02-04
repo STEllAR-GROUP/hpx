@@ -174,16 +174,16 @@ namespace hpx { namespace components { namespace amr
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+          resultval->pvalue_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
         }
         return;
       }
 
       // Quick sanity check to be sure we have bracketed the point we wish to interpolate
       if ( !no_interp_x  && !no_interp_y && !no_interp_z ) {
-        BOOST_ASSERT(floatcmp_ge(val->x_[ii-1],x) && floatcmp_le(val->x_[ii],x) );
-        BOOST_ASSERT(floatcmp_ge(val->y_[jj-1],y) && floatcmp_le(val->y_[jj],y) );
-        BOOST_ASSERT(floatcmp_ge(val->z_[kk-1],z) && floatcmp_le(val->z_[kk],z) );
+        BOOST_ASSERT(floatcmp_le(val->x_[ii-1],x) && floatcmp_ge(val->x_[ii],x) );
+        BOOST_ASSERT(floatcmp_le(val->y_[jj-1],y) && floatcmp_ge(val->y_[jj],y) );
+        BOOST_ASSERT(floatcmp_le(val->z_[kk-1],z) && floatcmp_ge(val->z_[kk],z) );
       }
 
       had_double_type tmp2[2][2][num_eqns];
@@ -191,10 +191,10 @@ namespace hpx { namespace components { namespace amr
 
       // interpolate in x {{{
       if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;kk++) {
-          for (int j=jj-1;j<jj+1;jj++) {
+        for (int k=kk-1;k<kk+1;k++) {
+          for (int j=jj-1;j<jj+1;j++) {
             for (int ll=0;ll<num_eqns;ll++) {
-              tmp2[j-jj][k-kk][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*k)].phi[0][ll],
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*k)].phi[0][ll],
                                                    val->value_[ii  +nx*(j+ny*k)].phi[0][ll],
                                                    x,
                                                    val->x_[ii-1],val->x_[ii]);
@@ -202,46 +202,46 @@ namespace hpx { namespace components { namespace amr
           }
         }
       } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;kk++) {
-          for (int j=jj-1;j<jj+1;jj++) {
+        for (int k=kk-1;k<kk+1;k++) {
+          for (int j=jj-1;j<jj+1;j++) {
             for (int ll=0;ll<num_eqns;ll++) {
-              tmp2[j-jj][k-kk][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
             }
           }
         }
       } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;kk++) {
+        for (int k=kk-1;k<kk+1;k++) {
           for (int ll=0;ll<num_eqns;ll++) {
-            tmp2[0][k-kk][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*k)].phi[0][ll],
+            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*k)].phi[0][ll],
                                               val->value_[ii  +nx*(jj+ny*k)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
         }
       } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
-        for (int j=jj-1;j<jj+1;jj++) {
+        for (int j=jj-1;j<jj+1;j++) {
           for (int ll=0;ll<num_eqns;ll++) {
-            tmp2[j-jj][0][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*kk)].phi[0][ll],
+            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*kk)].phi[0][ll],
                                               val->value_[ii  +nx*(j+ny*kk)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
         }
       } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;kk++) {
+        for (int k=kk-1;k<kk+1;k++) {
           for (int ll=0;ll<num_eqns;ll++) {
-            tmp2[0][k-kk][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
+            tmp2[0][k-(kk-1)][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
           }
         }
       } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
-        for (int j=jj-1;j<jj+1;jj++) {
+        for (int j=jj-1;j<jj+1;j++) {
           for (int ll=0;ll<num_eqns;ll++) {
-            tmp2[j-jj][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
+            tmp2[j-(jj-1)][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
           }
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
+          resultval->pvalue_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
                                                               val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
                                                               x,
                                                               val->x_[ii-1],val->x_[ii]);
@@ -254,21 +254,21 @@ namespace hpx { namespace components { namespace amr
 
       // interpolate in y {{{
       if ( !no_interp_y && !no_interp_z ) {
-        for (int k=0;k<2;kk++) {
+        for (int k=0;k<2;k++) {
           for (int ll=0;ll<num_eqns;ll++) {
             tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
                                          val->y_[jj-1],val->y_[jj]);
           }
         }
       } else if ( no_interp_y && !no_interp_z ) {
-        for (int k=0;k<2;kk++) {
+        for (int k=0;k<2;k++) {
           for (int ll=0;ll<num_eqns;ll++) {
             tmp3[k][ll] = tmp2[0][k][ll];
           }
         }
       } else if ( !no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+          resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
                                                               val->y_[jj-1],val->y_[jj]);
         }
         return;
@@ -280,7 +280,7 @@ namespace hpx { namespace components { namespace amr
       // interpolate in z {{{
       if ( !no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+          resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                               z,
                                                               val->z_[kk-1],val->z_[kk]);
         } 
@@ -838,11 +838,6 @@ namespace hpx { namespace components { namespace amr
                 BOOST_ASSERT(false);
               }
 
-              // Put all input into one contiguous 3d array for interpolation simplicity
-              for (int ii=0;ii<val.size();ii++) {
-                
-              }
-
               for (int k=0;k<nz;k++) {
                 had_double_type zt =  resultval->pz_[k];              
               for (int j=0;j<ny;j++) {
@@ -867,7 +862,7 @@ namespace hpx { namespace components { namespace amr
                   BOOST_ASSERT( floatcmp(yt,val[compute_index]->y_[bb] ) );
                   BOOST_ASSERT( floatcmp(zt,val[compute_index]->z_[cc] ) );
                   for (int ll=0;ll<num_eqns;ll++) {
-                  //  resultval->value_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                    resultval->pvalue_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
                   }
                 } else {
                   // check the other input
@@ -879,7 +874,7 @@ namespace hpx { namespace components { namespace amr
                            floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[par->granularity-1]) ) {
                         found = true;
                         // interpolate
-                        //interp3d(xt,yt,zt,val[ii],resultval,i+nx*(j+ny*k),par); 
+                        interp3d(xt,yt,zt,val[ii],resultval,i+nx*(j+ny*k),par); 
                         break;
                       }
                     }
