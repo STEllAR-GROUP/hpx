@@ -347,6 +347,7 @@ namespace hpx { namespace actions
         {
             using namespace boost::serialization;
             void_cast_register<action, base_argument_action<Arguments> >();
+            base_argument_action<Arguments>::register_base();
         }
 
     private:
