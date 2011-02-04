@@ -112,6 +112,186 @@ namespace hpx { namespace components { namespace amr
       return level;
     }
 
+    had_double_type stencil::interp_linear(had_double_type y1, had_double_type y2,
+                                           had_double_type x, had_double_type x1, had_double_type x2) {
+      had_double_type xx1 = x - x1;
+      had_double_type xx2 = x - x2;
+      had_double_type result = xx2*y1/( (x1-x2) ) + xx1*y2/( (x2-x1) );
+  
+      return result;
+    }
+
+    void stencil::interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
+                                      access_memory_block<stencil_data> &val, 
+                                      access_memory_block<stencil_data> &resultval,
+                                      int index, Parameter const& par) {
+
+      int ii,jj,kk;
+
+      // set up index bounds
+      for (int i=0;i<val->x_.size();i++) {
+        if ( floatcmp_ge(val->x_[i],x) ) {
+          ii = i;
+          break;
+        }         
+      }
+      for (int i=0;i<val->y_.size();i++) {
+        if ( floatcmp_ge(val->y_[i],y) ) {
+          jj = i;
+          break;
+        }         
+      }
+      for (int i=0;i<val->z_.size();i++) {
+        if ( floatcmp_ge(val->z_[i],z) ) {
+          kk = i;
+          break;
+        }         
+      }
+
+      int nx = val->x_.size();
+      int ny = val->y_.size();
+      int nz = val->z_.size();
+
+      bool no_interp_x = false;
+      bool no_interp_y = false;
+      bool no_interp_z = false;
+      if ( ii == 0 ) {
+        // we may have a problem unless x doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->x_[ii],x) );
+        no_interp_x = true;
+      }
+      if ( jj == 0 ) {
+        // we may have a problem unless y doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->y_[jj],y) );
+        no_interp_y = true;
+      }
+      if ( kk == 0 ) {
+        // we may have a problem unless z doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->z_[kk],z) );
+        no_interp_z = true;
+      }
+
+      if ( no_interp_x && no_interp_y && no_interp_z ) {
+        // no interp needed -- this probably will never be called but is added for completeness
+        for (int ll=0;ll<num_eqns;ll++) {
+          resultval->value_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+        }
+        return;
+      }
+
+      // Quick sanity check to be sure we have bracketed the point we wish to interpolate
+      if ( !no_interp_x  && !no_interp_y && !no_interp_z ) {
+        BOOST_ASSERT(floatcmp_ge(val->x_[ii-1],x) && floatcmp_le(val->x_[ii],x) );
+        BOOST_ASSERT(floatcmp_ge(val->y_[jj-1],y) && floatcmp_le(val->y_[jj],y) );
+        BOOST_ASSERT(floatcmp_ge(val->z_[kk-1],z) && floatcmp_le(val->z_[kk],z) );
+      }
+
+      had_double_type tmp2[2][2][num_eqns];
+      had_double_type tmp3[2][num_eqns];
+
+      // interpolate in x {{{
+      if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;kk++) {
+          for (int j=jj-1;j<jj+1;jj++) {
+            for (int ll=0;ll<num_eqns;ll++) {
+              tmp2[j-jj][k-kk][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*k)].phi[0][ll],
+                                                   val->value_[ii  +nx*(j+ny*k)].phi[0][ll],
+                                                   x,
+                                                   val->x_[ii-1],val->x_[ii]);
+            }
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;kk++) {
+          for (int j=jj-1;j<jj+1;jj++) {
+            for (int ll=0;ll<num_eqns;ll++) {
+              tmp2[j-jj][k-kk][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
+            }
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;kk++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp2[0][k-kk][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*k)].phi[0][ll],
+                                              val->value_[ii  +nx*(jj+ny*k)].phi[0][ll],
+                                              x,
+                                              val->x_[ii-1],val->x_[ii]);
+          }
+        }
+      } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj-1;j<jj+1;jj++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp2[j-jj][0][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*kk)].phi[0][ll],
+                                              val->value_[ii  +nx*(j+ny*kk)].phi[0][ll],
+                                              x,
+                                              val->x_[ii-1],val->x_[ii]);
+          }
+        }
+      } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;kk++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp2[0][k-kk][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj-1;j<jj+1;jj++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp2[j-jj][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          resultval->value_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
+                                                              val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
+                                                              x,
+                                                              val->x_[ii-1],val->x_[ii]);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in y {{{
+      if ( !no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;kk++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
+                                         val->y_[jj-1],val->y_[jj]);
+          }
+        }
+      } else if ( no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;kk++) {
+          for (int ll=0;ll<num_eqns;ll++) {
+            tmp3[k][ll] = tmp2[0][k][ll];
+          }
+        }
+      } else if ( !no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          resultval->value_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+                                                              val->y_[jj-1],val->y_[jj]);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in z {{{
+      if ( !no_interp_z ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                                              z,
+                                                              val->z_[kk-1],val->z_[kk]);
+        } 
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      return;
+    }
         
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
@@ -686,9 +866,9 @@ namespace hpx { namespace components { namespace amr
                   BOOST_ASSERT( floatcmp(xt,val[compute_index]->x_[aa] ) );
                   BOOST_ASSERT( floatcmp(yt,val[compute_index]->y_[bb] ) );
                   BOOST_ASSERT( floatcmp(zt,val[compute_index]->z_[cc] ) );
-                //  for (int ll=0;ll<num_eqns;ll++) {
-                //    resultval->value_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
-                //  }
+                  for (int ll=0;ll<num_eqns;ll++) {
+                  //  resultval->value_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                  }
                 } else {
                   // check the other input
                   found = false; 
@@ -699,6 +879,7 @@ namespace hpx { namespace components { namespace amr
                            floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[par->granularity-1]) ) {
                         found = true;
                         // interpolate
+                        //interp3d(xt,yt,zt,val[ii],resultval,i+nx*(j+ny*k),par); 
                         break;
                       }
                     }

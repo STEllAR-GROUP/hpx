@@ -64,6 +64,15 @@ namespace hpx { namespace components { namespace amr
    
         static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par);
 
+
+        void interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
+                                      access_memory_block<stencil_data> &val,
+                                      access_memory_block<stencil_data> &resultval,
+                                      int index, Parameter const& par);
+
+        had_double_type interp_linear(had_double_type y1, had_double_type y2,
+                                           had_double_type x, had_double_type x1, had_double_type x2);
+
     private:
         std::size_t numsteps_;
         naming::id_type log_;
