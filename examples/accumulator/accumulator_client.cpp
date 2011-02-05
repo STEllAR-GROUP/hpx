@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser, Richard D Guidry Jr
+//  Copyright (c) 2007-2011 Hartmut Kaiser, Richard D Guidry Jr
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,7 +36,7 @@ threads::thread_state_enum hpx_main()
     // create an accumulator locally
     using hpx::components::accumulator;
     accumulator accu;
-    accu.create(naming::id_type(prefix,naming::id_type::unmanaged));
+    accu.create(naming::id_type(prefix, naming::id_type::unmanaged));
 
     // print some message
     std::cout << "accumulator client, you may enter some commands "

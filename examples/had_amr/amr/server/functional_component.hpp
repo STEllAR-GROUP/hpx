@@ -19,7 +19,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT functional_component
-      : public simple_component_base<functional_component>
+      : public managed_component<functional_component>
     {
     private:
         typedef simple_component_base<functional_component> base_type;

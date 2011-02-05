@@ -94,6 +94,15 @@
      make copyable.
 */
 
+#if BOOST_COROUTINE_USE_GENERIC_CONTEXT != 0
+
+#include <boost/coroutine/detail/context_generic_context.hpp>
+namespace boost { namespace coroutines { namespace detail {
+  typedef generic_context::context_impl default_context_impl;
+}}}
+
+#else
+
 // #if defined(COROUTINE_STACKLESS_VERSION)
 // 
 // #include <boost/coroutine/detail/context_stackless.hpp>
@@ -155,5 +164,7 @@ namespace boost { namespace coroutines { namespace detail {
 #endif
 
 // #endif
+
+#endif // BOOST_COROUTINE_USE_GENERIC_CONTEXT
 
 #endif

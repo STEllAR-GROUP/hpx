@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// The accumulator is a very simple example of a HPX component. 
     ///
-    /// The accumulator class is a small example components demonstrating the
+    /// The accumulator class is a small example component demonstrating the
     /// main principles of writing your own components. It exposes 4 different
     /// actions: init, add, query, and print, showing how to used and implement
     /// functionality in a way conformant with the HPX runtime system. 
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace server
         void print() 
         {
             applier::applier& appl = applier::get_applier();
-            std::cout << appl.get_runtime_support_gid() << "> " 
+            std::cout << appl.get_runtime_support_gid() << std::dec << "> " 
                       << arg_ << std::flush << std::endl;
         }
 

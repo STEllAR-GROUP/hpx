@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,6 +40,7 @@ namespace hpx { namespace components
         component_thunk =               ///< a LCO implementing a thunk
             ((9 << 16) | component_base_lco_with_value),
 
+        component_dataflow_block = 10,  ///< a dataflow block
         component_first_dynamic = component_last
     };
 
