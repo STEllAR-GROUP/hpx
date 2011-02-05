@@ -5,7 +5,8 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(component_SUDIRS 
-    dataflow distributing_factory
+    distributing_factory
+#    dataflow 
    )
 
 foreach(subdir ${component_SUDIRS})
