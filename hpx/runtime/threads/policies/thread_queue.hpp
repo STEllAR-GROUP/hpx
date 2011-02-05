@@ -169,9 +169,14 @@ namespace hpx { namespace threads { namespace policies
                     case threads::suspended:
                         result = true;    // at least one is suspended
                         break;
+                    case threads::pending:
                     case threads::active:
                         result = false;   // one is active, no deadlock (yet)
                         collect_suspended = false;
+                        break;
+                    default:
+                        // If the thread is terminated we don't care too much 
+                        // anymore. 
                         break;
                     }
                 }
