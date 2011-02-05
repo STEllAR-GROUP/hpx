@@ -156,7 +156,7 @@ namespace hpx { namespace util
             fs::path libs_path (hpx::util::create_path(libs));
 
             if (!fs::exists(libs_path)) 
-                return;     // give directory doesn't exist
+                return;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
             if (!ini.has_section("hpx.components")) {
@@ -211,8 +211,9 @@ namespace hpx { namespace util
 
                     continue;   // handle next module
                 }
-                catch (std::logic_error const&) {
-                    /**/;
+                catch (std::logic_error const& e) {
+                    LRT_(info) << "dynamic loading failed: " << curr.string() 
+                               << ": " << e.what();
                 }
 
             // if something went wrong while reading the registry, just use

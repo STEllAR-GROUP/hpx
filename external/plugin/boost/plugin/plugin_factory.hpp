@@ -95,7 +95,7 @@ namespace boost { namespace plugin {
             plugin_entry += "_" + base_name;
 
             std::pair<get_plugins_list_type, DeleterType> f = 
-                d.get<get_plugins_list_type, DeleterType>(plugin_entry.c_str());
+                d.get<get_plugins_list_type, DeleterType>(plugin_entry);
 
             return get_abstract_factory_static<BasePlugin>(f.first, f.second, 
                 class_name, d.get_name());
@@ -112,7 +112,7 @@ namespace boost { namespace plugin {
             plugin_entry += "_" + base_name;
 
             std::pair<get_plugins_list_type, DeleterType> f = 
-                d.get<get_plugins_list_type, DeleterType>(plugin_entry.c_str());
+                d.get<get_plugins_list_type, DeleterType>(plugin_entry);
 
             exported_plugins_type& e = (f.first)();
 

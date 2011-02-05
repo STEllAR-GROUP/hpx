@@ -497,14 +497,14 @@ namespace hpx { namespace components { namespace server
         catch (std::logic_error const& e) {
             if (!isdefault) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string() 
-                            << ": " << instance << ": " << e.what();
+                              << ": " << instance << ": " << e.what();
             }
             return false;
         }
         catch (std::exception const& e) {
             if (!isdefault) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string() 
-                            << ": " << instance << ": " << e.what();
+                              << ": " << instance << ": " << e.what();
             }
             return false;
         }
