@@ -64,7 +64,7 @@ endif()
 
 # Enable testing
 if("$ENV{HPX_TESTS}" STREQUAL "all")
-    set(CMAKE_SKIP_RPATH TRUE)
+    #set(CMAKE_SKIP_RPATH TRUE)
     ENABLE_TESTING()
 endif("$ENV{HPX_TESTS}" STREQUAL "all")
 
@@ -90,7 +90,7 @@ include_directories(${hpx_SOURCE_DIR}/external/plugin)
 # initialize installation directory (can be changed via ccmake or 
 # 'cmake -DCMAKE_PREFIX=...')
 if(UNIX)
-    SET(CMAKE_PREFIX "/usr/lib" 
+    SET(CMAKE_PREFIX "/usr/local" 
         CACHE PATH "Prefix prepended to install directories")
 else()
     SET(CMAKE_PREFIX "C:/Program Files/hpx" 
@@ -109,6 +109,20 @@ set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}"
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" 
     CACHE PATH "Path to custom CMake Modules" 
     FORCE)
+
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+#if(BOOST_ROOT AND NOT BOOST_LIB_DIR AND NOT BOOST_USE_SYSTEM)
+#  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "${BOOST_ROOT}/stage/lib")
+#elseif(BOOST_LIB_DIR AND NOT BOOST_USE_SYSTEM)
+#  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "${BOOST_LIB_DIR}")
+#endif()
+
+set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "${CMAKE_INSTALL_PREFIX}/lib")
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 message(STATUS "HPX will be installed to: " ${CMAKE_INSTALL_PREFIX})
 
