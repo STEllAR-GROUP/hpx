@@ -376,15 +376,13 @@ public:
         
         In theory, could push/pop ebx onto/off the stack, but movs
         to a prepared stack slot turn out to be faster. */
-
         __asm__ __volatile__(
-            "movl %%ebx, %1\n"
             "movl %%ebx, %1\n"
             "movl %2, %%ebx\n"
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-            : "D" ((long)desired), "c" (((long)desired)>>32), "S" (&i), "0" (prev)
+            : "D" ((long)desired), "c" ((long) (((size_t)desired)>>32)), "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
