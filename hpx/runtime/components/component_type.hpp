@@ -83,12 +83,43 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This needs to be specialized for each of the components
+    template <typename Component, typename Enable = void>
+    struct extract_component_type_from_component
+    {
+        typedef component_type type;
+
+        static type call()
+        {
+            return Component::get_component_type();
+        }
+    }; 
+
+    template <typename Component, typename Enable = void>
+    struct assign_component_type_to_component
+    {
+        typedef void type;
+
+        static void call(component_type type)
+        {
+            return Component::set_component_type(type);
+        }
+    }; 
+ 
     template <typename Component>
-    HPX_ALWAYS_EXPORT component_type get_component_type();
+    HPX_ALWAYS_EXPORT typename
+    extract_component_type_from_component<Component>::type
+    get_component_type()
+    {
+        return extract_component_type_from_component<Component>::call();
+    }
 
     template <typename Component>
-    HPX_ALWAYS_EXPORT void set_component_type(component_type);
+    HPX_ALWAYS_EXPORT typename
+    assign_component_type_to_component<Component>::type
+    set_component_type(component_type type)
+    {
+        return assign_component_type_to_component<Component>::call(type);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     enum factory_property
@@ -105,16 +136,8 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
-    namespace hpx { namespace components {                                    \
-        template<> HPX_ALWAYS_EXPORT component_type                           \
-        get_component_type<component>()                                       \
-            { return component::get_component_type(); }                       \
-        template<> HPX_ALWAYS_EXPORT void                                     \
-        set_component_type<component>(component_type t)                       \
-            { return component::set_component_type(t); }                      \
-    }}                                                                        \
-    /**/
+// This macro is deprecated now.
+#define HPX_DEFINE_GET_COMPONENT_TYPE(component)
 
 #endif
 

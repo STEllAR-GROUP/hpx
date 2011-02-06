@@ -41,9 +41,17 @@ find_boost_library(system)
 find_boost_library(signals)
 find_boost_library(thread)
 
+if(NOT HPX_INTERNAL_CHRONO)
+  set(HPX_INTERNAL_CHRONO ON
+      CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: ON for Boost < 1.47)")
+else()
+  set(HPX_INTERNAL_CHRONO ${HPX_INTERNAL_CHRONO}
+      CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: ON for Boost < 1.47).")
+endif()
+
 # Chrono is not in 1.46 release
-if(NOT ${BOOST_MINOR_VERSION} LESS 47)
-  find_boost_library(chrono)
+if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
+    find_boost_library(chrono)
 endif()
 
 include_directories(${BOOST_INCLUDE_DIR})
@@ -67,7 +75,7 @@ endif("$ENV{HPX_TESTS}" STREQUAL "all")
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
-if(${BOOST_MINOR_VERSION} LESS 47)
+if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     include_directories(${hpx_SOURCE_DIR}/external/chrono)
 endif()
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
@@ -110,6 +118,10 @@ set(HPX_HW_ACCELERATION 0
 mark_as_advanced(HPX_HW_ACCELERATION)
 
 # global library configuration
+if(NOT HPX_INTERNAL_CHRONO)
+    add_definitions(-DHPX_CHRONO_DONT_USE_INTERNAL_VERSION)
+endif()
+
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 add_definitions(-DHPX_USE_LOCKFREE=1)
 add_definitions(-DHPX_USE_TBB=0)
@@ -129,7 +141,7 @@ add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
 # Boost.Chrono gets linked in directly (at least for now)
-if(${BOOST_MINOR_VERSION} LESS 47)
+if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     add_definitions(-DBOOST_CHRONO_NO_LIB)
 endif()
 
@@ -150,7 +162,9 @@ if(MSVC)
     endif()
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
+if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX)
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    OR "${CMAKE_CXX_COMPILER}" MATCHES "clang") # gcc, intel or clang 
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
 
@@ -242,7 +256,7 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE)
-if(${BOOST_MINOR_VERSION} LESS 47)
+if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     install(
         DIRECTORY external/chrono/boost
         DESTINATION include

@@ -392,14 +392,16 @@ set (hpxlib_SOURCES
     ${hpxlib_util_SOURCES})
 
 # add source file from coroutine library 
-if (CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX))   # gcc or Intel
+if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX)
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    OR "${CMAKE_CXX_COMPILER}" MATCHES "clang") # gcc, intel or clang 
     SET(hpxlib_SOURCES 
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)
-if(${BOOST_MINOR_VERSION} LESS 47)
+if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     set (hpxlib_SOURCES 
          ${hpxlib_SOURCES}
          ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)

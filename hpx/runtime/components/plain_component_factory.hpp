@@ -142,11 +142,9 @@ namespace hpx { namespace components
 /// register a minimal factory for plain actions with Boost.Plugin. 
 #define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
-    namespace hpx { namespace components {                                    \
-        HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::plain_component_factory<plain_action>,           \
-            plain_action_name);                                               \
-    }}                                                                        \
+    HPX_REGISTER_COMPONENT_FACTORY(                                           \
+        hpx::components::plain_component_factory<plain_action>,               \
+        plain_action_name);                                                   \
     HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
         hpx::components::plain_component_factory<plain_action>,               \
         plain_action_name)                                                    \
@@ -154,15 +152,6 @@ namespace hpx { namespace components
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(                                  \
         hpx::components::server::plain_function<plain_action>,                \
         plain_action_name)                                                    \
-    namespace hpx { namespace components {                                    \
-        template <> HPX_ALWAYS_EXPORT component_type                          \
-        get_component_type<server::plain_function<plain_action> >()           \
-            { return server::plain_function<plain_action>::get_component_type(); } \
-        template <> HPX_ALWAYS_EXPORT void                                    \
-        set_component_type<server::plain_function<plain_action> >(            \
-            component_type t)                                                 \
-        { server::plain_function<plain_action>::set_component_type(t); }      \
-    }}                                                                        \
     /**/
 
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
