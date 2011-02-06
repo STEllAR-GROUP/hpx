@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM
 
 #include <cstring>
+#include <boost/config.hpp>
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -93,7 +94,7 @@ namespace hpx { namespace actions
         }
 
     public:
-        manage_object_action const& get_instance() const
+        manage_object_action_base const& get_instance() const
         {
             static manage_object_action const instance =
                 manage_object_action();
@@ -121,6 +122,16 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int) {}
     };
+        
+    #if defined(BOOST_INTEL) 
+    inline manage_object_action_base const& 
+    manage_object_action_base::get_instance() const
+    {
+        static manage_object_action<boost::uint8_t> const instance =
+                manage_object_action<boost::uint8_t>();
+        return instance;
+    }
+    #endif
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

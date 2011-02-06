@@ -27,7 +27,7 @@ each operation) */
 	}
 	#define BOOST_ATOMIC_HAVE_CAS32 1
 	
-	#if defined(__amd64__) || defined(__i686__)
+	#if (defined(__amd64__) || defined(__x86_64__)) || defined(__i686__)
 	static inline int64_t
 	fenced_compare_exchange_strong_64(int64_t *ptr, int64_t expected, int64_t desired)
 	{

@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/runtime/actions/action_manager.hpp>
@@ -17,6 +18,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // This does not really belong here, but we put it into this spot for the 
     // lack of a better one :-P
+    #if !defined(BOOST_INTEL)
     inline manage_object_action_base const& 
     manage_object_action_base::get_instance() const
     {
@@ -24,6 +26,7 @@ namespace hpx { namespace actions
                 manage_object_action<boost::uint8_t>();
         return instance;
     }
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
