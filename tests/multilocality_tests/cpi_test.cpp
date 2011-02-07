@@ -107,8 +107,8 @@ int hpx_main(po::variables_map &vm)
     for (size_type lid = 0; lid < my_proc.size(); lid++)
     {
       hits.push_back(
-          lcos::eager_future<local_hits_action>(
-            my_proc.there(lid), local_throws, granularity));
+        lcos::eager_future<local_hits_action>(
+          my_proc.there(lid), local_throws, granularity));
     }
 
     size_type total_hits = 0;

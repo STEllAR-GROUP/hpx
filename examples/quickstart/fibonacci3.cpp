@@ -108,11 +108,11 @@ int hpx_main(po::variables_map &vm)
         rt.get_config().get_entry("application.fibonacci2.argument", argument));
 
     // get list of all known localities
-    std::vector<naming::gid_type> locales;
+    std::vector<naming::id_type> locales;
     applier::applier& appl = applier::get_applier();
 
-    naming::gid_type here = find_here();
-    naming::gid_type there;
+    naming::id_type here = find_here();
+    naming::id_type there;
 
     if (appl.get_remote_prefixes(locales)) {
         // execute the fib() function on any of the remote localities

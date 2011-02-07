@@ -246,7 +246,7 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
     applier::applier& appl = applier::get_applier();
 
     // get prefixes of all remote localities (if any)
-    std::vector<naming::gid_type> prefixes;
+    std::vector<naming::id_type> prefixes;
     appl.get_remote_prefixes(prefixes);
 
     // execute the mandelbrot() functions remotely only, if any, otherwise
@@ -254,7 +254,7 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
     bool debug_remote = true;
     if (prefixes.empty()) {
         debug_remote = false;
-        prefixes.push_back(appl.get_runtime_support_raw_gid());
+        prefixes.push_back(appl.get_runtime_support_gid());
     }
 
     std::size_t prefix_count = prefixes.size();
@@ -273,8 +273,7 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
         for (int y = 0; y < sizey; ++y, ++i) {
             mandelbrot::data data(x, y, sizex, sizey, 64, 0, 0.75, -0.75, 0); //-1.0, 0.5, -0.75, 0.75);
 //             data.debug_ = debug_remote;
-            naming::id_type id(prefixes[i % prefix_count], naming::id_type::unmanaged);
-            applier::apply_c<mandelbrot_action>(callback_gid, id, data);
+            applier::apply_c<mandelbrot_action>(callback_gid, prefixes[i % prefix_count], data);
         }
     }
 

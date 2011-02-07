@@ -10,6 +10,7 @@
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
@@ -272,7 +273,12 @@ namespace hpx
                     HPX_OSSTREAM_GETSTRING(strm));
             }
 
-            this->runtime::get_process().set_localities(here_lid, tmp_localities);
+            // wrap all gid_types into id_types
+            std::vector<naming::gid_type> prefixes;
+            BOOST_FOREACH(naming::gid_type& gid, tmp_localities)
+                prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
+
+            this->runtime::get_process().set_localities(here_lid, prefixes);
         }
 
         // register the given main function with the thread manager

@@ -21,9 +21,9 @@ namespace po = boost::program_options;
 typedef hpx::naming::id_type id_type;
 typedef hpx::naming::gid_type gid_type;
 
-inline gid_type find_here(void)
+inline id_type find_here(void)
 {
-  return get_runtime().get_process().here();
+    return get_runtime().get_process().here();
 }
 
 template <typename T>

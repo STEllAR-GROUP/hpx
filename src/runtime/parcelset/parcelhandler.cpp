@@ -137,7 +137,7 @@ namespace hpx { namespace parcelset
         return threads::thread_state(threads::terminated);
     }
 
-    bool parcelhandler::get_remote_prefixes(
+    bool parcelhandler::get_raw_remote_prefixes(
         std::vector<naming::gid_type>& prefixes, 
         components::component_type type) const
     {
@@ -149,6 +149,18 @@ namespace hpx { namespace parcelset
         using boost::lambda::_1;
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(), 
             std::back_inserter(prefixes), _1 == prefix_);
+        return !prefixes.empty();
+    }
+
+    bool parcelhandler::get_raw_prefixes(
+        std::vector<naming::gid_type>& prefixes, 
+        components::component_type type) const
+    {
+        std::vector<naming::gid_type> allprefixes;
+        error_code ec;
+        bool result = resolver_.get_prefixes(allprefixes, type, ec);
+        if (ec || !result) return false;
+
         return !prefixes.empty();
     }
 

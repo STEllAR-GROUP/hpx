@@ -101,24 +101,20 @@ int hpx_main()
     runtime& rt = get_runtime();
 
     // get list of all known localities
-    std::vector<naming::gid_type> prefixes;
+    std::vector<naming::id_type> prefixes;
     applier::applier& appl = applier::get_applier();
 
-    naming::gid_type this_prefix = appl.get_runtime_support_gid();
-    naming::gid_type that_prefix;
+    naming::id_type this_ = appl.get_runtime_support_gid();
+    naming::id_type that_;
 
     if (appl.get_remote_prefixes(prefixes)) {
         // execute the fib() function on any of the remote localities
-        that_prefix = prefixes[0];
+        that_ = prefixes[0];
     }
     else {
         // execute the fib() function locally
-        that_prefix = this_prefix;
+        that_ = this_;
     }
-
-    // the prefixes don|t need to be managed
-    naming::id_type this_(this_prefix, naming::id_type::unmanaged);
-    naming::id_type that_(that_prefix, naming::id_type::unmanaged);
 
     // create instances of the test component and invoke the test action
     components::refcnt_test::refcnt local; 

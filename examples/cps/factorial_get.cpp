@@ -24,17 +24,13 @@ namespace po = boost::program_options;
 template<typename Action, typename Arg0>
 inline void apply(Arg0 arg0, id_type k, id_type h)
 {
-  naming::id_type 
-      somewhere(get_runtime().get_process().next(), naming::id_type::unmanaged);
-  hpx::applier::apply<Action>(somewhere, arg0, k, h);
+  hpx::applier::apply<Action>(get_runtime().get_process().next(), arg0, k, h);
 }
 
 template<typename Action, typename Arg0, typename Arg1>
 inline void apply(Arg0 arg0, Arg1 arg1, id_type k, id_type h)
 {
-  naming::id_type 
-      somewhere(get_runtime().get_process().next(), naming::id_type::unmanaged);
-  hpx::applier::apply<Action>(somewhere, arg0, arg1, k, h);
+  hpx::applier::apply<Action>(get_runtime().get_process().next(), arg0, arg1, k, h);
 }
 
 template<typename Arg0>

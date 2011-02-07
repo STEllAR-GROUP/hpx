@@ -131,7 +131,8 @@ namespace hpx { namespace parcelset
             return prefix_; 
         }
 
-        /// Return the list of all remote localities
+        /// Return the list of all remote localities supporting the given 
+        /// component type
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
         ///                 by the function.
@@ -141,7 +142,21 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one 
         ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
-        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes, 
+        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes, 
+            components::component_type type = components::component_invalid) const;
+
+        /// Return the list of all localities supporting the given 
+        /// component type
+        ///
+        /// \param prefixes [out] The reference to a vector of id_types filled
+        ///                 by the function.
+        /// \param type     [in] The type of the component which needs to exist
+        ///                 on the returned localities.
+        ///
+        /// \returns The function returns \a true if there is at least one 
+        ///          locality known to the AGASservice 
+        ///          (!prefixes.empty()).
+        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes, 
             components::component_type type = components::component_invalid) const;
 
         /// A parcel is submitted for transport at the source locality site to 

@@ -94,9 +94,8 @@ typedef lcos::thunk_client<sum_thunk> sum_thunk_type;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    id_type here = naming::id_type(find_here(), naming::id_type::unmanaged);
-    id_type there = naming::id_type(
-	get_runtime().get_process().next(), naming::id_type::unmanaged);
+    id_type here = find_here();
+    id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;
     std::cout << here << " " << there << std::endl << std::endl;

@@ -68,8 +68,8 @@ int fib (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    gid_type here = find_here();
-    gid_type next = get_runtime().get_process().next();
+    id_type here = find_here();
+    id_type next = get_runtime().get_process().next();
 
     fibonacci_future n1(next, n - 1, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
@@ -89,7 +89,7 @@ int fib_rhs (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    gid_type here = find_here();
+    id_type here = find_here();
 
     fibonacci_rhs_future n1(here,  n - 1, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);

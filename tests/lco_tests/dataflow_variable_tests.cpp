@@ -33,14 +33,13 @@ typedef actions::plain_result_action1<int, id_type, print> print_action;
 HPX_REGISTER_PLAIN_ACTION(print_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
+typedef hpx::lcos::dataflow_variable<int, int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    id_type here = naming::id_type(find_here(), naming::id_type::unmanaged);
-    id_type there = naming::id_type(
-	get_runtime().get_process().next(), naming::id_type::unmanaged);
+    id_type here = find_here();
+    id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;
     std::cout << here << " " << there << std::endl << std::endl;

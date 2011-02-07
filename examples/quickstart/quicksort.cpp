@@ -115,8 +115,8 @@ hpx::actions::manage_object_action<boost::uint8_t> const raw_memory =
 int hpx_main(int argument)
 {
     // get list of all known localities
-    std::vector<naming::gid_type> prefixes;
-    naming::gid_type prefix;
+    std::vector<naming::id_type> prefixes;
+    naming::id_type prefix;
     applier::applier& appl = applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // execute the qsort() function on any of the remote localities
@@ -124,14 +124,13 @@ int hpx_main(int argument)
     }
     else {
         // execute the qsort() function locally
-        prefix = appl.get_runtime_support_raw_gid();
+        prefix = appl.get_runtime_support_gid();
     }
 
     {
         // create (remote) memory block
         components::memory_block mb;
-        naming::id_type prefix_id(prefix, naming::id_type::unmanaged);
-        mb.create(prefix_id, sizeof(int)*argument, raw_memory);
+        mb.create(prefix, sizeof(int)*argument, raw_memory);
         components::access_memory_block<int> data(mb.get());
 
         // randomly fill the vector
@@ -147,7 +146,7 @@ int hpx_main(int argument)
         t.restart();
 
         lcos::eager_future<quicksort<int>::quicksort_action> n(
-            prefix_id, prefix_id, mb.get_gid(), 0, argument);
+            prefix, prefix, mb.get_gid(), 0, argument);
         components::wait(n);
 
         elapsed = t.elapsed();

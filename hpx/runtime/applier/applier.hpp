@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
 #include <boost/thread/tss.hpp>
+#include <boost/foreach.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -106,11 +107,13 @@ namespace hpx { namespace applier
             return naming::get_prefix_from_gid(parcel_handler_.get_prefix());
         }
 
-        /// \brief Allow access to the prefixes of all remote localities 
-        ///        registered with the AGAS service.
+        /// \brief Return list of prefixes of all remote localities 
+        ///        registered with the AGAS service for a specific component 
+        ///        type.
         ///
         /// This function returns a list of all remote localities (all 
-        /// localities known to AGAS except the local one).
+        /// localities known to AGAS except the local one) supporting the given
+        /// component type.
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
         ///                 by the function.
@@ -120,10 +123,58 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one 
         ///          remote locality known to the AGASservice 
         ///          (!prefixes.empty()).
-        bool get_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
             components::component_type type = components::component_invalid) const
         {
-            return parcel_handler_.get_remote_prefixes(prefixes, type);
+            return parcel_handler_.get_raw_remote_prefixes(prefixes, type);
+        }
+
+        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes,
+            components::component_type type = components::component_invalid) const
+        {
+            std::vector<naming::gid_type> raw_prefixes;
+            if (!parcel_handler_.get_raw_remote_prefixes(raw_prefixes, type))
+                return false;
+            
+            BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+                prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
+
+            return true;
+        }
+
+        /// \brief Return list of prefixes of all localities 
+        ///        registered with the AGAS service for a specific component 
+        ///        type.
+        ///
+        /// This function returns a list of all localities (all 
+        /// localities known to AGAS except the local one) supporting the given
+        /// component type.
+        ///
+        /// \param prefixes [out] The reference to a vector of id_types filled
+        ///                 by the function.
+        /// \param type     [in] The type of the component which needs to exist
+        ///                 on the returned localities.
+        ///
+        /// \returns The function returns \a true if there is at least one 
+        ///          remote locality known to the AGASservice 
+        ///          (!prefixes.empty()).
+        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+            components::component_type type = components::component_invalid) const
+        {
+            return parcel_handler_.get_raw_prefixes(prefixes, type);
+        }
+
+        bool get_prefixes(std::vector<naming::id_type>& prefixes,
+            components::component_type type = components::component_invalid) const
+        {
+            std::vector<naming::gid_type> raw_prefixes;
+            if (!parcel_handler_.get_raw_prefixes(raw_prefixes, type))
+                return false;
+            
+            BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+                prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
+
+            return true;
         }
 
         /// By convention the runtime_support has a gid identical to the prefix 

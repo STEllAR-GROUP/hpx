@@ -44,17 +44,16 @@ namespace hpx
             hpx::threads::policies::callback_notifier>;
 
         void set_localities(std::size_t here_lid,
-                            std::vector<naming::gid_type>& localities)
+                            std::vector<naming::id_type>& localities)
         {
             BOOST_ASSERT(0 == localities_.size());
             here_lid_ = here_lid;
-            for (int i=0; i<localities.size(); i++)
-              localities_.push_back(localities[i]);
+            localities_= localities;
         }
 
     public:
         // Return the set of localities
-        std::vector<naming::gid_type>& localities(void)
+        std::vector<naming::id_type>& localities(void)
         {
             return localities_;
         }
@@ -66,7 +65,7 @@ namespace hpx
         }
 
         // Return the GID of this locality
-        naming::gid_type here() const
+        naming::id_type here() const
         {
             return localities_[here_lid_];
         }
@@ -78,7 +77,7 @@ namespace hpx
         }
 
         // Return the GID of the locality with the given logical ID 
-        naming::gid_type there(std::size_t lid) const
+        naming::id_type there(std::size_t lid) const
         {
             lid = lid % localities_.size();
             return localities_[lid];
@@ -86,14 +85,14 @@ namespace hpx
 
         // Return the GID of the "next" locality in the circular list
         // of localities
-        naming::gid_type next(void) const
+        naming::id_type next(void) const
         {
             return there(here_lid_+1);
         }
 
         // Return the GID of the "previous" locality in the circular list
         // of localities
-        naming::gid_type prev(void) const
+        naming::id_type prev(void) const
         {
             return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
         }
@@ -101,7 +100,7 @@ namespace hpx
     private:
         // Locality information
         std::size_t here_lid_;
-        std::vector<naming::gid_type> localities_;
+        std::vector<naming::id_type> localities_;
     };
 
     /// \class runtime runtime.hpp hpx/runtime.hpp
