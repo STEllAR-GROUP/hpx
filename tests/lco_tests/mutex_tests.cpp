@@ -185,6 +185,10 @@ struct test_lock_times_out_if_other_thread_has_lock
         &this_type::locking_thread_through_constructor
     > locking_thread_through_constructor_action;
 
+    static components::component_type get_component_type() 
+        { return components::component_invalid; }
+    static void set_component_type(components::component_type) {}
+
     void operator()()
     {
         do_test<locking_thread_action>();

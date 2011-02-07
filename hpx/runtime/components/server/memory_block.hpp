@@ -98,6 +98,15 @@ namespace hpx { namespace components { namespace server { namespace detail
         /// memory block
         bool is_master() const { return 0 != wrapper_; }
 
+        static component_type get_component_type()
+        {
+            return components::get_component_type<memory_block_header>(); 
+        }
+        static void set_component_type(component_type t)
+        {
+            components::set_component_type<memory_block_header>(t); 
+        }
+
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
         {
@@ -467,6 +476,15 @@ namespace hpx { namespace components { namespace server
             return get();
         }
 
+        static component_type get_component_type()
+        {
+            return wrapped_type::get_component_type();
+        }
+        static void set_component_type(component_type t)
+        {
+            wrapped_type::set_component_type(t);
+        }
+
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef components::detail::wrapper_heap_list<
@@ -591,7 +609,11 @@ namespace hpx { namespace components { namespace server
         ///        a single pointer
         boost::intrusive_ptr<detail::memory_block_header> component_;
     };
-}
+}}}
+
+#if !defined(BOOST_MSVC)
+namespace hpx { namespace components 
+{
     template <>
     struct HPX_ALWAYS_EXPORT component_type_database<server::detail::memory_block_header>
     {
@@ -607,7 +629,7 @@ namespace hpx { namespace components { namespace server
     }; 
     
     template <>
-    struct HPX_ALWAYS_EXPORT component_type_database<server::memory_block>
+    struct HPX_ALWAYS_EXPORT component_type_database<server::detail::memory_block>
     {
         static component_type get()
         {
@@ -619,5 +641,23 @@ namespace hpx { namespace components { namespace server
             BOOST_ASSERT(false);
         }
     }; 
+    
+    template <>
+    struct HPX_ALWAYS_EXPORT component_type_database<server::memory_block>
+    {
+        typedef server::memory_block::wrapped_type wrapped_type;
+
+        static component_type get()
+        {
+            return wrapped_type::get_component_type();
+        }
+
+        static void set(component_type type)
+        {
+            wrapped_type::set_component_type(type);
+        }
+    }; 
 }}
+#endif
+
 #endif

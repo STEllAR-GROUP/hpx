@@ -89,13 +89,13 @@ namespace hpx { namespace components
     {
         static component_type value;
 
-    #if defined(BOOST_MSVC)
+#if defined(BOOST_MSVC)
         static HPX_ALWAYS_EXPORT component_type get();
         static HPX_ALWAYS_EXPORT void set(component_type);
-    #else
+#else
         static component_type get() { return value; }
         static void set(component_type t) { value = t; }
-    #endif 
+#endif 
     }; 
     
     template <typename Component, typename Enable>
@@ -139,7 +139,7 @@ namespace hpx { namespace components
         template <> HPX_ALWAYS_EXPORT                                         \
         void component_type_database<component>::set(component_type t)        \
             { value = t; }                                                    \
-    }}
+    }}                                                                        \
     /**/
 
   #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)               \
@@ -151,7 +151,7 @@ namespace hpx { namespace components
         template <> HPX_ALWAYS_EXPORT                                         \
         void component_type_database<component>::set(component_type)          \
             { BOOST_ASSERT(false); }                                          \
-    }}
+    }}                                                                        \
     /**/
 #else
   #define HPX_DEFINE_GET_COMPONENT_TYPE(component)

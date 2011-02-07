@@ -173,6 +173,15 @@ namespace hpx { namespace components
         ///        destructed
         void finalize() {}  // finalize the wrapped component in our destructor
 
+        static component_type get_component_type()
+        {
+            return components::get_component_type<wrapped_type>();
+        }
+        static void set_component_type(component_type t)
+        {
+            components::set_component_type<wrapped_type>(t);
+        }
+
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
         Component* get()

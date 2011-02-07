@@ -45,6 +45,15 @@ namespace hpx { namespace lcos
         // component
         typedef components::managed_component<base_lco> wrapping_type;
 
+        static components::component_type get_component_type() 
+        { 
+            return components::get_component_type<base_lco>(); 
+        }
+        static void set_component_type(components::component_type type) 
+        { 
+            components::set_component_type<base_lco>(type); 
+        }
+
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco() {}
@@ -133,6 +142,15 @@ namespace hpx { namespace lcos
         // managed_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
+
+        static components::component_type get_component_type() 
+        { 
+            return components::get_component_type<base_lco_with_value>(); 
+        }
+        static void set_component_type(components::component_type type) 
+        { 
+            components::set_component_type<base_lco_with_value>(type); 
+        }
 
         /// The \a function set_result_nonvirt is called whenever a 
         /// \a set_result_action is applied on a instance of a LCO. This 

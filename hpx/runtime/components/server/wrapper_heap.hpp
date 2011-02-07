@@ -220,7 +220,8 @@ namespace hpx { namespace components { namespace detail
                 // with the AGAS
                 if (!get_agas_client_->bind_range(base_gid_, step_, 
                       naming::address(appl.here(),
-                      components::get_component_type<typename value_type::type_holder>(), addr),
+                          components::get_component_type<typename value_type::type_holder>(), 
+                          addr),
                       sizeof(value_type))) 
                 {
                     return naming::invalid_gid;

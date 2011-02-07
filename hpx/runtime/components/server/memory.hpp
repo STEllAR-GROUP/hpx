@@ -32,6 +32,15 @@ namespace hpx { namespace components { namespace server
             memory_load64 = 7,        ///< load a 64 bit value from a memory location
         };
 
+        static component_type get_component_type() 
+        { 
+            return components::get_component_type<memory>(); 
+        }
+        static void set_component_type(component_type t) 
+        { 
+            components::set_component_type<memory>(t); 
+        }
+
         // constructor
         memory() 
         {}

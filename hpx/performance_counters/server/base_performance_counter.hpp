@@ -44,6 +44,15 @@ namespace hpx { namespace performance_counters { namespace server
         ///        destructed
         void finalize() {}
 
+        static components::component_type get_component_type() 
+        { 
+            return components::get_component_type<wrapping_type>();
+        }
+        static void set_component_type(components::component_type t) 
+        { 
+            components::set_component_type<wrapping_type>(t);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         counter_info get_counter_info_nonvirt()
         {

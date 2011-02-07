@@ -17,6 +17,16 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 
 namespace hpx { namespace threads { namespace detail
 {
+    components::component_type thread::get_component_type()
+    {
+        return components::get_component_type<thread>();
+    }
+
+    void thread::set_component_type(components::component_type type)
+    {
+        components::set_component_type<thread>(type);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void *thread::operator new(std::size_t size, thread_pool& pool)
     {

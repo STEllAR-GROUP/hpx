@@ -55,6 +55,15 @@ namespace hpx { namespace components { namespace server
             runtime_support_create_memory_block = 7,   ///< create new memory block
         };
 
+        static component_type get_component_type() 
+        { 
+            return components::get_component_type<runtime_support>(); 
+        }
+        static void set_component_type(component_type t) 
+        { 
+            components::set_component_type<runtime_support>(t); 
+        }
+
         // constructor
         runtime_support(util::section& ini, naming::gid_type const& prefix, 
                 naming::resolver_client& agas_client, applier::applier& applier);

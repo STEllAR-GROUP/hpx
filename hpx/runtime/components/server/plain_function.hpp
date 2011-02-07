@@ -16,7 +16,16 @@ namespace hpx { namespace components { namespace server
     /// with the existing component based action template infrastructure
     template <typename Action>
     struct plain_function
-    { };
+    { 
+        static component_type get_component_type() 
+        { 
+            return components::get_component_type<plain_function<Action> >(); 
+        }
+        static void set_component_type(component_type type) 
+        { 
+            components::set_component_type<plain_function<Action> >(type); 
+        }
+    };
 }}}
 
 #endif
