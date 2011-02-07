@@ -156,9 +156,8 @@ namespace hpx { namespace parcelset
         std::vector<naming::gid_type>& prefixes, 
         components::component_type type) const
     {
-        std::vector<naming::gid_type> allprefixes;
         error_code ec;
-        bool result = resolver_.get_prefixes(allprefixes, type, ec);
+        bool result = resolver_.get_prefixes(prefixes, type, ec);
         if (ec || !result) return false;
 
         return !prefixes.empty();
