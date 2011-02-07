@@ -274,7 +274,7 @@ namespace hpx
             }
 
             // wrap all gid_types into id_types
-            std::vector<naming::gid_type> prefixes;
+            std::vector<naming::id_type> prefixes;
             BOOST_FOREACH(naming::gid_type& gid, tmp_localities)
                 prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
