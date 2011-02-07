@@ -3,13 +3,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(BOOST_DEBUG OFF CACHE BOOL "Enable debugging for the FindBoost (default: OFF).")
+option(BOOST_DEBUG "Enable debugging for the FindBoost (default: OFF)." OFF)
     
-set(BOOST_USE_MULTITHREADED ON CACHE BOOL "Set to true if multi-threaded boost libraries should be used (default: ON).")
-
+option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
+  
 macro(get_boost_version)
   if(NOT BOOST_VERSION_FOUND)
-  set(BOOST_VERSION_FOUND ON)
+  set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
 
   # Non-system Boost tree (tarball, SCM checkout, etc)
   if(NOT BOOST_USE_SYSTEM)
@@ -112,7 +112,7 @@ endmacro()
 
 macro(get_boost_compiler_version)
   if(NOT BOOST_COMPILER_VERSION_FOUND)
-  set(BOOST_COMPILER_VERSION_FOUND ON)
+  set(BOOST_COMPILER_VERSION_FOUND ON CACHE INTERNAL "Boost compiler version was found.")
 
   exec_program(${CMAKE_CXX_COMPILER}
     ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
@@ -239,7 +239,7 @@ macro(find_boost_library TARGET_LIB)
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
         if(BOOST_DEBUG)
-          message(STATUS "Looking for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
+          message(STATUS "Found for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
         endif()
         break()
       endif()
@@ -259,6 +259,9 @@ macro(find_boost_library TARGET_LIB)
         find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
         if(BOOST_${TARGET_LIB}_LIBRARY)
+          if(BOOST_DEBUG)
+            message(STATUS "Found for ${BOOST_TARGET} in system path...")
+          endif()
           break()
         endif()
       endforeach()
@@ -293,12 +296,15 @@ macro(find_boost_library TARGET_LIB)
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
+        if(BOOST_DEBUG)
+          message(STATUS "Found for ${BOOST_TARGET} in system path...")
+        endif()
         break()
       endif()
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      message(FATAL_ERROR "Failed to locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR} or in the default path.")
+      message(FATAL_ERROR "Failed to locate Boost ${TARGET_LIB} shared library in the system path.")
       set(BOOST_FOUND OFF)
       unset(BOOST_${TARGET_LIB}_LIBRARY)
     else()
@@ -309,8 +315,7 @@ macro(find_boost_library TARGET_LIB)
   
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
   endif()    
-  
-  set(BOOST_FOUND_LIBRARIES ${BOOST_FOUND_LIBRARIES} CACHE STRING
-    "Boost shared libraries found by CMake (default: none).")
+
+  set(BOOST_FOUND_LIBRARIES ${BOOST_FOUND_LIBRARIES} CACHE STRING "Boost shared libraries found by CMake (default: none).")
 endmacro()
 
