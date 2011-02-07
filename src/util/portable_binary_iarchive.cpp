@@ -9,6 +9,7 @@
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <boost/version.hpp>
+#include <boost/config.hpp>
 #include <hpx/config.hpp>
 
 #if BOOST_VERSION >= 103700 && HPX_USE_PORTABLE_ARCHIVES != 0
@@ -141,14 +142,14 @@ portable_binary_iarchive::init(unsigned int flags){
 
 }}
 
-// explicitly instantiate for this 
+// explicitly instantiate for this type
 #if BOOST_VERSION < 104000
 #include <boost/archive/impl/archive_pointer_iserializer.ipp>
 
 namespace boost {
 namespace archive {
 
-template class detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive> ;
+template class HPX_ALWAYS_EXPORT detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive> ;
 
 } // namespace archive
 } // namespace boost
@@ -159,12 +160,13 @@ template class detail::archive_pointer_iserializer<hpx::util::portable_binary_ia
 namespace boost {
 namespace archive {
 
-template class detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
+template class HPX_ALWAYS_EXPORT detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
 
 } // namespace archive
 } // namespace boost
 #endif
 
+// explicitly instantiate for this type of stream
 #include <boost/archive/impl/basic_binary_iprimitive.ipp>
 
 namespace boost {

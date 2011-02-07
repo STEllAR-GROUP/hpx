@@ -20,8 +20,8 @@
 # define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
 # define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
-# define HPX_APISYMBOL_EXPORT   /* empty */
-# define HPX_APISYMBOL_IMPORT   /* empty */
+# define HPX_APISYMBOL_EXPORT   __attribute__((visibility("default")))
+# define HPX_APISYMBOL_IMPORT   __attribute__((visibility("default")))
 #endif
 #endif
 

@@ -35,13 +35,24 @@
 #include <ostream>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
+
+#if !defined(BOOST_WINDOWS)
+  #pragma GCC visibility push(default)
+#endif
+
 #include <boost/archive/basic_binary_oprimitive.hpp>
+
+#if !defined(BOOST_WINDOWS)
+  #pragma GCC visibility pop
+#endif
+
 #include <boost/archive/detail/common_oarchive.hpp>
 #include <boost/archive/detail/register_archive.hpp>
 #if BOOST_VERSION >= 104400
 #include <boost/serialization/item_version_type.hpp>
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
 
 namespace hpx { namespace util
@@ -50,7 +61,7 @@ namespace hpx { namespace util
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) portable_binary_oarchive_exception : 
+class HPX_ALWAYS_EXPORT portable_binary_oarchive_exception : 
     public virtual boost::archive::archive_exception
 {
 public:
@@ -108,7 +119,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    HPX_ALWAYS_EXPORT void
     save_impl(const boost::intmax_t l, const char maxsize);
     // add base class to the places considered when matching
     // save function to a specific set of arguments.  Note, this didn't
@@ -190,7 +201,7 @@ protected:
         int
     ){}
 
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:

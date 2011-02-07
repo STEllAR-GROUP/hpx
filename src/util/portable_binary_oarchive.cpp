@@ -33,6 +33,7 @@
 #endif  // auto-linking disabled
 
 #include <ostream>
+
 #include <boost/detail/endian.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
@@ -114,7 +115,7 @@ portable_binary_oarchive::init(unsigned int flags) {
 namespace boost {
 namespace archive {
 
-template class detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive> ;
+template class HPX_ALWAYS_EXPORT detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive> ;
 
 } // namespace archive
 } // namespace boost
@@ -125,7 +126,7 @@ template class detail::archive_pointer_oserializer<hpx::util::portable_binary_oa
 namespace boost {
 namespace archive {
 
-template class detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
+template class HPX_ALWAYS_EXPORT detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
 
 } // namespace archive
 } // namespace boost

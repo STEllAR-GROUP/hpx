@@ -35,7 +35,17 @@
 #include <istream>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
+
+#if !defined(BOOST_WINDOWS)
+  #pragma GCC visibility push(default)
+#endif
+
 #include <boost/archive/basic_binary_iprimitive.hpp>
+
+#if !defined(BOOST_WINDOWS)
+  #pragma GCC visibility pop
+#endif
+
 #include <boost/archive/detail/common_iarchive.hpp>
 #include <boost/archive/shared_ptr_helper.hpp>
 #include <boost/archive/detail/register_archive.hpp>
@@ -43,6 +53,7 @@
 #include <boost/serialization/item_version_type.hpp>
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
 
 namespace hpx { namespace util
@@ -51,7 +62,7 @@ namespace hpx { namespace util
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) portable_binary_iarchive_exception : 
+class HPX_ALWAYS_EXPORT portable_binary_iarchive_exception : 
     public virtual boost::archive::archive_exception
 {
 public:
@@ -109,7 +120,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    HPX_ALWAYS_EXPORT void
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
@@ -186,7 +197,7 @@ protected:
     void load_override(T & t, BOOST_PFTO int){
         this->detail_common_iarchive::load_override(t, 0);
     }
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void) 
+    HPX_ALWAYS_EXPORT void
     load_override(boost::archive::class_name_type & t, int);
     // binary files don't include the optional information 
     void load_override(
@@ -194,7 +205,7 @@ protected:
         int
     ){}
 
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+    HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:

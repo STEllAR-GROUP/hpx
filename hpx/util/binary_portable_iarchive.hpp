@@ -28,6 +28,7 @@
 #endif
 #include <boost/detail/endian.hpp>
 #include <boost/cstdint.hpp>
+#include <hpx/config.hpp>
 
 namespace hpx { namespace util
 {
@@ -35,7 +36,7 @@ namespace hpx { namespace util
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) portable_binary_archive_exception : 
+class HPX_ALWAYS_EXPORT portable_binary_archive_exception : 
     public virtual boost::archive::archive_exception
 {
 public:

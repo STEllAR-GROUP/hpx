@@ -321,8 +321,8 @@ namespace hpx { namespace naming
         };
 
         // custom deleter for id_type_impl above
-        void gid_managed_deleter (id_type_impl* p);
-        void gid_unmanaged_deleter (id_type_impl* p);
+        void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
+        void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
     }
 
     ///////////////////////////////////////////////////////////////////////////

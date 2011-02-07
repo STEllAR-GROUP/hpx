@@ -47,15 +47,15 @@
 namespace boost { namespace archive 
 {
     // explicitly instantiate for this type of binary stream
-    template class binary_oarchive_impl<
+    template class HPX_ALWAYS_EXPORT binary_oarchive_impl<
         hpx::util::portable_binary_oarchive, 
         std::ostream::char_type, 
         std::ostream::traits_type
     >;
-    template class detail::archive_pointer_oserializer<
+    template class HPX_ALWAYS_EXPORT detail::archive_pointer_oserializer<
         hpx::util::portable_binary_oarchive
     >;
-    template class basic_binary_oprimitive<
+    template class HPX_ALWAYS_EXPORT basic_binary_oprimitive<
         hpx::util::portable_binary_oarchive,
         std::ostream::char_type, 
         std::ostream::traits_type
@@ -76,15 +76,15 @@ namespace boost { namespace archive
 
 namespace boost { namespace archive 
 {
-    template class binary_iarchive_impl<
+    template class HPX_ALWAYS_EXPORT binary_iarchive_impl<
         hpx::util::portable_binary_iarchive, 
         std::istream::char_type, 
         std::istream::traits_type
     >;
-    template class detail::archive_pointer_iserializer<
+    template class HPX_ALWAYS_EXPORT detail::archive_pointer_iserializer<
         hpx::util::portable_binary_iarchive
     >;
-    template class basic_binary_iprimitive<
+    template class HPX_ALWAYS_EXPORT basic_binary_iprimitive<
         hpx::util::portable_binary_iarchive,
         std::istream::char_type, 
         std::istream::traits_type

@@ -85,7 +85,7 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
-    struct component_type_database
+    struct HPX_ALWAYS_EXPORT component_type_database
     {
         static component_type value;
 
