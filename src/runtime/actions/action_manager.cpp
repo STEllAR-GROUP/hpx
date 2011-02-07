@@ -18,7 +18,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // This does not really belong here, but we put it into this spot for the 
     // lack of a better one :-P
-    #if !defined(BOOST_INTEL)
+    #if !defined(BOOST_INTEL) && !defined(__clang__)
     inline manage_object_action_base const& 
     manage_object_action_base::get_instance() const
     {

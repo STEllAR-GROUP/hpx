@@ -6,6 +6,7 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
+#include <boost/config.hpp>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
@@ -88,8 +89,13 @@ namespace hpx { namespace components
     {
         static component_type value;
 
+    #if defined(BOOST_MSVC)
         static HPX_ALWAYS_EXPORT component_type get();
-        static HPX_ALWAYS_EXPORT void set(component_type type);
+        static HPX_ALWAYS_EXPORT void set(component_type);
+    #else
+        static component_type get() { return value; }
+        static void set(component_type t) { value = t; }
+    #endif 
     }; 
     
     template <typename Component, typename Enable>
@@ -123,7 +129,8 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
+#if defined(BOOST_MSVC)
+  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                            \
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
@@ -135,7 +142,7 @@ namespace hpx { namespace components
     }}
     /**/
 
-#define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
+  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)               \
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
@@ -146,6 +153,10 @@ namespace hpx { namespace components
             { BOOST_ASSERT(false); }                                          \
     }}
     /**/
+#else
+  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)
+  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)
+#endif
 
 #endif
 

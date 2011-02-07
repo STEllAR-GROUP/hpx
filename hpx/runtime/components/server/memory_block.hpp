@@ -591,6 +591,33 @@ namespace hpx { namespace components { namespace server
         ///        a single pointer
         boost::intrusive_ptr<detail::memory_block_header> component_;
     };
-}}}
+}
+    template <>
+    struct HPX_ALWAYS_EXPORT component_type_database<server::detail::memory_block_header>
+    {
+        static component_type get()
+        {
+            return components::component_memory_block; 
+        }
 
+        static void set(component_type type)
+        {
+            BOOST_ASSERT(false);
+        }
+    }; 
+    
+    template <>
+    struct HPX_ALWAYS_EXPORT component_type_database<server::memory_block>
+    {
+        static component_type get()
+        {
+            return components::component_memory_block; 
+        }
+
+        static void set(component_type type)
+        {
+            BOOST_ASSERT(false);
+        }
+    }; 
+}}
 #endif

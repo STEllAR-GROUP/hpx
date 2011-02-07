@@ -123,7 +123,7 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int) {}
     };
         
-    #if defined(BOOST_INTEL) 
+    #if defined(BOOST_INTEL) || defined(__clang__) 
     inline manage_object_action_base const& 
     manage_object_action_base::get_instance() const
     {
