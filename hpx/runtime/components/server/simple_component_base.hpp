@@ -6,6 +6,7 @@
 #if !defined(HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM)
 #define HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM
 
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
@@ -22,8 +23,6 @@ namespace hpx { namespace components
                 boost::is_same<Component, detail::this_type>, 
                 simple_component_base, Component
             >::type this_component_type;
-
-        static component_type value;
 
     public:
         typedef this_component_type wrapped_type;
@@ -47,16 +46,14 @@ namespace hpx { namespace components
         ///             component instance. 
         void finalize() {}
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
+        // This exposes the component type. 
         static component_type get_component_type()
         {
-            return value;
+            return components::get_component_type<this_component_type>();
         }
         static void set_component_type(component_type type)
         {
-            value = type;
+            components::set_component_type<this_component_type>(type);
         }
 
         /// \brief Create a new GID (if called for the first time), assign this 
@@ -75,7 +72,7 @@ namespace hpx { namespace components
             {
                 applier::applier& appl = hpx::applier::get_applier();
                 naming::address addr(appl.here(), 
-                    this_component_type::get_component_type(), 
+                    components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
                 gid_ = appl.get_parcel_handler().get_next_id();
                 if (!appl.get_agas_client().bind(gid_, addr))
@@ -128,10 +125,6 @@ namespace hpx { namespace components
     private:
         mutable naming::gid_type gid_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
-    component_type simple_component_base<Component>::value = component_invalid;
 
 
     ///////////////////////////////////////////////////////////////////////////

@@ -37,18 +37,6 @@ namespace hpx { namespace performance_counters { namespace server
             base_type::finalize();
         }
 
-        // This is the component id. Every component needs to have a function
-        // \a get_component_type() which is used by the generic action 
-        // implementation to associate this component with a given action.
-        static components::component_type get_component_type() 
-        { 
-            return base_type::get_component_type(); 
-        }
-        static void set_component_type(components::component_type t) 
-        { 
-            base_type::set_component_type(t);
-        }
-
     private:
         counter_info info_;
         boost::function<boost::int64_t()> f_;

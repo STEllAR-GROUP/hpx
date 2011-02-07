@@ -17,7 +17,8 @@
 #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::memory);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::memory,
+    hpx::components::component_memory);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
@@ -38,8 +39,16 @@ HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint16_t>::set_
 HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint32_t>::set_result_action);
 HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<boost::uint8_t>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<boost::uint16_t>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<boost::uint32_t>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<boost::uint64_t>);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<boost::uint8_t>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<boost::uint16_t>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<boost::uint32_t>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<boost::uint64_t>,
+    hpx::components::component_base_lco_with_value);
 

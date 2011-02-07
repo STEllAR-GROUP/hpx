@@ -64,7 +64,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // output to file "output.dat"
-        FILE *fdata;
         std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
@@ -92,7 +91,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               std::string Pi_str = convert(val.value_[i].phi[0][2]);
               std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
-              fdata = fopen("chi.dat","a");
+              FILE* fdata = fopen("chi.dat","a");
               fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
               fclose(fdata);
 

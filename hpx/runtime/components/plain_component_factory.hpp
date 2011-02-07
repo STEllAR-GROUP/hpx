@@ -147,11 +147,13 @@ namespace hpx { namespace components
         plain_action_name);                                                   \
     HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
         hpx::components::plain_component_factory<plain_action>,               \
-        plain_action_name)                                                    \
+        plain_action_name);                                                   \
     template struct hpx::components::plain_component_factory<plain_action>;   \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(                                  \
         hpx::components::server::plain_function<plain_action>,                \
-        plain_action_name)                                                    \
+        plain_action_name);                                                   \
+    HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
+        hpx::components::server::plain_function<plain_action>)                \
     /**/
 
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \

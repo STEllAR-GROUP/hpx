@@ -55,17 +55,6 @@ namespace hpx { namespace components { namespace server
             runtime_support_create_memory_block = 7,   ///< create new memory block
         };
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type() 
-        { 
-            return component_runtime_support; 
-        }
-        static void set_component_type(component_type) 
-        { 
-        }
-
         // constructor
         runtime_support(util::section& ini, naming::gid_type const& prefix, 
                 naming::resolver_client& agas_client, applier::applier& applier);
@@ -241,7 +230,21 @@ namespace hpx { namespace components { namespace server
         util::section& ini_;
     };
 
-}}}
+}
+    template <>
+    struct HPX_ALWAYS_EXPORT component_type_database<runtime_support>
+    {
+        static component_type get()
+        {
+            return components::component_runtime_support; 
+        }
+
+        static void set(component_type type)
+        {
+            BOOST_ASSERT(false);
+        }
+    }; 
+}}
 
 #include <hpx/config/warnings_suffix.hpp>
 

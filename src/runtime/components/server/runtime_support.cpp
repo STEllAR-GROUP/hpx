@@ -58,7 +58,9 @@ HPX_REGISTER_ACTION_EX(
     get_config_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::runtime_support);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::components::server::runtime_support,
+    hpx::components::component_runtime_support);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

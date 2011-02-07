@@ -12,18 +12,11 @@
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::threads::detail::thread, hpx::components::component_thread);
+
 namespace hpx { namespace threads { namespace detail
 {
-    components::component_type thread::get_component_type()
-    {
-        return components::component_thread;
-    }
-
-    void thread::set_component_type(components::component_type type)
-    {
-        BOOST_ASSERT(false);    // shouldn't be called, ever
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     void *thread::operator new(std::size_t size, thread_pool& pool)
     {

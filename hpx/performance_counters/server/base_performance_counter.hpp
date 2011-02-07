@@ -34,8 +34,6 @@ namespace hpx { namespace performance_counters { namespace server
         virtual void get_counter_info(counter_info& info) = 0;
         virtual void get_counter_value(counter_value& value) = 0;
 
-        static components::component_type value;
-
     public:
         // components must contain a typedef for wrapping_type defining the
         // simple_component type used to encapsulate instances of this 
@@ -45,23 +43,6 @@ namespace hpx { namespace performance_counters { namespace server
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
         void finalize() {}
-
-        // This is the component id. Every component needs to have a function
-        // \a get_component_type() which is used by the generic action 
-        // implementation to associate this component with a given action.
-        static components::component_type get_component_type() 
-        { 
-            if (components::component_invalid == value) 
-            {
-                // first call to get_component_type, ask AGAS for a unique id
-                value = hpx::applier::get_applier().get_agas_client().
-                    get_component_id("base_performance_counter");
-            }
-            return value; 
-        }
-        static void set_component_type(components::component_type) 
-        { 
-        }
 
         ///////////////////////////////////////////////////////////////////////
         counter_info get_counter_info_nonvirt()

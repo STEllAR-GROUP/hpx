@@ -15,6 +15,7 @@
 #include <boost/preprocessor/repeat.hpp>
 
 #include <hpx/exception.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/util/static.hpp>
@@ -28,30 +29,25 @@ namespace hpx { namespace components
     class managed_component_base 
       : public detail::managed_component_tag, boost::noncopyable
     {
-    private:
-        static component_type value;
-
     public:
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
         typedef managed_component<Component, Wrapper> wrapping_type;
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return value;
-        }
-        static void set_component_type(component_type type)
-        {
-            value = type;
-        }
-
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
         void finalize() {}
+
+        // This exposes the component type
+        static component_type get_component_type()
+        {
+            return components::get_component_type<Component>();
+        }
+        static void set_component_type(component_type type)
+        {
+            components::set_component_type<Component>(type);
+        }
 
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
@@ -64,11 +60,6 @@ namespace hpx { namespace components
     private:
         mutable naming::id_type id_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper>
-    component_type managed_component_base<Component, Wrapper>::value = 
-        component_invalid;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -91,7 +82,7 @@ namespace hpx { namespace components
         {
             // ensure thread-safe initialization
             util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
-                heap(Component::get_component_type());
+                heap(components::get_component_type<Component>());
             return heap.get(get_runtime_instance_number());
         }
 
@@ -182,18 +173,6 @@ namespace hpx { namespace components
         ///        destructed
         void finalize() {}  // finalize the wrapped component in our destructor
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return wrapped_type::get_component_type();
-        }
-        static void set_component_type(component_type t)
-        {
-            wrapped_type::set_component_type(t);
-        }
-
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
         Component* get()
@@ -210,7 +189,8 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
+                     << components::get_component_type_name(
+                        components::get_component_type<wrapped_type>())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 
@@ -224,7 +204,8 @@ namespace hpx { namespace components
             if (0 == component_) {
                 HPX_OSSTREAM strm;
                 strm << "component is NULL (" 
-                     << components::get_component_type_name(get_component_type())
+                     << components::get_component_type_name(
+                        components::get_component_type<wrapped_type>())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 

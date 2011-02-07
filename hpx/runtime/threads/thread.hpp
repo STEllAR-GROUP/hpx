@@ -140,12 +140,6 @@ namespace hpx { namespace threads { namespace detail
         ~thread() 
         {}
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static components::component_type get_component_type();
-        static void set_component_type(components::component_type);
-
     public:
         thread_state_enum execute()
         {
@@ -649,7 +643,7 @@ namespace hpx { namespace threads
         typedef boost::object_pool<threads::detail::thread> detail_heap_type;
 
         thread_pool() 
-          : pool_(threads::detail::thread::get_component_type()) 
+          : pool_(components::get_component_type<threads::detail::thread>()) 
         {}
 
         heap_type pool_;

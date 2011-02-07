@@ -48,4 +48,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<unsigned long>::get_value_action,
     get_value_action_long);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<unsigned long>);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<unsigned long>,
+    hpx::components::component_base_lco_with_value);

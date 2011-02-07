@@ -32,17 +32,6 @@ namespace hpx { namespace components { namespace server
             memory_load64 = 7,        ///< load a 64 bit value from a memory location
         };
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type() 
-        { 
-            return components::component_memory; 
-        }
-        static void set_component_type(component_type) 
-        { 
-        }
-
         // constructor
         memory() 
         {}
@@ -151,7 +140,6 @@ namespace hpx { namespace components { namespace server
         > load64_action;
 
     };
-
 }}}
 
 #endif

@@ -45,17 +45,6 @@ namespace hpx { namespace lcos
         // component
         typedef components::managed_component<base_lco> wrapping_type;
 
-        // This is the component id. Every component needs to have a function
-        // \a get_component_type() which is used by the generic action 
-        // implementation to associate this component with a given action.
-        static components::component_type get_component_type() 
-        { 
-            return components::component_base_lco; 
-        }
-        static void set_component_type(components::component_type) 
-        { 
-        }
-
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco() {}
@@ -144,14 +133,6 @@ namespace hpx { namespace lcos
         // managed_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
-
-        // This is the component id. Every component needs to have a function
-        // \a get_component_type() which is used by the generic action 
-        // implementation to associate this component with a given action.
-        static components::component_type get_component_type() 
-        { 
-            return components::component_base_lco_with_value; 
-        }
 
         /// The \a function set_result_nonvirt is called whenever a 
         /// \a set_result_action is applied on a instance of a LCO. This 

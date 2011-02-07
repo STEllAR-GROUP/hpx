@@ -98,18 +98,6 @@ namespace hpx { namespace components { namespace server { namespace detail
         /// memory block
         bool is_master() const { return 0 != wrapper_; }
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return component_memory_block;
-        }
-        static void set_component_type(component_type t)
-        {
-            BOOST_ASSERT(false);    // this shouldn't be ever called
-        }
-
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
         {
@@ -479,18 +467,6 @@ namespace hpx { namespace components { namespace server
             return get();
         }
 
-        // This is the component id. Every component needs to have an embedded
-        // enumerator 'value' which is used by the generic action implementation
-        // to associate this component with a given action.
-        static component_type get_component_type()
-        {
-            return wrapped_type::get_component_type();
-        }
-        static void set_component_type(component_type t)
-        {
-            wrapped_type::set_component_type(t);
-        }
-
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef components::detail::wrapper_heap_list<
@@ -503,7 +479,7 @@ namespace hpx { namespace components { namespace server
         {
             // ensure thread-safe initialization
             util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
-                heap(get_component_type());
+                heap(component_memory_block);
             return heap.get(get_runtime_instance_number());
         }
 

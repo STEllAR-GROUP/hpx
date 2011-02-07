@@ -185,10 +185,6 @@ struct test_lock_times_out_if_other_thread_has_lock
         &this_type::locking_thread_through_constructor
     > locking_thread_through_constructor_action;
 
-    static components::component_type get_component_type() 
-        { return components::component_invalid; }
-    static void set_component_type(components::component_type) {}
-
     void operator()()
     {
         do_test<locking_thread_action>();
@@ -196,7 +192,9 @@ struct test_lock_times_out_if_other_thread_has_lock
     }
 };
 
-HPX_DEFINE_GET_COMPONENT_TYPE(test_lock_times_out_if_other_thread_has_lock<lcos::timed_mutex>);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    test_lock_times_out_if_other_thread_has_lock<lcos::timed_mutex>,
+    hpx::components::component_invalid);
 HPX_REGISTER_ACTION_EX(
     test_lock_times_out_if_other_thread_has_lock<lcos::timed_mutex>::locking_thread_action,
     test_lock_times_out_if_other_thread_has_lock_time_mutex_locking_thread_action);
@@ -204,7 +202,9 @@ HPX_REGISTER_ACTION_EX(
     test_lock_times_out_if_other_thread_has_lock<lcos::timed_mutex>::locking_thread_through_constructor_action,
     test_lock_times_out_if_other_thread_has_lock_time_mutex_locking_thread_through_constructor_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>,
+    hpx::components::component_invalid);
 HPX_REGISTER_ACTION_EX(
     test_lock_times_out_if_other_thread_has_lock<lcos::recursive_timed_mutex>::locking_thread_action,
     test_lock_times_out_if_other_thread_has_lock_recursive_time_mutex_locking_thread_action);

@@ -84,41 +84,28 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
-    struct extract_component_type_from_component
+    struct component_type_database
     {
-        typedef component_type type;
+        static component_type value;
 
-        static type call()
-        {
-            return Component::get_component_type();
-        }
+        static HPX_ALWAYS_EXPORT component_type get();
+        static HPX_ALWAYS_EXPORT void set(component_type type);
     }; 
-
-    template <typename Component, typename Enable = void>
-    struct assign_component_type_to_component
-    {
-        typedef void type;
-
-        static void call(component_type type)
-        {
-            return Component::set_component_type(type);
-        }
-    }; 
- 
+    
+    template <typename Component, typename Enable>
+    component_type component_type_database<Component, Enable>::value = component_invalid;
+    
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    HPX_ALWAYS_EXPORT typename
-    extract_component_type_from_component<Component>::type
-    get_component_type()
+    inline component_type get_component_type()
     {
-        return extract_component_type_from_component<Component>::call();
+        return component_type_database<Component>::get();
     }
 
     template <typename Component>
-    HPX_ALWAYS_EXPORT typename
-    assign_component_type_to_component<Component>::type
-    set_component_type(component_type type)
+    inline void set_component_type(component_type type)
     {
-        return assign_component_type_to_component<Component>::call(type);
+        return component_type_database<Component>::set(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -136,8 +123,29 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// This macro is deprecated now.
-#define HPX_DEFINE_GET_COMPONENT_TYPE(component)
+#define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        component_type component_type_database<component>::get()              \
+            { return value; }                                                 \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        void component_type_database<component>::set(component_type t)        \
+            { value = t; }                                                    \
+    }}
+    /**/
+
+#define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        component_type component_type_database<component>::get()              \
+            { return type; }                                                  \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        void component_type_database<component>::set(component_type)          \
+            { BOOST_ASSERT(false); }                                          \
+    }}
+    /**/
 
 #endif
 

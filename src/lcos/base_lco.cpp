@@ -76,15 +76,38 @@ HPX_REGISTER_ACTION_EX(
     get_value_action_void);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::naming::gid_type>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::naming::id_type>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::section>);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<hpx::util::unused_type>);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco, hpx::components::component_base_lco);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>,
+    hpx::components::component_base_lco_with_value);
+typedef 
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::naming::gid_type>
+remote_id_type_retval;
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    remote_id_type_retval,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<double>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<int>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<hpx::util::section>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<hpx::util::unused_type>,
+    hpx::components::component_base_lco_with_value);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Barrier
