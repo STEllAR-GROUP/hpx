@@ -16,19 +16,6 @@
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    // This does not really belong here, but we put it into this spot for the 
-    // lack of a better one :-P
-    #if !defined(BOOST_INTEL) && !defined(__clang__)
-    inline manage_object_action_base const& 
-    manage_object_action_base::get_instance() const
-    {
-        static manage_object_action<boost::uint8_t> const instance =
-                manage_object_action<boost::uint8_t>();
-        return instance;
-    }
-    #endif
-
-    ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
         parcelset::parcelhandler& parcel_handler, naming::address const& dest)

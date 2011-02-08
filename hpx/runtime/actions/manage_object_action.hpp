@@ -123,7 +123,6 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int) {}
     };
         
-    #if defined(BOOST_INTEL) || defined(__clang__) 
     inline manage_object_action_base const& 
     manage_object_action_base::get_instance() const
     {
@@ -131,7 +130,6 @@ namespace hpx { namespace actions
                 manage_object_action<boost::uint8_t>();
         return instance;
     }
-    #endif
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
