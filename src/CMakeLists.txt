@@ -394,7 +394,7 @@ set (hpxlib_SOURCES
 # add source file from coroutine library 
 if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX)
     OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-    OR "${CMAKE_CXX_COMPILER}" MATCHES "clang") # gcc, intel or clang 
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PathScale")
     SET(hpxlib_SOURCES 
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)

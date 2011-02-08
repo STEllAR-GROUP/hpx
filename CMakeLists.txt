@@ -178,7 +178,7 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX)
     OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-    OR "${CMAKE_CXX_COMPILER}" MATCHES "clang") # gcc, intel or clang 
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PathScale")
     add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
     add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
 
