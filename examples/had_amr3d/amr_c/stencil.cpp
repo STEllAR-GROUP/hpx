@@ -880,18 +880,189 @@ namespace hpx { namespace components { namespace amr
                     }
                   }
 
+                  int anchorlist[27];
+                  int anchor_index[27];
+                  int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+                  int interp_options[30] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+                  int counter = 0;
                   if ( !found ) {
-//                     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
-//                     std::cout << " Available data: " << std::endl;
-//                     for (int ii=0;ii<val.size();ii++) {
-//                       std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
-//                       std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
-//                       std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
-//                       std::cout << " " << std::endl;
-//                     }
-//                     BOOST_ASSERT(false);
-                  }
+                    // find the interpolating the anchors needed
+                    for (int lk=-1;lk<2;lk=lk+2) {
+                      had_double_type zn = zt + lk*dx;
+                    for (int lj=-1;lj<2;lj=lj+2) {
+                      had_double_type yn = yt + lj*dx;
+                    for (int li=-1;li<2;li=li+2) {
+                      had_double_type xn = xt + li*dx;
+                      for (int ii=0;ii<val.size();ii++) {
+                        if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[par->granularity-1]) &&
+                             floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[par->granularity-1]) &&
+                             floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[par->granularity-1]) ) {
+                          anchorlist[counter] = ii;
+                          if (li == -1 && lj == -1 && lk == -1 ) {
+                            has_corner[0] = 1;
+                            anchor_index[0] = counter;
+                          }
+                          if (li ==  1 && lj == -1 && lk == -1 ) {
+                            has_corner[1] = 1;
+                            anchor_index[1] = counter;
+                          }
+                          if (li ==  1 && lj ==  1 && lk == -1 ) {
+                            has_corner[2] = 1;
+                            anchor_index[2] = counter;
+                          }
+                          if (li == -1 && lj ==  1 && lk == -1 ) {
+                            has_corner[3] = 1;
+                            anchor_index[3] = counter;
+                          }
+                          if (li == -1 && lj == -1 && lk ==  1 ) {
+                            has_corner[4] = 1;
+                            anchor_index[4] = counter;
+                          }
+                          if (li ==  1 && lj == -1 && lk ==  1 ) {
+                            has_corner[5] = 1;
+                            anchor_index[5] = counter;
+                          }
+                          if (li ==  1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[6] = 1;
+                            anchor_index[6] = counter;
+                          }
+                          if (li == -1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[7] = 1;
+                            anchor_index[7] = counter;
+                          }
+                          counter++;
+                        }
+                      }
+                    } } }
 
+                    if ( counter == 8 ) {
+                      // all interpolation anchors found -- interpolate
+                      found = true;
+                    } else { 
+                      for (int lk=-1;lk<2;lk++) {
+                        had_double_type zn = zt + lk*dx;
+                      for (int lj=-1;lj<2;lj++) {
+                        had_double_type yn = yt + lj*dx;
+                      for (int li=-1;li<2;li++) {
+                        had_double_type xn = xt + li*dx;
+                        // let's not duplicate what we already know
+                        if ( li == 0 || lj == 0 || lk == 0 ) {
+                          for (int ii=0;ii<val.size();ii++) {
+                            if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[par->granularity-1]) &&
+                                 floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[par->granularity-1]) &&
+                                 floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[par->granularity-1]) ) {
+                              anchorlist[counter] = ii;
+                              if (li == -1 && lj == -1 && lk == 0 ) {
+                                has_corner[8]   = 1;
+                                anchor_index[8] = counter;
+                              }
+                              if (li ==  1 && lj == -1 && lk == 0 ) {
+                                has_corner[9]  = 1;
+                                anchor_index[9] = counter;
+                              }
+                              if (li ==  1 && lj ==  1 && lk == 0 ) {
+                                has_corner[10] = 1;
+                                anchor_index[10] = counter;
+                              }
+                              if (li == -1 && lj ==  1 && lk == 0 ) {
+                                has_corner[11] = 1;
+                                anchor_index[11] = counter;
+                              }
+                          
+                              if (li == 0 && lj == -1 && lk == -1 ) {
+                                has_corner[12] = 1;
+                                anchor_index[12] = counter;
+                              }
+                              if (li == 1 && lj == 0 && lk == -1 ) {
+                                has_corner[13] = 1;
+                                anchor_index[13] = counter;
+                              }
+                              if (li == 0 && lj == 1 && lk == -1 ) {
+                                has_corner[14] = 1;
+                                anchor_index[14] = counter;
+                              }
+                              if (li == -1 && lj == 0 && lk == -1 ) {
+                                has_corner[15] = 1;
+                                anchor_index[15] = counter;
+                              }
+
+                              if (li == 0 && lj == -1 && lk == 0 ) {
+                                has_corner[16] = 1;
+                                anchor_index[16] = counter;
+                              }
+                              if (li == 1 && lj == 0 && lk ==  0 ) {
+                                has_corner[17] = 1;
+                                anchor_index[17] = counter;
+                              }
+                              if (li == 0 && lj == 1 && lk ==  0 ) {
+                                has_corner[18] = 1;
+                                anchor_index[18] = counter;
+                              }
+                              if (li == -1 && lj == 0 && lk == 0 ) {
+                                has_corner[19] = 1;
+                                anchor_index[19] = counter;
+                              }
+
+                              if (li == 0 && lj == -1 && lk == 1 ) {
+                                has_corner[20] = 1;
+                                anchor_index[20] = counter;
+                              }
+                              if (li == 1 && lj == 0 && lk ==  1 ) {
+                                has_corner[21] = 1;
+                                anchor_index[21] = counter;
+                              }
+                              if (li == 0 && lj == 1 && lk ==  1 ) {
+                                has_corner[22] = 1;
+                                anchor_index[22] = counter;
+                              }
+                              if (li == -1 && lj == 0 && lk == 1 ) {
+                                has_corner[23] = 1;
+                                anchor_index[23] = counter;
+                              }
+
+                              if (li == 0 && lj == 0 && lk == 1 ) {
+                                has_corner[24] = 1;
+                                anchor_index[24] = counter;
+                              }
+
+                              if (li == 0 && lj == 0 && lk == -1 ) {
+                                has_corner[25] = 1;
+                                anchor_index[25] = counter;
+                              }
+
+                              counter++;
+                            }
+                          }
+                        }
+                      } } } 
+
+
+                      // Now we have the complete picture.  Determine what the interpolation options are and proceed.  
+                      if ( has_corner[0] != 1 ) {
+                        interp_options[4] = -1;
+                        interp_options[2] = -1;
+                        interp_options[0] = -1;
+                        interp_options[14] = -1;
+                        interp_options[17] = -1;
+                        interp_options[25] = -1;
+                        interp_options[22] = -1;
+                      }
+
+                    }
+
+                  } // end if found
+
+                //  if ( !found ) {
+                //     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
+                //     std::cout << " Available data: " << std::endl;
+                //     for (int ii=0;ii<val.size();ii++) {
+                //       std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
+                //       std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
+                //       std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
+                //       std::cout << " " << std::endl;
+                //     }
+                //     BOOST_ASSERT(false);
+                //  }
                 }
               } } }
               // }}}
