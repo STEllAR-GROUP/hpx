@@ -82,9 +82,21 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &resultval,
                                       int index, Parameter const& par);
 
+         static void findindex(had_double_type &x,had_double_type &y, had_double_type &z,
+                       access_memory_block<stencil_data> &val,
+                       int &xindex,int &yindex,int&zindex);
 
         had_double_type interp_linear(had_double_type y1, had_double_type y2,
                                            had_double_type x, had_double_type x1, had_double_type x2);
+
+        void special_interp2d_xy(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      access_memory_block<stencil_data> &val2,
+                                      access_memory_block<stencil_data> &val3,
+                                      access_memory_block<stencil_data> &resultval,
+                                      int index, Parameter const& par);
+
 
     private:
         std::size_t numsteps_;

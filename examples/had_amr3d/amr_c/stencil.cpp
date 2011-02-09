@@ -68,6 +68,38 @@ namespace hpx { namespace components { namespace amr
       }
     }
 
+    inline void 
+    stencil::findindex(had_double_type &x,had_double_type &y, had_double_type &z,
+                       access_memory_block<stencil_data> &val,
+                       int &xindex,int &yindex,int &zindex) {
+      int nx = val->x_.size();
+      int ny = val->y_.size();
+      int nz = val->z_.size();
+      // find the index that has this point
+      int i;
+      for (i=0;i<nx;i++) {
+        if ( floatcmp(x,val->x_[i]) == 1 ) {
+          xindex = i;
+          break;
+        }
+      }      
+      for (i=0;i<ny;i++) {
+        if ( floatcmp(y,val->y_[i]) == 1 ) {
+          yindex = i;
+          break;
+        }
+      }      
+      for (i=0;i<nz;i++) {
+        if ( floatcmp(z,val->z_[i]) == 1 ) {
+          zindex = i;
+          break;
+        }
+      }      
+      BOOST_ASSERT(xindex >= 0 && yindex >= 0 && zindex >= 0);
+
+      return;
+    }
+
     inline std::size_t stencil::findlevel3D(std::size_t step, std::size_t item, 
                                             std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
     {
@@ -329,196 +361,35 @@ namespace hpx { namespace components { namespace amr
       // find the index points {{{
       li = -1; lj = -1; lk = -1;
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[0];i++) {
-        if ( floatcmp(x[0],val0->x_[i]) == 1 ) {
-          xindex[0] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[0];i++) {
-        if ( floatcmp(y[0],val0->y_[i]) == 1 ) {
-          yindex[0] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[0];i++) {
-        if ( floatcmp(z[0],val0->z_[i]) == 1 ) {
-          zindex[0] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[0] >= 0 && yindex[0] >= 0 && zindex[0] >= 0);
-
+      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0]);
 
       li =  1; lj = -1; lk = -1;
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[1];i++) {
-        if ( floatcmp(x[1],val1->x_[i]) == 1 ) {
-          xindex[1] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[1];i++) {
-        if ( floatcmp(y[1],val1->y_[i]) == 1 ) {
-          yindex[1] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[1];i++) {
-        if ( floatcmp(z[1],val1->z_[i]) == 1 ) {
-          zindex[1] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[1] >= 0 && yindex[1] >= 0 && zindex[1] >= 0);
+      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1]);
 
       li =  1; lj =  1; lk = -1;
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[2];i++) {
-        if ( floatcmp(x[2],val2->x_[i]) == 1 ) {
-          xindex[2] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[2];i++) {
-        if ( floatcmp(y[2],val2->y_[i]) == 1 ) {
-          yindex[2] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[2];i++) {
-        if ( floatcmp(z[2],val2->z_[i]) == 1 ) {
-          zindex[2] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[2] >= 0 && yindex[2] >= 0 && zindex[2] >= 0);
+      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2]);
 
       li = -1; lj =  1; lk = -1;
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[3];i++) {
-        if ( floatcmp(x[3],val3->x_[i]) == 1 ) {
-          xindex[3] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[3];i++) {
-        if ( floatcmp(y[3],val3->y_[i]) == 1 ) {
-          yindex[3] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[3];i++) {
-        if ( floatcmp(z[3],val3->z_[i]) == 1 ) {
-          zindex[3] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[3] >= 0 && yindex[3] >= 0 && zindex[3] >= 0);
+      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3]);
 
       li = -1; lj = -1; lk =  1;
       z[4] = zt + lk*dx; y[4] = yt + lj*dx; x[4] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[4];i++) {
-        if ( floatcmp(x[4],val4->x_[i]) == 1 ) {
-          xindex[4] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[4];i++) {
-        if ( floatcmp(y[4],val4->y_[i]) == 1 ) {
-          yindex[4] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[4];i++) {
-        if ( floatcmp(z[4],val4->z_[i]) == 1 ) {
-          zindex[4] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[4] >= 0 && yindex[4] >= 0 && zindex[4] >= 0);
+      findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4]);
 
       li =  1; lj = -1; lk =  1;
       z[5] = zt + lk*dx; y[5] = yt + lj*dx; x[5] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[5];i++) {
-        if ( floatcmp(x[5],val5->x_[i]) == 1 ) {
-          xindex[5] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[5];i++) {
-        if ( floatcmp(y[5],val5->y_[i]) == 1 ) {
-          yindex[5] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[5];i++) {
-        if ( floatcmp(z[5],val5->z_[i]) == 1 ) {
-          zindex[5] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[5] >= 0 && yindex[5] >= 0 && zindex[5] >= 0);
+      findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5]);
 
       li =  1; lj =  1; lk =  1;
       z[6] = zt + lk*dx; y[6] = yt + lj*dx; x[6] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[6];i++) {
-        if ( floatcmp(x[6],val6->x_[i]) == 1 ) {
-          xindex[6] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[6];i++) {
-        if ( floatcmp(y[6],val6->y_[i]) == 1 ) {
-          yindex[6] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[6];i++) {
-        if ( floatcmp(z[6],val6->z_[i]) == 1 ) {
-          zindex[6] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[6] >= 0 && yindex[6] >= 0 && zindex[6] >= 0);
+      findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6]);
 
       li = -1; lj =  1; lk =  1;
       z[7] = zt + lk*dx; y[7] = yt + lj*dx; x[7] = xt + li*dx;
-
-      // find the index that has this point
-      for (i=0;i<nx[7];i++) {
-        if ( floatcmp(x[7],val7->x_[i]) == 1 ) {
-          xindex[7] = i;
-          break;
-        }
-      }      
-      for (i=0;i<ny[7];i++) {
-        if ( floatcmp(y[7],val7->y_[i]) == 1 ) {
-          yindex[7] = i;
-          break;
-        }
-      }      
-      for (i=0;i<nz[7];i++) {
-        if ( floatcmp(z[7],val7->z_[i]) == 1 ) {
-          zindex[7] = i;
-          break;
-        }
-      }      
-      BOOST_ASSERT(xindex[7] >= 0 && yindex[7] >= 0 && zindex[7] >= 0);
+      findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7]);
       // }}}
 
       had_double_type tmp2[2][2][num_eqns];
@@ -567,6 +438,69 @@ namespace hpx { namespace components { namespace amr
       return;
     }
     // }}}
+
+    // special interp 2d {{{
+    void stencil::special_interp2d_xy(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      access_memory_block<stencil_data> &val2, 
+                                      access_memory_block<stencil_data> &val3, 
+                                      access_memory_block<stencil_data> &resultval,
+                                      int index, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[4],y[4],z[4];  
+      int nx[4],ny[4],nz[4];
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[4] = {-1,-1,-1,-1};
+      int yindex[4] = {-1,-1,-1,-1};
+      int zindex[4] = {-1,-1,-1,-1};
+
+      nx[0] = val0->x_.size(); ny[0] = val0->y_.size(); nz[0] = val0->z_.size();
+      nx[1] = val1->x_.size(); ny[1] = val1->y_.size(); nz[1] = val1->z_.size();
+      nx[2] = val2->x_.size(); ny[2] = val2->y_.size(); nz[2] = val2->z_.size();
+      nx[3] = val3->x_.size(); ny[3] = val3->y_.size(); nz[3] = val3->z_.size();
+
+      li = -1; lj = -1; lk = 0;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0]);
+
+      li =  1; lj = -1; lk = 0;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1]);
+
+      li =  1; lj =  1; lk = 0;
+      z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
+      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2]);
+
+      li = -1; lj =  1; lk = 0;
+      z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
+      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3]);
+
+      had_double_type tmp3[2][num_eqns];
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate x
+        tmp3[0][ll] = interp_linear(val0->value_[xindex[0]+nx[0]*(yindex[0]+ny[0]*zindex[0])].phi[0][ll],
+                                    val1->value_[xindex[1]+nx[1]*(yindex[1]+ny[1]*zindex[1])].phi[0][ll], 
+                                    xt,
+                                    val0->x_[xindex[0]],val1->x_[xindex[1]]);
+
+        tmp3[1][ll] = interp_linear(val3->value_[xindex[3]+nx[3]*(yindex[3]+ny[3]*zindex[3])].phi[3][ll],
+                                    val2->value_[xindex[2]+nx[2]*(yindex[2]+ny[2]*zindex[2])].phi[2][ll], 
+                                    xt,
+                                    val3->x_[xindex[3]],val2->x_[xindex[2]]);
+
+        // interpolate y
+        resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                                            yt,
+                                                            val0->y_[yindex[0]],val2->y_[yindex[2]]);
+      }
+
+      return;
+    } // }}}
         
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
@@ -1288,6 +1222,9 @@ namespace hpx { namespace components { namespace amr
                     if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
                       // 2D interp
                       found = true;
+                     // special_interp2d_xy(xt,yt,zt,dx,
+                     //                     val[anchor_index[8]],val[anchor_index[9]],
+                     //                     val[anchor_index[10]],val[anchor_index[11]],resultval,i+nx*(j+ny*k),par);
                     } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
                       // 2D interp
                       found = true;
