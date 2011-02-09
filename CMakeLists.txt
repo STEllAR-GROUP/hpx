@@ -65,6 +65,7 @@ endif()
 # Enable testing
 if("$ENV{HPX_TESTS}" STREQUAL "all")
     #set(CMAKE_SKIP_RPATH TRUE)
+    set(HPX_TESTS TRUE CACHE BOOL "Generate tests")
     ENABLE_TESTING()
 endif("$ENV{HPX_TESTS}" STREQUAL "all")
 
