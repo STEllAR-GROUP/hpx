@@ -70,6 +70,19 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &resultval,
                                       int index, Parameter const& par);
 
+        void special_interp3d(had_double_type &x,had_double_type &y, had_double_type &z,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0,
+                                      access_memory_block<stencil_data> &val1,
+                                      access_memory_block<stencil_data> &val2,
+                                      access_memory_block<stencil_data> &val3,
+                                      access_memory_block<stencil_data> &val4,
+                                      access_memory_block<stencil_data> &val5,
+                                      access_memory_block<stencil_data> &val6,
+                                      access_memory_block<stencil_data> &val7,
+                                      access_memory_block<stencil_data> &resultval,
+                                      int index, Parameter const& par);
+
+
         had_double_type interp_linear(had_double_type y1, had_double_type y2,
                                            had_double_type x, had_double_type x1, had_double_type x2);
 
