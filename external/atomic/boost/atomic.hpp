@@ -9,6 +9,7 @@
 
 #include <cstddef>
 
+#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/memory_order.hpp>
 #include <boost/atomic/platform.hpp>

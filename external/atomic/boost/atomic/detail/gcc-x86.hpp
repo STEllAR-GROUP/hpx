@@ -382,7 +382,7 @@ public:
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-            : "D" ((long)desired), "c" ((long) ((desired)>>32)), "S" (&i), "0" (prev)
+            : "D" ((long)desired), "c" ((long)(desired>>32)), "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
