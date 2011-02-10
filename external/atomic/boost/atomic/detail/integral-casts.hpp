@@ -16,7 +16,9 @@ template<typename T>
 class platform_atomic<T, 1> : private platform_atomic_integral<boost::uint8_t> {
 public:
     typedef platform_atomic_integral<boost::uint8_t> super;
-// 	typedef union { T e; boost::uint8_t i;} conv;
+#if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
+    typedef union { T e; boost::uint8_t i;} conv;
+#endif
     
     platform_atomic() {}
     explicit platform_atomic(T t) : super(to_integral(t))
@@ -86,8 +88,10 @@ template<typename T>
 class platform_atomic<T, 2> : private platform_atomic_integral<boost::uint16_t> {
 public:
     typedef platform_atomic_integral<boost::uint16_t> super;
-// 	typedef union { T e; boost::uint16_t i;} conv;
-    
+#if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
+    typedef union { T e; boost::uint16_t i;} conv;
+#endif
+
     platform_atomic() {}
     explicit platform_atomic(T t) : super(to_integral(t))
     {
@@ -156,8 +160,10 @@ template<typename T>
 class platform_atomic<T, 4> : private platform_atomic_integral<boost::uint32_t> {
 public:
     typedef platform_atomic_integral<boost::uint32_t> super;
-// 	typedef union { T e; boost::uint32_t i;} conv;
-    
+#if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
+    typedef union { T e; boost::uint32_t i;} conv;
+#endif
+
     platform_atomic() {}
     explicit platform_atomic(T t) : super(to_integral(t))
     {
@@ -226,8 +232,10 @@ template<typename T>
 class platform_atomic<T, 8> : private platform_atomic_integral<boost::uint64_t> {
 public:
     typedef platform_atomic_integral<boost::uint64_t> super;
-// 	typedef union { T e; boost::uint64_t i;} conv;
-    
+#if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
+    typedef union { T e; boost::uint64_t i;} conv;
+#endif
+
     platform_atomic() {}
     explicit platform_atomic(T t) : super(to_integral(t))
     {

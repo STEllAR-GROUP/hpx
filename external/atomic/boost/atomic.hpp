@@ -190,8 +190,10 @@ typedef atomic<unsigned long> atomic_ulong;
 typedef atomic<long> atomic_long;
 typedef atomic<boost::uint64_t> atomic_uint64_t;
 typedef atomic<boost::int64_t> atomic_int64_t;
-typedef atomic<unsigned long long> atomic_ullong;
-typedef atomic<long long> atomic_llong;
+#ifdef BOOST_HAS_LONG_LONG
+typedef atomic<boost::ulong_long_type> atomic_ullong;
+typedef atomic<boost::long_long_type> atomic_llong;
+#endif
 typedef atomic<void*> atomic_address;
 typedef atomic<bool> atomic_bool;
 
