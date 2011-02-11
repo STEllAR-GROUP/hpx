@@ -68,16 +68,16 @@ namespace hpx { namespace components { namespace amr { namespace server
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
-            for (i=0;i<val.granularity;i++) {
+            for (i=0;i<par->granularity;i++) {
               x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
-            for (i=0;i<val.granularity;i++) {
+            for (i=0;i<par->granularity;i++) {
               x.push_back(val.y_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
-            for (i=0;i<val.granularity;i++) {
+            for (i=0;i<par->granularity;i++) {
               x.push_back(val.z_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
-            for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
+            for (i=0;i<par->granularity*par->granularity*par->granularity;i++) {
               phi.push_back(val.value_[i].phi[0][0]);
               d1phi.push_back(val.value_[i].phi[0][1]);
               d2phi.push_back(val.value_[i].phi[0][2]);

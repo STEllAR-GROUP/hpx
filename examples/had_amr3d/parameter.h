@@ -57,6 +57,7 @@ struct Par {
       int output_level;
       int PP;
       int granularity;
+      int gw;
       std::vector<std::size_t> rowsize,level_row;
       std::vector<std::size_t> level_begin, level_end;
       std::vector<had_double_type> min;

@@ -71,30 +71,34 @@ namespace hpx { namespace components { namespace amr
     inline void 
     stencil::findindex(had_double_type &x,had_double_type &y, had_double_type &z,
                        access_memory_block<stencil_data> &val,
-                       int &xindex,int &yindex,int &zindex) {
-      int nx = val->x_.size();
-      int ny = val->y_.size();
-      int nz = val->z_.size();
+                       int &xindex,int &yindex,int &zindex,int n) {
+
       // find the index that has this point
       int i;
-      for (i=0;i<nx;i++) {
+      for (i=0;i<n;i++) {
         if ( floatcmp(x,val->x_[i]) == 1 ) {
           xindex = i;
           break;
         }
       }      
-      for (i=0;i<ny;i++) {
+      for (i=0;i<n;i++) {
         if ( floatcmp(y,val->y_[i]) == 1 ) {
           yindex = i;
           break;
         }
       }      
-      for (i=0;i<nz;i++) {
+      for (i=0;i<n;i++) {
         if ( floatcmp(z,val->z_[i]) == 1 ) {
           zindex = i;
           break;
         }
       }      
+      if ( xindex < 0 || yindex < 0 || zindex < 0 ) {
+        std::cout << " TEST " << xindex << " " << yindex << " " << zindex << std::endl;
+        for (i=0;i<n;i++) {
+          std::cout << " TEST x " << x << " " << val->x_[i] << std::endl;
+        }
+      }
       BOOST_ASSERT(xindex >= 0 && yindex >= 0 && zindex >= 0);
 
       return;
@@ -159,31 +163,34 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &resultval,
                                       int index, Parameter const& par) {
 
-      int ii,jj,kk;
+      int ii = -1;
+      int jj = -1;
+      int kk = -1;
 
       // set up index bounds
-      for (int i=0;i<val->x_.size();i++) {
+      for (int i=0;i<par->granularity;i++) {
         if ( floatcmp_ge(val->x_[i],x) ) {
           ii = i;
           break;
         }         
       }
-      for (int i=0;i<val->y_.size();i++) {
+      for (int i=0;i<par->granularity;i++) {
         if ( floatcmp_ge(val->y_[i],y) ) {
           jj = i;
           break;
         }         
       }
-      for (int i=0;i<val->z_.size();i++) {
+      for (int i=0;i<par->granularity;i++) {
         if ( floatcmp_ge(val->z_[i],z) ) {
           kk = i;
           break;
         }         
       }
+      BOOST_ASSERT(ii > -1 && jj > -1 && kk > -1);
 
-      int nx = val->x_.size();
-      int ny = val->y_.size();
-      int nz = val->z_.size();
+      int nx = par->granularity;
+      int ny = par->granularity;
+      int nz = par->granularity;
 
       bool no_interp_x = false;
       bool no_interp_y = false;
@@ -207,7 +214,7 @@ namespace hpx { namespace components { namespace amr
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->pvalue_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+          resultval->value_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
         }
         return;
       }
@@ -274,7 +281,7 @@ namespace hpx { namespace components { namespace amr
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->pvalue_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
+          resultval->value_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
                                                               val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
                                                               x,
                                                               val->x_[ii-1],val->x_[ii]);
@@ -301,7 +308,7 @@ namespace hpx { namespace components { namespace amr
         }
       } else if ( !no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+          resultval->value_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
                                                               val->y_[jj-1],val->y_[jj]);
         }
         return;
@@ -313,7 +320,7 @@ namespace hpx { namespace components { namespace amr
       // interpolate in z {{{
       if ( !no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+          resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                               z,
                                                               val->z_[kk-1],val->z_[kk]);
         } 
@@ -342,54 +349,47 @@ namespace hpx { namespace components { namespace amr
 
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[8],y[8],z[8];  
-      int nx[8],ny[8],nz[8];
       int li,lj,lk;
       int i,j,k;
       int xindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int yindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int zindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
 
-      nx[0] = val0->x_.size(); ny[0] = val0->y_.size(); nz[0] = val0->z_.size();
-      nx[1] = val1->x_.size(); ny[1] = val1->y_.size(); nz[1] = val1->z_.size();
-      nx[2] = val2->x_.size(); ny[2] = val2->y_.size(); nz[2] = val2->z_.size();
-      nx[3] = val3->x_.size(); ny[3] = val3->y_.size(); nz[3] = val3->z_.size();
-      nx[4] = val4->x_.size(); ny[4] = val4->y_.size(); nz[4] = val4->z_.size();
-      nx[5] = val5->x_.size(); ny[5] = val5->y_.size(); nz[5] = val5->z_.size();
-      nx[6] = val6->x_.size(); ny[6] = val6->y_.size(); nz[6] = val6->z_.size();
-      nx[7] = val7->x_.size(); ny[7] = val7->y_.size(); nz[7] = val7->z_.size();
+ 
+      int n = par->granularity;
 
       // find the index points {{{
       li = -1; lj = -1; lk = -1;
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
-      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0]);
+      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
 
       li =  1; lj = -1; lk = -1;
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
-      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1]);
+      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
 
       li =  1; lj =  1; lk = -1;
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
-      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2]);
+      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
 
       li = -1; lj =  1; lk = -1;
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
-      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3]);
+      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
 
       li = -1; lj = -1; lk =  1;
       z[4] = zt + lk*dx; y[4] = yt + lj*dx; x[4] = xt + li*dx;
-      findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4]);
+      findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4],n);
 
       li =  1; lj = -1; lk =  1;
       z[5] = zt + lk*dx; y[5] = yt + lj*dx; x[5] = xt + li*dx;
-      findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5]);
+      findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5],n);
 
       li =  1; lj =  1; lk =  1;
       z[6] = zt + lk*dx; y[6] = yt + lj*dx; x[6] = xt + li*dx;
-      findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6]);
+      findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6],n);
 
       li = -1; lj =  1; lk =  1;
       z[7] = zt + lk*dx; y[7] = yt + lj*dx; x[7] = xt + li*dx;
-      findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7]);
+      findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7],n);
       // }}}
 
       had_double_type tmp2[2][2][num_eqns];
@@ -397,23 +397,23 @@ namespace hpx { namespace components { namespace amr
 
       // interp x
       for (int ll=0;ll<num_eqns;ll++) {
-        tmp2[0][0][ll] = interp_linear(val0->value_[xindex[0]+nx[0]*(yindex[0]+ny[0]*zindex[0])].phi[0][ll],
-                                       val1->value_[xindex[1]+nx[1]*(yindex[1]+ny[1]*zindex[1])].phi[0][ll],
+        tmp2[0][0][ll] = interp_linear(val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll],
+                                       val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll],
                                              xt,
                                        val0->x_[xindex[0]],val1->x_[xindex[0]]);
 
-        tmp2[1][0][ll] = interp_linear(val3->value_[xindex[3]+nx[3]*(yindex[3]+ny[3]*zindex[3])].phi[0][ll],
-                                       val2->value_[xindex[2]+nx[2]*(yindex[2]+ny[2]*zindex[2])].phi[0][ll],
+        tmp2[1][0][ll] = interp_linear(val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll],
+                                       val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll],
                                              xt,
                                        val3->x_[xindex[3]],val2->x_[xindex[2]]);
 
-        tmp2[0][1][ll] = interp_linear(val4->value_[xindex[4]+nx[4]*(yindex[4]+ny[4]*zindex[4])].phi[0][ll],
-                                       val5->value_[xindex[5]+nx[5]*(yindex[5]+ny[5]*zindex[5])].phi[0][ll],
+        tmp2[0][1][ll] = interp_linear(val4->value_[xindex[4]+n*(yindex[4]+n*zindex[4])].phi[0][ll],
+                                       val5->value_[xindex[5]+n*(yindex[5]+n*zindex[5])].phi[0][ll],
                                              xt,
                                        val4->x_[xindex[4]],val5->x_[xindex[5]]);
 
-        tmp2[1][1][ll] = interp_linear(val7->value_[xindex[7]+nx[7]*(yindex[7]+ny[7]*zindex[7])].phi[0][ll],
-                                       val6->value_[xindex[6]+nx[6]*(yindex[6]+ny[6]*zindex[6])].phi[0][ll],
+        tmp2[1][1][ll] = interp_linear(val7->value_[xindex[7]+n*(yindex[7]+n*zindex[7])].phi[0][ll],
+                                       val6->value_[xindex[6]+n*(yindex[6]+n*zindex[6])].phi[0][ll],
                                              xt,
                                        val7->x_[xindex[7]],val6->x_[xindex[6]]);
 
@@ -430,7 +430,7 @@ namespace hpx { namespace components { namespace amr
 
       // interp z
       for (int ll=0;ll<num_eqns;ll++) {
-        resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+        resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                             zt,
                                                             val0->z_[zindex[0]],val4->z_[zindex[4]]);
       } 
@@ -450,7 +450,6 @@ namespace hpx { namespace components { namespace amr
 
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[4],y[4],z[4];  
-      int nx[4],ny[4],nz[4];
       int li,lj,lk;
       int i,j,k;
 
@@ -458,43 +457,40 @@ namespace hpx { namespace components { namespace amr
       int yindex[4] = {-1,-1,-1,-1};
       int zindex[4] = {-1,-1,-1,-1};
 
-      nx[0] = val0->x_.size(); ny[0] = val0->y_.size(); nz[0] = val0->z_.size();
-      nx[1] = val1->x_.size(); ny[1] = val1->y_.size(); nz[1] = val1->z_.size();
-      nx[2] = val2->x_.size(); ny[2] = val2->y_.size(); nz[2] = val2->z_.size();
-      nx[3] = val3->x_.size(); ny[3] = val3->y_.size(); nz[3] = val3->z_.size();
+      int n = par->granularity;
 
       li = -1; lj = -1; lk = 0;
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
-      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0]);
+      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
 
       li =  1; lj = -1; lk = 0;
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
-      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1]);
+      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
 
       li =  1; lj =  1; lk = 0;
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
-      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2]);
+      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
 
       li = -1; lj =  1; lk = 0;
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
-      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3]);
+      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
 
       had_double_type tmp3[2][num_eqns];
 
       for (int ll=0;ll<num_eqns;ll++) {
         // interpolate x
-        tmp3[0][ll] = interp_linear(val0->value_[xindex[0]+nx[0]*(yindex[0]+ny[0]*zindex[0])].phi[0][ll],
-                                    val1->value_[xindex[1]+nx[1]*(yindex[1]+ny[1]*zindex[1])].phi[0][ll], 
+        tmp3[0][ll] = interp_linear(val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll],
+                                    val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll], 
                                     xt,
                                     val0->x_[xindex[0]],val1->x_[xindex[1]]);
 
-        tmp3[1][ll] = interp_linear(val3->value_[xindex[3]+nx[3]*(yindex[3]+ny[3]*zindex[3])].phi[3][ll],
-                                    val2->value_[xindex[2]+nx[2]*(yindex[2]+ny[2]*zindex[2])].phi[2][ll], 
+        tmp3[1][ll] = interp_linear(val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[3][ll],
+                                    val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[2][ll], 
                                     xt,
                                     val3->x_[xindex[3]],val2->x_[xindex[2]]);
 
         // interpolate y
-        resultval->pvalue_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+        resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                             yt,
                                                             val0->y_[yindex[0]],val2->y_[yindex[2]]);
       }
@@ -537,7 +533,6 @@ namespace hpx { namespace components { namespace amr
         int compute_index;
         bool boundary = false;
         int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
-        int pbox[6] = {0,0,0,0,0,0};   // initialize bounding box
 
         if ( val.size() == 0 ) {
           // This should not happen
@@ -583,7 +578,6 @@ namespace hpx { namespace components { namespace amr
             resultval->y_ = val[compute_index]->y_;
             resultval->z_ = val[compute_index]->z_;
             resultval->value_.resize(val[compute_index]->value_.size());
-            resultval->granularity = val[compute_index]->granularity;
             resultval->level_ = val[compute_index]->level_;
             resultval->max_index_ = val[compute_index]->max_index_;
             resultval->index_ = val[compute_index]->index_;
@@ -606,417 +600,9 @@ namespace hpx { namespace components { namespace amr
               had_double_type ymax = val[compute_index]->y_[par->granularity-1];
               had_double_type zmin = val[compute_index]->z_[0];
               had_double_type zmax = val[compute_index]->z_[par->granularity-1];
-
-              if ( floatcmp(xmin,par->min[level]) == 1 ) {
-                pbox[0] = 1;
-              }
-              if ( floatcmp(xmax,par->max[level]) == 1 ) {
-                pbox[1] = 1;
-              }
-              if ( floatcmp(ymin,par->min[level]) == 1 ) {
-                pbox[2] = 1;
-              }
-              if ( floatcmp(ymax,par->max[level]) == 1 ) {
-                pbox[3] = 1;
-              }
-              if ( floatcmp(zmin,par->min[level]) == 1 ) {
-                pbox[4] = 1;
-              }
-              if ( floatcmp(zmax,par->max[level]) == 1 ) {
-                pbox[5] = 1;
-              }
-
-              if ( pbox[0] == 0 && pbox[1] == 0 &&
-                   pbox[2] == 0 && pbox[3] == 0 &&
-                   pbox[4] == 0 && pbox[5] == 0 ) {
-                // no prolongation needed in this case.  Something somewhere has gone wrong
-                BOOST_ASSERT(false);
-              }
-
-              // an alternative 3D vector with all the prolongation data in the right place
-              if ( (pbox[0] == 1 && pbox[1] == 1) || (pbox[2] == 1 && pbox[3] == 1) || (pbox[4] == 1 && pbox[5] == 1) ) {
-                // this shouldn't happen
-                BOOST_ASSERT(false);
-              }
-
-              // 27 cases {{{
-              if (        pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  if (i >= 0) {
-                    resultval->py_[i] = ymin + i*dx;
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=0;i<2*par->granularity;i++) {
-                  resultval->px_[i] = xmin + i*dx;
-                  if ( i < par->granularity ) {
-                    resultval->py_[i] = ymin + i*dx;
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=0;i<2*par->granularity;i++) {
-                  resultval->py_[i] = ymin + i*dx;
-                  if ( i < par->granularity ) {
-                    resultval->px_[i] = xmin + i*dx;
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=0;i<2*par->granularity;i++) {
-                  resultval->pz_[i] = zmin + i*dx;
-                  if ( i < par->granularity ) {
-                    resultval->px_[i] = xmin + i*dx;
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-//
-//
-//
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  if (i >= 0) {
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                  if (i >= 0) {
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-//
-//
-//
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  if (i >= 0) {
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->pz_[i] = zmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                  if (i >= 0) {
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->py_[i] = ymin + i*dx;
-                  }
-                }
-                // }}}
-//
-//
-//
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                  }
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                  if (i >= 0) {
-                    resultval->px_[i] = xmin + i*dx;
-                  }
-                }
-                // }}}
-//
-//
-//
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 1 && pbox[1] == 0 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + i*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                }
-                // }}}
-//
-//
-//
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 1 && pbox[5] == 0  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + i*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 1 && pbox[3] == 0 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + i*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                }
-                // }}}
-              } else if ( pbox[0] == 0 && pbox[1] == 1 && pbox[2] == 0 && pbox[3] == 1 && pbox[4] == 0 && pbox[5] == 1  ) {
-                // {{{
-                resultval->pvalue_.resize(2*par->granularity * 2*par->granularity * 2*par->granularity);
-                resultval->px_.resize(2*par->granularity);
-                resultval->py_.resize(2*par->granularity);
-                resultval->pz_.resize(2*par->granularity);
-                for (int i=-par->granularity;i<par->granularity;i++) {
-                  resultval->px_[i+par->granularity] = xmin + (i+par->granularity)*dx;
-                  resultval->py_[i+par->granularity] = ymin + (i+par->granularity)*dx;
-                  resultval->pz_[i+par->granularity] = zmin + (i+par->granularity)*dx;
-                }
-                // }}}
-              } else {
-                std::cout << " PROBLEM " << pbox[0] << " " << pbox[1] << std::endl;
-                std::cout << "         " << pbox[2] << " " << pbox[3] << std::endl;
-                std::cout << "         " << pbox[4] << " " << pbox[5] << std::endl;
-                BOOST_ASSERT(false);
-              }
-              // }}}
-
-              // interpolate
-              int nx = resultval->px_.size();
-              int ny = resultval->py_.size();
-              int nz = resultval->pz_.size();
               int n = par->granularity;
 
+#if 0
               // get the bounding box of the input
               had_double_type vxmin,vymin,vzmin,vxmax,vymax,vzmax; 
               vxmin = 9999;
@@ -1046,44 +632,30 @@ namespace hpx { namespace components { namespace amr
                 std::cout << " " << std::endl;
                 BOOST_ASSERT(false);
               }
+#endif
 
-              for (int k=0;k<nz;k++) {
-                had_double_type zt =  resultval->pz_[k];              
-              for (int j=0;j<ny;j++) {
-                had_double_type yt =  resultval->py_[j];              
-              for (int i=0;i<nx;i++) {
-                had_double_type xt =  resultval->px_[i];              
- 
-                bool found = false;
-                // check compute_index first to see if this point is contained in it
-                if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
-                     floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
-                     floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
-                  // no interp need -- just grap the point  
-                  // figure out the index to grab
-                  had_double_type daa =  (xt-xmin)/dx + 0.5;
-                  had_double_type dbb =  (yt-ymin)/dx + 0.5;
-                  had_double_type dcc =  (zt-zmin)/dx + 0.5;
-                  int aa = (int) floor(daa); 
-                  int bb = (int) floor(dbb); 
-                  int cc = (int) floor(dcc); 
-                  BOOST_ASSERT( floatcmp(xt,val[compute_index]->x_[aa] ) );
-                  BOOST_ASSERT( floatcmp(yt,val[compute_index]->y_[bb] ) );
-                  BOOST_ASSERT( floatcmp(zt,val[compute_index]->z_[cc] ) );
-                  for (int ll=0;ll<num_eqns;ll++) {
-                    resultval->pvalue_[i+nx*(j+ny*k)].phi[0][ll] = val[compute_index]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
-                  }
-                } else {
-                  // check the other input
-                  found = false; 
+              for (int k=0;k<n;k++) {
+                had_double_type zt = resultval->z_[k];
+              for (int j=0;j<n;j++) {
+                had_double_type yt = resultval->y_[j];
+              for (int i=0;i<n;i++) {
+                had_double_type xt = resultval->x_[i];
+
+                // check if this is a prolongation point
+                if ( !(par->min[level]+2*par->gw*dx < xt && par->max[level]-2*par->gw*dx > xt &&     
+                       par->min[level]+2*par->gw*dx < yt && par->max[level]-2*par->gw*dx > yt &&     
+                       par->min[level]+2*par->gw*dx < zt && par->max[level]-2*par->gw*dx > zt)  
+                   ) {
+                  // this is a prolongation point -- overwrite the value with an interpolated value from the coarse mesh
+                  bool found = false;
                   for (int ii=0;ii<val.size();ii++) {
                     if ( ii != compute_index ) {
-                      if ( floatcmp_ge(xt,val[ii]->x_[0])  && floatcmp_le(xt,val[ii]->x_[par->granularity-1]) &&
-                           floatcmp_ge(yt,val[ii]->y_[0])  && floatcmp_le(yt,val[ii]->y_[par->granularity-1]) &&
-                           floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[par->granularity-1]) ) {
+                      if ( floatcmp_ge(xt,val[ii]->x_[0])  && floatcmp_le(xt,val[ii]->x_[n-1]) &&
+                           floatcmp_ge(yt,val[ii]->y_[0])  && floatcmp_le(yt,val[ii]->y_[n-1]) &&
+                           floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[n-1]) ) {
                         found = true;
                         // interpolate
-                        interp3d(xt,yt,zt,val[ii],resultval,i+nx*(j+ny*k),par); 
+                        interp3d(xt,yt,zt,val[ii],resultval,i+n*(j+n*k),par);
                         break;
                       }
                     }
@@ -1092,13 +664,14 @@ namespace hpx { namespace components { namespace amr
                   int anchor_index[27];
                   int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
                   if ( !found ) {
-                    // find the interpolating the anchors needed
+                    // find the interpolating the anchors needed  
                     for (int lk=-1;lk<2;lk++) {
                       had_double_type zn = zt + lk*dx;
                     for (int lj=-1;lj<2;lj++) {
                       had_double_type yn = yt + lj*dx;
                     for (int li=-1;li<2;li++) {
                       had_double_type xn = xt + li*dx;
+                      
                       for (int ii=0;ii<val.size();ii++) {
                         if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[par->granularity-1]) &&
                              floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[par->granularity-1]) &&
@@ -1153,8 +726,8 @@ namespace hpx { namespace components { namespace amr
                             has_corner[11] = 1;
                             anchor_index[11] = ii;
                           }
-                      
-                          if (li == 0 && lj == -1 && lk == -1 ) {
+
+                         if (li == 0 && lj == -1 && lk == -1 ) {
                             has_corner[12] = 1;
                             anchor_index[12] = ii;
                           }
@@ -1216,37 +789,18 @@ namespace hpx { namespace components { namespace amr
                           }
                         }
                       }
+                          
                     } } }
+                  }
 
-                    // Now we have the complete picture.  Determine what the interpolation options are and proceed.  
-                    if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
-                      // 2D interp
-                      found = true;
-                     // special_interp2d_xy(xt,yt,zt,dx,
-                     //                     val[anchor_index[8]],val[anchor_index[9]],
-                     //                     val[anchor_index[10]],val[anchor_index[11]],resultval,i+nx*(j+ny*k),par);
-                    } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
-                      // 2D interp
-                      found = true;
-                    } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
-                      // 2D interp
-                      found = true;
-                    } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
-                      // 1D interp
-                      found = true;
-                    } else if ( has_corner[19] == 1 && has_corner[17] == 1 ) {
-                      // 1D interp
-                      found = true;
-                    } else if ( has_corner[24] == 1 && has_corner[25] == 1 ) {
-                      // 1D interp
-                      found = true;
-                    } else if ( has_corner[0] == 1 && has_corner[1] == 1 && has_corner[2] == 1 &&
-                                has_corner[3] == 1 && has_corner[4] == 1 && has_corner[5] == 1 &&
-                                has_corner[6] == 1 && has_corner[7] == 1 ) {
-                      // 3D interpolation
-                      found = true;
+                  // Now we have the complete picture.  Determine what the interpolation options are and proceed. 
+                  if ( has_corner[0] == 1 && has_corner[1] == 1 && has_corner[2] == 1 &&
+                       has_corner[3] == 1 && has_corner[4] == 1 && has_corner[5] == 1 &&
+                       has_corner[6] == 1 && has_corner[7] == 1 ) {
+                    // 3D interpolation
+                    found = true;
 
-                      special_interp3d(xt,yt,zt,dx,
+                    special_interp3d(xt,yt,zt,dx,
                                        val[anchor_index[0]],
                                        val[anchor_index[1]],
                                        val[anchor_index[2]],
@@ -1255,29 +809,50 @@ namespace hpx { namespace components { namespace amr
                                        val[anchor_index[5]],
                                        val[anchor_index[6]],
                                        val[anchor_index[7]],
-                                       resultval,i+nx*(j+ny*k),par); 
-                    } else { 
-                      found = false;
-                    }
-                  } // end if found
+                                       resultval,i+n*(j+n*k),par);
+                  } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
+                    // 2D interp
+                    found = true;
+                    //std::cout << " SPECIAL INTERP32 " << std::endl;
+                    //special_interp2d_xy(xt,yt,zt,dx,
+                    //                    val[anchor_index[8]],val[anchor_index[9]],
+                    //                    val[anchor_index[10]],val[anchor_index[11]],resultval,i+n*(j+n*k),par);
+                  } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
+                    // 2D interp
+                    found = true;
+                  } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
+                    // 2D interp
+                    found = true;
+                  } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
+                    // 1D interp
+                    found = true;
+                  } else if ( has_corner[19] == 1 && has_corner[17] == 1 ) {
+                    // 1D interp
+                    found = true;
+                  } else if ( has_corner[24] == 1 && has_corner[25] == 1 ) {
+                    // 1D interp
+                    found = true;
+                  }
 
                   if ( !found ) {
-                     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " not found in prolongation." << std::endl;
-                     std::cout << " Available data: " << std::endl;
+                    std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " BBOX : " <<  par->min[level] << " " << par->min[level]+2*par->gw*dx << " " <<  par->max[level] << " " << par->max[level]-2*par->gw*dx << std::endl;
+                    std::cout << " Available data: " << std::endl;
                      for (int ii=0;ii<val.size();ii++) {
                        std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
                        std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
                        std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
                        std::cout << " " << std::endl;
-                     }
+                     }      
                      for (int ii=0;ii<27;ii++) {
                        std::cout << " Has corner : " << ii << " " << has_corner[ii] << std::endl;
-                     }
-                   
-                     BOOST_ASSERT(false);
+                     }      
+                            
+                    BOOST_ASSERT(false);
                   }
                 }
+
               } } }
+
               // }}}
             }
 
@@ -1293,67 +868,74 @@ namespace hpx { namespace components { namespace amr
                 yy = y + j*dx;
               for (int i=0;i<n;i++) {
                 xx = x + i*dx;
-                found = false;
 
-                //if ( last_time != -1 ) {
-                  // this might save some time -- see if the point is here
-                //  if ( xx >= val[last_time]->x_[0] && xx <= val[last_time]->x_[par->granularity-1] &&
-                //       yy >= val[last_time]->y_[0] && yy <= val[last_time]->y_[par->granularity-1] &&
-                //       zz >= val[last_time]->z_[0] && zz <= val[last_time]->z_[par->granularity-1] &&
-                //       val[last_time]->level_ >= resultval->level_) {
-                //    found = true;
-                //  }
-                //}
+                // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
+                if ( par->min[level+1] < xx - par->gw*dx && xx+par->gw*dx > par->max[level+1] &&
+                     par->min[level+1] < yy - par->gw*dx && yy+par->gw*dx > par->max[level+1] &&
+                     par->min[level+1] < zz - par->gw*dx && zz+par->gw*dx > par->max[level+1] ) {
 
-                int highest_level = resultval->level_;
-                if ( !found ) {
-                  // find the highest level who has this point
-                  highest_level -= 1;
-                  for (int ii=0;ii<val.size();ii++) {
-                    if ( (xx >= val[ii]->x_[0] || floatcmp(xx,val[ii]->x_[0])==1) && 
-                         (xx <= val[ii]->x_[par->granularity-1] || floatcmp(xx,val[ii]->x_[par->granularity-1])==1) &&
-                         (yy >= val[ii]->y_[0] || floatcmp(yy,val[ii]->y_[0])==1)  && 
-                         (yy <= val[ii]->y_[par->granularity-1] || floatcmp(yy,val[ii]->y_[par->granularity-1])==1) &&
-                         (zz >= val[ii]->z_[0] || floatcmp(zz,val[ii]->z_[0])==1) && 
-                         (zz <= val[ii]->z_[par->granularity-1] || floatcmp(zz,val[ii]->z_[par->granularity-1])==1) ) {
-                      int val_level = val[ii]->level_;
-                      if ( val_level > highest_level ) {
-                        found = true;
-                        last_time = ii;
-                        highest_level = val_level;
+                  found = false;
+
+                  //if ( last_time != -1 ) {
+                    // this might save some time -- see if the point is here
+                  //  if ( xx >= val[last_time]->x_[0] && xx <= val[last_time]->x_[par->granularity-1] &&
+                  //       yy >= val[last_time]->y_[0] && yy <= val[last_time]->y_[par->granularity-1] &&
+                  //       zz >= val[last_time]->z_[0] && zz <= val[last_time]->z_[par->granularity-1] &&
+                  //       val[last_time]->level_ >= resultval->level_) {
+                  //    found = true;
+                  //  }
+                  //}
+
+                  int highest_level = resultval->level_;
+                  if ( !found ) {
+                    // find the highest level who has this point
+                    highest_level -= 1;
+                    for (int ii=0;ii<val.size();ii++) {
+                      if ( (xx >= val[ii]->x_[0] || floatcmp(xx,val[ii]->x_[0])==1) && 
+                           (xx <= val[ii]->x_[par->granularity-1] || floatcmp(xx,val[ii]->x_[par->granularity-1])==1) &&
+                           (yy >= val[ii]->y_[0] || floatcmp(yy,val[ii]->y_[0])==1)  && 
+                           (yy <= val[ii]->y_[par->granularity-1] || floatcmp(yy,val[ii]->y_[par->granularity-1])==1) &&
+                           (zz >= val[ii]->z_[0] || floatcmp(zz,val[ii]->z_[0])==1) && 
+                           (zz <= val[ii]->z_[par->granularity-1] || floatcmp(zz,val[ii]->z_[par->granularity-1])==1) ) {
+                        int val_level = val[ii]->level_;
+                        if ( val_level > highest_level ) {
+                          found = true;
+                          last_time = ii;
+                          highest_level = val_level;
+                        }
                       }
                     }
                   }
-                }
 
-                if ( !found ) {
-                  std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
-                  for (int ii=0;ii<val.size();ii++) {
-                    std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
-                    std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
-                    std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
-                    std::cout << " DEBUG level: " << val[ii]->level_ << std::endl;
-                    std::cout << " " << std::endl;
+                  if ( !found ) {
+                    std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
+                    for (int ii=0;ii<val.size();ii++) {
+                      std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG level: " << val[ii]->level_ << std::endl;
+                      std::cout << " " << std::endl;
+                    }
                   }
-                }
-                BOOST_ASSERT(found);
+                  BOOST_ASSERT(found);
 
-                // identify the finer mesh index
-                int aa = -1;
-                int bb = -1;
-                int cc = -1;
-                for (int ii=0;ii<par->granularity;ii++) {
-                  if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
-                  if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
-                  if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
-                  if ( aa != -1 && bb != -1 && cc != -1 ) break;
-                }
-                BOOST_ASSERT(aa != -1); 
-                BOOST_ASSERT(bb != -1); 
-                BOOST_ASSERT(cc != -1); 
-                
-                for (int ll=0;ll<num_eqns;ll++) {
-                  resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                  // identify the finer mesh index
+                  int aa = -1;
+                  int bb = -1;
+                  int cc = -1;
+                  for (int ii=0;ii<par->granularity;ii++) {
+                    if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
+                    if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
+                    if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
+                    if ( aa != -1 && bb != -1 && cc != -1 ) break;
+                  }
+                  BOOST_ASSERT(aa != -1); 
+                  BOOST_ASSERT(bb != -1); 
+                  BOOST_ASSERT(cc != -1); 
+                  
+                  for (int ll=0;ll<num_eqns;ll++) {
+                    resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                  }
                 }
               } } }
               // }}}
@@ -1486,11 +1068,9 @@ namespace hpx { namespace components { namespace amr
           resultval->y_ = val[compute_index]->y_;
           resultval->z_ = val[compute_index]->z_;
           resultval->value_.resize(val[compute_index]->value_.size());
-          resultval->granularity = val[compute_index]->granularity;
           resultval->level_ = val[compute_index]->level_;
 
           resultval->max_index_ = val[compute_index]->max_index_;
-          resultval->granularity = val[compute_index]->granularity;
           resultval->index_ = val[compute_index]->index_;
 
           if (val[compute_index]->timestep_ < (int)numsteps_) {

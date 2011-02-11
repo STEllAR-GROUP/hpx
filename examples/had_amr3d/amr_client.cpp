@@ -414,6 +414,9 @@ int main(int argc, char* argv[])
           }
         }
 
+        //ghostwidth
+        par->gw = 5;
+
         // figure out the number of points for row 0
         numvals = par->rowsize[0];
 

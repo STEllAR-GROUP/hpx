@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace amr
 
          static void findindex(had_double_type &x,had_double_type &y, had_double_type &z,
                        access_memory_block<stencil_data> &val,
-                       int &xindex,int &yindex,int&zindex);
+                       int &xindex,int &yindex,int&zindex,int n);
 
         had_double_type interp_linear(had_double_type y1, had_double_type y2,
                                            had_double_type x, had_double_type x1, had_double_type x2);

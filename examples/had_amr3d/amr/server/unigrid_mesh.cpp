@@ -604,27 +604,27 @@ namespace hpx { namespace components { namespace amr { namespace server
               std::cout << "     " << std::endl;
 #endif
 
-              // see if this overlap a border region the next finest level
-              had_double_type extension1 = 1.0;
-              had_double_type extension2 = 1.0;
+              // see if this overlaps a gw region in the next finest level
+              int extension0 = 2;
+              int extension = par->granularity;
               if ( ( 
-                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,xmin) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,xmin)) || 
-                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,xmax) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,xmax)) ) &&
+                    (  (floatcmp_le(par->min[level+1]-extension0*dx,xmin) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,xmin)) || 
+                       (floatcmp_le(par->min[level+1]-extension0*dx,xmax) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,xmax)) ) &&
 
-                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,ymin) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,ymin)) || 
-                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,ymax) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,ymax)) ) &&
+                    (  (floatcmp_le(par->min[level+1]-extension0*dx,ymin) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,ymin)) || 
+                       (floatcmp_le(par->min[level+1]-extension0*dx,ymax) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,ymax)) ) &&
 
-                    (  (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,zmin) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,zmin)) || 
-                       (floatcmp_le(par->min[level+1]-extension1*dx*par->granularity,zmax) 
-                     && floatcmp_ge(par->max[level+1]+extension1*dx*par->granularity,zmax)) ) ) &&
-                  !( par->min[level+1] < xmin && par->max[level+1] > xmax &&
-                     par->min[level+1] < ymin && par->max[level+1] > ymax &&
-                     par->min[level+1] < zmin && par->max[level+1] > zmax 
+                    (  (floatcmp_le(par->min[level+1]-extension0*dx,zmin) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,zmin)) || 
+                       (floatcmp_le(par->min[level+1]-extension0*dx,zmax) 
+                     && floatcmp_ge(par->max[level+1]+extension0*dx,zmax)) ) ) &&
+                  !( par->min[level+1]+par->gw*dx < xmin && par->max[level+1]-par->gw*dx > xmax &&
+                     par->min[level+1]+par->gw*dx < ymin && par->max[level+1]-par->gw*dx > ymax &&
+                     par->min[level+1]+par->gw*dx < zmin && par->max[level+1]-par->gw*dx > zmax 
                    ) 
                        ) 
               {
@@ -645,9 +645,9 @@ namespace hpx { namespace components { namespace amr { namespace server
                 for (int sk=0;sk<par->nx[level+1];sk++) {
                 for (int sj=0;sj<par->nx[level+1];sj++) {
                 for (int si=0;si<par->nx[level+1];si++) {
-                  if ( si == 0 || si == par->nx[level+1]-1 ||
-                       sj == 0 || sj == par->nx[level+1]-1 ||
-                       sk == 0 || sk == par->nx[level+1]-1 ) {
+                  if ( si == 0 || si == 1 || si == par->nx[level+1]-2 || si == par->nx[level+1]-1 ||
+                       sj == 0 || sj == 1 || sj == par->nx[level+1]-2 || sj == par->nx[level+1]-1 ||
+                       sk == 0 || sk == 1 || sk == par->nx[level+1]-2 || sk == par->nx[level+1]-1 ) {
 #if 0
                       std::cout << "        " << std::endl;
                       std::cout << "        " << std::endl;
@@ -663,20 +663,20 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
                     // Check for overlap 
-                    if ( (  (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - extension2*dx*par->granularity,xmin) && 
-                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+extension2*dx*par->granularity,xmin)) ||
-                            (floatcmp_le(par->min[level+1] + si*par->granularity*fdx - extension2*dx*par->granularity,xmax) && 
-                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx+extension2*dx*par->granularity,xmax)) 
+                    if ( (  (floatcmp_le(par->min[level+1] +  si*par->granularity*fdx - extension*dx,xmin) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx + extension*dx,xmin)) ||
+                            (floatcmp_le(par->min[level+1] +  si*par->granularity*fdx,xmax - extension*dx) && 
+                             floatcmp_ge(par->min[level+1] + (si*par->granularity+par->granularity-1)*fdx + extension*dx,xmax)) 
                          ) &&
-                         (  (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - extension2*dx*par->granularity,ymin) && 
-                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,ymin)) ||
-                            (floatcmp_le(par->min[level+1] + sj*par->granularity*fdx - extension2*dx*par->granularity,ymax) && 
-                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,ymax)) 
+                         (  (floatcmp_le(par->min[level+1] +  sj*par->granularity*fdx - extension*dx,ymin) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension*dx,ymin)) ||
+                            (floatcmp_le(par->min[level+1] +  sj*par->granularity*fdx - extension*dx,ymax) && 
+                             floatcmp_ge(par->min[level+1] + (sj*par->granularity+par->granularity-1)*fdx + extension*dx,ymax)) 
                          ) &&
-                         (  (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - extension2*dx*par->granularity,zmin) && 
-                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,zmin)) ||
-                            (floatcmp_le(par->min[level+1] + sk*par->granularity*fdx - extension2*dx*par->granularity,zmax) && 
-                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension2*dx*par->granularity,zmax)) 
+                         (  (floatcmp_le(par->min[level+1] +  sk*par->granularity*fdx - extension*dx,zmin) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension*dx,zmin)) ||
+                            (floatcmp_le(par->min[level+1] +  sk*par->granularity*fdx - extension*dx,zmax) && 
+                             floatcmp_ge(par->min[level+1] + (sk*par->granularity+par->granularity-1)*fdx + extension*dx,zmax)) 
                          ) 
                        ) 
                     {
@@ -707,8 +707,10 @@ namespace hpx { namespace components { namespace amr { namespace server
 
                 if ( pfound == false ) {
                   std::cout << " PROBLEM: overlap point not found " << xmin << " " << xmax << " " << ymin << " " << ymax << " " << zmin << " " << zmax << std::endl;
-                  std::cout << " BBOX : " << par->min[level+1]-dx*par->granularity << " " << par->max[level+1]+dx*par->granularity << std::endl;
+                  std::cout << " GW BBOX : " << par->min[level+1]+par->gw*dx << " " << par->max[level+1]-par->gw*dx << std::endl;
+                  std::cout << " BBOX : " << par->min[level+1] << " " << par->max[level+1] << std::endl;
                   std::cout << "  " << std::endl;
+                  BOOST_ASSERT(false);
                 }
               } 
               // }}}
