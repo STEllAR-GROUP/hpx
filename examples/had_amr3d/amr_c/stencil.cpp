@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace amr
       }
     }
 
-    inline void 
+    inline int 
     stencil::findindex(had_double_type &x,had_double_type &y, had_double_type &z,
                        access_memory_block<stencil_data> &val,
                        int &xindex,int &yindex,int &zindex,int n) {
@@ -93,15 +93,9 @@ namespace hpx { namespace components { namespace amr
           break;
         }
       }      
-      if ( xindex < 0 || yindex < 0 || zindex < 0 ) {
-        std::cout << " TEST " << xindex << " " << yindex << " " << zindex << std::endl;
-        for (i=0;i<n;i++) {
-          std::cout << " TEST x " << x << " " << val->x_[i] << std::endl;
-        }
-      }
-      BOOST_ASSERT(xindex >= 0 && yindex >= 0 && zindex >= 0);
 
-      return;
+      if ( xindex < 0 || yindex < 0 || zindex < 0 ) return 1;
+      else return 0;
     }
 
     inline std::size_t stencil::findlevel3D(std::size_t step, std::size_t item, 
@@ -160,8 +154,7 @@ namespace hpx { namespace components { namespace amr
     // interp3d {{{
     void stencil::interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
                                       access_memory_block<stencil_data> &val, 
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par) {
+                                      nodedata &result, Parameter const& par) {
 
       int ii = -1;
       int jj = -1;
@@ -214,7 +207,7 @@ namespace hpx { namespace components { namespace amr
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+          result.phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
         }
         return;
       }
@@ -281,10 +274,10 @@ namespace hpx { namespace components { namespace amr
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
-                                                              val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
-                                                              x,
-                                                              val->x_[ii-1],val->x_[ii]);
+          result.phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
+                                            val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
+                                            x,
+                                            val->x_[ii-1],val->x_[ii]);
         }
         return;
       } else {
@@ -308,7 +301,7 @@ namespace hpx { namespace components { namespace amr
         }
       } else if ( !no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+          result.phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
                                                               val->y_[jj-1],val->y_[jj]);
         }
         return;
@@ -320,7 +313,7 @@ namespace hpx { namespace components { namespace amr
       // interpolate in z {{{
       if ( !no_interp_z ) {
         for (int ll=0;ll<num_eqns;ll++) {
-          resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+          result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                               z,
                                                               val->z_[kk-1],val->z_[kk]);
         } 
@@ -344,8 +337,7 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &val5, 
                                       access_memory_block<stencil_data> &val6, 
                                       access_memory_block<stencil_data> &val7, 
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par) {
+                                      nodedata &result, Parameter const& par) {
 
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[8],y[8],z[8];  
@@ -354,42 +346,100 @@ namespace hpx { namespace components { namespace amr
       int xindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int yindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int zindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
+      int rc;
 
+      nodedata work[8];
  
       int n = par->granularity;
 
       // find the index points {{{
       li = -1; lj = -1; lk = -1;
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
-      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
 
       li =  1; lj = -1; lk = -1;
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
-      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
 
       li =  1; lj =  1; lk = -1;
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
-      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[2],y[2],z[2],val2,work[2],par);
+      }
 
       li = -1; lj =  1; lk = -1;
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
-      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[3],y[3],z[3],val3,work[3],par);
+      }
 
       li = -1; lj = -1; lk =  1;
       z[4] = zt + lk*dx; y[4] = yt + lj*dx; x[4] = xt + li*dx;
-      findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4],n);
+      rc = findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[4].phi[0][ll] = val4->value_[xindex[4]+n*(yindex[4]+n*zindex[4])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[4],y[4],z[4],val4,work[4],par);
+      }
 
       li =  1; lj = -1; lk =  1;
       z[5] = zt + lk*dx; y[5] = yt + lj*dx; x[5] = xt + li*dx;
-      findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5],n);
+      rc = findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[5].phi[0][ll] = val5->value_[xindex[5]+n*(yindex[5]+n*zindex[5])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[5],y[5],z[5],val5,work[5],par);
+      }
 
       li =  1; lj =  1; lk =  1;
       z[6] = zt + lk*dx; y[6] = yt + lj*dx; x[6] = xt + li*dx;
-      findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6],n);
+      rc = findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[6].phi[0][ll] = val6->value_[xindex[6]+n*(yindex[6]+n*zindex[6])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[6],y[6],z[6],val6,work[6],par);
+      }
 
       li = -1; lj =  1; lk =  1;
       z[7] = zt + lk*dx; y[7] = yt + lj*dx; x[7] = xt + li*dx;
-      findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7],n);
+      rc = findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[7].phi[0][ll] = val7->value_[xindex[7]+n*(yindex[7]+n*zindex[7])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[7],y[7],z[7],val7,work[7],par);
+      }
       // }}}
 
       had_double_type tmp2[2][2][num_eqns];
@@ -397,56 +447,55 @@ namespace hpx { namespace components { namespace amr
 
       // interp x
       for (int ll=0;ll<num_eqns;ll++) {
-        tmp2[0][0][ll] = interp_linear(val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll],
-                                       val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll],
+        tmp2[0][0][ll] = interp_linear(work[0].phi[0][ll],
+                                       work[1].phi[0][ll],
                                              xt,
-                                       val0->x_[xindex[0]],val1->x_[xindex[0]]);
+                                       x[0],x[1]);
 
-        tmp2[1][0][ll] = interp_linear(val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll],
-                                       val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll],
+        tmp2[1][0][ll] = interp_linear(work[3].phi[0][ll],
+                                       work[2].phi[0][ll],
                                              xt,
-                                       val3->x_[xindex[3]],val2->x_[xindex[2]]);
+                                       x[3],x[2]);
 
-        tmp2[0][1][ll] = interp_linear(val4->value_[xindex[4]+n*(yindex[4]+n*zindex[4])].phi[0][ll],
-                                       val5->value_[xindex[5]+n*(yindex[5]+n*zindex[5])].phi[0][ll],
+        tmp2[0][1][ll] = interp_linear(work[4].phi[0][ll],
+                                       work[5].phi[0][ll],
                                              xt,
-                                       val4->x_[xindex[4]],val5->x_[xindex[5]]);
+                                       x[4],x[5]);
 
-        tmp2[1][1][ll] = interp_linear(val7->value_[xindex[7]+n*(yindex[7]+n*zindex[7])].phi[0][ll],
-                                       val6->value_[xindex[6]+n*(yindex[6]+n*zindex[6])].phi[0][ll],
+        tmp2[1][1][ll] = interp_linear(work[7].phi[0][ll],
+                                       work[6].phi[0][ll],
                                              xt,
-                                       val7->x_[xindex[7]],val6->x_[xindex[6]]);
+                                       x[7],x[6]);
 
       }
    
       // interp y
       for (int ll=0;ll<num_eqns;ll++) {
         tmp3[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],yt,
-                                     val0->y_[yindex[0]],val2->y_[yindex[2]]);
+                                     y[0],y[2]);
 
         tmp3[1][ll] = interp_linear(tmp2[0][1][ll],tmp2[1][1][ll],yt,
-                                     val4->y_[yindex[4]],val6->y_[yindex[6]]);
+                                     y[4],y[6]);
       }
 
       // interp z
       for (int ll=0;ll<num_eqns;ll++) {
-        resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
-                                                            zt,
-                                                            val0->z_[zindex[0]],val4->z_[zindex[4]]);
+        result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                          zt,
+                                          z[0],z[4]);
       } 
 
       return;
     }
     // }}}
 
-    // special interp 2d {{{
+    // special interp 2d xy {{{
     void stencil::special_interp2d_xy(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
                                       access_memory_block<stencil_data> &val0, 
                                       access_memory_block<stencil_data> &val1, 
                                       access_memory_block<stencil_data> &val2, 
                                       access_memory_block<stencil_data> &val3, 
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par) {
+                                      nodedata &result, Parameter const& par) {
 
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[4],y[4],z[4];  
@@ -458,41 +507,406 @@ namespace hpx { namespace components { namespace amr
       int zindex[4] = {-1,-1,-1,-1};
 
       int n = par->granularity;
+      int rc;
+
+      nodedata work[4];
 
       li = -1; lj = -1; lk = 0;
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
-      findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
 
       li =  1; lj = -1; lk = 0;
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
-      findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
 
       li =  1; lj =  1; lk = 0;
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
-      findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[2],y[2],z[2],val2,work[2],par);
+      }
 
       li = -1; lj =  1; lk = 0;
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
-      findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[3],y[3],z[3],val3,work[3],par);
+      }
 
       had_double_type tmp3[2][num_eqns];
 
       for (int ll=0;ll<num_eqns;ll++) {
         // interpolate x
-        tmp3[0][ll] = interp_linear(val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll],
-                                    val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll], 
+        tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
+                                    work[1].phi[0][ll], 
                                     xt,
-                                    val0->x_[xindex[0]],val1->x_[xindex[1]]);
+                                    x[0],x[1]);
 
-        tmp3[1][ll] = interp_linear(val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[3][ll],
-                                    val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[2][ll], 
+        tmp3[1][ll] = interp_linear(work[3].phi[3][ll],
+                                    work[2].phi[2][ll], 
                                     xt,
-                                    val3->x_[xindex[3]],val2->x_[xindex[2]]);
+                                    x[3],x[2]);
 
         // interpolate y
-        resultval->value_[index].phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
-                                                            yt,
-                                                            val0->y_[yindex[0]],val2->y_[yindex[2]]);
+        result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                          yt,
+                                          y[0],y[2]);
+      }
+
+      return;
+    } // }}}
+
+    // special interp 2d xz {{{
+    void stencil::special_interp2d_xz(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      access_memory_block<stencil_data> &val2, 
+                                      access_memory_block<stencil_data> &val3, 
+                                      nodedata &result, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[4],y[4],z[4];  
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[4] = {-1,-1,-1,-1};
+      int yindex[4] = {-1,-1,-1,-1};
+      int zindex[4] = {-1,-1,-1,-1};
+
+      int n = par->granularity;
+      int rc;
+
+      nodedata work[4];
+
+      li = -1; lj = 0; lk = -1;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
+
+      li =  1; lj =  0; lk = -1;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
+
+      li = -1; lj =  0; lk = 1;
+      z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
+      rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[2],y[2],z[2],val2,work[2],par);
+      }
+
+      li =  1; lj =  0; lk = 1;
+      z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
+      rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[3],y[3],z[3],val3,work[3],par);
+      }
+
+      had_double_type tmp3[2][num_eqns];
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate x
+        tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
+                                    work[1].phi[0][ll], 
+                                    xt,
+                                    x[0],x[1]);
+
+        tmp3[1][ll] = interp_linear(work[2].phi[3][ll],
+                                    work[3].phi[2][ll], 
+                                    xt,
+                                    x[2],x[3]);
+
+        // interpolate z
+        result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                          zt,
+                                          z[0],z[2]);
+      }
+
+      return;
+    } // }}}
+
+    // special interp 2d yz {{{
+    void stencil::special_interp2d_yz(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      access_memory_block<stencil_data> &val2, 
+                                      access_memory_block<stencil_data> &val3, 
+                                      nodedata &result, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[4],y[4],z[4];  
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[4] = {-1,-1,-1,-1};
+      int yindex[4] = {-1,-1,-1,-1};
+      int zindex[4] = {-1,-1,-1,-1};
+
+      int n = par->granularity;
+      int rc;
+
+      nodedata work[4];
+
+      li =  0; lj = -1; lk = -1;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
+
+      li =  0; lj =  1; lk = -1;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
+
+      li =  0; lj =  -1; lk = 1;
+      z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
+      rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[2],y[2],z[2],val2,work[2],par);
+      }
+
+      li =  0; lj =  1; lk = 1;
+      z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
+      rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[3],y[3],z[3],val3,work[3],par);
+      }
+
+      had_double_type tmp3[2][num_eqns];
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate y
+        tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
+                                    work[1].phi[0][ll], 
+                                    yt,
+                                    y[0],y[1]);
+
+        tmp3[1][ll] = interp_linear(work[2].phi[3][ll],
+                                    work[3].phi[2][ll], 
+                                    yt,
+                                    y[2],y[3]);
+
+        // interpolate z
+        result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                          zt,
+                                          z[0],z[2]);
+      }
+
+      return;
+    } // }}}
+
+    // special interp 1d x {{{
+    void stencil::special_interp1d_x(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      nodedata &result, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[2],y[2],z[2];  
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[2] = {-1,-1};
+      int yindex[2] = {-1,-1};
+      int zindex[2] = {-1,-1};
+
+      int n = par->granularity;
+      int rc;
+
+      nodedata work[2];
+
+      li = -1; lj = 0; lk = 0;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
+
+      li =  1; lj =  0; lk = 0;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate x
+        result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
+                                          xt,
+                                          x[0],x[1]);
+      }
+
+      return;
+    } // }}}
+
+    // special interp 1d y {{{
+    void stencil::special_interp1d_y(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      nodedata &result, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[2],y[2],z[2];  
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[2] = {-1,-1};
+      int yindex[2] = {-1,-1};
+      int zindex[2] = {-1,-1};
+
+      int n = par->granularity;
+      int rc;
+
+      nodedata work[2];
+
+      li =  0; lj = -1; lk = 0;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
+
+      li =  0; lj =  1; lk = 0;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate y
+        result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
+                                          yt,
+                                          y[0],y[1]);
+      }
+
+      return;
+    } // }}}
+
+    // special interp 1d z {{{
+    void stencil::special_interp1d_z(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1, 
+                                      nodedata &result, Parameter const& par) {
+
+      // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
+      had_double_type x[2],y[2],z[2];  
+      int li,lj,lk;
+      int i,j,k;
+
+      int xindex[2] = {-1,-1};
+      int yindex[2] = {-1,-1};
+      int zindex[2] = {-1,-1};
+
+      int n = par->granularity;
+      int rc;
+
+      nodedata work[2];
+
+      li = 0; lj = 0; lk = -1;
+      z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
+      rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[0],y[0],z[0],val0,work[0],par);
+      }
+
+      li = 0; lj = 0; lk = 1;
+      z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
+      rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
+      if ( rc == 0 ) {
+        for (int ll=0;ll<num_eqns;ll++) {
+          work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
+        }
+      } else {
+        interp3d(x[1],y[1],z[1],val1,work[1],par);
+      }
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        // interpolate z
+        result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
+                                          zt,
+                                          z[0],z[1]);
       }
 
       return;
@@ -655,7 +1069,7 @@ namespace hpx { namespace components { namespace amr
                            floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[n-1]) ) {
                         found = true;
                         // interpolate
-                        interp3d(xt,yt,zt,val[ii],resultval,i+n*(j+n*k),par);
+                        interp3d(xt,yt,zt,val[ii],resultval->value_[i+n*(j+n*k)],par);
                         break;
                       }
                     }
@@ -809,29 +1223,43 @@ namespace hpx { namespace components { namespace amr
                                        val[anchor_index[5]],
                                        val[anchor_index[6]],
                                        val[anchor_index[7]],
-                                       resultval,i+n*(j+n*k),par);
+                                       resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
                     // 2D interp
                     found = true;
-                    //std::cout << " SPECIAL INTERP32 " << std::endl;
-                    //special_interp2d_xy(xt,yt,zt,dx,
-                    //                    val[anchor_index[8]],val[anchor_index[9]],
-                    //                    val[anchor_index[10]],val[anchor_index[11]],resultval,i+n*(j+n*k),par);
+                    special_interp2d_xy(xt,yt,zt,dx,
+                                        val[anchor_index[8]],val[anchor_index[9]],
+                                        val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
                     // 2D interp
                     found = true;
+                    special_interp2d_yz(xt,yt,zt,dx,
+                                        val[anchor_index[12]],val[anchor_index[14]],
+                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
                     // 2D interp
                     found = true;
+                    special_interp2d_xz(xt,yt,zt,dx,
+                                        val[anchor_index[15]],val[anchor_index[13]],
+                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
                     // 1D interp
                     found = true;
+                    special_interp1d_y(xt,yt,zt,dx,
+                                       val[anchor_index[16]],val[anchor_index[18]],
+                                       resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[19] == 1 && has_corner[17] == 1 ) {
                     // 1D interp
                     found = true;
+                    special_interp1d_x(xt,yt,zt,dx,
+                                       val[anchor_index[19]],val[anchor_index[17]],
+                                       resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[24] == 1 && has_corner[25] == 1 ) {
                     // 1D interp
                     found = true;
+                    special_interp1d_z(xt,yt,zt,dx,
+                                       val[anchor_index[25]],val[anchor_index[24]],
+                                       resultval->value_[i+n*(j+n*k)],par);
                   }
 
                   if ( !found ) {
@@ -940,6 +1368,7 @@ namespace hpx { namespace components { namespace amr
               } } }
               // }}}
             }
+
             if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
               return 0;
             }

@@ -67,8 +67,7 @@ namespace hpx { namespace components { namespace amr
 
         void interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
                                       access_memory_block<stencil_data> &val,
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par);
+                                      nodedata &result, Parameter const& par);
 
         void special_interp3d(had_double_type &x,had_double_type &y, had_double_type &z,had_double_type &dx,
                                       access_memory_block<stencil_data> &val0,
@@ -79,10 +78,9 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &val5,
                                       access_memory_block<stencil_data> &val6,
                                       access_memory_block<stencil_data> &val7,
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par);
+                                      nodedata &result, Parameter const& par);
 
-         static void findindex(had_double_type &x,had_double_type &y, had_double_type &z,
+         static int findindex(had_double_type &x,had_double_type &y, had_double_type &z,
                        access_memory_block<stencil_data> &val,
                        int &xindex,int &yindex,int&zindex,int n);
 
@@ -94,8 +92,36 @@ namespace hpx { namespace components { namespace amr
                                       access_memory_block<stencil_data> &val1,
                                       access_memory_block<stencil_data> &val2,
                                       access_memory_block<stencil_data> &val3,
-                                      access_memory_block<stencil_data> &resultval,
-                                      int index, Parameter const& par);
+                                      nodedata &result, Parameter const& par);
+
+        void special_interp2d_xz(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      access_memory_block<stencil_data> &val2,
+                                      access_memory_block<stencil_data> &val3,
+                                      nodedata &result, Parameter const& par);
+
+        void special_interp2d_yz(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      access_memory_block<stencil_data> &val2,
+                                      access_memory_block<stencil_data> &val3,
+                                      nodedata &result, Parameter const& par);
+
+        void special_interp1d_x(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      nodedata &result, Parameter const& par);
+
+        void special_interp1d_y(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      nodedata &result, Parameter const& par);
+
+        void special_interp1d_z(had_double_type &xt,had_double_type &yt,had_double_type &zt,had_double_type &dx,
+                                      access_memory_block<stencil_data> &val0, 
+                                      access_memory_block<stencil_data> &val1,
+                                      nodedata &result, Parameter const& par);
 
 
     private:
