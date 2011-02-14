@@ -1,34 +1,26 @@
+# FIXME: this file is intentionally lacking a copyright notice as I do not know
+# the authors preference.
+
 # just recurse into all components subdirectories and execute the scripts there
-set(bh_SUDIRS 
+set(hpx_BHPX_SUBDIRS 
     tlf
-    itn
-)
+    itn)
 
-
-foreach(subdir ${bh_SUDIRS})
-    add_subdirectory(${subdir})
+foreach(hpx_BHPX_SUBDIR ${hpx_ACCUMULATOR_SUBDIRS})
+  add_subdirectory(${hpx_BHPX_SUBDIR})
 endforeach()
 
-# define list of target names for this directory
-set(component_EXAMPLES 
-    bh
-)          
+# define build target
+set(bhc_SOURCES 
+    bhc.cpp)
 
-# for all targets specified above
-foreach(example ${component_EXAMPLES})
-    # define build target
-set(${example}_client_SOURCES 
-    bhc.cpp
-)
+# add example executable
+add_hpx_executable(bhc
+  SOURCES ${bhc_SOURCES}
+  DEPENDENCIES tlf_component 
+               itn_component
+               distributing_factory_component)
 
-set(bhc_DEPENDENCIES
-    tlf_component 
-    itn_component
-    distributing_factory_component
-)
+# add a dependency to the pseudo-target  
+add_dependencies(examples.bhpx bhc) 
 
-add_hpx_executable(bhc  
-    SOURCES ${${example}_client_SOURCES}
-    DEPENDENCIES ${bhc_DEPENDENCIES}
-)     
-endforeach()

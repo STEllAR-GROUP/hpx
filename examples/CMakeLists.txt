@@ -1,26 +1,35 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Set examples to build by default
-set(example_SUBDIRS 
-	quickstart
-	#bh
-  accumulator
-	#had_amr3d
-  )
+# NOTE: please do not comment out targets here and commit. If you do not want
+# to build all the examples, you can explicitly specify which examples you
+# would like to build on the command line, e.g. `make examples.had_amr3d'.
+# It is important that all of these examples remain linked into the CMake
+# dependency tree for testing purposes.
 
-# Pick up additional examples for this build set using
-# -DHPX_WITH_EXAMPLES="ex1;ex2;ex3"
-if(HPX_WITH_EXAMPLES)
-  LIST(APPEND example_SUBDIRS ${HPX_WITH_EXAMPLES})
-endif(HPX_WITH_EXAMPLES)
-LIST(REMOVE_DUPLICATES example_SUBDIRS)
+set(hpx_EXAMPLE_SUBDIRS 
+    accumulator
+    amr
+    #atomic
+    basic_example
+    bhpx
+    cosmo
+    cps
+    generic
+    had_amr
+    had_amr3d
+    heart_beat
+    naming
+    parcelset
+    quickstart
+    )
 
-message("Building HPX with examples:")
-foreach(subdir ${example_SUBDIRS})
-message("  " ${subdir})
-    add_subdirectory(${subdir})
+foreach(hpx_EXAMPLE_SUBDIR ${hpx_EXAMPLE_SUBDIRS})
+  add_custom_target(examples.${hpx_EXAMPLE_SUBDIR})
+  add_subdirectory(${hpx_EXAMPLE_SUBDIR})
+  add_dependencies(examples examples.${hpx_EXAMPLE_SUBDIR})
 endforeach()
 
