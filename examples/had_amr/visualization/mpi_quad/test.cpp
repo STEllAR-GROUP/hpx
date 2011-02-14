@@ -1,3 +1,4 @@
+// FIXME: I need copyright information
 // 27 Sep 2010
 // Matt Anderson
 // FMR nlsm code for strong scaling comparison with HPX
@@ -13,6 +14,7 @@
 typedef mpfr::mpreal had_double_type;
 //typedef double had_double_type;
 
+// FIXME: using namespace std :( 
 using namespace std;
 
 int quad_send(int dst,had_double_type n,int tag);

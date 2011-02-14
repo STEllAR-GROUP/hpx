@@ -1,3 +1,4 @@
+# FIXME: I need copyright information
 # Makefile
 ########
 #ARCH = `uname -s` . `uname -m`

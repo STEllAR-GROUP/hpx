@@ -1291,7 +1291,8 @@ int mspace_mallopt(int, int);
 #ifndef LACKS_ERRNO_H
 #include <errno.h>       /* for MALLOC_FAILURE_ACTION */
 #endif /* LACKS_ERRNO_H */
-/*#if FOOTERS || DEBUG*/
+/*#if FOOTERS || DEBUG
+*/
 #include <time.h>        /* for magic initialization */
 /*#endif*/ /* FOOTERS */
 #ifndef LACKS_STDLIB_H
@@ -1369,7 +1370,7 @@ LONG __cdecl _InterlockedExchange(LONG volatile *Target, LONG Value);
 
 /* Declarations for bit scanning on win32 */
 #if defined(_MSC_VER) && _MSC_VER>=1300
-#ifndef BitScanForward	/* Try to avoid pulling in WinNT.h */
+#ifndef BitScanForward  /* Try to avoid pulling in WinNT.h */
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -1835,7 +1836,7 @@ static MLOCK_T malloc_global_mutex = PTHREAD_MUTEX_INITIALIZER;
 #ifdef linux
 #ifndef PTHREAD_MUTEX_RECURSIVE
 extern int pthread_mutexattr_setkind_np __P ((pthread_mutexattr_t *__attr,
-					   int __kind));
+             int __kind));
 #define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
 #define pthread_mutexattr_settype(x,y) pthread_mutexattr_setkind_np(x,y)
 #endif

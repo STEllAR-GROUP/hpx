@@ -1,3 +1,4 @@
+// FIXME: I need copyright information
 // 27 Sep 2010
 // Matt Anderson
 // FMR nlsm code for strong scaling comparison with HPX
