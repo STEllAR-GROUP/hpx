@@ -4,11 +4,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # just recurse into all components subdirectories and execute the scripts there
-set(component_SUDIRS 
+set(hpx_COMPONENT_SUBDIRS 
     distributing_factory
-#    dataflow 
    )
 
-foreach(subdir ${component_SUDIRS})
-    add_subdirectory(${subdir})
+foreach(hpx_COMPONENT_SUBDIR ${hpx_COMPONENT_SUBDIRS})
+    add_subdirectory(${hpx_COMPONENT_SUBDIR})
 endforeach()
+
