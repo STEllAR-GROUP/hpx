@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#! /usr/bin/env bash
 #
 # Copyright (c) 2007-2008 Richard Guildry
 # Copyright (c) 2011      Bryce Lelbach
