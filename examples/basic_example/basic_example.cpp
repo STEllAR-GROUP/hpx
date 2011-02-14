@@ -1,45 +1,45 @@
-/*
-    basic_example.cpp
-    Author: John West, john.e.west@gmail.com
-    
-    This example code is a candidate for the "simplest possible" HPX program that is in some way
-    instructive. As such the code in it may not represent the best way of getting something done;
-    it is primarily meant to familiarize the reader with the essential steps to getting an HPX 
-    code up and running.
-
-    The code starts out in the main routine, but the only function of the main() in this example is to 
-    (using the Boost helper routines) package up the command line options and call hpx_init(). 
-    hpx_init() initializes the runtime environment and then calls hpx_main(). This routine must be present, 
-    by name, in any HPX program. (For more about Boost, see http://www.boost.org/ .)
-    
-    hpx_main() does some bookkeeping and setup and then causes parallel work to be done by invoking
-    the futures registered earlier in the program.
-    
-    To run the program
-        1. Type "make" in the directory
-        2. 	./basic_example -r -t 2 -a localhost:5005 -x localhost:5006. 
-            - The "-t 2" option runs this program on two OS threads (one for each future). 
-            - The "-r" option runs the AGAS server (necessary if it isn't already running somewhere else).
-            - The "-a localhost:5005" option places the AGAS server on your machine and specifies that it
-                use port 5005 (this example assumes that ports 5005 and 5006 are open on your system. 
-                If they aren't, substitute two open port numbers appropriate for you).
-            - The "-x localhost:5006" specifies that HPX should include "localhost" in the runtime and use
-                port 5006.
-                
-    If you'd like to get some validation that getnumber_action is being run on two different threads, you 
-    can ask HPX to output a logfile via an environment variable. If you are using bash type
-    
-        export HPX_LOGLEVEL=5
-    
-    for very detailed information or
-    
-        export HPX_LOGLEVEL=2
-    
-    for more high level information.
-    
-    After you execute the application HPX creates a log file of the form hpx.PID.log. You can search this file
-    for the string getnumber_action and see that the thread IDs differ.
-*/
+// Copyright (c) 2011 John West <john.e.west@gmail.com>
+// 
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// This example code is a candidate for the "simplest possible" HPX program that is in some way
+// instructive. As such the code in it may not represent the best way of getting something done;
+// it is primarily meant to familiarize the reader with the essential steps to getting an HPX 
+// code up and running.
+//
+// The code starts out in the main routine, but the only function of the main() in this example is to 
+// (using the Boost helper routines) package up the command line options and call hpx_init(). 
+// hpx_init() initializes the runtime environment and then calls hpx_main(). This routine must be present, 
+// by name, in any HPX program. (For more about Boost, see http://www.boost.org/ .) 
+//
+// hpx_main() does some bookkeeping and setup and then causes parallel work to be done by invoking
+// the futures registered earlier in the program.
+// 
+// To run the program
+//   1. Type "make" in the directory
+//   2. ./basic_example -r -t 2 -a localhost:5005 -x localhost:5006. 
+//       - The "-t 2" option runs this program on two OS threads (one for each future). 
+//       - The "-r" option runs the AGAS server (necessary if it isn't already running somewhere else).
+//       - The "-a localhost:5005" option places the AGAS server on your machine and specifies that it
+//         use port 5005 (this example assumes that ports 5005 and 5006 are open on your system. 
+//         If they aren't, substitute two open port numbers appropriate for you).
+//       - The "-x localhost:5006" specifies that HPX should include "localhost" in the runtime and use
+//         port 5006.
+// 
+// If you'd like to get some validation that getnumber_action is being run on two different threads, you 
+// can ask HPX to output a logfile via an environment variable. If you are using bash type
+// 
+//    export HPX_LOGLEVEL=5
+// 
+// for very detailed information or
+// 
+//    export HPX_LOGLEVEL=2
+// 
+// for more high level information.
+// 
+// After you execute the application HPX creates a log file of the form hpx.PID.log. You can search this file
+// for the string getnumber_action and see that the thread IDs differ.
 
 //C++ include to permit output to the screen
 #include <iostream>
@@ -192,7 +192,7 @@ int hpx_main(po::variables_map &vm)
 
         //insert busy work
         
-        /* 	Calling the "get" method on a future causes the application to return the value that was
+        /*   Calling the "get" method on a future causes the application to return the value that was
             previouly computed (if the runtime was able to overlap some of the computation) or to 
             block until the requested value is available. Calling "get" tells the runtime that 
             you've got to have that value to continue with your computation and there is no other
@@ -214,7 +214,7 @@ int hpx_main(po::variables_map &vm)
 
 // The routine that does the "work" for this example.
 int getnumber ()
-{	
+{  
     int a,b;
     
     a = 2;
@@ -222,6 +222,4 @@ int getnumber ()
     
     return (a*b);
 }
-
-
 
