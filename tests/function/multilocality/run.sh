@@ -1,9 +1,12 @@
-#!/bin/bash
-#PBS -N multilocality_tests.cpi_test
-#PBS -l walltime=00:10:00,nodes=32:ppn=8
-#PBS -q workq
+#! /usr/bin/env bash
+#
+# Copyright (c) 2010-2011 Dylan Stark
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Make sure this matches your hpx_run install directory!
+# TODO: convert to python script, Bash is terribly non-portable
+
 export HPX_RUN=$HOME/projects/parallex_svn/projects/hpx_run
 
 cd $HOME
