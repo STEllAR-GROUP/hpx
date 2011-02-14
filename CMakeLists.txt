@@ -217,6 +217,37 @@ else()
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl)
   
   set(hpx_COMPONENT_LIBRARY_PREFIX "hpx_component_")
+
+  option(HPX_ELF_HIDDEN_VISIBILITY
+    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
+
+  if(CMAKE_COMPILER_IS_GNUCXX AND HPX_ELF_HIDDEN_VISIBILITY)
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
+    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fvisibility=hidden"
+      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo"
+      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo"
+      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo"
+      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
+    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo"
+      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo"
+      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo"
+      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
+  endif()
 endif()
 
 ################################################################################
