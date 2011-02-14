@@ -22,5 +22,5 @@ add_hpx_executable(bhc
                distributing_factory_component)
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.bhpx bhc) 
+add_dependencies(examples.bhpx bhc_exe) 
 

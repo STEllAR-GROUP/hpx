@@ -90,5 +90,5 @@ add_hpx_executable(cosmo_amr_client
   DEPENDENCIES ${cosmo_amr_DEPENDENCIES})
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.cosmo cosmo_amr_client) 
+add_dependencies(examples.cosmo cosmo_amr_client_exe) 
 

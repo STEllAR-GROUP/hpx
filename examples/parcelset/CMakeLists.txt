@@ -13,6 +13,6 @@ add_hpx_executable(parcelset_client SOURCES parcelset_client.cpp)
 add_hpx_executable(parcelset_server SOURCES parcelset_server.cpp)
 
 # add pseudo-target dependencies
-add_dependencies(examples.parcelset.parcelset_client parcelset_client)
-add_dependencies(examples.parcelset.parcelset_server parcelset_server)
+add_dependencies(examples.parcelset.parcelset_client parcelset_client_exe)
+add_dependencies(examples.parcelset.parcelset_server parcelset_server_exe)
 

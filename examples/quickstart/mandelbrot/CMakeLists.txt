@@ -21,5 +21,5 @@ add_hpx_executable(mandelbrot
   DEPENDENCIES mandelbrot_component_component)
 
 # add pseudo-target dependencies
-add_dependencies(examples.quickstart.mandelbrot mandelbrot)
+add_dependencies(examples.quickstart.mandelbrot mandelbrot_exe)
 

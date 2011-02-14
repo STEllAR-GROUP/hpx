@@ -9,5 +9,5 @@ add_hpx_executable(heart_beat SOURCES heart_beat.cpp
                               HEADERS heart_beat.hpp)
 
 # add pseudo-target dependencies
-add_dependencies(examples.heart_beat heart_beat)
+add_dependencies(examples.heart_beat heart_beat_exe)
 

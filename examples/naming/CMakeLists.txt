@@ -13,6 +13,6 @@ add_hpx_executable(resolver_client SOURCES resolver_client.cpp)
 add_hpx_executable(resolver_server SOURCES resolver_server.cpp)
 
 # add pseudo-target dependencies
-add_dependencies(examples.naming.resolver_client resolver_client)
-add_dependencies(examples.naming.resolver_server resolver_server)
+add_dependencies(examples.naming.resolver_client resolver_client_exe)
+add_dependencies(examples.naming.resolver_server resolver_server_exe)
 

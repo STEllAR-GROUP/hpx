@@ -13,7 +13,6 @@
 set(hpx_EXAMPLE_SUBDIRS 
     accumulator
     amr
-    #atomic
     basic_example
     bhpx
     cosmo
@@ -32,4 +31,20 @@ foreach(hpx_EXAMPLE_SUBDIR ${hpx_EXAMPLE_SUBDIRS})
   add_subdirectory(${hpx_EXAMPLE_SUBDIR})
   add_dependencies(examples examples.${hpx_EXAMPLE_SUBDIR})
 endforeach()
+
+add_custom_target(chirag)
+add_custom_target(dylan)
+add_custom_target(matt)
+add_custom_target(matt.all)
+
+add_dependencies(chirag examples.bhpx)
+
+add_dependencies(dylan examples.heart_beat)
+add_dependencies(dylan examples.cps)
+
+add_dependencies(matt examples.had_amr3d)
+add_dependencies(matt.all examples.cosmo)
+add_dependencies(matt.all examples.amr)
+add_dependencies(matt.all examples.had_amr)
+add_dependencies(matt.all examples.had_amr3d)
 

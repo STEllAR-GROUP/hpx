@@ -27,11 +27,8 @@ foreach(hpx_GENERIC_EXAMPLE ${hpx_GENERIC_EXAMPLES})
     SOURCES ${${hpx_GENERIC_EXAMPLE}_client_SOURCES}
     DEPENDENCIES ${hpx_GENERIC_EXAMPLE}_component)
 
-  # add a custom target for this example 
-  add_custom_target(examples.generic.${hpx_GENERIC_EXAMPLE})
-
   # add a dependency to the pseudo-target  
-  add_dependencies(examples.generic.${hpx_GENERIC_EXAMPLE}
-                   ${hpx_GENERIC_EXAMPLE}_client) 
+  add_dependencies(examples.generic
+                   ${hpx_GENERIC_EXAMPLE}_client_exe) 
 endforeach()
 

@@ -5,5 +5,5 @@
 
 add_hpx_executable(basic_example SOURCES basic_example.cpp)
 
-add_dependencies(examples.basic_example basic_example)
+add_dependencies(examples.basic_example basic_example_exe)
 

@@ -13,6 +13,6 @@ add_hpx_executable(factorial SOURCES factorial.cpp)
 add_hpx_executable(factorial_get SOURCES factorial_get.cpp)
 
 # add pseudo-target dependencies
-add_dependencies(examples.cps.factorial factorial)
-add_dependencies(examples.cps.factorial_get factorial_get)
+add_dependencies(examples.cps.factorial factorial_exe)
+add_dependencies(examples.cps.factorial_get factorial_get_exe)
 

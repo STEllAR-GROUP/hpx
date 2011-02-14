@@ -89,5 +89,5 @@ add_hpx_executable(had_amr3d_client
     DEPENDENCIES ${had_amr3d_DEPENDENCIES})
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.had_amr3d had_amr3d_client) 
+add_dependencies(examples.had_amr3d had_amr3d_client_exe) 
 

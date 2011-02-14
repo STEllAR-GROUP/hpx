@@ -34,6 +34,6 @@ foreach(hpx_ACCUMULATOR_EXAMPLE ${hpx_ACCUMULATOR_EXAMPLES})
 
   # add a dependency to the pseudo-target  
   add_dependencies(examples.accumulator.${hpx_ACCUMULATOR_EXAMPLE}
-                   ${hpx_ACCUMULATOR_EXAMPLE}_client) 
+                   ${hpx_ACCUMULATOR_EXAMPLE}_client_exe) 
 endforeach()
 
