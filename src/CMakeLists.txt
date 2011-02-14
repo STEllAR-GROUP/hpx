@@ -136,6 +136,7 @@ set (hpxlib_components_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/plain_component_factory.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/unique_component_name.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp)
 source_group("Header Files\\runtime\\components" 
     FILES ${hpxlib_components_HEADERS})
@@ -392,19 +393,17 @@ set (hpxlib_SOURCES
     ${hpxlib_util_SOURCES})
 
 # add source file from coroutine library 
-if(CMAKE_COMPILER_IS_GNUCXX OR (XIAR AND UNIX)
-    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PathScale")
-    SET(hpxlib_SOURCES 
+if(NOT MSVC)
+    set(hpxlib_SOURCES 
         ${hpxlib_SOURCES} 
         ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 endif()
 
 # Boost Chrono sources (as long as this library is not in Boost)
 if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-    set (hpxlib_SOURCES 
-         ${hpxlib_SOURCES}
-         ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+    set(hpxlib_SOURCES 
+        ${hpxlib_SOURCES}
+        ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
 endif()
 
 # yes, the main shared library contains components as well
