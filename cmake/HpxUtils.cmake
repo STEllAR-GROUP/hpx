@@ -103,7 +103,7 @@ macro(ADD_HPX_COMPONENT name)
     endif()
 
     if(UNIX)
-        set(component_LIBRARY_PREFIX "hpx_component_")
+        set(hpx_COMPONENT_LIBRARY_PREFIX "hpx_component_")
     endif()
     add_definitions(-DHPX_COMPONENT_NAME=${name})
     add_definitions(-DHPX_COMPONENT_EXPORTS)
@@ -117,7 +117,7 @@ macro(ADD_HPX_COMPONENT name)
         VERSION ${HPX_VERSION}      # create *nix style library versions + symbolic links
         SOVERSION ${HPX_SOVERSION}
         CLEAN_DIRECT_OUTPUT 1       # allow creating static and shared libs without conflicts
-        OUTPUT_NAME ${component_LIBRARY_PREFIX}${name})
+        OUTPUT_NAME ${hpx_COMPONENT_LIBRARY_PREFIX}${name})
 
     target_link_libraries(${name}_component 
         ${${name}_DEPENDENCIES}
@@ -210,17 +210,17 @@ macro(ADD_HPX_TEST name)
   set(simple_name ${simple_name}_${${name}_TEST})
   message("Adding test: " ${simple_name})
 
-  ADD_TEST(
+  add_test(
       NAME ${simple_name}
       COMMAND 
           ${hpx_SOURCE_DIR}/tools/hpx_run.py 
           "${app_command}"
           ${${name}_HPX})
 
-  SET_TESTS_PROPERTIES(${simple_name}
+  set_tests_properties(${simple_name}
                        PROPERTIES FAIL_REGULAR_EXPRESSION
                        "ERROR;FAIL;Test failed")
-  SET_TESTS_PROPERTIES(${simple_name}
+  set_tests_properties(${simple_name}
                        PROPERTIES PASS_REGULAR_EXPRESSION 
                        "Test passed")
 endmacro(ADD_HPX_TEST)

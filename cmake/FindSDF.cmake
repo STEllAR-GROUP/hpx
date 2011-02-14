@@ -11,7 +11,7 @@
 # SDF_ROOT          The SDF main path
 
 # Check if SDF_ROOT is defined and use that path first.
-if (NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
+if(NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
     set(SDF_ROOT $ENV{SDF_ROOT})
 endif(NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
 
