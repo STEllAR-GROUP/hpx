@@ -26,7 +26,7 @@ list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 
 # include additional macro definitions
-include(HpxUtils)
+include(HPX_Utils)
 
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -40,7 +40,7 @@ option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default:
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
-find_package(HpxBoostVersion)
+find_package(HPX_BoostVersion)
 
 if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
   message(STATUS "Not using HPX's internal version of Boost.Chrono")
@@ -69,7 +69,7 @@ else()
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
-find_package(HpxBoost)
+find_package(HPX_Boost)
 
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
@@ -151,7 +151,7 @@ set(HPX_HW_ACCELERATION OFF CACHE BOOL "Compile in support for hardware accelera
 mark_as_advanced(HPX_HW_ACCELERATION)
 
 if(HPX_HW_ACCELERATION)
-  find_package(PXACCEL)
+  find_package(HPX_PXACCEL)
 
   if(PXACCEL_FOUND)
     message(STATUS "Hardware acceleration framework found in ${PXACCEL_ROOT}.")

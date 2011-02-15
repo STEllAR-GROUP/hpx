@@ -1,4 +1,5 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,8 +11,12 @@
 # GMPXX_LIBRARY     The name(s) of the GMP++ library to link
 # GMP_ROOT          The GMP main path
 
+# C++-style include guard to prevent multiple searches in the same build
+if(NOT GMP_SEARCHED)
+set(GMP_SEARCHED ON CACHE INTERNAL "GMP library was searched for.")
+
 # Check if GMP_ROOT is defined and use that path first.
-if (NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
+if(NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
     set(GMP_ROOT $ENV{GMP_ROOT})
 endif(NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
 
@@ -20,7 +25,7 @@ if(GMP_ROOT)
     find_library(GMP_LIBRARY gmp PATHS ${GMP_ROOT}/lib NO_DEFAULT_PATH)
 
     if(NOT GMP_LIBRARY)
-        message(STATUS "Warning: GMP not found in the path specified in GMP_ROOT")
+        message(WARNING "GMP not found in ${GMP_ROOT}.")
         unset(GMP_ROOT)
     endif(NOT GMP_LIBRARY)
 endif(GMP_ROOT)
@@ -34,9 +39,11 @@ endif(NOT GMP_ROOT)
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GMP DEFAULT_MSG GMP_LIBRARY GMP_INCLUDE_DIR)
 
-if (GMP_FOUND)
+if(GMP_FOUND)
     get_filename_component(GMP_ROOT ${GMP_INCLUDE_DIR} PATH)
     set(GMP_ROOT ${GMP_ROOT} CACHE PATH "GMP root directory.")
     mark_as_advanced(GMP_INCLUDE_DIR GMP_LIBRARY)
 endif(GMP_FOUND)
+
+endif()
 

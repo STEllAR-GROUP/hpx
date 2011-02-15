@@ -11,13 +11,13 @@ set(hpx_HAD_AMR_SUBDIRS
     amr_c
     amr_c_test)
 
-find_package(GMP)
-find_package(SDF)
+find_package(HPX_GMP)
+find_package(HPX_RNPL)
 
-if(SDF_FOUND)
+if(RNPL_FOUND)
   # FIXME: HPX_* identifiers please
-  add_definitions(-DSDF_FOUND)
-  include_directories(${SDF_INCLUDE_DIR})
+  add_definitions(-DRNPL_FOUND)
+  include_directories(${RNPL_INCLUDE_DIR})
 endif()
 
 if(GMP_FOUND)
@@ -26,7 +26,7 @@ if(GMP_FOUND)
   include_directories(${GMP_INCLUDE_DIR})
 
   # MPFR depends on GMP, so no point looking for it if we don't have GMP  
-  find_package(MPFR)
+  find_package(HPX_MPFR)
   
   if(MPFR_FOUND)
     # FIXME: HPX_* identifiers please
@@ -77,11 +77,11 @@ if(GMP_FOUND)
   endif()
 endif()
 
-if(SDF_FOUND)
-  # add SDF as a dependency
+if(RNPL_FOUND)
+  # add RNPL as a dependency
   set(had_amr_DEPENDENCIES 
       ${had_amr_DEPENDENCIES}
-      ${SDF_LIBRARY})
+      ${RNPL_LIBRARY})
 endif()
 
 add_hpx_executable(had_amr_client 

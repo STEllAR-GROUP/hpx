@@ -1,4 +1,5 @@
 # Copyright (c) 2010 Maciej Brodowicz
+# Copyright (c) 2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,10 @@
 # PXACCEL_INC_DIR    The path to the public header files
 # PXACCEL_LIB_DIR    The path to the library
 # PXACCEL_BIN_DIR    The path to the binaries
+
+# C++-style include guard to prevent multiple searches in the same build
+if(NOT PXACCEL_SEARCHED)
+set(PXACCEL_SEARCHED ON CACHE INTERNAL "Hardware acceleration support was searched for.")
 
 # Check for explicit definition of root installation directory
 if(NOT PXACCEL_ROOT AND NOT $ENV{PXACCEL_ROOT} STREQUAL "")
@@ -21,7 +26,7 @@ if(PXACCEL_ROOT)
     find_program(PXACCEL_BIN pciconf PATHS ${PXACCEL_ROOT}/bin NO_DEFAULT_PATH)
 
     if(NOT PXACCEL_LIB OR NOT PXACCEL_INC_DIR)
-        message(STATUS "Warning: hardware access support not found in the path specified in PXACCEL_ROOT")
+        message(WARNING "Hardware access support not found in ${PXACCEL_ROOT}.")
         unset(PXACCEL_ROOT)
     endif()
 endif()
@@ -36,6 +41,7 @@ endif()
 if(PXACCEL_LIB)
     get_filename_component(PXACCEL_LIB_DIR ${PXACCEL_LIB} PATH)
 endif()
+
 if(PXACCEL_BIN)
     get_filename_component(PXACCEL_BIN_DIR ${PXACCEL_BIN} PATH)
 endif()
@@ -43,14 +49,15 @@ endif()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PXACCEL DEFAULT_MSG PXACCEL_LIB_DIR PXACCEL_INC_DIR PXACCEL_BIN_DIR)
 
-if (PXACCEL_FOUND)
+if(PXACCEL_FOUND)
     get_filename_component(PXACCEL_ROOT ${PXACCEL_INC_DIR} PATH)
-    set(PXACCEL_ROOT ${PXACCEL_ROOT} CACHE PATH "Root directory of acceleration framework.")
+    set(PXACCEL_ROOT ${PXACCEL_ROOT} CACHE PATH "Root directory of hardware acceleration framework.")
 endif()
 
-#mark_as_advanced(PXACCEL_DIR PXACCEL_BIN PXACCEL_LIB PXACCEL_INC_DIR
-#                 PXACCEL_LIB_DIR PXACCEL_BIN_DIR)
 mark_as_advanced(PXACCEL_ROOT PXACCEL_INC_DIR PXACCEL_LIB_DIR PXACCEL_BIN_DIR)
 
 unset(PXACCEL_BIN CACHE)
 unset(PXACCEL_LIB CACHE)
+
+endif() 
+
