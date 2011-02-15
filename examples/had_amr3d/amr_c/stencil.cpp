@@ -213,9 +213,13 @@ namespace hpx { namespace components { namespace amr
       }
 
       // Quick sanity check to be sure we have bracketed the point we wish to interpolate
-      if ( !no_interp_x  && !no_interp_y && !no_interp_z ) {
+      if ( !no_interp_x ) {
         BOOST_ASSERT(floatcmp_le(val->x_[ii-1],x) && floatcmp_ge(val->x_[ii],x) );
+      }
+      if ( !no_interp_y ) {
         BOOST_ASSERT(floatcmp_le(val->y_[jj-1],y) && floatcmp_ge(val->y_[jj],y) );
+      }
+      if ( !no_interp_z ) {
         BOOST_ASSERT(floatcmp_le(val->z_[kk-1],z) && floatcmp_ge(val->z_[kk],z) );
       }
 
@@ -557,6 +561,9 @@ namespace hpx { namespace components { namespace amr
 
       had_double_type tmp3[2][num_eqns];
 
+      // TEST
+      //std::cout << " TEST BEFORE " << result.phi[0][3]  << std::endl;
+
       for (int ll=0;ll<num_eqns;ll++) {
         // interpolate x
         tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
@@ -574,6 +581,9 @@ namespace hpx { namespace components { namespace amr
                                           yt,
                                           y[0],y[2]);
       }
+
+      // TEST
+      //std::cout << " TEST AFTER " << result.phi[0][3] << " input " << work[0].phi[0][3] << " " << work[1].phi[0][3] << " " << work[2].phi[0][3] << " " << work[3].phi[0][3] << std::endl;
 
       return;
     } // }}}
@@ -1224,24 +1234,6 @@ namespace hpx { namespace components { namespace amr
                                        val[anchor_index[6]],
                                        val[anchor_index[7]],
                                        resultval->value_[i+n*(j+n*k)],par);
-                  } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
-                    // 2D interp
-                    found = true;
-                    special_interp2d_xy(xt,yt,zt,dx,
-                                        val[anchor_index[8]],val[anchor_index[9]],
-                                        val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
-                  } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
-                    // 2D interp
-                    found = true;
-                    special_interp2d_yz(xt,yt,zt,dx,
-                                        val[anchor_index[12]],val[anchor_index[14]],
-                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
-                  } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
-                    // 2D interp
-                    found = true;
-                    special_interp2d_xz(xt,yt,zt,dx,
-                                        val[anchor_index[15]],val[anchor_index[13]],
-                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
                     // 1D interp
                     found = true;
@@ -1260,6 +1252,24 @@ namespace hpx { namespace components { namespace amr
                     special_interp1d_z(xt,yt,zt,dx,
                                        val[anchor_index[25]],val[anchor_index[24]],
                                        resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_xy(xt,yt,zt,dx,
+                                        val[anchor_index[8]],val[anchor_index[9]],
+                                        val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_yz(xt,yt,zt,dx,
+                                        val[anchor_index[12]],val[anchor_index[14]],
+                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_xz(xt,yt,zt,dx,
+                                        val[anchor_index[15]],val[anchor_index[13]],
+                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   }
 
                   if ( !found ) {
