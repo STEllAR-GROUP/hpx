@@ -54,7 +54,7 @@
 private:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static void BOOST_PP_CAT(invoke,N)(
-        hpx::lcos::lazy_future<Action,Result> *th, 
+        hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th, 
         naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
@@ -68,7 +68,7 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("lazy_future_direct::apply"),
         closure_(boost::bind(
-            BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+            &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }
@@ -77,7 +77,7 @@ public:
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("lazy_future_direct::apply"),
         closure_(boost::bind(
-            BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
+            &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { }

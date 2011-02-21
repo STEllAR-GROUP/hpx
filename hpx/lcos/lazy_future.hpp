@@ -112,7 +112,7 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        static void invoke(hpx::lcos::lazy_future<Action,Result> *th, 
+        static void invoke(hpx::lcos::lazy_future<Action,Result,boost::mpl::false_> *th, 
                            naming::id_type const& gid)
         {
             // FIXME: Simultaneous calls to invokeN() methods may result in
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void invoke1(naming::id_type const& gid, Arg0 const arg0)
+        void invoke1(naming::id_type const& gid, Arg0 const& arg0)
         {
             if (!((*this->impl_)->is_data()))
                 this->apply(gid, arg0);
@@ -289,7 +289,7 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        static void invoke(hpx::lcos::lazy_future<Action,Result> *th, 
+        static void invoke(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th, 
                            naming::id_type const& gid)
         {
             if (!((*th->impl_)->is_data()))
@@ -314,12 +314,12 @@ namespace hpx { namespace lcos
         ///               with the action as the continuation parameter).
         lazy_future(naming::gid_type const& gid)
           : apply_logger_("lazy_future_direct::apply"),
-            closure_(boost::bind(invoke, 
+            closure_(boost::bind(&lazy_future::invoke, 
                 naming::id_type(gid, naming::id_type::unmanaged)))
         { }
         lazy_future(naming::id_type const& gid)
           : apply_logger_("lazy_future_direct::apply"),
-            closure_(boost::bind(invoke, this, gid))
+            closure_(boost::bind(&lazy_future::invoke, this, gid))
         { }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -360,8 +360,8 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        static void invoke1(hpx::lcos::lazy_future<Action,Result> *th, 
-                            naming::id_type const& gid, Arg0 const arg0)
+        static void invoke1(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th, 
+                            naming::id_type const& gid, Arg0 const& arg0)
         {
             if (!((*th->impl_)->is_data()))
                 th->apply(gid, arg0);
@@ -388,13 +388,13 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         lazy_future(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("lazy_future_direct::apply"),
-            closure_(boost::bind(invoke1, this, 
+            closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this, 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { }
         template <typename Arg0>
         lazy_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("lazy_future_direct::apply"),
-            closure_(boost::bind(invoke1, this, gid, arg0))
+            closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this, gid, arg0))
         { }
 
         // pull in remaining constructors
