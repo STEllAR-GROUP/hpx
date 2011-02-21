@@ -9,6 +9,7 @@ set(type unit)
 set(groups 
     sanity
     component_memory
+    component_memory_block
     #lco
     #threadmanager
     performance_counters)
