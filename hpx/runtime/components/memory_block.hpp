@@ -40,7 +40,7 @@ namespace hpx { namespace components
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        /// Create a new instance of an distributing_factory on the locality as 
+        /// Create a new instance of a memory_block component on the locality as 
         /// given by the parameter \a targetgid
         template <typename T>
         memory_block& 
