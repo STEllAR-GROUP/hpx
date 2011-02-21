@@ -11,10 +11,16 @@
 # GMPXX_LIBRARY     The name(s) of the GMP++ library to link
 # GMP_ROOT          The GMP main path
 
+################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT GMP_SEARCHED)
-set(GMP_SEARCHED ON CACHE INTERNAL "GMP library was searched for.")
+set(GMP_SEARCHED ON CACHE INTERNAL "Found GMP library")
 
+if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
+  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+endif()
+
+################################################################################
 # Check if GMP_ROOT is defined and use that path first.
 if(NOT GMP_ROOT AND NOT $ENV{GMP_ROOT} STREQUAL "")
     set(GMP_ROOT $ENV{GMP_ROOT})
@@ -41,9 +47,13 @@ find_package_handle_standard_args(GMP DEFAULT_MSG GMP_LIBRARY GMP_INCLUDE_DIR)
 
 if(GMP_FOUND)
     get_filename_component(GMP_ROOT ${GMP_INCLUDE_DIR} PATH)
+    set(GMP_FOUND ${GMP_FOUND} CACHE BOOL "Found GMP.")
     set(GMP_ROOT ${GMP_ROOT} CACHE PATH "GMP root directory.")
-    mark_as_advanced(GMP_INCLUDE_DIR GMP_LIBRARY)
+    set(GMP_INCLUDE_DIR ${GMP_INCLUDE_DIR} CACHE PATH "GMP include directory.")
+    set(GMP_LIBRARY ${GMP_LIBRARY} CACHE FILEPATH "GMP shared library.")
 endif(GMP_FOUND)
+
+################################################################################
 
 endif()
 

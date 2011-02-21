@@ -3,6 +3,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+################################################################################
+# C++-style include guard to prevent multiple searches in the same build
+if(NOT BOOST_VERSION_SEARCHED)
+set(BOOST_VERSION_SEARCHED ON CACHE INTERNAL "Found Boost version")
+
+if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
+  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+endif()
+
+################################################################################
 macro(get_boost_version)
   if(NOT BOOST_VERSION_FOUND)
   set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
@@ -105,7 +115,9 @@ macro(get_boost_version)
   endif()
 endmacro()
 
-if(NOT BOOST_VERSION_FOUND)
-  get_boost_version()
+get_boost_version()
+
+################################################################################
+
 endif()
 

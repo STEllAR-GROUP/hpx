@@ -9,10 +9,16 @@
 #  MPFR_LIBRARY      The name(s) of the MPFR library 
 #  MPFR_ROOT         MPFR main path.
 
+################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT MPFR_SEARCHED)
-set(MPFR_SEARCHED ON CACHE INTERNAL "MPFR library was searched for.")
+set(MPFR_SEARCHED ON CACHE INTERNAL "Found MPFR library")
 
+if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
+  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+endif()
+
+################################################################################
 # Check if MPFR_ROOT is defined and use that path first.
 if (NOT MPFR_ROOT AND NOT $ENV{MPFR_ROOT} STREQUAL "")
     set(MPFR_ROOT $ENV{MPFR_ROOT})
@@ -36,9 +42,13 @@ find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_LIBRARY MPFR_INCLUDE_DIR
 
 if(MPFR_FOUND)
     get_filename_component(MPFR_ROOT ${MPFR_INCLUDE_DIR} PATH)
+    set(MPFR_FOUND ${MPFR_FOUND} CACHE BOOL "Found MPFR.")
     set(MPFR_ROOT ${MPFR_ROOT} CACHE PATH "MPFR root directory.")
-    mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
+    set(MPFR_INCLUDE_DIR ${MPFR_INCLUDE_DIR} CACHE PATH "MPFR include directory.")
+    set(MPFR_LIBRARY ${MPFR_LIBRARY} CACHE FILEPATH "MPFR shared library.")
 endif()
+
+################################################################################
 
 endif()
 

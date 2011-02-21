@@ -3,12 +3,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-option(BOOST_DEBUG "Enable debugging for the FindBoost (default: OFF)." OFF)
-    
+################################################################################
+# C++-style include guard to prevent multiple searches in the same build
+if(NOT BOOST_SEARCHED)
+set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
+
+include(HPX_Utils)
+
+if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
+  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+endif()
+
+################################################################################
 option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
   
 if(NOT BOOST_VERSION_FOUND)
-  include(FindBoostVersion)
+  include(FindHPX_BoostVersion)
 endif()
 
 macro(get_boost_compiler_version)
@@ -132,54 +142,45 @@ macro(find_boost_library TARGET_LIB)
     build_boost_libname(${TARGET_LIB}) 
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      if(BOOST_DEBUG)
-        message(STATUS "Looking for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
-      endif()
+      hpx_debug("Looking for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
 
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIB_DIR} NO_DEFAULT_PATH)
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
-        if(BOOST_DEBUG)
-          message(STATUS "Found for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
-        endif()
+        hpx_debug("Found for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
         break()
       endif()
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      message(WARNING "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR}. Now searching the system.")
+      hpx_warning("Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR}. Now searching the system.")
       unset(BOOST_${TARGET_LIB}_LIBRARY)
    
       build_boost_libname(${TARGET_LIB}) 
     
       foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-        if(BOOST_DEBUG)
-          message(STATUS "Looking for ${BOOST_TARGET} in system path...")
-        endif()
+        hpx_debug("Looking for ${BOOST_TARGET} in system path...")
 
         find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
         if(BOOST_${TARGET_LIB}_LIBRARY)
-          if(BOOST_DEBUG)
-            message(STATUS "Found for ${BOOST_TARGET} in system path...")
-          endif()
+          hpx_debug("Found for ${BOOST_TARGET} in system path...")
           break()
         endif()
       endforeach()
     
       if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-        set(BOOST_ERROR_MSG "Failed to locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR} or in the default path.")
-        message(FATAL_ERROR "${BOOST_ERROR_MSG}")
+        hpx_error("Failed to locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR} or in the default path.")
         unset(BOOST_${TARGET_LIB}_LIBRARY)
       else()
         set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
           CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-        message(STATUS "Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
+        hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
       endif()
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-      message(STATUS "Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
+      hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
     endif()
     
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
@@ -190,28 +191,24 @@ macro(find_boost_library TARGET_LIB)
     build_boost_libname(${TARGET_LIB}) 
     
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      if(BOOST_DEBUG)
-        message(STATUS "Looking for ${BOOST_TARGET} in system path...")
-      endif()
+      hpx_debug("Looking for ${BOOST_TARGET} in system path...")
 
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
-        if(BOOST_DEBUG)
-          message(STATUS "Found for ${BOOST_TARGET} in system path...")
-        endif()
+        hpx_debug("Found for ${BOOST_TARGET} in system path...")
         break()
       endif()
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      message(FATAL_ERROR "Failed to locate Boost ${TARGET_LIB} shared library in the system path.")
+      hpx_error("Failed to locate Boost ${TARGET_LIB} shared library in the system path.")
       set(BOOST_FOUND OFF)
       unset(BOOST_${TARGET_LIB}_LIBRARY)
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-      message(STATUS "Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
+      hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
     endif()
   
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
@@ -223,4 +220,8 @@ foreach(BOOST_LIB ${BOOST_LIBRARIES})
 endforeach()
 
 set(BOOST_FOUND_LIBRARIES ${BOOST_FOUND_LIBRARIES} CACHE STRING "Boost shared libraries found by CMake (default: none).")
+
+################################################################################
+
+endif()
 

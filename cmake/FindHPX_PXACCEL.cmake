@@ -11,10 +11,16 @@
 # PXACCEL_LIB_DIR    The path to the library
 # PXACCEL_BIN_DIR    The path to the binaries
 
+################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT PXACCEL_SEARCHED)
-set(PXACCEL_SEARCHED ON CACHE INTERNAL "Hardware acceleration support was searched for.")
+set(PXACCEL_SEARCHED ON CACHE INTERNAL "Found hardware acceleration")
 
+if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
+  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+endif()
+
+################################################################################
 # Check for explicit definition of root installation directory
 if(NOT PXACCEL_ROOT AND NOT $ENV{PXACCEL_ROOT} STREQUAL "")
     set(PXACCEL_ROOT $ENV{PXACCEL_ROOT})
@@ -51,13 +57,15 @@ find_package_handle_standard_args(PXACCEL DEFAULT_MSG PXACCEL_LIB_DIR PXACCEL_IN
 
 if(PXACCEL_FOUND)
     get_filename_component(PXACCEL_ROOT ${PXACCEL_INC_DIR} PATH)
+    set(PXACCEL_FOUND ${PXACCEL_FOUND} CACHE BOOL "Found PXACCEL.")
     set(PXACCEL_ROOT ${PXACCEL_ROOT} CACHE PATH "Root directory of hardware acceleration framework.")
+    set(PXACCEL_INC_DIR ${PXACCEL_INC_DIR} CACHE PATH "PXACCEL include directory.")
+    set(PXACCEL_LIB_DIR ${PXACCEL_LIB_DIR} CACHE PATH "PXACCEL shared library directory.")
+    set(PXACCEL_LIB ${PXACCEL_LIB} CACHE FILEPATH "PXACCEL shared library.")
+    set(PXACCEL_BIN_DIR ${PXACCEL_BIN_DIR} CACHE PATH "PXACCEL binary directory.")
 endif()
 
-mark_as_advanced(PXACCEL_ROOT PXACCEL_INC_DIR PXACCEL_LIB_DIR PXACCEL_BIN_DIR)
+################################################################################
 
-unset(PXACCEL_BIN CACHE)
-unset(PXACCEL_LIB CACHE)
-
-endif() 
+endif()
 
