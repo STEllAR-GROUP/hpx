@@ -399,7 +399,7 @@ macro(hpx_force_out_of_tree_build message)
   get_filename_component(parentdir ${CMAKE_SOURCE_DIR} PATH)
   string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${parentdir}" insourcesubdir)
   if(insource OR insourcesubdir)
-    message(FATAL_ERROR "${MSG}")
+    message(FATAL_ERROR "${message}")
   endif()
 endmacro()
 
