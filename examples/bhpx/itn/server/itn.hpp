@@ -11,6 +11,10 @@
 
 #include "../../tlf/tlf.hpp"
 
+#include "../itn.hpp"
+#include "../stubs/itn.hpp"
+// #include "../stubs/itn.hpp"
+
 namespace hpx { namespace components { namespace itn { namespace server
 {
     
@@ -21,7 +25,7 @@ namespace hpx { namespace components { namespace itn { namespace server
         
         struct child_type 
         {
-          int leaf;
+          int leaf;      // leaf = 0 - Intermediate Node, leaf = -1 - NULL, leaf = 1 - TreeLeaf type
           naming::id_type gid;
         };
         
@@ -33,7 +37,8 @@ namespace hpx { namespace components { namespace itn { namespace server
             itn_get_mass = 3,
             itn_get_pos = 4,
             itn_print = 5,
-            itn_get_type = 6
+            itn_get_type = 6,
+            itn_insert_body = 7
         };
         
         itn()
@@ -96,50 +101,77 @@ namespace hpx { namespace components { namespace itn { namespace server
             << p[2] << " " << std::flush << std::endl;    
         }
         
-//         void insert_body(naming::id_type const& gid, const double sub_box_dim)
-//         {
-//             int i = 0;
-//             std::vector<double> bpos = components::tlf::stubs::tlf::get_pos(gid);
-//             double temp[3];
-//             temp[0] = 0.0;
-//             temp[1] = 0.0;
-//             temp[2] = 0.0;
-//             
-//             if(p[0] < bpos[0])
-//             {
-//                 i = 1;
-//                 temp[0] = sub_box_dim;
-//             }
-//             if(p[1] < bpos[1])
-//             {
-//                 i += 2;
-//                 temp[2] = sub_box_dim;
-//             }
-//             if(p[2] < bpos[2])
-//             {
-//                 i += 4;
-//                 temp[2] = sub_box_dim;
-//             }
-//             if(child[i].leaf == -1)
-//             {
-//                 child[i].leaf = 1; // child[i] contains a TLF
-//                 child[i].gid = gid;
-//             }
-//             // TODO : figure out how to get node_type from an unknown component type 
-//             // int child_node_type = components_child[i]. ;
-//             //NEED TO WRITE GET_TYPE function in both components so we can check if the particle is a TLF OR ITN
-//             if(child[i].leaf == 1)
-//             {
-//                 const double new_sub_box_dim = 0.5 * sub_box_dim;
-//                 const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
-//                 naming::id_type cur_bod_gid = child[i].gid;
-//                 hpx::components::itn::itn temp_itn;
-//                 temp_itn.create(naming::id_type(child[i].gid, naming::id_type::unmanaged));
-//                 temp_itn.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
-//                 
-//             }
-//         }
-//         
+        void insert_body(naming::id_type const & new_bod_gid, double sub_box_dim)
+        {
+            int i=0;
+            std::vector<double> bpos = components::tlf::stubs::tlf::get_pos(new_bod_gid);
+            
+            double temp[3];
+            temp[0] = 0.0;
+            temp[1] = 0.0;
+            temp[2] = 0.0;
+            
+            if(p[0] < bpos[0])
+            {
+                i = 1;
+                temp[0] = sub_box_dim;
+            }
+            if(p[1] < bpos[1])
+            {
+                i += 2;
+                temp[2] = sub_box_dim;
+            }
+            if(p[2] < bpos[2])
+            {
+                i += 4;
+                temp[2] = sub_box_dim;
+            }
+            
+            if(child[i].leaf == -1)   // if child branch i is empty/NUll then set it to the new body being inserted
+            {
+                child[i].leaf = 1;
+                child[i].gid = new_bod_gid;
+            }
+            
+            else if(child[i].leaf == 0)   // if the child branch is an intermediate node
+            {
+                // Not correct the key issue here would be to get the ITN component from the child[i].gid and then 
+                // call the insert_body function on the retrieved component 
+                // TODO: need to create child[i].gid
+                
+                
+               hpx::components::itn::stubs::itn::insert_body(child[i].gid, new_bod_gid, 0.5* sub_box_dim);
+                //insert_body(child[i].gid, 0.5 * sub_box_dim);
+            }
+            
+            else if(child[i].leaf == 1) //if the child branch node is a treeleaf
+            {
+
+                // TODO: need to create child[i].gid
+                
+                naming::id_type cur_bod_gid = child[i].gid;
+                
+                //create an intermediate node that will reside in the current branch
+                child[i].leaf = 0;
+                const double new_sub_box_dim = 0.5 * sub_box_dim;
+                const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
+                hpx::components::itn::itn temp_itn;
+                
+                
+                temp_itn.create(child[i].gid);
+                temp_itn.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
+                child[i].gid = temp_itn.get_gid(); 
+                
+                
+                temp_itn.insert_body(cur_bod_gid, new_sub_box_dim);
+                temp_itn.insert_body(new_bod_gid, new_sub_box_dim);
+                
+                
+            } 
+            
+            
+        }
+             
         typedef hpx::actions::action3<itn, itn_set_pos, double, double, double, &itn::set_pos> set_pos_action;
         typedef hpx::actions::action1<itn, itn_set_mass, double, &itn::set_mass> set_mass_action;
         typedef hpx::actions::result_action0<itn, double, itn_get_mass, &itn::get_mass > get_mass_action;
@@ -147,7 +179,7 @@ namespace hpx { namespace components { namespace itn { namespace server
         typedef hpx::actions::action0<itn, itn_print, &itn::print> print_action;
         typedef hpx::actions::action3<itn, itn_new_node, double, double, double, &itn::new_node> new_node_action;
         typedef hpx::actions::result_action0<itn, int, itn_get_type, &itn::get_type> get_type_action;
-        
+        typedef hpx::actions::action2<itn, itn_insert_body, naming::id_type, double, &itn::insert_body > insert_body_action;
         
     private:
         int node_type;

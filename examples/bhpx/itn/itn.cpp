@@ -18,7 +18,8 @@ HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::new_node_action, itn_new_node_act
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::print_action, itn_print_action);
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_mass_action, itn_get_mass_action);
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_pos_action, itn_get_pos_action);
-HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_type_action, itn_get_type_action)
+HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_type_action, itn_get_type_action);
+HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::insert_body_action, itn_insert_body_action);
 
 
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action, set_result_action_vector_double);
