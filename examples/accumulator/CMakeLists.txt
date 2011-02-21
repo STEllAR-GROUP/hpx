@@ -5,35 +5,35 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # just recurse into all components subdirectories and execute the scripts there
-set(hpx_ACCUMULATOR_SUBDIRS 
+set(subdirs 
     accumulator
     simple_accumulator)
 
-foreach(hpx_ACCUMULATOR_SUBDIR ${hpx_ACCUMULATOR_SUBDIRS})
-  add_subdirectory(${hpx_ACCUMULATOR_SUBDIR})
-endforeach()
-
-# define list of target names for this directory
-set(hpx_ACCUMULATOR_EXAMPLES 
-    accumulator          # accumulator_client example
-    simple_accumulator)  # simple_accumulator_client example
-
 # for all targets specified above
-foreach(hpx_ACCUMULATOR_EXAMPLE ${hpx_ACCUMULATOR_EXAMPLES})
-  # define build target
-  set(${hpx_ACCUMULATOR_EXAMPLE}_client_SOURCES 
-      ${hpx_ACCUMULATOR_EXAMPLE}_client.cpp)
+foreach(subdir ${subdirs})
+  add_subdirectory(${subdir})
+
+  set(sources
+      ${subdir}_client.cpp)
+
+  source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${hpx_ACCUMULATOR_EXAMPLE}_client 
-    SOURCES ${${hpx_ACCUMULATOR_EXAMPLE}_client_SOURCES}
-    DEPENDENCIES ${hpx_ACCUMULATOR_EXAMPLE}_component)
+  add_hpx_executable(${subdir}_client 
+    MODULE accumulator
+    SOURCES ${sources} 
+    DEPENDENCIES ${subdir}_component)
 
   # add a custom target for this example 
-  add_custom_target(examples.accumulator.${hpx_ACCUMULATOR_EXAMPLE})
+  add_custom_target(examples.accumulator.${subdir})
 
-  # add a dependency to the pseudo-target  
-  add_dependencies(examples.accumulator.${hpx_ACCUMULATOR_EXAMPLE}
-                   ${hpx_ACCUMULATOR_EXAMPLE}_client_exe) 
+  # make pseudo-targets depend on master pseudo-target
+  add_dependencies(examples.accumulator
+                   examples.accumulator.${subdir})
+
+  # add dependencies to pseudo-target 
+  add_dependencies(examples.accumulator.${subdir}
+                   ${subdir}_client 
+                   ${subdir}_client_exe) 
 endforeach()
 

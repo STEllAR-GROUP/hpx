@@ -4,15 +4,32 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# add pseudo-targets
-add_custom_target(examples.naming.resolver_client)
-add_custom_target(examples.naming.resolver_server)
+# define build targets for this directory
+set(example_programs
+    resolver_client
+    resolver_server)
 
-# agas examples (resolver_server/resolver_client)
-add_hpx_executable(resolver_client SOURCES resolver_client.cpp)
-add_hpx_executable(resolver_server SOURCES resolver_server.cpp)
+foreach(example_program ${example_programs})
+  set(sources
+      ${example_program}.cpp)
 
-# add pseudo-target dependencies
-add_dependencies(examples.naming.resolver_client resolver_client_exe)
-add_dependencies(examples.naming.resolver_server resolver_server_exe)
+  source_group("Source Files" FILES ${sources})
+
+  # add example executable
+  add_hpx_executable(${example_program}
+                     MODULE naming
+                     SOURCES ${sources})
+
+  # add a custom target for this example 
+  add_custom_target(examples.naming.${example_program})
+
+  # make pseudo-targets depend on master pseudo-target
+  add_dependencies(examples.naming
+                   examples.naming.${example_program})
+
+  # add dependencies to pseudo-target 
+  add_dependencies(examples.naming.${example_program}
+                   ${example_program} 
+                   ${example_program}_exe)
+endforeach() 
 

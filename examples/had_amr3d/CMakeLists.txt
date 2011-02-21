@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # just recurse into all components subdirectories and execute the scripts there
-set(hpx_HAD_AMR3D_SUBDIRS 
+set(subdirs 
     amr
     amr_c
     amr_c_test)
@@ -42,23 +42,24 @@ if(GMP_FOUND)
   endif()
 endif()
 
-foreach(hpx_HAD_AMR3D_SUBDIR ${hpx_HAD_AMR_SUBDIRS})
-  add_subdirectory(${hpx_HAD_AMR3D_SUBDIR})
+foreach(subdir ${subdirs})
+  add_subdirectory(${subdir})
 endforeach()
 
 # define build target for this directory
-set(had_amr3d_client_SOURCES 
+set(sources 
     amr_client.cpp)
 
-if (MPFR_FOUND) 
-    set(had_amr3d_client_SOURCES 
-        ${had_amr3d_client_SOURCES}
-        mpreal.cpp 
-        serialize_mpreal.cpp)
+# add these MPFR specific files if we have MPFR
+if(MPFR_FOUND) 
+  set(sources 
+      ${sources}
+      mpreal.cpp 
+      serialize_mpreal.cpp)
 endif()
 
 # define basic dependencies
-set(had_amr3d_DEPENDENCIES
+set(dependencies
     had_amr3d_component 
     had_amr3d_c_component 
     had_amr3d_c_test_component
@@ -66,28 +67,31 @@ set(had_amr3d_DEPENDENCIES
 
 if(GMP_FOUND)
   # add GMP as a dependency
-  set(had_amr3d_DEPENDENCIES 
-      ${had_amr3d_DEPENDENCIES}
+  set(dependencies 
+      ${dependencies}
       ${GMP_LIBRARY})
   if(MPFR_FOUND)
     # add MPFR as a dependency
-    set(had_amr3d_DEPENDENCIES 
-        ${had_amr3d_DEPENDENCIES}
+    set(dependencies 
+        ${dependencies}
         ${MPFR_LIBRARY})
   endif()
 endif()
 
 if(RNPL_FOUND)
   # add RNPL as a dependency
-  set(had_amr3d_DEPENDENCIES 
-      ${had_amr3d_DEPENDENCIES}
+  set(dependencies 
+      ${dependencies}
       ${RNPL_LIBRARY})
 endif()
 
+source_group("Source Files" FILES ${sources})
+
 add_hpx_executable(had_amr3d_client 
-    SOURCES ${had_amr3d_client_SOURCES}
-    DEPENDENCIES ${had_amr3d_DEPENDENCIES})
+  MODULE had_amr3d
+  SOURCES ${sources}
+  DEPENDENCIES ${dependencies})
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.had_amr3d had_amr3d_client_exe) 
+add_dependencies(examples.had_amr3d had_amr3d_client_exe had_amr3d_client) 
 

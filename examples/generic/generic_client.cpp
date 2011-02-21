@@ -50,7 +50,7 @@ int hpx_main()
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: hpx_runtime [options]");
+        po::options_description desc_cmdline ("Usage: generic_client [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -62,7 +62,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
         ;
 

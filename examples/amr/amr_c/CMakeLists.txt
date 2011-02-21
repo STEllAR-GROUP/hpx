@@ -3,23 +3,33 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(amr_c_HEADERS
-    logging.hpp
-    stencil.hpp
-    stencil_data.hpp
-    stencil_functions.hpp)
-
-set(amr_c_SOURCES
+###############################################################################
+set(sources
     amr_c.cpp
     logging.cpp
     stencil.cpp)
 
-set(amr_c_INI
+set(headers
+    logging.hpp
+    stencil.hpp
+    stencil_data.hpp
+    stencil_data_locking.hpp
+    stencil_functions.hpp)
+
+###############################################################################
+set(ini_files
     amr_c.ini)
 
+###############################################################################
+source_group("Source Files"        FILES ${sources})
+source_group("Header Files"        FILES ${headers})
+source_group("Configuration Files" FILES ${ini_files})
+
+###############################################################################
 add_hpx_component(amr_c
-    SOURCES ${amr_c_SOURCES} 
-    HEADERS ${amr_c_HEADERS}
-    INI ${amr_c_INI}
-    DEPENDENCIES amr_c_test_component)
+  MODULE amr
+  SOURCES ${sources} 
+  HEADERS ${headers}
+  INI ${ini_files}
+  DEPENDENCIES amr_c_test_component)
 

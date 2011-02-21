@@ -87,14 +87,14 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("sizex,X", po::value<int>(), 
                 "the horizontal (X) size of the generated image (default is 20)")
             ("sizey,Y", po::value<int>(), 
                 "the vertical (Y) size of the generated image (default is 20)")
             ("iterations,i", po::value<int>(), 
-                "the nmber of iterations to use for the mandelbrot set calculations"
+                "the number of iterations to use for the mandelbrot set calculations"
                 " (default is 100")
         ;
 
@@ -131,7 +131,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
         std::cerr << "mandelbrot: illegal port number given: " << v.substr(p+1) << std::endl;
-        std::cerr << "           using default value instead: " << port << std::endl;
+        std::cerr << "            using default value instead: " << port << std::endl;
     }
 }
 

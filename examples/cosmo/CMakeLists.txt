@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # just recurse into all components subdirectories and execute the scripts there
-set(hpx_COSMO_AMR_SUBDIRS 
+set(subdirs 
     amr
     amr_c
     amr_c_test)
@@ -42,24 +42,24 @@ if(GMP_FOUND)
   endif()
 endif()
 
-foreach(hpx_COSMO_AMR_SUBDIR ${hpx_COSMO_AMR_SUBDIRS})
-  add_subdirectory(${hpx_COSMO_AMR_SUBDIR})
+foreach(subdir ${subdirs})
+  add_subdirectory(${subdir})
 endforeach()
 
 # define build target for this directory
-set(cosmo_amr_client_SOURCES 
+set(sources 
     amr_client.cpp)
 
 # add these MPFR specific files if we have MPFR
 if(MPFR_FOUND) 
-  set(cosmo_amr_client_SOURCES 
-      ${cosmo_amr_client_SOURCES}
+  set(sources 
+      ${sources}
       mpreal.cpp 
       serialize_mpreal.cpp)
 endif()
 
 # define basic dependencies
-set(cosmo_amr_DEPENDENCIES
+set(dependencies
     cosmo_amr_component 
     cosmo_amr_c_component 
     cosmo_amr_c_test_component
@@ -67,28 +67,31 @@ set(cosmo_amr_DEPENDENCIES
 
 if(GMP_FOUND)
   # add GMP as a dependency
-  set(cosmo_amr_DEPENDENCIES 
-      ${cosmo_amr_DEPENDENCIES}
+  set(dependencies 
+      ${dependencies}
       ${GMP_LIBRARY})
   if(MPFR_FOUND)
     # add MPFR as a dependency
-    set(cosmo_amr_DEPENDENCIES 
-        ${cosmo_amr_DEPENDENCIES}
+    set(dependencies 
+        ${dependencies}
         ${MPFR_LIBRARY})
   endif()
 endif()
 
 if(RNPL_FOUND)
   # add RNPL as a dependency
-  set(cosmo_amr_DEPENDENCIES 
-      ${cosmo_amr_DEPENDENCIES}
+  set(dependencies 
+      ${dependencies}
       ${RNPL_LIBRARY})
 endif()
 
+source_group("Source Files" FILES ${sources})
+
 add_hpx_executable(cosmo_amr_client 
-  SOURCES ${cosmo_amr_client_SOURCES}
-  DEPENDENCIES ${cosmo_amr_DEPENDENCIES})
+  MODULE cosmo
+  SOURCES ${sources}
+  DEPENDENCIES ${dependencies})
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.cosmo cosmo_amr_client_exe) 
+add_dependencies(examples.cosmo cosmo_amr_client_exe cosmo_amr_client) 
 

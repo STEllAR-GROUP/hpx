@@ -4,62 +4,55 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(had_amr3d_client_HEADERS
+set(client_sources
+    amr.cpp
+    parameter.cpp)
+
+set(server_sources
+    server/unigrid_mesh.cpp
+    server/functional_component.cpp
+    server/stencil_value_out_adaptor.cpp
+    server/dynamic_stencil_value.cpp)
+
+###############################################################################
+set(client_headers
     unigrid_mesh.hpp
     functional_component.hpp
     dynamic_stencil_value.hpp)
-source_group("Header Files" 
-    FILES ${had_amr3d_client_HEADERS})
 
-set(had_amr3d_stubs_HEADERS
+set(stubs_headers
     stubs/unigrid_mesh.hpp
     stubs/functional_component.hpp
     stubs/dynamic_stencil_value.hpp)
-source_group("Header Files\\Stubs" 
-    FILES ${had_amr3d_stubs_HEADERS})
 
-set(had_amr3d_server_HEADERS
+set(server_headers
     server/unigrid_mesh.hpp
     server/functional_component.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp
     server/dynamic_stencil_value.hpp
     server/dynamic_stencil_value_impl.hpp)
-source_group("Header Files\\Server" 
-    FILES ${had_amr3d_server_HEADERS})
-
-set(had_amr3d_HEADERS
-    ${had_amr3d_client_HEADERS}
-    ${had_amr3d_stubs_HEADERS}
-    ${had_amr3d_server_HEADERS})
 
 ###############################################################################
-set(had_amr3d_client_SOURCES
-    amr.cpp parameter.cpp)
-source_group("Source Files" 
-    FILES ${had_amr3d_client_SOURCES})
+set(sources
+    ${client_sources}
+    ${server_sources})
 
-set(had_amr3d_server_SOURCES
-    server/unigrid_mesh.cpp
-    server/functional_component.cpp
-    server/stencil_value_out_adaptor.cpp
-    server/dynamic_stencil_value.cpp)
-source_group("Source Files\\Server" 
-    FILES ${had_amr3d_server_SOURCES})
-
-set(had_amr3d_SOURCES
-    ${had_amr3d_client_SOURCES}
-    ${had_amr3d_server_SOURCES})
+set(headers
+    ${client_headers}
+    ${stubs_headers}
+    ${server_headers})
 
 ###############################################################################
-set(had_amr3d_INI
-    )
-source_group("" 
-    FILES ${had_amr3d_INI})
+source_group("Source Files\\Client" FILES ${client_sources})
+source_group("Source Files\\Server" FILES ${server_sources})
+source_group("Header Files\\Client" FILES ${client_headers})
+source_group("Header Files\\Stubs"  FILES ${stubs_headers})
+source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(had_amr3d 
-    SOURCES ${had_amr3d_SOURCES} 
-    HEADERS ${had_amr3d_HEADERS}
-    INI ${had_amr3d_INI})
+  MODULE had_amr3d
+  SOURCES ${sources} 
+  HEADERS ${headers})
 

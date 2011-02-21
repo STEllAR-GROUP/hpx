@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
       ("csv,s", "generate statistics of the run in comma separated format")
       ("busywait,b", po::value<int>(),
        "add this amount of busy wait workload to each of the iterations"
-       " [in steps of 1µs], i.e. -b1000 == 1ms")
+       " [in microseconds], i.e. -b1000 == 1 millisecond")
       ;
 
   // Initialize and run HPX

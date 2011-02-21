@@ -177,10 +177,10 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("localities,l", po::value<int>(), 
-                "the number of localities to wait for at application startup"
+                "the number of localities to wait for at application startup "
                 "(default is 1)")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("queueing,q", po::value<std::string>(),
                 "the queue scheduling policy to use, options are 'global' "
@@ -190,7 +190,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("csv,s", "generate statistics of the run in comma separated format")
             ("busywait,b", po::value<int>(),
                 "add this amount of busy wait workload to each of the iterations"
-                " [in steps of 1µs], i.e. -b1000 == 1ms")
+                " [in microseconds], i.e. -b1000 == 1 millisecond")
         ;
 
         po::store(po::command_line_parser(argc, argv)
@@ -226,7 +226,7 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
         std::cerr << "fibonacci2: illegal port number given: " << v.substr(p+1) << std::endl;
-        std::cerr << "           using default value instead: " << port << std::endl;
+        std::cerr << "            using default value instead: " << port << std::endl;
     }
 }
 

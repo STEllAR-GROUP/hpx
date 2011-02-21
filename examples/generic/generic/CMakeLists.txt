@@ -3,16 +3,23 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(generic_HEADERS
-    generic_component_noresult.hpp
-    generic_component_result.hpp)
-
-set(generic_SOURCES
+###############################################################################
+set(sources
     generic_module.cpp
     generic_component_noresult.cpp
     generic_component_result.cpp)
 
-add_hpx_component(generic 
-    SOURCES ${generic_SOURCES} 
-    HEADERS ${generic_HEADERS})
+set(headers
+    generic_component_noresult.hpp
+    generic_component_result.hpp)
+
+###############################################################################
+source_group("Source Files" FILES ${sources})
+source_group("Header Files" FILES ${headers})
+
+###############################################################################
+add_hpx_component(generic
+  MODULE generic
+  SOURCES ${sources} 
+  HEADERS ${headers})
 

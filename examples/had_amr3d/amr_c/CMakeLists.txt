@@ -3,24 +3,27 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(had_amr3d_c_HEADERS
+###############################################################################
+set(sources
+    amr_c.cpp
+    logging.cpp
+    stencil.cpp)
+
+set(headers
     logging.hpp
     stencil.hpp
     stencil_data.hpp
     stencil_data_locking.hpp
     stencil_functions.hpp)
 
-set(had_amr3d_c_SOURCES
-    amr_c.cpp
-    logging.cpp
-    stencil.cpp)
+###############################################################################
+source_group("Source Files" FILES ${sources})
+source_group("Header Files" FILES ${headers})
 
-set(had_amr3d_c_INI
-    )
-
+###############################################################################
 add_hpx_component(had_amr3d_c
-    SOURCES ${had_amr3d_c_SOURCES} 
-    HEADERS ${had_amr3d_c_HEADERS}
-    INI ${had_amr3d_c_INI}
-    DEPENDENCIES had_amr3d_c_test_component)
+  MODULE had_amr3d
+  SOURCES ${sources} 
+  HEADERS ${headers}
+  DEPENDENCIES had_amr3d_c_test_component)
 

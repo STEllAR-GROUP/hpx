@@ -18,7 +18,7 @@ public:
     enum { IDD = IDD_MANDELBROT_GUI_DIALOG };
 
     protected:
-    virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 
 
 // Implementation

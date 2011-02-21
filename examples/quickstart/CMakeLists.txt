@@ -4,41 +4,38 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# recurse into all components subdirectories and execute the scripts there
-set(hpx_QUICKSTART_SUBDIRS 
-    mandelbrot)
-
-foreach(hpx_QUICKSTART_SUBDIR ${hpx_QUICKSTART_SUBDIRS})
-  add_subdirectory(${hpx_QUICKSTART_SUBDIR})
-endforeach()
-
-# add pesudo-targets
-add_custom_target(examples.quickstart.fibonacci)
-add_custom_target(examples.quickstart.fibonacci2)
-add_custom_target(examples.quickstart.fibonacci2_memo)
-add_custom_target(examples.quickstart.fibonacci2_lazy_future)
-add_custom_target(examples.quickstart.fibonacci3)
-add_custom_target(examples.quickstart.fibonacci4)
-add_custom_target(examples.quickstart.fibonacci4_phased)
-add_custom_target(examples.quickstart.quicksort)
-
 # define build targets for this directory
-add_hpx_executable(fibonacci SOURCES fibonacci.cpp)
-add_hpx_executable(fibonacci2 SOURCES fibonacci2.cpp)
-add_hpx_executable(fibonacci2_memo SOURCES fibonacci2_memo.cpp)
-add_hpx_executable(fibonacci2_lazy_future SOURCES fibonacci2_lazy_future.cpp)
-add_hpx_executable(fibonacci3 SOURCES fibonacci3.cpp)
-add_hpx_executable(fibonacci4 SOURCES fibonacci4.cpp)
-add_hpx_executable(fibonacci4_phased SOURCES fibonacci4_phased.cpp)
-add_hpx_executable(quicksort SOURCES quicksort.cpp)
+set(example_programs
+    basic_example
+    factorial
+    factorial_get
+    fibonacci1
+    fibonacci2
+    fibonacci4
+    fibonacci4_phased
+    quicksort)
 
-# add pseudo-target dependencies
-add_dependencies(examples.quickstart.fibonacci fibonacci_exe)
-add_dependencies(examples.quickstart.fibonacci2 fibonacci2_exe)
-add_dependencies(examples.quickstart.fibonacci2_memo fibonacci2_memo_exe)
-add_dependencies(examples.quickstart.fibonacci2_lazy_future fibonacci2_lazy_future_exe)
-add_dependencies(examples.quickstart.fibonacci3 fibonacci3_exe)
-add_dependencies(examples.quickstart.fibonacci4 fibonacci4_exe)
-add_dependencies(examples.quickstart.fibonacci4_phased fibonacci4_phased_exe)
-add_dependencies(examples.quickstart.quicksort quicksort_exe)
+foreach(example_program ${example_programs})
+  set(sources
+      ${example_program}.cpp)
+
+  source_group("Source Files" FILES ${sources})
+
+  # add example executable
+  add_hpx_executable(${example_program}
+                     MODULE quickstart
+                     SOURCES ${sources})
+
+  # add a custom target for this example 
+  add_custom_target(examples.quickstart.${example_program})
+
+  # make pseudo-targets depend on master pseudo-target
+  add_dependencies(examples.quickstart
+                   examples.quickstart.${example_program})
+
+  # add dependencies to pseudo-target 
+  add_dependencies(examples.quickstart.${example_program}
+                   ${example_program} 
+                   ${example_program}_exe)
+endforeach() 
 

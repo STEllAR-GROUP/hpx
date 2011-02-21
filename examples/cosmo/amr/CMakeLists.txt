@@ -4,62 +4,61 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(cosmo_amr_client_HEADERS
+set(client_sources
+    amr.cpp
+    parameter.cpp)
+
+set(server_sources
+    server/unigrid_mesh.cpp
+    server/functional_component.cpp
+    server/stencil_value_out_adaptor.cpp
+    server/dynamic_stencil_value.cpp)
+
+###############################################################################
+set(client_headers
     unigrid_mesh.hpp
     functional_component.hpp
     dynamic_stencil_value.hpp)
-source_group("Header Files" 
-    FILES ${cosmo_amr_client_HEADERS})
 
-set(cosmo_amr_stubs_HEADERS
+set(stubs_headers
     stubs/unigrid_mesh.hpp
     stubs/functional_component.hpp
     stubs/dynamic_stencil_value.hpp)
-source_group("Header Files\\Stubs" 
-    FILES ${cosmo_amr_stubs_HEADERS})
 
-set(cosmo_amr_server_HEADERS
+set(server_headers
     server/unigrid_mesh.hpp
     server/functional_component.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp
     server/dynamic_stencil_value.hpp
     server/dynamic_stencil_value_impl.hpp)
-source_group("Header Files\\Server" 
-    FILES ${cosmo_amr_server_HEADERS})
-
-set(cosmo_amr_HEADERS
-    ${cosmo_amr_client_HEADERS}
-    ${cosmo_amr_stubs_HEADERS}
-    ${cosmo_amr_server_HEADERS})
 
 ###############################################################################
-set(cosmo_amr_client_SOURCES
-    amr.cpp parameter.cpp)
-source_group("Source Files" 
-    FILES ${cosmo_amr_client_SOURCES})
+set(sources
+    ${client_sources}
+    ${server_sources})
 
-set(cosmo_amr_server_SOURCES
-    server/unigrid_mesh.cpp
-    server/functional_component.cpp
-    server/stencil_value_out_adaptor.cpp
-    server/dynamic_stencil_value.cpp)
-source_group("Source Files\\Server" 
-    FILES ${cosmo_amr_server_SOURCES})
-
-set(cosmo_amr_SOURCES
-    ${cosmo_amr_client_SOURCES}
-    ${cosmo_amr_server_SOURCES})
+set(headers
+    ${client_headers}
+    ${stubs_headers}
+    ${server_headers})
 
 ###############################################################################
-set(cosmo_amr_INI
+set(ini_files
     cosmo_amr.ini)
-source_group("" 
-    FILES ${cosmo_amr_INI})
+
+###############################################################################
+source_group("Source Files\\Client" FILES ${client_sources})
+source_group("Source Files\\Server" FILES ${server_sources})
+source_group("Header Files\\Client" FILES ${client_headers})
+source_group("Header Files\\Stubs"  FILES ${stubs_headers})
+source_group("Header Files\\Server" FILES ${server_headers})
+source_group("Configuration Files"  FILES ${ini_files})
 
 ###############################################################################
 add_hpx_component(cosmo_amr 
-    SOURCES ${cosmo_amr_SOURCES} 
-    HEADERS ${cosmo_amr_HEADERS}
-    INI ${cosmo_amr_INI})
+  MODULE cosmo
+  SOURCES ${sources} 
+  HEADERS ${headers}
+  INI ${ini_files})
 

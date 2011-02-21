@@ -5,27 +5,29 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # just recurse into all components subdirectories and execute the scripts there
-set(hpx_ACCUMULATOR_SUBDIRS 
+set(subdirs 
     amr
     amr_c
     amr_c_test) 
 
-foreach(hpx_ACCUMULATOR_SUBDIR ${hpx_ACCUMULATOR_SUBDIRS})
-  add_subdirectory(${hpx_ACCUMULATOR_SUBDIR})
+foreach(subdir ${subdirs})
+  add_subdirectory(${subdir})
 endforeach()
 
-# define build target
-set(amr_client_SOURCES 
+set(sources
     amr_client.cpp)
+
+source_group("Source Files" FILES ${sources})
 
 # add example executable
 add_hpx_executable(amr_client 
-  SOURCES ${amr_client_SOURCES}
+  MODULE amr
+  SOURCES amr_client.cpp
   DEPENDENCIES amr_component
                amr_c_component
                amr_c_test_component
                distributing_factory_component)
  
 # add a dependency to the pseudo-target  
-add_dependencies(examples.amr amr_client_exe) 
+add_dependencies(examples.amr amr_client_exe amr_client) 
 

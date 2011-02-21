@@ -17,8 +17,7 @@
 // the futures registered earlier in the program.
 // 
 // To run the program
-//   1. Type "make" in the directory
-//   2. ./basic_example -r -t 2 -a localhost:5005 -x localhost:5006. 
+//       ./basic_example -r -t 2 -a localhost:5005 -x localhost:5006. 
 //       - The "-t 2" option runs this program on two OS threads (one for each future). 
 //       - The "-r" option runs the AGAS server (necessary if it isn't already running somewhere else).
 //       - The "-a localhost:5005" option places the AGAS server on your machine and specifies that it
@@ -30,7 +29,7 @@
 // If you'd like to get some validation that getnumber_action is being run on two different threads, you 
 // can ask HPX to output a logfile via an environment variable. If you are using bash type
 // 
-//    export HPX_LOGLEVEL=5
+//    export HPX_LOGLEVEL=6
 // 
 // for very detailed information or
 // 

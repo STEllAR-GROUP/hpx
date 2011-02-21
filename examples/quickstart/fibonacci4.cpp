@@ -32,7 +32,6 @@ typedef
     actions::plain_result_action2<int, int, int, fib_rhs> 
 fibonacci4_rhs_action;
 
-
 typedef lcos::eager_future<fibonacci4_action> fibonacci_future;
 typedef lcos::eager_future<fibonacci4_rhs_action> fibonacci_rhs_future;
 
@@ -110,7 +109,7 @@ int hpx_main(po::variables_map &vm)
     get_option(vm, "value", argument, "application.fibonacci2.argument");
     get_option(vm, "busywait", delay_coeff);
 
-    gid_type here = find_here();
+    id_type here = find_here();
 
     {
         util::high_resolution_timer t;
@@ -141,7 +140,7 @@ int main(int argc, char* argv[])
        "the number to be used as the argument to fib (default is 10)")
       ("busywait,b", po::value<int>(),
        "add this amount of busy wait workload to each of the iterations"
-       " [in steps of 1µs], i.e. -b1000 == 1ms")
+       " [in microseconds], i.e. -b1000 == 1 millisecond")
       ;
 
   // Initialize and run HPX

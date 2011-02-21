@@ -1,4 +1,4 @@
-// mandelbrot_gui.h : main header file for the PROJECT_NAME application
+// mandelbrot_gui.h : main header file for the mandelbrot application
 //
 
 #pragma once

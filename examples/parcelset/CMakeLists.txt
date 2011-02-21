@@ -4,15 +4,32 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# add pseudo-targets
-add_custom_target(examples.parcelset.parcelset_client)
-add_custom_target(examples.parcelset.parcelset_server)
+# define build targets for this directory
+set(example_programs
+    parcelset_client
+    parcelset_server)
 
-# parserset examples (parcelset_server/parcelset_client)
-add_hpx_executable(parcelset_client SOURCES parcelset_client.cpp)
-add_hpx_executable(parcelset_server SOURCES parcelset_server.cpp)
+foreach(example_program ${example_programs})
+  set(sources
+      ${example_program}.cpp)
 
-# add pseudo-target dependencies
-add_dependencies(examples.parcelset.parcelset_client parcelset_client_exe)
-add_dependencies(examples.parcelset.parcelset_server parcelset_server_exe)
+  source_group("Source Files" FILES ${sources})
+
+  # add example executable
+  add_hpx_executable(${example_program}
+                     MODULE parcelset
+                     SOURCES ${sources})
+
+  # add a custom target for this example 
+  add_custom_target(examples.parcelset.${example_program})
+
+  # make pseudo-targets depend on master pseudo-target
+  add_dependencies(examples.parcelset
+                   examples.parcelset.${example_program})
+
+  # add dependencies to pseudo-target 
+  add_dependencies(examples.parcelset.${example_program}
+                   ${example_program} 
+                   ${example_program}_exe)
+endforeach() 
 

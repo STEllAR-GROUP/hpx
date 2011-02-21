@@ -171,8 +171,8 @@ int hpx_main(po::variables_map &vm)
     }
     
             // get list of all known localities
-    std::vector<hpx::naming::gid_type> prefixes;
-    hpx::naming::gid_type prefix;
+    std::vector<hpx::naming::id_type> prefixes;
+    hpx::naming::id_type prefix;
     hpx::applier::applier& appl = hpx::applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
@@ -180,7 +180,7 @@ int hpx_main(po::variables_map &vm)
     }
     else {
         // create an accumulator locally
-        prefix = appl.get_runtime_support_raw_gid();
+        prefix = appl.get_runtime_support_gid();
     }
     
     for (iter = 0; iter < num_iterations; ++iter)
@@ -188,7 +188,7 @@ int hpx_main(po::variables_map &vm)
         double box_size, cPos[3];
         computeRootPos(num_bodies, box_size, cPos, bodies);
         hpx::components::itn::itn tree_root;
-        tree_root.create(naming::id_type(prefix, naming::id_type::unmanaged));
+        tree_root.create(prefix);
         tree_root.new_node(cPos[0], cPos[1], cPos[2]);
         
         const double sub_box_size = box_size * 0.5;
@@ -219,9 +219,9 @@ int main(int argc, char* argv[])
             desc_commandline("Usage: nbody [hpx_options] [options]");
         desc_commandline.add_options()
             ("input_file,i", po::value<std::string>(), 
-            "asdfasdfasdfasdfasfdasdfadsf")
+            "input file")
             ("output_file,o", po::value<std::string>(), 
-            "asdfasdfasdfasdfasfdasdfadsf")
+            "output file")
             ;
         // Check command line arguments.
         std::string hpx_host("localhost"), agas_host;

@@ -180,7 +180,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("value,v", po::value<int>(), 
                 "the number of random elements to sort (default is 1000)")

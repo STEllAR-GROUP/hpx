@@ -3,9 +3,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(cosmo_amr_c_test_SOURCES
-    cosmo_amr_c_test.cpp rand.cpp)
+###############################################################################
+set(sources
+    cosmo_amr_c_test.cpp
+    rand.cpp)
 
+###############################################################################
+source_group("Source Files" FILES ${sources})
+
+###############################################################################
 add_hpx_component(cosmo_amr_c_test
-    SOURCES ${cosmo_amr_c_test_SOURCES}) 
+  MODULE cosmo
+  SOURCES ${sources}) 
 
