@@ -18,9 +18,9 @@ set(testcases
     )
 
 foreach(testcase ${testcases})
-  add_hpx_test(${testcase}
+  add_hpx_test(${group}_${testcase}
                ${type}.${group}.${testcase}
-               SOURCES ${testcase}.cpp
+               SOURCES ${group}_${testcase}.cpp
                ARGS "-r")
 
   # add a custom target for this test
@@ -32,6 +32,6 @@ foreach(testcase ${testcases})
 
   # depend on the executable
   add_dependencies(tests.${type}.${group}.${testcase}
-                   ${testcase}_test)
+                   ${group}_${testcase}_test)
 endforeach()
 
