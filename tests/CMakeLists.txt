@@ -4,14 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(hpx_TEST_SUBDIRS 
-    function
-    #unit
+set(subdirs 
+    unit
     )
 
-foreach(hpx_TEST_SUBDIR ${hpx_TEST_SUBDIRS})
-  add_custom_target(tests.${hpx_TEST_SUBDIR})
-  add_subdirectory(${hpx_TEST_SUBDIR})
-  add_dependencies(tests tests.${hpx_TEST_SUBDIR})
+foreach(subdir ${subdirs})
+  add_custom_target(tests.${subdir})
+  add_subdirectory(${subdir})
+  add_dependencies(tests tests.${subdir})
 endforeach()
 

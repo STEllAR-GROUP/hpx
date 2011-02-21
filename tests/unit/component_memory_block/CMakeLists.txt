@@ -11,7 +11,7 @@
 
 set(type unit)
 
-set(group component_memory)
+set(group component_memory_block)
 
 set(testcases
     basic 

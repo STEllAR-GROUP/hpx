@@ -1,9 +1,36 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+################################################################################
+# Copyright (c) 2003 & onward LASMEA UMR 6602 CNRS/Univ. Clermont II
+# Copyright (c) 2009 & onward LRI    UMR 8623 CNRS/Univ Paris Sud XI
+# Copyright (c) 2011 Bryce Lelbach 
+#
+# Derived from the NT2 CMake unit tests (http://nt2.metascale.org/)
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+################################################################################
 
-# Component specific tests
-set(path_elements_test_SOURCES path_elements_test.cpp)
-add_hpx_executable(path_elements_test SOURCES ${path_elements_test_SOURCES})
+set(type unit)
 
+set(group performance_counters)
+
+set(testcases
+    path_elements
+    )
+
+foreach(testcase ${testcases})
+  add_hpx_test(${testcase}
+               ${type}.${group}.${testcase}
+               SOURCES ${testcase}.cpp)
+
+  # add a custom target for this test
+  add_custom_target(tests.${type}.${group}.${testcase})
+
+  # make parent depend on us
+  add_dependencies(tests.${type}.${group}
+                   tests.${type}.${group}.${testcase})
+
+  # depend on the executable
+  add_dependencies(tests.${type}.${group}.${testcase}
+                   ${testcase}_test)
+endforeach()
+ 

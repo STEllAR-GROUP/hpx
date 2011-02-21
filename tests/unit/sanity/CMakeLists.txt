@@ -11,17 +11,16 @@
 
 set(type unit)
 
-set(group component_memory)
+set(group sanity)
 
 set(testcases
-    basic 
+    links
     )
 
 foreach(testcase ${testcases})
   add_hpx_test(${testcase}
-               ${type}.${group}.${testcase}
-               SOURCES ${testcase}.cpp
-               ARGS "-r")
+               ${unit}.${group}.${testcase}
+               SOURCES ${testcase}.cpp)
 
   # add a custom target for this test
   add_custom_target(tests.${type}.${group}.${testcase})
@@ -34,4 +33,4 @@ foreach(testcase ${testcases})
   add_dependencies(tests.${type}.${group}.${testcase}
                    ${testcase}_test)
 endforeach()
-
+ 
