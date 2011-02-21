@@ -11,6 +11,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/base_object.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters 
