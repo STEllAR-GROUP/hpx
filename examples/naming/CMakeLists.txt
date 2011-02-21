@@ -29,7 +29,6 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target 
   add_dependencies(examples.naming.${example_program}
-                   ${example_program} 
                    ${example_program}_exe)
 endforeach() 
 

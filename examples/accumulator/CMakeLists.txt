@@ -33,7 +33,6 @@ foreach(subdir ${subdirs})
 
   # add dependencies to pseudo-target 
   add_dependencies(examples.accumulator.${subdir}
-                   ${subdir}_client 
                    ${subdir}_client_exe) 
 endforeach()
 

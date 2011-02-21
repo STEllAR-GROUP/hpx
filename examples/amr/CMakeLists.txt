@@ -29,5 +29,6 @@ add_hpx_executable(amr_client
                distributing_factory_component)
  
 # add a dependency to the pseudo-target  
-add_dependencies(examples.amr amr_client_exe amr_client) 
+add_dependencies(examples.amr
+                 amr_client_exe) 
 

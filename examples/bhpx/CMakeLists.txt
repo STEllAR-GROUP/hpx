@@ -28,5 +28,6 @@ add_hpx_executable(bhc_client
                distributing_factory_component)
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.bhpx bhc_client_exe bhc_client) 
+add_dependencies(examples.bhpx
+                 bhc_client_exe) 
 
