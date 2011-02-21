@@ -33,10 +33,10 @@ bool parse_commandline(char const* name, int argc, char *argv[],
                 "the IP address the HPX parcelport is listening on (default "
                 "is localhost:7910), expected format: 192.168.1.1:7913")
             ("localities,l", po::value<int>(), 
-                "the number of localities to wait for at application startup"
+                "the number of localities to wait for at application startup "
                 "(default is 1)")
             ("threads,t", po::value<int>(), 
-                "the number of operating system threads to spawn for this"
+                "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("pid,p", po::value<int>(), 
                 "the number of the node as supplied by the scheduler")

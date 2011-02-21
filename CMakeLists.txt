@@ -22,11 +22,12 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 ################################################################################
 # cmake configuration
 ################################################################################
-list(APPEND CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
-list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
+set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
 # include additional macro definitions
 include(HPX_Utils)
+
+hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst.")
 
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -43,7 +44,6 @@ option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default:
 find_package(HPX_BoostVersion)
 
 if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
-  message(STATUS "Not using HPX's internal version of Boost.Chrono")
   set(BOOST_LIBRARIES chrono
                       date_time
                       filesystem
@@ -55,7 +55,6 @@ if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
                       thread)
   add_definitions(-DHPX_CHRONO_DONT_USE_INTERNAL_VERSION)
 else()
-  message(STATUS "Using HPX's internal version of Boost.Chrono")
   set(BOOST_LIBRARIES date_time
                       filesystem
                       program_options
@@ -78,7 +77,8 @@ link_directories(${BOOST_LIB_DIR})
 add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
 add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
 
-# all other Boost libraries don't need to be loaded as shared libraries (but it's easier configuration wise to do so)
+# all other Boost libraries don't need to be loaded as shared libraries
+# (but it's easier configuration wise to do so)
 add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
 add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
 add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
@@ -87,14 +87,9 @@ add_definitions(-DBOOST_SYSTEM_DYN_LINK)
 add_definitions(-DBOOST_SIGNALS_DYN_LINK)
 add_definitions(-DBOOST_THREAD_DYN_DLL)
 
-# additional preprocessor definitions
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
+# additional preprocessor definitions (TODO: find out what these do)
+add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
-
-# Boost 1.36.0 and earlier didn't have Boost.Exception
-if(${BOOST_MINOR_VERSION} LESS 36)
-  include_directories(${hpx_SOURCE_DIR}/external/exception)
-endif()
 
 ################################################################################
 # include configuration
@@ -122,39 +117,31 @@ else()
   set(CMAKE_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
 endif()
 
-message(STATUS "HPX will be installed to ${CMAKE_INSTALL_PREFIX}.")
-
-################################################################################
-# forced variables 
-################################################################################
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
+ 
+set(CMAKE_DEBUG_POSTFIX "d")
 
-set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" 
-  CACHE STRING "Build type, options are: None Debug Release RelWithDebInfo MinSizeRel (default: RelWithDebInfo)." FORCE)
-
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" 
-  CACHE PATH "Path to custom CMake Modules." FORCE)
+add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 ################################################################################
 # rpath configuration
 ################################################################################
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
 # hardware support
 ################################################################################
-set(HPX_HW_ACCELERATION OFF CACHE BOOL "Compile in support for hardware acceleration (default: off).")
-mark_as_advanced(HPX_HW_ACCELERATION)
+option(HPX_HW_ACCELERATION "Compile in support for hardware acceleration (default: off)." OFF)
 
 if(HPX_HW_ACCELERATION)
   find_package(HPX_PXACCEL)
 
   if(PXACCEL_FOUND)
-    message(STATUS "Hardware acceleration framework found in ${PXACCEL_ROOT}.")
+    hpx_debug("Hardware acceleration framework found in ${PXACCEL_ROOT}.")
 
     add_definitions(-DHPX_ACCEL_QUEUING)
     include_directories(${PXACCEL_INC_DIR})
@@ -163,16 +150,9 @@ if(HPX_HW_ACCELERATION)
   else()
     # previously, this message was longer, but overly verbose and incorrectly formatted -
     # cmake has weird rules about message formats for fatal errors
-    message(FATAL "Hardware acceleration support was not found in ${PXACCEL_ROOT}.")
+    hpx_warn("Hardware acceleration support was not found in ${PXACCEL_ROOT}.")
   endif()
 endif()
-
-################################################################################
-# cpp definitions 
-################################################################################
-add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
-add_definitions(-DHPX_USE_LOCKFREE=1)
-add_definitions(-DHPX_USE_TBB=0)
 
 ################################################################################
 # Windows specific configuration 
@@ -194,67 +174,68 @@ if(MSVC)
     add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
   endif()
 
-  set(CMAKE_DEBUG_POSTFIX "d")
-
 ################################################################################
 # POSIX specific configuration 
 ################################################################################
 else()
-  # the major *nix compilers emulate GCC, so we assume that all *nix compilers
-  # emulate GCC to give them the best chance of building HPX.
-  add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
-  add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+  ##############################################################################
+  # GNU specific configuration
+  ##############################################################################
+  option(HPX_ELF_HIDDEN_VISIBILITY
+    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if(HPX_ELF_HIDDEN_VISIBILITY)
+      add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+      add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+      set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
+      set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
+      set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
+      set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
+      set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden")
+      set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
+    endif()
+  ##############################################################################
+  # Intel specific configuration
+  ##############################################################################
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    # warning #191: type qualifier is meaningless on cast type
+    add_definitions(-diag-disable 191) 
+    
+    # warning #279: controlling expression is constant 
+    add_definitions(-diag-disable 279) 
+    
+    # warning #68: integer conversion resulted in a change of sign 
+    add_definitions(-diag-disable 68) 
+    
+    # warning #858: type qualifier on return type is meaningless 
+    add_definitions(-diag-disable 858) 
+    
+    # warning #1125: virtual function override intended 
+    add_definitions(-diag-disable 1125) 
 
-  # check for availability of pthread_setaffinity_np()
-  include(CheckSymbolExists)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
+    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
+  endif()
 
-  check_symbol_exists(pthread_setaffinity_np "pthread.h" hpx_HAVE_PTHREAD_SETAFFINITY_NP)
+  hpx_check_pthreads_setaffinity_np(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
+
   if(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
     add_definitions(-DHPX_HAVE_PTHREAD_SETAFFINITY_NP)
   endif()
   
-  # Boost.Plugin needs libdl on *nix
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl)
-  
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl pthread rt)
+
   set(hpx_COMPONENT_LIBRARY_PREFIX "hpx_component_")
-
-  option(HPX_ELF_HIDDEN_VISIBILITY
-    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
-
-  if(CMAKE_COMPILER_IS_GNUCXX AND HPX_ELF_HIDDEN_VISIBILITY)
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
-    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fvisibility=hidden"
-      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo"
-      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo"
-      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo"
-      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
-    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo"
-      CACHE STRING "Flags used by the compiler for MinSizeRel builds" FORCE)
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo"
-      CACHE STRING "Flags used by the compiler for Release builds" FORCE)
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo"
-      CACHE STRING "Flags used by the compiler for RelWithDebInfo builds" FORCE)
-  endif()
 endif()
 
 ################################################################################
 # Mac OS X specific configuration 
 ################################################################################
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  add_definitions(-D_XOPEN_SOURCE=1)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+  add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
 endif()
 
 ################################################################################
@@ -262,7 +243,7 @@ endif()
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default, there may be more for individual modules, but this is the mandatory set
-set(hpx_LIBRARIES hpx hpx_serialization)
+set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's entire 
@@ -273,8 +254,8 @@ add_subdirectory(src)
 add_subdirectory(hpx/components)
 
 # executables that depend on libraries above
-add_custom_target(examples WORKING_DIRECTORY ${hpx_BINARY_DIR}/examples)
-add_subdirectory(examples EXCLUDE_FROM_ALL)
+add_custom_target(examples) 
+add_subdirectory(examples)
 
 # TODO: bring this into the CMake tree
 #add_custom_target(applications WORKING_DIRECTORY ${hpx_BINARY_DIR}/applications)
@@ -287,64 +268,50 @@ add_subdirectory(runtime)
 ################################################################################
 enable_testing()
 add_custom_target(tests) 
-add_subdirectory(tests EXCLUDE_FROM_ALL)
+add_subdirectory(tests)
 
 ################################################################################
 # installation instructions
 ################################################################################
 install( # install all hpx header files
-    DIRECTORY hpx/ 
-    DESTINATION include/hpx 
-    FILES_MATCHING PATTERN "*.h*"
-    PATTERN ".svn" EXCLUDE
-    PATTERN ".git" EXCLUDE
-    PATTERN "CMakeFiles" EXCLUDE
-    PATTERN "CTestFiles" EXCLUDE)
+  DIRECTORY hpx/ 
+  DESTINATION include/hpx 
+  COMPONENT core
+  FILES_MATCHING PATTERN "*.h*"
+  PATTERN ".svn" EXCLUDE
+  PATTERN ".git" EXCLUDE
+  PATTERN "CMakeFiles" EXCLUDE
+  PATTERN "CTestFiles" EXCLUDE)
 
 install( # install all hpx cmake utility files
-    DIRECTORY cmake/ 
-    DESTINATION share/cmake 
-    FILES_MATCHING PATTERN "*.cmake"
-    PATTERN ".svn" EXCLUDE
-    PATTERN ".git" EXCLUDE)
+  DIRECTORY cmake/ 
+  DESTINATION share/cmake 
+  COMPONENT core
+  FILES_MATCHING PATTERN "*.cmake"
+  PATTERN ".svn" EXCLUDE
+  PATTERN ".git" EXCLUDE)
 
 install( # install external dependencies
-    DIRECTORY external/cache/boost
-              external/coroutine/boost
-              external/atomic/boost
-              external/endian/boost
-              external/lockfree/boost
-              external/logging/boost
-              external/plugin/boost
+  DIRECTORY external/cache/boost
+            external/coroutine/boost
+            external/atomic/boost
+            external/endian/boost
+            external/lockfree/boost
+            external/logging/boost
+            external/plugin/boost
+  DESTINATION include
+  COMPONENT core
+  FILES_MATCHING PATTERN "*.h*"
+  PATTERN ".svn" EXCLUDE
+  PATTERN ".git" EXCLUDE)
+
+if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
+  install( # install Boost.Chrono headers if we're using our internal version
+    DIRECTORY external/chrono/boost
     DESTINATION include
+    COMPONENT core
     FILES_MATCHING PATTERN "*.h*"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
-
-if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-    install( # install Boost.Chrono headers if we're using our internal version
-        DIRECTORY external/chrono/boost
-        DESTINATION include
-        FILES_MATCHING PATTERN "*.h*"
-        PATTERN ".svn" EXCLUDE
-        PATTERN ".git" EXCLUDE)
 endif()
-
-if(${BOOST_MINOR_VERSION} LESS 36)
-    install( # install Boost.Exception headers if we're on an -ancient- box
-        DIRECTORY external/exception/boost
-        DESTINATION include
-        FILES_MATCHING PATTERN "*.h*"
-        PATTERN ".svn" EXCLUDE
-        PATTERN ".git" EXCLUDE)
-endif()
-
-################################################################################
-# export configuration 
-################################################################################
-include(CMakeExportBuildSettings)
-cmake_export_build_settings("${PROJECT_NAME}BuildSettings.cmake")
-
-# export library dependencies (keep this as the last line in the file)
-export_library_dependencies("${PROJECT_NAME}LibDeps.cmake")
 
