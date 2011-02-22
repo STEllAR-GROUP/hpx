@@ -207,8 +207,6 @@ int hpx_main(po::variables_map &vm)
     return 0;
 }
    
-
-
 /// New Main function HPX Style
 int main(int argc, char* argv[])
 {

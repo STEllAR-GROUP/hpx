@@ -4,6 +4,8 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+#include <vector>
+
 
 #include "server/itn.hpp"
 

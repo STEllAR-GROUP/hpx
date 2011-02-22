@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace itn { namespace stubs {
         
         static void insert_body(naming::id_type const & gid,  naming::id_type const & new_bod_gid, double sub_box_dim)
         {
-            applier::apply<hpx::components::itn::server::itn::itn_insert_body>(gid, new_bod_gid, sub_box_dim);
+            applier::apply<hpx::components::itn::server::itn::insert_body_action>(gid, new_bod_gid, sub_box_dim);
         }
     };
 }}}}
