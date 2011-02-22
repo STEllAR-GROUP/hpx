@@ -367,106 +367,28 @@ int main(int argc, char* argv[])
           if ( par->nx[i] > 2*par->nx[i-1] - 5 ) par->nx[i] = 2*par->nx[i-1] - 5;
         }
 
+        // for each row, record what the lowest level on the row is
         int num_rows = (int) pow(2.,par->allowedl);
+        // account for prolongation and restriction (which is done every other step
+        if ( par->allowedl > 0 ) {
+          num_rows += (int) pow(2.,par->allowedl)/2;
+        }
         num_rows *= 2; // we take two timesteps in the mesh
-
         int ii = -1; 
-        int level = 0;
-        int count = 0;
-        int count2 = 0; 
-        int ct3 = 0;
-        while (ct3 < num_rows ) {
-          ii++;
-          if ( count > 0 ) {
-            if ( par->level_row[count-1] != par->allowedl &&
-                 count2 < par->allowedl - par->level_row[count-1]
-               ) {
-              ii--; 
-              count2++;
-            } else {
-              count2 = 0;
-            } 
-          }
-
+        for (int i=0;i<num_rows;i++) {
+          if (  (i+5)%3 != 0 || par->allowedl == 0 ) {
+            ii++;
+          } 
+          int level = -1;
           for (int j=par->allowedl;j>=0;j--) {
             int tmp = (int) pow(2.,j);
             if ( ii%tmp == 0 ) {
               level = par->allowedl-j;
               par->level_row.push_back(level);
-              if ( count > 0 ) {
-                if ( par->level_row[count-1] != par->level_row[count] ||
-                     par->allowedl == 0 ) {
-                  ct3++;
-                } 
-              } else {
-                ct3++;
-              }
-              count++;
               break;
             }
           }
         }
-
-        par->prores.resize(par->level_row.size());
-        par->ndst.resize((par->allowedl+1)*par->level_row.size());
-        // initialize
-        for (int i=0;i<par->level_row.size();i++) {
-          for (int j=0;j<par->allowedl+1;j++) {
-            par->ndst[j + (par->allowedl+1)*i] = -1;
-          }
-        }
-        if ( par->allowedl == 0 ) {
-          par->prores[0] = 100;
-          par->ndst[0] = 1;
-        } else {
-          for (int i=0;i<par->level_row.size()-1;i++) {
-            if ( par->level_row[i] == par->level_row[i+1] ) {
-              // Avoid race condition by staggering restriction, one level at a time
-              if ( i == 0 ) {
-                par->prores[i] = par->allowedl;
-              } else {
-                if ( par->prores[i-1] == 100 ) {
-                  par->prores[i] = par->allowedl;
-                } else {
-                  par->prores[i] = par->prores[i-1]-1;
-                }
-              }
-
-              // all levels go to the next row
-              for (int j=par->level_row[i];j<par->allowedl+1;j++) {
-                par->ndst[j + (par->allowedl+1)*i] = i+1;
-              }
-            } else {
-              par->prores[i] = 100;
-              int found;
-              for (int j=par->level_row[i];j<par->allowedl+1;j++) {
-                found = -1;
-                // find the row containing a level equal to this or smaller
-                for (int k=i+1;k<par->level_row.size();k++) {
-                  if ( j >= par->level_row[k] ) {
-                    par->ndst[j + (par->allowedl+1)*i] = k;
-                    found = 1;
-                    break;
-                  }
-                }
-                if ( found != 1 ) {
-                  par->ndst[j + (par->allowedl+1)*i] = 0;
-                }
-              }
-            }
-          }
-        }
-        par->prores[par->level_row.size()-1] = 100;
-        par->ndst[par->allowedl + (par->allowedl+1)*(par->level_row.size()-1)] = 0;
-         
-        //for (int i=0;i<par->level_row.size();i++) {
-        //  std::cout << " DEBUG " << i << " " << par->level_row[i] << " prores " << par->prores[i] << std::endl;
-        //  std::cout << "                Destination: " << std::endl;
-        //  for (int j=par->level_row[i];j<par->allowedl+1;j++) {
-        //    std::cout << "                        level: " << j << " " << par->ndst[j+(par->allowedl+1)*i] << std::endl;
-        //  }
-        //}
-        //BOOST_ASSERT(false);
 
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
         par->dt0 = par->lambda*par->dx0;

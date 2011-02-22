@@ -313,7 +313,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = par->level_row.size();
+        int num_rows = (int) pow(2.,par->allowedl);
+        if ( par->allowedl > 0 ) {
+          num_rows += (int) pow(2.,par->allowedl)/2;
+        }
+        num_rows *= 2; // we take two steps
 
         // Each row potentially has a different number of points depending on the
         // number of levels of refinement.  There are 2^(nlevel) rows each timestep;
@@ -372,7 +376,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 35;
+        std::size_t memsize = 38;
         Array3D dst_port(num_rows,each_row[0],memsize);
         Array3D dst_src(num_rows,each_row[0],memsize);
         Array3D dst_step(num_rows,each_row[0],memsize);
@@ -543,13 +547,24 @@ namespace hpx { namespace components { namespace amr { namespace server
           int iend = a+2;
           if ( iend > par->nx[level] ) iend = par->nx[level];
 
-          dst = par->ndst[level+(par->allowedl+1)*step];
           bool prolongation;
-          if ( par->prores[step] == 100 ) {
+          dst = step;
+          if ( (step+3)%3 != 0 || par->allowedl == 0 ) {
+            // anytime there is a difference of more than one level between src and dst rows,
+            // you need to account for the prolongation/restriction rows going on inbetween them.
+            // That is given by 2^{L-l-1}-1
+            int intermediate = (int) pow(2.,par->allowedl-level) ;
+            if ( par->allowedl-level > 1 ) {
+              dst += intermediate + intermediate/2 - 1;
+            } else {
+              dst += intermediate;
+            }
             prolongation = false;
           } else {
+            dst += 1; // this is a prolongation/restriction step
             prolongation = true;
           }
+          if ( dst >= num_rows ) dst = 0;
 
           if ( prolongation == false ) {
             for (int kk=kstart;kk<kend;kk++) {
@@ -702,8 +717,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               // }}}
             }
 #endif
-#if 0
-            if ( level > par->level_row[step] && level == par->prores[step] ) { 
+            if ( level != par->level_row[step] ) { 
               // restriction {{{
               // send data to all levels less than this one (for restriction)
               had_double_type dx = par->dx0/pow(2.0,level);
@@ -715,7 +729,6 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
               had_double_type /*cxmin,cxmax,cymin,cymax,czmin,czmax,*/cdx; 
               had_double_type ca,cb,cc;
-          
               int ii = level-1;
               // determine which coarser mesh cube overlaps this finer mesh cube
               cdx = par->dx0/pow(2.0,ii);
@@ -766,15 +779,13 @@ namespace hpx { namespace components { namespace amr { namespace server
                   if ( ii != par->allowedl ) {
                     j += par->rowsize[ii+1];
                   }
-
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                   counter++;
+
                 } 
               } } }
             // }}}
             }
-#endif
-
           }
         }
       }

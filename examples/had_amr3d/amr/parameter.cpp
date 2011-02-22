@@ -49,8 +49,6 @@ namespace hpx { namespace components { namespace amr
         ar & min;
         ar & max;
         ar & gw;
-        ar & prores;
-        ar & ndst;
     }
 
     // explicit instantiation for the correct archive types

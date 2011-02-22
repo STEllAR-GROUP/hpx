@@ -984,7 +984,10 @@ namespace hpx { namespace components { namespace amr
             for (int i=0;i<val.size();i++) {
               if ( floatcmp(x,val[i]->x_[0]) == 1 && 
                    floatcmp(y,val[i]->y_[0]) == 1 && 
-                   floatcmp(z,val[i]->z_[0]) == 1 ) {
+                   floatcmp(z,val[i]->z_[0]) == 1 &&
+                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[par->granularity-1]) == 1 && 
+                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[par->granularity-1]) == 1 && 
+                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[par->granularity-1]) == 1 ) {
                 compute_index = i;
                 break;
               }
@@ -1255,21 +1258,21 @@ namespace hpx { namespace components { namespace amr
                   } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
                     // 2D interp
                     found = true;
-                    //special_interp2d_xy(xt,yt,zt,dx,
-                    //                    val[anchor_index[8]],val[anchor_index[9]],
-                    //                    val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
+                    special_interp2d_xy(xt,yt,zt,dx,
+                                        val[anchor_index[8]],val[anchor_index[9]],
+                                        val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
                     // 2D interp
                     found = true;
-                    //special_interp2d_yz(xt,yt,zt,dx,
-                    //                    val[anchor_index[12]],val[anchor_index[14]],
-                    //                    val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                    special_interp2d_yz(xt,yt,zt,dx,
+                                        val[anchor_index[12]],val[anchor_index[14]],
+                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
                     // 2D interp
                     found = true;
-                    //special_interp2d_xz(xt,yt,zt,dx,
-                    //                    val[anchor_index[15]],val[anchor_index[13]],
-                    //                    val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
+                    special_interp2d_xz(xt,yt,zt,dx,
+                                        val[anchor_index[15]],val[anchor_index[13]],
+                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   }
 #if 0
                   if ( !found ) {
