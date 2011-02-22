@@ -313,11 +313,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = (int) pow(2.,par->allowedl);
-        if ( par->allowedl > 0 ) {
-          num_rows += (int) pow(2.,par->allowedl)/2;
-        }
-        num_rows *= 2; // we take two steps
+        int num_rows = par->level_row.size();
 
         // Each row potentially has a different number of points depending on the
         // number of levels of refinement.  There are 2^(nlevel) rows each timestep;
@@ -376,7 +372,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 28;
+        std::size_t memsize = 35;
         Array3D dst_port(num_rows,each_row[0],memsize);
         Array3D dst_src(num_rows,each_row[0],memsize);
         Array3D dst_step(num_rows,each_row[0],memsize);
@@ -547,24 +543,13 @@ namespace hpx { namespace components { namespace amr { namespace server
           int iend = a+2;
           if ( iend > par->nx[level] ) iend = par->nx[level];
 
+          dst = par->ndst[level+(par->allowedl+1)*step];
           bool prolongation;
-          dst = step;
-          if ( (step+3)%3 != 0 || par->allowedl == 0 ) {
-            // anytime there is a difference of more than one level between src and dst rows,
-            // you need to account for the prolongation/restriction rows going on inbetween them.
-            // That is given by 2^{L-l-1}-1
-            int intermediate = (int) pow(2.,par->allowedl-level) ;
-            if ( par->allowedl-level > 1 ) {
-              dst += intermediate + intermediate/2 - 1;
-            } else {
-              dst += intermediate;
-            }
+          if ( par->prores[step] == 100 ) {
             prolongation = false;
           } else {
-            dst += 1; // this is a prolongation/restriction step
             prolongation = true;
           }
-          if ( dst >= num_rows ) dst = 0;
 
           if ( prolongation == false ) {
             for (int kk=kstart;kk<kend;kk++) {
@@ -582,6 +567,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
+#if 0
             if ( level != par->allowedl ) { 
               // prolongation {{{
               // send data to higher level boundary points
@@ -715,7 +701,9 @@ namespace hpx { namespace components { namespace amr { namespace server
               } 
               // }}}
             }
-            if ( level != par->level_row[step] ) { 
+#endif
+#if 0
+            if ( level > par->level_row[step] && level == par->prores[step] ) { 
               // restriction {{{
               // send data to all levels less than this one (for restriction)
               had_double_type dx = par->dx0/pow(2.0,level);
@@ -727,64 +715,66 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
               had_double_type /*cxmin,cxmax,cymin,cymax,czmin,czmax,*/cdx; 
               had_double_type ca,cb,cc;
-              for (int ii=par->level_row[step];ii<level;ii++) {
-                // determine which coarser mesh cube overlaps this finer mesh cube
-                cdx = par->dx0/pow(2.0,ii);
-                ca = (xmin - par->min[ii])/(par->granularity*cdx);
-                cb = (ymin - par->min[ii])/(par->granularity*cdx);
-                cc = (zmin - par->min[ii])/(par->granularity*cdx);
+          
+              int ii = level-1;
+              // determine which coarser mesh cube overlaps this finer mesh cube
+              cdx = par->dx0/pow(2.0,ii);
+              ca = (xmin - par->min[ii])/(par->granularity*cdx);
+              cb = (ymin - par->min[ii])/(par->granularity*cdx);
+              cc = (zmin - par->min[ii])/(par->granularity*cdx);
 
-                int starta = (int) floor(ca);
-                int startb = (int) floor(cb);
-                int startc = (int) floor(cc);
-                for (int sk=startc;sk<=startc+1;sk++) {
-                for (int sj=startb;sj<=startb+1;sj++) {
-                for (int si=starta;si<=starta+1;si++) {
-                  // check if there is any overlap
-                  if ( (  (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmin) && 
-                           floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmin)) ||
-                          (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmax) && 
-                           floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmax)) 
-                       ) &&
-                       (  (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymin) && 
-                           floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymin)) ||
-                          (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymax) && 
-                           floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymax)) 
-                       ) &&
-                       (  (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmin) && 
-                           floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmin)) ||
-                          (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmax) && 
-                           floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmax)) 
-                       ) 
+              int starta = (int) floor(ca);
+              int startb = (int) floor(cb);
+              int startc = (int) floor(cc);
+              for (int sk=startc;sk<=startc+1;sk++) {
+              for (int sj=startb;sj<=startb+1;sj++) {
+              for (int si=starta;si<=starta+1;si++) {
+                // check if there is any overlap
+                if ( (  (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmin) && 
+                         floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmin)) ||
+                        (floatcmp_le(par->min[ii] + si*par->granularity*cdx,xmax) && 
+                         floatcmp_ge(par->min[ii] + (si*par->granularity+par->granularity-1)*cdx,xmax)) 
+                     ) &&
+                     (  (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymin) && 
+                         floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymin)) ||
+                        (floatcmp_le(par->min[ii] + sj*par->granularity*cdx,ymax) && 
+                         floatcmp_ge(par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx,ymax)) 
+                     ) &&
+                     (  (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmin) && 
+                         floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmin)) ||
+                        (floatcmp_le(par->min[ii] + sk*par->granularity*cdx,zmax) && 
+                         floatcmp_ge(par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx,zmax)) 
                      ) 
-                  {
+                   ) 
+                {
 
 #if 0
-                    // DEBUG
-                    std::cout << " " << std::endl;
-                    std::cout << " DEBUG coarse: x " << par->min[ii] + si*par->granularity*cdx << " " << par->min[ii] + (si*par->granularity+par->granularity-1)*cdx << std::endl;
-                    std::cout << " DEBUG coarse: y " << par->min[ii] + sj*par->granularity*cdx << " " << par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx << std::endl;
-                    std::cout << " DEBUG coarse: z " << par->min[ii] + sk*par->granularity*cdx << " " << par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx << std::endl;
-                    std::cout << " DEBUG fine: x " << xmin << " " << xmax << std::endl;
-                    std::cout << " DEBUG fine: y " << ymin << " " << ymax << std::endl;
-                    std::cout << " DEBUG fine: z " << zmin << " " << zmax << std::endl;
+                  // DEBUG
+                  std::cout << " " << std::endl;
+                  std::cout << " DEBUG coarse: x " << par->min[ii] + si*par->granularity*cdx << " " << par->min[ii] + (si*par->granularity+par->granularity-1)*cdx << std::endl;
+                  std::cout << " DEBUG coarse: y " << par->min[ii] + sj*par->granularity*cdx << " " << par->min[ii] + (sj*par->granularity+par->granularity-1)*cdx << std::endl;
+                  std::cout << " DEBUG coarse: z " << par->min[ii] + sk*par->granularity*cdx << " " << par->min[ii] + (sk*par->granularity+par->granularity-1)*cdx << std::endl;
+                  std::cout << " DEBUG fine: x " << xmin << " " << xmax << std::endl;
+                  std::cout << " DEBUG fine: y " << ymin << " " << ymax << std::endl;
+                  std::cout << " DEBUG fine: z " << zmin << " " << zmax << std::endl;
 #endif
 
-                    // there is overlap -- some points from the specified finer mesh
-                    // need to be sent to this particular coarse mesh
-                    j = si + par->nx[ii]*(sj+sk*par->nx[ii]);
+                  // there is overlap -- some points from the specified finer mesh
+                  // need to be sent to this particular coarse mesh
+                  j = si + par->nx[ii]*(sj+sk*par->nx[ii]);
 
-                    if ( ii != par->allowedl ) {
-                      j += par->rowsize[ii+1];
-                    }
-                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                    counter++;
+                  if ( ii != par->allowedl ) {
+                    j += par->rowsize[ii+1];
+                  }
 
-                  } 
-                } } }
-              }
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                  counter++;
+                } 
+              } } }
             // }}}
             }
+#endif
+
           }
         }
       }
