@@ -8,6 +8,8 @@
 if(NOT BOOST_VERSION_SEARCHED)
 set(BOOST_VERSION_SEARCHED ON CACHE INTERNAL "Found Boost version")
 
+include(HPX_Utils)
+
 if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
   set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 endif()
@@ -39,12 +41,12 @@ macro(get_boost_version)
     find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
   
     if(NOT BOOST_VERSION_HPP)
-      message(WARNING "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
+      hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
       
       find_path(BOOST_VERSION_HPP boost/version.hpp)
     
       if(NOT BOOST_VERSION_HPP)
-        message(FATAL_ERRRO "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
+        hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
       endif()
     endif()
   
@@ -54,13 +56,13 @@ macro(get_boost_version)
     find_path(BOOST_VERSION_HPP boost/version.hpp)
     
     if(NOT BOOST_VERSION_HPP)
-      message(FATAL_ERROR "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
+      hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
     endif()
   
   endif()    
   
   set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}/boost/version.hpp) 
-  message(STATUS "Using ${BOOST_VERSION_HPP} as Boost version.hpp header.")
+  hpx_info("boost.version" "Using ${BOOST_VERSION_HPP} as Boost version.hpp header.")
   
   # Get Boost version 
   set(BOOST_VERSION "")
@@ -82,7 +84,7 @@ macro(get_boost_version)
     math(EXPR BOOST_MINOR_VERSION "${BOOST_VERSION_NUM} / 100 % 1000")
     math(EXPR BOOST_PATCH_VERSION "${BOOST_VERSION_NUM} % 100")
   else()
-    message(FATAL_ERROR "Invalid Boost version ${BOOST_VERSION_NUM}.")
+    hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}.")
   endif()
   
   set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}
@@ -101,7 +103,7 @@ macro(get_boost_version)
     "${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}"
     CACHE STRING "Boost version (M.mm.p string version).")
   
-  message(STATUS "Boost version is ${BOOST_VERSION_STR}.")
+  hpx_info("boost.version" "Boost version is ${BOOST_VERSION_STR}.")
 
   set(BOOST_USE_SYSTEM ${BOOST_USE_SYSTEM} CACHE BOOL
     "Set to true to search for a system install of Boost (default ON).")

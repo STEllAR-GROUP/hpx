@@ -6,9 +6,72 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(HPX_UTILS_LOADED TRUE)
+
 if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
   set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 endif()
+
+###############################################################################
+# messages 
+macro(hpx_info type)
+  string(TOLOWER ${type} lctype)
+  message("[hpx.info.${lctype}] " ${ARGN})
+endmacro()
+
+macro(hpx_debug type)
+  if("${HPX_CMAKE_LOGLEVEL}" STREQUAL "DEBUG|debug|Debug")
+    string(TOLOWER ${type} lctype)
+    message("[hpx.debug.${lctype}] " ${ARGN})
+  endif()
+endmacro()
+
+macro(hpx_warn type)
+  if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug|WARN|warn|Warn")
+    string(TOLOWER ${type} lctype)
+    message("[hpx.warn.${lctype}] " ${ARGN})
+  endif()
+endmacro()
+
+macro(hpx_error type)
+  string(TOLOWER ${type} lctype)
+  message(FATAL_ERROR "[hpx.error.${lctype}] " ${ARGN})
+endmacro()
+
+macro(hpx_message level type)
+  if("${level}" MATCHES "ERROR|error|Error")
+    string(TOLOWER ${type} lctype)
+    hpx_error(${lctype} ${ARGN})
+  elseif("${level}" MATCHES "WARN|warn|Warn")
+    string(TOLOWER ${type} lctype)
+    hpx_warn(${lctype} ${ARGN})
+  elseif("${level}" MATCHES "DEBUG|debug|Debug")
+    string(TOLOWER ${type} lctype)
+    hpx_debug(${lctype} ${ARGN})
+  elseif("${level}" MATCHES "INFO|info|Info")
+    string(TOLOWER ${type} lctype)
+    hpx_info(${lctype} ${ARGN})
+  else()
+    hpx_error("message" "\"${level}\" is not an HPX configuration logging level.") 
+  endif()
+endmacro()
+
+macro(hpx_config_loglevel level return)
+  set(${return} FALSE)
+  if(    "${HPX_CMAKE_LOGLEVEL}" MATCHES "ERROR|error|Error"
+     AND "${level}" MATCHES "ERROR|error|Error")
+    set(${return} TRUE) 
+  elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "WARN|warn|Warn"
+     AND "${level}" MATCHES "WARN|warn|Warn")
+    set(${return} TRUE) 
+  elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug"
+     AND "${level}" MATCHES "DEBUG|debug|Debug")
+    set(${return} TRUE) 
+  elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "INFO|info|Info"
+     AND "${level}" MATCHES "INFO|info|Info")
+    set(${return} TRUE) 
+  endif()
+endmacro()
 
 ################################################################################
 macro(hpx_list_contains var value)
@@ -18,28 +81,6 @@ macro(hpx_list_contains var value)
       set(${var} TRUE)
     endif()
   endforeach()
-endmacro()
-
-###############################################################################
-# Print a debug message if HPX_DEBUG is on 
-macro(hpx_debug)
-  if("${HPX_CMAKE_LOGLEVEL}" STREQUAL "DEBUG")
-    message("(HPX.DEBUG) " ${ARGN})
-  endif()
-endmacro()
-
-###############################################################################
-# Print a warning
-macro(hpx_warning)
-  if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|WARN")
-    message("(HPX.WARN) " ${ARGN})
-  endif()
-endmacro()
-
-###############################################################################
-# Print a debug message 
-macro(hpx_error)
-  message(FATAL_ERROR "(HPX.ERROR) " ${ARGN})
 endmacro()
 
 ###############################################################################
@@ -61,15 +102,16 @@ endmacro()
 
 ###############################################################################
 # Print a list 
-macro(hpx_debug_list message list) 
-  if("${HPX_CMAKE_LOGLEVEL}" STREQUAL "DEBUG")
+macro(hpx_print_list level type message list) 
+  hpx_config_loglevel(${level} printed)
+  if(printed)
     if(${list})
-      hpx_debug("${message}: ")
+      hpx_message(${level} ${type} "${message}: ")
       foreach(element ${${list}})
         message("    ${element}")
       endforeach()
     else()
-      hpx_debug("${message} is empty")
+      hpx_message(${level} ${type} "${message} is empty.")
     endif()
   endif()
 endmacro()
@@ -209,10 +251,10 @@ macro(add_hpx_component name)
   hpx_parse_arguments(${name}
     "MODULE;SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL" ${ARGN})
 
-  hpx_debug_list("Sources for ${name}" ${name}_SOURCES)
-  hpx_debug_list("Headers for ${name}" ${name}_HEADERS)
-  hpx_debug_list("Dependencies for ${name}" ${name}_DEPENDENCIES)
-  hpx_debug_list("Configuration files for ${name}" ${name}_INI)
+  hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
+  hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
+  hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
   # add defines for this component
   add_definitions(-DHPX_COMPONENT_NAME=${name})
@@ -248,6 +290,11 @@ macro(add_hpx_component name)
       ${CMAKE_INSTALL_PREFIX}/lib/${hpx_COMPONENT_LIBRARY_PREFIX}${name})
     set(built_target
       ${CMAKE_CURRENT_BINARY_DIR}/${hpx_COMPONENT_LIBRARY_PREFIX}${name}.dll)
+  endif()
+  
+  if(NOT ${${name}_MODULE})
+    set(${name}_MODULE "Unspecified")
+    hpx_warn("add_component.${name}" "Module was not specified for component.")
   endif()
 
   if(${name}_ESSENTIAL) 
@@ -286,9 +333,9 @@ macro(add_hpx_executable name)
   hpx_parse_arguments(${name}
     "MODULE;SOURCES;HEADERS;DEPENDENCIES" "ESSENTIAL" ${ARGN})
 
-  hpx_debug_list("Sources for ${name}" ${name}_SOURCES)
-  hpx_debug_list("Headers for ${name}" ${name}_HEADERS)
-  hpx_debug_list("Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
+  hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
+  hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
 
   # add defines for this executable
   add_definitions(-DHPX_APPLICATION_EXPORTS)
@@ -318,6 +365,11 @@ macro(add_hpx_executable name)
     ${BOOST_FOUND_LIBRARIES}
     ${pxaccel_LIBRARIES})
 
+  if(NOT ${${name}_MODULE})
+    set(${name}_MODULE "Unspecified")
+    hpx_warn("add_executable.${name}" "Module was not specified for component.")
+  endif()
+
   if(${name}_ESSENTIAL) 
     install(TARGETS ${name}_exe
       RUNTIME DESTINATION bin
@@ -343,10 +395,10 @@ macro(add_hpx_test target name)
   hpx_parse_arguments(${target}
     "SOURCES;HEADERS;DEPENDENCIES;ARGS" "DONTRUN;DONTCOMPILE" ${ARGN})
 
-  hpx_debug_list("Sources for ${target}" ${target}_SOURCES)
-  hpx_debug_list("Headers for ${target}" ${target}_HEADERS)
-  hpx_debug_list("Dependencies for ${target}" ${target}_DEPENDENCIES)
-  hpx_debug_list("Arguments for ${target}" ${target}_ARGS)
+  hpx_print_list("DEBUG" "add_test.${target}" "Sources for ${target}" ${target}_SOURCES)
+  hpx_print_list("DEBUG" "add_test.${target}" "Headers for ${target}" ${target}_HEADERS)
+  hpx_print_list("DEBUG" "add_test.${target}" "Dependencies for ${target}" ${target}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_test.${target}" "Arguments for ${target}" ${target}_ARGS)
 
   if(NOT ${target}_DONTCOMPILE)
     # add defines for this executable
@@ -363,20 +415,55 @@ macro(add_hpx_test target name)
       ${pxaccel_LIBRARIES})
   
     if(NOT ${target}_DONTRUN)
-      add_test(${name}
+      add_test(${target}
         ${CMAKE_CURRENT_BINARY_DIR}/${target}_test
         ${${target}_ARGS})
+    else()
+      hpx_info("add_test.${target}" "Module was not specified for component.")
     endif()
   endif()
 endmacro()
 
 ###############################################################################
+macro(hpx_config_test name var)
+  hpx_parse_arguments(${name} "SOURCE;FLAGS" "ESSENTIAL" ${ARGN})
+
+  file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cpp"
+       "${${name}_SOURCE}\n")
+
+  try_compile(${var}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${${name}_FLAGS}
+    OUTPUT_VARIABLE output)
+
+  if(${var})
+    set(${var} TRUE CACHE INTERNAL "Test ${name} result.")
+    hpx_info("config_test.${name}" "Test passed.")
+    file(APPEND ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
+      "Test ${name} passed with the following output:\n"
+      "${output}\n"
+      "Source code was:\n${${name}_SOURCE}\n")
+  else()
+    set(${var} FALSE CACHE INTERNAL "Test ${name} result.")
+    if(${name}_ESSENTIAL)
+      hpx_fail("config_test.${name}" "Test failed (check ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log).")
+    else()
+      hpx_warn("config_test.${name}" "Test failed (check ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log).")
+    endif()
+    file(APPEND ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log
+      "Test ${name} failed with the following output:\n"
+      "${output}\n"
+      "Source code was:\n${${name}_SOURCE}\n")
+  endif()
+endmacro()
+
+###############################################################################
 macro(hpx_check_pthreads_setaffinity_np variable)
-  set(CMAKE_REQUIRED_FLAGS -lpthread)
-
-  include(CheckCSourceCompiles)
-
-  check_c_source_compiles(
+  hpx_config_test(
+   "pthreads_setaffinity_np"
+   ${variable}
+   SOURCE
    "#include <pthread.h>
     
     int f()
@@ -390,7 +477,8 @@ macro(hpx_check_pthreads_setaffinity_np variable)
     int main()
     {
         return 0;
-    }" ${variable})
+    }"
+    FLAGS -lpthread)
 endmacro()
 
 ###############################################################################
@@ -399,7 +487,8 @@ macro(hpx_force_out_of_tree_build message)
   get_filename_component(parentdir ${CMAKE_SOURCE_DIR} PATH)
   string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${parentdir}" insourcesubdir)
   if(insource OR insourcesubdir)
-    message(FATAL_ERROR "${message}")
+    hpx_error("in_tree" "${message}")
   endif()
 endmacro()
+
 

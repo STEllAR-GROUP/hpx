@@ -140,47 +140,47 @@ macro(find_boost_library TARGET_LIB)
   if(NOT BOOST_USE_SYSTEM)
     # Locate libraries 
     build_boost_libname(${TARGET_LIB}) 
+    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIB_DIR} for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      hpx_debug("Looking for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
-
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIB_DIR} NO_DEFAULT_PATH)
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
-        hpx_debug("Found for ${BOOST_TARGET} in ${BOOST_LIB_DIR}...")
+        get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
+        get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
+        hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
         break()
       endif()
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      hpx_warning("Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR}. Now searching the system.")
+      hpx_warn("boost.${TARGET_LIB}" "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR}. Now searching the system path.")
       unset(BOOST_${TARGET_LIB}_LIBRARY)
    
       build_boost_libname(${TARGET_LIB}) 
+      hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
     
       foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-        hpx_debug("Looking for ${BOOST_TARGET} in system path...")
-
         find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
         if(BOOST_${TARGET_LIB}_LIBRARY)
-          hpx_debug("Found for ${BOOST_TARGET} in system path...")
+          get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
+          get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
+          hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
           break()
         endif()
       endforeach()
     
       if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-        hpx_error("Failed to locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR} or in the default path.")
+        hpx_error("boost.${TARGET_LIB}" "Failed to locate library in ${BOOST_LIB_DIR} or in the system path.")
         unset(BOOST_${TARGET_LIB}_LIBRARY)
       else()
         set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
           CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-        hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
       endif()
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-      hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
     endif()
     
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
@@ -189,26 +189,26 @@ macro(find_boost_library TARGET_LIB)
   else()
     # Locate libraries 
     build_boost_libname(${TARGET_LIB}) 
+    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
     
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      hpx_debug("Looking for ${BOOST_TARGET} in system path...")
-
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
-        hpx_debug("Found for ${BOOST_TARGET} in system path...")
+        get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
+        get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
+        hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
         break()
       endif()
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      hpx_error("Failed to locate Boost ${TARGET_LIB} shared library in the system path.")
+      hpx_error("boost.${TARGET_LIB}" "Failed to locate library in the system path.")
       set(BOOST_FOUND OFF)
       unset(BOOST_${TARGET_LIB}_LIBRARY)
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
-      hpx_debug("Using ${BOOST_${TARGET_LIB}_LIBRARY} as Boost ${TARGET_LIB} shared library.")
     endif()
   
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
