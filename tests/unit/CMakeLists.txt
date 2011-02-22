@@ -10,6 +10,7 @@ set(groups
     sanity
     component_memory
     component_memory_block
+    naming
     #lco
     #threadmanager
     performance_counters)
