@@ -27,7 +27,7 @@ set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 # include additional macro definitions
 include(HPX_Utils)
 
-hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst.")
+hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -141,16 +141,10 @@ if(HPX_HW_ACCELERATION)
   find_package(HPX_PXACCEL)
 
   if(PXACCEL_FOUND)
-    hpx_debug("Hardware acceleration framework found in ${PXACCEL_ROOT}.")
-
     add_definitions(-DHPX_ACCEL_QUEUING)
     include_directories(${PXACCEL_INC_DIR})
     link_directories(${PXACCEL_LIB_DIR})
     set(pxaccel_LIBRARIES pciutil pciaccess)
-  else()
-    # previously, this message was longer, but overly verbose and incorrectly formatted -
-    # cmake has weird rules about message formats for fatal errors
-    hpx_warn("Hardware acceleration support was not found in ${PXACCEL_ROOT}.")
   endif()
 endif()
 
@@ -267,6 +261,7 @@ add_subdirectory(runtime)
 # test configuration 
 ################################################################################
 enable_testing()
+include(CTest)
 add_custom_target(tests) 
 add_subdirectory(tests)
 
