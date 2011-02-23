@@ -20,7 +20,7 @@ macro(hpx_info type)
 endmacro()
 
 macro(hpx_debug type)
-  if("${HPX_CMAKE_LOGLEVEL}" STREQUAL "DEBUG|debug|Debug")
+  if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
     string(TOLOWER ${type} lctype)
     message("[hpx.debug.${lctype}] " ${ARGN})
   endif()
@@ -292,7 +292,7 @@ macro(add_hpx_component name)
       ${CMAKE_CURRENT_BINARY_DIR}/${hpx_COMPONENT_LIBRARY_PREFIX}${name}.dll)
   endif()
   
-  if(NOT ${${name}_MODULE})
+  if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
     hpx_warn("add_component.${name}" "Module was not specified for component.")
   endif()
@@ -390,7 +390,7 @@ endmacro()
 
 ###############################################################################
 # This macro runs an hpx test 
-macro(add_hpx_test target name)
+macro(add_hpx_test target)
   # retrieve arguments
   hpx_parse_arguments(${target}
     "SOURCES;HEADERS;DEPENDENCIES;ARGS" "DONTRUN;DONTCOMPILE" ${ARGN})
