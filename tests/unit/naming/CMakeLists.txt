@@ -18,19 +18,11 @@ set(testcases
     )
 
 foreach(testcase ${testcases})
-  add_hpx_test(${group}_${testcase}
-               ${type}.${group}.${testcase}
-               SOURCES ${group}_${testcase}.cpp)
-
-  # add a custom target for this test
-  add_custom_target(tests.${type}.${group}.${testcase})
-
-  # make parent depend on us
-  add_dependencies(tests.${type}.${group}
-                   tests.${type}.${group}.${testcase})
+  add_hpx_test(${type}.${group}.${testcase}
+               SOURCES ${testcase}.cpp)
 
   # depend on the executable
-  add_dependencies(tests.${type}.${group}.${testcase}
-                   ${group}_${testcase}_test)
+  add_dependencies(tests.${type}.${group}
+                   ${type}.${group}.${testcase}_test)
 endforeach()
 
