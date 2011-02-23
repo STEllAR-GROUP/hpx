@@ -166,7 +166,7 @@ int fib_rhs (int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;

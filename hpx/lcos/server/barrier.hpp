@@ -24,11 +24,6 @@ namespace hpx { namespace lcos { namespace server
     /// A barrier can be used to synchronize a specific number of threads, 
     /// blocking all of the entering threads until all of the threads have 
     /// entered the barrier.
-    ///
-    /// \note   A \a barrier is not a LCO in the sense that it has no global id
-    ///         and it can't be triggered using the action (parcel) mechanism. 
-    ///         It is just a low level synchronization primitive allowing to 
-    ///         synchronize a given number of \a threads.
     class barrier 
       : public lcos::base_lco
       , public components::managed_component_base<barrier> 

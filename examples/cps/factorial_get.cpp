@@ -110,11 +110,11 @@ void factorial_get(int n, id_type k, id_type h)
 typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int n = 0;
 
-    get_option(vm, "value", n);
+    hpx::get_option(vm, "value", n);
 
     // Create DFV to guard against premature termination of main thread
     dataflow_int_type halt;

@@ -118,7 +118,7 @@ hpx::actions::manage_object_action<boost::uint8_t> const raw_memory =
     hpx::actions::manage_object_action<boost::uint8_t>();
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;

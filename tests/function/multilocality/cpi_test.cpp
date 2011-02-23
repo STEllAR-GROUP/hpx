@@ -88,13 +88,13 @@ typedef actions::plain_result_action2<
 HPX_REGISTER_PLAIN_ACTION(local_hits_action);
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
   size_type throws = 1000;
   size_type granularity = 1;
 
-  get_option(vm, "throws", throws);
-  get_option(vm, "granularity", granularity);
+  hpx::get_option(vm, "throws", throws);
+  hpx::get_option(vm, "granularity", granularity);
 
   process my_proc(get_runtime().get_process());
 
@@ -129,7 +129,7 @@ int hpx_main(po::variables_map &vm)
     std::cout << "Elapsed time: " << t.elapsed() << std::endl;
   }
 
-  hpx_finalize();
+  hpx::finalize();
 
   std::cout << "Test passed" << std::endl;
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
      "The number of concurrent throwers to use per locality (default: 1)")
     ;
 
-  int retcode = hpx_init(desc_commandline, argc, argv);
+  int retcode = hpx::init(desc_commandline, argc, argv);
   return retcode;
 }
 

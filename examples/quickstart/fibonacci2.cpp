@@ -88,7 +88,7 @@ int fib (id_type there, int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;
@@ -96,8 +96,8 @@ int hpx_main(po::variables_map &vm)
     double elapsed = 0.0;
 
     //// Process application-specific command-line options
-    get_option(vm, "value", argument, "application.fibonacci2.argument");
-    get_option(vm, "busywait", delay_coeff);
+    hpx::get_option(vm, "value", argument, "application.fibonacci2.argument");
+    hpx::get_option(vm, "busywait", delay_coeff);
 
     process my_proc(get_runtime().get_process());
     id_type here = my_proc.here();
@@ -125,7 +125,7 @@ int hpx_main(po::variables_map &vm)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    hpx_finalize();
+    hpx::finalize();
 
     return 0;
 }
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  int retcode = hpx_init(desc_commandline, argc, argv); 
+  int retcode = hpx::init(desc_commandline, argc, argv); 
   return retcode;
 }
 

@@ -84,23 +84,29 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(BOOST_MSVC)
+    template <typename Component, typename Enable = void>
+    struct component_type_database
+    {
+        static component_type value;
+
+        static HPX_ALWAYS_EXPORT component_type get();
+        static HPX_ALWAYS_EXPORT void set(component_type);
+    }; 
+#else
     template <typename Component, typename Enable = void>
     struct HPX_ALWAYS_EXPORT component_type_database
     {
         static component_type value;
 
-#if defined(BOOST_MSVC)
-        static HPX_ALWAYS_EXPORT component_type get();
-        static HPX_ALWAYS_EXPORT void set(component_type);
-#else
         static component_type get() { return value; }
         static void set(component_type t) { value = t; }
-#endif 
     }; 
-    
+#endif 
+
     template <typename Component, typename Enable>
     component_type component_type_database<Component, Enable>::value = component_invalid;
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     inline component_type get_component_type()

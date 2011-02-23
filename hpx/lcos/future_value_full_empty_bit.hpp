@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/get_result.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -23,24 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail 
 {
-    template <typename Result, typename RemoteResult>
-    struct get_result
-    {
-        static Result call(RemoteResult const& rhs)
-        {
-            return Result(rhs);
-        }
-    };
-
-    template <typename Result>
-    struct get_result<Result, Result>
-    {
-        static Result const& call(Result const& rhs)
-        {
-            return rhs;
-        }
-    };
-
     /// A future_value can be used by a single thread to invoke a (remote) 
     /// action and wait for the result. 
     template <typename Result, typename RemoteResult, int N>

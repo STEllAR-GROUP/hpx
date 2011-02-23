@@ -14,9 +14,9 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
-  hpx_finalize();
+  hpx::finalize();
 
   std::cout << "Test passed" << std::endl;
 
@@ -28,6 +28,6 @@ int main(int argc, char* argv[])
   po::options_description
     desc_commandline("Usage: start_up_test [hpx_options]");
 
-  int retcode = hpx_init(desc_commandline, argc, argv);
+  int retcode = hpx::init(desc_commandline, argc, argv);
   return retcode;
 }

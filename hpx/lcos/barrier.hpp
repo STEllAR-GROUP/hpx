@@ -22,7 +22,7 @@ namespace hpx { namespace lcos
         {}
 
         /// Create a client side representation for the existing
-        /// \a server#accumulator instance with the given global id \a gid.
+        /// \a server#barrier instance with the given global id \a gid.
         barrier(naming::id_type gid) 
           : base_type(gid)
         {}

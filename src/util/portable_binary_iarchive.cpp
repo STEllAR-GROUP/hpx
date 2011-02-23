@@ -46,7 +46,7 @@
 namespace hpx { namespace util
 {
 
-void 
+void HPX_ALWAYS_EXPORT
 portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize){
     char size;
     l = 0;
@@ -82,7 +82,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize){
         l = -l;
 }
 
-void
+void HPX_ALWAYS_EXPORT
 portable_binary_iarchive::load_override(
     boost::archive::class_name_type & t, int
 ){
@@ -99,7 +99,7 @@ portable_binary_iarchive::load_override(
     t.t[cn.size()] = '\0';
 }
 
-void 
+void HPX_ALWAYS_EXPORT
 portable_binary_iarchive::init(unsigned int flags){
     if(0 == (flags & boost::archive::no_header)){
         // read signature in an archive version independent manner

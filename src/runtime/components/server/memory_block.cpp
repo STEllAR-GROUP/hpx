@@ -36,7 +36,6 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action);
 
-#if defined(BOOST_MSVC)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::detail::memory_block_header,
     hpx::components::component_memory_block);
@@ -46,7 +45,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::memory_block,
     hpx::components::component_memory_block);
-#endif
 
 typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_ACTION_EX(

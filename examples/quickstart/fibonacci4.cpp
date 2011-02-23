@@ -67,7 +67,7 @@ int fib (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    id_type here = find_here();
+    id_type here = hpx::find_here();
     id_type next = get_runtime().get_process().next();
 
     fibonacci_future n1(next, n - 1, delay_coeff);
@@ -88,7 +88,7 @@ int fib_rhs (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    id_type here = find_here();
+    id_type here = hpx::find_here();
 
     fibonacci_rhs_future n1(here,  n - 1, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
@@ -97,7 +97,7 @@ int fib_rhs (int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;
@@ -106,8 +106,8 @@ int hpx_main(po::variables_map &vm)
 
 
     // Process application-specific command-line options
-    get_option(vm, "value", argument, "application.fibonacci2.argument");
-    get_option(vm, "busywait", delay_coeff);
+    hpx::get_option(vm, "value", argument, "application.fibonacci2.argument");
+    hpx::get_option(vm, "busywait", delay_coeff);
 
     id_type here = find_here();
 
@@ -144,6 +144,6 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  int retcode = hpx_init(desc_commandline, argc, argv); 
+  int retcode = hpx::init(desc_commandline, argc, argv); 
   return retcode;
 }

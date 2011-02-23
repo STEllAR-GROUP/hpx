@@ -24,13 +24,15 @@ namespace po = boost::program_options;
 template<typename Action, typename Arg0>
 inline void apply(Arg0 arg0, id_type k)
 {
-  hpx::applier::apply<Action>(find_here(), arg0, k);
+  naming::id_type here(hpx::find_here(), naming::id_type::unmanaged);
+  hpx::applier::apply<Action>(here, arg0, k);
 }
 
 template<typename Action, typename Arg0, typename Arg1>
 inline void apply(Arg0 arg0, Arg1 arg1, id_type k)
 {
-  hpx::applier::apply<Action>(find_here(), arg0, arg1, k);
+  naming::id_type here(hpx::find_here(), naming::id_type::unmanaged);
+  hpx::applier::apply<Action>(here, arg0, arg1, k);
 }
 
 template<typename Arg0>
@@ -86,11 +88,11 @@ void factorial(int n, id_type k)
 typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int n = -1;
-    
-    get_option(vm, "value", n);
+
+    hpx::get_option(vm, "value", n);
 
     {
         std::cout << ">>> k1 = dataflow_variable()" << std::endl;

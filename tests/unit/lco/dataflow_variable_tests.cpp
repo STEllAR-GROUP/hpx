@@ -36,9 +36,9 @@ HPX_REGISTER_PLAIN_ACTION(print_action);
 typedef hpx::lcos::dataflow_variable<int, int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
-    id_type here = find_here();
+    id_type here = hpx::find_here();
     id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;
@@ -67,7 +67,7 @@ int hpx_main(po::variables_map &vm)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    hpx_finalize();
+    hpx::finalize();
 
     std::cout << "Test passed" << std::endl;
 
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
           "Usage: dataflow_variable_tests [hpx_options] [options]");
 
   // Initialize and run HPX
-  int retcode = hpx_init(desc_commandline, argc, argv);
+  int retcode = hpx::init(desc_commandline, argc, argv);
   return retcode;
 }
 

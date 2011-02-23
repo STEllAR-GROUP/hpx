@@ -77,7 +77,7 @@ typedef lcos::lazy_future<identity_action> identity_lazy_future;
 typedef lcos::lazy_future<sum_action> sum_lazy_future;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     gid_type here = find_here();
 

@@ -44,9 +44,9 @@ int fib(naming::id_type prefix, int n, int delay_coeff);
 
 typedef 
     actions::plain_result_action3<int, naming::id_type, int, int, fib> 
-fibonacci1_action;
+fibonacci_action;
 
-HPX_REGISTER_PLAIN_ACTION(fibonacci1_action);
+HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int count_invocations = 0;    // global invocation counter
@@ -70,13 +70,13 @@ int fib (naming::id_type that_prefix, int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    typedef lcos::eager_future<fibonacci1_action> fibonacci1_future;
+    typedef lcos::eager_future<fibonacci_action> fibonacci_future;
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
     naming::id_type this_prefix = applier::get_applier().get_runtime_support_gid();
-    fibonacci1_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
-    fibonacci1_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
+    fibonacci_future n1(that_prefix, this_prefix, n - 1, delay_coeff);
+    fibonacci_future n2(this_prefix, that_prefix, n - 2, delay_coeff);
 
 //     std::cout << "*";
 
@@ -84,7 +84,7 @@ int fib (naming::id_type that_prefix, int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;
@@ -100,7 +100,7 @@ int hpx_main(po::variables_map &vm)
     // try to get arguments from application configuration
     runtime& rt = get_runtime();
     argument = boost::lexical_cast<int>(
-        rt.get_config().get_entry("application.fibonacci1.argument", argument));
+        rt.get_config().get_entry("application.fibonacci.argument", argument));
 
     // get list of all known localities
     std::vector<naming::id_type> prefixes;
@@ -109,7 +109,7 @@ int hpx_main(po::variables_map &vm)
     naming::id_type this_prefix = appl.get_runtime_support_gid();
     naming::id_type that_prefix;
     components::component_type type = 
-        components::get_component_type<components::server::plain_function<fibonacci1_action> >();
+        components::get_component_type<components::server::plain_function<fibonacci_action> >();
 
     if (appl.get_remote_prefixes(prefixes, type)) {
         // execute the fib() function on any of the remote localities
@@ -122,7 +122,7 @@ int hpx_main(po::variables_map &vm)
 
     {
         util::high_resolution_timer t;
-        lcos::eager_future<fibonacci1_action> n(
+        lcos::eager_future<fibonacci_action> n(
             that_prefix, this_prefix, argument, delay_coeff);
         result = n.get();
         elapsed = t.elapsed();
@@ -150,14 +150,14 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options
     po::options_description 
-        desc_commandline ("usage: fibonacci1 [options]");
+        desc_commandline ("usage: fibonacci [options]");
     desc_commandline.add_options()
         ("value,v", po::value<int>(), 
          "the number to be used as the argument to fib (default is 10)")
         ("csv,s", "generate statistics of the run in comma separated format")
         ("busywait,b", po::value<int>(),
          "add this amount of busy wait workload to each of the iterations"
-         " [in microseconds], i.e. -b1000 == 1 millisecond")
+         " [in steps of 1µs], i.e. -b1000 == 1ms")
         ;
 
     // Initialize and run HPX

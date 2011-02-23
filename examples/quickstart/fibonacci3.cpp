@@ -89,7 +89,7 @@ int fib (naming::gid_type there, int n, int delay_coeff)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     int argument = 10;
     int delay_coeff = 0;
@@ -111,7 +111,7 @@ int hpx_main(po::variables_map &vm)
     std::vector<naming::id_type> locales;
     applier::applier& appl = applier::get_applier();
 
-    naming::id_type here = find_here();
+    naming::id_type here = hpx::find_here();
     naming::id_type there;
 
     if (appl.get_remote_prefixes(locales)) {

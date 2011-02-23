@@ -121,14 +121,14 @@ static inline void computeRootPos(const int num_bodies, double &box_dim, double 
    center_position[2] = (maxPos[2] + minPos[2]) / 2;
 }
 //*********************    
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
     std::string input_file;
-    get_option(vm, "input_file", input_file);
+    hpx::get_option(vm, "input_file", input_file);
     LAPP_(info) << "Nbody, heck yeah!" ;
     if(input_file.size() == 0)
     {
-        hpx_finalize();
+        hpx::finalize();
         return 0;
     }
     LAPP_(info) << "Using input file '" << input_file << "'";
@@ -203,7 +203,7 @@ int hpx_main(po::variables_map &vm)
     }
        
     infile.close();  
-    hpx_finalize();
+    hpx::finalize();
     return 0;
 }
    
@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
         int num_localities = 1;
         // Initialize and run HPX
-        retcode = hpx_init(desc_commandline, argc, argv); 
+        retcode = hpx::init(desc_commandline, argc, argv); 
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";
