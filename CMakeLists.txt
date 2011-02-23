@@ -32,6 +32,26 @@ hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. 
 # allow more human readable "if then else" constructs
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
+# be pedantic and annoying by default
+if(NOT HPX_CMAKE_LOGLEVEL)
+  set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+################################################################################
+# environment detection 
+################################################################################
+execute_process(COMMAND "${hpx_SOURCE_DIR}/tools/build_env.py" "${CMAKE_CXX_COMPILER}"
+                OUTPUT_VARIABLE build_environment
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(build_environment)
+  set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
+
+  hpx_info("build_env" "Build environment is ${BUILDNAME}")
+else()
+  hpx_warn("build_env" "Couldn't determine build environment (install python).") 
+endif()
+
 ################################################################################
 # Boost configuration
 ################################################################################
@@ -119,6 +139,8 @@ endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
+
+hpx_info("install" "Install root is ${CMAKE_PREFIX}")
  
 set(CMAKE_DEBUG_POSTFIX "d")
 

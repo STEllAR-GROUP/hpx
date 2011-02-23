@@ -22,6 +22,7 @@ environment. The identifier string takes the following form::
 from platform import uname
 from re import compile
 from string import lower
+from types import StringType
 
 try:
   import subprocess
@@ -66,20 +67,43 @@ def make_component(raw, type):
     return "unknown-%s" % type
 
 def make_compiler_component(driver):
-  proc = process("%s --version" % driver)
+  windows = 0
+
+  try:
+    from sys import getwindowsversion
+    # on windows, running cl.exe with no args returns what we want
+    windows = 1
+    proc = process("%s" % driver)
+  except ImportError, err:
+    # on POSIX, assume GNU-style long options
+    proc = process("%s --version" % driver)
+
   proc.wait()
   raw = proc.read() 
+
+  if (windows):
+    compiler = compile(r'Version ([0-9.]+)').match(raw) 
  
+    if (compiler):
+      compiler = compiler.expand(r'msvc-\2')
+      if compile(r'^[a-z0-9\-.]+$').match(compiler):
+        return compiler
+      else:
+        return "msvc" 
+
   # handle GNU GCC and Intel
   compiler = compile(r'^(icc|icpc|gcc|g[+][+]) [(][^)]+[)] ([0-9.]+)').match(raw)
   
   if (compiler):
-    compiler = compiler.expand(r'\1-\2')
+    unescaped = compiler.expand(r'\1-\2')
+    compiler = compile(r'[+]').sub("x", unescaped)
+
     if compile(r'^[a-z0-9\-.]+$').match(compiler):
       return compiler
     else:
-      return compile(r'^(icc|icpc|gcc|g[+][+])').match(raw).expand(r'\1')
-  
+      unescaped = compile(r'^(icc|icpc|gcc|g[+][+])').match(raw).expand(r'\1')
+      return compile(r'[+]').sub("x", unescaped)
+ 
   # handle Clang
   compiler = compile(r'(clang) version ([0-9.]+)').match(raw)
   
@@ -104,9 +128,9 @@ def identify(driver):
                           make_compiler_component(driver)) 
 
 if __name__ == "__main__":
-  from sys import argv
+  from sys import argv 
   command = ""
   for arg in argv[1:]:
     command += ("\"%s\"" % arg)
-  print identify(command),
+  print identify(command)
 
