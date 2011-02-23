@@ -117,6 +117,13 @@ namespace hpx { namespace components { namespace amr { namespace server
                                     Parameter const& par);
 
         static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par);
+        static bool intersection(had_double_type xmin,had_double_type xmax,
+                                    had_double_type ymin,had_double_type ymax,
+                                    had_double_type zmin,had_double_type zmax,
+                                    had_double_type xmin2,had_double_type xmax2,
+                                    had_double_type ymin2,had_double_type ymax2,
+                                    had_double_type zmin2,had_double_type zmax2);
+
 
         static bool floatcmp(had_double_type const& x1, had_double_type const& x2);
         static bool floatcmp_ge(had_double_type const& x1, had_double_type const& x2);
