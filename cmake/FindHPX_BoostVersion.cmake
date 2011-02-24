@@ -30,7 +30,9 @@ macro(get_boost_version)
     endif()
   
     if(NOT BOOST_LIB_DIR)
-      find_path(BOOST_LIB_DIR lib PATHS ${BOOST_ROOT}/stage/libs ${BOOST_ROOT} NO_DEFAULT_PATH)
+      find_path(BOOST_LIB_DIR lib PATHS ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+      set(BOOST_LIB_DIR "${BOOST_LIB_DIR}/lib")
+      hpx_debug("boost.version" "Using ${BOOST_LIB_DIR} as Boost shared library directory")
     endif()
     
     if(NOT BOOST_INCLUDE_DIR)
