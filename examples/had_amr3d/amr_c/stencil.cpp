@@ -1021,45 +1021,13 @@ namespace hpx { namespace components { namespace amr
             if ( prolongation ) {
               // prolongation {{{
               // interpolation
-              had_double_type xmin = val[compute_index]->x_[0];
-              had_double_type xmax = val[compute_index]->x_[par->granularity-1];
-              had_double_type ymin = val[compute_index]->y_[0];
-              had_double_type ymax = val[compute_index]->y_[par->granularity-1];
-              had_double_type zmin = val[compute_index]->z_[0];
-              had_double_type zmax = val[compute_index]->z_[par->granularity-1];
               int n = par->granularity;
-
-#if 0
-              // get the bounding box of the input
-              had_double_type vxmin,vymin,vzmin,vxmax,vymax,vzmax; 
-              vxmin = 9999;
-              vymin = 9999;
-              vzmin = 9999;
-              vxmax = -9999;
-              vymax = -9999;
-              vzmax = -9999;
-              for (int ii=0;ii<val.size();ii++) {
-                if ( val[ii]->x_[0] < vxmin ) vxmin = val[ii]->x_[0]; 
-                if ( val[ii]->y_[0] < vymin ) vymin = val[ii]->y_[0]; 
-                if ( val[ii]->z_[0] < vzmin ) vzmin = val[ii]->z_[0]; 
-                if ( val[ii]->x_[par->granularity-1] > vxmax ) vxmax = val[ii]->x_[par->granularity-1];
-                if ( val[ii]->y_[par->granularity-1] > vymax ) vymax = val[ii]->y_[par->granularity-1];
-                if ( val[ii]->z_[par->granularity-1] > vzmax ) vzmax = val[ii]->z_[par->granularity-1];
-              }
-
-              // sanity check
-              if ( vxmin > resultval->px_[0] || vymin > resultval->py_[0] || vzmin > resultval->pz_[0] ||
-                   vxmax < resultval->px_[nx-1] || vymax < resultval->py_[ny-1] || vzmax < resultval->pz_[nz-1] ) {
-                std::cout << " PROBLEM COARSE INPUT      x " << vxmin << " " << vxmax << std::endl;
-                std::cout << "                           y " << vymin << " " << vymax << std::endl;
-                std::cout << "                           z " << vzmin << " " << vzmax << std::endl;
-                std::cout << " PROBLEM FINE MESH FILL    x " << resultval->px_[0]  << " " << resultval->px_[nx-1] << std::endl;
-                std::cout << "                           y " << resultval->py_[0]  << " " << resultval->py_[ny-1] << std::endl;
-                std::cout << "                           z " << resultval->pz_[0]  << " " << resultval->pz_[nz-1] << std::endl;
-                std::cout << " " << std::endl;
-                BOOST_ASSERT(false);
-              }
-#endif
+              had_double_type xmin = val[compute_index]->x_[0];
+              had_double_type xmax = val[compute_index]->x_[n-1];
+              had_double_type ymin = val[compute_index]->y_[0];
+              had_double_type ymax = val[compute_index]->y_[n-1];
+              had_double_type zmin = val[compute_index]->z_[0];
+              had_double_type zmax = val[compute_index]->z_[n-1];
 
               for (int k=0;k<n;k++) {
                 had_double_type zt = resultval->z_[k];
@@ -1069,9 +1037,12 @@ namespace hpx { namespace components { namespace amr
                 had_double_type xt = resultval->x_[i];
 
                 // check if this is a prolongation point
-                if ( !(par->min[level]+2*par->gw*dx < xt && par->max[level]-2*par->gw*dx > xt &&     
-                       par->min[level]+2*par->gw*dx < yt && par->max[level]-2*par->gw*dx > yt &&     
-                       par->min[level]+2*par->gw*dx < zt && par->max[level]-2*par->gw*dx > zt)  
+                if ( ( floatcmp_le(xt,par->min[level]+par->gw*dx) && floatcmp_ge(xt,par->min[level]) ) ||
+                     ( floatcmp_le(xt,par->max[level])            && floatcmp_ge(xt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(yt,par->min[level]+par->gw*dx) && floatcmp_ge(yt,par->min[level]) ) ||
+                     ( floatcmp_le(yt,par->max[level])            && floatcmp_ge(yt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(zt,par->min[level]+par->gw*dx) && floatcmp_ge(zt,par->min[level]) ) ||
+                     ( floatcmp_le(zt,par->max[level])            && floatcmp_ge(zt,par->max[level]-par->gw*dx) ) 
                    ) {
                   // this is a prolongation point -- overwrite the value with an interpolated value from the coarse mesh
                   bool found = false;
@@ -1100,9 +1071,9 @@ namespace hpx { namespace components { namespace amr
                       had_double_type xn = xt + li*dx;
                       
                       for (int ii=0;ii<val.size();ii++) {
-                        if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[par->granularity-1]) &&
-                             floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[par->granularity-1]) &&
-                             floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[par->granularity-1]) &&
+                        if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[n-1]) &&
+                             floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[n-1]) &&
+                             floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[n-1]) &&
                              ii != compute_index ) {
                           if (li == -1 && lj == -1 && lk == -1 ) {
                             has_corner[0] = 1;
@@ -1214,6 +1185,10 @@ namespace hpx { namespace components { namespace amr
                             has_corner[25] = 1;
                             anchor_index[25] = ii;
                           }
+                          if (li == 0 && lj == 0 && lk == 0 ) {
+                            has_corner[26] = 1;
+                            anchor_index[26] = ii;
+                          }
                         }
                       }
                           
@@ -1274,15 +1249,16 @@ namespace hpx { namespace components { namespace amr
                                         val[anchor_index[15]],val[anchor_index[13]],
                                         val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   }
-#if 0
+//#if 0
                   if ( !found ) {
                     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " BBOX : " <<  par->min[level] << " " << par->min[level]+2*par->gw*dx << " " <<  par->max[level] << " " << par->max[level]-2*par->gw*dx << std::endl;
                     std::cout << " Available data: " << std::endl;
                      for (int ii=0;ii<val.size();ii++) {
-                       std::cout << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << std::endl;
-                       std::cout << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << std::endl;
-                       std::cout << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << std::endl;
-                       std::cout << " " << std::endl;
+                       if ( ii != compute_index ) {
+                         std::cout << val[ii]->x_[0] << " " << val[ii]->x_[n-1] << std::endl;
+                         std::cout << val[ii]->y_[0] << " " << val[ii]->y_[n-1] << std::endl;
+                         std::cout << val[ii]->z_[0] << " " << val[ii]->z_[n-1] << std::endl;
+                       }
                      }      
                      for (int ii=0;ii<27;ii++) {
                        std::cout << " Has corner : " << ii << " " << has_corner[ii] << std::endl;
@@ -1290,7 +1266,7 @@ namespace hpx { namespace components { namespace amr
                             
                     BOOST_ASSERT(false);
                   }
-#endif
+//#endif
                 }
 
               } } }
@@ -1312,38 +1288,46 @@ namespace hpx { namespace components { namespace amr
                 xx = x + i*dx;
 
                 // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
-                if ( par->min[level+1] < xx - par->gw*dx && xx+par->gw*dx > par->max[level+1] &&
-                     par->min[level+1] < yy - par->gw*dx && yy+par->gw*dx > par->max[level+1] &&
-                     par->min[level+1] < zz - par->gw*dx && zz+par->gw*dx > par->max[level+1] ) {
+                if ( par->min[level+1]+par->gw*dx < xx && xx < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < yy && yy < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < zz && zz < par->max[level+1]-par->gw*dx ) {
 
                   found = false;
+                  if ( last_time != -1 ) {
+                    // check the bounding box of the finer mesh
+                    had_double_type xmin = val[last_time]->x_[0];                      
+                    had_double_type xmax = val[last_time]->x_[n-1];                      
+                    had_double_type ymin = val[last_time]->y_[0];                      
+                    had_double_type ymax = val[last_time]->y_[n-1];                      
+                    had_double_type zmin = val[last_time]->z_[0];                      
+                    had_double_type zmax = val[last_time]->z_[n-1];                      
 
-                  //if ( last_time != -1 ) {
-                    // this might save some time -- see if the point is here
-                  //  if ( xx >= val[last_time]->x_[0] && xx <= val[last_time]->x_[par->granularity-1] &&
-                  //       yy >= val[last_time]->y_[0] && yy <= val[last_time]->y_[par->granularity-1] &&
-                  //       zz >= val[last_time]->z_[0] && zz <= val[last_time]->z_[par->granularity-1] &&
-                  //       val[last_time]->level_ >= resultval->level_) {
-                  //    found = true;
-                  //  }
-                  //}
+                    if ( floatcmp_ge(xx,xmin) && floatcmp_le(xx,xmax) &&
+                         floatcmp_ge(yy,ymin) && floatcmp_le(yy,ymax) &&
+                         floatcmp_ge(zz,zmin) && floatcmp_le(zz,zmax) ) {
+                      found = true;
+                    } else {
+                      last_time = -1;
+                    }
+                  }
 
-                  int highest_level = resultval->level_;
                   if ( !found ) {
-                    // find the highest level who has this point
-                    highest_level -= 1;
                     for (int ii=0;ii<val.size();ii++) {
-                      if ( (xx >= val[ii]->x_[0] || floatcmp(xx,val[ii]->x_[0])==1) && 
-                           (xx <= val[ii]->x_[par->granularity-1] || floatcmp(xx,val[ii]->x_[par->granularity-1])==1) &&
-                           (yy >= val[ii]->y_[0] || floatcmp(yy,val[ii]->y_[0])==1)  && 
-                           (yy <= val[ii]->y_[par->granularity-1] || floatcmp(yy,val[ii]->y_[par->granularity-1])==1) &&
-                           (zz >= val[ii]->z_[0] || floatcmp(zz,val[ii]->z_[0])==1) && 
-                           (zz <= val[ii]->z_[par->granularity-1] || floatcmp(zz,val[ii]->z_[par->granularity-1])==1) ) {
-                        int val_level = val[ii]->level_;
-                        if ( val_level > highest_level ) {
+                      if ( ii != compute_index ) {
+                        // check the bounding box of the finer mesh
+                        had_double_type xmin = val[ii]->x_[0];                      
+                        had_double_type xmax = val[ii]->x_[n-1];                      
+                        had_double_type ymin = val[ii]->y_[0];                      
+                        had_double_type ymax = val[ii]->y_[n-1];                      
+                        had_double_type zmin = val[ii]->z_[0];                      
+                        had_double_type zmax = val[ii]->z_[n-1];                      
+
+                        if ( floatcmp_ge(xx,xmin) && floatcmp_le(xx,xmax) &&
+                             floatcmp_ge(yy,ymin) && floatcmp_le(yy,ymax) &&
+                             floatcmp_ge(zz,zmin) && floatcmp_le(zz,zmax) ) {
                           found = true;
                           last_time = ii;
-                          highest_level = val_level;
+                          break;
                         }
                       }
                     }
