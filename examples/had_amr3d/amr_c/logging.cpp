@@ -6,7 +6,7 @@
 #include <iostream>
 #include <hpx/hpx.hpp>
 
-#if defined(SDF_FOUND)
+#if defined(RNPL_FOUND)
 #include <sdf.h>
 #endif
 
@@ -105,7 +105,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #endif
             }
-#if defined(SDF_FOUND)
+#if defined(RNPL_FOUND)
             int shape[3];
             char cnames[80] = { "x|y|z" };
             shape[0] = par->granularity;

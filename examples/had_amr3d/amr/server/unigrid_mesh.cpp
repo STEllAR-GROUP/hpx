@@ -376,7 +376,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 38;
+        std::size_t memsize = 28;
         Array3D dst_port(num_rows,each_row[0],memsize);
         Array3D dst_src(num_rows,each_row[0],memsize);
         Array3D dst_step(num_rows,each_row[0],memsize);
@@ -596,6 +596,14 @@ namespace hpx { namespace components { namespace amr { namespace server
               had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
               had_double_type zmin = par->min[level] + c*par->granularity*dx;  
               had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
+
+              // buffer
+              xmin -= fdx;
+              xmax += fdx;
+              ymin -= fdx;
+              ymax += fdx;
+              zmin -= fdx;
+              zmax += fdx;
 
               // First, check if this coarse mesh bounding box intersects the ghostzone region
               if ( intersection(xmin,xmax,ymin,ymax,zmin,zmax,
