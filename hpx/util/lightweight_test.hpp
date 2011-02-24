@@ -20,7 +20,7 @@ inline void sanity_failed_impl(char const* expr, char const* file, int line,
       << file << "(" << line << "): sanity check '"
       << expr << "' failed in function '"
       << function << "'" << std::endl;
-        ++boost::detail::test_errors();
+        ++::boost::detail::test_errors();
 }
 
 template <typename T, typename U>
@@ -35,7 +35,17 @@ inline void sanity_eq_impl(char const* expr1, char const* expr2,
             << " == " << expr2
             << "' failed in function '" << function << "': "
             << "'" << t << "' != '" << u << "'" << std::endl;
-        ++boost::detail::test_errors();
+        ++::boost::detail::test_errors();
+    }
+}
+
+template <typename T, typename U>
+inline void test_msg_impl(char const* msg, char const* file, int line, 
+                          char const* function, T const& t, U const& u)
+{
+    if (!(t == u))
+    {
+        ::boost::detail::error_impl(msg, file, line, function);
     }
 }
 
@@ -53,11 +63,10 @@ inline void sanity_eq_impl(char const* expr1, char const* expr2,
       (msg, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION))  \
   /***/
 
-#define HPX_TEST_EQ_MSG(expr1, expr2, msg)                \
-  ((expr1 == expr2)                                       \
-   ? (void)0                                              \
-   : ::boost::detail::error_impl                          \
-      (msg, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION))  \
+#define HPX_TEST_EQ_MSG(expr1, expr2, msg)    \
+  (::hpx::detail::test_msg_impl               \
+    (msg, __FILE__, __LINE__,                 \
+     BOOST_CURRENT_FUNCTION, expr1, expr2))   \
   /***/
 
 #define HPX_SANITY(expr)                                   \
