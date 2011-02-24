@@ -113,7 +113,7 @@ namespace hpx
         // print help screen
         if (vm.count("help")) {
           std::cout << desc_cmdline;
-          return true;
+          return false;
         }
       }
       catch (std::exception const& e) {
