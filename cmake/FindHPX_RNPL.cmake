@@ -9,6 +9,14 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
     
+if(NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
+  set(SDF_ROOT $ENV{SDF_ROOT})
+endif()
+
+if(SDF_ROOT)
+  set(RNPL_ROOT "${SDF_ROOT}")
+endif()
+ 
 hpx_find_package(RNPL
   LIBRARIES bbhutil libbbhutil
   LIBRARY_PATHS lib
