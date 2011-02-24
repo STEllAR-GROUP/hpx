@@ -5,8 +5,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
 #include <boost/program_options.hpp>
 
 using namespace hpx;
@@ -51,7 +51,7 @@ int hpx_main(po::variables_map &vm)
     BOOST_TEST_EQ(value1, 42);
 
     // initiate shutdown of the runtime system
-    components::stubs::runtime_support::shutdown_all();
+    hpx::finalize();
 
     return 0;
 }
@@ -61,10 +61,13 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options
     po::options_description
-       desc_commandline("usage: component_memory_block_basic [options]");
+       desc_commandline
+          ("usage: " BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME) " [options]");
 
     // Initialize and run HPX
-    BOOST_TEST_EQ(hpx_init(desc_commandline, argc, argv), 0);
+    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
+      "HPX main exited with non-zero status");
     return boost::report_errors();
 }
+
 

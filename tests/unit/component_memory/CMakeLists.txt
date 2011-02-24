@@ -20,7 +20,8 @@ set(testcases
 foreach(testcase ${testcases})
   add_hpx_test(${type}.${group}.${testcase}
                SOURCES ${testcase}.cpp
-               ARGS "-r")
+               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}")
 
   # depend on the executable
   add_dependencies(tests.${type}.${group}

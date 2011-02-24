@@ -92,9 +92,9 @@ typedef lcos::thunk_client<identity_thunk> identity_thunk_type;
 typedef lcos::thunk_client<sum_thunk> sum_thunk_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map &vm)
+int hpx_main(po::variables_map &vm)
 {
-    id_type here = hpx::find_here();
+    id_type here = find_here();
     id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;

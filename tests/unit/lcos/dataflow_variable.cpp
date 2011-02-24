@@ -36,7 +36,7 @@ HPX_REGISTER_PLAIN_ACTION(print_action);
 typedef hpx::lcos::dataflow_variable<int, int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map &vm)
+int hpx_main(po::variables_map &vm)
 {
     id_type here = hpx::find_here();
     id_type there = get_runtime().get_process().next();

@@ -11,7 +11,7 @@ set(groups
     component_memory
     component_memory_block
     naming
-    #lco
+    lcos
     #threadmanager
     performance_counters)
 
