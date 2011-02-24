@@ -200,7 +200,7 @@ macro(add_hpx_component name)
 
   if(NOT MSVC)
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES})
+      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
     set(prefix "hpx_component_")
     # main_target is checked by the ini install code, to see if ini files for
     # this component need to be installed
