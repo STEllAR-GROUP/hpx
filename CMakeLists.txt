@@ -141,8 +141,6 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
 hpx_info("install" "Install root is ${CMAKE_PREFIX}")
- 
-set(CMAKE_DEBUG_POSTFIX "d")
 
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
@@ -243,8 +241,6 @@ else()
   endif()
   
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl pthread rt)
-
-  set(hpx_COMPONENT_LIBRARY_PREFIX "hpx_component_")
 endif()
 
 ################################################################################

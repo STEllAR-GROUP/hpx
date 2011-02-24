@@ -163,14 +163,16 @@ endmacro()
 
 ################################################################################
 # Installs the ini files for a component, if it was built
-macro(hpx_ini_install component ini)
+macro(hpx_ini_install component name ini)
   set(install_code
-      "file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
-            OPTIONAL
-            PERMISSIONS OWNER_READ OWNER_WRITE 
-                        GROUP_READ 
-                        WORLD_READ)")
+      "if(EXISTS "${name}")
+          file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
+               DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
+               OPTIONAL
+               PERMISSIONS OWNER_READ OWNER_WRITE 
+                           GROUP_READ 
+                           WORLD_READ)
+       endif()")
   install(CODE "${install_code}" COMPONENT ${component})
 endmacro()
 
@@ -200,13 +202,17 @@ macro(add_hpx_component name)
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${hpx_LIBRARIES})
     set(prefix "hpx_component_")
+    # main_target is checked by the ini install code, to see if ini files for
+    # this component need to be installed
+    set(main_target lib${prefix}${name}.so)
     set(install_targets
-      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so
-      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so.${HPX_SOVERSION}
-      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so.${HPX_VERSION})
+      lib${prefix}${name}.so
+      lib${prefix}${name}.so.${HPX_SOVERSION}
+      lib${prefix}${name}.so.${HPX_VERSION})
   else()
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+    set(main_target ${name}.dll)
     set(install_targets ${name}.dll)
   endif()
 
@@ -253,7 +259,7 @@ macro(add_hpx_component name)
     endforeach()
 
     foreach(target ${${name}_INI})
-      hpx_ini_install(${${name}_MODULE} ${target})
+      hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
     endforeach()
   endif()
 endmacro()
@@ -277,15 +283,6 @@ macro(add_hpx_executable name)
     add_executable(${name}_exe EXCLUDE_FROM_ALL
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
-
-  # avoid conflicts between source and binary target names - this is done
-  # automatically for shared libraries if CMAKE_DEBUG_POSTFIX is defined, but
-  # not for executables.
-  set_target_properties(${name}_exe PROPERTIES
-    DEBUG_OUTPUT_NAME ${name}${CMAKE_DEBUG_POSTFIX}
-    RELEASE_OUTPUT_NAME ${name}
-    RELWITHDEBINFO_OUTPUT_NAME ${name}
-    MINSIZEREL_OUTPUT_NAME ${name})
 
   set_property(TARGET ${name}_exe APPEND
                PROPERTY COMPILE_DEFINITIONS
@@ -312,7 +309,7 @@ macro(add_hpx_executable name)
                   GROUP_READ GROUP_EXECUTE
                   WORLD_READ WORLD_EXECUTE)
   else()
-    hpx_install(${${name}_MODULE} ${name}${CMAKE_DEBUG_POSTFIX})
+    hpx_install(${${name}_MODULE} ${name})
   endif()
 endmacro()
 
