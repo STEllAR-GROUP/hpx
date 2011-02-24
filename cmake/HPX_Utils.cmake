@@ -137,7 +137,7 @@ endmacro()
 # This is an abusive hack that actually installs stuff properly
 macro(hpx_install component bin)
   set(install_code
-      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${bin}_exe
+      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${bin}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
             TYPE EXECUTABLE 
             OPTIONAL
@@ -283,6 +283,8 @@ macro(add_hpx_executable name)
     add_executable(${name}_exe EXCLUDE_FROM_ALL
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
+
+  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
   set_property(TARGET ${name}_exe APPEND
                PROPERTY COMPILE_DEFINITIONS
