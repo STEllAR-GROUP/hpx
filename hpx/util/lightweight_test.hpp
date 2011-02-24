@@ -16,11 +16,11 @@ namespace hpx { namespace detail
 inline void sanity_failed_impl(char const* expr, char const* file, int line,
                              char const* function)
 {
-    BOOST_LIGHTWEIGHT_TEST_OSTREAM
+    std::cout 
       << file << "(" << line << "): sanity check '"
       << expr << "' failed in function '"
       << function << "'" << std::endl;
-        ++::boost::detail::test_errors();
+    ++::boost::detail::test_errors();
 }
 
 template <typename T, typename U>
@@ -30,7 +30,7 @@ inline void sanity_eq_impl(char const* expr1, char const* expr2,
 {
     if (!(t == u))
     {
-        BOOST_LIGHTWEIGHT_TEST_OSTREAM
+        std::cout 
             << file << "(" << line << "): sanity check '" << expr1
             << " == " << expr2
             << "' failed in function '" << function << "': "
