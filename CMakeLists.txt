@@ -304,6 +304,14 @@ install( # install all hpx cmake utility files
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
+install( # install all hpx python scripts
+  DIRECTORY tools 
+  DESTINATION share/hpx/python 
+  COMPONENT core
+  FILES_MATCHING PATTERN "*.py"
+  PATTERN ".svn" EXCLUDE
+  PATTERN ".git" EXCLUDE)
+
 install( # install external dependencies
   DIRECTORY external/cache/boost
             external/coroutine/boost
