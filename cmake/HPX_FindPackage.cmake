@@ -28,7 +28,7 @@ macro(hpx_get_version name)
   if(NOT ${name}_USE_SYSTEM)
     if(NOT ${name}_ROOT AND NOT $ENV{${name}_ROOT} STREQUAL "")
       set(${name}_ROOT $ENV{${name}_ROOT})
-    endif(NOT ${name}_ROOT AND NOT $ENV{${name}_ROOT} STREQUAL "")
+    endif()
   endif()
   
   set(rooted_header_paths)
