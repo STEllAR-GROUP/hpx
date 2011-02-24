@@ -84,23 +84,6 @@ macro(hpx_list_contains var value)
 endmacro()
 
 ###############################################################################
-# Convert a list into a delimited string 
-macro(hpx_canonicalize_list list string delimiter)
-  set(tween "")
-  set(collect "${${string}}")
-
-  foreach(element ${list})
-    set(realpath ${CMAKE_CURRENT_SOURCE_DIR}/${element})
-    set(collect "${collect}${tween}${realpath}")
-    if("${tween}" STREQUAL "")
-      set(tween "${delimiter}")
-    endif()
-  endforeach()
-
-  set(${string} "${collect}")
-endmacro()
-
-###############################################################################
 # Print a list 
 macro(hpx_print_list level type message list) 
   hpx_config_loglevel(${level} printed)
@@ -152,95 +135,42 @@ endmacro()
 
 ###############################################################################
 # This is an abusive hack that actually installs stuff properly
-macro(hpx_install component target_name location)
-  get_filename_component(target_path ${target_name} PATH)
-  get_filename_component(target_bin ${target_name} NAME)
-  get_filename_component(install_path ${location} PATH)
+macro(hpx_install component bin)
   set(install_code
-    "find_path(${target_bin}_was_built
-               ${target_bin}
-               PATHS ${target_path} NO_DEFAULT_PATH)
-     if(${target_bin}_was_built)
-       file(INSTALL ${target_name}
-            DESTINATION ${install_path}
-            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${bin}_exe
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+            TYPE EXECUTABLE 
+            OPTIONAL
+            PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                         GROUP_READ GROUP_EXECUTE
-                        WORLD_READ WORLD_EXECUTE)
-     else(${target_bin}_was_built)
-       message(STATUS \"Not installing: ${location}\")
-     endif(${target_bin}_was_built)")
+                        WORLD_READ WORLD_EXECUTE)")
   install(CODE "${install_code}" COMPONENT ${component})
 endmacro()
 
 ###############################################################################
 # Like above, just for components 
-macro(hpx_component_install component target_name location)
-  if(NOT MSVC)
-    get_filename_component(target_path ${target_name} PATH)
-    get_filename_component(target_bin ${target_name} NAME)
-    get_filename_component(install_path ${location} PATH)
-    set(install_code
-      "find_path(${target_bin}_was_built
-                 ${target_bin}
-                 PATHS ${target_path} NO_DEFAULT_PATH)
-       if(${target_bin}_was_built)
-         file(INSTALL ${target_name}
-              DESTINATION ${install_path}
-              PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                          GROUP_READ GROUP_EXECUTE
-                          WORLD_READ WORLD_EXECUTE)
-         execute_process(COMMAND \"ln\" \"-fs\"
-                         \"${location}.so.${HPX_VERSION}\"
-                         \"${location}.so.${HPX_SOVERSION}\")
-         execute_process(COMMAND \"ln\" \"-fs\"
-                         \"${location}.so.${HPX_VERSION}\"
-                         \"${location}.so\")
-       else(${target_bin}_was_built)
-         message(STATUS \"Not installing: ${location}.so.${HPX_VERSION}\")
-         message(STATUS \"Not installing: ${location}.so.${HPX_SOVERSION}\")
-         message(STATUS \"Not installing: ${location}.so\")
-       endif(${target_bin}_was_built)")
-    install(CODE "${install_code}" COMPONENT ${component})
-  else()
-    get_filename_component(target_path ${target_name} PATH)
-    get_filename_component(target_bin ${target_name} NAME)
-    get_filename_component(install_path ${location} PATH)
-    set(install_code
-      "find_path(${target_bin}_was_built
-                 ${target_bin}
-                 PATHS ${target_path} NO_DEFAULT_PATH)
-       if(${target_bin}_was_built)
-         file(INSTALL ${target_name}
-              DESTINATION ${install_path}
-              PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                          GROUP_READ GROUP_EXECUTE
-                          WORLD_READ WORLD_EXECUTE)
-       else(${target_bin}_was_built)
-         message(STATUS \"Not installing: ${location}.dll\")
-       endif(${target_bin}_was_built)")
-    install(CODE "${install_code}" COMPONENT ${component})
-  endif()
+macro(hpx_component_install component lib)
+  set(install_code
+      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${lib}
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+            TYPE SHARED_LIBRARY 
+            OPTIONAL
+            PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
+                        GROUP_READ GROUP_EXECUTE
+                        WORLD_READ WORLD_EXECUTE)")
+  install(CODE "${install_code}" COMPONENT ${component})
 endmacro()
 
 ################################################################################
 # Installs the ini files for a component, if it was built
-macro(hpx_ini_install component target_name location ini_files)
-  get_filename_component(target_path ${target_name} PATH)
-  get_filename_component(target_bin ${target_name} NAME)
-  hpx_canonicalize_list(${ini_files} serialized_ini_files " ")
+macro(hpx_ini_install component ini)
   set(install_code
-    "find_path(${target_bin}_was_built
-               ${target_bin}
-               PATHS ${target_path} NO_DEFAULT_PATH)
-     if(${target_bin}_was_built)
-       file(INSTALL ${serialized_ini_files}
+      "file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
+            OPTIONAL
             PERMISSIONS OWNER_READ OWNER_WRITE 
                         GROUP_READ 
-                        WORLD_READ)
-     else(${target_bin}_was_built)
-       message(STATUS \"Not installing: ${location}.so.${HPX_VERSION}'s configuration files\")
-     endif(${target_bin}_was_built)")
+                        WORLD_READ)")
   install(CODE "${install_code}" COMPONENT ${component})
 endmacro()
 
@@ -256,10 +186,6 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
-  # add defines for this component
-  add_definitions(-DHPX_COMPONENT_NAME=${name})
-  add_definitions(-DHPX_COMPONENT_EXPORTS)
-
   if(${name}_ESSENTIAL)
     add_library(${name}_component SHARED 
       ${${name}_SOURCES} ${${name}_HEADERS})
@@ -268,6 +194,22 @@ macro(add_hpx_component name)
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif() 
 
+  set(prefix "")
+
+  if(NOT MSVC)
+    target_link_libraries(${name}_component
+      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES})
+    set(prefix "hpx_component_")
+    set(install_targets
+      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so
+      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so.${HPX_SOVERSION}
+      lib${prefix}${name}${CMAKE_DEBUG_POSTFIX}.so.${HPX_VERSION})
+  else()
+    target_link_libraries(${name}_component
+      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+    set(install_targets ${name}.dll)
+  endif()
+
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
     # create *nix style library versions + symbolic links
@@ -275,22 +217,12 @@ macro(add_hpx_component name)
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1 
-    OUTPUT_NAME ${hpx_COMPONENT_LIBRARY_PREFIX}${name})
-
-  target_link_libraries(${name}_component
-    ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
-
-  if(NOT MSVC)
-    set(installed_target
-      ${CMAKE_INSTALL_PREFIX}/lib/lib${hpx_COMPONENT_LIBRARY_PREFIX}${name})
-    set(built_target
-      ${CMAKE_CURRENT_BINARY_DIR}/lib${hpx_COMPONENT_LIBRARY_PREFIX}${name}.so.${HPX_VERSION})
-  else()
-    set(installed_target
-      ${CMAKE_INSTALL_PREFIX}/lib/${hpx_COMPONENT_LIBRARY_PREFIX}${name})
-    set(built_target
-      ${CMAKE_CURRENT_BINARY_DIR}/${hpx_COMPONENT_LIBRARY_PREFIX}${name}.dll)
-  endif()
+    OUTPUT_NAME ${prefix}${name})
+  
+  set_property(TARGET ${name}_component APPEND
+               PROPERTY COMPILE_DEFINITIONS
+               "HPX_COMPONENT_NAME=${name}"
+               "HPX_COMPONENT_EXPORTS")
   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
@@ -316,13 +248,13 @@ macro(add_hpx_component name)
                     WORLD_READ)
     endif()
   else()
-    hpx_component_install(${${name}_MODULE}
-      ${built_target} ${installed_target})
-  
-    if(${name}_INI)
-      hpx_ini_install(${${name}_MODULE}
-        ${built_target} ${installed_target} ${${name}_INI})
-    endif()
+    foreach(target ${install_targets})
+      hpx_component_install(${${name}_MODULE} ${target})
+    endforeach()
+
+    foreach(target ${${name}_INI})
+      hpx_ini_install(${${name}_MODULE} ${target})
+    endforeach()
   endif()
 endmacro()
 
@@ -336,9 +268,6 @@ macro(add_hpx_executable name)
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
-
-  # add defines for this executable
-  add_definitions(-DHPX_APPLICATION_EXPORTS)
 
   # add the executable build target
   if(${name}_ESSENTIAL)
@@ -358,6 +287,11 @@ macro(add_hpx_executable name)
     RELWITHDEBINFO_OUTPUT_NAME ${name}
     MINSIZEREL_OUTPUT_NAME ${name})
 
+  set_property(TARGET ${name}_exe APPEND
+               PROPERTY COMPILE_DEFINITIONS
+               "HPX_APPLICATION_NAME=${name}"
+               "HPX_APPLICATION_EXPORTS")
+
   # linker instructions
   target_link_libraries(${name}_exe
     ${${name}_DEPENDENCIES} 
@@ -365,9 +299,9 @@ macro(add_hpx_executable name)
     ${BOOST_FOUND_LIBRARIES}
     ${pxaccel_LIBRARIES})
 
-  if(NOT ${${name}_MODULE})
+  if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
-    hpx_warn("add_executable.${name}" "Module was not specified for component.")
+    hpx_warn("add_executable.${name}" "Module was not specified for executable.")
   endif()
 
   if(${name}_ESSENTIAL) 
@@ -378,13 +312,7 @@ macro(add_hpx_executable name)
                   GROUP_READ GROUP_EXECUTE
                   WORLD_READ WORLD_EXECUTE)
   else()
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-      hpx_install(${${name}_MODULE} ${CMAKE_CURRENT_BINARY_DIR}/${name}
-        ${CMAKE_INSTALL_PREFIX}/bin/${name}${CMAKE_DEBUG_POSTFIX}) 
-    else()
-      hpx_install(${${name}_MODULE} ${CMAKE_CURRENT_BINARY_DIR}/${name}
-        ${CMAKE_INSTALL_PREFIX}/bin/${name}) 
-    endif()
+    hpx_install(${${name}_MODULE} ${name}${CMAKE_DEBUG_POSTFIX})
   endif()
 endmacro()
 
@@ -401,11 +329,13 @@ macro(add_hpx_test target)
   hpx_print_list("DEBUG" "add_test.${target}" "Arguments for ${target}" ${target}_ARGS)
 
   if(NOT ${target}_DONTCOMPILE)
-    # add defines for this executable
-    add_definitions(-DHPX_APPLICATION_EXPORTS)
-
     add_executable(${target}_test EXCLUDE_FROM_ALL
       ${${target}_SOURCES} ${${target}_HEADERS})
+  
+    set_property(TARGET ${target}_test APPEND
+                 PROPERTY COMPILE_DEFINITIONS
+                 "HPX_APPLICATION_NAME=${target}"
+                 "HPX_APPLICATION_EXPORTS")
   
     # linker instructions
     target_link_libraries(${target}_test
