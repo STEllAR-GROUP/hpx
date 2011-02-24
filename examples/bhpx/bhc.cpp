@@ -171,8 +171,8 @@ int hpx_main(boost::program_options::variables_map &vm)
     }
     
             // get list of all known localities
-    std::vector<hpx::naming::gid_type> prefixes;
-    hpx::naming::gid_type prefix;
+    std::vector<hpx::naming::id_type> prefixes;
+    hpx::naming::id_type prefix;
     hpx::applier::applier& appl = hpx::applier::get_applier();
     if (appl.get_remote_prefixes(prefixes)) {
         // create accumulator on any of the remote localities
@@ -180,7 +180,7 @@ int hpx_main(boost::program_options::variables_map &vm)
     }
     else {
         // create an accumulator locally
-        prefix = appl.get_runtime_support_raw_gid();
+        prefix = appl.get_runtime_support_gid();
     }
     
     for (iter = 0; iter < num_iterations; ++iter)
@@ -188,7 +188,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         double box_size, cPos[3];
         computeRootPos(num_bodies, box_size, cPos, bodies);
         hpx::components::itn::itn tree_root;
-        tree_root.create(naming::id_type(prefix, naming::id_type::unmanaged));
+        tree_root.create(prefix);
         tree_root.new_node(cPos[0], cPos[1], cPos[2]);
         
         const double sub_box_size = box_size * 0.5;

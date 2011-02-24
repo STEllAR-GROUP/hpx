@@ -2,6 +2,7 @@
 #define _ITN_SERVER_HPP_020411
 
 #include <iostream>
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -18,7 +19,7 @@
 namespace hpx { namespace components { namespace itn { namespace server
 {
     
-    class itn
+    class HPX_ALWAYS_EXPORT itn
     : public components::detail::managed_component_base<itn>
     {
     public:

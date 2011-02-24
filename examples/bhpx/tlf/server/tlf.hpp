@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -11,7 +12,7 @@
 
 namespace hpx { namespace components { namespace tlf { namespace server {
     
-    class tlf
+    class HPX_ALWAYS_EXPORT tlf
     : public components::detail::managed_component_base<tlf>
     {
     public:
