@@ -92,7 +92,7 @@ def make_compiler_component(driver):
         return "msvc" 
 
   # handle GNU GCC and Intel
-  compiler = compile(r'^(icc|icpc|gcc|g[+][+]) [(][^)]+[)] ([0-9.]+)').match(raw)
+  compiler = compile(r'^(icc|icpc|gcc|g[+][+])[^ ]* [(][^)]+[)] ([0-9.]+)').match(raw)
   
   if (compiler):
     unescaped = compiler.expand(r'\1-\2')
