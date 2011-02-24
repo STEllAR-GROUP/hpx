@@ -23,3 +23,7 @@ hpx_find_package(RNPL
   HEADERS sdf.h
   HEADER_PATHS include)
 
+if(RNPL_FOUND)
+  add_definitions(-DSDF_FOUND)
+endif()
+
