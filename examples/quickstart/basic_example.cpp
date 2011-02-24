@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
        a series of calls to create the runtime manually with the desired characteristics. The
        two methods have equivalent results (ie., and hpx runtime is created). 
     */
-    int retcode = hpx_init(desc_commandline, argc, argv);
+    int retcode = hpx::init(desc_commandline, argc, argv);
     return retcode;
 
 }
@@ -207,7 +207,7 @@ int hpx_main(po::variables_map &vm)
     }
 
     // Initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx::finalize();
     return 0;
 }
 
