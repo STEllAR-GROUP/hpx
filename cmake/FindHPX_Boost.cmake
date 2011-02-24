@@ -112,8 +112,10 @@ macro(build_boost_libname BOOST_RAW_NAME)
   if(BOOST_SUFFIX)
     # user suffix
     set(BOOST_SUFFIX ${BOOST_SUFFIX} CACHE STRING
-      "Boost library suffix (default: none).")
+      "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds).")
     set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
+  elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug|RelWithDebInfo")
+    set(BOOST_LIB_SUFFIX "-d") 
   endif()
 
   if(BOOST_USE_MULTITHREADED)
@@ -129,6 +131,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
       libboost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
       boost_${BOOST_RAW_NAME}
       libboost_${BOOST_RAW_NAME})
+
 endmacro()
 
 macro(find_boost_library TARGET_LIB)
