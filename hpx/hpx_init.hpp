@@ -93,10 +93,10 @@ namespace hpx
             "the IP address the HPX parcelport is listening on (default "
             "is localhost:7910), expected format: 192.168.1.1:7913")
           ("localities,l", po::value<int>(), 
-            "the number of localities to wait for at application startup"
+            "the number of localities to wait for at application startup "
             "(default is 1)")
           ("threads,t", po::value<int>(), 
-            "the number of operating system threads to spawn for this"
+            "the number of operating system threads to spawn for this "
             "HPX locality")
           ("queueing,q", po::value<std::string>(),
             "the queue scheduling policy to use, options are 'global' "
