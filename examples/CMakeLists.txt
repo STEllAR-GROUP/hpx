@@ -19,6 +19,7 @@ set(subdirs
     had_amr
     had_amr3d
     naming
+    nqueen
     parcelset
     quickstart
     )
