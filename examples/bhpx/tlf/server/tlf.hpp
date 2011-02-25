@@ -24,7 +24,8 @@ namespace hpx { namespace components { namespace tlf { namespace server {
           tlf_set_acc = 3,
           tlf_print = 4,
           tlf_get_pos = 5,
-          tlf_get_type = 6
+          tlf_get_type = 6,
+          tlf_get_mass = 7
         };
         
         tlf()
@@ -52,6 +53,11 @@ namespace hpx { namespace components { namespace tlf { namespace server {
             p[0] = px;
             p[1] = py;
             p[2] = pz;
+        }
+        
+        double get_mass()
+        {
+            return mass;
         }
         
         std::vector<double> get_pos()
@@ -100,6 +106,8 @@ namespace hpx { namespace components { namespace tlf { namespace server {
         typedef hpx::actions::action0<tlf, tlf_print, &tlf::print> print_action;
         typedef hpx::actions::result_action0<tlf, std::vector<double>, tlf_get_pos, &tlf::get_pos> get_pos_action;
         typedef hpx::actions::result_action0<tlf, int, tlf_get_type, &tlf::get_type> get_type_action;
+        typedef hpx::actions::result_action0<tlf, double, tlf_get_mass, &tlf::get_mass > get_mass_action;
+
         
     private:
         int node_type;

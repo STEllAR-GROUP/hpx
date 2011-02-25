@@ -65,10 +65,20 @@ struct tlf : components::stubs::stub_base<hpx::components::tlf::server::tlf>
     {
         return get_type_async(gid).get();
     }
+    
+    static lcos::future_value<double> get_mass_async(naming::id_type const& gid)
+    {
+       typedef components::tlf::server::tlf::get_mass_action action_type;
+       return lcos::eager_future<action_type>(gid);
+    }
+        
+    static double get_mass(naming::id_type const& gid)
+    {
+       return get_mass_async(gid).get();
+    }    
 };
 }
 }
 }
 }
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

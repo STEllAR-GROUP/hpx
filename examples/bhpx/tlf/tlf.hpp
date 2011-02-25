@@ -78,6 +78,17 @@ namespace hpx { namespace components { namespace tlf
            BOOST_ASSERT(gid_);
            this->base_type::get_type_async(gid_);
        }
+       
+       double get_mass()
+       {
+           BOOST_ASSERT(gid_);
+           this->base_type::get_mass(gid_);
+       }
+       
+       lcos::future_value<double> get_mass_async()
+       {
+           return this->base_type::get_mass_async(gid_);
+       }
    };
 }}}
 

@@ -18,9 +18,12 @@ HPX_REGISTER_ACTION_EX(tlf_type::wrapped_type::set_acc_action, tlf_set_acc_actio
 HPX_REGISTER_ACTION_EX(tlf_type::wrapped_type::print_action, tlf_print_action);
 HPX_REGISTER_ACTION_EX(tlf_type::wrapped_type::get_pos_action, tlf_get_pos_action);
 HPX_REGISTER_ACTION_EX(tlf_type::wrapped_type::get_type_action, tlf_get_type_action);
+HPX_REGISTER_ACTION_EX(tlf_type::wrapped_type::get_mass_action, tlf_get_mass_action);
 
 
+HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<double>::set_result_action, set_result_action_double);
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<int>::set_result_action, set_result_action_int);
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action, set_result_action_vector_double);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<double> >);
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<double>);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<int>);
