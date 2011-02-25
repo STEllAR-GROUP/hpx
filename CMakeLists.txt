@@ -29,9 +29,6 @@ include(HPX_Utils)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
-# allow more human readable "if then else" constructs
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-
 # be pedantic and annoying by default
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
@@ -46,7 +43,6 @@ execute_process(COMMAND "${hpx_SOURCE_DIR}/tools/build_env.py" "${CMAKE_CXX_COMP
 
 if(build_environment)
   set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-
   hpx_info("build_env" "Build environment is ${BUILDNAME}")
 else()
   hpx_warn("build_env" "Couldn't determine build environment (install python).") 
