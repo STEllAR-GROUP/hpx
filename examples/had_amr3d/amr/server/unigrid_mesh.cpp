@@ -582,6 +582,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
+
             if ( level != par->allowedl ) { 
               // prolongation {{{
               // send data to higher level boundary points
@@ -672,7 +673,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
                     j = ii + par->nx[level+1]*(jj+kk*par->nx[level+1]);
                     if ( level+1 != par->allowedl ) {
-                      j += par->rowsize[level+1];
+                      j += par->rowsize[level+2];
                     }
                     vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
                     counter++;
@@ -726,6 +727,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               }
             // }}}
             }
+
           }
         }
       }
