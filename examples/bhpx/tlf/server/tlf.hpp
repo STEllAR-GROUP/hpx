@@ -28,76 +28,17 @@ namespace hpx { namespace components { namespace tlf { namespace server {
           tlf_get_mass = 7
         };
         
-        tlf()
-        {
-            node_type = 1;
-            mass = 0.0;
-            p[0] = 0.0;
-            p[1] = 0.0;
-            p[2] = 0.0;
-            v[0] = 0.0;
-            v[1] = 0.0;
-            v[2] = 0.0;
-            a[0] = 0.0;
-            a[1] = 0.0;
-            a[2] = 0.0;
-        }
+        tlf();
+        void set_mass(double mass_tmp);
+        void set_pos(double px, double py, double pz); 
+        double get_mass();
+        std::vector<double> get_pos();
+        int get_type();
+        void set_vel(double vx, double vy, double vz);
+        void set_acc(double ax, double ay, double az);
+        void print();
         
-        void set_mass(double mass_tmp)
-        {
-            mass = mass_tmp;
-        }
         
-        void set_pos(double px, double py, double pz)
-        {
-            p[0] = px;
-            p[1] = py;
-            p[2] = pz;
-        }
-        
-        double get_mass()
-        {
-            return mass;
-        }
-        
-        std::vector<double> get_pos()
-        {
-            std::vector<double> bPos;
-            bPos.push_back(p[0]);
-            bPos.push_back(p[1]);
-            bPos.push_back(p[2]);    
-            return bPos;
-        }
-        
-        int get_type()
-        {
-            return node_type;
-        }
-        
-        void set_vel(double vx, double vy, double vz)
-        {
-            v[0] = vx;
-            v[1] = vy;
-            v[2] = vz;
-        }        
-        
-        void set_acc(double ax, double ay, double az)
-        {
-            a[0] = ax;
-            a[1] = ay;
-            a[2] = az;
-        }        
-                
-        void print()
-        {
-            applier::applier& appl = applier::get_applier();
-            std::cout << appl.get_runtime_support_gid() 
-            << " pos > " << p[0] << " " << p[1] << " " 
-            << p[2] << " " << std::flush << std::endl;   
-            std::cout << appl.get_runtime_support_gid() 
-            << " vel > " << v[0] << " " << v[1] << " " 
-            << v[2] << " " << std::flush << std::endl;     
-        }
         
         typedef hpx::actions::action3<tlf, tlf_set_pos, double, double, double, &tlf::set_pos> set_pos_action;
         typedef hpx::actions::action3<tlf, tlf_set_vel, double, double, double, &tlf::set_vel> set_vel_action;        
