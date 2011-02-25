@@ -81,4 +81,24 @@ namespace hpx { namespace components { namespace tlf { namespace server {
             << v[2] << " " << std::flush << std::endl;     
         }
         
+//         void tlf::calc_force(naming::id_type root, const double box_size_buf, const double inv_tolerance_2, const int iter, const double half_dt)
+//         {
+//             double buf_acc[3];
+//             
+//             for (int i = 0; i < 3; ++i)
+//                 buf_acc[i] = a[i]; //TODO : figure out how a[i] gets passed to this function
+//             a[0] = 0.0;
+//             a[1] = 0.0;
+//             a[2] = 0.0;
+//             
+//             //force_calc_re(naming::id_type root, double box_size_buf * box_size_buf * inv_tolerance_2);
+//             force_calc_re(root, box_size_buf * box_size_buf * inv_tolerance_2);
+//             
+//             if(iter > 0)
+//             {
+//                 v[0] += (a[0] - buf_acc[0]) * half_dt;
+//                 v[1] += (a[1] - buf_acc[0]) * half_dt;
+//                 v[2] += (a[2] - buf_acc[0]) * half_dt;
+//             }
+//         }
 }}}}
