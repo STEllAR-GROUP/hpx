@@ -27,6 +27,8 @@ set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 # include additional macro definitions
 include(HPX_Utils)
 
+include(HPX_Distclean)
+
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
 # be pedantic and annoying by default

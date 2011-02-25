@@ -20,6 +20,8 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 # include additional macro definitions
 include(HPX_Utils)
 
+include(HPX_Distclean)
+
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
 # allow more human readable "if then else" constructs
