@@ -17,7 +17,7 @@
 namespace hpx { namespace components { namespace itn { namespace server
 {
     
-    class HPX_ALWAYS_EXPORT itn
+    class HPX_EXPORT itn
     : public components::detail::managed_component_base<itn>
     {
     public:

@@ -12,7 +12,7 @@
 
 namespace hpx { namespace components { namespace tlf { namespace server {
     
-    class HPX_ALWAYS_EXPORT tlf
+    class HPX_EXPORT tlf
     : public components::detail::managed_component_base<tlf>
     {
     public:
