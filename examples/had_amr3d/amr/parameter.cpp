@@ -40,7 +40,6 @@ namespace hpx { namespace components { namespace amr
         ar & amp_dot;
         ar & eps;
         ar & output_level;
-        ar & PP;
         ar & granularity;
         ar & rowsize;
         ar & level_row;

@@ -55,7 +55,6 @@ struct Par {
       had_double_type amp_dot;
       had_double_type eps;
       int output_level;
-      int PP;
       int granularity;
       int gw;
       std::vector<std::size_t> rowsize,level_row;

@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
         par->amp         =  0.1;
         par->amp_dot     =  0.1;
         par->delta       =  1.0;
-        par->PP          =  7;
+        par->gw          =  5;
         par->eps         =  0.0;
         par->output_level =  0;
         par->granularity =  3;
@@ -323,9 +323,9 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("amp_dot");
                 par->amp_dot = atof(tmp.c_str());
               }
-              if ( sec->has_entry("PP") ) {
-                std::string tmp = sec->get_entry("PP");
-                par->PP = atoi(tmp.c_str());
+              if ( sec->has_entry("ghostwidth") ) {
+                std::string tmp = sec->get_entry("ghostwidth");
+                par->gw = atoi(tmp.c_str());
               }
               if ( sec->has_entry("eps") ) {
                 std::string tmp = sec->get_entry("eps");
@@ -413,9 +413,6 @@ int main(int argc, char* argv[])
             par->rowsize[i] += par->nx[j]*par->nx[j]*par->nx[j];
           }
         }
-
-        //ghostwidth
-        par->gw = 5;
 
         // figure out the number of points for row 0
         numvals = par->rowsize[0];
