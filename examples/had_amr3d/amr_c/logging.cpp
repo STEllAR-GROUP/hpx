@@ -111,11 +111,11 @@ namespace hpx { namespace components { namespace amr { namespace server
             shape[0] = par->granularity;
             shape[1] = par->granularity;
             shape[2] = par->granularity;
-            gft_out_full("phi",datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
-            gft_out_full("d1phi",datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
-            gft_out_full("d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
-            gft_out_full("d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
-            gft_out_full("d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+            gft_out_full("0phi",datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+            gft_out_full("0d1phi",datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+            gft_out_full("0d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+            gft_out_full("0d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+            gft_out_full("0d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
 #endif
           }
         }

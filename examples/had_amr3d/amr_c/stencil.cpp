@@ -571,8 +571,8 @@ namespace hpx { namespace components { namespace amr
                                     xt,
                                     x[0],x[1]);
 
-        tmp3[1][ll] = interp_linear(work[3].phi[3][ll],
-                                    work[2].phi[2][ll], 
+        tmp3[1][ll] = interp_linear(work[3].phi[0][ll],
+                                    work[2].phi[0][ll], 
                                     xt,
                                     x[3],x[2]);
 
@@ -583,7 +583,7 @@ namespace hpx { namespace components { namespace amr
       }
 
       // TEST
-      //std::cout << " TEST AFTER " << result.phi[0][3] << " input " << work[0].phi[0][3] << " " << work[1].phi[0][3] << " " << work[2].phi[0][3] << " " << work[3].phi[0][3] << std::endl;
+      //std::cout << " TEST AFTER " << result.phi[0][3] << " input " << work[0].phi[0][3] << " " << work[1].phi[0][3] << " " << work[2].phi[0][3] << " " << work[3].phi[0][3] << " tmp " << tmp3[0][3] << " " << tmp3[1][3] << std::endl;
 
       return;
     } // }}}
@@ -663,8 +663,8 @@ namespace hpx { namespace components { namespace amr
                                     xt,
                                     x[0],x[1]);
 
-        tmp3[1][ll] = interp_linear(work[2].phi[3][ll],
-                                    work[3].phi[2][ll], 
+        tmp3[1][ll] = interp_linear(work[2].phi[0][ll],
+                                    work[3].phi[0][ll], 
                                     xt,
                                     x[2],x[3]);
 
@@ -752,8 +752,8 @@ namespace hpx { namespace components { namespace amr
                                     yt,
                                     y[0],y[1]);
 
-        tmp3[1][ll] = interp_linear(work[2].phi[3][ll],
-                                    work[3].phi[2][ll], 
+        tmp3[1][ll] = interp_linear(work[2].phi[0][ll],
+                                    work[3].phi[0][ll], 
                                     yt,
                                     y[2],y[3]);
 
@@ -1239,15 +1239,15 @@ namespace hpx { namespace components { namespace amr
                   } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
                     // 2D interp
                     found = true;
-                    special_interp2d_yz(xt,yt,zt,dx,
-                                        val[anchor_index[12]],val[anchor_index[14]],
-                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                    //special_interp2d_yz(xt,yt,zt,dx,
+                    //                    val[anchor_index[12]],val[anchor_index[14]],
+                    //                    val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
                     // 2D interp
                     found = true;
-                    special_interp2d_xz(xt,yt,zt,dx,
-                                        val[anchor_index[15]],val[anchor_index[13]],
-                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
+                    //special_interp2d_xz(xt,yt,zt,dx,
+                    //                    val[anchor_index[15]],val[anchor_index[13]],
+                    //                    val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   }
 //#if 0
                   if ( !found ) {
