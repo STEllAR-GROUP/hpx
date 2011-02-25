@@ -5,14 +5,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.6.2
-cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
-
 ################################################################################
 # project metadata
 ################################################################################
-project(hpx CXX C)
-
 set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 5)
 set(HPX_PATCH_LEVEL   0)
@@ -22,8 +17,6 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 ################################################################################
 # cmake configuration
 ################################################################################
-set(CMAKE_MODULE_PATH ${HPX_ROOT}/share/cmake)
-
 # include additional macro definitions
 include(HPX_Utils)
 
@@ -46,7 +39,6 @@ execute_process(COMMAND "${HPX_ROOT}/share/hpx/python/build_env.py" "${CMAKE_CXX
 
 if(build_environment)
   set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-
   hpx_info("build_env" "Build environment is ${BUILDNAME}")
 else()
   hpx_warn("build_env" "Couldn't determine build environment (install python).") 
@@ -88,6 +80,9 @@ endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
+
+include_directories("${HPX_ROOT}/include")
+link_directories("${HPX_ROOT}/lib")
 
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
@@ -220,4 +215,6 @@ endif()
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
   add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
 endif()
+
+set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 
