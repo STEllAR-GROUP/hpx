@@ -13,9 +13,6 @@
 
 #include "../../tlf/tlf.hpp"
 
-// #include "../itn.hpp"
-// #include "../stubs/itn.hpp"
-// #include "../stubs/itn.hpp"
 
 namespace hpx { namespace components { namespace itn { namespace server
 {
@@ -31,6 +28,14 @@ namespace hpx { namespace components { namespace itn { namespace server
           naming::id_type gid;
         };
         
+        struct tnode
+        {
+            int leaf;
+            naming::id_type gid;
+            double mass;
+            double p[3];
+        };
+        
         enum actions
         {
             itn_new_node = 0,
@@ -40,7 +45,8 @@ namespace hpx { namespace components { namespace itn { namespace server
             itn_get_pos = 4,
             itn_print = 5,
             itn_get_type = 6,
-            itn_insert_body = 7
+            itn_insert_body = 7,
+            itn_calc_cm = 8
         };
         
         itn();
@@ -52,6 +58,7 @@ namespace hpx { namespace components { namespace itn { namespace server
         int get_type();
         void print();
         void insert_body(naming::id_type const & new_bod_gid, double sub_box_dim);
+        void calc_cm(naming::id_type current_node);
              
         typedef hpx::actions::action3<itn, itn_set_pos, double, double, double, &itn::set_pos> set_pos_action;
         typedef hpx::actions::action1<itn, itn_set_mass, double, &itn::set_mass> set_mass_action;
@@ -61,6 +68,8 @@ namespace hpx { namespace components { namespace itn { namespace server
         typedef hpx::actions::action3<itn, itn_new_node, double, double, double, &itn::new_node> new_node_action;
         typedef hpx::actions::result_action0<itn, int, itn_get_type, &itn::get_type> get_type_action;
         typedef hpx::actions::action2<itn, itn_insert_body, naming::id_type const &, double, &itn::insert_body > insert_body_action;
+        typedef hpx::actions::action1<itn, itn_calc_cm, naming::id_type, &itn::calc_cm> calc_cm_action;
+        
         
     private:
         int node_type;

@@ -8,13 +8,11 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include "itn.hpp"  // serverhpp
-
-#include "../../tlf/tlf.hpp"
-
 #include "../itn.hpp"
 #include "../stubs/itn.hpp"
 
-
+#include "../../tlf/tlf.hpp"
+#include "../../tlf/stubs/tlf.hpp"
 
 namespace hpx { namespace components { namespace itn { namespace server
 { 
@@ -134,16 +132,60 @@ namespace hpx { namespace components { namespace itn { namespace server
                 const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
                 hpx::components::itn::itn temp_itn;
                 
-                
                 temp_itn.create(child[i].gid);
                 temp_itn.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
                 child[i].gid = temp_itn.get_gid(); 
                 
                 temp_itn.insert_body(cur_bod_gid, new_sub_box_dim);
-                temp_itn.insert_body(new_bod_gid, new_sub_box_dim);
-                
-                
+                temp_itn.insert_body(new_bod_gid, new_sub_box_dim); 
             } 
+        }
+        
+
+        
+        void itn::calc_cm(naming::id_type current_node)
+        {
+            double m, px = 0.0, py = 0.0, pz = 0.0;
+            int var = 0;
+            mass = 0.0;
+            
+            for (int i=0; i < 8; ++i)
+            {
+                if (child[i].leaf == 0)
+                    hpx::components::itn::itn temp_branch;
+                else if (child[i].leaf == 1)
+                    hpx::components::tlf::tlf temp_branch;
+                
+                if (child[i].leaf == 0) // contains an intermediate tree node (itn)
+                {
+                    components::itn::stubs::itn::calc_cm(child[i].gid, current_node);
+                }
+                
+                if (child[i].leaf == 0)
+                    m = components::itn::stubs::itn::get_mass(child[i].gid);
+                else if (child[i].leaf == 1)
+                    m = components::tlf::stubs::tlf::get_mass(child[i].gid);
+                
+               mass += m;
+               
+               std::vector<double> bpos;
+               if (child[i].leaf == 0)
+                   bpos = components::itn::stubs::itn::get_pos(child[i].gid);
+               else if (child[i].leaf == 1)
+                   bpos = components::tlf::stubs::tlf::get_pos(child[i].gid);              
+               
+               
+               px += bpos[0] * m;
+               py += bpos[1] * m;
+               pz += bpos[2] * m;
+               
+            }
+            
+            m = 1.0 / mass;
+            
+            p[0] = px * m;
+            p[1] = py * m;
+            p[2] = pz * m;
         }
     
 }}}}

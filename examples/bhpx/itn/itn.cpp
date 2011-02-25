@@ -4,6 +4,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <vector>
 
 
@@ -22,7 +23,7 @@ HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_mass_action, itn_get_mass_act
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_pos_action, itn_get_pos_action);
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::get_type_action, itn_get_type_action);
 HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::insert_body_action, itn_insert_body_action);
-
+HPX_REGISTER_ACTION_EX(itn_type::wrapped_type::calc_cm_action, itn_calc_cm_action);
 
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action, set_result_action_vector_double);
 //HPX_DEFINE_GET_COMPONENT_TYPE(hpx::lcos::base_lco_with_value<std::vector<double> >);

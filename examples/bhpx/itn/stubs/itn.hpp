@@ -71,6 +71,11 @@ namespace hpx { namespace components { namespace itn { namespace stubs {
         {
             applier::apply<hpx::components::itn::server::itn::insert_body_action>(gid, new_bod_gid, sub_box_dim);
         }
+        
+        static void calc_cm(naming::id_type const & gid, naming::id_type current_node)
+        {
+            applier::apply<hpx::components::itn::server::itn::calc_cm_action>(gid, current_node);
+        }
     };
 }}}}
 
