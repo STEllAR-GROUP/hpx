@@ -58,6 +58,15 @@ except ImportError, err:
     def read(self):
       return self._proc.fromchild.read()
 
+def absolute_path(p):
+  from os import pathsep, environ
+  from os.path import isfile, join, realpath
+  for dirname in environ['PATH'].split(pathsep):
+    candidate = join(dirname, p)
+    if isfile(candidate):
+      return realpath(candidate)
+  return realpath(p) 
+
 def make_component(raw, type):
   comp = compile(r'\s|_').sub('-', lower(raw))
 
@@ -125,12 +134,9 @@ def identify(driver):
   return "%s_%s-%s_%s" % (make_component(processor, "processor"),
                           make_component(system, "kernel"),
                           make_component(release, "version"),
-                          make_compiler_component(driver)) 
+                          make_compiler_component(absolute_path(driver))) 
 
 if __name__ == "__main__":
   from sys import argv 
-  command = ""
-  for arg in argv[1:]:
-    command += ("\"%s\"" % arg)
-  print identify(command)
+  print identify(argv[1])
 
