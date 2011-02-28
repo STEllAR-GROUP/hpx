@@ -67,8 +67,8 @@ int fib (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    id_type here = hpx::find_here();
-    id_type next = get_runtime().get_process().next();
+    naming::id_type here = hpx::find_here();
+    naming::id_type next = get_runtime().get_process().next();
 
     fibonacci_future n1(next, n - 1, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
@@ -88,7 +88,7 @@ int fib_rhs (int n, int delay_coeff)
     if (n < 2) 
         return n;
 
-    id_type here = hpx::find_here();
+    naming::id_type here = hpx::find_here();
 
     fibonacci_rhs_future n1(here,  n - 1, delay_coeff);
     fibonacci_rhs_future n2(here,  n - 2, delay_coeff);
@@ -106,10 +106,10 @@ int hpx_main(boost::program_options::variables_map &vm)
 
 
     // Process application-specific command-line options
-    hpx::get_option(vm, "value", argument, "application.fibonacci2.argument");
+    hpx::get_option(vm, "value", argument, "application.fibonacci4.argument");
     hpx::get_option(vm, "busywait", delay_coeff);
 
-    id_type here = find_here();
+    naming::id_type here = find_here();
 
     {
         util::high_resolution_timer t;
@@ -124,7 +124,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                                                        << std::endl;
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx::finalize();
 
     return 0;
 }
@@ -144,6 +144,5 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  int retcode = hpx::init(desc_commandline, argc, argv); 
-  return retcode;
+  return hpx::init(desc_commandline, argc, argv); 
 }

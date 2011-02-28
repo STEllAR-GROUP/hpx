@@ -22,19 +22,19 @@ namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
 // More helpers
 template<typename Action, typename Arg0>
-inline void apply(Arg0 arg0, id_type k)
+inline void apply(Arg0 arg0, naming::id_type k)
 {
   hpx::applier::apply<Action>(find_here(), arg0, k);
 }
 
 template<typename Action, typename Arg0, typename Arg1>
-inline void apply(Arg0 arg0, Arg1 arg1, id_type k)
+inline void apply(Arg0 arg0, Arg1 arg1, naming::id_type k)
 {
   hpx::applier::apply<Action>(find_here(), arg0, arg1, k);
 }
 
 template<typename Arg0>
-inline void trigger(id_type k, Arg0 arg0)
+inline void trigger(naming::id_type k, Arg0 arg0)
 {
   actions::continuation(k).trigger<Arg0>(arg0);
 }
@@ -59,17 +59,17 @@ inline void trigger(id_type k, Arg0 arg0)
 // 6
 
 ///////////////////////////////////////////////////////////////////////////////
-void factorial_aux(int, int, id_type);
-typedef actions::plain_action3<int, int, id_type, factorial_aux> 
+void factorial_aux(int, int, naming::id_type);
+typedef actions::plain_action3<int, int, naming::id_type, factorial_aux> 
     factorial_aux_action;
 HPX_REGISTER_PLAIN_ACTION(factorial_aux_action);
 
-void factorial(int, id_type);
-typedef actions::plain_action2<int, id_type, factorial> 
+void factorial(int, naming::id_type);
+typedef actions::plain_action2<int, naming::id_type, factorial> 
     factorial_action;
 HPX_REGISTER_PLAIN_ACTION(factorial_action);
 
-void factorial_aux(int n, int a, id_type k)
+void factorial_aux(int n, int a, naming::id_type k)
 {
   if (n == 0)
     trigger<int>(k, a);
@@ -77,7 +77,7 @@ void factorial_aux(int n, int a, id_type k)
     apply<factorial_aux_action>(n-1, n*a, k);
 }
 
-void factorial(int n, id_type k)
+void factorial(int n, naming::id_type k)
 {
   apply<factorial_aux_action>(n, 1, k);
 }
@@ -134,7 +134,7 @@ int hpx_main(po::variables_map &vm)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx::finalize();
 
     return 0;
 }
@@ -151,7 +151,6 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  int retcode = hpx::init(desc_commandline, argc, argv); 
-  return retcode;
+  return hpx::init(desc_commandline, argc, argv); 
 }
 

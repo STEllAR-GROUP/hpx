@@ -20,10 +20,6 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helpers
-typedef hpx::naming::gid_type gid_type;
-
-///////////////////////////////////////////////////////////////////////////////
 // int fib(int n)
 // {
 //     if (n < 2) 
@@ -45,10 +41,10 @@ typedef hpx::naming::gid_type gid_type;
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-int fib(id_type prefix, int n, int delay_coeff);
+int fib(naming::id_type prefix, int n, int delay_coeff);
 
 typedef 
-    actions::plain_result_action3<int, id_type, int, int, fib> 
+    actions::plain_result_action3<int, naming::id_type, int, int, fib> 
 fibonacci2_action;
 
 HPX_REGISTER_PLAIN_ACTION(fibonacci2_action);
@@ -69,7 +65,7 @@ inline void do_busy_work(double delay_coeff)
     }
 }
 
-int fib (id_type there, int n, int delay_coeff)
+int fib (naming::id_type there, int n, int delay_coeff)
 {
     // do some busy waiting, if requested
     do_busy_work(delay_coeff);
@@ -80,7 +76,7 @@ int fib (id_type there, int n, int delay_coeff)
 
     // execute the first fib() at the other locality, returning here afterwards
     // execute the second fib() here, forwarding the correct prefix
-    id_type here = get_runtime().get_process().here();
+    naming::id_type here = get_runtime().get_process().here();
     fibonacci_future n1(there, here, n - 1, delay_coeff);
     fibonacci_future n2(here, there, n - 2, delay_coeff);
 
@@ -100,8 +96,8 @@ int hpx_main(boost::program_options::variables_map &vm)
     hpx::get_option(vm, "busywait", delay_coeff);
 
     process my_proc(get_runtime().get_process());
-    id_type here = my_proc.here();
-    id_type there = my_proc.next();
+    naming::id_type here = my_proc.here();
+    naming::id_type there = my_proc.next();
 
     {
         util::high_resolution_timer t;
@@ -145,7 +141,6 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  int retcode = hpx::init(desc_commandline, argc, argv); 
-  return retcode;
+  return hpx::init(desc_commandline, argc, argv); 
 }
 

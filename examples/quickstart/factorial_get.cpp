@@ -22,19 +22,19 @@ namespace po = boost::program_options;
 ///////////////////////////////////////////////////////////////////////////////
 // More helpers
 template<typename Action, typename Arg0>
-inline void apply(Arg0 arg0, id_type k, id_type h)
+inline void apply(Arg0 arg0, naming::id_type k, naming::id_type h)
 {
   hpx::applier::apply<Action>(get_runtime().get_process().next(), arg0, k, h);
 }
 
 template<typename Action, typename Arg0, typename Arg1>
-inline void apply(Arg0 arg0, Arg1 arg1, id_type k, id_type h)
+inline void apply(Arg0 arg0, Arg1 arg1, naming::id_type k, naming::id_type h)
 {
   hpx::applier::apply<Action>(get_runtime().get_process().next(), arg0, arg1, k, h);
 }
 
 template<typename Arg0>
-inline void trigger(id_type k, Arg0 arg0)
+inline void trigger(naming::id_type k, Arg0 arg0)
 {
   typedef typename
       lcos::template base_lco_with_value<Arg0>::set_result_action set_action;
@@ -42,7 +42,7 @@ inline void trigger(id_type k, Arg0 arg0)
 }
 
 template<typename Value>
-inline Value get(id_type k)
+inline Value get(naming::id_type k)
 {
   typedef typename
       lcos::template base_lco_with_value<Value>::get_value_action get_action;
@@ -69,17 +69,17 @@ inline Value get(id_type k)
 // 6
 
 ///////////////////////////////////////////////////////////////////////////////
-void factorial_get_aux(int, int, id_type, id_type);
-typedef actions::plain_action4<int, int, id_type, id_type, factorial_get_aux> 
+void factorial_get_aux(int, int, naming::id_type, naming::id_type);
+typedef actions::plain_action4<int, int, naming::id_type, naming::id_type, factorial_get_aux> 
     factorial_get_aux_action;
 HPX_REGISTER_PLAIN_ACTION(factorial_get_aux_action);
 
-void factorial_get(int, id_type, id_type);
-typedef actions::plain_action3<int, id_type, id_type, factorial_get> 
+void factorial_get(int, naming::id_type, naming::id_type);
+typedef actions::plain_action3<int, naming::id_type, naming::id_type, factorial_get> 
     factorial_get_action;
 HPX_REGISTER_PLAIN_ACTION(factorial_get_action);
 
-void factorial_get_aux(int n, int a, id_type k, id_type h)
+void factorial_get_aux(int n, int a, naming::id_type k, naming::id_type h)
 {
   if (n == 0)
   {
@@ -100,7 +100,7 @@ void factorial_get_aux(int n, int a, id_type k, id_type h)
   }
 }
 
-void factorial_get(int n, id_type k, id_type h)
+void factorial_get(int n, naming::id_type k, naming::id_type h)
 {
   std::cout << "Applying factorial_aux(" << n << ", 1, k, h)" << std::endl;
   apply<factorial_get_aux_action>(n, 1, k, h);
@@ -137,7 +137,7 @@ int hpx_main(po::variables_map &vm)
     halt.get();
 
     // initiate shutdown of the runtime systems on all localities
-    components::stubs::runtime_support::shutdown_all();
+    hpx::finalize();
 
     return 0;
 }
@@ -152,7 +152,6 @@ int main(int argc, char* argv[])
        "the number to be used as the argument to factorial (default is 0)")
       ;
 
-  int retcode = hpx::init(desc_commandline, argc, argv);
-  return retcode;
+  return hpx::init(desc_commandline, argc, argv); 
 }
 
