@@ -114,11 +114,13 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-if(UNIX)
-  # on *nix, we do a local system install 
-  set(CMAKE_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
-else()
-  set(CMAKE_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+if(NOT CMAKE_PREFIX)
+  if(UNIX)
+    # on POSIX, we do a local system install by default 
+    set(CMAKE_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
+  else()
+    set(CMAKE_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+  endif()
 endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
