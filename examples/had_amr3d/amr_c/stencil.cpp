@@ -1239,15 +1239,15 @@ namespace hpx { namespace components { namespace amr
                   } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
                     // 2D interp
                     found = true;
-                    //special_interp2d_yz(xt,yt,zt,dx,
-                    //                    val[anchor_index[12]],val[anchor_index[14]],
-                    //                    val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                    special_interp2d_yz(xt,yt,zt,dx,
+                                        val[anchor_index[12]],val[anchor_index[14]],
+                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
                   } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
                     // 2D interp
                     found = true;
-                    //special_interp2d_xz(xt,yt,zt,dx,
-                    //                    val[anchor_index[15]],val[anchor_index[13]],
-                    //                    val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
+                    special_interp2d_xz(xt,yt,zt,dx,
+                                        val[anchor_index[15]],val[anchor_index[13]],
+                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
                   }
 //#if 0
                   if ( !found ) {
