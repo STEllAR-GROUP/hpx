@@ -1,5 +1,5 @@
 #define  JEMALLOC_ARENA_C_
-#include <hpx/memory/jemalloc/jemalloc_internal.h>
+#include <hpx_jemalloc/jemalloc_internal.h>
 
 /******************************************************************************/
 /* Data. */

@@ -120,6 +120,8 @@ include_directories(${hpx_SOURCE_DIR}/external/endian)
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
+include_directories(${hpx_SOURCE_DIR}/external/jemalloc)
+include_directories(${hpx_SOURCE_DIR}/external/nedmalloc)
 
 ################################################################################
 # installation configuration
@@ -140,7 +142,7 @@ endif()
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
-hpx_info("install" "Install root is ${CMAKE_PREFIX}")
+hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}")
 
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 

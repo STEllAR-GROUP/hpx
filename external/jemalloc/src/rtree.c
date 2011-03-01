@@ -1,5 +1,5 @@
 #define  RTREE_C_
-#include <hpx/memory/jemalloc/jemalloc_internal.h>
+#include <hpx_jemalloc/jemalloc_internal.h>
 
 rtree_t *
 rtree_new(unsigned bits)

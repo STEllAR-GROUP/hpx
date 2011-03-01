@@ -20,11 +20,24 @@ const int num_eqns = 5;
 const int maxlevels = 20;
 
 #include <vector>
-#include <hpx/memory/jemalloc_allocator.hpp>
+#include <boost/config.hpp>
+    
+#if defined(BOOST_WINDOWS)
+    #include <hpx/util/nedmalloc_allocator.hpp>
+#else
+    #include <hpx/util/jemalloc_allocator.hpp>
+#endif
 
-template<class T>
-struct had_vector {
-  typedef std::vector<T, typename hpx::memory::jemalloc_allocator<T>::type > type;
+template <typename T>
+struct had_vector
+{
+    #if defined(BOOST_WINDOWS)
+        typedef std::vector<T,
+            typename hpx::memory::nedmalloc_allocator<T>::type> type;
+    #else
+        typedef std::vector<T,
+            typename hpx::memory::jemalloc_allocator<T>::type> type;
+    #endif
 };
 
 #endif

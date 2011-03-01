@@ -5,36 +5,36 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_3C74DADC_8743_4902_993B_C3323BF2A863)
-#define HPX_3C74DADC_8743_4902_993B_C3323BF2A863
+#if !defined(HPX_5E7FA4BF_4907_4757_A15F_97BDF229807C)
+#define HPX_5E7FA4BF_4907_4757_A15F_97BDF229807C
 
-#include <hpx/memory/allocator.hpp>
-#include <hpx/memory/nedmalloc/nedmalloc.h>
+#include <hpx/util/allocator.hpp>
+#include <hpx_jemalloc/jemalloc.h>
 
 namespace hpx { namespace memory
 {
 
-struct nedmalloc
+struct jemalloc
 {
     typedef std::size_t size_type;    
         
     static void* malloc(size_type s)
     {
-        return nedalloc::nedmalloc(s); 
+        return HPX_JEMALLOC_malloc(s); 
     }
 
     static void free(void* p)
     {
-        nedalloc::nedfree(p);
+        HPX_JEMALLOC_free(p);
     }
 };
 
 template <typename T>
-struct nedmalloc_allocator {
-  typedef memory::allocator<memory::nedmalloc, T> type;
+struct jemalloc_allocator {
+  typedef memory::allocator<memory::jemalloc, T> type;
 };
 
 }}
 
-#endif // HPX_3C74DADC_8743_4902_993B_C3323BF2A863
+#endif // HPX_5E7FA4BF_4907_4757_A15F_97BDF229807C
 

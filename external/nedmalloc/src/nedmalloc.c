@@ -78,7 +78,7 @@ DEALINGS IN THE SOFTWARE.
 #define NOINLINE
 #endif
 
-#include <hpx/memory/nedmalloc/nedmalloc.h>
+#include <hpx_nedmalloc/nedmalloc.h>
 #include <errno.h>
 #if defined(WIN32)
  #include <malloc.h>
@@ -137,7 +137,7 @@ size_t malloc_usable_size(void *);
 #endif
 /*#define USE_SPIN_LOCKS 0*/
 
-#include <hpx/memory/nedmalloc/dlmalloc.h>
+#include <hpx_nedmalloc/dlmalloc.h>
 #ifdef NDEBUG               /* Disable assert checking on release builds */
  #undef DEBUG
 #endif

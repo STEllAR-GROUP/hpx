@@ -31,7 +31,7 @@
 #include <math.h>
 
 #define  JEMALLOC_MANGLE
-#include <hpx/memory/jemalloc/jemalloc.h>
+#include <hpx_jemalloc/jemalloc.h>
 
 #ifdef JEMALLOC_ZONE
 #include <mach/mach_error.h>
@@ -45,9 +45,9 @@
 #endif
 
 #define  RB_COMPACT
-#include <hpx/memory/jemalloc/rb.h>
-#include <hpx/memory/jemalloc/qr.h>
-#include <hpx/memory/jemalloc/ql.h>
+#include <hpx_jemalloc/rb.h>
+#include <hpx_jemalloc/qr.h>
+#include <hpx_jemalloc/ql.h>
 
 extern void  (*JEMALLOC_P(malloc_message))(void *wcbopaque, const char *s);
 
@@ -198,47 +198,47 @@ extern void  (*JEMALLOC_P(malloc_message))(void *wcbopaque, const char *s);
 #define  PAGE_CEILING(s)              \
   (((s) + PAGE_MASK) & ~PAGE_MASK)
 
-#include <hpx/memory/jemalloc/prn.h>
-#include <hpx/memory/jemalloc/ckh.h>
-#include <hpx/memory/jemalloc/stats.h>
-#include <hpx/memory/jemalloc/ctl.h>
-#include <hpx/memory/jemalloc/mutex.h>
-#include <hpx/memory/jemalloc/mb.h>
-#include <hpx/memory/jemalloc/extent.h>
-#include <hpx/memory/jemalloc/arena.h>
-#include <hpx/memory/jemalloc/base.h>
-#include <hpx/memory/jemalloc/chunk.h>
-#include <hpx/memory/jemalloc/huge.h>
-#include <hpx/memory/jemalloc/rtree.h>
-#include <hpx/memory/jemalloc/tcache.h>
-#include <hpx/memory/jemalloc/hash.h>
+#include <hpx_jemalloc/random.h>
+#include <hpx_jemalloc/ckh.h>
+#include <hpx_jemalloc/stats.h>
+#include <hpx_jemalloc/ctl.h>
+#include <hpx_jemalloc/mutex.h>
+#include <hpx_jemalloc/mb.h>
+#include <hpx_jemalloc/extent.h>
+#include <hpx_jemalloc/arena.h>
+#include <hpx_jemalloc/base.h>
+#include <hpx_jemalloc/chunk.h>
+#include <hpx_jemalloc/huge.h>
+#include <hpx_jemalloc/rtree.h>
+#include <hpx_jemalloc/tcache.h>
+#include <hpx_jemalloc/hash.h>
 #ifdef JEMALLOC_ZONE
-#include <hpx/memory/jemalloc/zone.h>
+#include <hpx_jemalloc/zone.h>
 #endif
-#include <hpx/memory/jemalloc/prof.h>
+#include <hpx_jemalloc/prof.h>
 
 #undef JEMALLOC_H_TYPES
 /******************************************************************************/
 #define JEMALLOC_H_STRUCTS
 
-#include <hpx/memory/jemalloc/prn.h>
-#include <hpx/memory/jemalloc/ckh.h>
-#include <hpx/memory/jemalloc/stats.h>
-#include <hpx/memory/jemalloc/ctl.h>
-#include <hpx/memory/jemalloc/mutex.h>
-#include <hpx/memory/jemalloc/mb.h>
-#include <hpx/memory/jemalloc/extent.h>
-#include <hpx/memory/jemalloc/arena.h>
-#include <hpx/memory/jemalloc/base.h>
-#include <hpx/memory/jemalloc/chunk.h>
-#include <hpx/memory/jemalloc/huge.h>
-#include <hpx/memory/jemalloc/rtree.h>
-#include <hpx/memory/jemalloc/tcache.h>
-#include <hpx/memory/jemalloc/hash.h>
+#include <hpx_jemalloc/random.h>
+#include <hpx_jemalloc/ckh.h>
+#include <hpx_jemalloc/stats.h>
+#include <hpx_jemalloc/ctl.h>
+#include <hpx_jemalloc/mutex.h>
+#include <hpx_jemalloc/mb.h>
+#include <hpx_jemalloc/extent.h>
+#include <hpx_jemalloc/arena.h>
+#include <hpx_jemalloc/base.h>
+#include <hpx_jemalloc/chunk.h>
+#include <hpx_jemalloc/huge.h>
+#include <hpx_jemalloc/rtree.h>
+#include <hpx_jemalloc/tcache.h>
+#include <hpx_jemalloc/hash.h>
 #ifdef JEMALLOC_ZONE
-#include <hpx/memory/jemalloc/zone.h>
+#include <hpx_jemalloc/zone.h>
 #endif
-#include <hpx/memory/jemalloc/prof.h>
+#include <hpx_jemalloc/prof.h>
 
 #undef JEMALLOC_H_STRUCTS
 /******************************************************************************/
@@ -344,39 +344,39 @@ int  buferror(int errnum, char *buf, size_t buflen);
 void  jemalloc_prefork(void);
 void  jemalloc_postfork(void);
 
-#include <hpx/memory/jemalloc/prn.h>
-#include <hpx/memory/jemalloc/ckh.h>
-#include <hpx/memory/jemalloc/stats.h>
-#include <hpx/memory/jemalloc/ctl.h>
-#include <hpx/memory/jemalloc/mutex.h>
-#include <hpx/memory/jemalloc/mb.h>
-#include <hpx/memory/jemalloc/extent.h>
-#include <hpx/memory/jemalloc/arena.h>
-#include <hpx/memory/jemalloc/base.h>
-#include <hpx/memory/jemalloc/chunk.h>
-#include <hpx/memory/jemalloc/huge.h>
-#include <hpx/memory/jemalloc/rtree.h>
-#include <hpx/memory/jemalloc/tcache.h>
-#include <hpx/memory/jemalloc/hash.h>
+#include <hpx_jemalloc/random.h>
+#include <hpx_jemalloc/ckh.h>
+#include <hpx_jemalloc/stats.h>
+#include <hpx_jemalloc/ctl.h>
+#include <hpx_jemalloc/mutex.h>
+#include <hpx_jemalloc/mb.h>
+#include <hpx_jemalloc/extent.h>
+#include <hpx_jemalloc/arena.h>
+#include <hpx_jemalloc/base.h>
+#include <hpx_jemalloc/chunk.h>
+#include <hpx_jemalloc/huge.h>
+#include <hpx_jemalloc/rtree.h>
+#include <hpx_jemalloc/tcache.h>
+#include <hpx_jemalloc/hash.h>
 #ifdef JEMALLOC_ZONE
-#include <hpx/memory/jemalloc/zone.h>
+#include <hpx_jemalloc/zone.h>
 #endif
-#include <hpx/memory/jemalloc/prof.h>
+#include <hpx_jemalloc/prof.h>
 
 #undef JEMALLOC_H_EXTERNS
 /******************************************************************************/
 #define JEMALLOC_H_INLINES
 
-#include <hpx/memory/jemalloc/prn.h>
-#include <hpx/memory/jemalloc/ckh.h>
-#include <hpx/memory/jemalloc/stats.h>
-#include <hpx/memory/jemalloc/ctl.h>
-#include <hpx/memory/jemalloc/mutex.h>
-#include <hpx/memory/jemalloc/mb.h>
-#include <hpx/memory/jemalloc/extent.h>
-#include <hpx/memory/jemalloc/base.h>
-#include <hpx/memory/jemalloc/chunk.h>
-#include <hpx/memory/jemalloc/huge.h>
+#include <hpx_jemalloc/random.h>
+#include <hpx_jemalloc/ckh.h>
+#include <hpx_jemalloc/stats.h>
+#include <hpx_jemalloc/ctl.h>
+#include <hpx_jemalloc/mutex.h>
+#include <hpx_jemalloc/mb.h>
+#include <hpx_jemalloc/extent.h>
+#include <hpx_jemalloc/base.h>
+#include <hpx_jemalloc/chunk.h>
+#include <hpx_jemalloc/huge.h>
 
 #ifndef JEMALLOC_ENABLE_INLINE
 size_t  pow2_ceil(size_t x);
@@ -546,12 +546,12 @@ choose_arena(void)
 }
 #endif
 
-#include <hpx/memory/jemalloc/rtree.h>
-#include <hpx/memory/jemalloc/tcache.h>
-#include <hpx/memory/jemalloc/arena.h>
-#include <hpx/memory/jemalloc/hash.h>
+#include <hpx_jemalloc/rtree.h>
+#include <hpx_jemalloc/tcache.h>
+#include <hpx_jemalloc/arena.h>
+#include <hpx_jemalloc/hash.h>
 #ifdef JEMALLOC_ZONE
-#include <hpx/memory/jemalloc/zone.h>
+#include <hpx_jemalloc/zone.h>
 #endif
 
 #ifndef JEMALLOC_ENABLE_INLINE
@@ -731,7 +731,7 @@ iralloc(void *ptr, size_t size, size_t extra, size_t alignment, bool zero,
 }
 #endif
 
-#include <hpx/memory/jemalloc/prof.h>
+#include <hpx_jemalloc/prof.h>
 
 #undef JEMALLOC_H_INLINES
 /******************************************************************************/

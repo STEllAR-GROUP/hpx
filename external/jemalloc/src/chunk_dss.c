@@ -1,5 +1,5 @@
 #define  JEMALLOC_CHUNK_DSS_C_
-#include <hpx/memory/jemalloc/jemalloc_internal.h>
+#include <hpx_jemalloc/jemalloc_internal.h>
 #ifdef JEMALLOC_DSS
 /******************************************************************************/
 /* Data. */

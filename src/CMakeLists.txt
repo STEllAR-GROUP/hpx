@@ -98,38 +98,38 @@ source_group("Header Files\\runtime"
 
 # nedmalloc
 set(hpxlib_nedmalloc_HEADERS
-    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/dlmalloc.h
-    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/nedmalloc.h)
+    ${hpx_SOURCE_DIR}/external/nedmalloc/hpx_nedmalloc/dlmalloc.h
+    ${hpx_SOURCE_DIR}/external/nedmalloc/hpx_nedmalloc/nedmalloc.h)
 source_group("Header Files\\memory\\nedmalloc" 
     FILES ${hpxlib_nedmalloc_HEADERS})
 
 # jemalloc
 set(hpxlib_jemalloc_HEADERS
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/arena.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/base.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/chunk.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/chunk_dss.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/chunk_mmap.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/chunk_swap.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/ckh.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/ctl.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/extent.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/hash.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/huge.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/jemalloc.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/jemalloc_defs.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/jemalloc_internal.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/mb.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/mutex.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/prn.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/prof.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/ql.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/qr.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/rb.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/rtree.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/stats.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/tcache.h
-    ${hpx_SOURCE_DIR}/hpx/memory/jemalloc/zone.h)     
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/arena.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/base.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/chunk.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/chunk_dss.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/chunk_mmap.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/chunk_swap.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/ckh.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/ctl.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/extent.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/hash.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/huge.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/jemalloc.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/jemalloc_defs.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/jemalloc_internal.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/mb.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/mutex.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/random.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/prof.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/ql.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/qr.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/rb.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/rtree.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/stats.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/tcache.h
+    ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/zone.h)     
 source_group("Header Files\\memory\\jemalloc" 
     FILES ${hpxlib_jemalloc_HEADERS})
 
@@ -253,6 +253,7 @@ source_group("Header Files\\runtime\\threads\\policies"
 # util
 set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/allocator.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_iarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/binary_portable_oarchive.hpp
     ${hpx_SOURCE_DIR}/hpx/util/block_profiler.hpp
@@ -297,8 +298,6 @@ set (hpxlib_HEADERS
     ${hpxlib_performance_counters_stubs_HEADERS}
     ${hpxlib_performance_counters_server_HEADERS}
     ${hpxlib_runtime_HEADERS}
-    ${hpxlib_nedmalloc_HEADERS}
-    ${hpxlib_jemalloc_HEADERS}
     ${hpxlib_actions_HEADERS}
     ${hpxlib_applier_HEADERS}
     ${hpxlib_components_HEADERS}
@@ -309,6 +308,18 @@ set (hpxlib_HEADERS
     ${hpxlib_threadmanager_HEADERS}
     ${hpxlib_threadmanager_policies_HEADERS}
     ${hpxlib_util_HEADERS})
+
+if(NOT MSVC AND NOT HPX_NO_JEMALLOC)
+  list(APPEND hpxlib_HEADERS
+       ${hpxlib_jemalloc_HEADERS}
+       ${hpx_SOURCE_DIR}/hpx/util/jemalloc_allocator.hpp)
+endif()
+
+if(NOT HPX_NO_NEDMALLOC)
+  list(APPEND hpxlib_HEADERS
+       ${hpxlib_nedmalloc_HEADERS}
+       ${hpx_SOURCE_DIR}/hpx/util/nedmalloc_allocator.hpp)
+endif()
 
 ###############################################################################
 # global
@@ -405,34 +416,34 @@ source_group ("Source Files\\runtime\\threads"
  
 # nedmalloc
 set(hpxlib_nedmalloc_SOURCES
-    ${hpx_SOURCE_DIR}/src/memory/nedmalloc/nedmalloc.c)
+    ${hpx_SOURCE_DIR}/external/nedmalloc/src/nedmalloc.c)
 source_group ("Source Files\\memory\\nedmalloc" 
     FILES ${hpxlib_nedmalloc_SOURCES})
 
 # jemalloc
 set(hpxlib_jemalloc_SOURCES
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/arena.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/base.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/chunk.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/chunk_dss.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/chunk_mmap.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/chunk_swap.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/ckh.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/ctl.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/extent.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/hash.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/huge.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/jemalloc.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/mb.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/mutex.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/prof.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/rtree.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/stats.c
-    ${hpx_SOURCE_DIR}/src/memory/jemalloc/tcache.c)
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/arena.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/base.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/chunk.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/chunk_dss.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/chunk_mmap.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/chunk_swap.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/ckh.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/ctl.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/extent.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/hash.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/huge.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/jemalloc.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/mb.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/mutex.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/prof.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/rtree.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/stats.c
+    ${hpx_SOURCE_DIR}/external/jemalloc/src/tcache.c)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     list(APPEND hpxlib_jemalloc_SOURCES
-        ${hpx_SOURCE_DIR}/src/memory/jemalloc/zone.c)
+        ${hpx_SOURCE_DIR}/external/jemalloc/src/zone.c)
 endif()
 
 source_group ("Source Files\\memory\\jemalloc" 
@@ -464,9 +475,15 @@ set (hpxlib_SOURCES
     ${hpxlib_naming_SOURCES}
     ${hpxlib_parcelset_SOURCES}
     ${hpxlib_threadmanager_SOURCES}
-    ${hpxlib_nedmalloc_SOURCES}
-    ${hpxlib_jemalloc_SOURCES}
     ${hpxlib_util_SOURCES})
+
+if(NOT MSVC AND NOT HPX_NO_JEMALLOC)
+  list(APPEND hpxlib_SOURCES ${hpxlib_jemalloc_SOURCES})
+endif()
+
+if(NOT HPX_NO_NEDMALLOC)
+  list(APPEND hpxlib_SOURCES ${hpxlib_nedmalloc_SOURCES})
+endif()
 
 # add source file from coroutine library 
 if(NOT MSVC)
