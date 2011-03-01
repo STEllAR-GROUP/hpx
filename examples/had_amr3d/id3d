@@ -1,7 +1,7 @@
 [had_amr]
 nx0         = 100
 nt0         = 50
-granularity = 5
+granularity = 10
 ghostwidth  = 5
 
 maxx0       =  4.0;
