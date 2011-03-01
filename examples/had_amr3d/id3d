@@ -1,7 +1,8 @@
 [had_amr]
 nx0         = 100
-nt0         = 4
-granularity = 10
+nt0         = 50
+granularity = 5
+ghostwidth  = 5
 
 maxx0       =  4.0;
 minx0       = -4.0;
@@ -16,22 +17,22 @@ R0     = 1.0
 ethreshold  = 0.005
 eps         = 0.3
 
-allowedl     = 1
+allowedl     = 2
 linearbounds = 0
 loglevel     = 2
-output       = 1.0
+output       = 5.0
 output_level = 0
 output_stdout = 1
 
 refine_level_0 = 0.8
-refine_level_1 = 1.5
-refine_level_2 = 1.9
-refine_level_3 = 1.9
-refine_level_4 = 1.9
-refine_level_5 = 1.9
-refine_level_6 = 1.9
-refine_level_7 = 1.9
-refine_level_8 = 1.9
-refine_level_9 = 1.9
+refine_level_1 = 0.8
+refine_level_2 = 0.8
+refine_level_3 = 0.8
+refine_level_4 = 0.8
+refine_level_5 = 0.8
+refine_level_6 = 0.8
+refine_level_7 = 0.8
+refine_level_8 = 0.8
+refine_level_9 = 0.8
 
 scheduler = 1
