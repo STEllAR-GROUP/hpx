@@ -34,14 +34,14 @@
  * respectively.
  *
  ******************************************************************************/
-#define	CKH_C_
+#define  CKH_C_
 #include <hpx/memory/jemalloc/jemalloc_internal.h>
 
 /******************************************************************************/
 /* Function prototypes for non-inline static functions. */
 
-static bool	ckh_grow(ckh_t *ckh);
-static void	ckh_shrink(ckh_t *ckh);
+static bool  ckh_grow(ckh_t *ckh);
+static void  ckh_shrink(ckh_t *ckh);
 
 /******************************************************************************/
 
@@ -52,16 +52,16 @@ static void	ckh_shrink(ckh_t *ckh);
 JEMALLOC_INLINE size_t
 ckh_bucket_search(ckh_t *ckh, size_t bucket, const void *key)
 {
-	ckhc_t *cell;
-	unsigned i;
+  ckhc_t *cell;
+  unsigned i;
 
-	for (i = 0; i < (ZU(1) << LG_CKH_BUCKET_CELLS); i++) {
-		cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) + i];
-		if (cell->key != NULL && ckh->keycomp(key, cell->key))
-			return ((bucket << LG_CKH_BUCKET_CELLS) + i);
-	}
+  for (i = 0; i < (ZU(1) << LG_CKH_BUCKET_CELLS); i++) {
+    cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) + i];
+    if (cell->key != NULL && ckh->keycomp(key, cell->key))
+      return ((bucket << LG_CKH_BUCKET_CELLS) + i);
+  }
 
-	return (SIZE_T_MAX);
+  return (SIZE_T_MAX);
 }
 
 /*
@@ -70,49 +70,49 @@ ckh_bucket_search(ckh_t *ckh, size_t bucket, const void *key)
 JEMALLOC_INLINE size_t
 ckh_isearch(ckh_t *ckh, const void *key)
 {
-	size_t hash1, hash2, bucket, cell;
+  size_t hash1, hash2, bucket, cell;
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
 
-	ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
+  ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
 
-	/* Search primary bucket. */
-	bucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-	cell = ckh_bucket_search(ckh, bucket, key);
-	if (cell != SIZE_T_MAX)
-		return (cell);
+  /* Search primary bucket. */
+  bucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+  cell = ckh_bucket_search(ckh, bucket, key);
+  if (cell != SIZE_T_MAX)
+    return (cell);
 
-	/* Search secondary bucket. */
-	bucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-	cell = ckh_bucket_search(ckh, bucket, key);
-	return (cell);
+  /* Search secondary bucket. */
+  bucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+  cell = ckh_bucket_search(ckh, bucket, key);
+  return (cell);
 }
 
 JEMALLOC_INLINE bool
 ckh_try_bucket_insert(ckh_t *ckh, size_t bucket, const void *key,
     const void *data)
 {
-	ckhc_t *cell;
-	unsigned offset, i;
+  ckhc_t *cell;
+  unsigned offset, i;
 
-	/*
-	 * Cycle through the cells in the bucket, starting at a random position.
-	 * The randomness avoids worst-case search overhead as buckets fill up.
-	 */
-	prn32(offset, LG_CKH_BUCKET_CELLS, ckh->prn_state, CKH_A, CKH_C);
-	for (i = 0; i < (ZU(1) << LG_CKH_BUCKET_CELLS); i++) {
-		cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) +
-		    ((i + offset) & ((ZU(1) << LG_CKH_BUCKET_CELLS) - 1))];
-		if (cell->key == NULL) {
-			cell->key = key;
-			cell->data = data;
-			ckh->count++;
-			return (false);
-		}
-	}
+  /*
+   * Cycle through the cells in the bucket, starting at a random position.
+   * The randomness avoids worst-case search overhead as buckets fill up.
+   */
+  prn32(offset, LG_CKH_BUCKET_CELLS, ckh->prn_state, CKH_A, CKH_C);
+  for (i = 0; i < (ZU(1) << LG_CKH_BUCKET_CELLS); i++) {
+    cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) +
+        ((i + offset) & ((ZU(1) << LG_CKH_BUCKET_CELLS) - 1))];
+    if (cell->key == NULL) {
+      cell->key = key;
+      cell->data = data;
+      ckh->count++;
+      return (false);
+    }
+  }
 
-	return (true);
+  return (true);
 }
 
 /*
@@ -125,94 +125,94 @@ JEMALLOC_INLINE bool
 ckh_evict_reloc_insert(ckh_t *ckh, size_t argbucket, void const **argkey,
     void const **argdata)
 {
-	const void *key, *data, *tkey, *tdata;
-	ckhc_t *cell;
-	size_t hash1, hash2, bucket, tbucket;
-	unsigned i;
+  const void *key, *data, *tkey, *tdata;
+  ckhc_t *cell;
+  size_t hash1, hash2, bucket, tbucket;
+  unsigned i;
 
-	bucket = argbucket;
-	key = *argkey;
-	data = *argdata;
-	while (true) {
-		/*
-		 * Choose a random item within the bucket to evict.  This is
-		 * critical to correct function, because without (eventually)
-		 * evicting all items within a bucket during iteration, it
-		 * would be possible to get stuck in an infinite loop if there
-		 * were an item for which both hashes indicated the same
-		 * bucket.
-		 */
-		prn32(i, LG_CKH_BUCKET_CELLS, ckh->prn_state, CKH_A, CKH_C);
-		cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) + i];
-		assert(cell->key != NULL);
+  bucket = argbucket;
+  key = *argkey;
+  data = *argdata;
+  while (true) {
+    /*
+     * Choose a random item within the bucket to evict.  This is
+     * critical to correct function, because without (eventually)
+     * evicting all items within a bucket during iteration, it
+     * would be possible to get stuck in an infinite loop if there
+     * were an item for which both hashes indicated the same
+     * bucket.
+     */
+    prn32(i, LG_CKH_BUCKET_CELLS, ckh->prn_state, CKH_A, CKH_C);
+    cell = &ckh->tab[(bucket << LG_CKH_BUCKET_CELLS) + i];
+    assert(cell->key != NULL);
 
-		/* Swap cell->{key,data} and {key,data} (evict). */
-		tkey = cell->key; tdata = cell->data;
-		cell->key = key; cell->data = data;
-		key = tkey; data = tdata;
+    /* Swap cell->{key,data} and {key,data} (evict). */
+    tkey = cell->key; tdata = cell->data;
+    cell->key = key; cell->data = data;
+    key = tkey; data = tdata;
 
 #ifdef CKH_COUNT
-		ckh->nrelocs++;
+    ckh->nrelocs++;
 #endif
 
-		/* Find the alternate bucket for the evicted item. */
-		ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
-		tbucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-		if (tbucket == bucket) {
-			tbucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-			/*
-			 * It may be that (tbucket == bucket) still, if the
-			 * item's hashes both indicate this bucket.  However,
-			 * we are guaranteed to eventually escape this bucket
-			 * during iteration, assuming pseudo-random item
-			 * selection (true randomness would make infinite
-			 * looping a remote possibility).  The reason we can
-			 * never get trapped forever is that there are two
-			 * cases:
-			 *
-			 * 1) This bucket == argbucket, so we will quickly
-			 *    detect an eviction cycle and terminate.
-			 * 2) An item was evicted to this bucket from another,
-			 *    which means that at least one item in this bucket
-			 *    has hashes that indicate distinct buckets.
-			 */
-		}
-		/* Check for a cycle. */
-		if (tbucket == argbucket) {
-			*argkey = key;
-			*argdata = data;
-			return (true);
-		}
+    /* Find the alternate bucket for the evicted item. */
+    ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
+    tbucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+    if (tbucket == bucket) {
+      tbucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+      /*
+       * It may be that (tbucket == bucket) still, if the
+       * item's hashes both indicate this bucket.  However,
+       * we are guaranteed to eventually escape this bucket
+       * during iteration, assuming pseudo-random item
+       * selection (true randomness would make infinite
+       * looping a remote possibility).  The reason we can
+       * never get trapped forever is that there are two
+       * cases:
+       *
+       * 1) This bucket == argbucket, so we will quickly
+       *    detect an eviction cycle and terminate.
+       * 2) An item was evicted to this bucket from another,
+       *    which means that at least one item in this bucket
+       *    has hashes that indicate distinct buckets.
+       */
+    }
+    /* Check for a cycle. */
+    if (tbucket == argbucket) {
+      *argkey = key;
+      *argdata = data;
+      return (true);
+    }
 
-		bucket = tbucket;
-		if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
-			return (false);
-	}
+    bucket = tbucket;
+    if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
+      return (false);
+  }
 }
 
 JEMALLOC_INLINE bool
 ckh_try_insert(ckh_t *ckh, void const**argkey, void const**argdata)
 {
-	size_t hash1, hash2, bucket;
-	const void *key = *argkey;
-	const void *data = *argdata;
+  size_t hash1, hash2, bucket;
+  const void *key = *argkey;
+  const void *data = *argdata;
 
-	ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
+  ckh->hash(key, ckh->lg_curbuckets, &hash1, &hash2);
 
-	/* Try to insert in primary bucket. */
-	bucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-	if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
-		return (false);
+  /* Try to insert in primary bucket. */
+  bucket = hash1 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+  if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
+    return (false);
 
-	/* Try to insert in secondary bucket. */
-	bucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
-	if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
-		return (false);
+  /* Try to insert in secondary bucket. */
+  bucket = hash2 & ((ZU(1) << ckh->lg_curbuckets) - 1);
+  if (ckh_try_bucket_insert(ckh, bucket, key, data) == false)
+    return (false);
 
-	/*
-	 * Try to find a place for this item via iterative eviction/relocation.
-	 */
-	return (ckh_evict_reloc_insert(ckh, bucket, argkey, argdata));
+  /*
+   * Try to find a place for this item via iterative eviction/relocation.
+   */
+  return (ckh_evict_reloc_insert(ckh, bucket, argkey, argdata));
 }
 
 /*
@@ -222,197 +222,197 @@ ckh_try_insert(ckh_t *ckh, void const**argkey, void const**argdata)
 JEMALLOC_INLINE bool
 ckh_rebuild(ckh_t *ckh, ckhc_t *aTab)
 {
-	size_t count, i, nins;
-	const void *key, *data;
+  size_t count, i, nins;
+  const void *key, *data;
 
-	count = ckh->count;
-	ckh->count = 0;
-	for (i = nins = 0; nins < count; i++) {
-		if (aTab[i].key != NULL) {
-			key = aTab[i].key;
-			data = aTab[i].data;
-			if (ckh_try_insert(ckh, &key, &data)) {
-				ckh->count = count;
-				return (true);
-			}
-			nins++;
-		}
-	}
+  count = ckh->count;
+  ckh->count = 0;
+  for (i = nins = 0; nins < count; i++) {
+    if (aTab[i].key != NULL) {
+      key = aTab[i].key;
+      data = aTab[i].data;
+      if (ckh_try_insert(ckh, &key, &data)) {
+        ckh->count = count;
+        return (true);
+      }
+      nins++;
+    }
+  }
 
-	return (false);
+  return (false);
 }
 
 static bool
 ckh_grow(ckh_t *ckh)
 {
-	bool ret;
-	ckhc_t *tab, *ttab;
-	size_t lg_curcells;
-	unsigned lg_prevbuckets;
+  bool ret;
+  ckhc_t *tab, *ttab;
+  size_t lg_curcells;
+  unsigned lg_prevbuckets;
 
 #ifdef CKH_COUNT
-	ckh->ngrows++;
+  ckh->ngrows++;
 #endif
 
-	/*
-	 * It is possible (though unlikely, given well behaved hashes) that the
-	 * table will have to be doubled more than once in order to create a
-	 * usable table.
-	 */
-	lg_prevbuckets = ckh->lg_curbuckets;
-	lg_curcells = ckh->lg_curbuckets + LG_CKH_BUCKET_CELLS;
-	while (true) {
-		lg_curcells++;
-		tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_curcells,
-		    ZU(1) << LG_CACHELINE, true);
-		if (tab == NULL) {
-			ret = true;
-			goto RETURN;
-		}
-		/* Swap in new table. */
-		ttab = ckh->tab;
-		ckh->tab = tab;
-		tab = ttab;
-		ckh->lg_curbuckets = lg_curcells - LG_CKH_BUCKET_CELLS;
+  /*
+   * It is possible (though unlikely, given well behaved hashes) that the
+   * table will have to be doubled more than once in order to create a
+   * usable table.
+   */
+  lg_prevbuckets = ckh->lg_curbuckets;
+  lg_curcells = ckh->lg_curbuckets + LG_CKH_BUCKET_CELLS;
+  while (true) {
+    lg_curcells++;
+    tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_curcells,
+        ZU(1) << LG_CACHELINE, true);
+    if (tab == NULL) {
+      ret = true;
+      goto RETURN;
+    }
+    /* Swap in new table. */
+    ttab = ckh->tab;
+    ckh->tab = tab;
+    tab = ttab;
+    ckh->lg_curbuckets = lg_curcells - LG_CKH_BUCKET_CELLS;
 
-		if (ckh_rebuild(ckh, tab) == false) {
-			idalloc(tab);
-			break;
-		}
+    if (ckh_rebuild(ckh, tab) == false) {
+      idalloc(tab);
+      break;
+    }
 
-		/* Rebuilding failed, so back out partially rebuilt table. */
-		idalloc(ckh->tab);
-		ckh->tab = tab;
-		ckh->lg_curbuckets = lg_prevbuckets;
-	}
+    /* Rebuilding failed, so back out partially rebuilt table. */
+    idalloc(ckh->tab);
+    ckh->tab = tab;
+    ckh->lg_curbuckets = lg_prevbuckets;
+  }
 
-	ret = false;
+  ret = false;
 RETURN:
-	return (ret);
+  return (ret);
 }
 
 static void
 ckh_shrink(ckh_t *ckh)
 {
-	ckhc_t *tab, *ttab;
-	size_t lg_curcells;
-	unsigned lg_prevbuckets;
+  ckhc_t *tab, *ttab;
+  size_t lg_curcells;
+  unsigned lg_prevbuckets;
 
-	/*
-	 * It is possible (though unlikely, given well behaved hashes) that the
-	 * table rebuild will fail.
-	 */
-	lg_prevbuckets = ckh->lg_curbuckets;
-	lg_curcells = ckh->lg_curbuckets + LG_CKH_BUCKET_CELLS - 1;
-	tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_curcells,
-	    ZU(1) << LG_CACHELINE, true);
-	if (tab == NULL) {
-		/*
-		 * An OOM error isn't worth propagating, since it doesn't
-		 * prevent this or future operations from proceeding.
-		 */
-		return;
-	}
-	/* Swap in new table. */
-	ttab = ckh->tab;
-	ckh->tab = tab;
-	tab = ttab;
-	ckh->lg_curbuckets = lg_curcells - LG_CKH_BUCKET_CELLS;
+  /*
+   * It is possible (though unlikely, given well behaved hashes) that the
+   * table rebuild will fail.
+   */
+  lg_prevbuckets = ckh->lg_curbuckets;
+  lg_curcells = ckh->lg_curbuckets + LG_CKH_BUCKET_CELLS - 1;
+  tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_curcells,
+      ZU(1) << LG_CACHELINE, true);
+  if (tab == NULL) {
+    /*
+     * An OOM error isn't worth propagating, since it doesn't
+     * prevent this or future operations from proceeding.
+     */
+    return;
+  }
+  /* Swap in new table. */
+  ttab = ckh->tab;
+  ckh->tab = tab;
+  tab = ttab;
+  ckh->lg_curbuckets = lg_curcells - LG_CKH_BUCKET_CELLS;
 
-	if (ckh_rebuild(ckh, tab) == false) {
-		idalloc(tab);
+  if (ckh_rebuild(ckh, tab) == false) {
+    idalloc(tab);
 #ifdef CKH_COUNT
-		ckh->nshrinks++;
+    ckh->nshrinks++;
 #endif
-		return;
-	}
+    return;
+  }
 
-	/* Rebuilding failed, so back out partially rebuilt table. */
-	idalloc(ckh->tab);
-	ckh->tab = tab;
-	ckh->lg_curbuckets = lg_prevbuckets;
+  /* Rebuilding failed, so back out partially rebuilt table. */
+  idalloc(ckh->tab);
+  ckh->tab = tab;
+  ckh->lg_curbuckets = lg_prevbuckets;
 #ifdef CKH_COUNT
-	ckh->nshrinkfails++;
+  ckh->nshrinkfails++;
 #endif
 }
 
 bool
 ckh_new(ckh_t *ckh, size_t minitems, ckh_hash_t *hash, ckh_keycomp_t *keycomp)
 {
-	bool ret;
-	size_t mincells;
-	unsigned lg_mincells;
+  bool ret;
+  size_t mincells;
+  unsigned lg_mincells;
 
-	assert(minitems > 0);
-	assert(hash != NULL);
-	assert(keycomp != NULL);
+  assert(minitems > 0);
+  assert(hash != NULL);
+  assert(keycomp != NULL);
 
 #ifdef CKH_COUNT
-	ckh->ngrows = 0;
-	ckh->nshrinks = 0;
-	ckh->nshrinkfails = 0;
-	ckh->ninserts = 0;
-	ckh->nrelocs = 0;
+  ckh->ngrows = 0;
+  ckh->nshrinks = 0;
+  ckh->nshrinkfails = 0;
+  ckh->ninserts = 0;
+  ckh->nrelocs = 0;
 #endif
-	ckh->prn_state = 42; /* Value doesn't really matter. */
-	ckh->count = 0;
+  ckh->prn_state = 42; /* Value doesn't really matter. */
+  ckh->count = 0;
 
-	/*
-	 * Find the minimum power of 2 that is large enough to fit aBaseCount
-	 * entries.  We are using (2+,2) cuckoo hashing, which has an expected
-	 * maximum load factor of at least ~0.86, so 0.75 is a conservative load
-	 * factor that will typically allow 2^aLgMinItems to fit without ever
-	 * growing the table.
-	 */
-	assert(LG_CKH_BUCKET_CELLS > 0);
-	mincells = ((minitems + (3 - (minitems % 3))) / 3) << 2;
-	for (lg_mincells = LG_CKH_BUCKET_CELLS;
-	    (ZU(1) << lg_mincells) < mincells;
-	    lg_mincells++)
-		; /* Do nothing. */
-	ckh->lg_minbuckets = lg_mincells - LG_CKH_BUCKET_CELLS;
-	ckh->lg_curbuckets = lg_mincells - LG_CKH_BUCKET_CELLS;
-	ckh->hash = hash;
-	ckh->keycomp = keycomp;
+  /*
+   * Find the minimum power of 2 that is large enough to fit aBaseCount
+   * entries.  We are using (2+,2) cuckoo hashing, which has an expected
+   * maximum load factor of at least ~0.86, so 0.75 is a conservative load
+   * factor that will typically allow 2^aLgMinItems to fit without ever
+   * growing the table.
+   */
+  assert(LG_CKH_BUCKET_CELLS > 0);
+  mincells = ((minitems + (3 - (minitems % 3))) / 3) << 2;
+  for (lg_mincells = LG_CKH_BUCKET_CELLS;
+      (ZU(1) << lg_mincells) < mincells;
+      lg_mincells++)
+    ; /* Do nothing. */
+  ckh->lg_minbuckets = lg_mincells - LG_CKH_BUCKET_CELLS;
+  ckh->lg_curbuckets = lg_mincells - LG_CKH_BUCKET_CELLS;
+  ckh->hash = hash;
+  ckh->keycomp = keycomp;
 
-	ckh->tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_mincells,
-	    (ZU(1) << LG_CACHELINE), true);
-	if (ckh->tab == NULL) {
-		ret = true;
-		goto RETURN;
-	}
+  ckh->tab = (ckhc_t *)ipalloc(sizeof(ckhc_t) << lg_mincells,
+      (ZU(1) << LG_CACHELINE), true);
+  if (ckh->tab == NULL) {
+    ret = true;
+    goto RETURN;
+  }
 
 #ifdef JEMALLOC_DEBUG
-	ckh->magic = CKH_MAGIC;
+  ckh->magic = CKH_MAGIC;
 #endif
 
-	ret = false;
+  ret = false;
 RETURN:
-	return (ret);
+  return (ret);
 }
 
 void
 ckh_delete(ckh_t *ckh)
 {
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
 
 #ifdef CKH_VERBOSE
-	malloc_printf(
-	    "%s(%p): ngrows: %"PRIu64", nshrinks: %"PRIu64","
-	    " nshrinkfails: %"PRIu64", ninserts: %"PRIu64","
-	    " nrelocs: %"PRIu64"\n", __func__, ckh,
-	    (unsigned long long)ckh->ngrows,
-	    (unsigned long long)ckh->nshrinks,
-	    (unsigned long long)ckh->nshrinkfails,
-	    (unsigned long long)ckh->ninserts,
-	    (unsigned long long)ckh->nrelocs);
+  malloc_printf(
+      "%s(%p): ngrows: %"PRIu64", nshrinks: %"PRIu64","
+      " nshrinkfails: %"PRIu64", ninserts: %"PRIu64","
+      " nrelocs: %"PRIu64"\n", __func__, ckh,
+      (unsigned long long)ckh->ngrows,
+      (unsigned long long)ckh->nshrinks,
+      (unsigned long long)ckh->nshrinkfails,
+      (unsigned long long)ckh->ninserts,
+      (unsigned long long)ckh->nrelocs);
 #endif
 
-	idalloc(ckh->tab);
+  idalloc(ckh->tab);
 #ifdef JEMALLOC_DEBUG
-	memset(ckh, 0x5a, sizeof(ckh_t));
+  memset(ckh, 0x5a, sizeof(ckh_t));
 #endif
 }
 
@@ -420,135 +420,135 @@ size_t
 ckh_count(ckh_t *ckh)
 {
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
 
-	return (ckh->count);
+  return (ckh->count);
 }
 
 bool
 ckh_iter(ckh_t *ckh, size_t *tabind, void **key, void **data)
 {
-	size_t i, ncells;
+  size_t i, ncells;
 
-	for (i = *tabind, ncells = (ZU(1) << (ckh->lg_curbuckets +
-	    LG_CKH_BUCKET_CELLS)); i < ncells; i++) {
-		if (ckh->tab[i].key != NULL) {
-			if (key != NULL)
-				*key = (void *)ckh->tab[i].key;
-			if (data != NULL)
-				*data = (void *)ckh->tab[i].data;
-			*tabind = i + 1;
-			return (false);
-		}
-	}
+  for (i = *tabind, ncells = (ZU(1) << (ckh->lg_curbuckets +
+      LG_CKH_BUCKET_CELLS)); i < ncells; i++) {
+    if (ckh->tab[i].key != NULL) {
+      if (key != NULL)
+        *key = (void *)ckh->tab[i].key;
+      if (data != NULL)
+        *data = (void *)ckh->tab[i].data;
+      *tabind = i + 1;
+      return (false);
+    }
+  }
 
-	return (true);
+  return (true);
 }
 
 bool
 ckh_insert(ckh_t *ckh, const void *key, const void *data)
 {
-	bool ret;
+  bool ret;
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
-	assert(ckh_search(ckh, key, NULL, NULL));
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
+  assert(ckh_search(ckh, key, NULL, NULL));
 
 #ifdef CKH_COUNT
-	ckh->ninserts++;
+  ckh->ninserts++;
 #endif
 
-	while (ckh_try_insert(ckh, &key, &data)) {
-		if (ckh_grow(ckh)) {
-			ret = true;
-			goto RETURN;
-		}
-	}
+  while (ckh_try_insert(ckh, &key, &data)) {
+    if (ckh_grow(ckh)) {
+      ret = true;
+      goto RETURN;
+    }
+  }
 
-	ret = false;
+  ret = false;
 RETURN:
-	return (ret);
+  return (ret);
 }
 
 bool
 ckh_remove(ckh_t *ckh, const void *searchkey, void **key, void **data)
 {
-	size_t cell;
+  size_t cell;
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
 
-	cell = ckh_isearch(ckh, searchkey);
-	if (cell != SIZE_T_MAX) {
-		if (key != NULL)
-			*key = (void *)ckh->tab[cell].key;
-		if (data != NULL)
-			*data = (void *)ckh->tab[cell].data;
-		ckh->tab[cell].key = NULL;
-		ckh->tab[cell].data = NULL; /* Not necessary. */
+  cell = ckh_isearch(ckh, searchkey);
+  if (cell != SIZE_T_MAX) {
+    if (key != NULL)
+      *key = (void *)ckh->tab[cell].key;
+    if (data != NULL)
+      *data = (void *)ckh->tab[cell].data;
+    ckh->tab[cell].key = NULL;
+    ckh->tab[cell].data = NULL; /* Not necessary. */
 
-		ckh->count--;
-		/* Try to halve the table if it is less than 1/4 full. */
-		if (ckh->count < (ZU(1) << (ckh->lg_curbuckets
-		    + LG_CKH_BUCKET_CELLS - 2)) && ckh->lg_curbuckets
-		    > ckh->lg_minbuckets) {
-			/* Ignore error due to OOM. */
-			ckh_shrink(ckh);
-		}
+    ckh->count--;
+    /* Try to halve the table if it is less than 1/4 full. */
+    if (ckh->count < (ZU(1) << (ckh->lg_curbuckets
+        + LG_CKH_BUCKET_CELLS - 2)) && ckh->lg_curbuckets
+        > ckh->lg_minbuckets) {
+      /* Ignore error due to OOM. */
+      ckh_shrink(ckh);
+    }
 
-		return (false);
-	}
+    return (false);
+  }
 
-	return (true);
+  return (true);
 }
 
 bool
 ckh_search(ckh_t *ckh, const void *searchkey, void **key, void **data)
 {
-	size_t cell;
+  size_t cell;
 
-	assert(ckh != NULL);
-	assert(ckh->magic == CKH_MAGIC);
+  assert(ckh != NULL);
+  assert(ckh->magic == CKH_MAGIC);
 
-	cell = ckh_isearch(ckh, searchkey);
-	if (cell != SIZE_T_MAX) {
-		if (key != NULL)
-			*key = (void *)ckh->tab[cell].key;
-		if (data != NULL)
-			*data = (void *)ckh->tab[cell].data;
-		return (false);
-	}
+  cell = ckh_isearch(ckh, searchkey);
+  if (cell != SIZE_T_MAX) {
+    if (key != NULL)
+      *key = (void *)ckh->tab[cell].key;
+    if (data != NULL)
+      *data = (void *)ckh->tab[cell].data;
+    return (false);
+  }
 
-	return (true);
+  return (true);
 }
 
 void
 ckh_string_hash(const void *key, unsigned minbits, size_t *hash1, size_t *hash2)
 {
-	size_t ret1, ret2;
-	uint64_t h;
+  size_t ret1, ret2;
+  uint64_t h;
 
-	assert(minbits <= 32 || (SIZEOF_PTR == 8 && minbits <= 64));
-	assert(hash1 != NULL);
-	assert(hash2 != NULL);
+  assert(minbits <= 32 || (SIZEOF_PTR == 8 && minbits <= 64));
+  assert(hash1 != NULL);
+  assert(hash2 != NULL);
 
-	h = hash(key, strlen((const char *)key), 0x94122f335b332aeaLLU);
-	if (minbits <= 32) {
-		/*
-		 * Avoid doing multiple hashes, since a single hash provides
-		 * enough bits.
-		 */
-		ret1 = h & ZU(0xffffffffU);
-		ret2 = h >> 32;
-	} else {
-		ret1 = h;
-		ret2 = hash(key, strlen((const char *)key),
-		    0x8432a476666bbc13U);
-	}
+  h = hash(key, strlen((const char *)key), 0x94122f335b332aeaLLU);
+  if (minbits <= 32) {
+    /*
+     * Avoid doing multiple hashes, since a single hash provides
+     * enough bits.
+     */
+    ret1 = h & ZU(0xffffffffU);
+    ret2 = h >> 32;
+  } else {
+    ret1 = h;
+    ret2 = hash(key, strlen((const char *)key),
+        0x8432a476666bbc13U);
+  }
 
-	*hash1 = ret1;
-	*hash2 = ret2;
+  *hash1 = ret1;
+  *hash2 = ret2;
 }
 
 bool
@@ -565,43 +565,43 @@ void
 ckh_pointer_hash(const void *key, unsigned minbits, size_t *hash1,
     size_t *hash2)
 {
-	size_t ret1, ret2;
-	uint64_t h;
-	union {
-		const void	*v;
-		uint64_t	i;
-	} u;
+  size_t ret1, ret2;
+  uint64_t h;
+  union {
+    const void  *v;
+    uint64_t  i;
+  } u;
 
-	assert(minbits <= 32 || (SIZEOF_PTR == 8 && minbits <= 64));
-	assert(hash1 != NULL);
-	assert(hash2 != NULL);
+  assert(minbits <= 32 || (SIZEOF_PTR == 8 && minbits <= 64));
+  assert(hash1 != NULL);
+  assert(hash2 != NULL);
 
-	assert(sizeof(u.v) == sizeof(u.i));
+  assert(sizeof(u.v) == sizeof(u.i));
 #if (LG_SIZEOF_PTR != LG_SIZEOF_INT)
-	u.i = 0;
+  u.i = 0;
 #endif
-	u.v = key;
-	h = hash(&u.i, sizeof(u.i), 0xd983396e68886082LLU);
-	if (minbits <= 32) {
-		/*
-		 * Avoid doing multiple hashes, since a single hash provides
-		 * enough bits.
-		 */
-		ret1 = h & ZU(0xffffffffU);
-		ret2 = h >> 32;
-	} else {
-		assert(SIZEOF_PTR == 8);
-		ret1 = h;
-		ret2 = hash(&u.i, sizeof(u.i), 0x5e2be9aff8709a5dLLU);
-	}
+  u.v = key;
+  h = hash(&u.i, sizeof(u.i), 0xd983396e68886082LLU);
+  if (minbits <= 32) {
+    /*
+     * Avoid doing multiple hashes, since a single hash provides
+     * enough bits.
+     */
+    ret1 = h & ZU(0xffffffffU);
+    ret2 = h >> 32;
+  } else {
+    assert(SIZEOF_PTR == 8);
+    ret1 = h;
+    ret2 = hash(&u.i, sizeof(u.i), 0x5e2be9aff8709a5dLLU);
+  }
 
-	*hash1 = ret1;
-	*hash2 = ret2;
+  *hash1 = ret1;
+  *hash2 = ret2;
 }
 
 bool
 ckh_pointer_keycomp(const void *k1, const void *k2)
 {
 
-	return ((k1 == k2) ? true : false);
+  return ((k1 == k2) ? true : false);
 }

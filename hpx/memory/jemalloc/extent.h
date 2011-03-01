@@ -10,23 +10,23 @@ typedef struct extent_node_s extent_node_t;
 /* Tree of extents. */
 struct extent_node_s {
 #if (defined(JEMALLOC_SWAP) || defined(JEMALLOC_DSS))
-	/* Linkage for the size/address-ordered tree. */
-	rb_node(extent_node_t)	link_szad;
+  /* Linkage for the size/address-ordered tree. */
+  rb_node(extent_node_t)  link_szad;
 #endif
 
-	/* Linkage for the address-ordered tree. */
-	rb_node(extent_node_t)	link_ad;
+  /* Linkage for the address-ordered tree. */
+  rb_node(extent_node_t)  link_ad;
 
 #ifdef JEMALLOC_PROF
-	/* Profile counters, used for huge objects. */
-	prof_ctx_t		*prof_ctx;
+  /* Profile counters, used for huge objects. */
+  prof_ctx_t    *prof_ctx;
 #endif
 
-	/* Pointer to the extent that this tree node is responsible for. */
-	void			*addr;
+  /* Pointer to the extent that this tree node is responsible for. */
+  void      *addr;
 
-	/* Total region size. */
-	size_t			size;
+  /* Total region size. */
+  size_t      size;
 };
 typedef rb_tree(extent_node_t) extent_tree_t;
 

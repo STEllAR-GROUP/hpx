@@ -1,4 +1,4 @@
-#define	JEMALLOC_MUTEX_C_
+#define  JEMALLOC_MUTEX_C_
 #include <hpx/memory/jemalloc/jemalloc_internal.h>
 
 /******************************************************************************/
@@ -9,7 +9,7 @@ bool isthreaded = false;
 #endif
 
 #ifdef JEMALLOC_LAZY_LOCK
-static void	pthread_create_once(void);
+static void  pthread_create_once(void);
 #endif
 
 /******************************************************************************/
@@ -26,14 +26,14 @@ static void
 pthread_create_once(void)
 {
 
-	pthread_create_fptr = dlsym(RTLD_NEXT, "pthread_create");
-	if (pthread_create_fptr == NULL) {
-		malloc_write("<jemalloc>: Error in dlsym(RTLD_NEXT, "
-		    "\"pthread_create\")\n");
-		abort();
-	}
+  pthread_create_fptr = dlsym(RTLD_NEXT, "pthread_create");
+  if (pthread_create_fptr == NULL) {
+    malloc_write("<jemalloc>: Error in dlsym(RTLD_NEXT, "
+        "\"pthread_create\")\n");
+    abort();
+  }
 
-	isthreaded = true;
+  isthreaded = true;
 }
 
 JEMALLOC_ATTR(visibility("default"))
@@ -42,11 +42,11 @@ pthread_create(pthread_t *__restrict thread,
     const pthread_attr_t *__restrict attr, void *(*start_routine)(void *),
     void *__restrict arg)
 {
-	static pthread_once_t once_control = PTHREAD_ONCE_INIT;
+  static pthread_once_t once_control = PTHREAD_ONCE_INIT;
 
-	pthread_once(&once_control, pthread_create_once);
+  pthread_once(&once_control, pthread_create_once);
 
-	return (pthread_create_fptr(thread, attr, start_routine, arg));
+  return (pthread_create_fptr(thread, attr, start_routine, arg));
 }
 #endif
 
@@ -55,30 +55,30 @@ pthread_create(pthread_t *__restrict thread,
 bool
 malloc_mutex_init(malloc_mutex_t *mutex)
 {
-	pthread_mutexattr_t attr;
+  pthread_mutexattr_t attr;
 
-	if (pthread_mutexattr_init(&attr) != 0)
-		return (true);
+  if (pthread_mutexattr_init(&attr) != 0)
+    return (true);
 #ifdef PTHREAD_MUTEX_ADAPTIVE_NP
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
 #else
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_DEFAULT);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_DEFAULT);
 #endif
-	if (pthread_mutex_init(mutex, &attr) != 0) {
-		pthread_mutexattr_destroy(&attr);
-		return (true);
-	}
-	pthread_mutexattr_destroy(&attr);
+  if (pthread_mutex_init(mutex, &attr) != 0) {
+    pthread_mutexattr_destroy(&attr);
+    return (true);
+  }
+  pthread_mutexattr_destroy(&attr);
 
-	return (false);
+  return (false);
 }
 
 void
 malloc_mutex_destroy(malloc_mutex_t *mutex)
 {
 
-	if (pthread_mutex_destroy(mutex) != 0) {
-		malloc_write("<jemalloc>: Error in pthread_mutex_destroy()\n");
-		abort();
-	}
+  if (pthread_mutex_destroy(mutex) != 0) {
+    malloc_write("<jemalloc>: Error in pthread_mutex_destroy()\n");
+    abort();
+  }
 }

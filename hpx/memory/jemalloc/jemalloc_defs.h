@@ -1,6 +1,6 @@
 /* include/jemalloc/jemalloc_defs.h.  Generated from jemalloc_defs.h.in by configure.  */
 #ifndef JEMALLOC_DEFS_H_
-#define	JEMALLOC_DEFS_H_
+#define  JEMALLOC_DEFS_H_
 
 /*
  * If JEMALLOC_PREFIX is defined, it will cause all public APIs to be prefixed.
