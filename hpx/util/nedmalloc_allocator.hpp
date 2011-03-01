@@ -14,24 +14,39 @@
 namespace hpx { namespace memory
 {
 
+// conforms to the Boost.Pool allocator interface
 struct nedmalloc
 {
     typedef std::size_t size_type;    
-        
-    static void* malloc(size_type s)
+    typedef std::ptrdiff_t difference_type;       
+ 
+    static char* malloc(size_type s)
     {
-        return nedalloc::nedmalloc(s); 
+        return reinterpret_cast<char*>(nedalloc::nedmalloc(s));
+    }
+ 
+    static void* void_malloc(size_type s)
+    {
+        return nedalloc::nedmalloc(s);
+    }
+    
+    template <typename T> 
+    static T* object_malloc(size_type s)
+    {
+        return reinterpret_cast<T*>(nedalloc::nedmalloc(s * sizeof(T)));
     }
 
-    static void free(void* p)
+    template <typename T>  
+    static void free(T* p)
     {
-        nedalloc::nedfree(p);
+        nedalloc::nedfree(reinterpret_cast<void*>(p));
     }
 };
 
 template <typename T>
-struct nedmalloc_allocator {
-  typedef memory::allocator<memory::nedmalloc, T> type;
+struct nedmalloc_allocator
+{
+    typedef memory::allocator<memory::nedmalloc, T> type;
 };
 
 }}

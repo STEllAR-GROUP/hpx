@@ -14,24 +14,39 @@
 namespace hpx { namespace memory
 {
 
+// conforms to the Boost.Pool allocator interface
 struct jemalloc
 {
     typedef std::size_t size_type;    
-        
-    static void* malloc(size_type s)
+    typedef std::ptrdiff_t difference_type;       
+ 
+    static char* malloc(size_type s)
     {
-        return HPX_JEMALLOC_malloc(s); 
+        return reinterpret_cast<char*>(HPX_JEMALLOC_malloc(s));
+    }
+    
+    static void* void_malloc(size_type s)
+    {
+        return HPX_JEMALLOC_malloc(s);
+    }
+    
+    template <typename T> 
+    static T* object_malloc(size_type s)
+    {
+        return reinterpret_cast<T*>(HPX_JEMALLOC_malloc(s * sizeof(T)));
     }
 
-    static void free(void* p)
+    template <typename T>  
+    static void free(T* p)
     {
-        HPX_JEMALLOC_free(p);
+        HPX_JEMALLOC_free(reinterpret_cast<void*>(p));
     }
 };
 
 template <typename T>
-struct jemalloc_allocator {
-  typedef memory::allocator<memory::jemalloc, T> type;
+struct jemalloc_allocator
+{
+    typedef memory::allocator<memory::jemalloc, T> type;
 };
 
 }}

@@ -18,6 +18,7 @@
 namespace hpx { namespace memory
 {
 
+// conforms to the C++ STD allocator interface
 template <typename Tag, typename T>
 struct allocator
 {
@@ -73,13 +74,12 @@ struct allocator
 
     pointer allocate(size_type c, const void* = 0) const
     {
-        void* ptr = Tag::malloc(c * sizeof(value_type));
-        return reinterpret_cast<pointer>(ptr);
+        return Tag::template object_malloc<value_type>(c);
     }
 
     void deallocate(pointer p, size_type) const
     {
-        Tag::free(reinterpret_cast<void*>(p));
+        Tag::free(p);
     }
 };
 
