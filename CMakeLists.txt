@@ -249,7 +249,11 @@ else()
     add_definitions(-DHPX_HAVE_PTHREAD_SETAFFINITY_NP)
   endif()
   
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl pthread rt)
+  add_definitions(-D_GNU_SOURCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 endif()
 
 ################################################################################
