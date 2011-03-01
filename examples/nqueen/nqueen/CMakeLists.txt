@@ -29,7 +29,7 @@ source_group("Header Files\\Stubs" 	FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 
-add_hpx_component(Board
+add_hpx_component(nqueen
 	MODULE Board
 	SOURCES ${client_sources}
 	HEADERS ${headers})

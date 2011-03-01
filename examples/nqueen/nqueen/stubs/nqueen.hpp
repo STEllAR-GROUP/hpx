@@ -23,6 +23,11 @@ namespace hpx { namespace components { namespace stubs
 			applier::apply<server::Board::init_action>(gid, size, level);
 		}
 
+		static void printBoard(naming::id_type gid)
+		{
+			applier::apply<server::Board::print_action>(gid);
+		}
+
 		static lcos::future_value<list_t> accessBoard_async(naming::id_type gid)
 		{
 			typedef server::Board::access_action action_type;
@@ -34,14 +39,31 @@ namespace hpx { namespace components { namespace stubs
 			return accessBoard_async(gid).get();
 		}
 
+		static lcos::future_value<unsigned int> getSize_async(naming::id_type gid)
+		{
+			typedef server::Board::size_action action_type;
+			return lcos::eager_future<action_type>(gid);
+		}
+
+		static unsigned int getSize(naming::id_type gid)
+		{
+			return getSize_async(gid).get();
+		}
+
+		static lcos::future_value <int> getLevel_async(naming::id_type gid)
+		{
+			typedef server::Board::level_action action_type;
+			return lcos::eager_future<action_type>(gid);
+		}
+
+		static int getLevel(naming::id_type gid)
+		{
+			return getLevel_async(gid).get();
+		}
+
 		static void updateBoard(naming::id_type gid, int level, int pos )
 		{
 			applier::apply<server::Board::update_action>(gid, level, pos);
-		}
-
-		static void solveNqueen(naming::id_type gid, Board board, unsigned int size, int level)
-		{
-			applier::apply<server::Board::solve_action>(gid, board, size, level);
 		}
 
 		static lcos::future_value<bool> checkBoard_async(naming::id_type gid, list_t list, int level)
@@ -53,6 +75,21 @@ namespace hpx { namespace components { namespace stubs
 		static bool checkBoard(naming::id_type gid, list_t list, int level )
 		{
 			return checkBoard_async(gid, list, level).get();
+		}
+
+		static void solveNqueen(naming::id_type gid, list_t list, unsigned int size, int level)
+		{
+			applier::apply<server::Board::solve_action>(gid, list, size, level);
+		}
+
+		static void clearBoard(naming::id_type gid)
+		{
+			applier::apply<server::Board::clear_action>(gid);
+		}
+
+		static void testBoard(naming::id_type gid, list_t list, unsigned int size, int level)
+		{
+			applier::apply<server::Board::test_action>(gid, list, size, level);
 		}
 
 	};

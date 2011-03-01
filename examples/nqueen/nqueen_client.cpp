@@ -33,7 +33,7 @@ threads::thread_state_enum hpx_main()
 	board.create(prefix);
 
 	std::cout << "Enter size of board. Default size is 8." << std::endl;
-	std::cout << "Command Options:size[value]|quit"<< std::endl;
+	std::cout << "Command Options: size[value] | default | print | clear | quit" << std::endl;
 
 	std::string cmd;
 	std::cin >> cmd;
@@ -43,20 +43,46 @@ threads::thread_state_enum hpx_main()
 		if(cmd == "size"){
 			std::string arg;
 			std::cin >> arg;
-			board.initBoard(boost::lexical_cast<unsigned int>(arg), 0);
-			board.solveNqueen(board, boost::lexical_cast<unsigned int>(arg), 0);
+			unsigned int sz_temp = boost::lexical_cast<unsigned int>(arg);
+			board.initBoard(sz_temp, 0);
+			std::cout << "Board Access at size -1:" << board.accessBoard().at(sz_temp - 1) << std::endl;
+			std::cout << "Board size: " << board.getSize() <<"  "<< "Board Level: " << board.getLevel() << std::endl;
+			board.printBoard();
+			std::cout<< "initial Value" << std::endl;
+			std::cout << "+++++++++++++++++++++++++++++++" << std::endl;
+			board.updateBoard(board.getLevel(), 5);
+			board.testBoard(board.accessBoard(), board.getSize(), board.getLevel());
+			std::cout << "OLD VALUE" << std::endl;
+			board.printBoard();
+			std::cout << "===============================" << std::endl;
+			//std::cout << "Board check: " << board.checkBoard(board.accessBoard(), board.getLevel()) << std::endl;
+			//board.updateBoard(board.getLevel(), 0);
+			//board.testBoard(board.accessBoard(), board.getSize(), board.getLevel());*/
+
+			board.solveNqueen(board.accessBoard(), sz_temp, 0);
+			//board.solveNqueen(board, boost::lexical_cast<unsigned int>(arg), 0);
+			//board.printBoard();
 			//board.solveNqueens(this, boost::lexical_cast<int>(arg), 0);
 		}
-		else if(cmd == " "){
-			board.initBoard(N,0);
-			board.solveNqueen(board, N, 0);
+		else if(cmd == ""){
+			board.initBoard(N,N);
+			//board.solveNqueen(board, N, 0);
+			//board.solveNqueen(board, N, 0);
+			//board.printBoard();
+		}
+		else if(cmd == "print"){
+			board.printBoard();
+
+		}
+		else if(cmd == "clear"){
+			board.clearBoard();
 		}
 		else if (cmd == "quit"){
 			break;
 		}
 		else {
 			std::cout << "Enter the right command." <<std::endl;
-			std::cout << "Options: size [value] | quit" << std::endl;
+			std::cout << "Options: size[value] | default | print | clear | quit" << std::endl;
 		}
 		std::cin >> cmd;
 	}
@@ -71,6 +97,22 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
 	try {
 		po::options_description opt_cmdline ("Usage: hpx_runtime [options]");
+		opt_cmdline.add_options()
+				("run_agas_server,r", "run AGAS server as part of this runtime instance")
+				("worker,w", "run this instance in worker (non-console) mode")
+				            ("agas,a", po::value<std::string>(),
+				                "the IP address the AGAS server is running on (default taken "
+				                "from hpx.ini), expected format: 192.168.1.1:7912")
+				            ("hpx,x", po::value<std::string>(),
+				                "the IP address the HPX parcelport is listening on (default "
+				                "is localhost:7910), expected format: 192.168.1.1:7913")
+				            ("localities,l", po::value<int>(),
+				                "the number of localities to wait for at application startup "
+				                "(default is 1)")
+				            ("threads,t", po::value<int>(),
+				                "the number of operating system threads to spawn for this "
+				                "HPX locality")
+				        ;
 
 		po::store(po::command_line_parser(argc, argv)
 			.options(opt_cmdline).run(), vm);

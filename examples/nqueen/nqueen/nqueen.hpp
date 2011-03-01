@@ -29,6 +29,12 @@ namespace hpx { namespace components
 			return this->base_type::initBoard(gid_, size, level);
 		}
 
+		void printBoard()
+		{
+			BOOST_ASSERT(gid_);
+			return this->base_type::printBoard(gid_);
+		}
+
 		list_t accessBoard(){
 			BOOST_ASSERT(gid_);
 			return this->base_type::accessBoard(gid_);
@@ -36,6 +42,24 @@ namespace hpx { namespace components
 
 		lcos::future_value<list_t> accessBoard_async(){
 			return this->base_type::accessBoard_async(gid_);
+		}
+
+		unsigned int getSize(){
+			BOOST_ASSERT(gid_);
+			return this->base_type::getSize(gid_);
+		}
+
+		lcos::future_value<unsigned int> getSize_async() {
+			return this->base_type::getSize_async(gid_);
+		}
+
+		int getLevel(){
+			BOOST_ASSERT(gid_);
+			return this->base_type::getLevel(gid_);
+		}
+
+		lcos::future_value<int> getLevel_async() {
+			return this->base_type::getLevel_async(gid_);
 		}
 
 		void updateBoard(int level, int pos){
@@ -52,9 +76,18 @@ namespace hpx { namespace components
 			return this->base_type::checkBoard_async(gid_, list, level);
 		}
 
-		void solveNqueen(Board board, unsigned int size, int level){
+		void solveNqueen(list_t list, unsigned int size, int level){
 			BOOST_ASSERT(gid_);
-			return this->base_type::solveNqueen(gid_, board, size, level);
+			return this->base_type::solveNqueen(gid_, list, size, level);
+		}
+
+		void clearBoard(){
+			BOOST_ASSERT(gid_);
+			return this->base_type::clearBoard(gid_);
+		}
+		void testBoard(list_t list, unsigned int size, int level){
+			BOOST_ASSERT(gid_);
+			return this->base_type::testBoard(gid_, list, size, level);
 		}
 
 	};

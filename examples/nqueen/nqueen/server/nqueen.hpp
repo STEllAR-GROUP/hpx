@@ -29,6 +29,8 @@ namespace hpx { namespace components { namespace server
 		int level_;
 		unsigned int size_;
 
+		// here Board is a component
+
 		friend class boost::serialization::access;
 		template<class Archive>
 		void serialize(Archive & ar, const unsigned int version){
@@ -44,7 +46,12 @@ namespace hpx { namespace components { namespace server
 			board_update = 1,
 			board_access = 2,
 			board_check = 3,
-			board_solve = 4
+			board_solve = 4,
+			board_print = 5,
+			board_size = 6,
+			board_level = 7,
+			board_test = 8,
+			board_clear = 9
 		};
 
 		Board():list_(0), size_(0), level_(0)
@@ -61,10 +68,24 @@ namespace hpx { namespace components { namespace server
 				 	 unsigned int i = 0;
 				 	 while(i!=Board::size_)
 				 	 {
-				 		 Board::list_.push_back(0);
+				 		 Board::list_.push_back(size_);
 				 		 i++;
 					 }
 				}
+
+		void printBoard()
+		{
+		  std::cout << "Printing Contents" << std::endl;
+		  std::cout << "Size:" << size_ << "   "
+			" Level:" << level_ << std::endl;
+		  std::cout << "List contents " << std::endl;
+		  int i = 0;
+		  while(i!=size_)
+		  {
+		    std::cout << list_.at(i) << std::endl;
+		    i++;
+		  };
+		}
 
 		bool checkBoard(list_t list, int level)
 		{
@@ -78,20 +99,24 @@ namespace hpx { namespace components { namespace server
 				return 1;
 		}
 
-		//unsigned int getSize()	{return size_;}
+		unsigned int getSize()	{return size_;}
 
-		//int getLevel() {return level_;}
+		int getLevel() {return level_;}
 
 		list_t accessBoard() const { return list_;}
 
-		void updateBoard(int level, int pos){int level_ = level, pos_= pos;list_.at(level_)=pos_;}
+		void updateBoard(int pos, int val){int pos_ = pos, val_= val;list_.at(pos_)=val_;}
 
-		void solveNqueen(Board board, unsigned int size,int level){
+		void clearBoard(){ Board::list_.clear();}
 
-			int size_ = size, level_ = level;
-			//Board board_(board.accessBoard(),level_);
-			Board board_(board.accessBoard(), size_, level_);
-			//std::cout << "I'm here again" << std::endl;
+
+		void solveNqueen(list_t list, unsigned int size, int level){
+
+			list_t list_ = list;
+			unsigned int size_ = size;
+			int level_ = level;
+			Board board_(list_, size_, level_);
+
 			if(level_== size_){
 				std::cout << std::endl << "Solution "<<(++c_soln)<<":"<< std::endl;
 				for(int i=0; i < size_; i++){
@@ -110,7 +135,7 @@ namespace hpx { namespace components { namespace server
 					board_.updateBoard(level_,i);
 					if(board_.checkBoard(board_.accessBoard(),level_)){
 						//soln_cnt = Queens(board,size,level+1);
-						solveNqueen(board_,size_,level_+1);
+						solveNqueen(board_.accessBoard(),size_,level_+1);
 					}
 				}
 			}
@@ -118,13 +143,40 @@ namespace hpx { namespace components { namespace server
 			//return c_soln;
 		}
 
+		////////////////////////////////test function////////////////////////////
+		void testBoard(list_t list, unsigned int size, int level){
+
+			Board board_(list, size, 0);
+			if(board_.accessBoard().at(0) == 5){
+				board_.initBoard(5,0);
+				board_.printBoard();
+				}
+			else{
+			}
+
+
+		}
+
 		typedef hpx::actions::action2<
 				Board, board_init, unsigned int, int, &Board::initBoard
 			> init_action;
 
+		typedef hpx::actions::action0<
+				Board, board_print, &Board::printBoard
+			> print_action;
+				
+
 		typedef hpx::actions::result_action0<
 				Board const, list_t, board_access, &Board::accessBoard
 			> access_action;
+
+		typedef hpx::actions::result_action0<
+				Board, unsigned int, board_size, &Board::getSize
+			> size_action;
+
+		typedef hpx::actions::result_action0<
+				Board, int, board_level, &Board::getLevel
+			> level_action;
 
 		typedef hpx::actions::action2<
 				Board, board_update, int, int, &Board::updateBoard
@@ -135,8 +187,16 @@ namespace hpx { namespace components { namespace server
 			>check_action;
 
 		typedef hpx::actions::action3<
-				Board, board_solve, Board, unsigned int, int, &Board::solveNqueen
+				Board, board_solve, list_t, unsigned int, int, &Board::solveNqueen
 			>solve_action;
+
+		typedef hpx::actions::action3<
+				Board, board_test, list_t, unsigned int, int, &Board::testBoard
+			>test_action;
+
+		typedef hpx::actions::action0<
+				Board, board_clear, &Board::clearBoard
+			>clear_action;
 	};
 
 }}}
