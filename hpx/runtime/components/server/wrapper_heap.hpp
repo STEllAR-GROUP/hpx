@@ -15,10 +15,11 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/util/default_malloc.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#if !defined(_DEBUG)
+#if !defined(DEBUG)
 #include <hpx/util/spinlock_pool.hpp>
 #endif
 
@@ -68,7 +69,7 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-#if !defined(_DEBUG)
+#if !defined(DEBUG)
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
 #else
@@ -128,7 +129,7 @@ namespace hpx { namespace components { namespace detail
 
         bool alloc(T** result, std::size_t count = 1)
         {
-#if !defined(_DEBUG)
+#if !defined(DEBUG)
             scoped_lock l(this);
 #else
             scoped_lock l(mtx_);
@@ -158,7 +159,7 @@ namespace hpx { namespace components { namespace detail
         {
             BOOST_ASSERT(did_alloc(p));
 
-#if !defined(_DEBUG)
+#if !defined(DEBUG)
             scoped_lock l(this);
 #else
             scoped_lock l(mtx_);
@@ -202,7 +203,7 @@ namespace hpx { namespace components { namespace detail
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
-#if !defined(_DEBUG)
+#if !defined(DEBUG)
                 scoped_lock l(this);
 #else
                 scoped_lock l(mtx_);
@@ -372,17 +373,21 @@ namespace hpx { namespace components { namespace detail
     namespace one_size_heap_allocators
     {
         ///////////////////////////////////////////////////////////////////////
-        // simple allocator which gets the memory from malloc, but which does
-        // not reallocate the heap (it doesn't grow)
+        // TODO: this interface should conform to the Boost.Pool allocator
+        // inteface/the interface required by <hpx/util/allocator.hpp>, to
+        // maximize code reuse and consistency - wash.
+        //
+        // simple allocator which gets the memory from the default malloc,
+        // but which does not reallocate the heap (it doesn't grow)
         struct fixed_mallocator  
         {
             static void* alloc(std::size_t& size) 
             { 
-                return malloc(size); 
+                return hpx::memory::default_malloc::void_malloc(size); 
             }
             static void free(void* p) 
             { 
-                ::free(p); 
+                hpx::memory::default_malloc::free(p); 
             }
             static void* realloc(std::size_t &size, void *p)
             { 

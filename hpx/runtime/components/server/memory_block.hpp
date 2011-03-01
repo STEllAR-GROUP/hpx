@@ -136,8 +136,15 @@ namespace hpx { namespace components { namespace server { namespace detail
     {
         if (0 == --p->count_) {
             p->~memory_block_header();
-            delete [] (boost::uint8_t*)p;
+            hpx::memory::default_malloc::free(p);
         }
+    }
+
+    template <typename T>
+    inline T* allocate_block(std::size_t size)
+    {
+        return (T*) hpx::memory::default_malloc::void_malloc
+            (size + sizeof(detail::memory_block_header));
     }
 }}}}
 
@@ -267,12 +274,11 @@ namespace hpx { namespace components
             ar >> size;
             ar >> act;
 
-            server::detail::memory_block_header* p = 
-                (server::detail::memory_block_header*)new boost::uint8_t[
-                    size + sizeof(server::detail::memory_block_header)];
-            data_.reset(new (p) server::detail::memory_block_header(
-                size, act->get_instance()));
-            delete act;
+            typedef server::detail::memory_block_header alloc_type;
+            alloc_type* p = server::detail::allocate_block<alloc_type>(size);
+
+            data_.reset(new (p) alloc_type(size, act->get_instance()));
+            hpx::memory::default_malloc::free(act);
 
             ar >> boost::serialization::make_array(data_->get_ptr(), size);
         }
@@ -407,9 +413,9 @@ namespace hpx { namespace components { namespace server
                 actions::manage_object_action_base const& act) 
           : component_(0) 
         {
-            detail::memory_block* p = (detail::memory_block*)new boost::uint8_t[
-                sizeof(detail::memory_block_header) + size];
-            new (p) detail::memory_block(this, size, act);
+            typedef detail::memory_block alloc_type;
+            alloc_type* p = server::detail::allocate_block<alloc_type>(size);
+            new (p) alloc_type(this, size, act);
             component_.reset(p);
         }
 
@@ -420,9 +426,9 @@ namespace hpx { namespace components { namespace server
           : component_(0) 
         {
             std::size_t size = rhs->get_size();
-            detail::memory_block* p = (detail::memory_block*)new boost::uint8_t[
-                sizeof(detail::memory_block_header) + size];
-            new (p) detail::memory_block(this, size, rhs, act);
+            typedef detail::memory_block alloc_type;
+            alloc_type* p = server::detail::allocate_block<alloc_type>(size);
+            new (p) alloc_type(this, size, rhs, act);
             component_.reset(p);
         }
 
@@ -513,7 +519,7 @@ namespace hpx { namespace components { namespace server
         static void* operator new(std::size_t size)
         {
             if (size > sizeof(memory_block))
-                return ::operator new(size);
+                return hpx::memory::default_malloc::void_malloc(size);
             return get_heap().alloc();
         }
         static void operator delete(void* p, std::size_t size)
@@ -522,7 +528,7 @@ namespace hpx { namespace components { namespace server
                 return;     // do nothing if given a NULL pointer
 
             if (size != sizeof(memory_block)) {
-                ::operator delete(p);
+                hpx::memory::default_malloc::free(p);
                 return;
             }
             get_heap().free(p);
