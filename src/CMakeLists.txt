@@ -96,6 +96,15 @@ set (hpxlib_runtime_HEADERS
 source_group("Header Files\\runtime" 
     FILES ${hpxlib_runtime_HEADERS})
 
+# memory
+set(hpxlib_memory_HEADERS
+    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/dlmalloc.hpp
+    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/nedmalloc.hpp
+    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/nedtrie.hpp
+    ${hpx_SOURCE_DIR}/hpx/memory/nedmalloc/usermodepageallocator.hpp)
+source_group("Header Files\\memory" 
+    FILES ${hpxlib_memory_HEADERS})
+
 # actions 
 set (hpxlib_actions_HEADERS
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_constructors.hpp
@@ -260,6 +269,7 @@ set (hpxlib_HEADERS
     ${hpxlib_performance_counters_stubs_HEADERS}
     ${hpxlib_performance_counters_server_HEADERS}
     ${hpxlib_runtime_HEADERS}
+    ${hpxlib_memory_HEADERS}
     ${hpxlib_actions_HEADERS}
     ${hpxlib_applier_HEADERS}
     ${hpxlib_components_HEADERS}
@@ -364,6 +374,12 @@ set (hpxlib_threadmanager_SOURCES
 source_group ("Source Files\\runtime\\threads" 
     FILES ${hpxlib_threadmanager_SOURCES})
 
+# memory
+set(hpxlib_memory_SOURCES
+    ${hpx_SOURCE_DIR}/src/memory/nedmalloc.cpp)
+source_group ("Source Files\\memory" 
+    FILES ${hpxlib_memory_SOURCES})
+
 # util 
 set (hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
@@ -390,6 +406,7 @@ set (hpxlib_SOURCES
     ${hpxlib_naming_SOURCES}
     ${hpxlib_parcelset_SOURCES}
     ${hpxlib_threadmanager_SOURCES}
+    ${hpxlib_memory_SOURCES}
     ${hpxlib_util_SOURCES})
 
 # add source file from coroutine library 

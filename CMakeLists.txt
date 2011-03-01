@@ -145,6 +145,14 @@ hpx_info("install" "Install root is ${CMAKE_PREFIX}")
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 ################################################################################
+# variant configuration
+################################################################################
+if(   "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
+   OR "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+  add_definitions(-DDEBUG)
+endif()
+
+################################################################################
 # rpath configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
@@ -201,6 +209,7 @@ else()
     if(HPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+      add_definitions(-DNEDMALLOC_DLL_EXPORTS)
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")

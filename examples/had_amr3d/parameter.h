@@ -59,8 +59,8 @@ struct Par {
       int gw;
       std::vector<std::size_t> rowsize,level_row;
       std::vector<std::size_t> level_begin, level_end;
-      std::vector<had_double_type> min;
-      std::vector<had_double_type> max;
+      had_vector<had_double_type>::type min;
+      had_vector<had_double_type>::type max;
 };
 
 #if defined(__cplusplus)

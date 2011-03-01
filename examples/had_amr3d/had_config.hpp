@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
 //                          Matt Anderson 
+//  Copyright (c)      2011 Bryce Lelbach
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -17,5 +18,13 @@ typedef double had_double_type;
 #endif
 const int num_eqns = 5;
 const int maxlevels = 20;
+
+#include <vector>
+#include <hpx/memory/nedmalloc/nedmalloc.hpp>
+
+template<class T>
+struct had_vector {
+  typedef std::vector<T, nedalloc::nedallocator<T> > type;
+};
 
 #endif

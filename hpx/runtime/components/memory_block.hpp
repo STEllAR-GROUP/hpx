@@ -192,17 +192,20 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     // helper functions to get several memory pointers asynchronously
 
-    template <typename T>
+    template <typename T, typename AllocA, typename AllocB>
     inline void
-    get_memory_block_async(std::vector<access_memory_block<T> >& results,
-        std::vector<naming::id_type> const& gids)
+    get_memory_block_async(std::vector<access_memory_block<T>, AllocA>& results,
+        std::vector<naming::id_type, AllocB> const& gids)
     {
-        typedef std::vector<lcos::future_value<memory_block_data> > 
-            lazy_results_type;
+        typedef std::vector<lcos::future_value<memory_block_data>,
+            typename AllocA::template rebind<
+                lcos::future_value<memory_block_data>
+            >::other
+        > lazy_results_type;
         lazy_results_type lazy_results;
 
         // first invoke all remote operations
-        typedef typename std::vector<naming::id_type>::const_iterator
+        typedef typename std::vector<naming::id_type, AllocB>::const_iterator
             const_iterator_type;
 
         const_iterator_type end = gids.end();
@@ -216,18 +219,21 @@ namespace hpx { namespace components
             results.push_back((*lit).get());
     }
 
-    template <typename T>
+    template <typename T, typename AllocA, typename AllocB>
     inline access_memory_block<T>
-    get_memory_block_async(std::vector<access_memory_block<T> >& results,
-        std::vector<naming::id_type> const& gids, 
+    get_memory_block_async(std::vector<access_memory_block<T>, AllocA>& results,
+        std::vector<naming::id_type, AllocB> const& gids, 
         naming::id_type const& result)
     {
-        typedef std::vector<lcos::future_value<memory_block_data> > 
-            lazy_results_type;
+        typedef std::vector<lcos::future_value<memory_block_data>,
+            typename AllocA::template rebind<
+                lcos::future_value<memory_block_data>
+            >::other
+        > lazy_results_type;
         lazy_results_type lazy_results;
 
         // first invoke all remote operations
-        typedef typename std::vector<naming::id_type>::const_iterator
+        typedef typename std::vector<naming::id_type, AllocB>::const_iterator
             const_iterator_type;
 
         const_iterator_type end = gids.end();

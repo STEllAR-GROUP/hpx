@@ -79,7 +79,7 @@ namespace hpx { namespace components { namespace amr
     struct scoped_values_lock
     {
         scoped_values_lock(
-            std::vector<access_memory_block<stencil_data> >& values)
+            had_vector<access_memory_block<stencil_data> >::type& values)
         {
             mutexes_.reserve(values.size());
             BOOST_FOREACH(access_memory_block<stencil_data>& val, values)
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace amr
         }
         scoped_values_lock(
             access_memory_block<stencil_data>& value, 
-            std::vector<access_memory_block<stencil_data> >& values)
+            had_vector<access_memory_block<stencil_data> >::type& values)
         {
             mutexes_.reserve(values.size()+1);
             BOOST_FOREACH(access_memory_block<stencil_data>& val, values)
