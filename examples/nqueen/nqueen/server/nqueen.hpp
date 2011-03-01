@@ -128,19 +128,15 @@ namespace hpx { namespace components { namespace server
 					}
 					std::cout << std::endl;
 				}
-				std::cout << "reached here" << std::endl;
 			}
 			else{
 				for(int i = 0; i < size_; i++){
 					board_.updateBoard(level_,i);
 					if(board_.checkBoard(board_.accessBoard(),level_)){
-						//soln_cnt = Queens(board,size,level+1);
 						solveNqueen(board_.accessBoard(),size_,level_+1);
 					}
 				}
 			}
-			//delete &board;
-			//return c_soln;
 		}
 
 		////////////////////////////////test function////////////////////////////

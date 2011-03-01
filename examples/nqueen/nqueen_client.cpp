@@ -45,30 +45,11 @@ threads::thread_state_enum hpx_main()
 			std::cin >> arg;
 			unsigned int sz_temp = boost::lexical_cast<unsigned int>(arg);
 			board.initBoard(sz_temp, 0);
-			std::cout << "Board Access at size -1:" << board.accessBoard().at(sz_temp - 1) << std::endl;
-			std::cout << "Board size: " << board.getSize() <<"  "<< "Board Level: " << board.getLevel() << std::endl;
-			board.printBoard();
-			std::cout<< "initial Value" << std::endl;
-			std::cout << "+++++++++++++++++++++++++++++++" << std::endl;
-			board.updateBoard(board.getLevel(), 5);
-			board.testBoard(board.accessBoard(), board.getSize(), board.getLevel());
-			std::cout << "OLD VALUE" << std::endl;
-			board.printBoard();
-			std::cout << "===============================" << std::endl;
-			//std::cout << "Board check: " << board.checkBoard(board.accessBoard(), board.getLevel()) << std::endl;
-			//board.updateBoard(board.getLevel(), 0);
-			//board.testBoard(board.accessBoard(), board.getSize(), board.getLevel());*/
-
 			board.solveNqueen(board.accessBoard(), sz_temp, 0);
-			//board.solveNqueen(board, boost::lexical_cast<unsigned int>(arg), 0);
-			//board.printBoard();
-			//board.solveNqueens(this, boost::lexical_cast<int>(arg), 0);
 		}
-		else if(cmd == ""){
+		else if(cmd == "default"){
 			board.initBoard(N,N);
-			//board.solveNqueen(board, N, 0);
-			//board.solveNqueen(board, N, 0);
-			//board.printBoard();
+			board.solveNqueen(board.accessBoard(), N, 0);
 		}
 		else if(cmd == "print"){
 			board.printBoard();
@@ -81,7 +62,7 @@ threads::thread_state_enum hpx_main()
 			break;
 		}
 		else {
-			std::cout << "Enter the right command." <<std::endl;
+			std::cout << "Invalid Command." <<std::endl;
 			std::cout << "Options: size[value] | default | print | clear | quit" << std::endl;
 		}
 		std::cin >> cmd;
