@@ -20,11 +20,11 @@ const int num_eqns = 5;
 const int maxlevels = 20;
 
 #include <vector>
-#include <hpx/memory/nedmalloc/nedmalloc.hpp>
+#include <hpx/memory/jemalloc_allocator.hpp>
 
 template<class T>
 struct had_vector {
-  typedef std::vector<T, nedalloc::nedallocator<T> > type;
+  typedef std::vector<T, typename hpx::memory::jemalloc_allocator<T>::type > type;
 };
 
 #endif

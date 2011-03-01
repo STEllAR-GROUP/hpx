@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 count = 0;
                 std::cout << " PX Timestep: " <<  val.timestep_ 
                           << " PX Time: " << val.timestep_*par->dx0*par->lambda  
-                          << " PX Level: " << val.level_  << std::endl << std::flush;
+                          << " PX Level: " << val.level_  << std::endl;
             } 
 #if 0
            // for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // output to file "output.dat"
-        std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
+        had_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {

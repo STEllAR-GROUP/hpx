@@ -1402,8 +1402,8 @@ namespace hpx { namespace components { namespace amr
             boundary = true;
           } 
 
-          std::vector<nodedata* > vecval;
-          std::vector<nodedata>::iterator niter;
+          had_vector<nodedata*>::type vecval;
+          had_vector<nodedata>::type::iterator niter;
           // this is really a 3d array
           vecval.resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
 
