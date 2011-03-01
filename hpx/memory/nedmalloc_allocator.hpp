@@ -30,7 +30,9 @@ struct nedmalloc
 };
 
 template <typename T>
-struct nedmalloc_allocator: memory::allocator<memory::nedmalloc, T> { };
+struct nedmalloc_allocator {
+  typedef memory::allocator<memory::nedmalloc, T> type;
+};
 
 }}
 

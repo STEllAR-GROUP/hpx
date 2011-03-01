@@ -30,7 +30,9 @@ struct jemalloc
 };
 
 template <typename T>
-struct jemalloc_allocator: memory::allocator<memory::jemalloc, T> { };
+struct jemalloc_allocator {
+  typedef memory::allocator<memory::jemalloc, T> type;
+};
 
 }}
 
