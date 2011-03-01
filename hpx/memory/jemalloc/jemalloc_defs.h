@@ -13,8 +13,8 @@
  * #include'ing jemalloc.h in order to cause name mangling that corresponds to
  * the API prefixing.
  */
-#define JEMALLOC_PREFIX "hpx_jemalloc_"
-#define JEMALLOC_CPREFIX "HPX_JEMALLOC_"
+#define JEMALLOC_PREFIX "hpx_jemalloc"
+#define JEMALLOC_CPREFIX "HPX_JEMALLOC"
 #if (defined(JEMALLOC_PREFIX) && defined(JEMALLOC_MANGLE))
 #define JEMALLOC_P(name) HPX_JEMALLOC_##name
 #endif
