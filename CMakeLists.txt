@@ -45,7 +45,7 @@ execute_process(COMMAND "${hpx_SOURCE_DIR}/tools/build_env.py" "${CMAKE_CXX_COMP
 
 if(build_environment)
   set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-  hpx_info("build_env" "Build environment is ${BUILDNAME}")
+  hpx_info("build_env" "Build environment is ${BUILDNAME}.")
 else()
   hpx_warn("build_env" "Couldn't determine build environment (install python).") 
 endif()
@@ -142,7 +142,7 @@ endif()
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
-hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}")
+hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
