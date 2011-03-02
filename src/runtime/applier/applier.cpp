@@ -141,7 +141,8 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), desc);
+            boost::bind(&thread_function_nullary, func), 
+            desc ? desc : "<unknown>");
         app->get_thread_manager().register_work(data, state, ec);
     }
 
@@ -159,7 +160,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), desc);
+            boost::bind(&thread_function, func), desc ? desc : "<unknown>");
         app->get_thread_manager().register_work(data, state, ec);
     }
 
@@ -177,7 +178,7 @@ namespace hpx { namespace applier
             return;
         }
 
-        threads::thread_init_data data(func, desc, lva);
+        threads::thread_init_data data(func, desc ? desc : "<unknown>", lva);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
