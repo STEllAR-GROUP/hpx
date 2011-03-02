@@ -16,6 +16,8 @@ namespace hpx { namespace components { namespace stubs
     template <typename ServerComponent>
     struct stub_base 
     {
+        typedef ServerComponent server_component_type;
+
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a component
         static lcos::future_value<naming::id_type, naming::gid_type>
@@ -48,20 +50,20 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a new instance of an simple_accumulator
         static naming::id_type
-        create(naming::gid_type const& gid, component_type type, 
+        create_sync(naming::gid_type const& gid, component_type type, 
             std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(gid, type, count);
         }
 
         static naming::id_type
-        create(naming::gid_type const& gid, std::size_t count = 1)
+        create_sync(naming::gid_type const& gid, std::size_t count = 1)
         {
-            return create(gid, get_component_type<ServerComponent>(), count);
+            return create_sync(gid, get_component_type<ServerComponent>(), count);
         }
 
         static naming::id_type
-        create(naming::id_type const& gid, component_type type, 
+        create_sync(naming::id_type const& gid, component_type type, 
             std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(
@@ -69,9 +71,9 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static naming::id_type
-        create(naming::id_type const& gid, std::size_t count = 1)
+        create_sync(naming::id_type const& gid, std::size_t count = 1)
         {
-            return create(gid.get_gid(), 
+            return create_sync(gid.get_gid(), 
                 get_component_type<ServerComponent>(), count);
         }
 
@@ -113,21 +115,21 @@ namespace hpx { namespace components { namespace stubs
         /// Create a new instance of an simple_accumulator
         template <typename Arg0>
         static naming::id_type
-        create_one(naming::gid_type const& gid, component_type type, Arg0 const& arg0)
+        create_one_sync(naming::gid_type const& gid, component_type type, Arg0 const& arg0)
         {
             return stubs::runtime_support::create_one_component(gid, type, arg0);
         }
 
         template <typename Arg0>
         static naming::id_type
-        create_one(naming::gid_type const& gid, Arg0 const& arg0)
+        create_one_sync(naming::gid_type const& gid, Arg0 const& arg0)
         {
-            return create_one(gid, get_component_type<ServerComponent>(), arg0);
+            return create_one_sync(gid, get_component_type<ServerComponent>(), arg0);
         }
 
         template <typename Arg0>
         static naming::id_type
-        create_one(naming::id_type const& gid, component_type type, Arg0 const& arg0)
+        create_one_sync(naming::id_type const& gid, component_type type, Arg0 const& arg0)
         {
             return stubs::runtime_support::create_one_component(
                 gid.get_gid(), type, arg0);
@@ -135,9 +137,9 @@ namespace hpx { namespace components { namespace stubs
 
         template <typename Arg0>
         static naming::id_type
-        create_one(naming::id_type const& gid, Arg0 const& arg0)
+        create_one_sync(naming::id_type const& gid, Arg0 const& arg0)
         {
-            return create_one(gid.get_gid(), 
+            return create_one_sync(gid.get_gid(), 
                 get_component_type<ServerComponent>(), arg0);
         }
 
@@ -166,7 +168,6 @@ namespace hpx { namespace components { namespace stubs
             gid = naming::invalid_id;
         }
     };
-
 }}}
 
 #endif

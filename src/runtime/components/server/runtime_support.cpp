@@ -202,7 +202,8 @@ namespace hpx { namespace components { namespace server
                 strm << "global id " << gid << " is not bound to any "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
+                    "runtime_support::free_component", 
+                    HPX_OSSTREAM_GETSTRING(strm));
                 return;
             }
 
@@ -214,7 +215,8 @@ namespace hpx { namespace components { namespace server
                 strm << "global id " << gid << " is not bound to any local "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "destroy<Component>", HPX_OSSTREAM_GETSTRING(strm));
+                    "runtime_support::free_component", 
+                    HPX_OSSTREAM_GETSTRING(strm));
                 return;
             }
 
@@ -230,9 +232,20 @@ namespace hpx { namespace components { namespace server
         if (it == components_.end()) {
             // we don't know anything about this component
             HPX_OSSTREAM strm;
+
             strm << "attempt to destroy component " << gid 
                  << " of invalid/unknown type: " 
-                 << components::get_component_type_name(type);
+                 << components::get_component_type_name(type)
+                 << std::endl;
+
+            strm << "list of registered components: \n";
+            component_map_type::iterator end = components_.end();
+            for (component_map_type::iterator it = components_.begin(); it!= end; ++it)
+            {
+                strm << "  " << components::get_component_type_name((*it).first) 
+                     << std::endl;
+            }
+
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::free_component",
                 HPX_OSSTREAM_GETSTRING(strm));
@@ -483,8 +496,22 @@ namespace hpx { namespace components { namespace server
             }
 
             // store component factory and module for later use
-            std::pair<component_map_type::iterator, bool> p = components_.insert(
-                    component_map_type::value_type(t, std::make_pair(factory, d)));
+            component_factory_type data(factory, d);
+            std::pair<component_map_type::iterator, bool> p = 
+                components_.insert(component_map_type::value_type(t, data));
+
+            if (components::get_derived_type(t) != 0) {
+            // insert three component types, the base type, the derived 
+            // type and the combined one.
+                if (p.second) {
+                    p = components_.insert(component_map_type::value_type(
+                            components::get_derived_type(t), data));
+                }
+                if (p.second) {
+                    p = components_.insert(component_map_type::value_type(
+                            components::get_base_type(t), data));
+                }
+            }
 
             if (!p.second) {
                 LRT_(error) << "duplicate component id: " << instance

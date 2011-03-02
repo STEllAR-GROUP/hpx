@@ -34,14 +34,14 @@ namespace hpx { namespace components
             std::size_t count = 1)
         {
             free();
-            gid_ = stub_type::create(targetgid, type, count);
+            gid_ = stub_type::create_sync(targetgid, type, count);
             return static_cast<Derived&>(*this);
         }
 
         Derived& create(naming::gid_type const& targetgid, std::size_t count = 1)
         {
             free();
-            gid_ = stub_type::create(targetgid, count);
+            gid_ = stub_type::create_sync(targetgid, count);
             return static_cast<Derived&>(*this);
         }
 
@@ -62,7 +62,7 @@ namespace hpx { namespace components
             Arg0 const& arg0)
         {
             free();
-            gid_ = stub_type::create_one(gid, type, arg0);
+            gid_ = stub_type::create_one_sync(gid, type, arg0);
             return static_cast<Derived&>(*this);
         }
 
@@ -70,7 +70,7 @@ namespace hpx { namespace components
         Derived& create_one(naming::gid_type const& gid, Arg0 const& arg0)
         {
             free();
-            gid_ = stub_type::create_one(gid, arg0);
+            gid_ = stub_type::create_one_sync(gid, arg0);
             return static_cast<Derived&>(*this);
         }
 
@@ -90,12 +90,12 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         void free(component_type)
         {
-            gid_ = naming::invalid_id;
+            stub_base::free(gid_);
         }
 
         void free()
         {
-            gid_ = naming::invalid_id;
+            stub_base::free(gid_);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -114,7 +114,6 @@ namespace hpx { namespace components
     protected:
         naming::id_type gid_;
     };
-
 }}
 
 #endif

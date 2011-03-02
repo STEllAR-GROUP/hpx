@@ -36,7 +36,7 @@ typedef hpx::components::amr::server::logging had_logging_type;
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     hpx::components::simple_component<had_stencil_type>, 
-    had_stencil, "had_functional_component");
+    had_stencil, "functional_component_type");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_type);
 

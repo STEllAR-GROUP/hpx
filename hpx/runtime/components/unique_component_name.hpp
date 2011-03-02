@@ -23,47 +23,47 @@ namespace hpx { namespace components
     };
 }}
 
-#define HPX_DEF_UNIQUE_COMPONENT_NAME(ComponentType, name)          \
-    namespace hpx { namespace components                            \
-    {                                                               \
-        template <>                                                 \
-        struct unique_component_name<ComponentType>                 \
-        {                                                           \
-            typedef char const* type;                               \
-                                                                    \
-            static type call (void)                                 \
-            {                                                       \
-                return BOOST_PP_STRINGIZE(name);                    \
-            }                                                       \
-        };                                                          \
-    }}                                                              \
+#define HPX_DEF_UNIQUE_COMPONENT_NAME(ComponentType, name)                    \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <>                                                           \
+        struct unique_component_name<ComponentType>                           \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return BOOST_PP_STRINGIZE(name);                              \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
     /***/
 
-#define HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(ComponentType, name, basename) \
-    namespace hpx { namespace components                            \
-    {                                                               \
-        template <>                                                 \
-        struct unique_component_name<ComponentType>                 \
-        {                                                           \
-            typedef char const* type;                               \
-                                                                    \
-            static type call (void)                                 \
-            {                                                       \
-                return BOOST_PP_STRINGIZE(name);                    \
-            }                                                       \
-        };                                                          \
-                                                                    \
-        template <>                                                 \
-        struct unique_component_name<ComponentType, base_name>      \
-        {                                                           \
-            typedef char const* type;                               \
-                                                                    \
-            static type call (void)                                 \
-            {                                                       \
-                return basename;                                    \
-            }                                                       \
-        };                                                          \
-    }}                                                              \
+#define HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(ComponentType, name, basename)  \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <>                                                           \
+        struct unique_component_name<ComponentType>                           \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return BOOST_PP_STRINGIZE(name);                              \
+            }                                                                 \
+        };                                                                    \
+                                                                              \
+        template <>                                                           \
+        struct unique_component_name<ComponentType, base_name>                \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return basename;                                              \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
     /***/
 
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
