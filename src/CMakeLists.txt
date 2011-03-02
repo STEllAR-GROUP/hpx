@@ -98,6 +98,7 @@ source_group("Header Files\\runtime"
 
 # nedmalloc
 set(hpxlib_nedmalloc_HEADERS
+    ${hpx_SOURCE_DIR}/hpx/util/nedmalloc_allocator.hpp
     ${hpx_SOURCE_DIR}/external/nedmalloc/hpx_nedmalloc/dlmalloc.h
     ${hpx_SOURCE_DIR}/external/nedmalloc/hpx_nedmalloc/nedmalloc.h)
 source_group("Header Files\\memory\\nedmalloc" 
@@ -105,6 +106,7 @@ source_group("Header Files\\memory\\nedmalloc"
 
 # jemalloc
 set(hpxlib_jemalloc_HEADERS
+    ${hpx_SOURCE_DIR}/hpx/util/jemalloc_allocator.hpp
     ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/arena.h
     ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/base.h
     ${hpx_SOURCE_DIR}/external/jemalloc/hpx_jemalloc/chunk.h
@@ -282,6 +284,7 @@ set (hpxlib_util_HEADERS
     ${hpx_SOURCE_DIR}/hpx/util/serialize_sequence.hpp
     ${hpx_SOURCE_DIR}/hpx/util/spinlock_pool.hpp
     ${hpx_SOURCE_DIR}/hpx/util/static.hpp
+    ${hpx_SOURCE_DIR}/hpx/util/system_allocator.hpp
     ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
     ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
     ${hpx_SOURCE_DIR}/hpx/util/util.hpp
@@ -309,13 +312,11 @@ set (hpxlib_HEADERS
     ${hpxlib_threadmanager_policies_HEADERS}
     ${hpxlib_util_HEADERS})
 
-if(NOT MSVC AND NOT HPX_NO_JEMALLOC)
+if("${HPX_MALLOC}" STREQUAL "jemalloc")
   list(APPEND hpxlib_HEADERS
        ${hpxlib_jemalloc_HEADERS}
        ${hpx_SOURCE_DIR}/hpx/util/jemalloc_allocator.hpp)
-endif()
-
-if(NOT HPX_NO_NEDMALLOC)
+elseif("${HPX_MALLOC}" STREQUAL "nedmalloc")
   list(APPEND hpxlib_HEADERS
        ${hpxlib_nedmalloc_HEADERS}
        ${hpx_SOURCE_DIR}/hpx/util/nedmalloc_allocator.hpp)
@@ -477,11 +478,9 @@ set (hpxlib_SOURCES
     ${hpxlib_threadmanager_SOURCES}
     ${hpxlib_util_SOURCES})
 
-if(NOT MSVC AND NOT HPX_NO_JEMALLOC)
+if("${HPX_MALLOC}" STREQUAL "jemalloc")
   list(APPEND hpxlib_SOURCES ${hpxlib_jemalloc_SOURCES})
-endif()
-
-if(NOT HPX_NO_NEDMALLOC)
+elseif("${HPX_MALLOC}" STREQUAL "nedmalloc")
   list(APPEND hpxlib_SOURCES ${hpxlib_nedmalloc_SOURCES})
 endif()
 

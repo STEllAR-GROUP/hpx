@@ -202,6 +202,10 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "jemalloc")
+  endif()
+
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
@@ -211,7 +215,9 @@ else()
     if(HPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-      add_definitions(-DNEDMALLOC_DLL_EXPORTS)
+      if("${HPX_MALLOC}" STREQUAL "nedmalloc")
+        add_definitions(-DNEDMALLOC_DLL_EXPORTS)
+      endif()
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
@@ -263,6 +269,19 @@ endif()
 ################################################################################
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
   add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
+endif()
+
+################################################################################
+# malloc configuration 
+################################################################################
+if("${HPX_MALLOC}" STREQUAL "jemalloc")
+  add_definitions(-DHPX_USE_JEMALLOC)
+  hpx_info("malloc" "Using jemalloc allocator.")
+elseif("${HPX_MALLOC}" STREQUAL "nedmalloc")
+  add_definitions(-DHPX_USE_NEDMALLOC)
+  hpx_info("malloc" "Using nedmalloc allocator.")
+else()
+  hpx_info("malloc" "Using default system allocator.")
 endif()
 
 ################################################################################
