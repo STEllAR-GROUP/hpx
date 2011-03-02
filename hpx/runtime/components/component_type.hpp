@@ -23,7 +23,6 @@ namespace hpx { namespace components
 
         // LCO's
         component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
-        component_last,
 
         component_base_lco_with_value = 
             ((4 << 16) | component_base_lco),
@@ -42,6 +41,8 @@ namespace hpx { namespace components
             ((9 << 16) | component_base_lco_with_value),
 
         component_dataflow_block = 10,  ///< a dataflow block
+
+        component_last,
         component_first_dynamic = component_last
     };
 
