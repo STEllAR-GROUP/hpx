@@ -53,14 +53,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
         hpx::util::high_resolution_timer t;
         std::vector<naming::id_type> result_data;
-        
-        // we are in spherical symmetry, r=0 is the smallest radial domain point             
+
+        // we are in spherical symmetry, r=0 is the smallest radial domain point
         components::amr::unigrid_mesh unigrid_mesh;
         unigrid_mesh.create(here);
         result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
             do_logging ? logging_type : components::component_invalid,par);
-        printf("Elapsed time: %f s\n", t.elapsed());
-    
+
+        std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
+
     // provide some wait time to read the elapsed time measurement
     //std::cout << " Hit return " << std::endl;
     //int junk;
@@ -418,22 +419,32 @@ int main(int argc, char* argv[])
         numvals = par->rowsize[0];
 
         // initialize and start the HPX runtime
+        std::size_t executed_threads = 0;
+
         if (scheduler == 0) {
           global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
           if (mode == hpx::runtime::worker) 
               rt.run(num_threads);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
-        } else if ( scheduler == 1) {
+
+          executed_threads = rt.get_executed_threads();
+        } 
+        else if (scheduler == 1) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
           if (mode == hpx::runtime::worker) 
               rt.run(num_threads);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
-        } else {
+
+          executed_threads = rt.get_executed_threads();
+        } 
+        else {
           BOOST_ASSERT(false);
         }
+
+        std::cout << "Executed number of PX threads: " << executed_threads << std::endl;
     }
     catch (std::exception& e) {
         std::cerr << "std::exception caught: " << e.what() << "\n";

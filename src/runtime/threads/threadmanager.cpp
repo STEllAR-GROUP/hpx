@@ -20,6 +20,8 @@
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <numeric>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
@@ -588,7 +590,7 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        tfunc(std::size_t num_thread)
+        tfunc(std::size_t num_thread, std::size_t& num_px_threads)
     {
         // wait for all threads to start up before before starting px work
         startup_->wait();   
@@ -615,7 +617,6 @@ namespace hpx { namespace threads
             }
 
             LTM_(info) << "tfunc(" << num_thread << "): start";
-            std::size_t num_px_threads = 0;
             try {
                 num_px_threads = tfunc_impl(num_thread);
             }
@@ -1010,20 +1011,24 @@ namespace hpx { namespace threads
         timer_pool_.run(false);
 
         running_ = false;
+        executed_threads_.reserve(num_threads);
+
         try {
             // run threads and wait for initialization to complete
             BOOST_ASSERT (NULL == startup_);
-            startup_ = new boost::barrier(num_threads+1);   
+            startup_ = new boost::barrier(num_threads+1);
 
             running_ = true;
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                LTM_(info) << "run: create OS thread: " << thread_num; 
+                LTM_(info) << "run: create OS thread: " << thread_num;
 
                 // create a new thread
-                threads_.push_back(new boost::thread(
-                    boost::bind(&threadmanager_impl::tfunc, this, thread_num)));
+                executed_threads_.push_back(0);
+                threads_.push_back(new boost::thread(boost::bind(
+                    &threadmanager_impl::tfunc, this, thread_num, 
+                    boost::ref(executed_threads_.back()))));
 
                 // set the new threads affinity (on Windows systems)
                 set_affinity(threads_.back(), thread_num, scheduler_.numa_sensitive());
@@ -1031,7 +1036,7 @@ namespace hpx { namespace threads
 
             // start timer pool as well
             timer_pool_.run(false);
-            
+
             // the main thread needs to have a unique thread_num
             init_tss(thread_num, scheduler_.numa_sensitive());
             startup_->wait();
@@ -1094,6 +1099,16 @@ namespace hpx { namespace threads
         }
         delete startup_;
         startup_ = NULL;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_executed_threads(std::size_t num) const
+    {
+        if (num != std::size_t(-1)) 
+            return executed_threads_[num];
+
+        return std::accumulate(executed_threads_.begin(), executed_threads_.end(), 0);
     }
 
     ///////////////////////////////////////////////////////////////////////////
