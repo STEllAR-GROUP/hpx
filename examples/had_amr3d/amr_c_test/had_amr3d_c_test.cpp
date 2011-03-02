@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace amr
 #endif
 
 void calcrhs(struct nodedata * rhs,
-             had_vector< nodedata* >::type const& vecval,
+             hpx::memory::default_vector< nodedata* >::type const& vecval,
              int flag, had_double_type const& dx,
              bool boundary,int i,int j,int k, Par const& par);
 
@@ -188,7 +188,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(had_vector< nodedata* >::type const& vecval, stencil_data* result, 
+int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stencil_data* result, 
   bool boundary,
   int *bbox, int compute_index, 
   had_double_type const& dt, had_double_type const& dx, had_double_type const& timestep,
@@ -196,8 +196,8 @@ int rkupdate(had_vector< nodedata* >::type const& vecval, stencil_data* result,
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
-  had_vector<nodedata>::type work,work2;
-  had_vector<nodedata* >::type pwork, pwork2;
+  hpx::memory::default_vector<nodedata>::type work,work2;
+  hpx::memory::default_vector<nodedata* >::type pwork, pwork2;
   static had_double_type const c_0_75 = 0.75;
   static had_double_type const c_0_25 = 0.25;
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
@@ -249,7 +249,7 @@ int rkupdate(had_vector< nodedata* >::type const& vecval, stencil_data* result,
       }
     }}}
 
-    had_vector<nodedata>::type::iterator n_iter;
+    hpx::memory::default_vector<nodedata>::type::iterator n_iter;
     for (n_iter=work.begin();n_iter!=work.end();++n_iter) pwork.push_back( &(*n_iter) );
 
   // -------------------------------------------------------------------------
@@ -292,7 +292,7 @@ int rkupdate(had_vector< nodedata* >::type const& vecval, stencil_data* result,
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-               had_vector< nodedata* >::type const& vecval,
+               hpx::memory::default_vector< nodedata* >::type const& vecval,
                 int flag, had_double_type const& dx,
                 bool boundary,int i,int j,int k, Par const& par)
 {

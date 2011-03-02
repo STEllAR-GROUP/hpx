@@ -66,6 +66,7 @@
   SUCH DAMAGE.
 */
 
+#include <cstdio>
 #include <cstring>
 #include "mpreal.h"
 

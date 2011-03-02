@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // output to file "output.dat"
-        had_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
+        hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {

@@ -946,7 +946,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         // get all input and result memory_block_data instances
-        had_vector<access_memory_block<stencil_data> >::type val;
+        hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
         access_memory_block<stencil_data> resultval = 
             get_memory_block_async(val, gids, result);
 
@@ -1402,8 +1402,8 @@ namespace hpx { namespace components { namespace amr
             boundary = true;
           } 
 
-          had_vector<nodedata*>::type vecval;
-          had_vector<nodedata>::type::iterator niter;
+          hpx::memory::default_vector<nodedata*>::type vecval;
+          hpx::memory::default_vector<nodedata>::type::iterator niter;
           // this is really a 3d array
           vecval.resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
 
