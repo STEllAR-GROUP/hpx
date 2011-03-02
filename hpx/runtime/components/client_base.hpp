@@ -90,12 +90,12 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         void free(component_type)
         {
-            stub_base::free(gid_);
+            stub_type::free(gid_);
         }
 
         void free()
         {
-            stub_base::free(gid_);
+            stub_type::free(gid_);
         }
 
         ///////////////////////////////////////////////////////////////////////
