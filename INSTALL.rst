@@ -91,10 +91,9 @@ POSIX Build Instructions
 
 1) Invoke CMake, setting the BOOST_ROOT cmake variable to point to the root
    of a Boost source tree or the root of a system-installed Boost (example
-   CMake configurations can be found in $HPX_ROOT/build). It is *strongly* 
-   advised to do an out of tree build. You can set the CMake variable 
-   CMAKE_PREFIX to specify an install location for HPX. By default, HPX
-   installs to /usr/local/.::
+   CMake configurations can be found in $HPX_ROOT/build). HPX requires an out
+   of tree build. You can set the CMake variable CMAKE_PREFIX to specify an
+   install location for HPX. By default, HPX installs to /usr/local/.::
 
   $ cd hpx
   $ mkdir my_hpx_build
@@ -113,4 +112,17 @@ POSIX Build Instructions
 
 If you have difficulty in compiling the code, please email 
 the `HPX developers <gopx@cct.lsu.edu>`_.
+
+Malloc Allocator
+================
+
+HPX supports the use of alternative malloc implementations. Currently, HPX ships
+with two allocators, `jemalloc`_ and `nedmalloc`_. In the default configuration,
+jemalloc is used for POSIX systems, and the system allocator is used on Windows.
+To switch allocators, set the CMake variable HPX_MALLOC to the name of your
+preferred allocator. Set the variable to "system" to use your default system
+allocator on POSIX.
+
+.. _jemalloc: http://www.canonware.com/jemalloc/
+.. _nedmalloc: http://www.nedprod.com/programs/portable/nedmalloc/
 
