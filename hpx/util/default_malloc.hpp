@@ -8,19 +8,23 @@
 #if !defined(HPX_76CF5A02_404F_4174_BCA2_6DEA15D4D981)
 #define HPX_76CF5A02_404F_4174_BCA2_6DEA15D4D981
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_USE_NEDMALLOC)
     #include <hpx/util/nedmalloc_allocator.hpp>
-#else
+#elif defined(HPX_USE_JEMALLOC)
     #include <hpx/util/jemalloc_allocator.hpp>
+#else
+    #include <hpx/util/system_allocator.hpp>
 #endif
 
 namespace hpx { namespace memory
 {
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_USE_NEDMALLOC)
     typedef hpx::memory::nedmalloc default_malloc; 
-#else
+#elif defined(HPX_USE_JEMALLOC)
     typedef hpx::memory::jemalloc default_malloc; 
+#else
+    typedef hpx::memory::system default_malloc; 
 #endif
 
 template <typename T>
