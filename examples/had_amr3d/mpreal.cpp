@@ -110,7 +110,7 @@
 #define NUMA_NODE_NUMBER() hpx::threads::get_numa_node_number()
 #endif
 
-#include "nedmalloc.c"
+#include <hpx/util/default_malloc.hpp>
 #endif // MPFR_USE_NED_ALLOCATOR
 
 using std::ws;
@@ -520,17 +520,17 @@ istream& operator>>(istream &is, mpreal& v)
 // Optimized dynamic memory allocation/(re-)deallocation.
 void * mpreal::mpreal_allocate(size_t alloc_size)
 {
-  return(nedalloc::nedmalloc(alloc_size));
+  return (hpx::memory::default_malloc::void_malloc(alloc_size));
 }
  
 void * mpreal::mpreal_reallocate(void *ptr, size_t old_size, size_t new_size)
 {
-  return(nedalloc::nedrealloc(ptr,new_size));
+  return (hpx::memory::default_malloc::realloc(ptr,new_size));
 }
  
 void mpreal::mpreal_free(void *ptr, size_t size)
 {
-  nedalloc::nedfree(ptr);
+  hpx::memory::default_malloc::free(ptr);
 }
 #endif
 

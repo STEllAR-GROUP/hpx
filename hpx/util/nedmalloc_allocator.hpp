@@ -37,9 +37,15 @@ struct nedmalloc
     }
 
     template <typename T>  
+    static T* realloc(T* p, size_type s)
+    {
+        return nedalloc::nedrealloc(p, s);
+    }
+
+    template <typename T>  
     static void free(T* p)
     {
-        nedalloc::nedfree(reinterpret_cast<void*>(p));
+        nedalloc::nedfree(p);
     }
 };
 

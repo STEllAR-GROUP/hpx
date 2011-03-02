@@ -37,9 +37,15 @@ struct jemalloc
     }
 
     template <typename T>  
+    static T* realloc(T* p, size_type s)
+    {
+        return HPX_JEMALLOC_realloc(p, s);
+    }
+
+    template <typename T>  
     static void free(T* p)
     {
-        HPX_JEMALLOC_free(reinterpret_cast<void*>(p));
+        HPX_JEMALLOC_free(p);
     }
 };
 
