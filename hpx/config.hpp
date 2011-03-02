@@ -11,6 +11,12 @@
 #include <hpx/config/export_definitions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Make sure DEBUG macro is defined consistently across platforms
+#if defined(_DEBUG) && !defined(DEBUG)
+#define DEBUG
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the global address resolver
 #define HPX_PORT 7910
 #define HPX_NAME_RESOLVER_ADDRESS   "127.0.0.1"
