@@ -18,6 +18,7 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/function.hpp>
+#include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -49,6 +50,52 @@ namespace hpx { namespace actions
 
         template <typename Action>
         HPX_ALWAYS_EXPORT char const* get_action_name();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace traits
+    {
+        // The customization point handle_gid is used to handle reference 
+        // counting of GIDs while they are transferred to a different locality. 
+        // It has to be specialized for arbitrary types, which may hold GIDs. 
+        // 
+        // It is important to make sure that all GID instances which are 
+        // contained in any transferred data structure are handled during 
+        // serialization. For this reason any user defined data type, which
+        // is passed as an parameter to a action or which is returned from
+        // a result_action needs to provide a corresponding specialization.
+        // 
+        // The purpose of this customization point is to call the provided 
+        // function for all GIDs held in the data type.
+        template <typename T, typename F, typename Enable = void>
+        struct handle_gid
+        {
+            static bool call(T const&, F)
+            {
+                return true;    // do nothing for arbitrary types
+            }
+        };
+
+        template <typename F>
+        struct handle_gid<naming::id_type, F>
+        {
+            static bool call(naming::id_type const &id, F f)
+            {
+                f(id);
+                return true;
+            }
+        };
+
+        template <typename F>
+        struct handle_gid<std::vector<naming::id_type>, F>
+        {
+            static bool call(std::vector<naming::id_type> const& ids, F f)
+            {
+                BOOST_FOREACH(naming::id_type const& id, ids)
+                    f(boost::ref(id));
+                return true;
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -147,24 +194,19 @@ namespace hpx { namespace actions
     struct enum_gid_handler
     {
         /// Enumerate all GIDs which stored as arguments
-        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
+        typedef base_action::enum_gid_handler_type enum_gid_handler_type;
 
-        enum_gid_handler(base_action::enum_gid_handler_type f)
+        enum_gid_handler(enum_gid_handler_type f)
           : f_(f)
         {}
 
         template <typename T>
-        bool operator()(T&) const
+        bool operator()(T const& t) const
         {
-            return true;
-        }
-        bool operator()(naming::id_type const& id) const
-        {
-            f_(boost::ref(id));
-            return true;
+            return traits::handle_gid<T, enum_gid_handler_type>::call(t, f_);
         }
 
-        base_action::enum_gid_handler_type f_;
+        enum_gid_handler_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
