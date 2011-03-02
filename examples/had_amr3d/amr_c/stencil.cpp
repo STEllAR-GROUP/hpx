@@ -346,7 +346,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[8],y[8],z[8];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
       int xindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int yindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
       int zindex[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
@@ -504,7 +504,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[4],y[4],z[4];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[4] = {-1,-1,-1,-1};
       int yindex[4] = {-1,-1,-1,-1};
@@ -599,7 +599,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[4],y[4],z[4];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[4] = {-1,-1,-1,-1};
       int yindex[4] = {-1,-1,-1,-1};
@@ -688,7 +688,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[4],y[4],z[4];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[4] = {-1,-1,-1,-1};
       int yindex[4] = {-1,-1,-1,-1};
@@ -775,7 +775,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[2],y[2],z[2];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[2] = {-1,-1};
       int yindex[2] = {-1,-1};
@@ -827,7 +827,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[2],y[2],z[2];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[2] = {-1,-1};
       int yindex[2] = {-1,-1};
@@ -879,7 +879,7 @@ namespace hpx { namespace components { namespace amr
       // we know the patch that has our data; now we need to find the index of the anchor we need inside the patch
       had_double_type x[2],y[2],z[2];  
       int li,lj,lk;
-      int i,j,k;
+//       int i,j,k;
 
       int xindex[2] = {-1,-1};
       int yindex[2] = {-1,-1};
