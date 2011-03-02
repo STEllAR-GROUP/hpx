@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\had_amr\init_mpfr.hpp" />
     <ClInclude Include="..\..\..\examples\had_amr\mpreal.h" />
+    <ClInclude Include="..\..\..\examples\had_amr\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="My Amplifier Results\r016lw\r016lw.ampl" />
@@ -132,4 +133,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.None.Increment" BuildVersion_AssemblyInfoFilename="..\..\..\examples\had_amr\amr_client.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

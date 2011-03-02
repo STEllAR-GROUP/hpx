@@ -61,7 +61,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=2;HPX_DEBUG_WRAPPER_HEAP1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -92,6 +92,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\external\nedmalloc\src\nedmalloc.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
@@ -149,10 +153,13 @@
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_init.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\server\future.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
@@ -164,15 +171,20 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\allocator.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\tools_api\internal\ittnotify.h" />
-    <ClInclude Include="..\..\..\hpx\util\tools_api\ittnotify.h" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />
@@ -333,4 +345,9 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_UseGlobalSettings="True" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

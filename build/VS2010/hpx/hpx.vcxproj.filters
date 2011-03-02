@@ -141,12 +141,6 @@
     <Filter Include="Source Files\Runtime\Components\Server">
       <UniqueIdentifier>{c1cfc809-0781-465d-808d-06554754c0a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Util\tools_api">
-      <UniqueIdentifier>{321ce0f0-99e6-4920-97d9-6f4090465e67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Util\tools_api\internal">
-      <UniqueIdentifier>{c94147f0-7281-4166-9121-181b13968101}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -290,6 +284,9 @@
     <ClCompile Include="..\..\..\src\util\itt_notify.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\external\nedmalloc\src\nedmalloc.c">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -309,9 +306,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\c\types.h">
       <Filter>Header Files\C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\exception.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\exception_list.hpp">
       <Filter>Header Files</Filter>
@@ -757,17 +751,44 @@
     <ClInclude Include="..\..\..\hpx\util\random.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\server\future.hpp">
-      <Filter>Header Files\LCOs\Server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\tools_api\ittnotify.h">
-      <Filter>Header Files\Util\tools_api</Filter>
+    <ClInclude Include="..\..\..\hpx\exception.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\tools_api\internal\ittnotify.h">
-      <Filter>Header Files\Util\tools_api\internal</Filter>
+    <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp">
+      <Filter>Header Files\LCOs\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\allocator.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

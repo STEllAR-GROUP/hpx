@@ -28,6 +28,9 @@
     <ClInclude Include="..\..\..\examples\had_amr\init_mpfr.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\examples\had_amr\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="My Amplifier Results\r016lw\r016lw.ampl">
