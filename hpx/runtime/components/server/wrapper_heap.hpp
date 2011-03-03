@@ -132,7 +132,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(DEBUG)
             scoped_lock l(this);
 #else
-            scoped_lock l(mutex_type mtx_);
+            scoped_lock l(mtx_);
 #endif
             if (!ensure_pool(count))
                 return false;
@@ -162,7 +162,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(DEBUG)
             scoped_lock l(this);
 #else
-            scoped_lock l(mutex_type mtx_);
+            scoped_lock l(mtx_);
 #endif
             storage_type* p1 = static_cast<storage_type*>(p);
 
@@ -206,7 +206,7 @@ namespace hpx { namespace components { namespace detail
 #if !defined(DEBUG)
                 scoped_lock l(this);
 #else
-                scoped_lock l(mutex_type mtx_);
+                scoped_lock l(mtx_);
 #endif
 
                 // store a pointer to the AGAS client
@@ -358,7 +358,7 @@ namespace hpx { namespace components { namespace detail
         naming::gid_type base_gid_;
         naming::resolver_client const* get_agas_client_;
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
         mutable mutex_type mtx_;
 #endif
 
