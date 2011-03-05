@@ -92,6 +92,7 @@ namespace hpx { namespace components { namespace tlf { namespace server {
 //             a[2] = 0.0;
 //             
 //             //force_calc_re(naming::id_type root, double box_size_buf * box_size_buf * inv_tolerance_2);
+//             
 //             force_calc_re(root, box_size_buf * box_size_buf * inv_tolerance_2);
 //             
 //             if(iter > 0)
@@ -101,18 +102,22 @@ namespace hpx { namespace components { namespace tlf { namespace server {
 //                 v[2] += (a[2] - buf_acc[0]) * half_dt;
 //             }
 //         }
-/*
-      void tlf::force_calc_re(naming::id_type root, double box_size_2)
-      {
-          double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
-          double buf_pos[3;
-          
-//           get pos from naming::id_type root and store it in buf_pos, 
-          
-          for (int i=0; i<3; ++i)
-          {
-              distance_r[i] = buf_pos[i] - p[i];
-       
-          }
-      }*/
+// 
+//       void tlf::force_calc_re(naming::id_type root, double box_size_2)
+//       {
+//           double d_r[3], d_r_2, acceleration_factor, inv_distance_r;
+//           double buf_pos[3];
+//           
+//           //TODO get pos from naming::id_type root and store it in buf_pos, 
+//           
+//           for (int i=0; i<3; ++i)
+//               d_r[i] = buf_pos[i] - p[i];
+// 
+//           d_r_2 = d_r[0]*d_r[0] + d_r[1]*d_r[1] + d_r[2]*d_r[2];
+//           
+//           if (d_r_2 < box_size_2)
+//           {
+//             
+//           }
+//       }
 }}}}

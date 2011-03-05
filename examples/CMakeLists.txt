@@ -14,6 +14,7 @@ set(subdirs
     accumulator
     amr
     bhpx
+    bh
     cosmo
     generic
     had_amr
@@ -31,10 +32,12 @@ foreach(subdir ${subdirs})
 endforeach()
 
 add_custom_target(chirag)
+add_custom_target(bh)
 add_custom_target(matt)
 add_custom_target(matt.all)
 
 add_dependencies(chirag examples.bhpx)
+add_dependencies(bh examples.bh)
 
 add_dependencies(matt examples.had_amr3d)
 add_dependencies(matt.all examples.cosmo)
