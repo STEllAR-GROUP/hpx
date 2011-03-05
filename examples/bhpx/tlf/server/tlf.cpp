@@ -101,4 +101,18 @@ namespace hpx { namespace components { namespace tlf { namespace server {
 //                 v[2] += (a[2] - buf_acc[0]) * half_dt;
 //             }
 //         }
+/*
+      void tlf::force_calc_re(naming::id_type root, double box_size_2)
+      {
+          double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
+          double buf_pos[3;
+          
+//           get pos from naming::id_type root and store it in buf_pos, 
+          
+          for (int i=0; i<3; ++i)
+          {
+              distance_r[i] = buf_pos[i] - p[i];
+       
+          }
+      }*/
 }}}}
