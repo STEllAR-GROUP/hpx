@@ -34,6 +34,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         void set_pos(double px, double py, double pz); 
         double get_mass();
         std::vector<double> get_pos();
+        void set_type(int type_var);
         int get_type();
         void set_vel(double vx, double vy, double vz);
         void set_acc(double ax, double ay, double az);
@@ -43,6 +44,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         typedef hpx::actions::action3<node, node_set_vel, double, double, double, &node::set_vel> set_vel_action;        
         typedef hpx::actions::action3<node, node_set_acc, double, double, double, &node::set_acc> set_acc_action;        
         typedef hpx::actions::action1<node, node_set_mass, double, &node::set_mass> set_mass_action;
+        typedef hpx::actions::action1<node, node_set_type, int, &node::set_type> set_type_action;        
         typedef hpx::actions::action0<node, node_print, &node::print> print_action;
         typedef hpx::actions::result_action0<node, std::vector<double>, node_get_pos, &node::get_pos> get_pos_action;
         typedef hpx::actions::result_action0<node, int, node_get_type, &node::get_type> get_type_action;

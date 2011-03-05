@@ -50,7 +50,11 @@ namespace hpx { namespace components { namespace node { namespace server {
             bPos.push_back(p[2]);    
             return bPos;
         }
-        
+        void node::set_type(int type_var)
+        {
+            node_type = type_var;
+        }
+
         int node::get_type()
         {
             return node_type;
