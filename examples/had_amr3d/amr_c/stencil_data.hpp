@@ -17,7 +17,7 @@
 struct nodedata
 {
     had_double_type phi[2][num_eqns];
- 
+
 private:
     // serialization support
     friend class boost::serialization::access;

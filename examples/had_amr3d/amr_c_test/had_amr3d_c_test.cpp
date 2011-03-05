@@ -12,6 +12,8 @@
 #include "../had_config.hpp"
 #include <stdio.h>
 
+#include <boost/scoped_array.hpp>
+
 #define UGLIFY 1
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,15 +198,14 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
 {
   // allocate some temporary arrays for calculating the rhs
   nodedata rhs;
-  hpx::memory::default_vector<nodedata>::type work,work2;
+  boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
+  boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
+
   hpx::memory::default_vector<nodedata* >::type pwork, pwork2;
   static had_double_type const c_0_75 = 0.75;
   static had_double_type const c_0_25 = 0.25;
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
-
-  work.resize(vecval.size());
-  work2.resize(vecval.size());
 
   int n = 3*par.granularity;
   int n2 = par.granularity;
@@ -249,8 +250,9 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       }
     }}}
 
-    hpx::memory::default_vector<nodedata>::type::iterator n_iter;
-    for (n_iter=work.begin();n_iter!=work.end();++n_iter) pwork.push_back( &(*n_iter) );
+    nodedata* n_iter;
+    pwork.reserve(vecval.size());
+    for (n_iter=&work[0];n_iter!=&work[vecval.size()];++n_iter) pwork.push_back( n_iter );
 
   // -------------------------------------------------------------------------
   // iter 1
@@ -265,7 +267,8 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       }
     }}}
 
-    for (n_iter=work2.begin();n_iter!=work2.end();++n_iter) pwork2.push_back( &(*n_iter) );
+    pwork2.reserve(vecval.size());
+    for (n_iter=&work2[0];n_iter!=&work2[vecval.size()];++n_iter) pwork2.push_back( n_iter );
 
   // -------------------------------------------------------------------------
   // iter 2
