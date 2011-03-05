@@ -12,6 +12,7 @@ typedef hpx::components::managed_component<hpx::components::node::server::node> 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(node_type, node);
 HPX_DEFINE_GET_COMPONENT_TYPE(node_type::wrapped_type);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::set_mass_action, node_set_mass_action);
+HPX_REGISTER_ACTION_EX(node_type::wrapped_type::set_type_action, node_set_type_action);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::set_pos_action, node_set_pos_action);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::set_vel_action, node_set_vel_action);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::set_acc_action, node_set_acc_action);

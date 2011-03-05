@@ -99,6 +99,7 @@ int hpx_main(boost::program_options::variables_map &vm)
     {
         double dat[7] = {0,0,0,0,0,0,0};
         infile >> dat[0] >> dat[1] >> dat[2] >> dat[3] >> dat[4] >> dat[5] >> dat[6];
+        components::node::stubs::node::set_type((*bBeg), 1);
         components::node::stubs::node::set_mass((*bBeg),dat[0]);
         components::node::stubs::node::set_pos((*bBeg), dat[1], dat[2], dat[3]);
         components::node::stubs::node::set_vel((*bBeg), dat[4], dat[5], dat[6]);

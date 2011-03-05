@@ -22,6 +22,12 @@ struct node : components::stubs::stub_base<hpx::components::node::server::node>
     {
         applier::apply<hpx::components::node::server::node::set_mass_action>(gid, mass_tmp);
     }
+    
+    static void set_type(naming::id_type const& gid, int type_var)
+    {
+        applier::apply<hpx::components::node::server::node::set_type_action>(gid, type_var);
+    }
+
 
     static void set_pos(naming::id_type gid, double px, double py, double pz)
     {

@@ -25,7 +25,8 @@ namespace hpx { namespace components { namespace node { namespace server {
           node_print = 4,
           node_get_pos = 5,
           node_get_type = 6,
-          node_get_mass = 7
+          node_get_mass = 7,
+          node_set_type = 8
         };
         
         node();

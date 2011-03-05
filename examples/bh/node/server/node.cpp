@@ -77,6 +77,10 @@ namespace hpx { namespace components { namespace node { namespace server {
         void node::print()
         {
             applier::applier& appl = applier::get_applier();
+            
+            if (node_type == 1)
+                std::cout << "BODY :: ";
+            
             std::cout << appl.get_runtime_support_gid() 
             << " pos > " << p[0] << " " << p[1] << " " 
             << p[2] << " " << std::flush << std::endl;   

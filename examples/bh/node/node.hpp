@@ -32,6 +32,12 @@ namespace hpx { namespace components { namespace node
            this->base_type::set_mass(gid_, mass_buf);
        }
        
+       void set_type(int type_var)
+       {
+           BOOST_ASSERT(gid_);
+           this->base_type::set_type(gid_, type_var);
+       }
+       
        void set_pos(double px, double py, double pz)
        {
            BOOST_ASSERT(gid_);
