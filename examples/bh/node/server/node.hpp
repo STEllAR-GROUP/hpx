@@ -9,8 +9,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
-namespace hpx { namespace components { namespace node { namespace server {
+namespace hpx { namespace components { namespace node { namespace server 
+{
     
     class HPX_EXPORT node
     : public components::detail::managed_component_base<node>
@@ -39,7 +41,6 @@ namespace hpx { namespace components { namespace node { namespace server {
         };
         
         node();
-        
         void set_mass(double mass_tmp);
         void set_pos(double px, double py, double pz); 
         void new_node(double px, double py, double pz);
@@ -49,7 +50,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         int get_type();
         void set_vel(double vx, double vy, double vz);
         void set_acc(double ax, double ay, double az);
-//         void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim); 
+        void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim); 
         void print();
         
         typedef hpx::actions::action3<node, node_set_pos, double, double, double, &node::set_pos> set_pos_action;
@@ -62,7 +63,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         typedef hpx::actions::result_action0<node, int, node_get_type, &node::get_type> get_type_action;
         typedef hpx::actions::result_action0<node, double, node_get_mass, &node::get_mass > get_mass_action;
         typedef hpx::actions::action3<node, node_new_node, double, double, double, &node::new_node> new_node_action;
-//         typedef hpx::actions::action2<node, node_insert_node, naming::id_type, double, &node::insert_node > insert_node_action;
+        typedef hpx::actions::action2<node, node_insert_node, naming::id_type const &, double, &node::insert_node > insert_node_action;
         
         
     private:

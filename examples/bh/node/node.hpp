@@ -15,15 +15,11 @@ namespace hpx { namespace components { namespace node
        typedef client_base<node, stubs::node> base_type;
        
    public:
-       
        node()
        { }
        
        node(naming::id_type gid)
-       :base_type(gid)
-       { }
-       
-       ~node()
+       : base_type(gid)
        { }
        
        void set_mass(double mass_buf)
@@ -102,11 +98,11 @@ namespace hpx { namespace components { namespace node
            this->base_type::new_node(gid_, px, py, pz);
        }
        
-//        void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim)
-//        {
-//            BOOST_ASSERT(gid_);
-//            this->base_type::insert_node(gid_, new_bod_gid, sub_box_dim);
-//        }
+       void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim)
+       {
+           BOOST_ASSERT(gid_);
+           this->base_type::insert_node(gid_, new_bod_gid, sub_box_dim);
+       }
    };
 }}}
 
