@@ -20,6 +20,7 @@ HPX_REGISTER_ACTION_EX(node_type::wrapped_type::print_action, node_print_action)
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::get_pos_action, node_get_pos_action);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::get_type_action, node_get_type_action);
 HPX_REGISTER_ACTION_EX(node_type::wrapped_type::get_mass_action, node_get_mass_action);
+HPX_REGISTER_ACTION_EX(node_type::wrapped_type::new_node_action, node_new_node_action);
 
 
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<double>::set_result_action, set_result_action_double);

@@ -158,15 +158,23 @@ int hpx_main(boost::program_options::variables_map &vm)
         double box_size, cPos[3];
         computeRootPos(cv.num_bodies, box_size, cPos, bodies);
         cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
+        
+        hpx::naming::id_type prefix;
+        hpx::applier::applier& appl = hpx::applier::get_applier();
+        prefix = appl.get_runtime_support_gid();
+        hpx::components::node::node tree_root;
+        tree_root.create(prefix);
+        tree_root.new_node(cPos[0], cPos[1], cPos[2]);
+        if (tree_root.get_type() == 0)
+            std::cout << "tree Root is a Cell" << std::endl;
+        else
+            std::cout << "tree Root is a Body" << std::endl;
+        //new_no
+        tree_root.free();
     }
     
-    hpx::naming::id_type prefix;
-    prefix = appl.get_runtime_support_gid();
-    hpx::components::node::node tree_root;
-    tree_root.create(prefix);
-    tree_root.set_type(0);
-    
 
+    
     hpx::finalize();
     return 0;
 }

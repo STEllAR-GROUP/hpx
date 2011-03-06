@@ -95,6 +95,12 @@ namespace hpx { namespace components { namespace node
        {
            return this->base_type::get_mass_async(gid_);
        }
+           
+       void new_node(double px, double py, double pz)
+       {
+           BOOST_ASSERT(gid_);
+           this->base_type::new_node(gid_, px, py, pz);
+       }
    };
 }}}
 

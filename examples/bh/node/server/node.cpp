@@ -89,4 +89,13 @@ namespace hpx { namespace components { namespace node { namespace server {
             << v[2] << " " << std::flush << std::endl;     
         }
         
+        void node::new_node(double px, double py, double pz)
+        {
+            node_type = 0; // sets node type to indicate this node is a cell not a body
+            mass = 0.0;
+            p[0] = px;
+            p[1] = py;
+            p[2] = pz;
+        }
+        
 }}}}

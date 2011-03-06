@@ -26,13 +26,15 @@ namespace hpx { namespace components { namespace node { namespace server {
           node_get_pos = 5,
           node_get_type = 6,
           node_get_mass = 7,
-          node_set_type = 8
+          node_set_type = 8,
+          node_new_node =9
         };
         
         node();
         
         void set_mass(double mass_tmp);
         void set_pos(double px, double py, double pz); 
+        void new_node(double px, double py, double pz);
         double get_mass();
         std::vector<double> get_pos();
         void set_type(int type_var);
@@ -50,6 +52,8 @@ namespace hpx { namespace components { namespace node { namespace server {
         typedef hpx::actions::result_action0<node, std::vector<double>, node_get_pos, &node::get_pos> get_pos_action;
         typedef hpx::actions::result_action0<node, int, node_get_type, &node::get_type> get_type_action;
         typedef hpx::actions::result_action0<node, double, node_get_mass, &node::get_mass > get_mass_action;
+        typedef hpx::actions::action3<node, node_new_node, double, double, double, &node::new_node> new_node_action;
+        
         
     private:
         int node_type;   // If set to 1 the node is a body if set to 0 the node is a cell
@@ -57,7 +61,8 @@ namespace hpx { namespace components { namespace node { namespace server {
         double p[3];
         double v[3];
         double a[3];  
-        
+        naming::id_type child[8];
+        naming::id_type parent;
     };
     
 }}}}
