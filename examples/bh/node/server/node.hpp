@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         typedef hpx::actions::result_action0<node, double, node_get_mass, &node::get_mass > get_mass_action;
         
     private:
-        int node_type;
+        int node_type;   // If set to 1 the node is a body if set to 0 the node is a cell
         double mass;
         double p[3];
         double v[3];

@@ -52,6 +52,52 @@ typedef struct {
     int num_iterations;
 } crit_vals;
 
+
+static inline void computeRootPos(const int num_bodies, double &box_dim, double center_position[], components::distributing_factory::result_type bodies) 
+{
+    double minPos[3];
+    minPos[0] = 1.0E90; 
+    minPos[1] = 1.0E90;
+    minPos[2] = 1.0E90;
+    double maxPos[3];
+    maxPos[0] = -1.0E90;
+    maxPos[1] = -1.0E90;
+    maxPos[2] = -1.0E90;
+   
+    components::distributing_factory::iterator_range_type bod_range = locality_results(bodies);
+    components::distributing_factory::iterator_type bBeg = bod_range.first; 
+    components::distributing_factory::iterator_type bEnd = bod_range.second;
+    for (int i = 0; bBeg != bEnd; ++i, ++bBeg)
+    {
+        std::vector<double> bPos = components::node::stubs::node::get_pos((*bBeg));
+       
+        if (minPos[0] > bPos[0])
+            minPos[0] = bPos[0];
+        if (minPos[1] > bPos[1])
+            minPos[1] = bPos[1];
+        if (minPos[2] > bPos[2])
+            minPos[2] = bPos[2];
+        if (maxPos[0] < bPos[0])
+            maxPos[0] = bPos[0];
+        if (maxPos[1] < bPos[1])
+            maxPos[1] = bPos[1];
+        if (maxPos[2] < bPos[2])
+            maxPos[2] = bPos[2];
+    }
+    box_dim = maxPos[0] - minPos[0];
+    if (box_dim < (maxPos[1] - minPos[1]))
+        box_dim = maxPos[1] - minPos[1];
+    if (box_dim < (maxPos[2] - minPos[2]))
+        box_dim = maxPos[2] - minPos[2];
+    center_position[0] = (maxPos[0] + minPos[0]) / 2;
+    center_position[1] = (maxPos[1] + minPos[1]) / 2;
+    center_position[2] = (maxPos[2] + minPos[2]) / 2;
+}
+
+
+
+
+
 //*********************    
 int hpx_main(boost::program_options::variables_map &vm)
 {
@@ -106,6 +152,20 @@ int hpx_main(boost::program_options::variables_map &vm)
         components::node::stubs::node::print((*bBeg));
     }       
     infile.close();  
+    
+    for (cv.iter = 0; cv.iter < cv.num_iterations; ++cv.iter)
+    {
+        double box_size, cPos[3];
+        computeRootPos(cv.num_bodies, box_size, cPos, bodies);
+        cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
+    }
+    
+    hpx::naming::id_type prefix;
+    prefix = appl.get_runtime_support_gid();
+    hpx::components::node::node tree_root;
+    tree_root.create(prefix);
+    tree_root.set_type(0);
+    
 
     hpx::finalize();
     return 0;
