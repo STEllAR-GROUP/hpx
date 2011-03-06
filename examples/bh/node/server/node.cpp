@@ -7,6 +7,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include "node.hpp"
+#include "../stubs/node.hpp"
 
 namespace hpx { namespace components { namespace node { namespace server {
     
@@ -96,6 +97,63 @@ namespace hpx { namespace components { namespace node { namespace server {
             p[0] = px;
             p[1] = py;
             p[2] = pz;
+            for(int i = 0; i<8; ++i)
+                child[i].state = -1;  // initialize all children to -1 implying that the children are empty
         }
+        
+//         void node::insert_node(const hpx::naming::id_type& new_bod_gid, double sub_box_dim)
+//         {
+//             int i=0;
+//             std::vector<double> bpos = components::node::stubs::node::get_pos(new_bod_gid);
+// 
+//             double temp[3];
+//             temp[0] = 0.0;
+//             temp[1] = 0.0;
+//             temp[2] = 0.0;
+//             
+//             if(p[0] < bpos[0])
+//             {
+//                 i = 1;
+//                 temp[0] = sub_box_dim;
+//             }
+//             if(p[1] < bpos[1])
+//             {
+//                 i += 2;
+//                 temp[2] = sub_box_dim;
+//             }
+//             if(p[2] < bpos[2])
+//             {
+//                 i += 4;
+//                 temp[2] = sub_box_dim;
+//             }
+//             if(child[i].state == -1)   // if child branch i is empty/NUll then set it to the new body being inserted
+//             {
+//                 child[i].state = 1;
+//                 child[i].gid = new_bod_gid;
+//             }
+//             else if(child[i].state == 0)   // if the child branch is an intermediate node
+//             {
+//                 hpx::components::node::stubs::node::insert_body(child[i].gid, new_bod_gid, 0.5*sub_box_dim);
+//             }
+//             else if(child[i].state == 1) // if the child branch is a treeleaf
+//             {
+//                 naming::id_type cur_bod_gid = child[i].gid;
+//                 //create an intermediate node that will reside in the current branch
+//                 child[i].state = 0;
+//                 const double new_sub_box_dim = 0.5 * sub_box_dim;
+//                 const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
+//                 hpx::components::node::node temp_node;
+//                 hpx::naming::id_type prefix;
+//                 hpx::applier::applier& appl = hpx::applier::get_applier();
+//                 prefix = appl.get_runtime_support_gid();
+//                 temp_node.create(prefix);    
+//                 temp_node.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
+//                 child[i].gid = temp_node.get_gid(); 
+//                 
+//                 temp_node.insert_body(cur_bod_gid, new_sub_box_dim);
+//                 temp_node.insert_body(new_bod_gid, new_sub_box_dim); 
+//             }
+//         }
+
         
 }}}}

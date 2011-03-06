@@ -16,6 +16,13 @@ namespace hpx { namespace components { namespace node { namespace server {
     : public components::detail::managed_component_base<node>
     {
     public:
+         
+        struct child_type 
+        {
+          int state;      // state = 0 - Intermediate Node, state = -1 - NULL, state = 1 - TreeLeaf type
+          naming::id_type gid;
+        };
+        
         enum actions
         {
           node_set_pos = 0,
@@ -27,7 +34,8 @@ namespace hpx { namespace components { namespace node { namespace server {
           node_get_type = 6,
           node_get_mass = 7,
           node_set_type = 8,
-          node_new_node =9
+          node_new_node =9,
+          node_insert_node=10
         };
         
         node();
@@ -41,6 +49,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         int get_type();
         void set_vel(double vx, double vy, double vz);
         void set_acc(double ax, double ay, double az);
+//         void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim); 
         void print();
         
         typedef hpx::actions::action3<node, node_set_pos, double, double, double, &node::set_pos> set_pos_action;
@@ -53,6 +62,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         typedef hpx::actions::result_action0<node, int, node_get_type, &node::get_type> get_type_action;
         typedef hpx::actions::result_action0<node, double, node_get_mass, &node::get_mass > get_mass_action;
         typedef hpx::actions::action3<node, node_new_node, double, double, double, &node::new_node> new_node_action;
+//         typedef hpx::actions::action2<node, node_insert_node, naming::id_type, double, &node::insert_node > insert_node_action;
         
         
     private:
@@ -61,7 +71,7 @@ namespace hpx { namespace components { namespace node { namespace server {
         double p[3];
         double v[3];
         double a[3];  
-        naming::id_type child[8];
+        child_type child[8];
         naming::id_type parent;
     };
     

@@ -84,6 +84,12 @@ namespace hpx { namespace components { namespace node { namespace stubs {
         {
             applier::apply<hpx::components::node::server::node::new_node_action>(gid, px, py, pz);
         }
+        
+                
+//         static void insert_node(naming::id_type const & gid,  naming::id_type const & new_bod_gid, double sub_box_dim)
+//         {
+//             applier::apply<hpx::components::node::server::node::insert_node_action>(gid, new_bod_gid, sub_box_dim);
+//         }
     };
 }}}}
 #endif
