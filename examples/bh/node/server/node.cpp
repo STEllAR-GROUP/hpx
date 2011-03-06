@@ -164,5 +164,28 @@ namespace hpx { namespace components { namespace node { namespace server {
             }
         }
 
-        
+        void node::calc_cm(naming::id_type current_node)
+        {
+            double m, px = 0.0, py = 0.0, pz = 0.0;
+            int var = 0;
+            if (node_type == 0)
+                mass = 0.0;
+            for (int i=0; i < 8; ++i)
+            {
+                if (child[i].state != -1)
+                {
+                    if (child[i].state == 0 )
+                    {
+                        std::cout << "I am a CELL" << std::endl;
+                        components::node::stubs::node::calc_cm(child[i].gid, current_node);
+                    }
+                    else if (child[i].state == 1)
+                    {
+                        std::cout << "I am a BODY" << std::endl;
+                    }
+
+                }
+            }
+        }
+
 }}}}

@@ -170,9 +170,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         else
             std::cout << "tree Root is a Body" << std::endl;
         //new_no
-            
+         const double sub_box_size = 0.5 * box_size;   
          for (bBeg = bod_range.first; bBeg != bEnd; ++bBeg)
          {
+             tree_root.insert_node((*bBeg), sub_box_size);
+             
              //insert tree node
          }
         tree_root.free();

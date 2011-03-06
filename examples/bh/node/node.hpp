@@ -103,6 +103,12 @@ namespace hpx { namespace components { namespace node
            BOOST_ASSERT(gid_);
            this->base_type::insert_node(gid_, new_bod_gid, sub_box_dim);
        }
+       
+       void calc_cm(naming::id_type current_node)
+       {
+           BOOST_ASSERT(gid_);
+           this->base_type::calc_cm(gid_, current_node);
+       }
    };
 }}}
 
