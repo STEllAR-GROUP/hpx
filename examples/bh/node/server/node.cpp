@@ -26,6 +26,8 @@ namespace hpx { namespace components { namespace node { namespace server {
             a[0] = 0.0;
             a[1] = 0.0;
             a[2] = 0.0;
+            for(int i = 0; i<8; ++i)
+                this->child[i].state = -1;  // initialize all children to -1 implying that the children are empty
         }
         
         void node::set_mass(double mass_tmp)
@@ -107,13 +109,21 @@ namespace hpx { namespace components { namespace node { namespace server {
             p[1] = py;
             p[2] = pz;
             for(int i = 0; i<8; ++i)
-                child[i].state = -1;  // initialize all children to -1 implying that the children are empty
+                this->child[i].state = -1;  // initialize all children to -1 implying that the children are empty
         }
         
         void node::insert_node(const hpx::naming::id_type& new_bod_gid, double sub_box_dim)
         {
             int i=0;
             std::vector<double> bpos = components::node::stubs::node::get_pos(new_bod_gid);
+            std::cout << "insert_node :: initial i " << i << std::endl;
+            std::cout << "insert_node :: bpos " << bpos[0] << " " << bpos[1] << " " << bpos[2] << std::endl;
+            std::cout << "insert_node :: p " << bpos[0] << " " << bpos[1] << " " << bpos[2] << std::endl;
+            for (int k=0; k < 8; ++k)
+            {
+                std::cout << "insert_node :: states " << this->child[i].state << std::endl;
+            }
+
 
             double temp[3];
             temp[0] = 0.0;
@@ -135,49 +145,60 @@ namespace hpx { namespace components { namespace node { namespace server {
                 i += 4;
                 temp[2] = sub_box_dim;
             }
-            if(child[i].state == -1)   // if child branch i is empty/NUll then set it to the new body being inserted
-            {
-                child[i].state = 1;
-                child[i].gid = new_bod_gid;
-            }
-            else if(child[i].state == 0)   // if the child branch is an intermediate node
-            {
-                hpx::components::node::stubs::node::insert_node(child[i].gid, new_bod_gid, 0.5*sub_box_dim);
-            }
-            else if(child[i].state == 1) // if the child branch is a treeleaf
-            {
-                naming::id_type cur_bod_gid = child[i].gid;
-                //create an intermediate node that will reside in the current branch
-                child[i].state = 0;
-                const double new_sub_box_dim = 0.5 * sub_box_dim;
-                const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
-                hpx::components::node::node temp_node;
-                hpx::naming::id_type prefix;
-                hpx::applier::applier& appl = hpx::applier::get_applier();
-                prefix = appl.get_runtime_support_gid();
-                temp_node.create(prefix);    
-                temp_node.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
-                child[i].gid = temp_node.get_gid(); 
-                
-                temp_node.insert_node(cur_bod_gid, new_sub_box_dim);
-                temp_node.insert_node(new_bod_gid, new_sub_box_dim); 
-            }
+            
+            std::cout << "insert_node :: i " << i << std::endl;
+
+
+//             if(child[i].state == -1)   // if child branch i is empty/NUll then set it to the new body being inserted
+//             {
+//                 std::cout << "I was a NULL now I am a PARTICLE" << std::endl;
+//                 child[i].state = 1;
+//                 child[i].gid = new_bod_gid;
+//             }
+//             else if(child[i].state == 0)   // if the child branch is an intermediate node
+//             {
+//                 std::cout << "I am NODE Recurse further" << std::endl;
+// 
+//                 hpx::components::node::stubs::node::insert_node(child[i].gid, new_bod_gid, 0.5*sub_box_dim);
+//             }
+//             else if(child[i].state == 1) // if the child branch is a treeleaf
+//             {
+//                 std::cout << "I am CELL Recurse further Create New Node" << std::endl;
+//                 naming::id_type cur_bod_gid = child[i].gid;
+//                 //create an intermediate node that will reside in the current branch
+//                 child[i].state = 0;
+//                 const double new_sub_box_dim = 0.5 * sub_box_dim;
+//                 const double pos_buf[] = {p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
+//                 hpx::components::node::node temp_node;
+//                 hpx::naming::id_type prefix;
+//                 hpx::applier::applier& appl = hpx::applier::get_applier();
+//                 prefix = appl.get_runtime_support_gid();
+//                 temp_node.create(prefix);    
+//                 temp_node.new_node(pos_buf[0], pos_buf[1], pos_buf[2]);
+//                 child[i].gid = temp_node.get_gid(); 
+//                 
+//                 temp_node.insert_node(cur_bod_gid, new_sub_box_dim);
+//                 temp_node.insert_node(new_bod_gid, new_sub_box_dim); 
+//             }
         }
 
-        void node::calc_cm(naming::id_type current_node)
+        void node::calc_cm()
         {
+            std::cout << "I am Here" << std::endl;
             double m, px = 0.0, py = 0.0, pz = 0.0;
             int var = 0;
             if (node_type == 0)
                 mass = 0.0;
             for (int i=0; i < 8; ++i)
             {
+                if (child[i].state == -1)
+                    std::cout << "Child " << i <<" is set to NULL"<<std::endl;
                 if (child[i].state != -1)
                 {
                     if (child[i].state == 0 )
                     {
                         std::cout << "I am a CELL" << std::endl;
-                        components::node::stubs::node::calc_cm(child[i].gid, current_node);
+                        components::node::stubs::node::calc_cm(child[i].gid);
                     }
                     else if (child[i].state == 1)
                     {
@@ -185,6 +206,7 @@ namespace hpx { namespace components { namespace node { namespace server {
                     }
 
                 }
+
             }
         }
 

@@ -170,13 +170,20 @@ int hpx_main(boost::program_options::variables_map &vm)
         else
             std::cout << "tree Root is a Body" << std::endl;
         //new_no
-         const double sub_box_size = 0.5 * box_size;   
-         for (bBeg = bod_range.first; bBeg != bEnd; ++bBeg)
-         {
-             tree_root.insert_node((*bBeg), sub_box_size);
-             
-             //insert tree node
-         }
+        //Things are successful until here
+        
+        components::distributing_factory::iterator_range_type bod_range = locality_results(bodies);
+        components::distributing_factory::iterator_type bBeg ; 
+        components::distributing_factory::iterator_type bEnd = bod_range.second;
+        const double sub_box_size = 0.5 * box_size;   
+        for (bBeg = bod_range.first; bBeg != bEnd; ++bBeg)
+        {
+            tree_root.insert_node((*bBeg), sub_box_size);
+            
+            //insert tree node
+        }
+       
+        //tree_root.calc_cm();
         tree_root.free();
         
     }

@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace node { namespace server
         void set_acc(double ax, double ay, double az);
         void insert_node(naming::id_type const & new_bod_gid, double sub_box_dim); 
         void print();
-        void calc_cm(naming::id_type current_node);
+        void calc_cm();
         
         typedef hpx::actions::action3<node, node_set_pos, double, double, double, &node::set_pos> set_pos_action;
         typedef hpx::actions::action3<node, node_set_vel, double, double, double, &node::set_vel> set_vel_action;        
@@ -66,7 +66,7 @@ namespace hpx { namespace components { namespace node { namespace server
         typedef hpx::actions::result_action0<node, double, node_get_mass, &node::get_mass > get_mass_action;
         typedef hpx::actions::action3<node, node_new_node, double, double, double, &node::new_node> new_node_action;
         typedef hpx::actions::action2<node, node_insert_node, naming::id_type const &, double, &node::insert_node > insert_node_action;
-        typedef hpx::actions::action1<node, node_calc_cm, naming::id_type, &node::calc_cm> calc_cm_action;
+        typedef hpx::actions::action0<node, node_calc_cm, &node::calc_cm> calc_cm_action;
         
         
     private:
