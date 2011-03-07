@@ -118,10 +118,10 @@ namespace hpx { namespace components { namespace node { namespace server {
             std::vector<double> bpos = components::node::stubs::node::get_pos(new_bod_gid);
             std::cout << "insert_node :: initial i " << i << std::endl;
             std::cout << "insert_node :: bpos " << bpos[0] << " " << bpos[1] << " " << bpos[2] << std::endl;
-            std::cout << "insert_node :: p " << bpos[0] << " " << bpos[1] << " " << bpos[2] << std::endl;
+            std::cout << "insert_node :: p " << p[0] << " " << p[1] << " " << p[2] << std::endl;
             for (int k=0; k < 8; ++k)
             {
-                std::cout << "insert_node :: states " << this->child[i].state << std::endl;
+                std::cout << "insert_node :: states " << this->child[k].state << std::endl;
             }
 
 
