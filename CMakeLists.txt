@@ -39,7 +39,7 @@ endif()
 ################################################################################
 # environment detection 
 ################################################################################
-execute_process(COMMAND "${hpx_SOURCE_DIR}/tools/build_env.py" "${CMAKE_CXX_COMPILER}"
+execute_process(COMMAND "${hpx_SOURCE_DIR}/python/build_env.py" "${CMAKE_CXX_COMPILER}"
                 OUTPUT_VARIABLE build_environment
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -342,7 +342,7 @@ install( # install all hpx cmake utility files
   PATTERN ".git" EXCLUDE)
 
 install( # install all hpx python scripts
-  DIRECTORY tools 
+  DIRECTORY python 
   DESTINATION share/hpx/python 
   COMPONENT core
   FILES_MATCHING PATTERN "*.py"
