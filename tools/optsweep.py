@@ -10,7 +10,9 @@ Perform parameter sweep runs of an application.
 """
 
 import sys, os, getopt, time, string
+from re import compile
 from types import *
+from operator import *
 
 # subprocess instantiation wrapper;
 # unfortunately older Python still lurks on some machines
@@ -121,7 +123,7 @@ def quoteopts(olist, qchar = '"'):
     return s
 
 
-# create separator with cenetred string
+# create separator with centered string
 def sepstr(sepch = '-', s = ''):
     if s: s = ' '+s.strip()+' '
     nl = (seplen-len(s))/2
@@ -131,10 +133,18 @@ def sepstr(sepch = '-', s = ''):
     if nr < 3: nr = 3
     return nl*sepch+s+nr*sepch
 
+# python has no conditional expression, so we need this to call if/else from
+# eval
+def if_else(pred, then, else_):
+  if pred:
+    return then
+  return else_
 
 # substitute all option ids in string with formatting keys
 def optidsub(optids, s):
-    for o in optids: s = s.replace(o, '%('+o+')s')
+    # first pass - option subsitution
+    for o in optids:
+      s = s.replace(o, '%('+o+')s')
     return s
 
 
@@ -251,6 +261,15 @@ if __name__ == '__main__':
         if before: runscript(before, optd, ofhs)
         # build command line
         cmd = map(lambda x: x%optd, cmdproto)
+ 
+        # second pass - eval
+        p = compile(r'eval\("([^"]*)"\)')
+
+        for e in range(len(cmd)):
+          while p.search(cmd[e]):
+            ss = p.search(cmd[e]).expand(r'\1')
+            cmd[e] = cmd[e].replace("eval(\"%s\")" % ss, str(eval(ss)))
+
         writeres(sepstr('=')+'\nExecuting:'+quoteopts(cmd)+'\n', ofhs)
         # run test requested number of times
         for i in range(nrep):
