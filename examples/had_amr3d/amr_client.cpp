@@ -52,13 +52,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         }
 
         hpx::util::high_resolution_timer t;
-        std::vector<naming::id_type> result_data;
 
         // we are in spherical symmetry, r=0 is the smallest radial domain point
         components::amr::unigrid_mesh unigrid_mesh;
         unigrid_mesh.create(here);
-        result_data = unigrid_mesh.init_execute(function_type, numvals, numsteps,
-            do_logging ? logging_type : components::component_invalid,par);
+        std::vector<naming::id_type> result_data =
+            unigrid_mesh.init_execute(function_type, numvals, numsteps,
+                do_logging ? logging_type : components::component_invalid,par);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
 
@@ -94,7 +94,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: hpx_runtime [options]");
+        po::options_description desc_cmdline ("Usage: had_amr3d_client [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
@@ -112,6 +112,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "random distribution type (uniform or normal)")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
+            ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
+            ("dimensions,i", po::value<int>(), "the dimensions of the search space")
+            ("refinement,e", po::value<std::size_t>(), "levels of refinement")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
             ("verbose,v", "print calculated values after each time step")
@@ -128,7 +131,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "amr_client: exception caught: " << e.what() << std::endl;
+        std::cerr << "had_amr3d_client: exception caught: " << e.what() << std::endl;
         return false;
     }
     return true;
@@ -149,8 +152,8 @@ split_ip_address(std::string const& v, std::string& addr, boost::uint16_t& port)
         }
     }
     catch (boost::bad_lexical_cast const& /*e*/) {
-        std::cerr << "amr_client: illegal port number given: " << v.substr(p+1) << std::endl;
-        std::cerr << "            using default value instead: " << port << std::endl;
+        std::cerr << "had_amr3d_client: illegal port number given: " << v.substr(p+1) << std::endl;
+        std::cerr << "                  using default value instead: " << port << std::endl;
     }
 }
 
@@ -221,16 +224,27 @@ int main(int argc, char* argv[])
         std::size_t numsteps = 400;
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
+        
+        std::size_t granularity = 3;
+        if (vm.count("granularity"))
+            granularity = vm["granularity"].as<std::size_t>();
+        
+        std::size_t allowedl = 0;
+        if (vm.count("refinement"))
+            allowedl = vm["refinement"].as<std::size_t>();
+        
+        int nx0 = 33;
+        if (vm.count("dimensions"))
+            nx0 = vm["dimensions"].as<int>();
 
         components::amr::Parameter par;
 
         // default pars
-        par->allowedl    = 0;
+        par->allowedl    = allowedl;
         par->loglevel    = 2;
         par->output      = 1.0;
         par->output_stdout = 1;
         par->lambda      = 0.15;
-        int nx0          = 33;
         par->nt0         = numsteps;
         par->minx0       = -15.0;
         par->maxx0       =  15.0;
@@ -242,7 +256,7 @@ int main(int argc, char* argv[])
         par->gw          =  5;
         par->eps         =  0.0;
         par->output_level =  0;
-        par->granularity =  3;
+        par->granularity =  granularity;
         for (int i=0;i<maxlevels;i++) {
           // default
           par->refine_level[i] = 1.5;
