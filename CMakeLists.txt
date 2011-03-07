@@ -206,6 +206,8 @@ else()
     set(HPX_MALLOC "jemalloc")
   endif()
 
+  option(HPX_MALLOC_PRELOAD_SO "Build the shared object that contains the HPX default allocator (default: ON for POSIX)" ON)
+
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
@@ -289,6 +291,7 @@ endif()
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default, there may be more for individual modules, but this is the mandatory set
+#set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_util hpx_serialization)
 set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 

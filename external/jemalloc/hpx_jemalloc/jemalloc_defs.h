@@ -1,6 +1,6 @@
 /* include/jemalloc/jemalloc_defs.h.  Generated from jemalloc_defs.h.in by configure.  */
 #ifndef JEMALLOC_DEFS_H_
-#define  JEMALLOC_DEFS_H_
+#define JEMALLOC_DEFS_H_
 
 /*
  * If JEMALLOC_PREFIX is defined, it will cause all public APIs to be prefixed.
@@ -13,25 +13,28 @@
  * #include'ing jemalloc.h in order to cause name mangling that corresponds to
  * the API prefixing.
  */
-#define JEMALLOC_PREFIX "hpx_jemalloc"
-#define JEMALLOC_CPREFIX "HPX_JEMALLOC"
-#if (defined(JEMALLOC_PREFIX) && defined(JEMALLOC_MANGLE))
-#define JEMALLOC_P(name) HPX_JEMALLOC_##name
+#if defined(HPX_MALLOC_PRELOAD_SO)
+  #define JEMALLOC_PREFIX
+  #define JEMALLOC_CPREFIX
+  #if defined(JEMALLOC_MANGLE)
+    #define JEMALLOC_P(name) name 
+  #endif
+#else
+  #define JEMALLOC_PREFIX "hpx_jemalloc"
+  #define JEMALLOC_CPREFIX "HPX_JEMALLOC"
+  #if defined(JEMALLOC_MANGLE)
+    #define JEMALLOC_P(name) HPX_JEMALLOC_##name
+  #endif
 #endif
 
 /*
  * Hyper-threaded CPUs may need a special instruction inside spin loops in
  * order to yield to another virtual CPU.
  */
-#define CPU_SPINWAIT __asm__ volatile("pause")
+#define CPU_SPINWAIT __asm__ __volatile__ ("pause")
 
 /* Defined if __attribute__((...)) syntax is supported. */
-#define JEMALLOC_HAVE_ATTR 
-#ifdef JEMALLOC_HAVE_ATTR
-#  define JEMALLOC_ATTR(s) __attribute__((s))
-#else
-#  define JEMALLOC_ATTR(s)
-#endif
+#define JEMALLOC_ATTR(s) __attribute__((s))
 
 /* JEMALLOC_CC_SILENCE enables code that silences unuseful compiler warnings. */
 /* #undef JEMALLOC_CC_SILENCE */
