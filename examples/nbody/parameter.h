@@ -40,6 +40,7 @@ struct Par {
       had_double_type output;
       int output_stdout;
       int rowsize;
+      std::string input_file;
 };
 
 #if defined(__cplusplus)

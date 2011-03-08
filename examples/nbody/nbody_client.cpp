@@ -5,8 +5,14 @@
 
 #include <cstring>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+
 
 #include <hpx/hpx.hpp>
+
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
@@ -24,6 +30,18 @@
 
 namespace po = boost::program_options;
 
+typedef struct {
+    double dtime;
+    double eps;
+    double tolerance;
+    double half_dt;
+    double softening_2;
+    double inv_tolerance_2;
+    int iter;
+    int num_bodies;
+    int num_iterations;
+} crit_vals;
+
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,6 +55,9 @@ namespace hpx { namespace components { namespace nbody
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
              components::nbody::Parameter const& par)
 {
+    std::string input_file;
+    crit_vals cv;
+
     // get component types needed below
     components::component_type function_type = 
         components::get_component_type<components::nbody::stencil>();
@@ -55,6 +76,33 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
         components::nbody::unigrid_mesh unigrid_mesh;
         unigrid_mesh.create(here);
+        
+        input_file = par->input_file;
+        if(input_file.size() == 0)
+        {
+            //hpx::finalize();
+            return 0;
+        }
+            
+        std::ifstream infile;
+        infile.open(input_file.c_str());
+        if (!infile)                                /* if there is a problem opening file */
+        {                                           /* exit gracefully */
+            std::cerr << "Can't open input file " << input_file << std::endl;
+            exit (1);
+        }
+        infile >> cv.num_bodies;                   
+        infile >> cv.num_iterations;               
+        infile >> cv.dtime;                        
+        infile >> cv.eps;                          
+        infile >> cv.tolerance;                  
+        cv.half_dt = 0.5 * cv.dtime;
+        cv.softening_2 = cv.eps * cv.eps;
+        cv.inv_tolerance_2 = 1.0 / (cv.tolerance * cv.tolerance);    
+        infile.close();  
+        
+        std::cout << "Num Bodies" << cv.num_bodies << std::endl;
+
 
 
         // for loop for iteration
@@ -85,6 +133,8 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
     try {
         po::options_description desc_cmdline ("Usage:nbody_client [options]");
         desc_cmdline.add_options()
+            ("input_file,i", po::value<std::string>(), 
+            "Input File")
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
             ("worker,w", "run this instance in worker (non-console) mode")
@@ -210,6 +260,7 @@ int main(int argc, char* argv[])
         par->output      = 1.0;
         par->output_stdout = 1;
         par->rowsize =  4;
+        par->input_file="5_file";
 
         int scheduler = 1;  // 0: global scheduler
                             // 1: parallel scheduler
@@ -236,6 +287,10 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("thread_scheduler");
                 scheduler = atoi(tmp.c_str());
                 BOOST_ASSERT( scheduler == 0 || scheduler == 1 );
+              }
+              if ( sec->has_entry("input_file") ) {
+                std::string tmp = sec->get_entry("input_file");
+                par->input_file = tmp;
               }
             }
         }
