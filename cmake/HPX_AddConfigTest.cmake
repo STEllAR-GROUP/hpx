@@ -44,9 +44,9 @@ macro(add_hpx_config_test name var)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_pthreads_setaffinity_np variable)
+macro(hpx_check_pthreads_affinity variable)
   add_hpx_config_test(
-   "pthreads_setaffinity_np"
+   "pthreads_affinity"
    ${variable}
    SOURCE
    "#include <pthread.h>
@@ -57,6 +57,7 @@ macro(hpx_check_pthreads_setaffinity_np variable)
         size_t cpusetsize;
         cpu_set_t* cpuset;
         pthread_setaffinity_np(th, cpusetsize, cpuset);
+        pthread_getaffinity_np(th, cpusetsize, cpuset);
     }
     
     int main()

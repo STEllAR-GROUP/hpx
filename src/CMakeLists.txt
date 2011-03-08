@@ -555,7 +555,8 @@ target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
 
 ###############################################################################
 # build instructions for the optional malloc preload shared object
-if(HPX_MALLOC_PRELOAD_SO)
+if(   "${HPX_MALLOC}" STREQUAL "nedmalloc"
+   OR "${HPX_MALLOC}" STREQUAL "jemalloc")
   add_library(hpx_malloc SHARED
       ${hpxmalloclib_SOURCES} ${hpxmalloclib_HEADERS})
   set_target_properties(hpx_malloc PROPERTIES

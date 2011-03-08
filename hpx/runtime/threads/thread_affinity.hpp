@@ -259,7 +259,7 @@ namespace hpx { namespace threads
         }
 
         CPU_SET(affinity, &cpu);
-#if defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
+#if defined(HPX_USE_PTHREADS_AFFINITY)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
 #else
         if (0 == sched_setaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))

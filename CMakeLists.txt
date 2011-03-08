@@ -253,10 +253,10 @@ else()
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
   endif()
 
-  hpx_check_pthreads_setaffinity_np(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
+  hpx_check_pthreads_affinity(hpx_HAVE_PTHREADS_AFFINITY)
 
-  if(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
-    add_definitions(-DHPX_HAVE_PTHREAD_SETAFFINITY_NP)
+  if(hpx_HAVE_PTHREADS_AFFINITY)
+    add_definitions(-DHPX_USE_PTHREADS_AFFINITY)
   endif()
   
   add_definitions(-D_GNU_SOURCE)
