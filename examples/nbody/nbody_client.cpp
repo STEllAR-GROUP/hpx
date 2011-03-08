@@ -8,6 +8,12 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cstdlib>
+#include <fstream>
+#include <cstdio>
+#include <cmath>
+#include <sys/time.h>
 
 
 
@@ -59,38 +65,316 @@ namespace hpx { namespace components { namespace nbody
 }}}
 
 
-static inline void computeRootPos(const int num_bodies, double &box_dim, double center_position[],hpx::memory::default_vector<body>::type bodies) 
+/*
+ * The N-Body tree is composed of two different kinds of particles
+ * CELL - intermediate nodes
+ * PAR - Terminal nodes which contain the body/particle.
+ */
+enum 
 {
+    CELL, PAR
+};
+
+
+///////// Main Class Definitions
+class TreeLeaf;
+static TreeLeaf **particles; // the n particles
+
+class TreeNode 
+{
+    public:
+        int node_type; /* Each node has a node type which is either NDE or PAR*/
+        double mass;   /* Each node has a mass */
+        double p[3];   /* position of each node is stored in a vector of type double named p */
+};
+
+class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode */
+{ 
+    private:
+        IntrTreeNode *edge_link; /* Each Internal node has a pointer to link itself with rest of the tree */
+        static IntrTreeNode *tree_head, *free_node_list; /* Each also has two static links to the current root and the free list */
+    public:
+        static IntrTreeNode *newNode(const double pos_buf[]); /* Function to create a new node, returns an Internal Tree Node */
+        void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
+        void calculateCM(int &current_index); /* Recursive function to compute center of mass */
+
+        static void treeReuse()      /* function to recycle tree */
+        {
+            free_node_list = tree_head; /* point the free List to the root of the tree */
+        }
+        TreeNode *branch[8];  /* Each Internal node has pointers to 8 branch nodes (since it is an octtree) of type TreeNode*/
+};
+
+class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate nodes */
+{                                 /* in addition to the mass, px, py, pz the internal */
+    public:                       /* nodes also have velocity vector of type double named v and */
+        double v[3];              /* acceleration vector of type double named a  */
+        double a[3];
+        TreeLeaf()                /* TreeLeaf Constructor */
+        {
+            node_type = PAR;     /* Initialize TreeLeaf node to PARTICLE type */
+            mass = 0.0;          /* Initialize mass to zero */
+            p[0] = 0.0; /* Initialize position vector elements to 0 */
+            p[1] = 0.0; /* Initialize position vector elements to 0 */
+            p[2] = 0.0; /* Initialize position vector elements to 0 */
+            v[0] = 0.0; /* Initialize velocity vector to 0 */
+            v[1] = 0.0; /* Initialize velocity vector to 0 */
+            v[2] = 0.0; /* Initialize velocity vector to 0 */
+            a[0] = 0.0; /* Initialize acceleration vector to 0 */
+            a[1] = 0.0; /* Initialize acceleration vector to 0 */
+            a[2] = 0.0; /* Initialize acceleration vector to 0 */
+        }
+        void moveParticles(); /* moves particles according to acceleration and velocity calculated */
+        void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
+        ~TreeLeaf() { }       /* TreeLeaf Destructor */
+    private:
+        void forceCalcRe(const TreeNode * const n, double box_size_2); /* traverses tree recursively while calculating force for each particle */
+};
+
+
+IntrTreeNode *IntrTreeNode::tree_head = NULL;  /* Initialize the head pointer to NULL */
+IntrTreeNode *IntrTreeNode::free_node_list = NULL; /* Initialize the free list pointer to NULL */
+
+IntrTreeNode *IntrTreeNode::newNode(const double pos_buf[]) 
+{
+    register IntrTreeNode *temp_node; /* Declare the temporary node of type TreeNodeI */
+
+    if (free_node_list == NULL)           /* if the list of free nodes is Null then create */
+    {                                     /* a new node and link it to the previous node of the tree */
+        temp_node = new IntrTreeNode();   /* create a new node of type Tree Node internal and store it in temp_node */
+        temp_node->edge_link = tree_head; /* initialize the link to point to the previous node of the tree */
+        tree_head = temp_node;            /* set new subroot of the tree to be temp_node */
+    } 
+    else 
+    { 
+        temp_node = free_node_list;       /* get a node from the free list of nodes ... re use previously allocated */
+        free_node_list = free_node_list->edge_link; /* memory space. Helps in reuse of space */
+    }
+
+    temp_node->node_type = CELL;  /* Set the node type to CELL (since an intermediate node is being created */
+    temp_node->mass = 0.0;        /* intermediate node have no mass. Center of Mass is populated here later*/
+    temp_node->p[0] = pos_buf[0]; /* Set the position of the cell to the position passed in*/
+    temp_node->p[1] = pos_buf[1];
+    temp_node->p[2] = pos_buf[2];
+    for (int i = 0; i < 8; ++i)        /* Intermediate nodes in a BHT can have upto 8 branch.  */
+        temp_node->branch[i] = NULL;   /* Initialized to NULL */
+
+    return temp_node;
+}
+
+/* Insert New Particle: This function inserts a new particle from the specified level 
+ * values passed into the function are:
+ *     the new particle to be inserted into the tree named new_particle (of type TreeLeaf)
+ *     the value representing dimension of the sub_box  helps determine the 
+ *     position of intermediate node
+ */
+void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim) // builds the tree
+{
+    register int i = 0;                        /* Initialize stores the index  */ 
+    register double temp[3] ;                  /* Initialize buffer position to 0.0 */
+    temp[0] = 0.0;                    /* bufPos stores the value which helps derive*/
+    temp[1] = 0.0;                    /* bufPos stores the value which helps derive*/
+    temp[2] = 0.0;                    /* bufPos stores the value which helps derive
+                                                * the coordinates of a new intermediate node
+                                                * if one has to be created.
+                                                */
+    /*
+     * If the curr.x > new.x & curr.y > new.y & curr.z > new.z then store at i=0 buf.x=0, buf.y=0, buf.z=0
+     * If the curr.x < new.x & curr.y > new.y & curr.z > new.z then store at i=1 buf.x=sub_box, buf.y=0, buf.z=0
+     * If the curr.x > new.x & curr.y < new.y & curr.z > new.z then store at i=2 buf.x=0, buf.y=sub_box, buf.z=0
+     * If the curr.x < new.x & curr.y < new.y & curr.z > new.z then store at i=3 buf.x=sub_box, buf.y=sub_box, buf.z=0
+     * If the curr.x > new.x & curr.y > new.y & curr.z < new.z then store at i=4 buf.x=0, buf.y=0, buf.z=sub_box
+     * If the curr.x < new.x & curr.y > new.y & curr.z < new.z then store at i=5 buf.x=sub_box, buf.y=0, buf.z=sub_box
+     * If the curr.x > new.x & curr.y < new.y & curr.z < new.z then store at i=6 buf.x=0, buf.y=sub_box, buf.z=sub_box
+     * If the curr.x < new.x & curr.y < new.y & curr.z < new.z then store at i=7 buf.x=sub_box, buf.y=sub_box, buf.z=sub_box
+     */ 
+    if (p[0] < new_particle->p[0]) 
+    {
+        i = 1;
+        temp[0] = sub_box_dim;
+    }
+    if (p[1] < new_particle->p[1]) 
+    {
+        i += 2;
+        temp[1] = sub_box_dim;
+    }
+    if (p[2] < new_particle->p[2]) 
+    {
+        i += 4;
+        temp[2] = sub_box_dim;
+    }
+
+    /* if the branch node at i as determined above is empty then
+     * store current body at that position */
+    if (branch[i] == NULL) 
+    {
+        branch[i] = new_particle;
+    } 
+    /* if the branch node at the current i is a CELL then
+     * traverse to the branch nodes to see where the body 
+     * can be inserted */ 
+    else if (branch[i]->node_type == CELL) 
+    {
+        ((IntrTreeNode *) (branch[i]))->treeNodeInsert(new_particle, 0.5 * sub_box_dim);
+    } 
+
+    /* if all branch node at the current position is a LEAF 
+     * then create a node at the current position 
+     * insert the current branch node into the subtree
+     * insert the new node into the subtree */
+    else 
+    {
+        /* since the cell that we are inserting in, is already a terminal node
+         * we split the cell and create an intermediate node. In order to do this
+         * we need to allocate an intermediate node */
+        /* Since we are creating a new intermediate node we divide sub_box by 2 */
+        register const double new_sub_box_dim = 0.5 * sub_box_dim;
+        /* The coordinates of the intermediate which will point to the two branch nodes 
+         * can be calculated 
+         * the X coordinate of the intermediate node is p[0] - sub_box2 + bufPos[0]
+         * the Y coordinate of the intermediate node is p[1] - sub_box2 + bufPos[1]
+         * the Z coordinate of the intermediate node is p[2] - sub_box2 + bufPos[2]
+         **/
+        register const double pos_buf[] = { p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
+        register IntrTreeNode * const cell = newNode(pos_buf);
+        /* Insert the new node at the new intermediate node */
+        cell->treeNodeInsert(new_particle, new_sub_box_dim);
+        /* Insert the current branch node at the new intermediate node */
+        cell->treeNodeInsert((TreeLeaf *) (branch[i]), new_sub_box_dim);
+        /* Set the current branch[i] to the new intermediate node that we just created */
+        branch[i] = cell;
+    }
+}
+
+/* This function computes the center of mass
+ * of the  tree upto a specified node. 
+ * If the root is passed in as an argument
+ * this function calculates the Center of Mass 
+ * across the entire tree recursively. 
+ */
+
+void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info about subtrees
+{
+    /* initialize local buffer mass and position variables to 0 */
+    register double m, px = 0.0, py = 0.0, pz = 0.0;
+    /* create a buffer branch variable of the type tree node */
+    register TreeNode *temp_branch;
+
+    /* initialize var variable to 0 ... helps in cycling through 
+     * the array index
+     */ 
+    register int var = 0;
+    /* this variable will store the total mass of the branch bodies */
+    mass = 0.0;
+    /* Cycle through each of the 8 children of the current node
+     */
+    for (int i = 0; i < 8; ++i) 
+    {
+        /* copy the current branch into the buffer */
+        /* check to see if the current branch is NULL (empty) if so
+         * then skip processing and move on to the next branch */
+        temp_branch = branch[i];
+
+        if (temp_branch != NULL) 
+        {
+            /* move the non null children to the front */
+            branch[i] = NULL; // move non-NULL children to the front (needed to make other code faster)
+            branch[var++] = temp_branch;
+            /* if the current node is a leaf node ie contains a particle
+             * then copy it into a new position in the particles[]
+             * else it is an intermediate node, cycle through the 
+             * branch nodes of the current intermediate node by recursively
+             * calling the Compute Center of Mass function at the current 
+             * intermediate node
+             */
+            if (temp_branch->node_type == PAR) 
+            { // Leaf Node
+                particles[current_node++] = (TreeLeaf *) temp_branch; // sort particles in tree order (approximation of putting nearby nodes together for locality)
+            } 
+            else 
+            { // Intermediate Node
+                ((IntrTreeNode *) temp_branch)->calculateCM(current_node);
+            }
+            /* copy mass of the branch node into the temporary variable m */
+            m = temp_branch->mass;
+            /* Accumulate the mass of the current node into the variable
+             * holding the total mass named "mass" */
+            mass += m;
+            /* Accumulate the position*mass of each branch coordinate 
+             * and store the values in the temporary pos vector. 
+             */
+            px += temp_branch->p[0] * m;
+            py += temp_branch->p[1] * m;
+            pz += temp_branch->p[2] * m;
+            
+            std::cout << "Center of Mass Calc : " << mass << px << py << pz << std::endl;
+        }
+    }
+    /* Calculate center of mass for each intermediate node & root node
+     * using the formula
+     *                        ----- 
+     *                 1      \  
+     * CM_vector =  --------     m_i * pos_i
+     *              tot_mass  /
+     *                        -----
+     */
+    m = 1.0 / mass;
+    p[0] = px * m;
+    p[1] = py * m;
+    p[2] = pz * m;
+    std::cout << "Center of Mass Calc : " << m << p[0] << p[0] << p[0] << std::endl;
+}
+
+static inline void computeRootPos(const int num_bodies, double &box_dim, double center_position[]) 
+{
+ /* Initialize the min and max position vectors to extreme values */
     double minPos[3];
-    minPos[0] = 1.0E90; 
+    minPos[0] = 1.0E90;
     minPos[1] = 1.0E90;
     minPos[2] = 1.0E90;
     double maxPos[3];
     maxPos[0] = -1.0E90;
     maxPos[1] = -1.0E90;
     maxPos[2] = -1.0E90;
-   
-    for (int i = 0; i < bodies.size(); ++i)
+    
+    /* loop through the all the bodies
+     * compare each x, y, z and store
+     * the max and min values for each coordinate
+     * in the maxPos and minPos vector
+     */
+    for (int i = 0; i < num_bodies; ++i)
     {
-       
-        if (minPos[0] > bodies[i].px)
-            minPos[0] = bodies[i].px;
-        if (minPos[1] > bodies[i].py)
-            minPos[1] = bodies[i].py;
-        if (minPos[2] > bodies[i].pz)
-            minPos[2] = bodies[i].pz;
-        if (maxPos[0] < bodies[i].px)
-            maxPos[0] = bodies[i].px;
-        if (maxPos[1] < bodies[i].py)
-            maxPos[1] = bodies[i].py;
-        if (maxPos[2] < bodies[i].pz)
-            maxPos[2] = bodies[i].pz;
+//        std::cout << " x "<< particles[i]->p[0] <<" y " << particles[i]->p[1] << " z " << particles[i]->p[2] << std::endl;  
+        if (minPos[0] > particles[i]->p[0])
+            minPos[0] = particles[i]->p[0];
+        if (minPos[1] > particles[i]->p[1])
+            minPos[1] = particles[i]->p[1];
+        if (minPos[2] > particles[i]->p[2])
+            minPos[2] = particles[i]->p[2];
+        if (maxPos[0] < particles[i]->p[0])
+            maxPos[0] = particles[i]->p[0];
+        if (maxPos[1] < particles[i]->p[1])
+            maxPos[1] = particles[i]->p[1];
+        if (maxPos[2] < particles[i]->p[2])
+            maxPos[2] = particles[i]->p[2];
     }
+    /* Maximum of the difference between 
+     * max.X and min.X, max.Y and min.Y
+     * and max.Z and min.Z 
+     * is stored in the box_dim
+     * The pass by reference box_dim variable helps determine
+     * the bounding box of the particles 
+     */
     box_dim = maxPos[0] - minPos[0];
     if (box_dim < (maxPos[1] - minPos[1]))
         box_dim = maxPos[1] - minPos[1];
     if (box_dim < (maxPos[2] - minPos[2]))
         box_dim = maxPos[2] - minPos[2];
+       
+    /* Calculate the center position as the average of
+     * maxPos and minPos for each of the x, y and z 
+     * coordinates and store it in a vector 
+     */
     center_position[0] = (maxPos[0] + minPos[0]) / 2;
     center_position[1] = (maxPos[1] + minPos[1]) / 2;
     center_position[2] = (maxPos[2] + minPos[2]) / 2;
@@ -148,36 +432,56 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         cv.inv_tolerance_2 = 1.0 / (cv.tolerance * cv.tolerance);    
         
         std::cout << "Num Bodies " << cv.num_bodies << std::endl;
-        hpx::memory::default_vector<body>::type bodies;
-        hpx::memory::default_vector<body>::type::iterator bod_iter;
-        bodies.resize(cv.num_bodies);
+//         hpx::memory::default_vector<body>::type bodies;
+//         hpx::memory::default_vector<body>::type::iterator bod_iter;
+//         bodies.resize(cv.num_bodies);
+        if (particles == NULL) 
+        {
+            /* create a n array container for particles each of type treeleaf */
+            particles = new TreeLeaf*[cv.num_bodies];
+            /* cycle through the n array container and allocate memory space for each
+            * particle */
+            for (int i = 0; i < cv.num_bodies; ++i)
+                particles[i] = new TreeLeaf();
+        }
         
         for (int i =0; i < cv.num_bodies ; ++i)
         {
             double dat[7] = {0,0,0,0,0,0,0};
             infile >> dat[0] >> dat[1] >> dat[2] >> dat[3] >> dat[4] >> dat[5] >> dat[6];
-            bodies[i].mass = dat[0];
-            bodies[i].px = dat[1];
-            bodies[i].py = dat[2];
-            bodies[i].pz = dat[3];
-            bodies[i].vx = dat[4];
-            bodies[i].vy = dat[5];
-            bodies[i].vz = dat[6];
+            particles[i]->mass = dat[0];
+            particles[i]->p[0] = dat[1];
+            particles[i]->p[1] = dat[2];
+            particles[i]->p[2] = dat[3];
+            particles[i]->v[0] = dat[4];
+            particles[i]->v[1] = dat[5];
+            particles[i]->v[2] = dat[6];
         }
         
         for (int i =0; i < cv.num_bodies ; ++i)
         {
-            std::cout << "body : "<< i << " : " << bodies[i].mass << " : " <<
-            bodies[i].px << " : " << bodies[i].py << " : " << bodies[i].pz << std::endl;
-            std::cout <<"           " << " : " << bodies[i].vx << " : " << bodies[i].vy 
-            << " : " << bodies[i].vz << std::endl;
+            std::cout << "body : "<< i << " : " << particles[i]->mass << " : " <<
+            particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+            std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+            << " : " << particles[i]->v[2] << std::endl;
         }
 
         infile.close();  
         for (cv.iter = 0; cv.iter < cv.num_iterations; ++cv.iter)
         {
             double box_size, cPos[3];
-            computeRootPos(cv.num_bodies, box_size, cPos, bodies);
+            computeRootPos(cv.num_bodies, box_size, cPos);
+            
+            IntrTreeNode *bht_root = IntrTreeNode::newNode(cPos);
+            const double sub_box_size = box_size * 0.5;
+            for (int i = 0; i < cv.num_bodies; ++i) 
+            {
+                bht_root->treeNodeInsert(particles[i], sub_box_size); // grow the tree by inserting each body
+            }
+            
+            register int current_index = 0;
+            bht_root->calculateCM(current_index);
+
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
         }
 
