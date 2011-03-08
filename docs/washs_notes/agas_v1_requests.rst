@@ -9,9 +9,9 @@
 Distributed under the Boost Software License, Version 1.0. (See accompanying 
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-------------
+************
 Introduction
-------------
+************
 
 *Disclaimer: Read my paper on the implementation of RTTI-free dynamic type
 systems in C++ first and my introduction to AGAS.*
@@ -30,61 +30,86 @@ In AGAS v1, the C++ identifiers given to these types are a little bit ambiguous.
 Unfortunately, these names are used by AGAS logging, so it is important for HPX
 users to understand how this type system maps to the services provided by AGAS.
 
------------------
-command_getprefix
------------------
+*************************
+Requests to AGAS Services
+*************************
 
-::
-
-  command_getprefix = 0,      ///< return a unique prefix for the requesting site
-
-------------------------
-command_getconsoleprefix
-------------------------
-
-::
-
-  command_getconsoleprefix = 1, ///< return the prefix of the console locality
-
------------------
-command_getprefix
------------------
-
-::
-
-  command_getprefixes = 2,    ///< return prefixes for all known localities in the system
-
------------------
-command_getprefix
------------------
-
-::
-
-  command_getprefix_for_site = 3, ///< return prefix for the given site
-
------------------
-command_getprefix
------------------
+---------------------------------------------------------
+Factory Registration (get_component_id, register_factory)
+---------------------------------------------------------
 
 ::
 
   command_get_component_id = 4,   ///< return an unique component type
-
------------------
-command_getprefix
------------------
-
-::
-
   command_register_factory = 5,   ///< register a factory for a component type
 
-------------------
-command_getidrange
-------------------
+Mappings
+^^^^^^^^
+
+component name (std::string) -> type id (hpx::components::component_type) 
+type id (hpx::components::component_type) -> prefixes (boost::uint32_t) [0]_
+
+Interface
+^^^^^^^^^
+
+========================== ==============
+AGAS v1 ptype              Method concept 
+========================== ==============
+command_get_component_id   resolve [1]_
+command_register_factory   bind [2]_
+========================== ==============
+
+.. [0] This table currently provides no accessors, and is only used by the
+       locality registration service (see command_getprefixes below).
+.. [1] command_get_component_id resolves a component name to a type id.
+.. [2] command_register_factory creates bindings in the component name ->
+       type id database as well as the type id -> prefixes database. It is
+       currently the only bind interface for this service.
+
+------------------------------------------------------------------------------------------------
+Locality Registration (getprefix, getconsoleprefix, getprefixes, getprefix_for_site, getidrange)
+------------------------------------------------------------------------------------------------
 
 ::
 
+  command_getprefix = 0,      ///< return a unique prefix for the requesting site
+  command_getconsoleprefix = 1, ///< return the prefix of the console locality
+  command_getprefixes = 2,    ///< return prefixes for all known localities in the system
+  command_getprefix_for_site = 3, ///< return prefix for the given site
   command_getidrange = 6,     ///< return a unique range of ids for the requesting site
+
+Mappings
+^^^^^^^^
+
+locality (hpx::naming::locality) -> prefix (std::pair<boost::uint32_t, hpx::naming::gid_type>) [3]_
+
+Interface
+^^^^^^^^^
+
+========================== ==============
+AGAS v1 ptype              Method concept 
+========================== ==============
+command_getprefix          bind
+command_getconsoleprefix   resolve [4]_
+command_getprefixes        resolve [5]_
+command_getprefix_for_site resolve [6]_ 
+command_getidrange         rebind
+========================== ==============
+
+.. [3] Note that locality registration uses the local address resolution
+       service. This means that registering a locality will create bindings
+       in both the locality -> prefix database and the gid -> address database.
+.. [4] command_getconsoleprefix returns the console locality prefix.
+.. [5] A command_getprefixes request is sent with a component type. If the
+       component type is hpx::components::component_invalid, then a vector
+       of all prefixes is returned with the reply. Otherwise, a vector of
+       prefixes with have a factory for the given component type is returned.
+       The factory lookup semantics provide the only direct resolution interface
+       to the component type -> prefixes database provided by the factory
+       registration service.  
+.. [6] command_get_prefix_for_site actually just calls getprefix_for_site -
+       the only different is that it doesn't try to verify that there's only
+       one console locality.
 
 ------------------------------------------------------------
 Local Address Resolution (resolve, unbind_range, bind_range)
@@ -96,7 +121,13 @@ Local Address Resolution (resolve, unbind_range, bind_range)
   command_unbind_range = 10,  ///< remove binding for a range of global ids
   command_resolve = 11,       ///< resolve a global id to an address
 
-:mappings: gid (hpx::naming::gid_type) -> local address (hpx::naming::address)
+Mappings
+^^^^^^^^
+
+gid (hpx::naming::gid_type) -> local address (hpx::naming::address)
+
+Interface
+^^^^^^^^^
 
 ==================== ==============
 AGAS v1 ptype        Method concept 
@@ -125,7 +156,13 @@ Namespace Resolution (queryid, registerid, unregisterid)
   command_registerid = 13,    ///< associate a namespace name with a global id
   command_unregisterid = 14,  ///< remove association of a namespace name with a global id
 
-:mappings: name (std::string) -> gid (hpx::naming::gid_type)
+Mappings
+^^^^^^^^
+
+name (std::string) -> gid (hpx::naming::gid_type)
+
+Interface
+^^^^^^^^^
 
 ==================== ==============
 AGAS v1 ptype        Method concept 
@@ -140,7 +177,7 @@ believe that this command unregisters a gid. This command is the unbind command
 for the name --> gid service.
 
 ****************
-Special Commands
+Special Requests
 ****************
 
 ---------------
