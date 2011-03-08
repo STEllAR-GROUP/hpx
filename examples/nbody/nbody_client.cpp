@@ -42,6 +42,13 @@ typedef struct {
     int num_iterations;
 } crit_vals;
 
+typedef struct {
+    double mass;
+    double px, py, pz;
+    double vx, vy, vz;
+    double ax, ay, az;
+} body;
+
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,6 +57,46 @@ namespace hpx { namespace components { namespace nbody
 {
  //   init_mpfr init_(true);
 }}}
+
+
+static inline void computeRootPos(const int num_bodies, double &box_dim, double center_position[],hpx::memory::default_vector<body>::type bodies) 
+{
+    double minPos[3];
+    minPos[0] = 1.0E90; 
+    minPos[1] = 1.0E90;
+    minPos[2] = 1.0E90;
+    double maxPos[3];
+    maxPos[0] = -1.0E90;
+    maxPos[1] = -1.0E90;
+    maxPos[2] = -1.0E90;
+   
+    for (int i = 0; i < bodies.size(); ++i)
+    {
+       
+        if (minPos[0] > bodies[i].px)
+            minPos[0] = bodies[i].px;
+        if (minPos[1] > bodies[i].py)
+            minPos[1] = bodies[i].py;
+        if (minPos[2] > bodies[i].pz)
+            minPos[2] = bodies[i].pz;
+        if (maxPos[0] < bodies[i].px)
+            maxPos[0] = bodies[i].px;
+        if (maxPos[1] < bodies[i].py)
+            maxPos[1] = bodies[i].py;
+        if (maxPos[2] < bodies[i].pz)
+            maxPos[2] = bodies[i].pz;
+    }
+    box_dim = maxPos[0] - minPos[0];
+    if (box_dim < (maxPos[1] - minPos[1]))
+        box_dim = maxPos[1] - minPos[1];
+    if (box_dim < (maxPos[2] - minPos[2]))
+        box_dim = maxPos[2] - minPos[2];
+    center_position[0] = (maxPos[0] + minPos[0]) / 2;
+    center_position[1] = (maxPos[1] + minPos[1]) / 2;
+    center_position[2] = (maxPos[2] + minPos[2]) / 2;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
@@ -99,11 +146,40 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         cv.half_dt = 0.5 * cv.dtime;
         cv.softening_2 = cv.eps * cv.eps;
         cv.inv_tolerance_2 = 1.0 / (cv.tolerance * cv.tolerance);    
-        infile.close();  
         
-        std::cout << "Num Bodies" << cv.num_bodies << std::endl;
+        std::cout << "Num Bodies " << cv.num_bodies << std::endl;
+        hpx::memory::default_vector<body>::type bodies;
+        hpx::memory::default_vector<body>::type::iterator bod_iter;
+        bodies.resize(cv.num_bodies);
+        
+        for (int i =0; i < cv.num_bodies ; ++i)
+        {
+            double dat[7] = {0,0,0,0,0,0,0};
+            infile >> dat[0] >> dat[1] >> dat[2] >> dat[3] >> dat[4] >> dat[5] >> dat[6];
+            bodies[i].mass = dat[0];
+            bodies[i].px = dat[1];
+            bodies[i].py = dat[2];
+            bodies[i].pz = dat[3];
+            bodies[i].vx = dat[4];
+            bodies[i].vy = dat[5];
+            bodies[i].vz = dat[6];
+        }
+        
+        for (int i =0; i < cv.num_bodies ; ++i)
+        {
+            std::cout << "body : "<< i << " : " << bodies[i].mass << " : " <<
+            bodies[i].px << " : " << bodies[i].py << " : " << bodies[i].pz << std::endl;
+            std::cout <<"           " << " : " << bodies[i].vx << " : " << bodies[i].vy 
+            << " : " << bodies[i].vz << std::endl;
+        }
 
-
+        infile.close();  
+        for (cv.iter = 0; cv.iter < cv.num_iterations; ++cv.iter)
+        {
+            double box_size, cPos[3];
+            computeRootPos(cv.num_bodies, box_size, cPos, bodies);
+            std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
+        }
 
         // for loop for iteration
 
