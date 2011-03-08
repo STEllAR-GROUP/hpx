@@ -83,6 +83,7 @@ static TreeLeaf **particles; // the n particles
 class TreeNode 
 {
     public:
+        int tag;
         int node_type; /* Each node has a node type which is either NDE or PAR*/
         double mass;   /* Each node has a mass */
         double p[3];   /* position of each node is stored in a vector of type double named p */
@@ -97,6 +98,9 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         static IntrTreeNode *newNode(const double pos_buf[]); /* Function to create a new node, returns an Internal Tree Node */
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
+        void tagTree(int &current_node);
+        void printTag(int &current_node);
+
 
         static void treeReuse()      /* function to recycle tree */
         {
@@ -253,6 +257,48 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
  * across the entire tree recursively. 
  */
 
+void IntrTreeNode::tagTree(int &current_node)
+{
+   static int tag_id;
+    register TreeNode *temp_branch;
+    for (int i = 0; i < 8; ++i) 
+    {
+        temp_branch = branch[i];
+        if (temp_branch != NULL) 
+        {
+            ++tag_id;
+            if(temp_branch->node_type == CELL)
+            { // Intermediate Node
+                ((IntrTreeNode *) temp_branch)->tagTree(current_node);
+            }
+            temp_branch->tag = tag_id;
+
+            std::cout << "particleid : " << tag_id << std::endl;
+        }
+    }
+    ++tag_id;
+    tag = tag_id;
+    std::cout << "particleid : " << tag_id << std::endl;
+}
+
+void IntrTreeNode::printTag(int &current_node)
+{
+    register TreeNode *temp_branch;
+    for (int i = 0; i < 8; ++i) 
+    {
+        temp_branch = branch[i];
+        if (temp_branch != NULL) 
+        {
+            if(temp_branch->node_type == CELL)
+            { // Intermediate Node
+                ((IntrTreeNode *) temp_branch)->tagTree(current_node);
+            }
+            std::cout << "Tag : " << temp_branch->tag << std::endl;
+        }
+    }
+    std::cout << "tag : " << tag << std::endl;
+}
+
 void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info about subtrees
 {
     /* initialize local buffer mass and position variables to 0 */
@@ -263,6 +309,7 @@ void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info
     /* initialize var variable to 0 ... helps in cycling through 
      * the array index
      */ 
+    
     register int var = 0;
     /* this variable will store the total mass of the branch bodies */
     mass = 0.0;
@@ -481,8 +528,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             register int current_index = 0;
             bht_root->calculateCM(current_index);
+            bht_root->tagTree(current_index);
+            bht_root->printTag(current_index);
 
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
+            std::cout << bht_root->tag << std::endl;
+            
         }
 
         // for loop for iteration
