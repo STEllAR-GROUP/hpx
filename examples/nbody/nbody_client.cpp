@@ -70,6 +70,13 @@ namespace hpx { namespace components { namespace nbody
  * CELL - intermediate nodes
  * PAR - Terminal nodes which contain the body/particle.
  */
+
+template <typename T>
+T square(const T& value)
+{
+    return value * value;
+}
+
 enum 
 {
     CELL, PAR
@@ -100,6 +107,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
         void tagTree(int &current_node);
         void printTag(int &current_node);
+        void interList(const IntrTreeNode * const n, double box_size_2, std::vector<int> iList[]);
 
 
         static void treeReuse()      /* function to recycle tree */
@@ -130,8 +138,10 @@ class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate n
         }
         void moveParticles(); /* moves particles according to acceleration and velocity calculated */
         void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
+        void interactionList(const TreeNode * const n, double box_size_2, std::vector<int > iList[] , const int idx );
         ~TreeLeaf() { }       /* TreeLeaf Destructor */
     private:
+
         void forceCalcRe(const TreeNode * const n, double box_size_2); /* traverses tree recursively while calculating force for each particle */
 };
 
@@ -293,12 +303,99 @@ void IntrTreeNode::printTag(int &current_node)
             { // Intermediate Node
                 ((IntrTreeNode *) temp_branch)->tagTree(current_node);
             }
-            std::cout << "Tag : " << temp_branch->tag << std::endl;
+            std::cout << "PAR Tag : " << temp_branch->tag << std::endl;
         }
     }
-    std::cout << "tag : " << tag << std::endl;
+    std::cout << "CELL tag : " << tag << std::endl;
 }
 
+void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector<int> iList[])
+{
+    register TreeNode *temp_branch;
+    for (int i = 0; i < 8; ++i) 
+    {
+        temp_branch = branch[i];
+        if (temp_branch != NULL) 
+        {
+            if(temp_branch->node_type == CELL)
+            { // Intermediate Node
+                std::cout << "Tag : " << temp_branch->tag << std::endl;
+            }
+            if(temp_branch->node_type == PAR)
+            { // Intermediate Node
+                //temp_branch->tag ;
+                ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
+            }
+        }
+    }
+}
+
+
+//call with box_size_buf * box_size_buf * inv_tolerance_2
+void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector<int > iList[] , const int idx )
+{
+    register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
+    for (int i=0; i < 3; ++i)
+        distance_r[i] = n->p[i] - p[i];
+    
+    distance_r_2 = square<double>(distance_r[0]) + square<double>(distance_r[1]) + square<double>(distance_r[2]);
+    
+    if (distance_r_2 < box_size_2) 
+    {
+        if (n->node_type == CELL) 
+        {
+            register IntrTreeNode *temp_node = (IntrTreeNode *) n;
+            box_size_2 *= 0.25;
+            if (temp_node->branch[0] != NULL) 
+            {
+                interactionList(temp_node->branch[0], box_size_2, iList, idx);
+                if (temp_node->branch[1] != NULL) 
+                {
+                    interactionList(temp_node->branch[1], box_size_2, iList, idx);
+                    if (temp_node->branch[2] != NULL) 
+                    {
+                        interactionList(temp_node->branch[2], box_size_2, iList, idx);
+                        if (temp_node->branch[3] != NULL) 
+                        {
+                            interactionList(temp_node->branch[3], box_size_2, iList, idx);
+                            if (temp_node->branch[4] != NULL) 
+                            {
+                                interactionList(temp_node->branch[4], box_size_2, iList, idx);
+                                if (temp_node->branch[5] != NULL) 
+                                {
+                                    interactionList(temp_node->branch[5], box_size_2, iList, idx);
+                                    if (temp_node->branch[6] != NULL) 
+                                    {
+                                        interactionList(temp_node->branch[6], box_size_2, iList, idx);
+                                        if (temp_node->branch[7] != NULL) 
+                                        {
+                                            interactionList(temp_node->branch[7], box_size_2, iList, idx);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+        else
+        {
+            if (n != this) 
+            {
+                iList[idx].push_back(n->tag - 1);
+            }
+        }
+    }
+    else 
+    {
+        if (n != this) 
+        {
+            iList[idx].push_back(n->tag - 1);
+        }
+    }
+
+}
 void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info about subtrees
 {
     /* initialize local buffer mass and position variables to 0 */
@@ -533,6 +630,27 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
             std::cout << bht_root->tag << std::endl;
+            
+            std::vector<int > iList[bht_root->tag];
+            
+            double temp_box_size = box_size;
+            bht_root->interList(bht_root, temp_box_size * temp_box_size *cv.inv_tolerance_2, iList);
+            
+//             for (int i = 0; i != cv.num_bodies; ++i) 
+//             {
+//                 particles[i]->interactionList(bht_root, temp_box_size * temp_box_size * cv.inv_tolerance_2, iList ,i );
+//             }
+                
+            for (int p = 0; p < bht_root->tag; ++p)
+            {
+                std::cout << " p : " << p << " list : " ;
+                for (int q = 0; q < iList[p].size(); ++q)
+                {
+                    std::cout << " " << q;
+                }
+                std::cout << std::endl;
+            }
+
             
         }
 
