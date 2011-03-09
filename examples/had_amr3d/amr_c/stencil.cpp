@@ -997,13 +997,11 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
 
-            // TEST
-            resultval.get() = val[compute_index].get();
-
             // copy over critical info
             resultval->x_ = val[compute_index]->x_;
             resultval->y_ = val[compute_index]->y_;
             resultval->z_ = val[compute_index]->z_;
+            resultval->timestep_ = val[compute_index]->timestep_;
             resultval->value_.resize(val[compute_index]->value_.size());
             resultval->level_ = val[compute_index]->level_;
             resultval->max_index_ = val[compute_index]->max_index_;

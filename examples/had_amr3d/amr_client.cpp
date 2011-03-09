@@ -431,6 +431,12 @@ int main(int argc, char* argv[])
 
         // figure out the number of points for row 0
         numvals = par->rowsize[0];
+#if 0
+        FILE *fdata;
+        fdata = fopen("equator.dat","w");
+        fprintf(fdata,"\n");
+        fclose(fdata);
+#endif
 
         // initialize and start the HPX runtime
         std::size_t executed_threads = 0;

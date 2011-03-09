@@ -67,6 +67,24 @@ namespace hpx { namespace components { namespace amr { namespace server
         hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
         double datatime;
         if ( logcode == 0 ) {
+#if 0
+          FILE *fdata;
+          fdata = fopen("equator.dat","a");
+          had_double_type xx,yy,zz;
+          int j,k;
+          for (k=0;k<par->granularity;k++) {
+          for (j=0;j<par->granularity;j++) {
+          for (i=0;i<par->granularity;i++) {
+            xx = val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_);
+            yy = val.y_[0]+j*par->dx0/pow(2.0,(int)val.level_);
+            zz = val.z_[0]+k*par->dx0/pow(2.0,(int)val.level_);
+            if ( zz <= 0.0 + 1.e-4 && zz >= 0.0 - 1.e-4 ) {
+              fprintf(fdata,"%g %g %g %g\n",xx,yy,zz,val.timestep_*par->dx0*par->lambda);
+            }
+          } } }
+          fclose(fdata);
+#endif
+
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<par->granularity;i++) {
               x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
