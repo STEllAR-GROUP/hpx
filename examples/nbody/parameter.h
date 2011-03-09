@@ -42,6 +42,16 @@ struct Par {
       int rowsize;
       std::string input_file;
       std::vector <std::vector<int> > iList;
+      double dtime;
+      double eps;
+      double tolerance;
+      double half_dt;
+      double softening_2;
+      double inv_tolerance_2;
+      int iter;
+      int num_bodies;
+      int num_iterations;
+      double part_mass;
 };
 
 #if defined(__cplusplus)

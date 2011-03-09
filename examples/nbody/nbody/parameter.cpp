@@ -27,6 +27,16 @@ namespace hpx { namespace components { namespace nbody
         ar & rowsize;
         ar & input_file;
         ar & iList;
+        ar & dtime;
+        ar & eps;
+        ar & tolerance;
+        ar & half_dt;
+        ar & softening_2;
+        ar & inv_tolerance_2;
+        ar & iter;
+        ar & num_bodies;
+        ar & num_iterations;
+        ar & part_mass;
     }
 
     // explicit instantiation for the correct archive types

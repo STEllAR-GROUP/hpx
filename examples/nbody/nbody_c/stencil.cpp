@@ -124,7 +124,36 @@ namespace hpx { namespace components { namespace nbody
           }    
           BOOST_ASSERT(compute_index != -1);
 
-          resultval.get() = val[compute_index].get();
+          resultval->ax = 0.0;
+          resultval->ay = 0.0;
+          resultval->az = 0.0;
+          
+          for (int i=0;i<val.size();i++)
+          {
+              
+              if ( i != compute_index ) {
+                double dx = val[compute_index]->x - val[i]->x;
+                double dy = val[compute_index]->y - val[i]->y;
+                double dz = val[compute_index]->z - val[i]->z;
+                
+                double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+                resultval->ax += dx + acc_factor;
+                resultval->ay += dy + acc_factor;
+                resultval->az += dz + acc_factor;
+              }
+              std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
+          }
+          
+          ////TODO Put the move function here 
+//           for (int i=0;i<val.size();i++)
+//           {
+//              if ( i != compute_index ) {
+//                 
+//              }
+//           }
+
+       //   resultval.get() = val[compute_index].get();
           return 0;
         }
         BOOST_ASSERT(false);
