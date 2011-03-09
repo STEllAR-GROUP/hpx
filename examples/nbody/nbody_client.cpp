@@ -107,7 +107,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
         void tagTree(int &current_node);
         void printTag(int &current_node);
-        void interList(const IntrTreeNode * const n, double box_size_2, std::vector<int> iList[]);
+        void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
 
 
         static void treeReuse()      /* function to recycle tree */
@@ -138,7 +138,7 @@ class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate n
         }
         void moveParticles(); /* moves particles according to acceleration and velocity calculated */
         void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
-        void interactionList(const TreeNode * const n, double box_size_2, std::vector<int > iList[] , const int idx );
+        void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx );
         ~TreeLeaf() { }       /* TreeLeaf Destructor */
     private:
 
@@ -309,7 +309,7 @@ void IntrTreeNode::printTag(int &current_node)
     std::cout << "CELL tag : " << tag << std::endl;
 }
 
-void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector<int> iList[])
+void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList)
 {
     register TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
@@ -332,7 +332,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
 
 
 //call with box_size_buf * box_size_buf * inv_tolerance_2
-void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector<int > iList[] , const int idx )
+void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx )
 {
     register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
     for (int i=0; i < 3; ++i)
@@ -631,7 +631,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
             std::cout << bht_root->tag << std::endl;
             
-            std::vector<int > iList[bht_root->tag];
+            std::vector <std::vector<int> > iList;
+            iList.resize(bht_root->tag);
+            
             
             double temp_box_size = box_size;
             bht_root->interList(bht_root, temp_box_size * temp_box_size *cv.inv_tolerance_2, iList);
@@ -646,7 +648,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << " p : " << p << " list : " ;
                 for (int q = 0; q < iList[p].size(); ++q)
                 {
-                    std::cout << " " << q;
+                    std::cout << " " << iList[p][q];
                 }
                 std::cout << std::endl;
             }
