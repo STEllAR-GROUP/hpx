@@ -528,7 +528,7 @@ static inline void computeRootPos(const int num_bodies, double &box_dim, double 
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
-             components::nbody::Parameter const& par)
+             components::nbody::Parameter & par)
 {
     std::string input_file;
     crit_vals cv;
@@ -553,6 +553,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         unigrid_mesh.create(here);
         
         input_file = par->input_file;
+        
         if(input_file.size() == 0)
         {
             //hpx::finalize();
@@ -631,12 +632,14 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
             std::cout << bht_root->tag << std::endl;
             
-            std::vector <std::vector<int> > iList;
-            iList.resize(bht_root->tag);
+
+            par->iList.resize(bht_root->tag);
             
+            numvals = par->iList.size();
+            par->rowsize = par->iList.size();
             
             double temp_box_size = box_size;
-            bht_root->interList(bht_root, temp_box_size * temp_box_size *cv.inv_tolerance_2, iList);
+            bht_root->interList(bht_root, temp_box_size * temp_box_size *cv.inv_tolerance_2, par->iList);
             
 //             for (int i = 0; i != cv.num_bodies; ++i) 
 //             {
@@ -646,9 +649,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             for (int p = 0; p < bht_root->tag; ++p)
             {
                 std::cout << " p : " << p << " list : " ;
-                for (int q = 0; q < iList[p].size(); ++q)
+                for (int q = 0; q < par->iList[p].size(); ++q)
                 {
-                    std::cout << " " << iList[p][q];
+                    std::cout << " " << par->iList[p][q];
                 }
                 std::cout << std::endl;
             }

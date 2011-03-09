@@ -26,6 +26,7 @@ namespace hpx { namespace components { namespace nbody
         ar & loglevel;
         ar & rowsize;
         ar & input_file;
+        ar & iList;
     }
 
     // explicit instantiation for the correct archive types

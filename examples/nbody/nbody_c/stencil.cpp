@@ -101,6 +101,9 @@ namespace hpx { namespace components { namespace nbody
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
+        
+        std::cout << "row: " << row << " column : " << column << std::endl;
+        
 
         if ( val.size() == 0 ) {
           // This should not happen

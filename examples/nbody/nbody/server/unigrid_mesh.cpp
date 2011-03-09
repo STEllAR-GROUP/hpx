@@ -484,24 +484,22 @@ namespace hpx { namespace components { namespace nbody { namespace server
           int j = i;
           vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
           counter++;
+          
+          if (step == 0)
+          {
+            
 
-
-          if ( i == 1 && step == 0 ) { 
-            j = 3;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-
-          if ( i == 2 && step == 0 ) { 
-            j = 0;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
-          }
-
-          if ( i == 3 && step == 0 ) { 
-            j = 1;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-            counter++;
+                for (int p=0; p < par->iList[i].size() ; ++p)
+                {
+                    
+                    j = par->iList[i][p];
+                    std::cout << "i :" << i << " j: " << j <<std::endl;
+                    if (i!=j)
+                    {
+                        vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                        counter++;   
+                    }
+                }
           }
         }
       }

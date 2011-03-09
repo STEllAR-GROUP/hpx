@@ -41,6 +41,7 @@ struct Par {
       int output_stdout;
       int rowsize;
       std::string input_file;
+      std::vector <std::vector<int> > iList;
 };
 
 #if defined(__cplusplus)
