@@ -13,6 +13,8 @@ import sys, os, getopt, time, string
 from re import compile
 from types import *
 from operator import *
+from datetime import datetime
+from signal import SIGKILL
 
 # subprocess instantiation wrapper;
 # unfortunately older Python still lurks on some machines
@@ -27,6 +29,12 @@ try:
             
         def wait(self):
             return self._proc.wait()
+
+        def poll(self):
+            return self._proc.poll()
+        
+        def pid(self):
+            return self._proc.pid
 
         def read(self):
             return self._proc.stdout.read()
@@ -43,6 +51,12 @@ except ImportError, err:
 
         def wait(self):
             return self._proc.wait()
+        
+        def poll(self):
+            return self._proc.poll()
+
+        def pid(self):
+            return self._proc.pid
 
         def read(self):
             return self._proc.fromchild.read()
@@ -63,6 +77,10 @@ Options:
  -t command   : prefix application command line with profiling "command"
  -x list      : exclude cases with argument tuples matching any item in the
                 "list" (python expression)
+ -w seconds   : kill runs that take longer than "seconds" to complete (default
+                360). 
+ -i seconds   : interval to wait in between each poll of the run subprocesses
+                (default 10).
  -b command   : run preprocessing "command" before starting test sequence for
                 each configuration, applying option substitution
  -p command   : run postprocessing "command" after test sequence for each
@@ -87,8 +105,19 @@ def next(ixd, opts, optv):
         
 
 # run the application and optionally capture its output and error streams
-def run(cmd, outfl = None):
+def run(cmd, outfl = None, timeout = 360, tic = 10):
+    start = datetime.now() 
     proc = Process(cmd)
+
+    while proc.poll() is None:
+        time.sleep(tic)
+        now = datetime.now()
+        if (now - start).seconds > timeout:
+            print 'Error: "%s" timed out.' % cmd
+            os.kill(proc.pid(), SIGKILL)
+            os.waitpid(-1, os.WNOHANG)
+            return -1
+
     while outfl:
         s = proc.read()
         if s: writeres(s, outfl)
@@ -149,10 +178,10 @@ def optidsub(optids, s):
 
 
 # run pre- or postprocessor
-def runscript(cmdlst, options, ofhs):
+def runscript(cmdlst, options, ofhs, timeout, interval):
     for cmd in cmdlst:
         scr = cmd%options
-        rc = run(scr)
+        rc = run(scr, timeout, interval)
         if rc:
             writeres('Warning: command: "'+scr+'" returned '+str(rc)+'\n', ofhs)
 
@@ -160,7 +189,7 @@ def runscript(cmdlst, options, ofhs):
 if __name__ == '__main__':
     # parse command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:t:x:')
+        opts, args = getopt.getopt(sys.argv[1:], 'a:b:d:hno:p:r:t:x:w:i:')
     except getopt.GetoptError, err:
         print 'Error:', str(err)
         usage()
@@ -177,6 +206,8 @@ if __name__ == '__main__':
     runs, configs, erruns, excnt = 0, 0, 0, 0
     # separator length for pretty printing
     seplen = 78
+    # timeout length/polling interval for process management
+    timeout, interval = 360, 10
     # non-quotable characters
     nonquot = string.letters+string.digits+'-+='
 
@@ -205,6 +236,8 @@ if __name__ == '__main__':
         elif o == '-r': nrep = intopt(a, o)
         elif o == '-o': ofile = a
         elif o == '-t': profcmd = a
+        elif o == '-w': timeout = intopt(a, o)
+        elif o == '-i': interval = intopt(a, o)
         elif o == '-x':
             try:
                 excl = map(tuple, eval(a))
@@ -258,7 +291,7 @@ if __name__ == '__main__':
             excnt += 1
             continue
         # run setup program
-        if before: runscript(before, optd, ofhs)
+        if before: runscript(before, optd, ofhs, timeout, interval)
         # build command line
         cmd = map(lambda x: x%optd, cmdproto)
  
@@ -276,7 +309,7 @@ if __name__ == '__main__':
             txt = 'BEGIN RUN '+str(i+1)+' @ '+timestr()
             writeres(sepstr('*', txt)+'\n', ofhs)
             runs += 1
-            rc = run(cmd, ofhs)
+            rc = run(cmd, ofhs, timeout, interval)
             txt = 'END RUN '+str(i+1)+' @ '+timestr()
             if rc: erruns += 1
             outs = sepstr('-', txt)
@@ -284,7 +317,7 @@ if __name__ == '__main__':
             writeres(outs, ofhs)
             time.sleep(tpad)
         # run postprocessor
-        if after: runscript(after, optd, ofhs)
+        if after: runscript(after, optd, ofhs, timeout, interval)
 
         optix = next(optix, optnames, options)
     # final banner
