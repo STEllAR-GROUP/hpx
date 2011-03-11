@@ -7,7 +7,9 @@
 #include <iostream>
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/asio_util.hpp>
 
+#include <boost/fusion/include/at_c.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -56,7 +58,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         // we are in spherical symmetry, r=0 is the smallest radial domain point
         components::amr::unigrid_mesh unigrid_mesh;
         unigrid_mesh.create(here);
-        std::vector<naming::id_type> result_data =
+        boost::shared_ptr<std::vector<naming::id_type> > result_data =
             unigrid_mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid,par);
 
@@ -80,8 +82,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
 //         boost::this_thread::sleep(boost::posix_time::seconds(3)); 
 
-        for (std::size_t i = 0; i < result_data.size(); ++i)
-            components::stubs::memory_block::free(result_data[i]);
+        for (std::size_t i = 0; i < result_data->size(); ++i)
+            components::stubs::memory_block::free((*result_data)[i]);
     }   // amr_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
@@ -110,6 +112,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "HPX locality")
             ("dist,d", po::value<std::string>(), 
                 "random distribution type (uniform or normal)")
+            ("random_ports", "use random ports for AGAS and parcels.")
             ("numsteps,s", po::value<std::size_t>(), 
                 "the number of time steps to use for the computation")
             ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
@@ -197,6 +200,21 @@ int main(int argc, char* argv[])
         int num_threads = 1;
         hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
         bool do_logging = false;
+
+        if (vm.count("random_ports") && !vm.count("agas") && !vm.count("hpx"))
+        {
+            using boost::fusion::at_c;
+
+            boost::fusion::vector2<boost::uint16_t, boost::uint16_t> ports =
+                hpx::util::get_random_ports();
+
+            std::cout <<   "Randomized port for AGAS: " << at_c<0>(ports)
+                      << "\nRandomized port for parcels: " << at_c<1>(ports)
+                      << std::endl; 
+
+            agas_port = at_c<0>(ports);
+            hpx_port = at_c<1>(ports);
+        }
 
         // extract IP address/port arguments
         if (vm.count("agas")) 

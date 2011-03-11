@@ -12,6 +12,7 @@
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 
 #include "../dynamic_stencil_value.hpp"
@@ -29,6 +30,13 @@ HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action,
     had_unigrid_mesh_init_execute_action);
 HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, 
     had_unigrid_mesh_execute_action);
+
+typedef hpx::lcos::base_lco_with_value<
+    boost::shared_ptr<std::vector<hpx::naming::id_type> > > lco_gid_vector_ptr;
+
+HPX_REGISTER_ACTION_EX(lco_gid_vector_ptr::set_result_action,
+    set_result_action_gid_vector_ptr);
+HPX_DEFINE_GET_COMPONENT_TYPE(lco_gid_vector_ptr);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh3d);
@@ -291,14 +299,15 @@ namespace hpx { namespace components { namespace amr { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
-    std::vector<naming::id_type> unigrid_mesh::init_execute(
+    boost::shared_ptr<std::vector<naming::id_type> > unigrid_mesh::init_execute(
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
         components::component_type logging_type,
         Parameter const& par)
     {
         //hpx::util::high_resolution_timer t;
-        std::vector<naming::id_type> result_data;
+        boost::shared_ptr<std::vector<naming::id_type> > result_data
+            (new std::vector<naming::id_type>());
 
         components::component_type stencil_type = 
             components::get_component_type<components::amr::server::dynamic_stencil_value>();
@@ -409,7 +418,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
         // do actual work
-        execute(locality_results(stencils[0]), initial_data, result_data);
+        execute(locality_results(stencils[0]), initial_data, *result_data);
 
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())

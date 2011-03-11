@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace amr
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        lcos::future_value<std::vector<naming::id_type> > 
+        lcos::future_value<boost::shared_ptr<std::vector<naming::id_type> > > 
         init_execute_async(components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
            // components::component_type logging_type = components::component_invalid,
@@ -50,7 +50,7 @@ namespace hpx { namespace components { namespace amr
                 numvalues, numsteps, logging_type,par);
         }
 
-        std::vector<naming::id_type> 
+        boost::shared_ptr<std::vector<naming::id_type> > 
         init_execute(components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
             components::component_type logging_type,
