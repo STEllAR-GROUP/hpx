@@ -291,7 +291,8 @@ if __name__ == '__main__':
             excnt += 1
             continue
         # run setup program
-        if before: runscript(before, optd, ofhs, timeout, interval)
+        # TODO: add timeout/interval options
+        if before: runscript(before, optd, ofhs)
         # build command line
         cmd = map(lambda x: x%optd, cmdproto)
  
@@ -317,7 +318,8 @@ if __name__ == '__main__':
             writeres(outs, ofhs)
             time.sleep(tpad)
         # run postprocessor
-        if after: runscript(after, optd, ofhs, timeout, interval)
+        # TODO: add timeout/interval options
+        if after: runscript(after, optd, ofhs)
 
         optix = next(optix, optnames, options)
     # final banner
