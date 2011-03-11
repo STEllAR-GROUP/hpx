@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to the Active Global Address Space &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="index.html" />
+    <link rel="next" title="AGAS v1 Requests" href="agas_v1_requests.html" />
+    <link rel="prev" title="Wash’s Notes on HPX, C++ and ParalleX" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="agas_v1_requests.html" title="AGAS v1 Requests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Wash’s Notes on HPX, C++ and ParalleX"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction-to-the-active-global-address-space">
+<h1>Introduction to the Active Global Address Space<a class="headerlink" href="#introduction-to-the-active-global-address-space" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">author:</th><td class="field-body">Bryce Lelbach aka &#8220;wash&#8221;</td>
+</tr>
+<tr class="field"><th class="field-name">contact:</th><td class="field-body"><a class="reference external" href="mailto:blelbach&#37;&#52;&#48;cct&#46;lsu&#46;edu">blelbach<span>&#64;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a></td>
+</tr>
+<tr class="field"><th class="field-name">organization:</th><td class="field-body">LSU Center for Computation and Technology, ParalleX group</td>
+</tr>
+<tr class="field"><th class="field-name">copyright:</th><td class="field-body">Copyright (c) 2011</td>
+</tr>
+</tbody>
+</table>
+<p>Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at <a class="reference external" href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>One of the key elements of the ParalleX execution model is a set of constructs
+which implement a distributed, global 128-bit address space accessible by all
+<em>localities</em> <a class="footnote-reference" href="#id8" id="id1">[0]</a> in a ParalleX system. These services and the address space
+that they deploy are collectively known as the <em>Active Global Address Space
+(AGAS)</em>.</p>
+<p>The common currency of AGAS is the <em>global identifier (GID)</em>. The GID data
+structure is a representation of a unique AGAS address. These GIDs are usually
+<a class="footnote-reference" href="#id9" id="id2">[1]</a> associated with a single <em>object</em> in the physical memory of one of the
+localities participating in a ParalleX system.</p>
+<p>One of the core services that AGAS provides is global reference counting of
+GIDs. This implements garbage collection of objects registered with AGAS. When
+a locality decrements a GID with a reference count of 1, AGAS will inform the
+locality that it must clean up the GID. <a class="footnote-reference" href="#id10" id="id3">[2]</a></p>
+<p>Another key aspect of AGAS&#8217; design is the mobility of objects. Objects
+registered with AGAS are intended to have the capability to move between
+localities. The implementation of this particular facet of AGAS&#8217; design has
+largely been unexplored at this point in time.</p>
+<p>The administration of the AGAS address space is managed by <em>namespaces</em>. <a class="footnote-reference" href="#id11" id="id4">[3]</a>
+The AGAS namespaces are a series of interconnected yet distinct registries
+which <em>bind</em>, <em>resolve</em> and <em>unbind</em> key-value pairs. These namespaces form
+a hierarchal <em>service stack</em>:</p>
+<div class="highlight-python"><pre>+---------------+ +-------------------------------+-----------------+
+|               | |       factory namespace       |                 |
+|               | |                               |                 |
+|               | |      type id -&gt; prefixes      |                 |
+|               | +-------------------------------+                 |
+|    symbol     | +-----------------------------+ |    component    |
+|   namespace   | |      locality namespace     | |    namespace    |
+|               | |                             | |                 |
+| string -&gt; gid | |      locality -&gt; prefix     | | name -&gt; type id |
+|               | +-----------------------------+ |                 |
+|               | |      primary namespace      | |                 |
+|               | |                             | |                 |
+|               | |    gid --&gt; local address    | |                 |
++---------------+ +-----------------------------+ +-----------------+</pre>
+</div>
+<p>In this paper, we will focus on this service stack and the GID reference
+counting infrastructure.</p>
+</div>
+<div class="section" id="namespaces">
+<h2>Namespaces<a class="headerlink" href="#namespaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="primary-namespace">
+<h3>Primary Namespace<a class="headerlink" href="#primary-namespace" title="Permalink to this headline">¶</a></h3>
+<p>AGAS&#8217; most primitive construct is the <em>primary namespace</em>. The primary namespace
+maps GIDs to <em>local addresses</em> <a class="footnote-reference" href="#id12" id="id5">[4]</a>. Conceptually, local addresses are tuples
+consisting of a protocol-specific network address <a class="footnote-reference" href="#id13" id="id6">[5]</a>, a component type, and
+64-bits of application data. Typically, this application data is a pointer
+which directly or indirectly refers to a data structure in a particular worker
+nodes&#8217; address space. <a class="footnote-reference" href="#id14" id="id7">[6]</a></p>
+</div>
+</div>
+<div class="section" id="footnotes">
+<h2>Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[0]</a></td><td>A locality is a set of computing resources connected by a network that
+has a finite, bounded response time. Currently we consider uniprocessor
+and multiprocessor machines with HyperTransport (or similiar) technology
+to be a single locality.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>In the current system, no gurantee is made that a GID will be unique among
+all AGAS namespaces, though this is generally assumed to be true. Software
+implementation of this gurantee is likely forthcoming.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Currently, GIDS are represented by the hpx::naming::gid_type class
+Instances of this class should rarely be used directly be HPX users,
+because incrementing/decrementing their reference count involves a full
+network roundtrip to AGAS, and therefore are expensive to copy. The
+hpx::naming::id_type class is a handle for hpx::naming::gid_type which is
+reference counted locally; this is the class exposed to to user code.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td>The english word &#8216;namespace&#8217; is defined as an abstract domain that
+provides context for the elements that it holds. This definition is apt
+for our purpose; please note that I am not referring to C++ namespaces
+or similiar programming language constructs.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[4]</a></td><td>Local addresses are represented in HPX by the hpx::naming::address and
+hpx::naming::full_address class.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[5]</a></td><td>For IP (v4 and v6), the protocal specific address is the human-readable
+form of an IP address and a port.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id14" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[6]</a></td><td>In HPX, the core component types of the runtime system
+(hpx::components::server::runtime_support, hpx::components::server::memory
+and hpx::components::server::memory_block at the time that this paper was
+written) register direct memory addresses with AGAS. Simple components
+also register direct addresses. Managed components, however, register a
+&#8220;virtual&#8221; address which must be further resolved with the hpx::get_lva()
+utility.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Introduction to the Active Global Address Space</a><ul>
+<li><a class="reference external" href="#abstract">Abstract</a></li>
+<li><a class="reference external" href="#namespaces">Namespaces</a><ul>
+<li><a class="reference external" href="#primary-namespace">Primary Namespace</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#footnotes">Footnotes</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Wash&#8217;s Notes on HPX, C++ and ParalleX</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="agas_v1_requests.html"
+                                  title="next chapter">AGAS v1 Requests</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/introduction_to_agas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="agas_v1_requests.html" title="AGAS v1 Requests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Wash’s Notes on HPX, C++ and ParalleX"
+             >previous</a> |</li>
+        <li><a href="index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2011, Bryce Lelbach aka wash.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>
