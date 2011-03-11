@@ -18,9 +18,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the global address resolver
-#define HPX_PORT 7910
+#define HPX_PORT                    7910
 #define HPX_NAME_RESOLVER_ADDRESS   "127.0.0.1"
 #define HPX_NAME_RESOLVER_PORT      7911
+#define HPX_RANDOM_PORT_MIN         26001
+#define HPX_RANDOM_PORT_MAX         26132
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEBUG) && defined(_DEBUG)
