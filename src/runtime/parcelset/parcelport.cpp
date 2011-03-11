@@ -175,7 +175,7 @@ namespace hpx { namespace parcelset
                     if (!error) 
                         break;
 
-                    // we wait for a really short amount of time (usually 100µs)
+                    // we wait for a really short amount of time (usually 100microseconds)
                     boost::this_thread::sleep(boost::get_system_time() + 
                         boost::posix_time::microseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
