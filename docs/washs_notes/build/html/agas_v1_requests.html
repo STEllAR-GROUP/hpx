@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -12,14 +14,16 @@
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
         VERSION:     '0.5.0',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="index.html" />
+    <link rel="next" title="HPX Logging" href="hpx_logs.html" />
     <link rel="prev" title="Introduction to the Active Global Address Space" href="introduction_to_agas.html" /> 
   </head>
   <body>
@@ -29,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="hpx_logs.html" title="HPX Logging"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="introduction_to_agas.html" title="Introduction to the Active Global Address Space"
              accesskey="P">previous</a> |</li>
@@ -68,12 +75,12 @@ class. This class implements all of the services that AGAS provides. Requests
 are sent to the handler in the form of hpx::naming::server::request instances.</p>
 <p>The request data structure holds two pieces of information:</p>
 <blockquote>
-<ol class="arabic simple" start="0">
+<div><ol class="arabic simple" start="0">
 <li>A punned type (ptype) from the bounded type system defined by
 hpx::naming::server::agas_server_command.</li>
 <li>Request data (note that not all ptypes have request data).</li>
 </ol>
-</blockquote>
+</div></blockquote>
 <p>In AGAS v1, the C++ identifiers given to these types are a little bit ambiguous.
 Unfortunately, these names are used by AGAS logging, so it is important for HPX
 users to understand how this type system maps to the services provided by AGAS.</p>
@@ -351,67 +358,70 @@ hpx::not_implemented, it simply returns 0.0.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">AGAS v1 Requests</a><ul>
-<li><a class="reference external" href="#introduction">Introduction</a></li>
-<li><a class="reference external" href="#requests-to-agas-services">Requests to AGAS Services</a><ul>
-<li><a class="reference external" href="#component-factory-namespace-get-component-id-register-factory">Component/Factory Namespace (get_component_id, register_factory)</a><ul>
-<li><a class="reference external" href="#mappings">Mappings</a></li>
-<li><a class="reference external" href="#interface">Interface</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AGAS v1 Requests</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#requests-to-agas-services">Requests to AGAS Services</a><ul>
+<li><a class="reference internal" href="#component-factory-namespace-get-component-id-register-factory">Component/Factory Namespace (get_component_id, register_factory)</a><ul>
+<li><a class="reference internal" href="#mappings">Mappings</a></li>
+<li><a class="reference internal" href="#interface">Interface</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#console-locality-namespace-getprefix-getconsoleprefix-getprefixes-getprefix-for-site-getidrange">Console/Locality Namespace (getprefix, getconsoleprefix, getprefixes, getprefix_for_site, getidrange)</a><ul>
-<li><a class="reference external" href="#id7">Mappings</a></li>
-<li><a class="reference external" href="#id9">Interface</a></li>
+<li><a class="reference internal" href="#console-locality-namespace-getprefix-getconsoleprefix-getprefixes-getprefix-for-site-getidrange">Console/Locality Namespace (getprefix, getconsoleprefix, getprefixes, getprefix_for_site, getidrange)</a><ul>
+<li><a class="reference internal" href="#id7">Mappings</a></li>
+<li><a class="reference internal" href="#id9">Interface</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#primary-namespace-resolve-unbind-range-bind-range">Primary Namespace (resolve, unbind_range, bind_range)</a><ul>
-<li><a class="reference external" href="#id17">Mappings</a></li>
-<li><a class="reference external" href="#id18">Interface</a></li>
+<li><a class="reference internal" href="#primary-namespace-resolve-unbind-range-bind-range">Primary Namespace (resolve, unbind_range, bind_range)</a><ul>
+<li><a class="reference internal" href="#id17">Mappings</a></li>
+<li><a class="reference internal" href="#id18">Interface</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#gid-garbage-collection-namespace-incref-decref">GID Garbage Collection Namespace (incref, decref)</a></li>
-<li><a class="reference external" href="#symbol-namespace-queryid-registerid-unregisterid">Symbol Namespace (queryid, registerid, unregisterid)</a><ul>
-<li><a class="reference external" href="#id19">Mappings</a></li>
-<li><a class="reference external" href="#id20">Interface</a></li>
+<li><a class="reference internal" href="#gid-garbage-collection-namespace-incref-decref">GID Garbage Collection Namespace (incref, decref)</a></li>
+<li><a class="reference internal" href="#symbol-namespace-queryid-registerid-unregisterid">Symbol Namespace (queryid, registerid, unregisterid)</a><ul>
+<li><a class="reference internal" href="#id19">Mappings</a></li>
+<li><a class="reference internal" href="#id20">Interface</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference external" href="#special-requests">Special Requests</a><ul>
-<li><a class="reference external" href="#command-unknown">command_unknown</a></li>
-<li><a class="reference external" href="#command-firstcommand">command_firstcommand</a></li>
-<li><a class="reference external" href="#command-lastcommand">command_lastcommand</a></li>
-<li><a class="reference external" href="#command-statistics-count-command-statistics-mean">command_statistics_count, command_statistics_mean</a></li>
-<li><a class="reference external" href="#command-statistics-moment2">command_statistics_moment2</a></li>
+<li><a class="reference internal" href="#special-requests">Special Requests</a><ul>
+<li><a class="reference internal" href="#command-unknown">command_unknown</a></li>
+<li><a class="reference internal" href="#command-firstcommand">command_firstcommand</a></li>
+<li><a class="reference internal" href="#command-lastcommand">command_lastcommand</a></li>
+<li><a class="reference internal" href="#command-statistics-count-command-statistics-mean">command_statistics_count, command_statistics_mean</a></li>
+<li><a class="reference internal" href="#command-statistics-moment2">command_statistics_moment2</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="introduction_to_agas.html"
-                                  title="previous chapter">Introduction to the Active Global Address Space</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/agas_v1_requests.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction_to_agas.html"
+                        title="previous chapter">Introduction to the Active Global Address Space</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hpx_logs.html"
+                        title="next chapter">HPX Logging</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/agas_v1_requests.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -423,14 +433,17 @@ hpx::not_implemented, it simply returns 0.0.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="hpx_logs.html" title="HPX Logging"
+             >next</a> |</li>
+        <li class="right" >
           <a href="introduction_to_agas.html" title="Introduction to the Active Global Address Space"
              >previous</a> |</li>
         <li><a href="index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2011, Bryce Lelbach aka wash.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+        &copy; Copyright 2011, Bryce Lelbach aka wash.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

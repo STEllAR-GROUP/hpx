@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -12,14 +14,16 @@
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
         VERSION:     '0.5.0',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="index.html" /> 
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="index.html" />
+    <link rel="prev" title="AGAS v1 Requests" href="agas_v1_requests.html" /> 
   </head>
   <body>
     <div class="related">
@@ -28,6 +32,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="agas_v1_requests.html" title="AGAS v1 Requests"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -121,7 +128,21 @@ set to 0.</p>
 <p>In HPX ini files, the following syntax::</p>
 <div class="highlight-python"><pre>${FOO:default}</pre>
 </div>
-<p>Will use the environmental variable FOO if it is set and default otherwise.</p>
+<p>Will use the environmental variable FOO if it is set and default otherwise.
+No default has to be specified. Therefore this::</p>
+<div class="highlight-python"><pre>${FOO}</pre>
+</div>
+<p>refers to the environmental variable FOO. If FOO is not set or empty the
+overall expression will evaluate to an empty string.</p>
+<p>The syntax::</p>
+<div class="highlight-python"><pre>$[section.key:default]</pre>
+</div>
+<p>refers to the value held by the &#8216;key&#8217; in the ini &#8216;section&#8217; if it exists and
+default otherwise. No default has to be specified. Therefore this::</p>
+<div class="highlight-python"><pre>$[section.key]</pre>
+</div>
+<p>refers to the &#8216;key&#8217; inside the given &#8216;section&#8217;. If the key is not set or
+empty the overall expression will evaluate to an empty string.</p>
 </div>
 </div>
 <div class="section" id="reference">
@@ -179,44 +200,47 @@ destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">HPX Logging</a><ul>
-<li><a class="reference external" href="#introduction">Introduction</a><ul>
-<li><a class="reference external" href="#destinations">Destinations</a></li>
-<li><a class="reference external" href="#levels">Levels</a></li>
-<li><a class="reference external" href="#ini-environmental-variable-syntax">INI Environmental Variable Syntax</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HPX Logging</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#destinations">Destinations</a></li>
+<li><a class="reference internal" href="#levels">Levels</a></li>
+<li><a class="reference internal" href="#ini-environmental-variable-syntax">INI Environmental Variable Syntax</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#reference">Reference</a><ul>
-<li><a class="reference external" href="#general-logs">General Logs</a></li>
-<li><a class="reference external" href="#timing-logs">Timing Logs</a></li>
-<li><a class="reference external" href="#agas-logs">AGAS Logs</a></li>
-<li><a class="reference external" href="#application-logs">Application Logs</a></li>
+<li><a class="reference internal" href="#reference">Reference</a><ul>
+<li><a class="reference internal" href="#general-logs">General Logs</a></li>
+<li><a class="reference internal" href="#timing-logs">Timing Logs</a></li>
+<li><a class="reference internal" href="#agas-logs">AGAS Logs</a></li>
+<li><a class="reference internal" href="#application-logs">Application Logs</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/hpx_logs.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="agas_v1_requests.html"
+                        title="previous chapter">AGAS v1 Requests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/hpx_logs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -227,12 +251,15 @@ destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="agas_v1_requests.html" title="AGAS v1 Requests"
+             >previous</a> |</li>
         <li><a href="index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2011, Bryce Lelbach aka wash.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+        &copy; Copyright 2011, Bryce Lelbach aka wash.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
