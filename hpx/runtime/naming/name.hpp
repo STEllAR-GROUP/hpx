@@ -1,3 +1,4 @@
+//  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 // 
