@@ -12,7 +12,7 @@
 
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/agas/traits_fwd.hpp>
+#include <hpx/runtime/agas/traits_fwd.hpp>
 
 namespace hpx { namespace agas { namespace traits
 {

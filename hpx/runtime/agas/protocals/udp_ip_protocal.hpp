@@ -5,33 +5,32 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_6A8F4842_FB5A_4B32_8D20_56368768A707)
-#define HPX_6A8F4842_FB5A_4B32_8D20_56368768A707
+#if !defined(HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473)
+#define HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 
-#if defined(HPX_USE_ASIO_IB_SUPPORT)
-#include <boost/asio/ip/ib.hpp> // doesn't exist (yet)
+#include <boost/asio/ip/udp.hpp>
 
-#include <hpx/agas/traits.hpp>
+#include <hpx/runtime/agas/traits.hpp>
 
 namespace hpx { namespace agas // hpx::agas
 {
 
-namespace tag { struct ib_protocal; }
+namespace tag { struct udp_ip_protocal; }
 
 namespace traits { // hpx::agas::traits
 
 template <>
-struct protocal_name_hook<tag::ib_protocal>
+struct protocal_name_hook<tag::udp_ip_protocal>
 {
     typedef std::string result_type;
 
     static result_type call()
-    { return "IB"; }
+    { return "UDP/IP"; }
 };
 
 template <>
-struct locality_type<tag::ib_protocal>
-{ typedef boost::asio::ip::ib::endpoint type; };
+struct locality_type<tag::udp_ip_protocal>
+{ typedef boost::asio::ip::udp::endpoint type; };
 
 } // hpx::agas
 } // hpx
@@ -40,15 +39,15 @@ struct locality_type<tag::ib_protocal>
 namespace components { namespace agas // hpx::components::agas
 {
 
-typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
-    ib_primary_namespace;
+typedef primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_primary_namespace;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
 
-typedef server::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
-    ib_primary_namespace;
+typedef server::primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_primary_namespace;
 
 } // hpx::components::agas::stubs
 
@@ -56,8 +55,8 @@ typedef server::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
 namespace stubs // hpx::components::agas::stubs
 {
 
-typedef stubs::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
-    ib_primary_namespace;
+typedef stubs::primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_primary_namespace;
 
 } // hpx::components::agas::stubs
 
@@ -65,9 +64,5 @@ typedef stubs::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
 } // hpx::components
 } // hpx
 
-#else
-  #warning HPX_USE_ASIO_IB_SUPPORT is not defined, IB protocal disabled.
-#endif
-
-#endif // HPX_6A8F4842_FB5A_4B32_8D20_56368768A707
+#endif // HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 

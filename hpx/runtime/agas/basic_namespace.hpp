@@ -10,8 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/agas/traits.hpp>
-#include <hpx/agas/stubs/basic_namespace.hpp>
+#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/stubs/basic_namespace.hpp>
 
 namespace hpx { namespace components { namespace agas 
 {

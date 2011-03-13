@@ -11,8 +11,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/agas/traits.hpp>
-#include <hpx/agas/server/basic_namespace.hpp>
+#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/server/basic_namespace.hpp>
 
 namespace hpx { namespace components { namespace agas { namespace stubs
 {

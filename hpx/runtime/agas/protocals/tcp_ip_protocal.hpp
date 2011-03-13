@@ -10,7 +10,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 
-#include <hpx/agas/traits.hpp>
+#include <hpx/runtime/agas/traits.hpp>
 
 namespace hpx { namespace agas // hpx::agas
 {

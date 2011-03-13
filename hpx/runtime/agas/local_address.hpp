@@ -15,8 +15,8 @@
 #include <boost/serialization/version.hpp>
 
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/agas/traits.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/agas/traits.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // local_address<> serialization format version

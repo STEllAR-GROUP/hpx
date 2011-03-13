@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/agas/traits.hpp>
+#include <hpx/runtime/agas/traits.hpp>
 
 namespace hpx { namespace components { namespace agas { namespace server
 {
