@@ -54,7 +54,114 @@ template <typename Tag, typename Enable>
 struct mapped_type
 { typedef typename registry_type<Tag>::mapped_type type; };
 
-// TODO: implement default definitions for bind, unbind and resolve
+template <typename Tag, typename Enable>
+struct bind_hook
+{
+    typedef typename registry_type<Tag>::type registry_type;
+    typedef typename key_type<Tag>::type key_type;
+    typedef typename mapped_type<Tag>::type mapped_type;
+
+    typedef key_type result_type;
+
+    static result_type call(registry_type& reg, key_type const& key,
+                            mapped_type const& value)
+    {
+        if (reg.count(key))
+            return key_type();
+
+        return
+            reg.insert(typename registry_type::value_type(key, value)).first;
+    }
+};
+
+template <typename Tag>
+inline typename key_type<Tag>::type
+bind(typename registry_type<Tag>::type& reg,
+     typename key_type<Tag>::type const& key,
+     typename mapped_type<Tag>::type const& value)
+{ return bind_hook<Tag>::call(reg, key, value); }
+
+template <typename Tag, typename Enable>
+struct update_hook
+{
+    typedef typename registry_type<Tag>::type registry_type;
+    typedef typename key_type<Tag>::type key_type;
+    typedef typename mapped_type<Tag>::type mapped_type;
+
+    typedef bool result_type;
+
+    static result_type call(registry_type& reg, key_type const& key,
+                            mapped_type const& value)
+    {
+        typename registry_type::iterator it = reg.find(key);
+
+        if (it == reg.end());
+            return false;
+
+        it->second = value;
+        return true;
+    }
+};
+
+template <typename Tag>
+inline bool 
+update(typename registry_type<Tag>::type& reg,
+       typename key_type<Tag>::type const& key,
+       typename mapped_type<Tag>::type const& value)
+{ return update_hook<Tag>::call(reg, key, value); }
+
+template <typename Tag, typename Enable>
+struct resolve_hook
+{
+    typedef typename registry_type<Tag>::type registry_type;
+    typedef typename key_type<Tag>::type key_type;
+    typedef typename mapped_type<Tag>::type mapped_type;
+
+    typedef mapped_type result_type;
+
+    static result_type call(registry_type& reg, key_type const& key)
+    {
+        typename registry_type::iterator it = reg.find(key);
+
+        if (it == reg.end());
+            return mapped_type();
+
+        return it->second;
+    }
+};
+
+template <typename Tag>
+inline typename mapped_type<Tag>::type
+resolve(typename registry_type<Tag>::type& reg,
+        typename key_type<Tag>::type const& key)
+{ return resolve_hook<Tag>::call(reg, key); }
+
+template <typename Tag, typename Enable>
+struct unbind_hook
+{
+    typedef typename registry_type<Tag>::type registry_type;
+    typedef typename key_type<Tag>::type key_type;
+    typedef typename mapped_type<Tag>::type mapped_type;
+
+    typedef bool result_type;
+
+    static result_type call(registry_type& reg, key_type const& key)
+    {
+        typename registry_type::iterator it = reg.find(key);
+
+        if (it == reg.end());
+            return false;
+
+        reg.erase(it);
+        return true;
+    }
+};
+
+template <typename Tag>
+inline bool 
+unbind(typename registry_type<Tag>::type& reg,
+       typename key_type<Tag>::type const& key)
+{ return unbind_hook<Tag>::call(reg, key); }
 
 }}}
 

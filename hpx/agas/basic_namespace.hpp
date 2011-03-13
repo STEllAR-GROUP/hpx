@@ -39,6 +39,16 @@ struct basic_namespace
     key_type
     bind(key_type const& key, mapped_type const& value)
     { return this->base_type::bind(this->gid_, key, value); }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Update key. Behavior is Tag specific if the key is not bound. 
+    lcos::future_value<bool>
+    update_async(key_type const& key, mapped_type const& value)
+    { return this->base_type::update_async(this->gid_, key, value); }
+
+    bool
+    update(key_type const& key, mapped_type const& value)
+    { return this->base_type::update(this->gid_, key, value); }
 
     ///////////////////////////////////////////////////////////////////////////
     // Resolve key to value. Returns an invalid/empty type if key is unbound.

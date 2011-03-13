@@ -41,6 +41,23 @@ struct basic_namespace : stub_base<Tag>
     } 
 
     ///////////////////////////////////////////////////////////////////////////
+    static lcos::future_value<bool>
+    update_async(naming::id_type const& gid, key_type const& key,
+               mapped_type const& value)
+    {
+        typedef typename server::basic_namespace<Tag>::update_action
+            action_type;
+        return lcos::eager_future<action_type, key_type>(gid, key, value);
+    }
+
+    static bool
+    update(naming::id_type const& gid, key_type const& key,
+         mapped_type const& value)
+    {
+        return update_async(gid, key, value).get();
+    } 
+
+    ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<mapped_type>
     resolve_async(naming::id_type const& gid, key_type const& key)
     {

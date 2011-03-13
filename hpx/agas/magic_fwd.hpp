@@ -48,9 +48,41 @@ template <typename Protocal>
 inline std::string protocal_name();
 
 ///////////////////////////////////////////////////////////////////////////////
-// basic_namespace implementation hooks (Spirit-stlye CPs)
+// basic_namespace implementation hooks (Spirit-style CPs)
 
-// TODO: write prototypes for bind, unbind and resolve
+template <typename Tag, typename Enable = void>
+struct bind_hook;
+
+template <typename Tag>
+inline typename key_type<Tag>::type
+bind(typename registry_type<Tag>::type&,
+     typename key_type<Tag>::type const&,
+     typename mapped_type<Tag>::type const&);
+
+template <typename Tag, typename Enable = void>
+struct update_hook;
+
+template <typename Tag>
+inline typename key_type<Tag>::type
+update(typename registry_type<Tag>::type&,
+       typename key_type<Tag>::type const&,
+       typename mapped_type<Tag>::type const&);
+
+template <typename Tag, typename Enable = void>
+struct resolve_hook;
+
+template <typename Tag>
+inline typename mapped_type<Tag>::type
+resolve(typename registry_type<Tag>::type&,
+        typename key_type<Tag>::type const&);
+
+template <typename Tag, typename Enable = void>
+struct unbind_hook;
+
+template <typename Tag>
+inline bool 
+unbind(typename registry_type<Tag>::type&,
+       typename key_type<Tag>::type const&);
 
 }}}
 
