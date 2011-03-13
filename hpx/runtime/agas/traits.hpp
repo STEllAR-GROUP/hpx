@@ -8,8 +8,6 @@
 #if !defined(HPX_7D2054F6_DBA9_4D70_82FB_32D284A3CCB4)
 #define HPX_7D2054F6_DBA9_4D70_82FB_32D284A3CCB4
 
-#include <boost/optional.hpp>
-
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
@@ -19,8 +17,7 @@ namespace hpx { namespace agas { namespace traits
 
 template <typename Tag, typename Enable> 
 struct mutex_type
-{ typedef typename hpx::lcos::mutex type; };
-
+{ typedef hpx::lcos::mutex type; };
 
 template <typename Mutex, typename Enable>
 struct initialize_mutex_hook
