@@ -10,6 +10,7 @@
 
 #include <map>
 
+#include <hpx/agas/magic.hpp>
 #include <hpx/agas/local_address.hpp>
 #include <hpx/agas/basic_namespace.hpp>
 
@@ -33,7 +34,7 @@ struct registry_type<tag::primary_namespace<Protocal> >
     > type;
 };
 
-// TODO: implement bind_hook, resolve_hook and unbind_hook
+// TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
 } // hpx::agas::magic
 } // hpx::agas
