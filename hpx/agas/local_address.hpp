@@ -18,8 +18,6 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/agas/magic.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // local_address<> serialization format version
 #define HPX_LOCAL_ADDRESS_VERSION 0x10
@@ -48,7 +46,7 @@ struct local_address
       : _locality(l), _type(t), _lva(lva) {}
 
     local_address(locality_type const& l, component_type t, void* lva)
-      : _locality(l), _type(t), _lva(reinterpret_cast<address_type>(lva)) {}
+      : _locality(l), _type(t), _lva(reinterpret_cast<lva_type>(lva)) {}
 
     local_address(lva_type a)
       : _locality(), _type(components::component_invalid), _lva(a) {}
@@ -63,21 +61,33 @@ struct local_address
             (components::component_invalid != _type || 0 != _lva); 
     }
 
-    bool operator==(local_address const& rhs)
+    bool operator==(local_address const& rhs) const
     {
         return _type     == rhs._type
             && _lva      == rhs._lva 
             && _locality == rhs._locality;
     }
 
-    locality_type locality() const
+    locality_type get_locality() const
     { return _locality; }
+    
+    void set_locality(locality_type const& l) 
+    { _locality = l; }
 
-    component_type type() const
+    component_type get_type() const
     { return _type; }
     
-    lva_type lva() const
+    void set_type(component_type t) 
+    { _type = t; }
+    
+    lva_type get_lva() const
     { return _lva; }
+    
+    void set_lva(lva_type lva) 
+    { _lva = lva; }
+    
+    void set_lva(void* lva) 
+    { _lva = reinterpret_cast<lva_type>(lva); }
 
   private:
     locality_type _locality;
@@ -109,10 +119,10 @@ operator<< (std::basic_ostream<Char, Traits>& out,
             local_address<Protocal> const& addr)
 {
     boost::io::ios_flags_saver ifs(os); 
-    os << "(" << magic::protocal_name<Protocal>() << ":"
-       << addr.locality() << ":" 
-       << components::get_component_type_name((int)addr.type()) 
-       << ":0x" << std::hex << addr.lva() << ")"; 
+    os << "(" << magic::protocal_name<Protocal>() << " "
+       << addr.get_locality() << " " 
+       << components::get_component_type_name((int)addr.get_type()) 
+       << " " << std::showbase << std::hex << addr.get_lva() << ")"; 
     return os;
 } 
 
@@ -120,8 +130,6 @@ operator<< (std::basic_ostream<Char, Traits>& out,
 
 //BOOST_CLASS_VERSION(hpx::agas::local_address, HPX_LOCAL_ADDRESS_VERSION)
 //BOOST_CLASS_TRACKING(hpx::agas::local_address, boost::serialization::track_never)
-
-#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_68F6AFA9_0C73_4CE8_8D9A_D34D53DA1DF1
 
