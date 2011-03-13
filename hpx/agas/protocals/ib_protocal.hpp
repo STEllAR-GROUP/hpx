@@ -11,14 +11,14 @@
 #if defined(HPX_USE_ASIO_IB_SUPPORT)
 #include <boost/asio/ip/ib.hpp> // doesn't exist (yet)
 
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 
 namespace hpx { namespace agas // hpx::agas
 {
 
 namespace tag { struct ib_protocal; }
 
-namespace magic { // hpx::agas::magic
+namespace traits { // hpx::agas::traits
 
 template <>
 struct protocal_name_hook<tag::ib_protocal>

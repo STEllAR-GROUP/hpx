@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 
 namespace hpx { namespace components { namespace agas { namespace server
 {
@@ -19,10 +19,10 @@ template <typename Tag>
 struct HPX_COMPONENT_EXPORT basic_namespace
   : simple_component_base<basic_namespace<Tag> >
 {
-    typedef typename hpx::agas::magic::mutex_type<Tag>::type mutex_type;
-    typedef typename hpx::agas::magic::registry_type<Tag>::type registry_type;
-    typedef typename hpx::agas::magic::key_type<Tag>::type key_type;
-    typedef typename hpx::agas::magic::mapped_type<Tag>::type mapped_type;
+    typedef typename hpx::agas::traits::mutex_type<Tag>::type mutex_type;
+    typedef typename hpx::agas::traits::registry_type<Tag>::type registry_type;
+    typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
+    typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
 
     enum actions
     {
@@ -38,30 +38,30 @@ struct HPX_COMPONENT_EXPORT basic_namespace
   
   public:
     basic_namespace()
-    { hpx::agas::magic::initialize_mutex(_mutex); }
+    { hpx::agas::traits::initialize_mutex(_mutex); }
 
     key_type bind(key_type const& key, mapped_type const& value)
     {
         typename mutex_type::scoped_lock l(_mutex);
-        return hpx::agas::magic::bind<Tag>(_registry, key, value);
+        return hpx::agas::traits::bind<Tag>(_registry, key, value);
     }
 
     bool update(key_type const& key, mapped_type const& value)
     {
         typename mutex_type::scoped_lock l(_mutex);
-        return hpx::agas::magic::update<Tag>(_registry, key, value);
+        return hpx::agas::traits::update<Tag>(_registry, key, value);
     }
     
     mapped_type resolve(key_type const& key)
     {
         typename mutex_type::scoped_lock l(_mutex);
-        return hpx::agas::magic::resolve<Tag>(_registry, key);
+        return hpx::agas::traits::resolve<Tag>(_registry, key);
     } 
     
     bool unbind(key_type const& key)
     {
         typename mutex_type::scoped_lock l(_mutex);
-        return hpx::agas::magic::unbind<Tag>(_registry, key);
+        return hpx::agas::traits::unbind<Tag>(_registry, key);
     } 
 
     typedef hpx::actions::result_action2<

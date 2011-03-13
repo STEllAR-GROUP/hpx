@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace hpx { namespace agas { namespace magic
+namespace hpx { namespace agas { namespace traits
 {
 
 // MPL metafunction

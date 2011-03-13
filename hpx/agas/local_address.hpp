@@ -16,7 +16,7 @@
 
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // local_address<> serialization format version
@@ -33,7 +33,7 @@ struct local_address
     > registry_entry_type;
 
     // locality_type is usually an Asio endpoint
-    typedef typename magic::locality_type<Protocal>::type locality_type;
+    typedef typename traits::locality_type<Protocal>::type locality_type;
     typedef boost::int64_t component_type;
     typedef boost::uint64_t lva_type;
 
@@ -119,7 +119,7 @@ operator<< (std::basic_ostream<Char, Traits>& out,
             local_address<Protocal> const& addr)
 {
     boost::io::ios_flags_saver ifs(os); 
-    os << "(" << magic::protocal_name<Protocal>() << " "
+    os << "(" << traits::protocal_name<Protocal>() << " "
        << addr.get_locality() << " " 
        << components::get_component_type_name((int)addr.get_type()) 
        << " " << std::showbase << std::hex << addr.get_lva() << ")"; 

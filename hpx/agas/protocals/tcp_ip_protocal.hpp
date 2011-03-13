@@ -10,14 +10,14 @@
 
 #include <boost/asio/ip/tcp.hpp>
 
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 
 namespace hpx { namespace agas // hpx::agas
 {
 
 namespace tag { struct tcp_ip_protocal; }
 
-namespace magic { // hpx::agas::magic
+namespace traits { // hpx::agas::traits
 
 template <>
 struct protocal_name_hook<tag::tcp_ip_protocal>

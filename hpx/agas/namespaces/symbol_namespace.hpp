@@ -11,7 +11,7 @@
 #include <string>
 #include <map>
 
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 #include <hpx/agas/basic_namespace.hpp>
 
 namespace hpx { namespace agas // hpx::agas
@@ -23,7 +23,7 @@ struct symbol_namespace;
 
 } // hpx::agas::tag
 
-namespace magic { // hpx::agas::magic
+namespace traits { // hpx::agas::traits
 
 template <>
 struct registry_type<tag::symbol_namespace>
@@ -31,7 +31,7 @@ struct registry_type<tag::symbol_namespace>
 
 // TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
-} // hpx::agas::magic
+} // hpx::agas::traits
 } // hpx::agas
 
 ///////////////////////////////////////////////////////////////////////////////

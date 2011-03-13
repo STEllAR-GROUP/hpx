@@ -10,7 +10,7 @@
 
 #include <map>
 
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 #include <hpx/agas/local_address.hpp>
 #include <hpx/agas/basic_namespace.hpp>
 
@@ -24,7 +24,7 @@ struct primary_namespace;
 
 } // hpx::agas::tag
 
-namespace magic { // hpx::agas::magic
+namespace traits { // hpx::agas::traits
 
 template <typename Protocal>
 struct registry_type<tag::primary_namespace<Protocal> >
@@ -36,7 +36,7 @@ struct registry_type<tag::primary_namespace<Protocal> >
 
 // TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
-} // hpx::agas::magic
+} // hpx::agas::traits
 } // hpx::agas
 
 ///////////////////////////////////////////////////////////////////////////////

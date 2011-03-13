@@ -11,7 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 #include <hpx/agas/server/basic_namespace.hpp>
 
 namespace hpx { namespace components { namespace agas { namespace stubs
@@ -20,8 +20,8 @@ namespace hpx { namespace components { namespace agas { namespace stubs
 template <typename Tag>
 struct basic_namespace : stub_base<Tag>
 {
-    typedef typename hpx::agas::magic::key_type<Tag>::type key_type;
-    typedef typename hpx::agas::magic::mapped_type<Tag>::type mapped_type;
+    typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
+    typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<key_type>

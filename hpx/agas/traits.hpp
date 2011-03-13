@@ -12,9 +12,9 @@
 
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/agas/magic_fwd.hpp>
+#include <hpx/agas/traits_fwd.hpp>
 
-namespace hpx { namespace agas { namespace magic
+namespace hpx { namespace agas { namespace traits
 {
 
 template <typename Tag, typename Enable> 

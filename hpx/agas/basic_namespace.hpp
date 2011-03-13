@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/agas/magic.hpp>
+#include <hpx/agas/traits.hpp>
 #include <hpx/agas/stubs/basic_namespace.hpp>
 
 namespace hpx { namespace components { namespace agas 
@@ -23,8 +23,8 @@ struct basic_namespace
     typedef client_base<basic_namespace<Tag>, stubs::basic_namespace<Tag> >
         base_type;
 
-    typedef typename hpx::agas::magic::key_type<Tag>::type key_type;
-    typedef typename hpx::agas::magic::mapped_type<Tag>::type mapped_type;
+    typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
+    typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
 
     basic_namespace() : base_type(naming::invalid_id) {}
     
