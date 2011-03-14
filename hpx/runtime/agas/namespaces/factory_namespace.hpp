@@ -26,7 +26,7 @@ namespace traits { // hpx::agas::traits
 
 template <>
 struct registry_type<tag::factory_namespace>
-{ typedef std::multimap<int, boost::uint32_t> type; };
+{ typedef std::multimap<naming::gid_type, boost::uint32_t> type; };
 
 // TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
