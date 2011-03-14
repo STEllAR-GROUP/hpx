@@ -39,8 +39,8 @@ struct HPX_COMPONENT_EXPORT refcnt_service
     refcnt()
     { hpx::agas::traits::initialize_mutex(_mutex); }
 
-    boost::uint64_t
-    increment(naming::gid_type const& key, boost::uint64_t count)
+    mapped_type
+    increment(key_type const& key, mapped_type count)
     {
         try {
             mutex_type::scoped_lock l(_mutex);
@@ -73,8 +73,8 @@ struct HPX_COMPONENT_EXPORT refcnt_service
         }
     }
 
-    boost::uint64_t
-    decrement(naming::gid_type const& key, boost::uint64_t count)
+    mapped_type 
+    decrement(key_type const& key, mapped_type count)
     {
         try {
             mutex_type::scoped_lock l(_mutex);
@@ -136,6 +136,22 @@ struct HPX_COMPONENT_EXPORT refcnt_service
             throw exception(internal_server_error);
         }
     }
+
+    typedef hpx::actions::result_action2<
+        refcnt_service,
+        key_type,                    // return type
+        refcnt_increment,            // action type
+        key_type const&, mapped_type // arguments 
+        &refcnt_service::increment
+    > increment_action;
+
+    typedef hpx::actions::result_action2<
+        refcnt_service,
+        key_type,                    // return type
+        refcnt_decrement,            // action type
+        key_type const&, mapped_type // arguments 
+        &refcnt_service::decrement
+    > decrement_action;
 };
 
 }}}
