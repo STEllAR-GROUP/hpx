@@ -611,7 +611,6 @@ namespace hpx { namespace naming { namespace server
                 typename refcnt_store_type::iterator it = refcnts_.find(id);
                 if (it != refcnts_.end()) 
                 {
-                    // FIXME: Why do we throw here? How is the credit bogus?
                     if ((*it).second < req.get_count()) {
                         rep = reply(command_decref, bad_parameter,
                             "Bogus credit while decrementing global reference count.");
@@ -639,7 +638,6 @@ namespace hpx { namespace naming { namespace server
                     }
                     it = p.first;
 
-                    // FIXME: Why do we throw here? How is the credit bogus?
                     if ((*it).second < req.get_count()) {
                         rep = reply(command_decref, bad_parameter,
                             "Bogus credit while decrementing global reference count.");
@@ -653,13 +651,11 @@ namespace hpx { namespace naming { namespace server
                     // to be true, because this entire branch is only entered if
                     // the requested count is less than HPX_INITIAL_GLOBALCREDIT.
                     // Shouldn't we just assert here?
-                    if (0 == cnt)
-                        refcnts_.erase(it);   // last reference removes entry
+                    //if (0 == cnt)
+                    //    refcnts_.erase(it);   // last reference removes entry
                 }
             }
 
-            // FIXME: Checking the component type's validity seems excessive
-            // here.
             components::component_type t = components::component_invalid;
             if (0 == cnt) 
             {
