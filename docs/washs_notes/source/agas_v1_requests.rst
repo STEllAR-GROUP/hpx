@@ -69,17 +69,13 @@ command_register_factory   bind [2]_
        type id database as well as the type id -> prefixes database. It is
        currently the only bind interface for this service.
 
------------------------------------------------------------------------------------------------------
-Console/Locality Namespace (getprefix, getconsoleprefix, getprefixes, getprefix_for_site, getidrange)
------------------------------------------------------------------------------------------------------
-
-*Note: The console AGAS namespace and the locality AGAS namespace are tightly
-coupled but distinct.*
+---------------------------------------------------------------------------
+Locality Namespace (getprefix, getprefixes, getprefix_for_site, getidrange)
+---------------------------------------------------------------------------
 
 ::
 
   command_getprefix = 0,      ///< return a unique prefix for the requesting site
-  command_getconsoleprefix = 1, ///< return the prefix of the console locality
   command_getprefixes = 2,    ///< return prefixes for all known localities in the system
   command_getprefix_for_site = 3, ///< return prefix for the given site
   command_getidrange = 6,     ///< return a unique range of ids for the requesting site
@@ -96,24 +92,22 @@ Interface
 AGAS v1 ptype              Method concept 
 ========================== ==============
 command_getprefix          bind
-command_getconsoleprefix   resolve [4]_
-command_getprefixes        resolve [5]_
-command_getprefix_for_site resolve [6]_ 
+command_getprefixes        resolve [4]_
+command_getprefix_for_site resolve [5]_ 
 command_getidrange         rebind
 ========================== ==============
 
 .. [3] Note that locality registration uses the local address resolution
        service. This means that registering a locality will create bindings
        in both the locality -> prefix database and the gid -> address database.
-.. [4] command_getconsoleprefix returns the console locality prefix.
-.. [5] A command_getprefixes request is sent with a component type. If the
+.. [4] A command_getprefixes request is sent with a component type. If the
        component type is hpx::components::component_invalid, then a vector
        of all prefixes is returned with the reply. Otherwise, a vector of
        prefixes with have a factory for the given component type is returned.
        The factory lookup semantics provide the only direct resolution interface
        to the component type -> prefixes database provided by the factory
        registration service.  
-.. [6] command_get_prefix_for_site actually just calls getprefix_for_site -
+.. [5] command_get_prefix_for_site actually just calls getprefix_for_site -
        the only different is that it doesn't try to verify that there's only
        one console locality.
 
@@ -152,12 +146,13 @@ GID Garbage Collection Namespace (incref, decref)
   command_incref = 8,         ///< increment global reference count for the given id
   command_decref = 9,         ///< decrement global reference count for the given id
 
----------------------------------------------------
-Symbol Namespace (queryid, registerid, unregisterid)
----------------------------------------------------
+----------------------------------------------------------------------
+Symbol Namespace (queryid, registerid, unregisterid, getconsoleprefix)
+----------------------------------------------------------------------
 
 ::
 
+  command_getconsoleprefix = 1, ///< return the prefix of the console locality
   command_queryid = 12,       ///< query for a global id associated with a namespace name (string)
   command_registerid = 13,    ///< associate a namespace name with a global id
   command_unregisterid = 14,  ///< remove association of a namespace name with a global id
@@ -170,17 +165,14 @@ string (std::string) -> gid (hpx::naming::gid_type)
 Interface
 ^^^^^^^^^
 
-==================== ==============
-AGAS v1 ptype        Method concept 
-==================== ==============
-command_queryid      resolve
-command_registerid   bind
-command_unregisterid unbind
-==================== ==============
-
-The name of this request is not particularly concise; one might be led to
-believe that this command unregisters a gid. This command is the unbind command
-for the name --> gid service.
+======================== ==============
+AGAS v1 ptype            Method concept 
+======================== ==============
+command_getconsoleprefix resolve
+command_queryid          resolve
+command_registerid       bind
+command_unregisterid     unbind 
+======================== ==============
 
 ****************
 Special Requests
