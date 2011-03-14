@@ -35,15 +35,15 @@ endif()
 ################################################################################
 # environment detection 
 ################################################################################
-execute_process(COMMAND "${HPX_ROOT}/share/hpx/python/build_env.py" "${CMAKE_CXX_COMPILER}"
+execute_process(COMMAND "${HPX_ROOT}/bin/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
                 OUTPUT_VARIABLE build_environment
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(build_environment)
   set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-  hpx_info("build_env" "Build environment is ${BUILDNAME}")
+  hpx_info("environment" "Build environment is ${BUILDNAME}")
 else()
-  hpx_warn("build_env" "Couldn't determine build environment (install python).") 
+  hpx_warn("environment" "Couldn't determine build environment (install python).") 
 endif()
 
 ################################################################################

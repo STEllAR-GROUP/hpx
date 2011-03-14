@@ -39,15 +39,15 @@ endif()
 ################################################################################
 # environment detection 
 ################################################################################
-execute_process(COMMAND "${hpx_SOURCE_DIR}/python/build_env.py" "${CMAKE_CXX_COMPILER}"
+execute_process(COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
                 OUTPUT_VARIABLE build_environment
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(build_environment)
   set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-  hpx_info("build_env" "Build environment is ${BUILDNAME}.")
+  hpx_info("environment" "Build environment is ${BUILDNAME}.")
 else()
-  hpx_warn("build_env" "Couldn't determine build environment (install python).") 
+  hpx_warn("environment" "Couldn't determine build environment (install python).") 
 endif()
 
 ################################################################################
@@ -222,10 +222,8 @@ else()
       endif()
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
-      set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
       set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
     endif()
   ##############################################################################
   # Intel specific configuration
@@ -341,8 +339,19 @@ install( # install all hpx cmake utility files
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
-install( # install all hpx python scripts
-  DIRECTORY python 
+install( # install hpx python scripts 
+  DIRECTORY python/scripts/ 
+  DESTINATION bin
+  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                   GROUP_READ GROUP_EXECUTE
+                   WORLD_READ WORLD_EXECUTE
+  COMPONENT core
+  FILES_MATCHING PATTERN "*.py"
+  PATTERN ".svn" EXCLUDE
+  PATTERN ".git" EXCLUDE)
+
+install( # install hpx python module (TODO: this is a temporary hack) 
+  DIRECTORY python/hpx 
   DESTINATION share/hpx/python 
   COMPONENT core
   FILES_MATCHING PATTERN "*.py"

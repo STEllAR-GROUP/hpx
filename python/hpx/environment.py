@@ -1,12 +1,13 @@
 #! /usr/bin/env python 
+#
+# Copyright (c) 2011 Bryce Lelbach
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 """
-=========
-build_env
-=========
-
-Module for generating a string which identifies a C or C++ development
-environment. The identifier string takes the following form::
+Module for generating strings which describe a C or C++ development environment.
+The identifier string takes the following form:::
 
   processor  ::= [a-z0-9\\-.]+
   kernel     ::= [a-z0-9\\-.]+
@@ -14,60 +15,16 @@ environment. The identifier string takes the following form::
   identifier ::= processor '_' kernel '_' compiler
 """
 
-# Copyright (c) 2011 Bryce Lelbach
-#
-# Distributed under the Boost Software License, Version 1.0. (See accompanying
-# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-from platform import uname
 from re import compile
-from string import lower
-from types import StringType
-
-try:
-  import subprocess
-    
-  class process:
-    _proc = None
-        
-    def __init__(self, cmd):
-      self._proc = subprocess.Popen(cmd,
-        stderr = subprocess.STDOUT,
-        stdout = subprocess.PIPE,
-        shell = (False, True)[type(cmd) == StringType])
-            
-    def wait(self):
-      return self._proc.wait()
-
-    def read(self):
-      return self._proc.stdout.read()
-            
-except ImportError, err:
-  # no "subprocess"; use older popen module
-  import popen2
-
-  class process:
-    _proc = None
-    
-    def __init__(self, cmd):
-      self._proc = popen2.Popen4(cmd)
-
-    def wait(self):
-      return self._proc.wait()
-
-    def read(self):
-      return self._proc.fromchild.read()
-
-def absolute_path(p):
-  from os import pathsep, environ
-  from os.path import isfile, join, realpath
-  for dirname in environ['PATH'].split(pathsep):
-    candidate = join(dirname, p)
-    if isfile(candidate):
-      return realpath(candidate)
-  return realpath(p) 
 
 def make_component(raw, type):
+  """
+  Transliterate characters from an element returned by platform.uname() to
+  match the regex ``^[a-z0-9\-.]+$``. Returns ``"unknown-%s" % type`` if 
+  the transliterated string doesn't match the regex pattern. 
+  """ 
+  from string import lower
+
   comp = compile(r'\s|_').sub('-', lower(raw))
 
   if compile(r'^[a-z0-9\-.]+$').match(comp):
@@ -76,6 +33,13 @@ def make_component(raw, type):
     return "unknown-%s" % type
 
 def make_compiler_component(driver):
+  """
+  Given the name of a compiler driver, generate a string describing the compiler
+  suite and version. Returns ``"unknown-compiler"`` if the compiler cannot be
+  identified.
+  """ 
+  from hpx.process import process
+
   windows = 0
 
   try:
@@ -126,6 +90,14 @@ def make_compiler_component(driver):
   return "unknown-compiler"
 
 def identify(driver):
+  """
+  Given the name of a compiler driver in the current path (or an absolute path
+  to a compiler driver), build a complete environment identifier using the
+  information provided by platform.uname().
+  """
+  from platform import uname
+  from hpx.path import absolute_path
+
   (system, node, release, version, machine, processor) = uname()
 
   if len(processor) == 0:
@@ -135,8 +107,4 @@ def identify(driver):
                           make_component(system, "kernel"),
                           make_component(release, "version"),
                           make_compiler_component(absolute_path(driver))) 
-
-if __name__ == "__main__":
-  from sys import argv 
-  print identify(argv[1])
 

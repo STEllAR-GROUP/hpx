@@ -1,9 +1,10 @@
-#!/usr/bin/env python
-
-#  Copyright (c) 2009 Maciej Brodowicz
-# 
-#  Distributed under the Boost Software License, Version 1.0. (See accompanying 
-#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#! /usr/bin/env python
+#
+# Copyright (c) 2009 Maciej Brodowicz
+# Copyright (c) 2011 Bryce Lelbach
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 """
 Perform parameter sweep runs of an application.
@@ -16,50 +17,12 @@ from operator import *
 from datetime import datetime
 from signal import SIGKILL
 
-# subprocess instantiation wrapper;
-# unfortunately older Python still lurks on some machines
-try:
-    import subprocess
-    
-    class Process:
-        _proc = None
-        
-        def __init__(self, cmd):
-            self._proc = subprocess.Popen(cmd, stderr = subprocess.STDOUT, stdout = subprocess.PIPE, shell = (False, True)[type(cmd) == StringType])
-            
-        def wait(self):
-            return self._proc.wait()
+if os.path.exists(os.path.join(sys.path[0], "../hpx")):
+  sys.path.append(os.path.join(sys.path[0], ".."))
+if os.path.exists(os.path.join(sys.path[0], "../share/hpx/python/hpx")):
+  sys.path.append(os.path.join(sys.path[0], "../share/hpx/python"))
 
-        def poll(self):
-            return self._proc.poll()
-        
-        def pid(self):
-            return self._proc.pid
-
-        def read(self):
-            return self._proc.stdout.read()
-            
-except ImportError, err:
-    # no "subprocess"; use older popen module
-    import popen2
-
-    class Process:
-        _proc = None
-        
-        def __init__(self, cmd):
-            self._proc = popen2.Popen4(cmd)
-
-        def wait(self):
-            return self._proc.wait()
-        
-        def poll(self):
-            return self._proc.poll()
-
-        def pid(self):
-            return self._proc.pid
-
-        def read(self):
-            return self._proc.fromchild.read()
+from hpx.process import process
 
 
 # print usage info and exit with an error code
@@ -107,7 +70,7 @@ def next(ixd, opts, optv):
 # run the application and optionally capture its output and error streams
 def run(cmd, outfl = None, timeout = 360, tic = 10):
     start = datetime.now() 
-    proc = Process(cmd)
+    proc = process(cmd)
 
     while proc.poll() is None:
         time.sleep(tic)

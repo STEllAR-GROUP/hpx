@@ -567,6 +567,8 @@ if(   "${HPX_MALLOC}" STREQUAL "nedmalloc"
       OUTPUT_NAME hpx_malloc)
   set_property(TARGET hpx_malloc APPEND
                PROPERTY COMPILE_DEFINITIONS "HPX_MALLOC_PRELOAD_SO")
+  set_property(TARGET hpx_malloc APPEND
+               PROPERTY COMPILE_FLAGS "-fno-builtin-malloc -fno-builtin-free -fno-builtin-calloc -fno-builtin-realloc")
   install(TARGETS hpx_malloc 
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
