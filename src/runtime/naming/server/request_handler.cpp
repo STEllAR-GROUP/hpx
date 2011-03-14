@@ -647,12 +647,7 @@ namespace hpx { namespace naming { namespace server
                     (*it).second -= req.get_count();
                     cnt = (*it).second;
 
-                    // FIXME: It should be impossible for this if statement
-                    // to be true, because this entire branch is only entered if
-                    // the requested count is less than HPX_INITIAL_GLOBALCREDIT.
-                    // Shouldn't we just assert here?
-                    //if (0 == cnt)
-                    //    refcnts_.erase(it);   // last reference removes entry
+                    BOOST_ASSERT(0 == cnt);
                 }
             }
 
