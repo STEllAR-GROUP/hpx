@@ -42,53 +42,99 @@ struct HPX_COMPONENT_EXPORT refcnt_service
     boost::uint64_t
     increment(naming::gid_type const& key, boost::uint64_t count)
     {
-        mutex_type::scoped_lock l(_mutex);
+        try {
+            mutex_type::scoped_lock l(_mutex);
 
-        // FIXME: This copy is a one-off, but necessary because
-        // strip_credit_from_gid() mutates. Fix this.
-        naming::gid_type id = key;
-        naming::strip_credit_from_gid(id);
+            // FIXME: This copy is a one-off, but necessary because
+            // strip_credit_from_gid() mutates. Fix this.
+            naming::gid_type id = key;
+            naming::strip_credit_from_gid(id);
 
-        registry_type::iterator it = _registry.find(id);
+            registry_type::iterator it = _registry.find(id);
 
-        if (it == _registry.end())
-        {
-            // TODO: This behavior of ignoring the count if the GID isn't 
-            // in the registry comes from AGAS v1. It's potentially annoying,
-            // though, and these semantics need to be reviewed.
-            _registry.insert
-                (registry_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
-            return HPX_INITIAL_GLOBALCREDIT;
+            if (it == _registry.end())
+            {
+                std::pair<registry_type::iterator, bool> p = _registry.insert
+                    (registry_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
+
+                if (!p.second)
+                    throw exception(out_of_memory);
+
+                it = p.first;
+            }
+
+            return it->second += count;
+        } catch (std::bad_alloc) {
+            throw exception(out_of_memory);
+        } catch (hpx::exception) {
+            throw;
+        } catch (...) {
+            throw exception(internal_server_error);
         }
-
-        return it->second += count;
     }
 
     boost::uint64_t
     decrement(naming::gid_type const& key, boost::uint64_t count)
     {
-        mutex_type::scoped_lock l(_mutex);
+        try {
+            mutex_type::scoped_lock l(_mutex);
 
-        // FIXME: This copy is a one-off, but necessary because
-        // strip_credit_from_gid() mutates. Fix this.
-        naming::gid_type id = key;
-        naming::strip_credit_from_gid(id);
+            // FIXME: This copy is a one-off, but necessary because
+            // strip_credit_from_gid() mutates. Fix this.
+            naming::gid_type id = key;
+            naming::strip_credit_from_gid(id);
 
-        registry_type::iterator it = _registry.find(id);
+            // TODO: This needs an exception message explaining why it's
+            // invalid.
+            if (count <= HPX_INITIAL_GLOBALCREDIT)
+                throw exception(bad_parameter);
 
-        if (it != _registry.end())
-        {
-            // AGAS v1 would give an error here.
-            if (it->second <= count)
+            registry_type::iterator it = _registry.find(id);
+
+            if (it != _registry.end())
             {
-                _registry.erase(it);
-                return 0;
+                if (it->second < count)
+                    throw exception(bad_parameter,
+                        "bogus credit found while decrementing global reference"
+                        "count");
+
+                // Remove the entry if it's been decremented to 0.
+                if ((it->second -= count) == 0)
+                    _registry.erase(it);
+                else
+                    return it->second;
             }
 
-            return it->second -= count;
-        }
+            // Annoying-ish insert-on-decrement semantics reproduced to maintain
+            // AGAS v1 behavior. 
+            else if (count < HPX_INITIAL_GLOBALCREDIT)
+            {
+                std::pair<registry_type::iterator, bool> p = _registry.insert
+                    (registry_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
 
-        throw exception(bad_parameter, "trying to decrement unregistered GID");
+                if (!p.second)
+                    throw exception(out_of_memory);
+
+                it = p.first;
+               
+                if (it->second < count)
+                    throw exception(bad_parameter,
+                        "bogus credit found while decrementing global reference"
+                        "count");
+
+                return (it->second -= count);
+            }
+            
+            // TODO: This needs an exception message explaining why it's invalid.
+            throw exception(bad_parameter); 
+
+        } catch (std::bad_alloc) {
+            throw exception(out_of_memory);
+        } catch (hpx::exception) {
+            throw;
+        } catch (...) {
+            throw exception(internal_server_error);
+        }
     }
 };
 
