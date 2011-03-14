@@ -10,11 +10,15 @@
 
 #include <map>
 
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 
-namespace hpx { namespace components { namespace server
+namespace hpx { namespace components { namespace agas { namespace server
 {
 
 struct HPX_COMPONENT_EXPORT refcnt_service
@@ -24,6 +28,8 @@ struct HPX_COMPONENT_EXPORT refcnt_service
     typedef std::map<naming::gid_type, boost::uint64_t> registry_type;
     typedef registry_type::key_type key_type;
     typedef registry_type::mapped_type mapped_type; 
+    typedef boost::fusion::vector2<boost::uint64_t, component_type>
+        decrement_result_type;
 
     enum actions
     {
@@ -73,9 +79,11 @@ struct HPX_COMPONENT_EXPORT refcnt_service
         }
     }
 
-    mapped_type 
+    decrement_result_type 
     decrement(key_type const& key, mapped_type count)
     {
+        using boost::fusion::at_c;
+
         try {
             mutex_type::scoped_lock l(_mutex);
 
@@ -88,6 +96,8 @@ struct HPX_COMPONENT_EXPORT refcnt_service
             // invalid.
             if (count <= HPX_INITIAL_GLOBALCREDIT)
                 throw exception(bad_parameter);
+
+            decrement_result_type r(0, component_invalid);
 
             registry_type::iterator it = _registry.find(id);
 
@@ -102,7 +112,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
                 if ((it->second -= count) == 0)
                     _registry.erase(it);
                 else
-                    return it->second;
+                    at_c<0>(r) = it->second;
             }
 
             // Annoying-ish insert-on-decrement semantics reproduced to maintain
@@ -122,11 +132,18 @@ struct HPX_COMPONENT_EXPORT refcnt_service
                         "bogus credit found while decrementing global reference"
                         "count");
 
-                return (it->second -= count);
+                at_c<0>(r) = (it->second -= count);
             }
             
-            // TODO: This needs an exception message explaining why it's invalid.
-            throw exception(bad_parameter); 
+            if (at_c<0>(r) == 0)
+            {
+                if ((at_c<1>(r) = get_component_type(id)) == component_invalid)
+                    throw exception(bad_component_type,
+                        "unknown component type encountered while decrementing"
+                        "global reference count to 0");
+            }
+    
+            return r; 
 
         } catch (std::bad_alloc) {
             throw exception(out_of_memory);
@@ -154,7 +171,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
     > decrement_action;
 };
 
-}}}
+}}}}
 
 #endif // HPX_63C75B03_87A6_428E_99A7_F91027E0D463
 

@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/agas/server/refcnt_service.hpp>
 
-namespace hpx { namespace components { namespace stubs
+namespace hpx { namespace components { namespace agas { namespace stubs
 {
 
 struct refcnt_service
@@ -21,6 +21,8 @@ struct refcnt_service
 {
     typedef server::refcnt_service::registry_type::key_type key_type;
     typedef server::refcnt_service::registry_type::mapped_type mapped_type; 
+    
+    typedef server::refcnt_service::decrement_result_type decrement_result_type;
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<key_type>
@@ -39,7 +41,7 @@ struct refcnt_service
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<key_type>
+    static lcos::future_value<decrement_result_type>
     decrement_async(naming::id_type const& gid, key_type const& key,
                     mapped_type count)
     {
@@ -47,7 +49,7 @@ struct refcnt_service
         return lcos::eager_future<action_type, key_type>(gid, key, count);
     } 
     
-    static key_type
+    static decrement_result_type
     decrement(naming::id_type const& gid, key_type const& key,
               mapped_type count)
     {
@@ -55,7 +57,7 @@ struct refcnt_service
     }
 };            
 
-}}}
+}}}}
 
 #endif // HPX_84B8E09E_9BB8_4E81_A3C5_2424910BDDE6
 
