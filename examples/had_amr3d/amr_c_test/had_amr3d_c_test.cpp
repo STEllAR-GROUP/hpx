@@ -248,9 +248,12 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
     for (int j=j_start; j<j_end;j++) {
     for (int i=i_start; i<i_end;i++) {
       calcrhs(&rhs,vecval,0,dx,boundary,i,j,k,par); 
+
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata const *ndvecval = vecval[i+n*(j+n*k)];
       for (int ll=0;ll<num_eqns;ll++) {
-        work[i+n*(j+n*k)].phi[0][ll] = vecval[i+n*(j+n*k)]->phi[0][ll];
-        work[i+n*(j+n*k)].phi[1][ll] = vecval[i+n*(j+n*k)]->phi[0][ll] + rhs.phi[0][ll]*dt; 
+        nd.phi[0][ll] = ndvecval->phi[0][ll];
+        nd.phi[1][ll] = ndvecval->phi[0][ll] + rhs.phi[0][ll]*dt; 
       }
     }}}
 
@@ -265,9 +268,11 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
     for (int i=i_start; i<i_end;i++) {
      // calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
       calcrhs(&rhs,work,1,dx,boundary,i,j,k,par); 
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata& nd2 = work2[i+n*(j+n*k)];
       for (int ll=0;ll<num_eqns;ll++) {
-        work2[i+n*(j+n*k)].phi[1][ll] = c_0_75*work[i+n*(j+n*k)].phi[0][ll] + 
-                                        c_0_25*work[i+n*(j+n*k)].phi[1][ll] + 
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
+                                        c_0_25*nd.phi[1][ll] + 
                                         c_0_25*rhs.phi[0][ll]*dt;
       }
     }}}
@@ -287,10 +292,15 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       ii = i - n2;
       jj = j - n2;
       kk = k - n2;
+
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata& nd2 = work2[i+n*(j+n*k)];
+      nodedata& ndresult = result->value_[ii + n2*(jj + n2*kk)];
+
       for (int ll=0;ll<num_eqns;ll++) {
-        result->value_[ii + n2*(jj + n2*kk)].phi[0][ll] = 
-                                   c_1_3*work[i+n*(j+n*k)].phi[0][ll]  
-                                 + c_2_3*(work2[i+n*(j+n*k)].phi[1][ll] + rhs.phi[0][ll]*dt);
+        ndresult.phi[0][ll] = 
+                                   c_1_3*nd.phi[0][ll]  
+                                 + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }}}
 
