@@ -37,13 +37,6 @@
 namespace po = boost::program_options;
 
 
-// typedef struct {
-//     double mass;
-//     double px, py, pz;
-//     double vx, vy, vz;
-//     double ax, ay, az;
-// } body;
-
 using namespace hpx;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,6 +88,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
         void tagTree(int &current_node, int & max_count);
+        void buildBodies(int &current_node, std::vector<body> & bodies);
         void printTag(int &current_node);
         void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
 
@@ -287,6 +281,73 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count)
     else 
         max_count = max_ctr;
     std::cout << "particleid : " << tag_id << std::endl;
+}
+
+
+void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
+{
+    //static int max_ctr;
+    static int bod_idx;
+    register TreeNode *temp_branch;
+    for (int i = 0; i < 8; ++i) 
+    {
+        temp_branch = branch[i];
+        if (temp_branch != NULL) 
+        {
+            //++tag_id;
+            if(temp_branch->node_type == CELL)
+            { // Intermediate Node
+                bodies[bod_idx].mass = temp_branch->mass;
+                bodies[bod_idx].px = temp_branch->p[0];
+                bodies[bod_idx].py = temp_branch->p[1];
+                bodies[bod_idx].pz = temp_branch->p[2];
+                bodies[bod_idx].vx = 0.0;
+                bodies[bod_idx].vy = 0.0;
+                bodies[bod_idx].vz = 0.0;
+                std::cout << "built CELL : " << temp_branch->tag << std::endl;
+
+                ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies);
+            }
+            else if(temp_branch->node_type == PAR)
+            { // Intermediate Node
+                bodies[bod_idx].mass = ((TreeLeaf *) temp_branch)->mass;
+                bodies[bod_idx].px = ((TreeLeaf *) temp_branch)->p[0];
+                bodies[bod_idx].py = ((TreeLeaf *) temp_branch)->p[1];
+                bodies[bod_idx].pz = ((TreeLeaf *) temp_branch)->p[2];
+                bodies[bod_idx].vx = ((TreeLeaf *) temp_branch)->v[0];
+                bodies[bod_idx].vy = ((TreeLeaf *) temp_branch)->v[1];
+                bodies[bod_idx].vz = ((TreeLeaf *) temp_branch)->v[2];
+                std::cout << "built PAR : " << temp_branch->tag << std::endl;
+            }
+            ++bod_idx;
+            //temp_branch->tag = tag_id ;
+             
+        }
+    }
+        bodies[bod_idx].mass = mass;
+        bodies[bod_idx].px = p[0];
+        bodies[bod_idx].py = p[1];
+        bodies[bod_idx].pz = p[2];
+        bodies[bod_idx].vx = 0.0;
+        bodies[bod_idx].vy = 0.0;
+        bodies[bod_idx].vz = 0.0;
+        std::cout << "Built Cell : " << tag << std::endl;
+    ++bod_idx;           
+//     if(node_type == CELL)
+//     { // Intermediate Node
+
+//     }
+//     else if(node_type == PAR)
+//     { // Intermediate Node
+//         bodies[bod_idx].mass = mass;
+//         bodies[bod_idx].px = p[0];
+//         bodies[bod_idx].py = p[1];
+//         bodies[bod_idx].pz = p[2];
+//         bodies[bod_idx].vx = ((TreeLeaf*)this)->v[0];
+//         bodies[bod_idx].vy = ((TreeLeaf*)this)->v[1];
+//         bodies[bod_idx].vz = ((TreeLeaf*)this)->v[2];
+//     }
+//      std::cout << "build last body: " << tag << std::endl;
 }
 
 void IntrTreeNode::printTag(int &current_node)
@@ -612,6 +673,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //         }
 
         infile.close();  
+        
+        std::vector<naming::id_type> result_data;
         for (par->iter = 0; par->iter < par->num_iterations; ++par->iter)
         {
             double box_size, cPos[3];
@@ -635,6 +698,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
 //             std::cout << bht_root->tag << std::endl;
             par->iList.resize(max_count);
+            par->bodies.resize(max_count);
+            bht_root->buildBodies(current_index,par->bodies);
             
             numvals = par->iList.size();
             par->rowsize = par->iList.size();
@@ -657,16 +722,20 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << std::endl;
             }
 
-            
+           if (par->iter == 0)
+                result_data = 
+                unigrid_mesh.init_execute(function_type, numvals, 
+                numsteps, do_logging ? logging_type : components::component_invalid,par);
+            //else
+                //unigrid_mesh.
+                
         }
 
         // for loop for iteration
 
         // recompute tree/mass
         
-        std::vector<naming::id_type> result_data =
-            unigrid_mesh.init_execute(function_type, numvals, numsteps,
-                do_logging ? logging_type : components::component_invalid,par);
+
 
         // end for loop
 

@@ -37,6 +37,7 @@ namespace hpx { namespace components { namespace nbody
         ar & num_bodies;
         ar & num_iterations;
         ar & part_mass;
+        ar & bodies;
     }
 
     // explicit instantiation for the correct archive types

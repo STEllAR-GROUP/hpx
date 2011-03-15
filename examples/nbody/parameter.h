@@ -31,9 +31,38 @@ class Array3D {
     }
 };
 
+struct body {
+    double mass;
+    double px, py, pz;
+    double vx, vy, vz;
+    double ax, ay, az;
+private:
+    // serialization support
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & mass;
+        ar & px;
+        ar & py;
+        ar & pz;
+        ar & vx;
+        ar & vy;
+        ar & vz;
+        ar & ax;
+        ar & ay;
+        ar & az;
+    }
+};
+
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+
+
 
 struct Par {
       int loglevel;
@@ -42,6 +71,7 @@ struct Par {
       int rowsize;
       std::string input_file;
       std::vector <std::vector<int> > iList;
+      std::vector<body> bodies; 
       double dtime;
       double eps;
       double tolerance;

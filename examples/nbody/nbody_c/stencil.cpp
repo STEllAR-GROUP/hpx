@@ -145,35 +145,34 @@ namespace hpx { namespace components { namespace nbody
               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
           }
           
-            double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
-            double v_half_x, v_half_y, v_half_z;
+          double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
+          double v_half_x, v_half_y, v_half_z;
+          
+          resultval->x = val[compute_index]->x;
+          resultval->y = val[compute_index]->y;
+          resultval->z = val[compute_index]->z;            
+          resultval->vx = val[compute_index]->vx;
+          resultval->vy = val[compute_index]->vy;
+          resultval->vz = val[compute_index]->vz;
             
-            resultval->x = val[compute_index]->x;
-            resultval->y = val[compute_index]->y;
-            resultval->z = val[compute_index]->z;
+          vel_dt_half_x = resultval->ax * par->half_dt;
+          vel_dt_half_y = resultval->ay * par->half_dt;
+          vel_dt_half_z = resultval->az * par->half_dt;
             
-            resultval->vx = val[compute_index]->vx;
-            resultval->vy = val[compute_index]->vy;
-            resultval->vz = val[compute_index]->vz;
+          v_half_x = resultval->vx * par->half_dt;
+          v_half_y = resultval->vy * par->half_dt;
+          v_half_z = resultval->vz * par->half_dt;
             
-            vel_dt_half_x = resultval->ax * par->half_dt;
-            vel_dt_half_y = resultval->ay * par->half_dt;
-            vel_dt_half_z = resultval->az * par->half_dt;
+          resultval->x += v_half_x * par->dtime;
+          resultval->y += v_half_y * par->dtime;
+          resultval->z += v_half_z * par->dtime;
             
-            v_half_x = resultval->vx * par->half_dt;
-            v_half_y = resultval->vy * par->half_dt;
-            v_half_z = resultval->vz * par->half_dt;
-            
-            resultval->x += v_half_x * par->dtime;
-            resultval->y += v_half_y * par->dtime;
-            resultval->z += v_half_z * par->dtime;
-            
-            resultval->vx += v_half_x + vel_dt_half_x;
-            resultval->vy += v_half_y + vel_dt_half_y;
-            resultval->vz += v_half_z + vel_dt_half_z;
+          resultval->vx += v_half_x + vel_dt_half_x;
+          resultval->vy += v_half_y + vel_dt_half_y;
+          resultval->vz += v_half_z + vel_dt_half_z;
 
-            std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
-            std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
+          std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
+          std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
 
           ////TODO Put the move function here 
 //           for (int i=0;i<val.size();i++)

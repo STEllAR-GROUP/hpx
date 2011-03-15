@@ -47,14 +47,29 @@ inline int floatcmp(had_double_type const& x1, had_double_type const& x2)
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     Par const& par)
 {
-    // provide initial data for the given data value 
-    val->x = item;
-    val->y = item + 100; 
-    val->z = item + 1000;
+//     // provide initial data for the given data value 
+//     val->x = item;
+//     val->y = item + 100; 
+//     val->z = item + 1000;
+// 
+//     val->vx = 0.0;
+//     val->vy = 0.0;
+//     val->vz = 0.0;
+// 
+//     val->ax = 0.0;
+//     val->ay = 0.0;
+//     val->az = 0.0;
+//     
+//     val->row = row;
+//     val->column = item;
+    
+     val->x = par.bodies[item].px;
+    val->y = par.bodies[item].py; 
+    val->z = par.bodies[item].pz;
 
-    val->vx = 0.0;
-    val->vy = 0.0;
-    val->vz = 0.0;
+    val->vx = par.bodies[item].vx;
+    val->vy = par.bodies[item].vy;
+    val->vz = par.bodies[item].vz;
 
     val->ax = 0.0;
     val->ay = 0.0;
@@ -62,6 +77,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     
     val->row = row;
     val->column = item;
+
 
     return 1;
 }
