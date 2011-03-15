@@ -647,7 +647,7 @@ namespace hpx { namespace naming { namespace server
                     (*it).second -= req.get_count();
                     cnt = (*it).second;
 
-                    BOOST_ASSERT(0 == cnt);
+                    BOOST_ASSERT(0 != cnt);
                 }
             }
 
