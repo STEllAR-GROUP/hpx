@@ -10,6 +10,7 @@ set (HPLMatreX_SOURCES
     hplmatrex.cpp)
 
 add_hpx_component(HPLMatreX 
+    MODULE hplmatrex
     SOURCES ${HPLMatreX_SOURCES} 
     HEADERS ${HPLMatreX_HEADERS})
 
