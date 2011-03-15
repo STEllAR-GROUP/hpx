@@ -74,7 +74,6 @@ source_group("Header Files\\lcos"
 # Performance counters
 set(hpxlib_performance_counters_HEADERS
     ${hpx_SOURCE_DIR}/hpx/performance_counters/counters.hpp
-    ${hpx_SOURCE_DIR}/hpx/performance_counters/performance_counter.hpp
     ${hpx_SOURCE_DIR}/hpx/performance_counters/registry.hpp)
 source_group("Header Files\\performance_counters" 
     FILES ${hpxlib_performance_counters_HEADERS})

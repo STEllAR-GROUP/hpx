@@ -322,11 +322,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = (int) pow(2.,par->allowedl);
-        if ( par->allowedl > 0 ) {
-          num_rows += (int) pow(2.,par->allowedl)/2;
-        }
-        num_rows *= 2; // we take two steps
+        int num_rows = par->num_rows;
 
         // Each row potentially has a different number of points depending on the
         // number of levels of refinement.  There are 2^(nlevel) rows each timestep;

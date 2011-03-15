@@ -38,6 +38,7 @@ extern "C" {
 struct Par {
       had_double_type lambda;
       int allowedl;
+      int num_rows;
       int loglevel;
       had_double_type output;
       int output_stdout;

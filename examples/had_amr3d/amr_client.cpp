@@ -407,6 +407,7 @@ int main(int argc, char* argv[])
           num_rows += (int) pow(2.,par->allowedl)/2;
         }
         num_rows *= 2; // we take two timesteps in the mesh
+        par->num_rows = num_rows;
         int ii = -1; 
         for (int i=0;i<num_rows;i++) {
           if (  (i+5)%3 != 0 || par->allowedl == 0 ) {

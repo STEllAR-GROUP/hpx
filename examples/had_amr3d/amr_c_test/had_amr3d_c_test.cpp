@@ -30,9 +30,13 @@ namespace hpx { namespace components { namespace amr
 #endif
 
 void calcrhs(struct nodedata * rhs,
-             hpx::memory::default_vector< nodedata* >::type const& vecval,
+             boost::scoped_array<nodedata> const& vecval,
              int flag, had_double_type const& dx,
              bool boundary,int i,int j,int k, Par const& par);
+void calcrhs(struct nodedata * rhs,
+               hpx::memory::default_vector< nodedata*>::type const& vecval,
+                int flag, had_double_type const& dx,
+                bool boundary,int i,int j,int k, Par const& par);
 
 ///////////////////////////////////////////////////////////////////////////////
 // local functions
@@ -250,16 +254,17 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       }
     }}}
 
-    nodedata* n_iter;
-    pwork.reserve(vecval.size());
-    for (n_iter=&work[0];n_iter!=&work[vecval.size()];++n_iter) pwork.push_back( n_iter );
+    //nodedata* n_iter;
+    //pwork.reserve(vecval.size());
+    //for (n_iter=&work[0];n_iter!=&work[vecval.size()];++n_iter) pwork.push_back( n_iter );
 
   // -------------------------------------------------------------------------
   // iter 1
     for (int k=k_start; k<k_end;k++) {
     for (int j=j_start; j<j_end;j++) {
     for (int i=i_start; i<i_end;i++) {
-      calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
+     // calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
+      calcrhs(&rhs,work,1,dx,boundary,i,j,k,par); 
       for (int ll=0;ll<num_eqns;ll++) {
         work2[i+n*(j+n*k)].phi[1][ll] = c_0_75*work[i+n*(j+n*k)].phi[0][ll] + 
                                         c_0_25*work[i+n*(j+n*k)].phi[1][ll] + 
@@ -267,8 +272,8 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       }
     }}}
 
-    pwork2.reserve(vecval.size());
-    for (n_iter=&work2[0];n_iter!=&work2[vecval.size()];++n_iter) pwork2.push_back( n_iter );
+    //pwork2.reserve(vecval.size());
+    //for (n_iter=&work2[0];n_iter!=&work2[vecval.size()];++n_iter) pwork2.push_back( n_iter );
 
   // -------------------------------------------------------------------------
   // iter 2
@@ -276,7 +281,8 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
     for (int k=n2; k<2*n2;k++) {
     for (int j=n2; j<2*n2;j++) {
     for (int i=n2; i<2*n2;i++) {
-      calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
+     // calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
+      calcrhs(&rhs,work2,1,dx,boundary,i,j,k,par); 
 
       ii = i - n2;
       jj = j - n2;
@@ -295,7 +301,38 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi
 void calcrhs(struct nodedata * rhs,
-               hpx::memory::default_vector< nodedata* >::type const& vecval,
+               boost::scoped_array<nodedata> const& vecval,
+                int flag, had_double_type const& dx,
+                bool boundary,int i,int j,int k, Par const& par)
+{
+
+  int n = 3*par.granularity;
+
+  if ( !boundary ) {
+    rhs->phi[0][0] = vecval[i+n*(j+n*k)].phi[flag][4]; 
+
+    rhs->phi[0][1] = - 0.5*(vecval[i+1+n*(j+n*k)].phi[flag][4] - vecval[i-1+n*(j+n*k)].phi[flag][4])/dx;
+
+    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)].phi[flag][4] - vecval[i+n*(j-1+n*k)].phi[flag][4])/dx;
+
+    rhs->phi[0][3] = - 0.5*(vecval[i+n*(j+n*(k+1))].phi[flag][4] - vecval[i+n*(j+n*(k-1))].phi[flag][4])/dx;
+
+    rhs->phi[0][4] = - 0.5*(vecval[i+1+n*(j+n*k)].phi[flag][1] - vecval[i-1+n*(j+n*k)].phi[flag][1])/dx
+                - 0.5*(vecval[i+n*(j+1+n*k)].phi[flag][2] - vecval[i+n*(j-1+n*k)].phi[flag][2])/dx
+                - 0.5*(vecval[i+n*(j+n*(k+1))].phi[flag][3] - vecval[i+n*(j+n*(k-1))].phi[flag][3])/dx;
+  } else {
+    // dirichlet
+    rhs->phi[0][0] = 0.0;
+    rhs->phi[0][1] = 0.0;
+    rhs->phi[0][2] = 0.0;
+    rhs->phi[0][3] = 0.0;
+    rhs->phi[0][4] = 0.0;
+  }
+  return;
+}
+
+void calcrhs(struct nodedata * rhs,
+               hpx::memory::default_vector< nodedata*>::type const& vecval,
                 int flag, had_double_type const& dx,
                 bool boundary,int i,int j,int k, Par const& par)
 {

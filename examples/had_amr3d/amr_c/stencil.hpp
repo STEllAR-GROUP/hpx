@@ -125,6 +125,7 @@ namespace hpx { namespace components { namespace amr
 
 
     private:
+        hpx::memory::default_vector< hpx::memory::default_vector<nodedata* >::type > ::type vecval;
         std::size_t numsteps_;
         naming::id_type log_;
     };

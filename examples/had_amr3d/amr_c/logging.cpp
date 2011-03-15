@@ -86,6 +86,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
+#if defined(RNPL_FOUND)
             for (i=0;i<par->granularity;i++) {
               x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
@@ -95,6 +96,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             for (i=0;i<par->granularity;i++) {
               x.push_back(val.z_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
+
             for (i=0;i<par->granularity*par->granularity*par->granularity;i++) {
               phi.push_back(val.value_[i].phi[0][0]);
               d1phi.push_back(val.value_[i].phi[0][1]);
@@ -123,7 +125,6 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #endif
             }
-#if defined(RNPL_FOUND)
             int shape[3];
             char cnames[80] = { "x|y|z" };
             shape[0] = par->granularity;

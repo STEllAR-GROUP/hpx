@@ -1400,10 +1400,14 @@ namespace hpx { namespace components { namespace amr
             boundary = true;
           } 
 
-          hpx::memory::default_vector<nodedata*>::type vecval;
+          //hpx::memory::default_vector<nodedata*>::type vecval;
+          if ( vecval.size() == 0 ) {
+            vecval.resize(par->num_rows);
+          }
+          if ( vecval[row].size() == 0 ) {
+            vecval[row].resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
+          }
           hpx::memory::default_vector<nodedata>::type::iterator niter;
-          // this is really a 3d array
-          vecval.resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
 
           int count_i = 0;
           int count_j = 0;
@@ -1480,7 +1484,7 @@ namespace hpx { namespace components { namespace amr
               int b = tmp_index%par->granularity;
               int a = count - par->granularity*(b+c*par->granularity);
 
-              vecval[a+(ii+1)*par->granularity 
+              vecval[row][a+(ii+1)*par->granularity 
                         + 3*par->granularity*( 
                              (b+(jj+1)*par->granularity)
                                 +3*par->granularity*(c+(kk+1)*par->granularity) )] = &(*niter); 
@@ -1507,7 +1511,7 @@ namespace hpx { namespace components { namespace amr
 
               // call rk update 
               int adj_index = 0;
-              int gft = rkupdate(vecval,resultval.get_ptr(),
+              int gft = rkupdate(vecval[row],resultval.get_ptr(),
                                    boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                    level,*par.p);
 
