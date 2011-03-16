@@ -50,10 +50,10 @@ namespace hpx
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  inline void finalize(void)
+  inline void finalize(double wait_time = 0.0, bool user_override = true)
   {
-    double wait_time = 0.0;
-    get_option(wait_time, "hpx.finalize_wait_time");
+    if (user_override)
+      get_option(wait_time, "hpx.finalize_wait_time");
 
     if (wait_time)
     {
