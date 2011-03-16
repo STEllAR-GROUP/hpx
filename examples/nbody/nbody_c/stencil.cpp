@@ -147,7 +147,7 @@ namespace hpx { namespace components { namespace nbody
           
           double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
           double v_half_x, v_half_y, v_half_z;
-          
+          resultval->node_type = val[compute_index]->node_type;
           resultval->x = val[compute_index]->x;
           resultval->y = val[compute_index]->y;
           resultval->z = val[compute_index]->z;            
@@ -171,18 +171,24 @@ namespace hpx { namespace components { namespace nbody
           resultval->vy += v_half_y + vel_dt_half_y;
           resultval->vz += v_half_z + vel_dt_half_z;
 
+          std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
           std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
           std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
+//           par->bodies[compute_index].node_type = resultval->node_type;
+//           par->bodies[compute_index].px = resultval->x;
+//           par->bodies[compute_index].py = resultval->y;
+//           par->bodies[compute_index].pz = resultval->z;
+//           par->bodies[compute_index].vx = resultval->vx;
+//           par->bodies[compute_index].vy = resultval->vy;
+//           par->bodies[compute_index].vz = resultval->vz;   
+//           par->bodies[compute_index].ax = resultval->ax;
+//           par->bodies[compute_index].ay = resultval->ay;
+//           par->bodies[compute_index].az = resultval->az;
 
-          ////TODO Put the move function here 
-//           for (int i=0;i<val.size();i++)
-//           {
-//              if ( i != compute_index ) {
-//                 
-//              }
-//           }
+
 
        //   resultval.get() = val[compute_index].get();
+          
           return 0;
         }
         BOOST_ASSERT(false);

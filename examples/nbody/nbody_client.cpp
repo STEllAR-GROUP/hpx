@@ -252,8 +252,8 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
 
 void IntrTreeNode::tagTree(int &current_node,  int & max_count)
 {
-    static int max_ctr;
-    static int tag_id;
+    static int max_ctr=0;
+    static int tag_id=0;
     register TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
     {
@@ -280,14 +280,14 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count)
         max_count = tag_id;
     else 
         max_count = max_ctr;
-    std::cout << "particleid : " << tag_id << std::endl;
+    std::cout << "particleid : " << tag << std::endl;
 }
 
 
 void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
 {
     //static int max_ctr;
-    static int bod_idx;
+    static int bod_idx=0;
     register TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
     {
@@ -678,6 +678,11 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         for (par->iter = 0; par->iter < par->num_iterations; ++par->iter)
         {
             double box_size, cPos[3];
+            box_size = 0;
+            cPos[0]=0;
+            cPos[1]=0;
+            cPos[2]=0;
+            
             computeRootPos(par->num_bodies, box_size, cPos);
             
             IntrTreeNode *bht_root = IntrTreeNode::newNode(cPos);
@@ -711,7 +716,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             {
 //                 particles[i]->interactionList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, iList ,i );
 //             }
-                
+               
+            IntrTreeNode::treeReuse();
+            
             for (int p = 0; p < bht_root->tag; ++p)
             {
                 std::cout << " p : " << p << " list : " ;
@@ -728,7 +735,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
             //else
                 //unigrid_mesh.
-                
+            
         }
 
         // for loop for iteration

@@ -32,6 +32,7 @@ class Array3D {
 };
 
 struct body {
+    int node_type;
     double mass;
     double px, py, pz;
     double vx, vy, vz;
@@ -43,6 +44,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
+        ar & node_type;
         ar & mass;
         ar & px;
         ar & py;

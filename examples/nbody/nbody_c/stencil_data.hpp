@@ -38,7 +38,7 @@ struct stencil_data
     ~stencil_data() {}
 
     stencil_data(stencil_data const& rhs)
-      : x(rhs.x), y(rhs.y), z(rhs.z),
+      : node_type(rhs.node_type), x(rhs.x), y(rhs.y), z(rhs.z),
         ax(rhs.ax),ay(rhs.ay),az(rhs.az),
         vx(rhs.vx),vy(rhs.vy),vz(rhs.vz),
         row(rhs.row),column(rhs.column)
@@ -49,6 +49,7 @@ struct stencil_data
     stencil_data& operator=(stencil_data const& rhs)
     {
         if (this != &rhs) {
+            node_type = rhs.node_type;
             x = rhs.x;
             y = rhs.y;
             z = rhs.z;
@@ -67,6 +68,7 @@ struct stencil_data
 
     hpx::lcos::mutex mtx_;    // lock for this data block
 
+    int node_type;
     had_double_type x,y,z;
     had_double_type ax,ay,az;
     had_double_type vx,vy,vz;
@@ -80,6 +82,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
+        ar & node_type;
         ar & x & y & z & ax & ay & az;
         ar & vx & vy & vz & row & column;
     }

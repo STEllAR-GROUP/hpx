@@ -381,10 +381,88 @@ namespace hpx { namespace components { namespace nbody { namespace server
         std::size_t numsteps,
         components::component_type logging_type, Parameter const& par)
     {
-        BOOST_ASSERT(false);
+ //       BOOST_ASSERT(false);
         // This routine is deprecated currently
 
         std::vector<naming::id_type> result_data;
+        
+                //hpx::util::high_resolution_timer t;
+ //       std::vector<naming::id_type> result_data;
+
+        components::component_type stencil_type = 
+            components::get_component_type<components::nbody::server::dynamic_stencil_value>();
+
+        typedef components::distributing_factory::result_type result_type;
+
+        // create a distributing factory locally
+        components::distributing_factory factory;
+        factory.create(applier::get_applier().get_runtime_support_gid());
+
+        // create a couple of stencil (functional) components and twice the 
+        // amount of stencil_value components
+        result_type functions = factory.create_components(function_type, numvalues);
+
+        std::size_t num_rows = 2; 
+
+        std::vector<std::size_t> each_row;
+        each_row.resize(num_rows);
+        for (int i=0;i<num_rows;i++) {
+          each_row[i] = par->rowsize;
+        }
+
+        std::vector<result_type> stencils;
+        for (int i=0;i<num_rows;i++) {
+          stencils.push_back(factory.create_components(stencil_type, each_row[i]));
+        }
+
+        // initialize logging functionality in functions
+        result_type logging;
+        if (logging_type != components::component_invalid)
+            logging = factory.create_components(logging_type);
+
+        init(locality_results(functions), locality_results(logging), numsteps);
+
+        // prep the connections
+        std::size_t memsize = 28;
+        Array3D dst_port(num_rows,each_row[0],memsize);
+        Array3D dst_src(num_rows,each_row[0],memsize);
+        Array3D dst_step(num_rows,each_row[0],memsize);
+        Array3D dst_size(num_rows,each_row[0],1);
+        Array3D src_size(num_rows,each_row[0],1);
+        prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,
+                   num_rows,each_row,par);
+
+        // initialize stencil_values using the stencil (functional) components
+        for (int i = 0; i < num_rows; ++i) 
+            init_stencils(locality_results(stencils[i]), locality_results(functions), i,
+                          dst_port,dst_src,dst_step,dst_size,src_size, par);
+
+        // ask stencil instances for their output gids
+        std::vector<std::vector<std::vector<naming::id_type> > > outputs(num_rows);
+        for (int i = 0; i < num_rows; ++i) 
+            get_output_ports(locality_results(stencils[i]), outputs[i]);
+
+        // connect output gids with corresponding stencil inputs
+        connect_input_ports(&*stencils.begin(), outputs,dst_size,dst_step,dst_src,dst_port,par);
+
+        // for loop over second row ; call start for each
+        for (int i = 1; i < num_rows; ++i) 
+            start_row(locality_results(stencils[i]));
+
+        // prepare initial data
+
+        //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
+        // do actual work
+        execute(locality_results(stencils[0]), initial_data, result_data);
+
+        // free all allocated components (we can do that synchronously)
+        if (!logging.empty())
+            factory.free_components_sync(logging);
+
+        for (int i = 0; i < num_rows; ++i) 
+            factory.free_components_sync(stencils[i]);
+        factory.free_components_sync(functions);
+
 #if 0
         components::component_type stencil_type = 
             components::get_component_type<components::nbody::server::dynamic_stencil_value >();

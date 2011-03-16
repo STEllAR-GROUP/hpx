@@ -62,8 +62,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 //     
 //     val->row = row;
 //     val->column = item;
-    
-     val->x = par.bodies[item].px;
+    val->node_type = par.bodies[item].node_type;
+    val->x = par.bodies[item].px;
     val->y = par.bodies[item].py; 
     val->z = par.bodies[item].pz;
 
