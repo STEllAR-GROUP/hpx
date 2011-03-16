@@ -89,7 +89,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         static IntrTreeNode *newNode(const double pos_buf[]); /* Function to create a new node, returns an Internal Tree Node */
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
-        void tagTree(int &current_node, int & max_count, int tag_id, int max_ctr);
+        void tagTree(int &current_node, int & max_count, int & tag_id, int max_ctr);
         void buildBodies(int &current_node, std::vector<body> & bodies, int bod_idx);
         void printTag(int &current_node);
         void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
@@ -252,7 +252,7 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
  * across the entire tree recursively. 
  */
 
-void IntrTreeNode::tagTree(int &current_node,  int & max_count, int tag_id, int max_ctr)
+void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, int max_ctr)
 {    
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
@@ -260,22 +260,25 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int tag_id, int 
         temp_branch = branch[i];
         if (temp_branch != NULL) 
         {
+            
+            ++tag_id;
+            ++max_ctr;
+            temp_branch->tag = tag_id ;
             //++tag_id;
+            std::cout << "particleid : " << temp_branch->tag << std::endl;
             if(temp_branch->node_type == CELL)
             { // Intermediate Node
                 ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count, tag_id, max_ctr);
             }
-            ++tag_id;
-            ++max_ctr;
-            temp_branch->tag = tag_id ;
 
-            std::cout << "particleid : " << temp_branch->tag << std::endl;
+
+            
              
         }
     }
     ++tag_id;
     ++max_ctr;
-    tag = tag_id;
+     tag = tag_id;
     if (max_ctr < tag_id)
         max_count = tag_id;
     else 
@@ -697,7 +700,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             int max_count;
             int current_index = 0;
             bht_root->calculateCM(current_index);
-            bht_root->tagTree(current_index, max_count, 0, 0);
+            int tag_id = 0;
+            bht_root->tagTree(current_index, max_count, tag_id, 0);
 //             std::cout << "TADA : " << max_count << std::endl;
 
 //             bht_root->printTag(current_index);
