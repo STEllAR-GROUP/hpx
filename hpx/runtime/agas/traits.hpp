@@ -8,6 +8,8 @@
 #if !defined(HPX_7D2054F6_DBA9_4D70_82FB_32D284A3CCB4)
 #define HPX_7D2054F6_DBA9_4D70_82FB_32D284A3CCB4
 
+#include <boost/mpl/integral_c.hpp>
+
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
@@ -15,7 +17,11 @@
 namespace hpx { namespace agas { namespace traits
 {
 
-template <typename Tag, typename Enable> 
+template <typename T, typename Enable>
+struct serialization_version
+  : boost::mpl::integral_c<unsigned, 0x10> {};
+
+template <typename T, typename Enable> 
 struct mutex_type
 { typedef hpx::lcos::mutex type; };
 

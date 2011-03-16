@@ -12,15 +12,12 @@
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/util/safe_bool.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// local_address<> serialization format version
-#define HPX_LOCAL_ADDRESS_VERSION 0x10
 
 namespace hpx { namespace agas
 {
@@ -28,7 +25,7 @@ namespace hpx { namespace agas
 template <typename Protocal>
 struct local_address 
 {
-    typedef boost::fusion::vector<
+    typedef boost::fusion::vector3<
         local_address<Protocal>, std::size_t, std::ptrdiff_t
     > registry_entry_type;
 
@@ -55,7 +52,7 @@ struct local_address
       : _locality(), _type(components::component_invalid), 
         _lva(reinterpret_cast<lva_type>(lva)) {}
 
-    operator util::safe_bool<local_address>::result_type() const 
+    operator typename util::safe_bool<local_address>::result_type() const 
     { 
         return util::safe_bool<local_address>()
             (components::component_invalid != _type || 0 != _lva); 
@@ -103,7 +100,7 @@ struct local_address
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_LOCAL_ADDRESS_VERSION) {
+        if (version > traits::serialization_version<Protocal>::value) {
             throw exception(version_too_new, 
                 "trying to load local_address with unknown version");
         }
@@ -115,7 +112,7 @@ struct local_address
 
 template <typename Char, typename Traits, typename Protocal>
 inline std::basic_ostream<Char, Traits>&
-operator<< (std::basic_ostream<Char, Traits>& out,
+operator<< (std::basic_ostream<Char, Traits>& os,
             local_address<Protocal> const& addr)
 {
     boost::io::ios_flags_saver ifs(os); 
@@ -127,9 +124,6 @@ operator<< (std::basic_ostream<Char, Traits>& out,
 } 
 
 }}
-
-//BOOST_CLASS_VERSION(hpx::agas::local_address, HPX_LOCAL_ADDRESS_VERSION)
-//BOOST_CLASS_TRACKING(hpx::agas::local_address, boost::serialization::track_never)
 
 #endif // HPX_68F6AFA9_0C73_4CE8_8D9A_D34D53DA1DF1
 

@@ -29,35 +29,35 @@ struct partition
     typedef naming::gid_type upper_bound_type;
 
     partition(prefix_type prefix, upper_bound_type const& upper)
-      : _prefix(prefix), _upper(upper) {}
+      : prefix_(prefix), upper_(upper) {}
 
     bool operator==(partition const& rhs) const
     {
-        return _prefix == rhs._prefix
-            && _upper  == rhs._upper; 
+        return prefix_ == rhs.prefix_
+            && upper_  == rhs.upper_; 
     }
 
     prefix_type get_prefix() const
-    { return _prefix; }
+    { return prefix_; }
 
     void set_prefix(prefix_type prefix)
-    { _prefix = prefix; }
+    { prefix_ = prefix; }
 
     upper_bound_type get_upper_bound() const
-    { return _upper_bound; }
+    { return upper_; }
 
     void set_upper_bound(upper_bound_type upper_bound)
-    { _upper_bound = upper_bound; }
+    { upper_ = upper_bound; }
 
   private:
-    prefix_type _prefix;
-    upper_bound_type _upper;
+    prefix_type prefix_;
+    upper_bound_type upper_;
 
     friend class boost::serialization::access;
 
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
-    { ar << _prefix << _upper; }
+    { ar << prefix_ << upper_; }
 
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
@@ -66,7 +66,7 @@ struct partition
             throw exception(version_too_new, 
                 "trying to load partition with unknown version");
         }
-        ar >> _prefix >> _upper; 
+        ar >> prefix_ >> upper_; 
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -74,10 +74,10 @@ struct partition
 
 template <typename Char, typename Traits>
 inline std::basic_ostream<Char, Traits>&
-operator<< (std::basic_ostream<Char, Traits>& out, partition const& part)
+operator<< (std::basic_ostream<Char, Traits>& os, partition const& part)
 {
     boost::io::ios_flags_saver ifs(os); 
-    os << std::showbase << std::hex << "(" << 
+    os << std::showbase << std::hex << "(" 
        << part.get_prefix() << " "
        << part.get_upper_bound() << ")";
     return os;

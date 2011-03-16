@@ -10,15 +10,24 @@
 
 #if defined(HPX_USE_ASIO_IB_SUPPORT)
 #include <boost/asio/ip/ib.hpp> // doesn't exist (yet)
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
-#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/local_address.hpp>
+#if 0
+    #include <hpx/runtime/agas/namespaces/primary.hpp>
+    #include <hpx/runtime/agas/namespaces/locality.hpp>
+#else
+    #include <hpx/runtime/agas/traits.hpp>
+#endif
 
 namespace hpx { namespace agas // hpx::agas
 {
 
 namespace tag { struct ib_protocal; }
 
-namespace traits { // hpx::agas::traits
+namespace traits // hpx::agas::traits
+{
 
 template <>
 struct protocal_name_hook<tag::ib_protocal>
@@ -33,22 +42,33 @@ template <>
 struct locality_type<tag::ib_protocal>
 { typedef boost::asio::ip::ib::endpoint type; };
 
+} // hpx::agas::traits
+
+typedef local_address<tag::ib_protocal> ib_local_address;
+
 } // hpx::agas
-} // hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace components { namespace agas // hpx::components::agas
 {
 
+#if 0
 typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
+    ib_locality_namespace;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
 
-typedef server::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
+#if 0
+typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
+    ib_locality_namespace;
+#endif
 
 } // hpx::components::agas::stubs
 
@@ -56,14 +76,27 @@ typedef server::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
 namespace stubs // hpx::components::agas::stubs
 {
 
-typedef stubs::primary_namespace_type<hpx::agas::tag::ib_protocal>::type
+#if 0
+typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
+    ib_locality_namespace;
+#endif
 
 } // hpx::components::agas::stubs
 
 } // hpx::components::agas
 } // hpx::components
 } // hpx
+
+///////////////////////////////////////////////////////////////////////////////
+BOOST_CLASS_VERSION(
+    hpx::agas::ib_local_address, 
+    hpx::agas::traits::serialization_version<
+        hpx::agas::tag::ib_protocal
+    >::value)
+BOOST_CLASS_TRACKING(
+    hpx::agas::ib_local_address, boost::serialization::track_never)
 
 #else
   #warning HPX_USE_ASIO_IB_SUPPORT is not defined, IB protocal disabled.

@@ -17,6 +17,7 @@
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/agas/traits.hpp>
 
 namespace hpx { namespace components { namespace agas { namespace server
 {
@@ -38,29 +39,29 @@ struct HPX_COMPONENT_EXPORT refcnt_service
     };
 
   private:
-    mutex_type _mutex;
-    registry_type _registry;
+    mutex_type mutex_;
+    registry_type registry_;
 
   public:
-    refcnt()
-    { hpx::agas::traits::initialize_mutex(_mutex); }
+    refcnt_service()
+    { hpx::agas::traits::initialize_mutex(mutex_); }
 
     mapped_type
     increment(key_type const& key, mapped_type count)
     {
         try {
-            mutex_type::scoped_lock l(_mutex);
+            mutex_type::scoped_lock l(mutex_);
 
             // FIXME: This copy is a one-off, but necessary because
             // strip_credit_from_gid() mutates. Fix this.
             naming::gid_type id = key;
             naming::strip_credit_from_gid(id);
 
-            registry_type::iterator it = _registry.find(id);
+            registry_type::iterator it = registry_.find(id);
 
-            if (it == _registry.end())
+            if (it == registry_.end())
             {
-                std::pair<registry_type::iterator, bool> p = _registry.insert
+                std::pair<registry_type::iterator, bool> p = registry_.insert
                     (registry_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
 
                 if (!p.second)
@@ -85,7 +86,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
         using boost::fusion::at_c;
 
         try {
-            mutex_type::scoped_lock l(_mutex);
+            mutex_type::scoped_lock l(mutex_);
 
             // FIXME: This copy is a one-off, but necessary because
             // strip_credit_from_gid() mutates. Fix this.
@@ -99,9 +100,9 @@ struct HPX_COMPONENT_EXPORT refcnt_service
 
             decrement_result_type r(0, component_invalid);
 
-            registry_type::iterator it = _registry.find(id);
+            registry_type::iterator it = registry_.find(id);
 
-            if (it != _registry.end())
+            if (it != registry_.end())
             {
                 if (it->second < count)
                     throw exception(bad_parameter,
@@ -110,7 +111,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
 
                 // Remove the entry if it's been decremented to 0.
                 if ((it->second -= count) == 0)
-                    _registry.erase(it);
+                    registry_.erase(it);
                 else
                     at_c<0>(r) = it->second;
             }
@@ -119,7 +120,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
             // AGAS v1 behavior. 
             else if (count < HPX_INITIAL_GLOBALCREDIT)
             {
-                std::pair<registry_type::iterator, bool> p = _registry.insert
+                std::pair<registry_type::iterator, bool> p = registry_.insert
                     (registry_type::value_type(id, HPX_INITIAL_GLOBALCREDIT));
 
                 if (!p.second)
@@ -134,7 +135,10 @@ struct HPX_COMPONENT_EXPORT refcnt_service
 
                 at_c<0>(r) = (it->second -= count);
             }
-            
+          
+            // FIXME: This can't be implemented without access to the primary
+            // namespace. 
+            #if 0 
             if (at_c<0>(r) == 0)
             {
                 if ((at_c<1>(r) = get_component_type(id)) == component_invalid)
@@ -142,6 +146,7 @@ struct HPX_COMPONENT_EXPORT refcnt_service
                         "unknown component type encountered while decrementing"
                         "global reference count to 0");
             }
+            #endif
     
             return r; 
 
@@ -156,17 +161,17 @@ struct HPX_COMPONENT_EXPORT refcnt_service
 
     typedef hpx::actions::result_action2<
         refcnt_service,
-        key_type,                    // return type
-        refcnt_increment,            // action type
-        key_type const&, mapped_type // arguments 
+        mapped_type,                  // return type
+        refcnt_increment,             // action type
+        key_type const&, mapped_type, // arguments 
         &refcnt_service::increment
     > increment_action;
 
     typedef hpx::actions::result_action2<
         refcnt_service,
-        key_type,                    // return type
-        refcnt_decrement,            // action type
-        key_type const&, mapped_type // arguments 
+        decrement_result_type,        // return type
+        refcnt_decrement,             // action type
+        key_type const&, mapped_type, // arguments 
         &refcnt_service::decrement
     > decrement_action;
 };

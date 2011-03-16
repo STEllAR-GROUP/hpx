@@ -9,15 +9,24 @@
 #define HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 
 #include <boost/asio/ip/udp.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
-#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/local_address.hpp>
+#if 0
+    #include <hpx/runtime/agas/namespaces/primary.hpp>
+    #include <hpx/runtime/agas/namespaces/locality.hpp>
+#else
+    #include <hpx/runtime/agas/traits.hpp>
+#endif
 
 namespace hpx { namespace agas // hpx::agas
 {
 
 namespace tag { struct udp_ip_protocal; }
 
-namespace traits { // hpx::agas::traits
+namespace traits // hpx::agas::traits
+{
 
 template <>
 struct protocal_name_hook<tag::udp_ip_protocal>
@@ -32,22 +41,33 @@ template <>
 struct locality_type<tag::udp_ip_protocal>
 { typedef boost::asio::ip::udp::endpoint type; };
 
+} // hpx::agas::traits
+
+typedef local_address<tag::udp_ip_protocal> udp_ip_local_address;
+
 } // hpx::agas
-} // hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace components { namespace agas // hpx::components::agas
 {
 
+#if 0
 typedef primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
     udp_ip_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_locality_namespace;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
 
-typedef server::primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+#if 0
+typedef primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
     udp_ip_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_locality_namespace;
+#endif
 
 } // hpx::components::agas::stubs
 
@@ -55,14 +75,27 @@ typedef server::primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
 namespace stubs // hpx::components::agas::stubs
 {
 
-typedef stubs::primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+#if 0
+typedef primary_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
     udp_ip_primary_namespace;
+typedef locality_namespace_type<hpx::agas::tag::udp_ip_protocal>::type
+    udp_ip_locality_namespace;
+#endif
 
 } // hpx::components::agas::stubs
 
 } // hpx::components::agas
 } // hpx::components
 } // hpx
+
+///////////////////////////////////////////////////////////////////////////////
+BOOST_CLASS_VERSION(
+    hpx::agas::udp_ip_local_address,
+    hpx::agas::traits::serialization_version<
+        hpx::agas::tag::udp_ip_protocal
+    >::value)
+BOOST_CLASS_TRACKING(
+    hpx::agas::udp_ip_local_address, boost::serialization::track_never)
 
 #endif // HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 

@@ -26,7 +26,7 @@ struct basic_namespace
     typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
     typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
 
-    basic_namespace(naming::id_type gid = naming::invalid_id)
+    explicit basic_namespace(naming::id_type const& gid = naming::invalid_id)
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////

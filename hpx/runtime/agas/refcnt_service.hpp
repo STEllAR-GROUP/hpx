@@ -26,25 +26,25 @@ struct refcnt_service
 
     typedef stubs::refcnt_service::decrement_result_type decrement_result_type;
 
-    refcnt_service(naming::id_type gid = naming::invalid_id)
+    explicit refcnt_service(naming::id_type const& gid = naming::invalid_id)
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<key_type>
-    increment_async(key_type const& key, mapped_type count)
+    increment_async(key_type const& key, mapped_type count = 1)
     { return this->base_type::increment_async(this->gid_, key, count); }
  
     key_type
-    increment(key_type const& key, mapped_type count)
+    increment(key_type const& key, mapped_type count = 1)
     { return this->base_type::increment(this->gid_, key, count); }
 
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<decrement_result_type>
-    decrement_async(key_type const& key, mapped_type count)
+    decrement_async(key_type const& key, mapped_type count = 1)
     { return this->base_type::decrement_async(this->gid_, key, count); }
     
     decrement_result_type
-    decrement(key_type const& key, mapped_type count)
+    decrement(key_type const& key, mapped_type count = 1)
     { return this->base_type::decrement(this->gid_, key, count); }
 };            
 

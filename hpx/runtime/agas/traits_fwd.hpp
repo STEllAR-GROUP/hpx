@@ -13,8 +13,12 @@
 namespace hpx { namespace agas { namespace traits
 {
 
+// MPL integral constant wrapper
+template <typename T, typename Enable = void> 
+struct serialization_version;
+
 // MPL metafunction
-template <typename Tag, typename Enable = void> 
+template <typename T, typename Enable = void> 
 struct mutex_type;
 
 // Spirit-style CP
@@ -23,6 +27,9 @@ struct initialize_mutex_hook;
 
 template <typename Mutex>
 inline void initialize_mutex(Mutex&);
+
+///////////////////////////////////////////////////////////////////////////////
+// AGAS namespace traits. 
 
 // MPL metafunction
 template <typename Tag, typename Enable = void> 
@@ -36,6 +43,9 @@ struct key_type;
 template <typename Tag, typename Enable = void> 
 struct mapped_type;
 
+///////////////////////////////////////////////////////////////////////////////
+// Network protocol traits.
+
 // MPL metafunction
 template <typename Protocal, typename Enable = void> 
 struct locality_type;
@@ -48,7 +58,7 @@ template <typename Protocal>
 inline std::string protocal_name();
 
 ///////////////////////////////////////////////////////////////////////////////
-// basic_namespace implementation hooks (Spirit-style CPs)
+// basic_namespace implementation hooks (Spirit-style CPs).
 
 template <typename Tag, typename Enable = void>
 struct bind_hook;

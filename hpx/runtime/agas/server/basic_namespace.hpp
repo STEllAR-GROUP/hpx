@@ -68,7 +68,7 @@ struct HPX_COMPONENT_EXPORT basic_namespace
         basic_namespace<Tag>,
         key_type,                           // return type
         namespace_bind,                     // action type
-        key_type const&, mapped_type const& // arguments 
+        key_type const&, mapped_type const&, // arguments 
         &basic_namespace<Tag>::bind
     > bind_action;
 
@@ -76,7 +76,7 @@ struct HPX_COMPONENT_EXPORT basic_namespace
         basic_namespace<Tag>,
         bool,                               // return type
         namespace_update,                   // action type
-        key_type const&, mapped_type const& // arguments 
+        key_type const&, mapped_type const&, // arguments 
         &basic_namespace<Tag>::update
     > update_action;
     
