@@ -18,8 +18,9 @@
 
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/asio_util.hpp>
 
-
+#include <boost/fusion/include/at_c.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -30,6 +31,7 @@
 #include "nbody/functional_component.hpp"
 #include "nbody/unigrid_mesh.hpp"
 #include "nbody_c/stencil.hpp"
+#include "nbody_c/stencil_data.hpp"
 #include "nbody_c/logging.hpp"
 
 #include "nbody_c_test/rand.hpp"
@@ -297,6 +299,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
             //++tag_id;
             if(temp_branch->node_type == CELL)
             { // Intermediate Node
+                bodies[bod_idx].node_type = temp_branch->node_type;
                 bodies[bod_idx].mass = temp_branch->mass;
                 bodies[bod_idx].px = temp_branch->p[0];
                 bodies[bod_idx].py = temp_branch->p[1];
@@ -310,6 +313,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
             }
             else if(temp_branch->node_type == PAR)
             { // Intermediate Node
+                bodies[bod_idx].node_type = temp_branch->node_type;
                 bodies[bod_idx].mass = ((TreeLeaf *) temp_branch)->mass;
                 bodies[bod_idx].px = ((TreeLeaf *) temp_branch)->p[0];
                 bodies[bod_idx].py = ((TreeLeaf *) temp_branch)->p[1];
@@ -324,6 +328,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
              
         }
     }
+        bodies[bod_idx].node_type = node_type;
         bodies[bod_idx].mass = mass;
         bodies[bod_idx].px = p[0];
         bodies[bod_idx].py = p[1];
@@ -729,13 +734,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << std::endl;
             }
 
-           if (par->iter == 0)
+         //  if (par->iter == 0)
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
-          else 
-               result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
-                numsteps, do_logging ? logging_type : components::component_invalid,par );
+//           else 
+//                result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
+//                 numsteps, do_logging ? logging_type : components::component_invalid,par );
 
            
 //            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
@@ -749,6 +754,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                access_memory_block<stencil_data> temp_data = components::stubs::memory_block::get(result_data[i]);
 //                std::cout << temp_data.x << std::endl;
 //            }
+                
+            std::cout << "Results: " << std::endl;
+            for (std::size_t i = 0; i < result_data.size(); ++i)
+            {
+                components::access_memory_block<stencil_data> val(
+                    components::stubs::memory_block::get(result_data[i]));
+                std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
+            }
+            
                  
         }
 

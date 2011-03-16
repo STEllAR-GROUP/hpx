@@ -124,6 +124,7 @@ namespace hpx { namespace components { namespace nbody
           }    
           BOOST_ASSERT(compute_index != -1);
 
+      //    if (resultval->node_type == 1){
           resultval->ax = 0.0;
           resultval->ay = 0.0;
           resultval->az = 0.0;
@@ -185,7 +186,7 @@ namespace hpx { namespace components { namespace nbody
 //           par->bodies[compute_index].ay = resultval->ay;
 //           par->bodies[compute_index].az = resultval->az;
 
-
+        //  } // if node_type == 1 (par)
 
        //   resultval.get() = val[compute_index].get();
           
