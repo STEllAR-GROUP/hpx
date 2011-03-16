@@ -29,14 +29,50 @@ namespace hpx { namespace components { namespace amr
 }}}
 #endif
 
-void calcrhs(struct nodedata * rhs,
-             boost::scoped_array<nodedata> const& vecval,
-             int flag, had_double_type const& dx,
-             bool boundary,int i,int j,int k, Par const& par);
-void calcrhs(struct nodedata * rhs,
-               hpx::memory::default_vector< nodedata*>::type const& vecval,
-                int flag, had_double_type const& dx,
-                bool boundary,int i,int j,int k, Par const& par);
+// This is a pointwise calculation: compute the rhs for point result given input values in array phi
+template <int flag, int dim>
+inline had_double_type& phi(nodedata& nd)
+{
+    return nd.phi[flag][dim];
+}
+
+template <int flag, int dim>
+inline had_double_type& phi(nodedata* nd)
+{
+    return nd->phi[flag][dim];
+}
+
+template <int flag, typename Array>
+inline void 
+calcrhs(struct nodedata * rhs, Array const& vecval, 
+    had_double_type const& dx, bool boundary, 
+    int const i, int const j, int const k, Par const& par)
+{
+  int const n = 3*par.granularity;
+
+  if ( !boundary ) {
+    rhs->phi[0][0] = phi<flag, 4>(vecval[i+n*(j+n*k)]); 
+
+    rhs->phi[0][1] = - 0.5*(phi<flag, 4>(vecval[i+1+n*(j+n*k)]) - phi<flag, 4>(vecval[i-1+n*(j+n*k)]))/dx;
+
+    rhs->phi[0][2] = - 0.5*(phi<flag, 4>(vecval[i+n*(j+1+n*k)]) - phi<flag, 4>(vecval[i+n*(j-1+n*k)]))/dx;
+
+    rhs->phi[0][3] = - 0.5*(phi<flag, 4>(vecval[i+n*(j+n*(k+1))]) - phi<flag, 4>(vecval[i+n*(j+n*(k-1))]))/dx;
+
+    rhs->phi[0][4] = - 0.5*(phi<flag, 1>(vecval[i+1+n*(j+n*k)]) - phi<flag, 1>(vecval[i-1+n*(j+n*k)]))/dx
+                - 0.5*(phi<flag, 2>(vecval[i+n*(j+1+n*k)]) - phi<flag, 2>(vecval[i+n*(j-1+n*k)]))/dx
+                - 0.5*(phi<flag, 3>(vecval[i+n*(j+n*(k+1))]) - phi<flag, 3>(vecval[i+n*(j+n*(k-1))]))/dx;
+  } 
+  else {
+    // dirichlet
+    rhs->phi[0][0] = 0.0;
+    rhs->phi[0][1] = 0.0;
+    rhs->phi[0][2] = 0.0;
+    rhs->phi[0][3] = 0.0;
+    rhs->phi[0][4] = 0.0;
+  }
+  return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // local functions
@@ -224,7 +260,8 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       j_end = i_end;
       k_start = i_start;
       k_end = i_end;
-    } else {
+    } 
+    else {
       if ( bbox[0] == 1 ) i_start = n2;
       else i_start = n2-3;
 
@@ -247,7 +284,7 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
     for (int k=k_start; k<k_end;k++) {
     for (int j=j_start; j<j_end;j++) {
     for (int i=i_start; i<i_end;i++) {
-      calcrhs(&rhs,vecval,0,dx,boundary,i,j,k,par); 
+      calcrhs<0>(&rhs,vecval,dx,boundary,i,j,k,par); 
 
       nodedata& nd = work[i+n*(j+n*k)];
       nodedata const *ndvecval = vecval[i+n*(j+n*k)];
@@ -261,33 +298,32 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
     //pwork.reserve(vecval.size());
     //for (n_iter=&work[0];n_iter!=&work[vecval.size()];++n_iter) pwork.push_back( n_iter );
 
-  // -------------------------------------------------------------------------
-  // iter 1
+    // -------------------------------------------------------------------------
+    // iter 1
     for (int k=k_start; k<k_end;k++) {
     for (int j=j_start; j<j_end;j++) {
     for (int i=i_start; i<i_end;i++) {
-     // calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
-      calcrhs(&rhs,work,1,dx,boundary,i,j,k,par); 
+      // calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
+      calcrhs<1>(&rhs,work,dx,boundary,i,j,k,par); 
       nodedata& nd = work[i+n*(j+n*k)];
       nodedata& nd2 = work2[i+n*(j+n*k)];
       for (int ll=0;ll<num_eqns;ll++) {
         nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
-                                        c_0_25*nd.phi[1][ll] + 
-                                        c_0_25*rhs.phi[0][ll]*dt;
+          c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
       }
     }}}
 
     //pwork2.reserve(vecval.size());
     //for (n_iter=&work2[0];n_iter!=&work2[vecval.size()];++n_iter) pwork2.push_back( n_iter );
 
-  // -------------------------------------------------------------------------
-  // iter 2
+    // -------------------------------------------------------------------------
+    // iter 2
     int ii,jj,kk;
     for (int k=n2; k<2*n2;k++) {
     for (int j=n2; j<2*n2;j++) {
     for (int i=n2; i<2*n2;i++) {
-     // calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
-      calcrhs(&rhs,work2,1,dx,boundary,i,j,k,par); 
+      // calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
+      calcrhs<1>(&rhs,work2,dx,boundary,i,j,k,par); 
 
       ii = i - n2;
       jj = j - n2;
@@ -298,9 +334,7 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       nodedata& ndresult = result->value_[ii + n2*(jj + n2*kk)];
 
       for (int ll=0;ll<num_eqns;ll++) {
-        ndresult.phi[0][ll] = 
-                                   c_1_3*nd.phi[0][ll]  
-                                 + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
+        ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }}}
 
@@ -309,65 +343,3 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
   return 1;
 }
 
-// This is a pointwise calculation: compute the rhs for point result given input values in array phi
-void calcrhs(struct nodedata * rhs,
-               boost::scoped_array<nodedata> const& vecval,
-                int flag, had_double_type const& dx,
-                bool boundary,int i,int j,int k, Par const& par)
-{
-
-  int n = 3*par.granularity;
-
-  if ( !boundary ) {
-    rhs->phi[0][0] = vecval[i+n*(j+n*k)].phi[flag][4]; 
-
-    rhs->phi[0][1] = - 0.5*(vecval[i+1+n*(j+n*k)].phi[flag][4] - vecval[i-1+n*(j+n*k)].phi[flag][4])/dx;
-
-    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)].phi[flag][4] - vecval[i+n*(j-1+n*k)].phi[flag][4])/dx;
-
-    rhs->phi[0][3] = - 0.5*(vecval[i+n*(j+n*(k+1))].phi[flag][4] - vecval[i+n*(j+n*(k-1))].phi[flag][4])/dx;
-
-    rhs->phi[0][4] = - 0.5*(vecval[i+1+n*(j+n*k)].phi[flag][1] - vecval[i-1+n*(j+n*k)].phi[flag][1])/dx
-                - 0.5*(vecval[i+n*(j+1+n*k)].phi[flag][2] - vecval[i+n*(j-1+n*k)].phi[flag][2])/dx
-                - 0.5*(vecval[i+n*(j+n*(k+1))].phi[flag][3] - vecval[i+n*(j+n*(k-1))].phi[flag][3])/dx;
-  } else {
-    // dirichlet
-    rhs->phi[0][0] = 0.0;
-    rhs->phi[0][1] = 0.0;
-    rhs->phi[0][2] = 0.0;
-    rhs->phi[0][3] = 0.0;
-    rhs->phi[0][4] = 0.0;
-  }
-  return;
-}
-
-void calcrhs(struct nodedata * rhs,
-               hpx::memory::default_vector< nodedata*>::type const& vecval,
-                int flag, had_double_type const& dx,
-                bool boundary,int i,int j,int k, Par const& par)
-{
-
-  int n = 3*par.granularity;
-
-  if ( !boundary ) {
-    rhs->phi[0][0] = vecval[i+n*(j+n*k)]->phi[flag][4]; 
-
-    rhs->phi[0][1] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][4] - vecval[i-1+n*(j+n*k)]->phi[flag][4])/dx;
-
-    rhs->phi[0][2] = - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][4] - vecval[i+n*(j-1+n*k)]->phi[flag][4])/dx;
-
-    rhs->phi[0][3] = - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][4] - vecval[i+n*(j+n*(k-1))]->phi[flag][4])/dx;
-
-    rhs->phi[0][4] = - 0.5*(vecval[i+1+n*(j+n*k)]->phi[flag][1] - vecval[i-1+n*(j+n*k)]->phi[flag][1])/dx
-                - 0.5*(vecval[i+n*(j+1+n*k)]->phi[flag][2] - vecval[i+n*(j-1+n*k)]->phi[flag][2])/dx
-                - 0.5*(vecval[i+n*(j+n*(k+1))]->phi[flag][3] - vecval[i+n*(j+n*(k-1))]->phi[flag][3])/dx;
-  } else {
-    // dirichlet
-    rhs->phi[0][0] = 0.0;
-    rhs->phi[0][1] = 0.0;
-    rhs->phi[0][2] = 0.0;
-    rhs->phi[0][3] = 0.0;
-    rhs->phi[0][4] = 0.0;
-  }
-  return;
-}

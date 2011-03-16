@@ -36,7 +36,6 @@ namespace hpx { namespace components { namespace amr { namespace server
     void logging::logentry(stencil_data const& val, int row, int logcode, Parameter const& par)
     {
         mutex_type::scoped_lock l(mtx_);
-        int i;
 
         if ( par->output_stdout == 1 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6) {
@@ -49,7 +48,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             } 
 #if 0
            // for (i=0;i<val.granularity*val.granularity*val.granularity;i++) {
-              i = 0;
+              int i = 0;
               std::cout << " AMR Level: " << val.level_ 
                         << " Timestep: " <<  val.timestep_ 
                         << " Time: " << val.timestep_*par->dx0*par->lambda  
@@ -64,14 +63,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
 
         // output to file "output.dat"
-        hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
-        double datatime;
         if ( logcode == 0 ) {
 #if 0
           FILE *fdata;
           fdata = fopen("equator.dat","a");
           had_double_type xx,yy,zz;
-          int j,k;
+          int i,j,k;
           for (k=0;k<par->granularity;k++) {
           for (j=0;j<par->granularity;j++) {
           for (i=0;i<par->granularity;i++) {
@@ -85,8 +82,9 @@ namespace hpx { namespace components { namespace amr { namespace server
           fclose(fdata);
 #endif
 
-          if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
 #if defined(RNPL_FOUND)
+          hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
+          if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<par->granularity;i++) {
               x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
             }
@@ -103,7 +101,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               d2phi.push_back(val.value_[i].phi[0][2]);
               d3phi.push_back(val.value_[i].phi[0][3]);
               d4phi.push_back(val.value_[i].phi[0][4]);
-              datatime = val.timestep_*par->dx0*par->lambda;
+              double datatime = val.timestep_*par->dx0*par->lambda;
 #if 0
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
@@ -135,8 +133,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             gft_out_full("0d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
             gft_out_full("0d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
             gft_out_full("0d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
-#endif
           }
+#endif
         }
     }
 
