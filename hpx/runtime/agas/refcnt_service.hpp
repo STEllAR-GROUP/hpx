@@ -21,8 +21,8 @@ struct refcnt_service
     typedef client_base<refcnt_service, stubs::refcnt_service>
         base_type;
 
-    typedef stubs::refcnt_service::registry_type::key_type key_type;
-    typedef stubs::refcnt_service::registry_type::mapped_type mapped_type; 
+    typedef stubs::refcnt_service::key_type key_type;
+    typedef stubs::refcnt_service::mapped_type mapped_type; 
 
     typedef stubs::refcnt_service::decrement_result_type decrement_result_type;
 
@@ -30,11 +30,11 @@ struct refcnt_service
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<key_type>
+    lcos::future_value<mapped_type>
     increment_async(key_type const& key, mapped_type count = 1)
     { return this->base_type::increment_async(this->gid_, key, count); }
  
-    key_type
+    mapped_type
     increment(key_type const& key, mapped_type count = 1)
     { return this->base_type::increment(this->gid_, key, count); }
 
