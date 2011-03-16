@@ -40,8 +40,6 @@ macro(add_hpx_test name)
       add_test(${name}
         ${CMAKE_CURRENT_BINARY_DIR}/${name}_test
         ${${name}_ARGS})
-    else()
-      hpx_info("add_test.${name}" "Module was not specified for component.")
     endif()
   endif()
 endmacro()
