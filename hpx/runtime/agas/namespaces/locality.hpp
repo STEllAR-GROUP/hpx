@@ -5,12 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_D9951196_521D_4EA5_947D_43451437AEE6)
-#define HPX_D9951196_521D_4EA5_947D_43451437AEE6
+#if !defined(HPX_352F80CF_5A0C_4DAE_9DC3_8CEE5F789A75)
+#define HPX_352F80CF_5A0C_4DAE_9DC3_8CEE5F789A75
 
-#include <multimap>
+#include <map>
 
 #include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/partition.hpp>
 #include <hpx/runtime/agas/basic_namespace.hpp>
 
 namespace hpx { namespace agas // hpx::agas
@@ -18,15 +19,19 @@ namespace hpx { namespace agas // hpx::agas
 
 namespace tag { // hpx::agas::tag
 
-struct factory_namespace;
+template <typename Protocal>
+struct locality_namespace;
 
 } // hpx::agas::tag
 
 namespace traits { // hpx::agas::traits
 
-template <>
-struct registry_type<tag::factory_namespace>
-{ typedef std::multimap<naming::gid_type, boost::uint32_t> type; };
+template <typename Protocal>
+struct registry_type<tag::locality_namespace<Protocal> >
+{
+    typedef std::map<typename locality_type<Protocal>::type, partition>
+        type;
+};
 
 // TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
@@ -37,16 +42,17 @@ struct registry_type<tag::factory_namespace>
 namespace components { namespace agas // hpx::components::agas
 {
 
-struct factory_namespace
-  : private basic_namespace<hpx::agas::tag::factory_namespace>
+template <typename Protocal>
+struct locality_namespace
+  : private basic_namespace<hpx::agas::tag::locality_namespace<Protocal> >
 {
     // TODO: implement interface
 };
 
 // MPL metafunction (syntactic sugar)
 template <typename Protocal>
-struct factory_namespace_type
-{ typedef factory_namespace type; }; 
+struct locality_namespace_type
+{ typedef locality_namespace<Protocal> type; }; 
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
@@ -54,8 +60,12 @@ namespace server // hpx::components::agas::server
 
 // MPL metafunction
 template <typename Protocal>
-struct factory_namespace_type
-{ typedef server::basic_namespace<hpx::agas::tag::factory_namespace> type };
+struct locality_namespace_type
+{
+    typedef server::basic_namespace<
+        hpx::agas::tag::locality_namespace<Protocal>
+    > type;
+};
 
 } // hpx::components::agas::server
 
@@ -65,8 +75,12 @@ namespace stubs // hpx::components::agas::stubs
 
 // MPL metafunction
 template <typename Protocal>
-struct factory_namespace_type
-{ typedef stubs::basic_namespace<hpx::agas::tag::factory_namespace> type };
+struct locality_namespace_type
+{
+    typedef stubs::basic_namespace<
+        hpx::agas::tag::locality_namespace<Protocal>
+    > type;
+};
 
 } // hpx::components::agas::stubs
 
@@ -74,5 +88,5 @@ struct factory_namespace_type
 } // hpx::components
 } // hpx
 
-#endif // HPX_D9951196_521D_4EA5_947D_43451437AEE6
+#endif // HPX_352F80CF_5A0C_4DAE_9DC3_8CEE5F789A75
 
