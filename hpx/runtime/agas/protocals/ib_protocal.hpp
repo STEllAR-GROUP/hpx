@@ -14,12 +14,8 @@
 #include <boost/serialization/tracking.hpp>
 
 #include <hpx/runtime/agas/local_address.hpp>
-#if 0
-    #include <hpx/runtime/agas/namespaces/primary.hpp>
-    #include <hpx/runtime/agas/namespaces/locality.hpp>
-#else
-    #include <hpx/runtime/agas/traits.hpp>
-#endif
+#include <hpx/runtime/agas/namespaces/primary.hpp>
+#include <hpx/runtime/agas/namespaces/locality.hpp>
 
 namespace hpx { namespace agas // hpx::agas
 {
@@ -52,23 +48,19 @@ typedef local_address<tag::ib_protocal> ib_local_address;
 namespace components { namespace agas // hpx::components::agas
 {
 
-#if 0
 typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
 typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_locality_namespace;
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
 
-#if 0
 typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
 typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_locality_namespace;
-#endif
 
 } // hpx::components::agas::stubs
 
@@ -76,12 +68,10 @@ typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
 namespace stubs // hpx::components::agas::stubs
 {
 
-#if 0
 typedef primary_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_primary_namespace;
 typedef locality_namespace_type<hpx::agas::tag::ib_protocal>::type
     ib_locality_namespace;
-#endif
 
 } // hpx::components::agas::stubs
 
