@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace agas { namespace stubs
 {
 
 template <typename Tag>
-struct basic_namespace : stub_base<Tag>
+struct basic_namespace : components::stubs::stub_base<Tag>
 {
     typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
     typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;

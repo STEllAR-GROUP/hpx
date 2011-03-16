@@ -17,7 +17,7 @@ namespace hpx { namespace components { namespace agas { namespace stubs
 {
 
 struct refcnt_service
-  : stub_base<server::refcnt_service>
+  : components::stubs::stub_base<server::refcnt_service>
 {
     typedef server::refcnt_service::registry_type::key_type key_type;
     typedef server::refcnt_service::registry_type::mapped_type mapped_type; 
@@ -25,19 +25,19 @@ struct refcnt_service
     typedef server::refcnt_service::decrement_result_type decrement_result_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<key_type>
+    static lcos::future_value<mapped_type>
     increment_async(naming::id_type const& gid, key_type const& key,
                     mapped_type count)
     {
-        typedef service::refcnt_service::increment_action action_type;
-        return lcos::eager_future<action_type, key_type>(gid, key, count);
+        typedef server::refcnt_service::increment_action action_type;
+        return lcos::eager_future<action_type, mapped_type>(gid, key, count);
     } 
     
-    static key_type
+    static mapped_type
     increment(naming::id_type const& gid, key_type const& key,
               mapped_type count)
     {
-        return increment_async(gid, key, value).get();
+        return increment_async(gid, key, count).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -45,15 +45,16 @@ struct refcnt_service
     decrement_async(naming::id_type const& gid, key_type const& key,
                     mapped_type count)
     {
-        typedef service::refcnt_service::decrement_action action_type;
-        return lcos::eager_future<action_type, key_type>(gid, key, count);
+        typedef server::refcnt_service::decrement_action action_type;
+        return lcos::eager_future<action_type, decrement_result_type>
+            (gid, key, count);
     } 
     
     static decrement_result_type
     decrement(naming::id_type const& gid, key_type const& key,
               mapped_type count)
     {
-        return decrement_async(gid, key, value).get();
+        return decrement_async(gid, key, count).get();
     }
 };            
 
