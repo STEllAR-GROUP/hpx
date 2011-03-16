@@ -89,8 +89,8 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         static IntrTreeNode *newNode(const double pos_buf[]); /* Function to create a new node, returns an Internal Tree Node */
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
-        void tagTree(int &current_node, int & max_count);
-        void buildBodies(int &current_node, std::vector<body> & bodies);
+        void tagTree(int &current_node, int & max_count, int tag_id, int max_ctr);
+        void buildBodies(int &current_node, std::vector<body> & bodies, int bod_idx);
         void printTag(int &current_node);
         void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
 
@@ -252,10 +252,8 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
  * across the entire tree recursively. 
  */
 
-void IntrTreeNode::tagTree(int &current_node,  int & max_count)
-{
-    static int max_ctr=0;
-    static int tag_id=0;
+void IntrTreeNode::tagTree(int &current_node,  int & max_count, int tag_id, int max_ctr)
+{    
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
     {
@@ -265,7 +263,7 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count)
             //++tag_id;
             if(temp_branch->node_type == CELL)
             { // Intermediate Node
-                ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count);
+                ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count, tag_id, max_ctr);
             }
             ++tag_id;
             ++max_ctr;
@@ -286,10 +284,10 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count)
 }
 
 
-void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
+void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, int bod_idx)
 {
     //static int max_ctr;
-    static int bod_idx=0;
+/*    static int bod_idx=0;*/
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
     {
@@ -309,7 +307,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies)
                 bodies[bod_idx].vz = 0.0;
                 std::cout << "built CELL : " << temp_branch->tag << std::endl;
 
-                ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies);
+                ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies,bod_idx);
             }
             else if(temp_branch->node_type == PAR)
             { // Intermediate Node
@@ -699,7 +697,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             int max_count;
             int current_index = 0;
             bht_root->calculateCM(current_index);
-            bht_root->tagTree(current_index, max_count);
+            bht_root->tagTree(current_index, max_count, 0, 0);
 //             std::cout << "TADA : " << max_count << std::endl;
 
 //             bht_root->printTag(current_index);
@@ -709,7 +707,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             std::cout << bht_root->tag << std::endl;
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
-            bht_root->buildBodies(current_index,par->bodies);
+            bht_root->buildBodies(current_index,par->bodies, 0);
             
             numvals = par->iList.size();
             par->rowsize = par->iList.size();
@@ -740,13 +738,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << std::endl;
             }
 
-         //  if (par->iter == 0)
+          if (par->iter == 0)
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
-//           else 
-//                result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
-//                 numsteps, do_logging ? logging_type : components::component_invalid,par );
+          else 
+               result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
+                numsteps, do_logging ? logging_type : components::component_invalid,par );
 
            
 //            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
@@ -770,6 +768,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 << " : " << particles[i]->v[2] << std::endl;
 //             }    
             std::cout << "Results: " << std::endl;
+            par->iList.clear();
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
