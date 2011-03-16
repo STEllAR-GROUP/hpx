@@ -5,8 +5,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.6.2
-cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
+# We require at least CMake V2.8.0
+cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
+
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
 # project metadata

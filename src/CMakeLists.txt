@@ -466,6 +466,15 @@ set(hpxlib_util_SOURCES
     ${hpx_SOURCE_DIR}/src/util/logging.cpp
     ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
     ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp)
+
+# TODO: add sse2 detection from nt2, use address model detection to only
+# compile the definition we need.
+if(NOT MSVC)
+    list(APPEND hpxlib_util_SOURCES
+         ${hpx_SOURCE_DIR}/src/util/hardware/posix_x86_32_hardware_tick.S
+         ${hpx_SOURCE_DIR}/src/util/hardware/posix_x86_64_hardware_tick.S)
+endif()
+
 source_group("Source Files\\util" 
 #    FILES ${hpxutillib_SOURCES})
     FILES ${hpxlib_util_SOURCES})
