@@ -722,7 +722,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 particles[i]->interactionList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, iList ,i );
 //             }
                
-            IntrTreeNode::treeReuse();
+            IntrTreeNode::treeReuse();//         for (int i =0; i < par->num_bodies ; ++i)
+//         {
+//             std::cout << "body : "<< i << " : " << particles[i]->mass << " : " <<
+//             particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+//             std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//             << " : " << particles[i]->v[2] << std::endl;
+//         }
             
             for (int p = 0; p < bht_root->tag; ++p)
             {
@@ -755,13 +761,42 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                std::cout << temp_data.x << std::endl;
 //            }
                 
+                
+//              for (int i =0; i < par->num_bodies ; ++i)
+//             {
+//                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
+//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//                 << " : " << particles[i]->v[2] << std::endl;
+//             }    
             std::cout << "Results: " << std::endl;
-            for (std::size_t i = 0; i < result_data.size(); ++i)
+            for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
                 std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
+                if(val->node_type == 1){
+                    particles[j]->p[0] = val->x;
+                    particles[j]->p[1] = val->y;
+                    particles[j]->p[2] = val->z;
+                    particles[j]->v[0] = val->vx;
+                    particles[j]->v[1] = val->vy;
+                    particles[j]->v[2] = val->vz;
+                    particles[j]->a[0] = val->ax;
+                    particles[j]->a[1] = val->ay;
+                    particles[j]->a[2] = val->az;    
+                    ++j;
+                }
+               
             }
+            
+//             for (int i =0; i < par->num_bodies ; ++i)
+//             {
+//                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
+//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//                 << " : " << particles[i]->v[2] << std::endl;
+//             }
             
                  
         }
