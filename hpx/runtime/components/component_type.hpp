@@ -6,10 +6,11 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
-#include <boost/config.hpp>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
+
+#include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

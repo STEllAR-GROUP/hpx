@@ -9,6 +9,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/applier/applier.hpp> 
 
 namespace hpx { namespace components 
 {

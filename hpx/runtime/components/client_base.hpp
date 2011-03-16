@@ -8,6 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
 {

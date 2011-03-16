@@ -14,6 +14,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/future_value.hpp>
 #include <hpx/util/block_profiler.hpp>
 
