@@ -265,7 +265,7 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, in
             ++max_ctr;
             temp_branch->tag = tag_id ;
             //++tag_id;
-            std::cout << "particleid : " << temp_branch->tag << std::endl;
+//            std::cout << "particleid : " << temp_branch->tag << std::endl;
             if(temp_branch->node_type == CELL)
             { // Intermediate Node
                 ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count, tag_id, max_ctr);
@@ -283,7 +283,7 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, in
         max_count = tag_id;
     else 
         max_count = max_ctr;
-    std::cout << "particleid : " << tag << std::endl;
+//    std::cout << "particleid : " << tag << std::endl;
 }
 
 
@@ -308,7 +308,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
                 bodies[bod_idx].vx = 0.0;
                 bodies[bod_idx].vy = 0.0;
                 bodies[bod_idx].vz = 0.0;
-                std::cout << "built CELL : " << temp_branch->tag << std::endl;
+//                std::cout << "built CELL : " << temp_branch->tag << std::endl;
 
                 ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies,bod_idx);
             }
@@ -322,7 +322,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
                 bodies[bod_idx].vx = ((TreeLeaf *) temp_branch)->v[0];
                 bodies[bod_idx].vy = ((TreeLeaf *) temp_branch)->v[1];
                 bodies[bod_idx].vz = ((TreeLeaf *) temp_branch)->v[2];
-                std::cout << "built PAR : " << temp_branch->tag << std::endl;
+//                std::cout << "built PAR : " << temp_branch->tag << std::endl;
             }
             ++bod_idx;
             //temp_branch->tag = tag_id ;
@@ -337,7 +337,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
         bodies[bod_idx].vx = 0.0;
         bodies[bod_idx].vy = 0.0;
         bodies[bod_idx].vz = 0.0;
-        std::cout << "Built Cell : " << tag << std::endl;
+//        std::cout << "Built Cell : " << tag << std::endl;
     ++bod_idx;           
 //     if(node_type == CELL)
 //     { // Intermediate Node
@@ -451,7 +451,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
         {
             if (n != this) 
             {
-                iList[idx].push_back(n->tag - 1);
+                iList[idx].push_back(n->tag-1);
             }
         }
     }
@@ -459,7 +459,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
     {
 //        if (n != this) 
  //       {
-            iList[idx].push_back(n->tag - 1);
+            iList[idx].push_back(n->tag-1);
   //      }
     }
 
@@ -707,7 +707,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             bht_root->printTag(current_index);
             
 
-            std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
+ //           std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
 //             std::cout << bht_root->tag << std::endl;
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
@@ -747,9 +747,18 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
           else 
+          {
+              for (std::size_t i = 0; i < result_data.size(); ++i)
+              {
+                  components::access_memory_block<stencil_data> val(
+                    components::stubs::memory_block::get(result_data[i]));
+                  std::cout << i << " VALrow : " << val->row << " VALcolumn : " <<  val->column << std::endl;
+                  val->column = i;
+              }
                result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par );
 
+          }
            
 //            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
 //            access_memory_block<stencil_data> resultval = get_memory_block_async(val, gids, result);     
@@ -763,21 +772,22 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                std::cout << temp_data.x << std::endl;
 //            }
                 
-                
-//              for (int i =0; i < par->num_bodies ; ++i)
-//             {
-//                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
-//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
-//                 << " : " << particles[i]->v[2] << std::endl;
-//             }    
+              
+            std::cout << par->iter << std::endl;  
+            for (int i =0; i < par->num_bodies ; ++i)
+            {
+                std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
+                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+                << " : " << particles[i]->v[2] << std::endl;
+            }    
             std::cout << "Results: " << std::endl;
             par->iList.clear();
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
-                std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
+ //               std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
                 if(val->node_type == 1){
                     particles[j]->p[0] = val->x;
                     particles[j]->p[1] = val->y;
@@ -793,13 +803,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                
             }
             
-//             for (int i =0; i < par->num_bodies ; ++i)
-//             {
-//                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
-//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
-//                 << " : " << particles[i]->v[2] << std::endl;
-//             }
+            for (int i =0; i < par->num_bodies ; ++i)
+            {
+                std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
+                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+                << " : " << particles[i]->v[2] << std::endl;
+            }
             
                  
         }
@@ -807,8 +817,6 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         // for loop for iteration
 
         // recompute tree/mass
-        
-
 
         // end for loop
 
