@@ -28,7 +28,7 @@ HPX_posix_x86_32_hardware_tick:
   # Perform the time stamp read.
 
   # First, we need to call a serializing instruction.
-  #if defined(HPX_USE_MFENCE)
+  #if defined(HPX_USE_SSE2)
     mfence # AMD says mfence, intel says lfence, mfence makes more sense to me.
   #else
     cpuid # cpuid is not ideal because it's expensive and uses 4 registers.

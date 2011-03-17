@@ -53,6 +53,13 @@ else()
   hpx_warn("environment" "Couldn't determine build environment (install python).") 
 endif()
 
+# TODO: auto-detect this with NT2 stuff
+option(HPX_USE_SSE2 "Use SSE2 hardware support (Default: OFF)" OFF)
+
+if(HPX_USE_SSE2)
+  add_definitions(-DHPX_USE_SSE2)
+endif()
+
 ################################################################################
 # Boost configuration
 ################################################################################
@@ -316,6 +323,9 @@ add_subdirectory(runtime)
 ################################################################################
 # test configuration 
 ################################################################################
+set(DART_TESTING_TIMEOUT "60" CACHE STRING
+  "CTest timeout, in seconds (Default: 60).")
+
 enable_testing()
 include(CTest)
 add_custom_target(tests) 
