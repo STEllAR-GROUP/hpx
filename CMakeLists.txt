@@ -212,9 +212,9 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  if(NOT HPX_MALLOC)
-    set(HPX_MALLOC "jemalloc")
-  endif()
+  #if(NOT HPX_MALLOC)
+  #  set(HPX_MALLOC "jemalloc")
+  #endif()
 
   option(HPX_MALLOC_PRELOAD_SO "Build the shared object that contains the HPX default allocator (default: ON for POSIX)" ON)
 
