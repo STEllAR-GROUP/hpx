@@ -84,7 +84,6 @@ void print_state (thread_state_enum t_s)
 {
     switch (t_s) {
     case unknown:    std::cout << "Unknown" << std::endl << std::flush;    break;
-    case init:       std::cout << "Init" << std::endl << std::flush;       break;
     case active:     std::cout << "Active" << std::endl << std::flush;     break;
     case pending:    std::cout << "Pending" << std::endl << std::flush;    break;
     case suspended:  std::cout << "Suspended" << std::endl << std::flush;  break;

@@ -27,32 +27,29 @@ void barrier_test(naming::id_type const& id, boost::detail::atomic_count& c, std
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    int num_threads = 1, num_tests = 1;
+    int num_threads = 1;
 
     if (vm.count("threads"))
         num_threads = vm["threads"].as<int>();
-
-    if (vm.count("num_tests"))
-        num_tests = vm["num_tests"].as<int>();
     
+    std::cout << "Number of OS threads: " << num_threads << std::endl;
+
     naming::id_type prefix = applier::get_applier().get_runtime_support_gid();
 
-    for (int t = 0; t < num_tests; ++t) {
-        std::size_t count = 2 * num_threads;
+    std::size_t count = num_threads;
 
-        // create a barrier waiting on 'count' threads
-        lcos::barrier b;
-        b.create_one (prefix, count+1);
+    // create a barrier waiting on 'count' threads
+    lcos::barrier b;
+    b.create_one (prefix, count+1);
 
-        boost::detail::atomic_count c(0);
-        for (std::size_t j = 0; j < count; ++j) {
-            applier::register_work(
-                boost::bind(&barrier_test, b.get_gid(), boost::ref(c), count));
-        }
-
-        b.wait(); // wait for all threads to enter the barrier
-        HPX_TEST_EQ(count, c);
+    boost::detail::atomic_count c(0);
+    for (std::size_t j = 0; j < count; ++j) {
+        applier::register_work(
+            boost::bind(&barrier_test, b.get_gid(), boost::ref(c), count));
     }
+
+    b.wait(); // wait for all threads to enter the barrier
+    HPX_TEST_EQ(count, c);
 
     // initiate shutdown of the runtime system
     hpx::finalize();
@@ -67,11 +64,6 @@ int main(int argc, char* argv[])
        desc_commandline
           ("usage: " BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME) " [options]");
         
-    desc_commandline.add_options()
-        ("num_tests,n", po::value<int>(), 
-            "the number of times to repeat the test (default: 1)")
-        ;
-
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");

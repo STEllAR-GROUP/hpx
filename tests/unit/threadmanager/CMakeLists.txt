@@ -1,24 +1,33 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+################################################################################
+# Copyright (c) 2003 & onward LASMEA UMR 6602 CNRS/Univ. Clermont II
+# Copyright (c) 2009 & onward LRI    UMR 8623 CNRS/Univ Paris Sud XI
+# Copyright (c) 2011 Bryce Lelbach 
+#
+# Derived from the NT2 CMake unit tests (http://nt2.metascale.org/)
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+################################################################################
 
-# Thread Manager tests
-set(TESTS 
-    thread_state_test 
-    timed_set_state_tests 
-    exception_test)
+set(type unit)
 
-# build and install each of the tests
-foreach(test ${TESTS})
-    set(${test}_SOURCES ${test}.cpp)
-    add_executable(${test}_exe ${${test}_SOURCES})
-    set_target_properties(${test}_exe PROPERTIES OUTPUT_NAME ${test})
-    target_link_libraries(${test}_exe ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
-    install(TARGETS ${test}_exe
-        RUNTIME DESTINATION bin
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                    GROUP_READ GROUP_EXECUTE
-                    WORLD_READ WORLD_EXECUTE)
+set(group threadmanager)
+
+set(testcases
+    exception
+    thread_state
+    timed_set_state
+    )
+
+foreach(testcase ${testcases})
+  add_hpx_test(${type}.${group}.${testcase}
+               SOURCES ${testcase}.cpp
+               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
+                         "-t" "${HPX_TEST_NUM_THREADS}")
+
+  # depend on the executable
+  add_dependencies(tests.${type}.${group}
+                   ${type}.${group}.${testcase}_test)
 endforeach()
 

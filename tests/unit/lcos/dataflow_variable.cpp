@@ -10,6 +10,7 @@
 
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -20,16 +21,18 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-int print(id_type d_id)
+int print(naming::id_type const& d_id)
 {
-  typedef lcos::base_lco_with_value<int>::get_value_action get_action;
+    typedef lcos::base_lco_with_value<int>::get_value_action get_action;
 
-  std::cout << "print> print d" << std::endl;
-  std::cout << lcos::eager_future<get_action>(d_id).get() << std::endl;
+    std::cout << "print> print d" << std::endl;
+    std::cout << lcos::eager_future<get_action>(d_id).get() << std::endl;
 
-  return 0;
+    return 0;
 }
-typedef actions::plain_result_action1<int, id_type, print> print_action;
+
+typedef actions::plain_result_action1<int, naming::id_type const&, print>
+    print_action;
 HPX_REGISTER_PLAIN_ACTION(print_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,8 +41,8 @@ typedef hpx::lcos::dataflow_variable<int, int> dataflow_int_type;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    id_type here = hpx::find_here();
-    id_type there = get_runtime().get_process().next();
+    naming::id_type here = hpx::find_here();
+    naming::id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;
     std::cout << here << " " << there << std::endl << std::endl;
@@ -74,18 +77,15 @@ int hpx_main(po::variables_map &vm)
     return 0;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    // Configure application-specific options
+    po::options_description
+        desc_commandline
+            ("usage: " BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME) " [options]");
 
-  // Configure application-specific options
-  po::options_description
-      desc_commandline(
-          "Usage: dataflow_variable_tests [hpx_options] [options]");
-
-  // Initialize and run HPX
-  int retcode = hpx::init(desc_commandline, argc, argv);
-  return retcode;
+    // Initialize and run HPX
+    return hpx::init(desc_commandline, argc, argv);
 }
 

@@ -11,25 +11,15 @@
 
 set(type unit)
 
-set(group lcos)
+set(group hardware)
 
 set(testcases
-    dataflow_variable
-    full_empty
-    lazy_future
-    local_barrier
-    mutex
-    thunk
-    counting_semaphore
-    barrier
+    tick 
     )
 
 foreach(testcase ${testcases})
   add_hpx_test(${type}.${group}.${testcase}
-               SOURCES ${testcase}.cpp
-               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
-                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
-                         "-t" "${HPX_TEST_NUM_THREADS}")
+               SOURCES ${testcase}.cpp)
 
   # depend on the executable
   add_dependencies(tests.${type}.${group}

@@ -20,51 +20,38 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-// int zero(void)
-// {
-//     return 0;
-// }
-//
-// int identity(int x)
-// {
-//     return i;
-// }
-//
-// int sum(int a, int b)
-// {
-//     return a + b;
-// }
-
 int zero(void)
 { 
     std::cout << "Computing 'zero()'" << std::endl;
-
     return 0; 
 }
+
 typedef actions::plain_result_action0<int, zero> zero_action;
 HPX_REGISTER_PLAIN_ACTION(zero_action);
 
 typedef hpx::lcos::detail::thunk<zero_action> zero_thunk;
 HPX_REGISTER_THUNK(zero_thunk);
 
+///////////////////////////////////////////////////////////////////////////////
 int identity(int x) 
 { 
     std::cout << "Computing 'identity(" << x << ")'" << std::endl;
-    
     return x; 
 }
+
 typedef actions::plain_result_action1<int, int, identity> identity_action;
 HPX_REGISTER_PLAIN_ACTION(identity_action);
 
 typedef hpx::lcos::detail::thunk<identity_action> identity_thunk;
 HPX_REGISTER_THUNK(identity_thunk);
 
+///////////////////////////////////////////////////////////////////////////////
 int sum(int a, int b) 
 {
     std::cout << "Computing 'sum(" << a << "," << b << ")'" << std::endl;
-    
     return a + b; 
 }
+
 typedef actions::plain_result_action2<int, int, int, sum> sum_action;
 HPX_REGISTER_PLAIN_ACTION(sum_action);
 
@@ -72,18 +59,20 @@ typedef hpx::lcos::detail::thunk<sum_action> sum_thunk;
 HPX_REGISTER_THUNK(sum_thunk);
 
 ////////////////////////////////////////////////////////////////////////////////
-int test(id_type s_id)
+int test(naming::id_type const& s_id)
 {
-  std::cout << "test> sum = apply(get, eager_future(get, s_id))" << std::endl;
-  int sum = lcos::eager_future<sum_thunk_get_action>(s_id).get();
+    std::cout << "test> sum = apply(get, eager_future(get, s_id))" << std::endl;
+    int sum = lcos::eager_future<sum_thunk_get_action>(s_id).get();
   
-  std::cout << "test> print sum" << std::endl;
-  std::cout << sum << std::endl;
+    std::cout << "test> print sum" << std::endl;
+    std::cout << sum << std::endl;
 
-  std::cout << "test> return sum" << std::endl;
-  return sum;
+    std::cout << "test> return sum" << std::endl;
+    return sum;
 }
-typedef actions::plain_result_action1<int, id_type, test> test_action;
+
+typedef actions::plain_result_action1<int, naming::id_type const&, test>
+    test_action;
 HPX_REGISTER_PLAIN_ACTION(test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,8 +83,8 @@ typedef lcos::thunk_client<sum_thunk> sum_thunk_type;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)
 {
-    id_type here = find_here();
-    id_type there = get_runtime().get_process().next();
+    naming::id_type here = find_here();
+    naming::id_type there = get_runtime().get_process().next();
 
     std::cout << ">>> print here, there" << std::endl;
     std::cout << here << " " << there << std::endl << std::endl;
@@ -160,17 +149,15 @@ int hpx_main(po::variables_map &vm)
     return 0;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    // Configure application-specific options
+    po::options_description
+        desc_commandline
+            ("usage: " BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME) " [options]");
 
-  // Configure application-specific options
-  po::options_description
-      desc_commandline("Usage: thunk_tests [hpx_options] [options]");
-
-  // Initialize and run HPX
-  int retcode = hpx::init(desc_commandline, argc, argv);
-  return retcode;
+    // Initialize and run HPX
+    return hpx::init(desc_commandline, argc, argv);
 }
 
