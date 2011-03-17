@@ -83,6 +83,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
 #if defined(RNPL_FOUND)
+          int i;
+          double datatime;
           hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<par->granularity;i++) {
@@ -101,7 +103,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               d2phi.push_back(val.value_[i].phi[0][2]);
               d3phi.push_back(val.value_[i].phi[0][3]);
               d4phi.push_back(val.value_[i].phi[0][4]);
-              double datatime = val.timestep_*par->dx0*par->lambda;
+              datatime = val.timestep_*par->dx0*par->lambda;
 #if 0
               std::string x_str = convert(val.x_[i]);
               std::string chi_str = convert(val.value_[i].phi[0][0]);
