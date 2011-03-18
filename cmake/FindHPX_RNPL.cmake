@@ -19,7 +19,7 @@ endif()
  
 hpx_find_package(RNPL
   LIBRARIES bbhutil libbbhutil
-  LIBRARY_PATHS lib
+  LIBRARY_PATHS lib64 lib
   HEADERS sdf.h
   HEADER_PATHS include)
 

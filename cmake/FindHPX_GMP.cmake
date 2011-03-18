@@ -11,7 +11,7 @@ endif()
     
 hpx_find_package(GMP
   LIBRARIES gmp libgmp
-  LIBRARY_PATHS lib
+  LIBRARY_PATHS lib64 lib
   HEADERS gmp.h
   HEADER_PATHS include)
 

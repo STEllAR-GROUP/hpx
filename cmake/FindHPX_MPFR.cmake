@@ -11,7 +11,7 @@ endif()
     
 hpx_find_package(MPFR
   LIBRARIES mpfr libmpfr
-  LIBRARY_PATHS lib
+  LIBRARY_PATHS lib64 lib
   HEADERS mpfr.h
   HEADER_PATHS include)
 
