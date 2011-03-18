@@ -14,7 +14,11 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
 
-namespace hpx { namespace agas { namespace traits
+namespace hpx { namespace agas {
+
+namespace tag { struct protocal_independent; }
+
+namespace traits
 {
 
 template <typename T, typename Enable>
@@ -51,11 +55,11 @@ inline void initialize_mutex (Mutex& m)
 
 template <typename Tag, typename Enable> 
 struct key_type
-{ typedef typename registry_type<Tag>::key_type type; };
+{ typedef typename registry_type<Tag>::type::key_type type; };
 
 template <typename Tag, typename Enable> 
 struct mapped_type
-{ typedef typename registry_type<Tag>::mapped_type type; };
+{ typedef typename registry_type<Tag>::type::mapped_type type; };
 
 template <typename Tag, typename Enable>
 struct bind_hook
@@ -73,7 +77,7 @@ struct bind_hook
             return key_type();
 
         return
-            reg.insert(typename registry_type::value_type(key, value)).first;
+            reg.insert(typename registry_type::value_type(key, value))->first;
     }
 };
 

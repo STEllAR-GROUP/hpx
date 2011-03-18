@@ -73,7 +73,7 @@ template <typename Tag, typename Enable = void>
 struct update_hook;
 
 template <typename Tag>
-inline typename key_type<Tag>::type
+inline bool 
 update(typename registry_type<Tag>::type&,
        typename key_type<Tag>::type const&,
        typename mapped_type<Tag>::type const&);

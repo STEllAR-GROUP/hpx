@@ -8,7 +8,7 @@
 #if !defined(HPX_D9951196_521D_4EA5_947D_43451437AEE6)
 #define HPX_D9951196_521D_4EA5_947D_43451437AEE6
 
-#include <multimap>
+#include <map>
 
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/basic_namespace.hpp>
