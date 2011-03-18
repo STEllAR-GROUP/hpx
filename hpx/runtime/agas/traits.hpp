@@ -76,8 +76,8 @@ struct bind_hook
         if (reg.count(key))
             return key_type();
 
-        return
-            reg.insert(typename registry_type::value_type(key, value))->first;
+        return (reg.insert
+            (typename registry_type::value_type(key, value)).first)->first;
     }
 };
 
