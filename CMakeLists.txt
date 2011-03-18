@@ -212,12 +212,6 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  #if(NOT HPX_MALLOC)
-  #  set(HPX_MALLOC "jemalloc")
-  #endif()
-
-  option(HPX_MALLOC_PRELOAD_SO "Build the shared object that contains the HPX default allocator (default: ON for POSIX)" ON)
-
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
@@ -227,9 +221,6 @@ else()
     if(HPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-      if("${HPX_MALLOC}" STREQUAL "nedmalloc")
-        add_definitions(-DNEDMALLOC_DLL_EXPORTS)
-      endif()
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
       set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
@@ -272,6 +263,32 @@ else()
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
+
+  find_package(HPX_TCMALLOC)
+
+  if(TCMALLOC_FOUND)
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-malloc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-free")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-calloc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-cfree")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-realloc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-pvalloc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-valloc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-memalign")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-posix_memalign")
+  else()
+    hpx_warn("tcmalloc" "HPX will perform poorly without tcmalloc.")
+  endif()
 endif()
 
 ################################################################################
@@ -282,24 +299,10 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 endif()
 
 ################################################################################
-# malloc configuration 
-################################################################################
-if("${HPX_MALLOC}" STREQUAL "jemalloc")
-  add_definitions(-DHPX_USE_JEMALLOC)
-  hpx_info("malloc" "Using jemalloc allocator.")
-elseif("${HPX_MALLOC}" STREQUAL "nedmalloc")
-  add_definitions(-DHPX_USE_NEDMALLOC)
-  hpx_info("malloc" "Using nedmalloc allocator.")
-else()
-  hpx_info("malloc" "Using default system allocator.")
-endif()
-
-################################################################################
 # target specification 
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default, there may be more for individual modules, but this is the mandatory set
-#set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_util hpx_serialization)
 set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
@@ -313,10 +316,6 @@ add_subdirectory(hpx/components)
 # executables that depend on libraries above
 add_custom_target(examples) 
 add_subdirectory(examples)
-
-# TODO: bring this into the CMake tree
-#add_custom_target(applications WORKING_DIRECTORY ${hpx_BINARY_DIR}/applications)
-#add_subdirectory(applications EXCLUDE_FROM_ALL)
 
 add_subdirectory(runtime)
 
