@@ -10,13 +10,19 @@
 
 #include <boost/cstdint.hpp>
 
-extern "C" boost::uint64_t HPX_posix_x86_32_hardware_tick();
-
 namespace hpx { namespace util { namespace hardware
 {
 
 inline boost::uint64_t tick() {
-  return HPX_posix_x86_32_hardware_tick(); 
+  boost::uint64_t r = 0; 
+  __asm__ __volatile__ (
+      "cpuid\n"
+      "rdtsc\n"
+    : "=A" (r)
+    :
+    : "%ebx", "%ecx", "%ebx"
+  ); 
+  return r; 
 }
 
 }}}
