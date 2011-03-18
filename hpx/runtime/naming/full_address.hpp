@@ -35,7 +35,7 @@ namespace hpx { namespace naming
         full_address(boost::uint64_t msb_id, boost::uint64_t lsb_id, 
                 locality const& l, components::component_type t, 
                 naming::address::address_type a)
-          : gid_(msb_id, lsb_id), address_(l, t, a)
+          : gid_(msb_id, lsb_id, id_type::unmanaged), address_(l, t, a)
         {}
 
         // local only full_address
