@@ -126,7 +126,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
 
 //#endif
-#if 0
+//#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -139,7 +139,29 @@ namespace hpx { namespace components { namespace nbody { namespace server
             if ( dst_size(static_step,column,0) > 3 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
             }
-#endif
+            if ( dst_size(static_step,column,0) > 4 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,4) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 5 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,5) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 6 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,6) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 7 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,7) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 8 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,8) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 9 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,9) << std::endl;
+            }
+            if ( dst_size(static_step,column,0) > 10 ) {
+              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,10) << std::endl;
+            }
+            
+//#endif
 
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
@@ -308,15 +330,16 @@ namespace hpx { namespace components { namespace nbody { namespace server
 
         std::size_t num_rows = 2; 
 
-        std::vector<std::size_t> each_row;
-        each_row.resize(num_rows);
-        for (int i=0;i<num_rows;i++) {
-          each_row[i] = par->rowsize;
-        }
+//         std::vector<std::size_t> each_row;
+//         each_row.resize(num_rows);
+//         for (int i=0;i<num_rows;i++) {
+//           each_row[i] = par->rowsize;
+//           std::cout <<"each row" << each_row[i] << std::endl;
+//         }
 
         std::vector<result_type> stencils;
         for (int i=0;i<num_rows;i++) {
-          stencils.push_back(factory.create_components(stencil_type, each_row[i]));
+          stencils.push_back(factory.create_components(stencil_type, numvalues));
         }
 
         // initialize logging functionality in functions
@@ -328,13 +351,13 @@ namespace hpx { namespace components { namespace nbody { namespace server
 
         // prep the connections
         std::size_t memsize = 28;
-        Array3D dst_port(num_rows,each_row[0],memsize);
-        Array3D dst_src(num_rows,each_row[0],memsize);
-        Array3D dst_step(num_rows,each_row[0],memsize);
-        Array3D dst_size(num_rows,each_row[0],1);
-        Array3D src_size(num_rows,each_row[0],1);
+        Array3D dst_port(num_rows,numvalues,memsize);
+        Array3D dst_src(num_rows,numvalues,memsize);
+        Array3D dst_step(num_rows,numvalues,memsize);
+        Array3D dst_size(num_rows,numvalues,1);
+        Array3D src_size(num_rows,numvalues,1);
         prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,
-                   num_rows,each_row,par);
+                   num_rows,numvalues,par);
 
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i) 
@@ -356,7 +379,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), initial_data, 
-                             each_row[0],par);
+                             numvalues,par);
 
         //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
         // do actual work
@@ -404,15 +427,15 @@ namespace hpx { namespace components { namespace nbody { namespace server
 
         std::size_t num_rows = 2; 
 
-        std::vector<std::size_t> each_row;
-        each_row.resize(num_rows);
-        for (int i=0;i<num_rows;i++) {
-          each_row[i] = par->rowsize;
-        }
+//         std::vector<std::size_t> each_row;
+//         each_row.resize(num_rows);
+//         for (int i=0;i<num_rows;i++) {
+//           each_row[i] = par->rowsize;
+//         }
 
         std::vector<result_type> stencils;
         for (int i=0;i<num_rows;i++) {
-          stencils.push_back(factory.create_components(stencil_type, each_row[i]));
+          stencils.push_back(factory.create_components(stencil_type, numvalues));
         }
 
         // initialize logging functionality in functions
@@ -424,13 +447,13 @@ namespace hpx { namespace components { namespace nbody { namespace server
 
         // prep the connections
         std::size_t memsize = 28;
-        Array3D dst_port(num_rows,each_row[0],memsize);
-        Array3D dst_src(num_rows,each_row[0],memsize);
-        Array3D dst_step(num_rows,each_row[0],memsize);
-        Array3D dst_size(num_rows,each_row[0],1);
-        Array3D src_size(num_rows,each_row[0],1);
+        Array3D dst_port(num_rows,numvalues,memsize);
+        Array3D dst_src(num_rows,numvalues,memsize);
+        Array3D dst_step(num_rows,numvalues,memsize);
+        Array3D dst_size(num_rows,numvalues,1);
+        Array3D src_size(num_rows,numvalues,1);
         prep_ports(dst_port,dst_src,dst_step,dst_size,src_size,
-                   num_rows,each_row,par);
+                   num_rows,numvalues,par);
 
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i) 
@@ -533,7 +556,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
 
     void unigrid_mesh::prep_ports(Array3D &dst_port,Array3D &dst_src,
                                   Array3D &dst_step,Array3D &dst_size,Array3D &src_size,std::size_t num_rows,
-                                  std::vector<std::size_t> &each_row,
+                                  int numvalues,
                                   Parameter const& par)
     {
       int i,j,k;
@@ -552,7 +575,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
 //      int found;
 
       for (step=0;step<num_rows;step = step + 1) {
-        for (i=0;i<each_row[step];i++) {
+        for (i=0;i<numvalues;i++) {
 
           dst = step + 1;
           if ( dst >= num_rows ) dst = 0;

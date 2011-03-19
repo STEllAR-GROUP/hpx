@@ -113,7 +113,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
         static void prep_ports(Array3D &dst_port,Array3D &dst_src,
                                     Array3D &dst_step,Array3D &dst_size,
                                     Array3D &src_size,std::size_t num_rows,
-                                    std::vector<std::size_t> &each_row,
+                                    int numvalues,
                                     Parameter const& par);
 
         static bool floatcmp(had_double_type const& x1, had_double_type const& x2);

@@ -74,7 +74,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->ax = 0.0;
     val->ay = 0.0;
     val->az = 0.0;
-    
+    std::cout << "Row: " << row << " item: " << item << " x: " << val->x << " y: " << val->y << " z: " << val->z << std::endl;
+    std::cout << " Maxitems " << maxitems << std::endl;
     val->row = row;
     val->column = item;
 

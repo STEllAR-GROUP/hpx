@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace nbody
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         
-  //      std::cout << "row: " << row << " column : " << column << std::endl;
+       std::cout << "row: " << row << " column : " << column << std::endl;
         
 
         if ( val.size() == 0 ) {
@@ -118,6 +118,7 @@ namespace hpx { namespace components { namespace nbody
           compute_index = -1;
           for (int i=0;i<val.size();i++) {
             if ( column == val[i]->column ) {
+              std::cout<< "Compute Index: " << i << "column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
               compute_index = i;
               break;
             }   
@@ -150,7 +151,7 @@ namespace hpx { namespace components { namespace nbody
                 resultval->ay += dy + acc_factor;
                 resultval->az += dz + acc_factor;
               }
-//               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
+              std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
           }
           
           double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
@@ -179,19 +180,9 @@ namespace hpx { namespace components { namespace nbody
           resultval->vy += v_half_y + vel_dt_half_y;
           resultval->vz += v_half_z + vel_dt_half_z;
 
-//           std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
-//           std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
-//           std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
-//           par->bodies[compute_index].node_type = resultval->node_type;
-//           par->bodies[compute_index].px = resultval->x;
-//           par->bodies[compute_index].py = resultval->y;
-//           par->bodies[compute_index].pz = resultval->z;
-//           par->bodies[compute_index].vx = resultval->vx;
-//           par->bodies[compute_index].vy = resultval->vy;
-//           par->bodies[compute_index].vz = resultval->vz;   
-//           par->bodies[compute_index].ax = resultval->ax;
-//           par->bodies[compute_index].ay = resultval->ay;
-//           par->bodies[compute_index].az = resultval->az;
+          std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
+          std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
+          std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
 
         //  } // if node_type == 1 (par)
 

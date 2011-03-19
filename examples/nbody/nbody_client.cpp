@@ -90,7 +90,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
         void tagTree(int &current_node, int & max_count, int & tag_id, int max_ctr);
-        void buildBodies(int &current_node, std::vector<body> & bodies, int bod_idx);
+        void buildBodies(int &current_node, std::vector<body> & bodies, int & bod_idx);
         void printTag(int &current_node);
         void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
 
@@ -169,8 +169,9 @@ IntrTreeNode *IntrTreeNode::newNode(const double pos_buf[])
  */
 void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim) // builds the tree
 {
-    int i = 0;                        /* Initialize stores the index  */ 
-    double temp[3] ;                  /* Initialize buffer position to 0.0 */
+ //   std::cout << " sub box dim " << sub_box_dim <<std::endl;
+    register int i = 0;                        /* Initialize stores the index  */ 
+    register double temp[3] ;                  /* Initialize buffer position to 0.0 */
     temp[0] = 0.0;                    /* bufPos stores the value which helps derive*/
     temp[1] = 0.0;                    /* bufPos stores the value which helps derive*/
     temp[2] = 0.0;                    /* bufPos stores the value which helps derive
@@ -208,13 +209,18 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
     if (branch[i] == NULL) 
     {
         branch[i] = new_particle;
+        
+ //       std::cout << "I am Stuck Here. Inserting into empty space" << std::endl;
     } 
     /* if the branch node at the current i is a CELL then
      * traverse to the branch nodes to see where the body 
      * can be inserted */ 
     else if (branch[i]->node_type == CELL) 
     {
+ //       std::cout << "I am Stuck Here reached a ITN" << std::endl;
         ((IntrTreeNode *) (branch[i]))->treeNodeInsert(new_particle, 0.5 * sub_box_dim);
+
+
     } 
 
     /* if all branch node at the current position is a LEAF 
@@ -223,19 +229,21 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
      * insert the new node into the subtree */
     else 
     {
+ //        std::cout << "I am Stuck Here reached a TLF" << std::endl;
+
         /* since the cell that we are inserting in, is already a terminal node
          * we split the cell and create an intermediate node. In order to do this
          * we need to allocate an intermediate node */
         /* Since we are creating a new intermediate node we divide sub_box by 2 */
-        const double new_sub_box_dim = 0.5 * sub_box_dim;
+        register const double new_sub_box_dim = 0.5 * sub_box_dim;
         /* The coordinates of the intermediate which will point to the two branch nodes 
          * can be calculated 
          * the X coordinate of the intermediate node is p[0] - sub_box2 + bufPos[0]
          * the Y coordinate of the intermediate node is p[1] - sub_box2 + bufPos[1]
          * the Z coordinate of the intermediate node is p[2] - sub_box2 + bufPos[2]
          **/
-        const double pos_buf[] = { p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
-        IntrTreeNode * const cell = newNode(pos_buf);
+        register const double pos_buf[] = { p[0] - new_sub_box_dim + temp[0], p[1] - new_sub_box_dim + temp[1], p[2] - new_sub_box_dim + temp[2] };
+        register IntrTreeNode * const cell = newNode(pos_buf);
         /* Insert the new node at the new intermediate node */
         cell->treeNodeInsert(new_particle, new_sub_box_dim);
         /* Insert the current branch node at the new intermediate node */
@@ -260,35 +268,41 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, in
         temp_branch = branch[i];
         if (temp_branch != NULL) 
         {
-            
-            ++tag_id;
-            ++max_ctr;
-            temp_branch->tag = tag_id ;
-            //++tag_id;
-//            std::cout << "particleid : " << temp_branch->tag << std::endl;
-            if(temp_branch->node_type == CELL)
-            { // Intermediate Node
-                ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count, tag_id, max_ctr);
+            if (temp_branch->node_type == 1)
+            {
+                temp_branch->tag = tag_id ;
+                ++tag_id;
+                ++max_ctr;
+//                std::cout << "particleid : " << temp_branch->tag  << "Node Type : " << temp_branch->node_type << std::endl;
             }
+            //++tag_id;
 
-
+            if(temp_branch->node_type == 0)
+            { // Intermediate Node
+                temp_branch->tag = tag_id ; 
+                ((IntrTreeNode *) temp_branch)->tagTree(current_node, max_count, tag_id, max_ctr);
+                ++tag_id;
+                ++max_ctr;
+            } 
             
-             
         }
     }
-    ++tag_id;
-    ++max_ctr;
-     tag = tag_id;
+    tag = tag_id;
+//    ++tag_id;
+//    ++max_ctr;
+
+
     if (max_ctr < tag_id)
-        max_count = tag_id;
+        max_count = tag_id+1;
     else 
         max_count = max_ctr;
-//    std::cout << "particleid : " << tag << std::endl;
+//    std::cout << "particleid : " << tag << "Node Type : " << node_type<< std::endl;
 }
 
 
-void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, int bod_idx)
+void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, int & bod_idx)
 {
+//    std::cout << "I get till here" << std::endl;
     //static int max_ctr;
 /*    static int bod_idx=0;*/
     TreeNode *temp_branch;
@@ -298,8 +312,26 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
         if (temp_branch != NULL) 
         {
             //++tag_id;
-            if(temp_branch->node_type == CELL)
+            
+            if(temp_branch->node_type == 1)
+            {   
+                bodies[bod_idx].node_type = temp_branch->node_type;
+                bodies[bod_idx].mass = temp_branch->mass;
+                bodies[bod_idx].px = temp_branch->p[0];
+                bodies[bod_idx].py = temp_branch->p[1];
+                bodies[bod_idx].pz = temp_branch->p[2];
+                bodies[bod_idx].vx = ((TreeLeaf *) temp_branch)->v[0];
+                bodies[bod_idx].vy = ((TreeLeaf *) temp_branch)->v[1];
+                bodies[bod_idx].vz = ((TreeLeaf *) temp_branch)->v[2];
+                std::cout << "bod_idx : " << bod_idx << "built TAG " << temp_branch->tag << "Node Type : " << temp_branch->node_type << std::endl;
+                ++bod_idx;
+
+               // std::cout << "bod_idx : " << bod_idx << "built TAG " << temp_branch->tag << "Node Type : " << temp_branch->node_type << std::endl;
+            }
+            if(temp_branch->node_type == 0)
             { // Intermediate Node
+               // ++bod_idx;
+              //   std::cout << "bod_idx : " << bod_idx << "built CAEELL : " <<  ((IntrTreeNode *) temp_branch)->tag << "Node Type : " << ((IntrTreeNode *) temp_branch)->node_type << std::endl;                
                 bodies[bod_idx].node_type = temp_branch->node_type;
                 bodies[bod_idx].mass = temp_branch->mass;
                 bodies[bod_idx].px = temp_branch->p[0];
@@ -308,27 +340,15 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
                 bodies[bod_idx].vx = 0.0;
                 bodies[bod_idx].vy = 0.0;
                 bodies[bod_idx].vz = 0.0;
-//                std::cout << "built CELL : " << temp_branch->tag << std::endl;
-
-                ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies,bod_idx);
+                ((IntrTreeNode *) temp_branch)->buildBodies(current_node, bodies, bod_idx);
+                ++bod_idx;
             }
-            else if(temp_branch->node_type == PAR)
-            { // Intermediate Node
-                bodies[bod_idx].node_type = temp_branch->node_type;
-                bodies[bod_idx].mass = ((TreeLeaf *) temp_branch)->mass;
-                bodies[bod_idx].px = ((TreeLeaf *) temp_branch)->p[0];
-                bodies[bod_idx].py = ((TreeLeaf *) temp_branch)->p[1];
-                bodies[bod_idx].pz = ((TreeLeaf *) temp_branch)->p[2];
-                bodies[bod_idx].vx = ((TreeLeaf *) temp_branch)->v[0];
-                bodies[bod_idx].vy = ((TreeLeaf *) temp_branch)->v[1];
-                bodies[bod_idx].vz = ((TreeLeaf *) temp_branch)->v[2];
-//                std::cout << "built PAR : " << temp_branch->tag << std::endl;
-            }
-            ++bod_idx;
-            //temp_branch->tag = tag_id ;
-             
         }
     }
+    
+       // std::cout << "BEFORE bod_idx : " << bod_idx << std::endl;
+      //  ++bod_idx; 
+       // std::cout << "AFTER bod_idx : " << bod_idx << std::endl;
         bodies[bod_idx].node_type = node_type;
         bodies[bod_idx].mass = mass;
         bodies[bod_idx].px = p[0];
@@ -337,8 +357,8 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
         bodies[bod_idx].vx = 0.0;
         bodies[bod_idx].vy = 0.0;
         bodies[bod_idx].vz = 0.0;
-//        std::cout << "Built Cell : " << tag << std::endl;
-    ++bod_idx;           
+        std::cout << "bod_idx : " << bod_idx  << "built TAG " << tag << "Node Type : " << node_type << std::endl;
+         
 //     if(node_type == CELL)
 //     { // Intermediate Node
 
@@ -384,25 +404,30 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
         temp_branch = branch[i];
         if (temp_branch != NULL) 
         {
-            if(temp_branch->node_type == CELL)
-            { // Intermediate Node
-             //   std::cout << "Tag : " << temp_branch->tag << std::endl;
-                ((IntrTreeNode *) temp_branch)->interList(n, box_size_2, iList);
-            }
-            if(temp_branch->node_type == PAR)
+            if(temp_branch->node_type == 1)
             { // Intermediate Node
                 //temp_branch->tag ;
-                ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
+                std::cout << "I am A PAR " << temp_branch->tag << std::endl;
+               ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
+               // iListGen(n, box_size_2, iList, temp_branch->tag);
             }
+            if(temp_branch->node_type == 0)
+            { // Intermediate Node
+             //   std::cout << "Tag : " << temp_branch->tag << std::endl;
+                std::cout << "I am A CELL " << temp_branch->tag << std::endl;
+                ((IntrTreeNode *) temp_branch)->interList(n, box_size_2, iList);
+            }
+
         }
     }
 }
 
 
-//call with box_size_buf * box_size_buf * inv_tolerance_2
+// //call with box_size_buf * box_size_buf * inv_tolerance_2
 void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx )
 {
-    double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
+    std::cout << "idx : "  << idx << std::endl;
+    register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
     for (int i=0; i < 3; ++i)
         distance_r[i] = n->p[i] - p[i];
     
@@ -410,7 +435,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
     
     if (distance_r_2 < box_size_2) 
     {
-        if (n->node_type == CELL) 
+        if (n->node_type == 0) 
         {
             IntrTreeNode *temp_node = (IntrTreeNode *) n;
             box_size_2 *= 0.25;
@@ -447,23 +472,31 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
                 }
             }
         } 
-        else
+        else if (n->node_type == 1) 
         {
             if (n != this) 
             {
-                iList[idx].push_back(n->tag-1);
+                std::cout << "TAG Pushed "<< n->tag <<"idx : "  << idx << std::endl;
+
+                iList[idx].push_back(n->tag);
             }
         }
     }
     else 
     {
+        
+             std::cout << "TAG Pushed "<< n->tag  << "idx : "  << idx << std::endl;
+
+
 //        if (n != this) 
  //       {
-            iList[idx].push_back(n->tag-1);
+            iList[idx].push_back(n->tag);
   //      }
     }
 
 }
+
+
 void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info about subtrees
 {
     /* initialize local buffer mass and position variables to 0 */
@@ -683,18 +716,30 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         std::vector<naming::id_type> result_data;
         for (par->iter = 0; par->iter < par->num_iterations; ++par->iter)
         {
+            
+            std::cout << "\n \n ITERATION Number: " << par->iter << " \n \n " << std::endl;
+//            { /// extra brace
             double box_size, cPos[3];
             box_size = 0;
             cPos[0]=0;
             cPos[1]=0;
             cPos[2]=0;
             
+//             for (int i =0; i < par->num_bodies ; ++i)
+//             {
+//                 std::cout << "body : "<< i << " : " << particles[i]->mass << " : " <<
+//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//                 << " : " << particles[i]->v[2] << std::endl;
+//             }
             computeRootPos(par->num_bodies, box_size, cPos);
-            
+            std::cout << "CPOS : " <<cPos[0] << " " << cPos[1]<< " "  << cPos[2]<< " "  << std::endl;
             IntrTreeNode *bht_root = IntrTreeNode::newNode(cPos);
             const double sub_box_size = box_size * 0.5;
+            
             for (int i = 0; i < par->num_bodies; ++i) 
             {
+//                std::cout << " Inserting particle i = " << i <<std::endl;
                 bht_root->treeNodeInsert(particles[i], sub_box_size); // grow the tree by inserting each body
             }
             int max_count;
@@ -702,29 +747,39 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             bht_root->calculateCM(current_index);
             int tag_id = 0;
             bht_root->tagTree(current_index, max_count, tag_id, 0);
-//             std::cout << "TADA : " << max_count << std::endl;
+             std::cout << "TADA : " << max_count << std::endl;
 
-//             bht_root->printTag(current_index);
+//            bht_root->printTag(current_index);
             
 
  //           std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
 //             std::cout << bht_root->tag << std::endl;
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
-            bht_root->buildBodies(current_index,par->bodies, 0);
+            int box_idx = 0;
+            bht_root->buildBodies(current_index,par->bodies, box_idx);
+//             for(int i=0; i<par->bodies.size(); ++i)
+//             {
+//                 std::cout << par->bodies[i].node_type << " " << par->bodies[i].px << " " << par->bodies[i].py 
+//                 << " " << par->bodies[i].pz << " " << par->bodies[i].vx << " " << par->bodies[i].vy << " " << par->bodies[i].vz << std::endl;
+//             }
+//            std::cout << "body size " << par->bodies.size() << " body 7 X:" << par->bodies[6].px << std::endl;
+            std::cout << "ilist.size" << par->iList.size() <<std::endl;
             
-            numvals = par->iList.size();
-            par->rowsize = par->iList.size();
+           numvals = par->iList.size();
+           par->rowsize = par->iList.size();
             
             double temp_box_size = box_size;
-            bht_root->interList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, par->iList);
+            
+            
+           bht_root->interList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, par->iList);
             
 //             for (int i = 0; i != par->num_bodies; ++i) 
 //             {
 //                 particles[i]->interactionList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, iList ,i );
 //             }
                
-            IntrTreeNode::treeReuse();//         for (int i =0; i < par->num_bodies ; ++i)
+            //         for (int i =0; i < par->num_bodies ; ++i)
 //         {
 //             std::cout << "body : "<< i << " : " << particles[i]->mass << " : " <<
 //             particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
@@ -732,7 +787,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             << " : " << particles[i]->v[2] << std::endl;
 //         }
             
-            for (int p = 0; p < bht_root->tag; ++p)
+            
+            
+            for (int p = 0; p < par->iList.size(); ++p)
             {
                 std::cout << " p : " << p << " list : " ;
                 for (int q = 0; q < par->iList[p].size(); ++q)
@@ -741,7 +798,16 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 }
                 std::cout << std::endl;
             }
-
+            
+            
+            
+//            } /// extra brace
+            
+            
+            
+            
+            
+////////commenttest             
           if (par->iter == 0)
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
@@ -760,6 +826,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
           }
            
+            
+            
+            
+            
+            
+            
 //            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
 //            access_memory_block<stencil_data> resultval = get_memory_block_async(val, gids, result);     
 //            naming::id_type const & result;
@@ -772,7 +844,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                std::cout << temp_data.x << std::endl;
 //            }
                 
-              
+           
+            
+            
+            
+            
+////////commenttest             
             std::cout << par->iter << std::endl;  
             for (int i =0; i < par->num_bodies ; ++i)
             {
@@ -783,12 +860,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             }    
             std::cout << "Results: " << std::endl;
             par->iList.clear();
+            std::cout << "Result data size: " << result_data.size() << std::endl;
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
  //               std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
+                std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type << std::endl;
                 if(val->node_type == 1){
+                    std::cout << "updating particles" << std::endl;
                     particles[j]->p[0] = val->x;
                     particles[j]->p[1] = val->y;
                     particles[j]->p[2] = val->z;
@@ -810,6 +890,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
             }
+            
+            //bht_root=NULL;
+
             
                  
         }
@@ -964,7 +1047,8 @@ int main(int argc, char* argv[])
         par->loglevel    = 2;
         par->output      = 1.0;
         par->output_stdout = 1;
-        par->rowsize =  4;
+        
+        //par->rowsize =  4;
         par->input_file="5_file";
 
         int scheduler = 1;  // 0: global scheduler
@@ -1002,7 +1086,7 @@ int main(int argc, char* argv[])
 
         
         // figure out the number of points for row 0
-        numvals = par->rowsize;
+       //numvals = par->rowsize;
 
         // initialize and start the HPX runtime
         std::size_t executed_threads = 0;
