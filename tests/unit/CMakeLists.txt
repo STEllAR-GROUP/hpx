@@ -7,14 +7,15 @@
 set(type unit)
 
 set(groups 
-    sanity
     component_memory
     component_memory_block
     hardware
     lcos
     naming
-    threadmanager
-    performance_counters)
+    performance_counters
+    sanity
+    serialization
+    threadmanager)
 
 foreach(group ${groups})
   add_custom_target(tests.${type}.${group})
