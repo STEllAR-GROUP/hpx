@@ -19,7 +19,10 @@ namespace boost { namespace serialization
 
 template <typename Archive>
 void save(Archive& ar, asio::ip::address_v6 const& v, unsigned int)
-{ ar & v.to_bytes(); }
+{
+    asio::ip::address_v6::bytes_type bytes = v.to_bytes();
+    ar & bytes;
+}
 
 template <typename Archive>
 void load(Archive& ar, asio::ip::address_v6& v, unsigned int)

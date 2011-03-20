@@ -21,16 +21,25 @@ void save(Archive& ar, asio::ip::address const& v, unsigned int)
 {
     // ipv6
     if (v.is_v6())
-        ar & 1 & v.to_v6();
+    {
+        bool i = 1; // serialization is silly, won't take const references
+        asio::ip::address_v6 a = v.to_v6(); // see: above
+        ar & i & a;
+    }
+    
     // ipv4
-    ar & 0 & v.to_v4(); 
+    else
+    {
+        bool i = 0;
+        asio::ip::address_v4 a = v.to_v4();
+        ar & i & a;
+    } 
 }
 
 template <typename Archive>
 void load(Archive& ar, asio::ip::address& v, unsigned int)
 {
     bool proto;
-
     ar & proto;
 
     // ipv6
@@ -40,10 +49,14 @@ void load(Archive& ar, asio::ip::address& v, unsigned int)
         ar & addr;
         v = addr;
     }
+
     // ipv4
-    asio::ip::address_v4 addr;     
-    ar & addr;
-    v = addr; 
+    else
+    {
+        asio::ip::address_v4 addr;     
+        ar & addr;
+        v = addr;
+    }
 }
 
 }}

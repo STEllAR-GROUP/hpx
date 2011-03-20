@@ -8,9 +8,7 @@
 #if !defined(HPX_3058286E_3A0C_4B95_943A_0492450ABEE8)
 #define HPX_3058286E_3A0C_4B95_943A_0492450ABEE8
 
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/ip/udp.hpp>
-#include <boost/asio/ip/icmp.hpp>
+#include <boost/asio/ip/basic_endpoint.hpp>
 
 #include <hpx/util/serialize_asio_address.hpp>
 
@@ -20,7 +18,12 @@ namespace boost { namespace serialization
 template <typename Archive, typename InternetProtocol>
 void save(Archive& ar, asio::ip::basic_endpoint<InternetProtocol> const& v,
           unsigned int)
-{ ar & v.port() & v.address(); }
+{
+    // serialization, annoyingly, won't take const references for save()
+    boost::uint16_t port = v.port();
+    asio::ip::address addr = v.address();
+    ar & port & addr;
+}
 
 template <typename Archive, typename InternetProtocol>
 void load(Archive& ar, asio::ip::basic_endpoint<InternetProtocol>& v,
@@ -33,11 +36,12 @@ void load(Archive& ar, asio::ip::basic_endpoint<InternetProtocol>& v,
     v.address(addr); 
 }
 
-}}
+template <typename Archive, typename InternetProtocol>
+void serialize(Archive& ar, asio::ip::basic_endpoint<InternetProtocol>& v,
+               unsigned int version)
+{ split_free(ar, v, version); }
 
-BOOST_SERIALIZATION_SPLIT_FREE(boost::asio::ip::tcp::endpoint);
-BOOST_SERIALIZATION_SPLIT_FREE(boost::asio::ip::udp::endpoint);
-BOOST_SERIALIZATION_SPLIT_FREE(boost::asio::ip::icmp::endpoint);
+}}
 
 #endif // HPX_3058286E_3A0C_4B95_943A_0492450ABEE8
 
