@@ -19,7 +19,6 @@ set(subdirs
     generic
     had_amr
     had_amr3d
-    naming
     nbody
     nqueen
     parcelset
