@@ -14,6 +14,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -33,15 +34,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx 
 {
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    class HPX_EXPORT runtime_impl;
+
     struct process {
     protected:
-        friend class hpx::runtime_impl<
-            hpx::threads::policies::global_queue_scheduler, 
-            hpx::threads::policies::callback_notifier>;
-        
-        friend class hpx::runtime_impl<
-            hpx::threads::policies::local_queue_scheduler, 
-            hpx::threads::policies::callback_notifier>;
+        template <typename SchedulingPolicy, typename NotificationPolicy> 
+        friend class runtime_impl; 
 
         void set_localities(std::size_t here_lid,
                             std::vector<naming::id_type>& localities)
