@@ -39,7 +39,12 @@ set_target_properties(hpx_serialization PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx_serialization)
-target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
+
+if(TCMALLOC_FOUND)
+  target_link_libraries(hpx_serialization ${TCMALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+else()
+  target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
+endif()
 
 get_target_property(path hpx_serialization LOCATION)
 get_filename_component(name "${path}" NAME)
@@ -57,8 +62,13 @@ set_target_properties(hpx PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx)
-target_link_libraries(hpx hpx_serialization ${BOOST_FOUND_LIBRARIES})
 
+if(TCMALLOC_FOUND)
+  target_link_libraries(hpx hpx_serialization ${TCMALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+else()
+  target_link_libraries(hpx hpx_serialization ${BOOST_FOUND_LIBRARIES})
+endif()
+ 
 get_target_property(path hpx LOCATION)
 get_filename_component(name "${path}" NAME)
 set_property(TARGET hpx APPEND
