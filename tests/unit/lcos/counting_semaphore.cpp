@@ -27,7 +27,7 @@ struct test_environment
     {}
     ~test_environment()
     {
-        BOOST_TEST(counter1_ == 0);
+        HPX_TEST(counter1_ == 0);
     }
 
     std::string desc_;
@@ -286,6 +286,6 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

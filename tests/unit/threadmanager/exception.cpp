@@ -9,7 +9,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
 
@@ -73,19 +73,19 @@ int main(int argc, char* argv[])
         rt.register_error_sink(errorsink, errorsink_connection);
 
         rt.run(throw_error_locally);
-        BOOST_TEST(error_sink_called);
+        HPX_TEST(error_sink_called);
 
         error_sink_called = false;
         rt.run(throw_error_remotely);
-        BOOST_TEST(error_sink_called);
+        HPX_TEST(error_sink_called);
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }

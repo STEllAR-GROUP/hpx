@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/performance_counters/counters.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct testdata_good
@@ -97,38 +97,38 @@ void test_good()
         using namespace hpx::performance_counters;
 
         std::string fullname;
-        BOOST_TEST(status_valid_data == get_counter_name(t->path_, fullname, ec));
-        BOOST_TEST(ec.value() == hpx::success);
-        BOOST_TEST(fullname == t->fullname_);
+        HPX_TEST(status_valid_data == get_counter_name(t->path_, fullname, ec));
+        HPX_TEST(ec.value() == hpx::success);
+        HPX_TEST(fullname == t->fullname_);
 
         std::string type_name;
-        BOOST_TEST(status_valid_data == get_counter_name(
+        HPX_TEST(status_valid_data == get_counter_name(
             (counter_type_path_elements const&)t->path_, type_name, ec));
-        BOOST_TEST(ec.value() == hpx::success);
-        BOOST_TEST(type_name == t->typename_);
+        HPX_TEST(ec.value() == hpx::success);
+        HPX_TEST(type_name == t->typename_);
 
         counter_path_elements p;
         p.instanceindex_ = 0;
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p, ec));
-        BOOST_TEST(ec.value() == hpx::success);
-        BOOST_TEST(p.objectname_ == t->path_.objectname_);
-        BOOST_TEST(p.parentinstancename_ == t->path_.parentinstancename_);
-        BOOST_TEST(p.instancename_ == t->path_.instancename_);
-        BOOST_TEST(p.instanceindex_ == t->path_.instanceindex_);
-        BOOST_TEST(p.countername_ == t->path_.countername_);
+        HPX_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p, ec));
+        HPX_TEST(ec.value() == hpx::success);
+        HPX_TEST(p.objectname_ == t->path_.objectname_);
+        HPX_TEST(p.parentinstancename_ == t->path_.parentinstancename_);
+        HPX_TEST(p.instancename_ == t->path_.instancename_);
+        HPX_TEST(p.instanceindex_ == t->path_.instanceindex_);
+        HPX_TEST(p.countername_ == t->path_.countername_);
 
         counter_type_path_elements tp1, tp2;
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->fullname_, tp1, ec));
-        BOOST_TEST(ec.value() == hpx::success);
-        BOOST_TEST(tp1.objectname_ == t->path_.objectname_);
-        BOOST_TEST(tp1.countername_ == t->path_.countername_);
+        HPX_TEST(status_valid_data == get_counter_path_elements(t->fullname_, tp1, ec));
+        HPX_TEST(ec.value() == hpx::success);
+        HPX_TEST(tp1.objectname_ == t->path_.objectname_);
+        HPX_TEST(tp1.countername_ == t->path_.countername_);
 
-        BOOST_TEST(status_valid_data == get_counter_path_elements(t->typename_, tp2, ec));
-        BOOST_TEST(ec.value() == hpx::success);
-        BOOST_TEST(tp2.objectname_ == t->path_.objectname_);
-        BOOST_TEST(tp2.countername_ == t->path_.countername_);
+        HPX_TEST(status_valid_data == get_counter_path_elements(t->typename_, tp2, ec));
+        HPX_TEST(ec.value() == hpx::success);
+        HPX_TEST(tp2.objectname_ == t->path_.objectname_);
+        HPX_TEST(tp2.countername_ == t->path_.countername_);
     }
 }
 
@@ -160,8 +160,8 @@ void test_bad()
     int i = 0;
     for (char const* t = testdata_bad[0]; NULL != t; t = testdata_bad[++i])
     {
-        BOOST_TEST(status_invalid_data == get_counter_path_elements(t, p, ec));
-        BOOST_TEST(ec.value() == hpx::bad_parameter);
+        HPX_TEST(status_invalid_data == get_counter_path_elements(t, p, ec));
+        HPX_TEST(ec.value() == hpx::bad_parameter);
     }
 
     // test throwing version
@@ -170,10 +170,10 @@ void test_bad()
     {
         try {
             get_counter_path_elements(t, p);
-            BOOST_TEST(false);
+            HPX_TEST(false);
         }
         catch (hpx::exception const& e) {
-            BOOST_TEST(e.get_error() == hpx::bad_parameter);
+            HPX_TEST(e.get_error() == hpx::bad_parameter);
         }
     }
 }
@@ -182,6 +182,6 @@ int main()
 {
     test_good();
     test_bad();
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

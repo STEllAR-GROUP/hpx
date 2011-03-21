@@ -11,7 +11,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <boost/serialization/export.hpp>
 
 using namespace hpx;
@@ -31,11 +31,11 @@ struct test_lock
         // Test the lock's constructors.
         {
             lock_type lock(mutex, boost::defer_lock);
-            BOOST_TEST(!lock);
+            HPX_TEST(!lock);
         }
 
         lock_type lock(mutex);
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
 
 //         // Construct and initialize an xtime for a fast time out.
 //         boost::condition condition;
@@ -44,14 +44,14 @@ struct test_lock
 //         // Test the lock and the mutex with condition variables.
 //         // No one is going to notify this condition variable.  We expect to
 //         // time out.
-//         BOOST_TEST(!condition.timed_wait(lock, xt));
-//         BOOST_TEST(lock ? true : false);
+//         HPX_TEST(!condition.timed_wait(lock, xt));
+//         HPX_TEST(lock ? true : false);
 
         // Test the lock and unlock methods.
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
         lock.lock();
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
     }
 };
 
@@ -68,14 +68,14 @@ struct test_trylock
         // Test the lock's constructors.
         {
             try_lock_type lock(mutex);
-            BOOST_TEST(lock ? true : false);
+            HPX_TEST(lock ? true : false);
         }
         {
             try_lock_type lock(mutex, boost::defer_lock);
-            BOOST_TEST(!lock);
+            HPX_TEST(!lock);
         }
         try_lock_type lock(mutex);
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
 
 //         // Construct and initialize an xtime for a fast time out.
 //         boost::condition condition;
@@ -84,18 +84,18 @@ struct test_trylock
 //         // Test the lock and the mutex with condition variables.
 //         // No one is going to notify this condition variable.  We expect to
 //         // time out.
-//         BOOST_TEST(!condition.timed_wait(lock, xt));
-//         BOOST_TEST(lock ? true : false);
+//         HPX_TEST(!condition.timed_wait(lock, xt));
+//         HPX_TEST(lock ? true : false);
 
         // Test the lock, unlock and trylock methods.
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
         lock.lock();
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
         lock.unlock();
-        BOOST_TEST(!lock);
-        BOOST_TEST(lock.try_lock());
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(!lock);
+        HPX_TEST(lock.try_lock());
+        HPX_TEST(lock ? true : false);
     }
 };
 
@@ -159,10 +159,10 @@ struct test_lock_times_out_if_other_thread_has_lock
                 threads::set_thread_state(id, boost::posix_time::seconds(3));
 
                 // suspend this thread waiting for test to happen
-                BOOST_TEST(threads::wait_timeout != self.yield(threads::suspended));
+                HPX_TEST(threads::wait_timeout != self.yield(threads::suspended));
 
-                BOOST_TEST(done);
-                BOOST_TEST(!locked);
+                HPX_TEST(done);
+                HPX_TEST(!locked);
             }
 
             lock.unlock();
@@ -240,14 +240,14 @@ struct test_timedlock
                 boost::posix_time::milliseconds(100);
 
             timed_lock_type lock(mutex, xt);
-            BOOST_TEST(lock ? true : false);
+            HPX_TEST(lock ? true : false);
         }
         {
             timed_lock_type lock(mutex, boost::defer_lock);
-            BOOST_TEST(!lock);
+            HPX_TEST(!lock);
         }
         timed_lock_type lock(mutex);
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
 
 //         // Construct and initialize an xtime for a fast time out.
 //         boost::system_time timeout = boost::get_system_time()+boost::posix_time::milliseconds(100);
@@ -256,33 +256,33 @@ struct test_timedlock
 //         // No one is going to notify this condition variable.  We expect to
 //         // time out.
 //         boost::condition condition;
-//         BOOST_TEST(!condition.timed_wait(lock, timeout, fake_predicate));
-//         BOOST_TEST(lock ? true : false);
+//         HPX_TEST(!condition.timed_wait(lock, timeout, fake_predicate));
+//         HPX_TEST(lock ? true : false);
 // 
 //         boost::system_time now=boost::get_system_time();
 //         boost::posix_time::milliseconds const timeout_resolution(20);
-//         BOOST_TEST((timeout-timeout_resolution)<now);
+//         HPX_TEST((timeout-timeout_resolution)<now);
 
         // Test the lock, unlock and timedlock methods.
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
         lock.lock();
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock ? true : false);
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
         boost::system_time target = boost::get_system_time()+boost::posix_time::milliseconds(100);
-        BOOST_TEST(lock.timed_lock(target));
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock.timed_lock(target));
+        HPX_TEST(lock ? true : false);
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
 
-        BOOST_TEST(mutex.timed_lock(boost::posix_time::milliseconds(100)));
+        HPX_TEST(mutex.timed_lock(boost::posix_time::milliseconds(100)));
         mutex.unlock();
 
-        BOOST_TEST(lock.timed_lock(boost::posix_time::milliseconds(100)));
-        BOOST_TEST(lock ? true : false);
+        HPX_TEST(lock.timed_lock(boost::posix_time::milliseconds(100)));
+        HPX_TEST(lock ? true : false);
         lock.unlock();
-        BOOST_TEST(!lock);
+        HPX_TEST(!lock);
     }
 };
 
@@ -607,12 +607,12 @@ int main(int argc, char* argv[])
         }
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }

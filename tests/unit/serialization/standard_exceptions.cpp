@@ -85,6 +85,6 @@ int main()
     test_std_exception<std::out_of_range>();
     test_std_exception<std::runtime_error>();
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

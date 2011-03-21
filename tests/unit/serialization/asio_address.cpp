@@ -84,6 +84,6 @@ int main()
         }
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

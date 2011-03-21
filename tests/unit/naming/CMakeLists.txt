@@ -16,7 +16,6 @@ set(group naming)
 set(testcases
     gid_type
     resolver_client
-    resolver_server
     )
 
 foreach(testcase ${testcases})

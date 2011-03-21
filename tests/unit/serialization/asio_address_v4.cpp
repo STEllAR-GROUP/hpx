@@ -52,6 +52,6 @@ int main()
         HPX_TEST_EQ(data, loaded);
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

@@ -7,7 +7,7 @@
 #include <hpx/lcos/local_barrier.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/program_options.hpp>
 
@@ -21,7 +21,7 @@ void barrier_test(lcos::local_barrier& b, boost::detail::atomic_count& c, std::s
     b.wait();
 
     // all of the 'count' threads need to have incremented the counter
-    BOOST_TEST(count == c);
+    HPX_TEST(count == c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ int hpx_main(lcos::local_barrier& b, boost::detail::atomic_count& c, std::size_t
     b.wait();     // wait for all threads to enter the barrier
 
     // all of the 'count' threads need to have incremented the counter
-    BOOST_TEST(count == c);
+    HPX_TEST(count == c);
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -198,12 +198,12 @@ int main(int argc, char* argv[])
         }
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }

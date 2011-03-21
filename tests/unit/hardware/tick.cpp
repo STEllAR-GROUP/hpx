@@ -27,7 +27,7 @@ int main() {
         std::cout <<   "Tick 0: " << t0 
                   << "\nTick 1: " << t1 << std::endl;
 
-        BOOST_TEST(t1 > t0);
+        HPX_TEST(t1 > t0);
     }
    
     std::cout << "serializing test" << std::endl;
@@ -41,9 +41,9 @@ int main() {
         std::cout <<   "Tick 0: " << t0 
                   << "\nTick 1: " << t1 << std::endl;
 
-        BOOST_TEST(t1 > t0);
+        HPX_TEST(t1 > t0);
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

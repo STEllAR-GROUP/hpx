@@ -7,7 +7,7 @@
 #include <hpx/lcos/local_barrier.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 using namespace hpx;
@@ -17,7 +17,7 @@ void timed_set_state_test(util::high_resolution_timer& timer,
     double wait_time)
 {
     double elapsed = timer.elapsed();
-    BOOST_TEST(elapsed + 0.01 >= wait_time);    // we need some leeway here...
+    HPX_TEST(elapsed + 0.01 >= wait_time);    // we need some leeway here...
     std::cerr << "Elapsed: " << elapsed << std::endl;
 }
 
@@ -108,12 +108,12 @@ int main(int argc, char* argv[])
             rt.run(hpx_main, i);
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }

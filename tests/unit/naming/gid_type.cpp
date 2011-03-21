@@ -300,5 +300,5 @@ int main()
         "'lsb == true' and 'msb == false' case failed");
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 } 

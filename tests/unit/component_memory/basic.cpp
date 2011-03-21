@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-
 #include <boost/lexical_cast.hpp>
-#include <boost/detail/lightweight_test.hpp>
 #include <boost/program_options.hpp>
+
+#include <hpx/hpx.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 using namespace hpx;
 namespace po = boost::program_options;
@@ -62,20 +62,20 @@ int hpx_main()
     typedef components::server::memory::store32_action store_action_type;
     applier::apply<store_action_type>(memid, boost::uint64_t(&value), 1);
 
-    BOOST_TEST(value == 1);
+    HPX_TEST(value == 1);
 
     // read the value back from memory (using an eager_future)
     typedef components::server::memory::load32_action load_action_type;
     lcos::eager_future<load_action_type> ef(memid, boost::uint64_t(&value));
 
     boost::uint32_t result1 = ef.get();
-    BOOST_TEST(result1 == value);
+    HPX_TEST(result1 == value);
 
     // read the value back from memory (using a lazy_future)
     lcos::lazy_future<load_action_type> lf(memid, boost::uint64_t(&value));
 
     boost::uint32_t result2 = lf.get();
-    BOOST_TEST(result2 == value);
+    HPX_TEST(result2 == value);
 
     // initiate shutdown of the runtime system
     components::stubs::runtime_support::shutdown_all();
@@ -162,12 +162,13 @@ int main(int argc, char* argv[])
         rt.run(hpx_main, 2);
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
+

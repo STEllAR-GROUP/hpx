@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 
 #include <boost/bind.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <boost/program_options.hpp>
 
 using namespace hpx;
@@ -18,10 +18,10 @@ void test1_helper(hpx::util::full_empty<int>& data)
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
             get_thread_gid(threads::get_self().get_thread_id());
-    BOOST_TEST(gid);
+    HPX_TEST(gid);
 
     data.set(1);
-    BOOST_TEST(!data.is_empty());
+    HPX_TEST(!data.is_empty());
 }
 
 void test1(threads::thread_state_ex)
@@ -29,11 +29,11 @@ void test1(threads::thread_state_ex)
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
             get_thread_gid(threads::get_self().get_thread_id());
-    BOOST_TEST(gid);
+    HPX_TEST(gid);
 
     // create a full_empty data item
     hpx::util::full_empty<int> data;
-    BOOST_TEST(data.is_empty());
+    HPX_TEST(data.is_empty());
 
     // schedule the helper thread
     applier::register_work(boost::bind(&test1_helper, boost::ref(data)));
@@ -42,14 +42,14 @@ void test1(threads::thread_state_ex)
     int value = 0;
     data.read(value);   // this blocks for test1_helper to set value
 
-    BOOST_TEST(!data.is_empty());
-    BOOST_TEST(value == 1);
+    HPX_TEST(!data.is_empty());
+    HPX_TEST(value == 1);
 
     value = 0;
     data.read(value);   // this should not block anymore
 
-    BOOST_TEST(!data.is_empty());
-    BOOST_TEST(value == 1);
+    HPX_TEST(!data.is_empty());
+    HPX_TEST(value == 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ int hpx_main()
     // retrieve gid for this thread
     naming::id_type gid = applier::get_applier().get_thread_manager().
             get_thread_gid(threads::get_self().get_thread_id());
-    BOOST_TEST(gid);
+    HPX_TEST(gid);
 
     // schedule test threads: test1
     applier::register_work(test1);
@@ -215,14 +215,14 @@ int main(int argc, char* argv[])
         }
     }
     catch (std::exception& e) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "std::exception caught: " << e.what() << "\n";
     }
     catch (...) {
-        BOOST_TEST(false);
+        HPX_TEST(false);
         std::cerr << "unexpected exception caught\n";
     }
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
 

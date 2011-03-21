@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <hpx/hpx.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 using namespace hpx;
 using namespace hpx::threads;
@@ -36,32 +36,32 @@ int main(int argc, char* argv[])
     threads::thread_init_data data4(boost::bind (my_gcd, 9, 15, 3), "gcd");
     my_tm.register_work(data4, pending);              // GCD = 3
 
-    BOOST_TEST(my_tm.get_state(t2_id) == suspended);
+    HPX_TEST(my_tm.get_state(t2_id) == suspended);
     my_tm.set_state(t2_id, pending);
-    BOOST_TEST(my_tm.get_state(t2_id) == pending);
+    HPX_TEST(my_tm.get_state(t2_id) == pending);
 
-    BOOST_TEST(my_tm.get_state(t_id) == suspended);
+    HPX_TEST(my_tm.get_state(t_id) == suspended);
     if (my_tm.get_state(t_id) == pending)
         std::cout << "Error, thread ID invalid" << std::endl;
 
     if (my_tm.get_state(t_id) == suspended)
         my_tm.set_state(t_id, pending);
-    BOOST_TEST(my_tm.get_state(t_id) == pending);
+    HPX_TEST(my_tm.get_state(t_id) == pending);
 
     thread_state t_s = my_tm.get_state(t2_id);
-    BOOST_TEST(t_s == pending);
+    HPX_TEST(t_s == pending);
 //     print_state (t_s);
 
     for (int i = 1; i <= 8; ++i) {
         my_tm.run(i);
         while ((t_s = my_tm.get_state(t2_id)) != unknown)
         {
-            BOOST_TEST(t_s == pending || t_s == active || t_s == terminated);
+            HPX_TEST(t_s == pending || t_s == active || t_s == terminated);
         }
         my_tm.stop();
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
 thread_state_enum my_gcd (int m, int n, int gcd)
@@ -75,7 +75,7 @@ thread_state_enum my_gcd (int m, int n, int gcd)
 
     get_self().yield(pending);   // just reschedule
 
-    BOOST_TEST(m == gcd);
+    HPX_TEST(m == gcd);
 //     std::cout << "GCD for the two numbers is: " << m << std::endl;
     return terminated;
 }
