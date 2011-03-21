@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace server
 {
-    class parcelhandler_queue
+    class HPX_EXPORT parcelhandler_queue
     {
     public:
         parcelhandler_queue(parcelhandler& ph)
