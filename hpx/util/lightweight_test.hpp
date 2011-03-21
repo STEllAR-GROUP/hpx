@@ -8,79 +8,130 @@
 #if !defined(HPX_F646702C_6556_48FA_BF9D_3E7959983122)
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
-#include <boost/detail/lightweight_test.hpp>
+#include <cstddef>
 
-namespace hpx { namespace detail
+#include <iostream>
+
+#include <boost/config.hpp>
+#include <boost/current_function.hpp>
+#include <boost/preprocessor/stringize.hpp>
+
+namespace hpx { namespace util { namespace detail
 {
 
-inline void sanity_failed_impl(char const* expr, char const* file, int line,
-                             char const* function)
+std::size_t sanity_failures = 0;
+std::size_t test_failures = 0;
+
+template <typename T>
+inline bool check(char const* file, int line, char const* function,
+                  std::size_t& counter, T const& t, char const* msg)
 {
-    std::cout 
-      << file << "(" << line << "): sanity check '"
-      << expr << "' failed in function '"
-      << function << "'" << std::endl;
-    ++::boost::detail::test_errors();
+    if (!t)
+    { 
+        std::cerr 
+            << file << "(" << line << "): "
+            << msg << " failed in function '"
+            << function << "'" << std::endl;
+        ++counter;
+        return false;
+    }
+    return true;
 }
 
 template <typename T, typename U>
-inline void sanity_eq_impl(char const* expr1, char const* expr2,
-                           char const* file, int line, char const* function,
-                           T const& t, U const& u)
+inline bool check_eq(char const* file, int line, char const* function,
+                     std::size_t& counter, T const& t, U const& u,
+                     char const* msg)
 {
     if (!(t == u))
     {
-        std::cout 
-            << file << "(" << line << "): sanity check '" << expr1
-            << " == " << expr2
-            << "' failed in function '" << function << "': "
+        std::cerr 
+            << file << "(" << line << "): " << msg  
+            << " failed in function '" << function << "': "
             << "'" << t << "' != '" << u << "'" << std::endl;
-        ++::boost::detail::test_errors();
+        ++counter;
+        return false;
     }
+    return true;
 }
 
-template <typename T, typename U>
-inline void test_msg_impl(char const* msg, char const* file, int line, 
-                          char const* function, T const& t, U const& u)
+} // hpx::util::detail
+
+inline int report_errors()
 {
-    if (!(t == u))
+    if ((detail::sanity_failures == 0) && (detail::test_failures == 0))
+        return 0;
+
+    else
     {
-        ::boost::detail::error_impl(msg, file, line, function);
+        std::cerr << detail::sanity_failures << " sanity check"
+                  << ((detail::sanity_failures == 1) ? " and " : "s and ")
+                  << detail::test_failures << " test"
+                  << ((detail::test_failures == 1) ? " failed." : "s failed.")
+                  << std::endl;
+        return 1;
     }
 }
 
-} // detail
-} // hpx
+}} // hpx::util
 
-#define HPX_TEST(expr)            BOOST_TEST(expr)
-#define HPX_ERROR(msg)            BOOST_ERROR(msg)
-#define HPX_TEST_EQ(expr1, expr2) BOOST_TEST_EQ(expr1, expr2)
+#define HPX_TEST(expr)                                                      \
+    ::hpx::util::detail::check                                              \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::test_failures,                                \
+         expr, "test '" BOOST_PP_STRINGIZE(expr) "'")                       \
+    /***/
 
-#define HPX_TEST_MSG(expr, msg)                           \
-  ((expr)                                                 \
-   ? (void)0                                              \
-   : ::boost::detail::error_impl                          \
-      (msg, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION))  \
-  /***/
+#define HPX_TEST_MSG(expr, msg)                                             \
+    ::hpx::util::detail::check                                              \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::test_failures,                                \
+         expr, msg)                                                         \
+    /***/
 
-#define HPX_TEST_EQ_MSG(expr1, expr2, msg)    \
-  (::hpx::detail::test_msg_impl               \
-    (msg, __FILE__, __LINE__,                 \
-     BOOST_CURRENT_FUNCTION, expr1, expr2))   \
-  /***/
+#define HPX_TEST_EQ(expr1, expr2)                                           \
+    ::hpx::util::detail::check_eq                                           \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::test_failures,                                \
+         expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " == "            \
+                                BOOST_PP_STRINGIZE(expr2) "'")              \
+    /***/
 
-#define HPX_SANITY(expr)                                   \
-  ((expr)                                                  \
-   ? (void)0                                               \
-   : ::hpx::detail::sanity_failed_impl                     \
-      (#expr, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION)) \
-  /***/
+#define HPX_TEST_EQ_MSG(expr1, expr2, msg)                                  \
+    ::hpx::util::detail::check_eq                                           \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::test_failures,                                \
+         expr1, expr2, msg)                                                 \
+    /***/
 
-#define HPX_SANITY_EQ(expr1,expr2)          \
-  (::hpx::detail::sanity_eq_impl            \
-    (#expr1, #expr2, __FILE__, __LINE__,    \
-     BOOST_CURRENT_FUNCTION, expr1, expr2)) \
-  /***/
+#define HPX_SANITY(expr)                                                    \
+    ::hpx::util::detail::check                                              \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::sanity_failures,                              \
+         expr, "sanity check '" BOOST_PP_STRINGIZE(expr) "'")               \
+    /***/
+
+#define HPX_SANITY_MSG(expr, msg)                                           \
+    ::hpx::util::detail::check                                              \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::sanity_failures,                              \
+         expr, msg)                                                         \
+    /***/
+
+#define HPX_SANITY_EQ(expr1, expr2)                                         \
+    ::hpx::util::detail::check_eq                                           \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::sanity_failures,                              \
+         expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " == "    \
+                                        BOOST_PP_STRINGIZE(expr2) "'")      \
+    /***/
+
+#define HPX_SANITY_EQ_MSG(expr1, expr2, msg)                                \
+    ::hpx::util::detail::check_eq                                           \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::detail::sanity_failures,                              \
+         expr1, expr2)                                                      \
+    /***/
 
 #endif // HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
