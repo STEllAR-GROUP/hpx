@@ -41,6 +41,13 @@ set_target_properties(hpx_serialization PROPERTIES
   OUTPUT_NAME hpx_serialization)
 target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
 
+get_target_property(path hpx_serialization LOCATION)
+get_filename_component(name "${path}" NAME)
+set_property(TARGET hpx_serialization APPEND
+  PROPERTY COMPILE_DEFINITIONS
+  "HPX_LIBRARY_NAME=${name}"
+  "HPX_LIBRARY_STRING=\"${name}\"")
+
 ###############################################################################
 # build instructions for main shared HPX library
 add_library(hpx SHARED ${hpx_SOURCES})
@@ -51,6 +58,13 @@ set_target_properties(hpx PROPERTIES
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx)
 target_link_libraries(hpx hpx_serialization ${BOOST_FOUND_LIBRARIES})
+
+get_target_property(path hpx LOCATION)
+get_filename_component(name "${path}" NAME)
+set_property(TARGET hpx APPEND
+  PROPERTY COMPILE_DEFINITIONS
+  "HPX_LIBRARY_NAME=${name}"
+  "HPX_LIBRARY_STRING=\"${name}\"")
 
 ###############################################################################
 # installation instructions

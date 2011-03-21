@@ -45,7 +45,7 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
-            "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
+            "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
 
             // create default ini entries for memory_block component hosted in 
             // the main hpx shared library
@@ -63,11 +63,9 @@ namespace hpx { namespace util
 //                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
 //                 HPX_SHARED_LIB_EXTENSION,
 // 
-//             "[hpx.components.barrier]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" 
-//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
-//                 HPX_SHARED_LIB_EXTENSION
+             "[hpx.components.barrier]",
+             "name = hpx",
+             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
         ;
         ini.parse("static defaults", lines);
     }
