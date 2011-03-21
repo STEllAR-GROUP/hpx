@@ -30,8 +30,6 @@ struct registry_type<tag::factory_namespace>
 
 // TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
 
-// TODO: this is not the proper implementation, just a placeholder to handle
-// std::multimap<>::insert()'s return type.
 template <>
 struct bind_hook<tag::factory_namespace>
 {
@@ -43,12 +41,7 @@ struct bind_hook<tag::factory_namespace>
 
     static result_type call(registry_type& reg, key_type const& key,
                             mapped_type const& value)
-    {
-        if (reg.count(key))
-            return key_type();
-
-        return reg.insert(registry_type::value_type(key, value))->first;
-    }
+    { return reg.insert(registry_type::value_type(key, value))->first; }
 };
 
 } // hpx::agas::traits
