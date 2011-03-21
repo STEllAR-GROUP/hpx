@@ -72,25 +72,25 @@ namespace hpx { namespace components { namespace amr
     stencil::findindex(had_double_type &x,had_double_type &y, had_double_type &z,
                        access_memory_block<stencil_data> &val,
                        int &xindex,int &yindex,int &zindex,int n) {
-
       // find the index that has this point
-      int i;
-      for (i=0;i<n;i++) {
-        if ( floatcmp(x,val->x_[i]) == 1 ) {
-          xindex = i;
-          break;
-        }
-      }      
-      for (i=0;i<n;i++) {
-        if ( floatcmp(y,val->y_[i]) == 1 ) {
+      register bool foundx = false;
+      register bool foundy = false;
+      register bool foundz = false;
+      for (int i=0;i<n;i++) {
+        if ( !foundx && floatcmp(y,val->y_[i]) == 1 ) {
           yindex = i;
-          break;
+          if ( foundy && foundz ) break;
+          else foundx = true;
         }
-      }      
-      for (i=0;i<n;i++) {
-        if ( floatcmp(z,val->z_[i]) == 1 ) {
+        if ( !foundy && floatcmp(x,val->x_[i]) == 1 ) {
+          xindex = i;
+          if ( foundx && foundz ) break;
+          else foundy = true;
+        }
+        if ( !foundz && floatcmp(z,val->z_[i]) == 1 ) {
           zindex = i;
-          break;
+          if ( foundx && foundy ) break;
+          else foundz = true;
         }
       }      
 
