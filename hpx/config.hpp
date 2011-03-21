@@ -155,6 +155,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_LIBRARY_STRING)
+#define HPX_LIBRARY_STRING                                                    \
+        BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))               \
+        HPX_SHARED_LIB_EXTENSION                                              \
+    /**/
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
 #define snprintf _snprintf
 #if !defined(HPX_EMULATE_SWAP_CONTEXT)
