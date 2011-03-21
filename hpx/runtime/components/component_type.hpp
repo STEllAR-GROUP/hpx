@@ -150,16 +150,21 @@ namespace hpx { namespace components
     }}                                                                        \
     /**/
 #else
-  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)               \
-      namespace hpx { namespace components                                    \
-      {                                                                       \
-          template <> HPX_ALWAYS_EXPORT                                       \
-          component_type component_type_database<component>::get()            \
-              { return type; }                                                \
-          template <> HPX_ALWAYS_EXPORT                                       \
-          void component_type_database<component>::set(component_type)        \
-              { BOOST_ASSERT(false); }                                        \
-      }}                                                                      \
-      /**/
+  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        component_type component_type_database<component>::get()              \
+            { return type; }                                                  \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        void component_type_database<component>::set(component_type)          \
+            { BOOST_ASSERT(false); }                                          \
+    }}                                                                        \
+    /**/
+
 #endif
 
