@@ -31,21 +31,24 @@ namespace hpx
     template <typename T>
     inline void 
     get_option(boost::program_options::variables_map& vm,
-               std::string const& name, T& x)
+               std::string const& name, T& x,
+               std::string const& config = "")
     {
         if (vm.count(name)) 
             x = vm[name].as<T>();
 
-        x = boost::lexical_cast<T>(
-            get_runtime().get_config().get_entry(HPX_APPLICATION_STRING, x));
+        if (!config.empty()) 
+            x = boost::lexical_cast<T>
+                (get_runtime().get_config().get_entry(config, x));
     }
 
     template <typename T>
-    inline void get_option(T& x,
-                           std::string const& name = HPX_APPLICATION_STRING)
+    inline void
+    get_option(T& x, std::string const& config)
     {
-        x = boost::lexical_cast<T>(
-            get_runtime().get_config().get_entry(name, x));
+        if (!config.empty())
+            x = boost::lexical_cast<T>
+                (get_runtime().get_config().get_entry(config, x));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,7 +61,7 @@ namespace hpx
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
-            double current = 0;
+            double current = 0.0;
             do {
                 current = t.elapsed();
             } while (current - start_time < wait_time * 1e-6);
