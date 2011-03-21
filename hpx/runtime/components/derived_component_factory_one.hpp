@@ -1,11 +1,10 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM)
-#define HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM
+#if !defined(HPX_derived_component_factory_one_ONE_MAR_21_2011_0125PM)
+#define HPX_derived_component_factory_one_ONE_MAR_21_2011_0125PM
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -23,17 +22,25 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory component_factory.hpp hpx/runtime/components/component_factory.hpp
+    /// \class derived_component_factory_one derived_component_factory_one.hpp hpx/runtime/components/derived_component_factory_one.hpp
     ///
-    /// The \a component_factory provides a minimal implementation of a 
+    /// The \a derived_component_factory_one provides a minimal implementation of a 
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required 
     /// functions to be exposed by a component's factory instance.
+    /// 
+    /// The difference to a plain \a component_factory is that it should be 
+    /// used for components which are derived from component base classes 
+    /// exposing the actions and which dispatch the action functions through
+    /// virtual functions to the derived component.
+    ///
+    /// This is necessary because the lower part of the component type needs to 
+    /// match the component type of the component exposing the actions.
     ///
     /// \tparam Component   The component type this factory should be 
     ///                     responsible for.
     template <typename Component>
-    struct component_factory : public component_factory_base
+    struct derived_component_factory_one : public component_factory_base
     {
         /// \brief Construct a new factory instance
         ///
@@ -51,7 +58,8 @@ namespace hpx { namespace components
         ///
         /// \note The contents of both sections has to be cloned in order to 
         ///       save the configuration setting for later use.
-        component_factory(util::section const* global, util::section const* local)
+        derived_component_factory_one(util::section const* global, 
+            util::section const* local)
           : refcnt_(0)
         {
             // store the configuration settings
@@ -62,7 +70,7 @@ namespace hpx { namespace components
         }
 
         ///
-        ~component_factory() {}
+        ~derived_component_factory_one() {}
 
         /// \brief Return the unique identifier of the component type this 
         ///        factory is responsible for
@@ -81,10 +89,21 @@ namespace hpx { namespace components
             typedef typename Component::type_holder type_holder;
             if (component_invalid == components::get_component_type<type_holder>()) 
             {
+                typedef typename Component::wrapped_type base_type_holder;
+                component_type base_type = 
+                    components::get_component_type<base_type_holder>();
+                if (component_invalid == base_type) 
+                {
                 // first call to get_component_type, ask AGAS for a unique id
+                    base_type = agas_client.get_component_id(
+                        unique_component_name<derived_component_factory_one, base_name>::call());
+                }
+
+                component_type this_type = agas_client.register_factory(
+                    prefix, unique_component_name<derived_component_factory_one>::call());
+
                 components::set_component_type<type_holder>(
-                    agas_client.register_factory(prefix,
-                        unique_component_name<component_factory>::call()));
+                    derived_component_type(this_type, base_type));
             }
             return components::get_component_type<type_holder>();
         }
@@ -97,7 +116,7 @@ namespace hpx { namespace components
         ///         error.
         std::string get_component_name() const
         {
-            return unique_component_name<component_factory>::call();
+            return unique_component_name<derived_component_factory_one>::call();
         }
 
         /// \brief  The function \a get_factory_properties is used to 
@@ -123,6 +142,23 @@ namespace hpx { namespace components
         naming::gid_type create (std::size_t count)
         {
             naming::gid_type id = server::create<Component>(count);
+            if (id) 
+                ++refcnt_;
+            return id;
+        }
+
+        /// \brief Create one new component instance using the given constructor 
+        ///        argument.
+        ///
+        /// \param Arg0  [in] The type specific constructor argument
+        ///
+        /// \return Returns the GID of the first newly created component 
+        ///         instance. If more than one component instance has been 
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        naming::gid_type create_one (components::constructor_argument const& arg0)
+        {
+            naming::gid_type id = server::create_one<Component>(arg0);
             if (id) 
                 ++refcnt_;
             return id;
@@ -160,15 +196,21 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to 
-/// register a minimal component factory with Boost.Plugin. 
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ComponentType, componentname)  \
+/// register a minimal component factory with Boost.Plugin. This macro may be 
+/// used if the registered component factory is the only factory to be exposed 
+/// from a particular module. If more than one factories need to be exposed
+/// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
+/// macros should be used instead.
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(ComponentType,             \
+    componentname, basecomponentname)                                         \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::component_factory<ComponentType>,                \
+            hpx::components::derived_component_factory_one<ComponentType>,    \
             componentname);                                                   \
-        HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::component_factory<ComponentType>,                \
-            componentname)                                                    \
-        template struct hpx::components::component_factory<ComponentType>;    \
+        HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(                                \
+            hpx::components::derived_component_factory_one<ComponentType>,    \
+            componentname, basecomponentname)                                 \
+        template struct                                                       \
+            hpx::components::derived_component_factory_one<ComponentType>;    \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
     /**/
 

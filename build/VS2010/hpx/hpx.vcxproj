@@ -170,14 +170,17 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\util\allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\default_vector.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp" />
@@ -185,6 +188,7 @@
     <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />

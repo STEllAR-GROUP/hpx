@@ -754,9 +754,6 @@
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\exception.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -789,6 +786,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\default_vector.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp">
+      <Filter>Header Files\Runtime\Threads\Policies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\exception.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp">
+      <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

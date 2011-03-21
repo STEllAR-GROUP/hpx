@@ -239,21 +239,7 @@ namespace hpx { namespace components { namespace server
         util::section& ini_;
     };
 
-}
-    template <>
-    struct HPX_ALWAYS_EXPORT component_type_database<runtime_support>
-    {
-        static component_type get()
-        {
-            return components::component_runtime_support; 
-        }
-
-        static void set(component_type type)
-        {
-            BOOST_ASSERT(false);
-        }
-    }; 
-}}
+}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 

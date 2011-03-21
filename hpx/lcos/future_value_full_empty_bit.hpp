@@ -523,6 +523,7 @@ namespace hpx { namespace lcos
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     template <typename Result, typename RemoteResult, int N>

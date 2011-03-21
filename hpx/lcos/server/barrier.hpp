@@ -84,9 +84,9 @@ namespace hpx { namespace lcos { namespace server
         using base_type::finalize;
         typedef base_type::wrapping_type wrapping_type;
 
-        static components::component_type get_component_type()
-        {
-            return components::component_barrier;
+        static components::component_type get_component_type() 
+        { 
+            return components::component_barrier; 
         }
         static void set_component_type(components::component_type type) {}
 

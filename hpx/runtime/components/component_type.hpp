@@ -149,8 +149,12 @@ namespace hpx { namespace components
             { value = t; }                                                    \
     }}                                                                        \
     /**/
+#else
+  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)
+#endif
 
-  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)               \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
@@ -161,10 +165,6 @@ namespace hpx { namespace components
             { BOOST_ASSERT(false); }                                          \
     }}                                                                        \
     /**/
-#else
-  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)
-  #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)
-#endif
 
 #endif
 

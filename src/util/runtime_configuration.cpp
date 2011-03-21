@@ -62,7 +62,7 @@ namespace hpx { namespace util
 //             "path = $[hpx.location]/lib/" 
 //                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
 //                 HPX_SHARED_LIB_EXTENSION,
-// 
+
              "[hpx.components.barrier]",
              "name = hpx",
              "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING

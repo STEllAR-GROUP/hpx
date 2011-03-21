@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options
     options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-        
+      desc_commandline("usage: " + std::string(argv[0]) + " [options]");
+
     desc_commandline.add_options()
         ("pxthreads,T", value<std::size_t>(), 
             "the number of PX threads to invoke (default: OS threads * 2)")
