@@ -4,52 +4,52 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/thread/thread.hpp>
+
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/barrier.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/detail/atomic_count.hpp>
-#include <boost/program_options.hpp>
-
-using namespace hpx;
-namespace po = boost::program_options;
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-void barrier_test(naming::id_type const& id, boost::detail::atomic_count& c, std::size_t count)
+void barrier_test(hpx::naming::id_type const& id,
+                  boost::detail::atomic_count& c)
 {
+    std::cout << "Entered barrier on OS thread "
+              << boost::this_thread::get_id() << std::endl;
     ++c;
-    lcos::stubs::barrier::wait(id);// wait for all threads to enter the barrier
+    // wait for all threads to enter the barrier
+    hpx::lcos::stubs::barrier::wait(id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(po::variables_map &vm)
+int hpx_main(boost::program_options::variables_map &vm)
 {
-    int num_threads = 1;
+    std::size_t num_threads = 1, value = num_threads * 2;
+
+    if (vm.count("value"))
+        value = vm["value"].as<std::size_t>();
 
     if (vm.count("threads"))
-        num_threads = vm["threads"].as<int>();
+        num_threads = vm["threads"].as<std::size_t>();
     
     std::cout << "Number of OS threads: " << num_threads << std::endl;
 
-    naming::id_type prefix = applier::get_applier().get_runtime_support_gid();
-
-    std::size_t count = num_threads;
+    hpx::naming::id_type prefix =
+        hpx::applier::get_applier().get_runtime_support_gid();
 
     // create a barrier waiting on 'count' threads
-    lcos::barrier b;
-    b.create_one (prefix, count+1);
+    hpx::lcos::barrier b;
+    b.create_one(prefix, value);
 
     boost::detail::atomic_count c(0);
-    for (std::size_t j = 0; j < count; ++j) {
-        applier::register_work(
-            boost::bind(&barrier_test, b.get_gid(), boost::ref(c), count));
-    }
+
+    for (std::size_t j = 0; j < value; ++j)
+        hpx::applier::register_work
+            (boost::bind(&barrier_test, b.get_gid(), boost::ref(c)));
 
     b.wait(); // wait for all threads to enter the barrier
-    HPX_TEST_EQ(count, c);
+    HPX_TEST_EQ(value, c);
 
     // initiate shutdown of the runtime system
     hpx::finalize();
@@ -60,10 +60,14 @@ int hpx_main(po::variables_map &vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    po::options_description
-       desc_commandline
-          ("usage: " BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME) " [options]");
+    boost::program_options::options_description
+       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
         
+    desc_commandline.add_options()
+        ("value,v", boost::program_options::value<std::size_t>(), 
+            "the number of threads to wait on (default: OS threads * 2)")
+        ;
+
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
