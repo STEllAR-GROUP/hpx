@@ -29,8 +29,6 @@ void barrier_test(local_barrier& b, boost::detail::atomic_count& c,
     ++c;
     // wait for all threads to enter the barrier
     b.wait();
-    
-    HPX_TEST_EQ(pxthreads, c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,7 +45,7 @@ int hpx_main(variables_map& vm)
         pxthreads = vm["pxthreads"].as<std::size_t>();
 
     // create a barrier waiting on 'count' threads
-    local_barrier b(pxthreads);
+    local_barrier b(pxthreads + 1);
 
     boost::detail::atomic_count c(0);
 

@@ -32,8 +32,6 @@ void barrier_test(id_type const& id, boost::detail::atomic_count& c,
     ++c;
     // wait for all threads to enter the barrier
     hpx::lcos::stubs::barrier::wait(id);
-    
-    HPX_TEST_EQ(pxthreads, c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
