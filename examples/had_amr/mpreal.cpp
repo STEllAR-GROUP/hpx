@@ -468,10 +468,14 @@ string mpreal::to_string(size_t n, int b, mp_rnd_t mode) const
 
 //////////////////////////////////////////////////////////////////////////
 // I/O
+ostream& operator<<(ostream& os, const mpreal& v) HPX_EXPORT;
+
 ostream& operator<<(ostream& os, const mpreal& v)
 {
   return os<<v.to_string(static_cast<size_t>(os.precision()));
 }
+
+istream& operator>>(istream &is, mpreal& v) HPX_EXPORT;
 
 istream& operator>>(istream &is, mpreal& v)
 {

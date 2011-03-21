@@ -78,6 +78,8 @@
 
 #include <mpfr.h>
 
+#include <hpx/config/export_definitions.hpp>
+
 #if MPREAL_USE_BOOST_MOVE != 0
 #include <boost/move/move.hpp>
 #endif
@@ -108,7 +110,7 @@
 
 namespace mpfr {
 
-class mpreal {
+class HPX_EXPORT mpreal {
 private:
   mpfr_t mp;
 #if MPREAL_USE_BOOST_MOVE != 0
