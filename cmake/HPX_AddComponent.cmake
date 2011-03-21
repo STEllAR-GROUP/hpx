@@ -62,6 +62,7 @@ macro(add_hpx_component name)
   set_property(TARGET ${name}_component APPEND
                PROPERTY COMPILE_DEFINITIONS
                "HPX_COMPONENT_NAME=${name}"
+               "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
   
   if(NOT ${name}_MODULE)

@@ -35,6 +35,7 @@ macro(add_hpx_executable name)
   set_property(TARGET ${name}_exe APPEND
                PROPERTY COMPILE_DEFINITIONS
                "HPX_APPLICATION_NAME=${name}"
+               "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
   # linker instructions

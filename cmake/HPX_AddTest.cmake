@@ -27,6 +27,7 @@ macro(add_hpx_test name)
     set_property(TARGET ${name}_test APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
+                 "HPX_APPLICATION_STRING=\"${name}\""
                  "HPX_APPLICATION_EXPORTS")
   
     # linker instructions
