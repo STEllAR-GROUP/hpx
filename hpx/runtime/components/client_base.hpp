@@ -81,13 +81,13 @@ namespace hpx { namespace components
         Derived& create_one(naming::id_type const& gid, component_type type,
             Arg0 const& arg0)
         {
-            return create(gid.get_gid(), type, arg0);
+            return create_one(gid.get_gid(), type, arg0);
         }
 
         template <typename Arg0>
         Derived& create_one(naming::id_type const& gid, Arg0 const& arg0)
         {
-            return create(gid.get_gid(), arg0);
+            return create_one(gid.get_gid(), arg0);
         }
 
         ///////////////////////////////////////////////////////////////////////
