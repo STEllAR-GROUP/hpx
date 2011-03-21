@@ -52,19 +52,19 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void finalize(double wait_time = 0.0, bool user_override = true)
+    inline void finalize(double microseconds = 0.0, bool user_override = true)
     {
         if (user_override)
-          get_option(wait_time, "hpx.finalize_wait_time");
+          get_option(microseconds, "hpx.finalize_wait_time");
 
-        if (wait_time)
+        if (microseconds)
         {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
             do {
                 current = t.elapsed();
-            } while (current - start_time < wait_time * 1e-6);
+            } while (current - start_time < microseconds * 1e-6);
         }
 
         components::stubs::runtime_support::shutdown_all();
@@ -341,16 +341,16 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(int argc = 0, char* argv[] = 0)
+    int init(std::string const& app_name, int argc = 0, char* argv[] = 0)
     {
         using boost::program_options::options_description; 
 
         options_description desc_commandline
-            ("usage: " HPX_APPLICATION_STRING " [options]");
+            (std::string("usage: ") + app_name + " [options]");
 
         if (argc == 0 || argv == 0)
         {
-            char *dummy_argv[1] = { const_cast<char*>(HPX_APPLICATION_STRING) };
+            char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
             return init(desc_commandline, 1, dummy_argv);
         }
     
