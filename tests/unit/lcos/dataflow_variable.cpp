@@ -26,20 +26,21 @@ using hpx::lcos::eager_future;
 using hpx::lcos::dataflow_variable;
 using hpx::lcos::future_value;
 
+using hpx::util::report_errors;
+
 using hpx::actions::plain_result_action1;
 using hpx::actions::continuation;
 
 ///////////////////////////////////////////////////////////////////////////////
-int print(id_type const& d_id)
+int test(id_type const& d_id)
 {
     typedef base_lco_with_value<int>::get_value_action get_action;
     HPX_TEST_EQ(eager_future<get_action>(d_id).get(), 42);
     return 0;
 }
 
-typedef plain_result_action1<int, id_type const&, print>
-    print_action;
-HPX_REGISTER_PLAIN_ACTION(print_action);
+typedef plain_result_action1<int, id_type const&, test> test_action;
+HPX_REGISTER_PLAIN_ACTION(test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef dataflow_variable<int, int> dataflow_int_type;
@@ -50,22 +51,15 @@ int hpx_main(variables_map& vm)
     id_type here = find_here();
     id_type there = get_runtime().get_process().next();
 
-    std::cout << ">>> print here, there" << std::endl;
-    std::cout << here << " " << there << std::endl << std::endl;
-
     {
-        std::cout << ">>> d1 = dataflow_variable()" << std::endl;
         dataflow_int_type d1;
 
-        std::cout << ">>> spawning { print d1 } here" << std::endl; 
         future_value<int> 
-            local_spawn(eager_future<print_action>(here, d1.get_gid()));
+            local_spawn(eager_future<test_action>(here, d1.get_gid()));
 
-        std::cout << ">>> spawning { print d1 } there" << std::endl; 
         future_value<int> 
-            remote_spawn(eager_future<print_action>(there, d1.get_gid()));
+            remote_spawn(eager_future<test_action>(there, d1.get_gid()));
 
-        std::cout << ">>> bind(d1, 42)" << std::endl;
         continuation(d1.get_gid()).trigger<int>(42);
 
         // We have to use the eager_future here in order to make sure the
@@ -88,8 +82,8 @@ int main(int argc, char* argv[])
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
-    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
-    return hpx::util::report_errors();
+    return report_errors();
 }
 

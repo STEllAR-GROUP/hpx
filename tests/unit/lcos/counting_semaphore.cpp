@@ -10,8 +10,26 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/lcos/counting_semaphore.hpp>
+
+using boost::program_options::variables_map;
+using boost::program_options::options_description;
+using boost::program_options::value;
+
+using hpx::naming::id_type;
+
+using hpx::lcos::counting_semaphore;
+
+using hpx::applier::register_work;
+
+using hpx::init;
+using hpx::finalize;
+
+using hpx::util::report_errors;
+
+using hpx::exception;
+using hpx::bad_parameter;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_environment
@@ -23,7 +41,7 @@ struct test_environment
     { HPX_TEST_EQ(counter1_, 0); }
 
     std::string desc_;
-    hpx::lcos::counting_semaphore sem_;
+    counting_semaphore sem_;
     boost::atomic<long> counter1_;
 };
 
@@ -133,12 +151,16 @@ char const* const sem_signal2_desc[] =
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map &vm)
+int hpx_main(variables_map &vm)
 {
     std::size_t max_semaphore_value = 3;
 
-    if (vm.count("value"))
-        max_semaphore_value = vm["value"].as<std::size_t>();
+    if (vm.count("semaphores"))
+        max_semaphore_value = vm["semaphores"].as<std::size_t>();
+
+    if (max_semaphore_value > 80)
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "hpx_main", "semaphore count specified is higher than 80");
 
     // create a semaphore, which which we will use to make several threads 
     // waiting for another one
@@ -146,11 +168,11 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     // create the threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
+        register_work(boost::bind
             (&sem_wait1, env1, max_semaphore_value), sem_wait1_desc[i]);
 
     // now create a thread signaling the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_signal1, env1, max_semaphore_value), "sem_signal1");
 
     // create a semaphore, which which we will use to make several threads 
@@ -160,11 +182,11 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     // create the  threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
+        register_work(boost::bind
             (&sem_wait1, env1_all, max_semaphore_value), sem_wait1_desc[i]);
 
     // now create a thread signaling the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_signal1_all, env1_all, max_semaphore_value), "sem_signal1_all");
 
     // create a semaphore, which we will use to make several threads 
@@ -173,12 +195,12 @@ int hpx_main(boost::program_options::variables_map &vm)
     boost::shared_ptr<test_environment> env2(new test_environment("test2"));
 
     // create a thread signaling the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_signal1, env2, max_semaphore_value), "sem_signal1");
 
     // create the  threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
+        register_work(boost::bind
             (&sem_wait1, env2, max_semaphore_value), sem_wait1_desc[i]);
 
     // create a semaphore, which we will use to make several threads 
@@ -188,12 +210,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         env2_all(new test_environment("test2_all"));
 
     // create a thread signaling the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_signal1_all, env2_all, max_semaphore_value), "sem_signal1_all");
 
     // create the threads which will have to wait on the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
+        register_work(boost::bind
             (&sem_wait1, env2_all, max_semaphore_value), sem_wait1_desc[i]);
 
     // the 3rd test does the opposite, it creates a semaphore, which  
@@ -201,13 +223,12 @@ int hpx_main(boost::program_options::variables_map &vm)
     boost::shared_ptr<test_environment> env3(new test_environment("test3"));
 
     // now create a thread waiting on the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_wait2, env3, max_semaphore_value), "sem_wait2");
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
-            (&sem_signal2, env3), sem_signal2_desc[i]);
+        register_work(boost::bind(&sem_signal2, env3), sem_signal2_desc[i]);
 
     // the 3rd test does the opposite, it creates a semaphore, which  
     // will be used to make one thread waiting for several other threads,
@@ -216,13 +237,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         env3_all(new test_environment("test3_all"));
 
     // now create a thread waiting on the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_wait2_all, env3_all, max_semaphore_value), "sem_wait2_all");
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
-            (&sem_signal2, env3_all), sem_signal2_desc[i]);
+        register_work(boost::bind(&sem_signal2, env3_all), sem_signal2_desc[i]);
 
     // the 4th test does the opposite, it creates a semaphore, which  
     // will be used to make one thread waiting for several other threads, but 
@@ -231,11 +251,10 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
-            (&sem_signal2, env4), sem_signal2_desc[i]);
+        register_work(boost::bind(&sem_signal2, env4), sem_signal2_desc[i]);
 
     // now create a thread waiting on the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_wait2, env4, max_semaphore_value), "sem_wait2");
 
     // the 4th test does the opposite, it creates a semaphore, which  
@@ -246,16 +265,14 @@ int hpx_main(boost::program_options::variables_map &vm)
 
     // create the threads which will have to signal the semaphore
     for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        hpx::applier::register_work(boost::bind
-            (&sem_signal2, env4_all), sem_signal2_desc[i]);
+        register_work(boost::bind(&sem_signal2, env4_all), sem_signal2_desc[i]);
 
     // now create a thread waiting on the semaphore
-    hpx::applier::register_work(boost::bind
+    register_work(boost::bind
         (&sem_wait2_all, env4_all, max_semaphore_value), "sem_wait2_all");
 
     // initiate shutdown of the runtime system
-    hpx::finalize();
-
+    finalize();
     return 0;
 }
 
@@ -263,18 +280,17 @@ int hpx_main(boost::program_options::variables_map &vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description
+    options_description
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
         
     desc_commandline.add_options()
-        ("value,v", boost::program_options::value<std::size_t>(), 
-            "the number of threads to create for concurrent access to the "
-            "tested semaphores (default: 3, max: 80)")
+        ("semaphores,s", value<std::size_t>(), 
+            "the number of semaphores (default: 3, max: 80)")
         ;
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
-    return hpx::util::report_errors();
+    return report_errors();
 }
 
