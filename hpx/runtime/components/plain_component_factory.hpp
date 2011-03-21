@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/ini.hpp>
 
+#include <boost/serialization/export.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
