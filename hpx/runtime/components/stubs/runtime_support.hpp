@@ -252,7 +252,8 @@ namespace hpx { namespace components { namespace stubs
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::gid_type
-                >::call(appl.get_runtime_support_raw_gid().get_lsb(), type, gid);
+                >::call(appl.get_runtime_support_raw_gid().get_lsb(),
+                        threads::thread_priority_default, type, gid);
             }
             else {
                 // apply remotely

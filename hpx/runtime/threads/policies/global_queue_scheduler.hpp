@@ -74,7 +74,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd, std::size_t num_thread)
+        void schedule_thread(threads::thread* thrd, std::size_t num_thread,
+            thread_priority /*priority*/ = thread_priority_normal)
         {
             queue_.schedule_thread(thrd, num_thread);
         }

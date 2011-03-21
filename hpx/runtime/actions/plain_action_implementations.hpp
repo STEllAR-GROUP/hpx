@@ -43,26 +43,27 @@
     template <
         typename Result, 
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), 
-        typename Derived
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived, 
+        threads::thread_priority Priority = threads::thread_priority_default
     >
     class BOOST_PP_CAT(plain_base_result_action, N)
       : public action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
-            Derived>
+            Derived, Priority>
     {
     private:
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
-            arguments_type,
-            Derived> base_type;
+            arguments_type, Derived, Priority> base_type;
 
     public:
-        BOOST_PP_CAT(plain_base_result_action, N)() 
+        BOOST_PP_CAT(plain_base_result_action, N)(
+                threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         // construct an action from its arguments
@@ -70,6 +71,13 @@
         BOOST_PP_CAT(plain_base_result_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_base_result_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
     private:
@@ -181,19 +189,23 @@
     //  N parameter version, direct execution with result
     template <
         typename Result, BOOST_PP_ENUM_PARAMS(N, typename T), 
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        threads::thread_priority Priority = threads::thread_priority_default>
     class BOOST_PP_CAT(plain_result_action, N)
       : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
           BOOST_PP_ENUM_PARAMS(N, T), F, 
-          BOOST_PP_CAT(plain_result_action, N)<Result, BOOST_PP_ENUM_PARAMS(N, T), F> >
+          BOOST_PP_CAT(plain_result_action, N)<
+              Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Priority>
     {
     private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F, 
-            BOOST_PP_CAT(plain_result_action, N)> base_type;
+            BOOST_PP_CAT(plain_result_action, N), Priority> base_type;
 
     public:
-        BOOST_PP_CAT(plain_result_action, N)()
+        BOOST_PP_CAT(plain_result_action, N)(
+                threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         // construct an action from its arguments
@@ -201,6 +213,13 @@
         BOOST_PP_CAT(plain_result_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_result_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
         /// The function \a get_action_name returns the name of this action
@@ -240,6 +259,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -255,6 +275,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -267,12 +288,13 @@
     class BOOST_PP_CAT(plain_direct_result_action, N)
       : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
           BOOST_PP_ENUM_PARAMS(N, T), F, 
-          BOOST_PP_CAT(plain_direct_result_action, N)<Result, BOOST_PP_ENUM_PARAMS(N, T), F> >
+          BOOST_PP_CAT(plain_direct_result_action, N)<
+              Result, BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F,
-            BOOST_PP_CAT(plain_direct_result_action, N)> base_type;
+            BOOST_PP_CAT(plain_direct_result_action, N) > base_type;
 
     public:
         BOOST_PP_CAT(plain_direct_result_action, N)()
@@ -281,6 +303,13 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_direct_result_action, N)(
+                threads::thread_priority, 
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
@@ -348,6 +377,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -363,6 +393,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -371,25 +402,27 @@
     //  N parameter version, no result type
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived,
+        threads::thread_priority Priority = threads::thread_priority_default>
     class BOOST_PP_CAT(plain_base_action, N)
       : public action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_action_arg, N), 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
-            Derived>
+            Derived, Priority>
     {
     private:
-        
-        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef 
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> 
+        arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_action_arg, N), 
-            arguments_type,
-            Derived> base_type;
+            arguments_type, Derived, Priority> base_type;
 
     public:
-        BOOST_PP_CAT(plain_base_action, N)() 
+        BOOST_PP_CAT(plain_base_action, N)(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         // construct an action from its arguments
@@ -397,6 +430,13 @@
         BOOST_PP_CAT(plain_base_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_base_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
     private:
@@ -503,19 +543,22 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T), 
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        threads::thread_priority Priority = threads::thread_priority_default>
     class BOOST_PP_CAT(plain_action, N)
       : public BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, 
-            BOOST_PP_CAT(plain_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F> >
+            BOOST_PP_CAT(plain_action, N)<
+                BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Priority>
     {
     private:
         typedef BOOST_PP_CAT(plain_base_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T), F, BOOST_PP_CAT(plain_action, N)> 
+            BOOST_PP_ENUM_PARAMS(N, T), F, BOOST_PP_CAT(plain_action, N), Priority> 
         base_type;
 
     public:
-        BOOST_PP_CAT(plain_action, N)()
+        BOOST_PP_CAT(plain_action, N)(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         // construct an action from its arguments
@@ -523,6 +566,13 @@
         BOOST_PP_CAT(plain_action, N)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
         /// The function \a get_action_name returns the name of this action
@@ -562,6 +612,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -577,6 +628,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -584,16 +636,18 @@
     ///////////////////////////////////////////////////////////////////////////
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        threads::thread_priority Priority = threads::thread_priority_default>
     class BOOST_PP_CAT(plain_direct_action, N)
       : public BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F,
-            BOOST_PP_CAT(plain_direct_action, N)<BOOST_PP_ENUM_PARAMS(N, T), F> >
+            BOOST_PP_CAT(plain_direct_action, N)<
+                BOOST_PP_ENUM_PARAMS(N, T), F> >
     {
     private:
         typedef BOOST_PP_CAT(plain_base_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T), F, BOOST_PP_CAT(plain_direct_action, N)> 
-        base_type;
+            BOOST_PP_ENUM_PARAMS(N, T), F, BOOST_PP_CAT(plain_direct_action, N), 
+            Priority> base_type;
 
     public:
         BOOST_PP_CAT(plain_direct_action, N)()
@@ -602,6 +656,13 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_direct_action, N)(
+                threads::thread_priority, 
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
@@ -668,6 +729,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -683,6 +745,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };

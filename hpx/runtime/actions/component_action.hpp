@@ -37,16 +37,18 @@ namespace hpx { namespace actions
     // zero argument version
     template <
         typename Component, typename Result, int Action, 
-        Result (Component::*F)(), typename Derived>
+        Result (Component::*F)(), typename Derived, 
+        threads::thread_priority Priority = threads::thread_priority_default>
     class base_result_action0 
-      : public action<Component, Action, boost::fusion::vector<>, Derived>
+      : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
     {
         typedef boost::fusion::vector<> arguments_type;
-        typedef action<Component, Action, arguments_type, Derived> 
+        typedef action<Component, Action, arguments_type, Derived, Priority> 
             base_type;
 
     public:
-        base_result_action0()
+        explicit base_result_action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
     private:
@@ -141,17 +143,19 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action, 
-        Result (Component::*F)()>
+        Result (Component::*F)(), 
+        threads::thread_priority Priority = threads::thread_priority_default>
     class result_action0 
       : public base_result_action0<Component, Result, Action, F,
-            result_action0<Component, Result, Action, F> >
+            result_action0<Component, Result, Action, F, Priority>, Priority>
     {
     private:
         typedef base_result_action0<
-            Component, Result, Action, F, result_action0> base_type;
+            Component, Result, Action, F, result_action0, Priority> base_type;
 
     public:
-        result_action0()
+        explicit result_action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         /// The function \a get_action_name returns the name of this action
@@ -189,6 +193,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -202,6 +207,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -220,6 +226,9 @@ namespace hpx { namespace actions
 
     public:
         direct_result_action0()
+        {}
+
+        explicit direct_result_action0(threads::thread_priority)
         {}
 
     public:
@@ -274,6 +283,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<direct_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -287,24 +297,26 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<direct_result_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <typename Component, int Action, void (Component::*F)(), 
-        typename Derived>
+    template <typename Component, int Action, void (Component::*F)(), typename Derived, 
+      threads::thread_priority Priority = threads::thread_priority_default>
     class base_action0 
-      : public action<Component, Action, boost::fusion::vector<>, Derived>
+      : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
     {
     private:
         typedef boost::fusion::vector<> arguments_type;
-        typedef action<Component, Action, arguments_type, Derived> 
+        typedef action<Component, Action, arguments_type, Derived, Priority> 
             base_type;
 
     public:
-        base_action0()
+        explicit base_action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
     private:
@@ -396,15 +408,18 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, int Action, void (Component::*F)()>
+    template <typename Component, int Action, void (Component::*F)(),
+        threads::thread_priority Priority = threads::thread_priority_default>
     class action0 
-      : public base_action0<Component, Action, F, action0<Component, Action, F> >
+      : public base_action0<Component, Action, F, 
+            action0<Component, Action, F, Priority>, Priority>
     {
     private:
-        typedef base_action0<Component, Action, F, action0> base_type;
+        typedef base_action0<Component, Action, F, action0, Priority> base_type;
 
     public:
-        action0()
+        explicit action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
         {}
 
         /// The function \a get_action_name returns the name of this action
@@ -442,6 +457,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -455,6 +471,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -470,6 +487,9 @@ namespace hpx { namespace actions
 
     public:
         direct_action0()
+        {}
+
+        explicit direct_action0(threads::thread_priority)
         {}
 
     public:
@@ -526,6 +546,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<direct_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
 
@@ -539,6 +560,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<direct_action0>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
             return data;
         }
     };

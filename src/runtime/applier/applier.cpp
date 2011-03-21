@@ -53,7 +53,8 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
         boost::function<void()> const& func, char const* desc, 
-        threads::thread_state_enum state, bool run_now, error_code& ec)
+        threads::thread_state_enum state, threads::thread_priority priority,
+        bool run_now, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -65,7 +66,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), desc);
+            boost::bind(&thread_function_nullary, func), desc, 0, priority);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -73,7 +74,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread(
         boost::function<void(threads::thread_state_ex)> const& func, 
         char const* desc, threads::thread_state_enum state, bool run_now,
-        error_code& ec)
+        threads::thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -85,7 +86,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), desc);
+            boost::bind(&thread_function, func), desc, 0, priority);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -93,7 +94,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* desc, threads::thread_state_enum state, bool run_now,
-        error_code& ec)
+        threads::thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -104,7 +105,7 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        threads::thread_init_data data(func, desc);
+        threads::thread_init_data data(func, desc, 0, priority);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -129,7 +130,8 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
         boost::function<void()> const& func, char const* desc, 
-        threads::thread_state_enum state, error_code& ec)
+        threads::thread_state_enum state, threads::thread_priority priority,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -142,13 +144,14 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             boost::bind(&thread_function_nullary, func), 
-            desc ? desc : "<unknown>");
+            desc ? desc : "<unknown>", 0, priority);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
         boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* desc, threads::thread_state_enum state, error_code& ec)
+        char const* desc, threads::thread_state_enum state, 
+        threads::thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -160,14 +163,16 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), desc ? desc : "<unknown>");
+            boost::bind(&thread_function, func), 
+            desc ? desc : "<unknown>", 0, priority);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* desc, naming::address::address_type lva,
-        threads::thread_state_enum state, error_code& ec)
+        threads::thread_state_enum state, threads::thread_priority priority,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -178,7 +183,8 @@ namespace hpx { namespace applier
             return;
         }
 
-        threads::thread_init_data data(func, desc ? desc : "<unknown>", lva);
+        threads::thread_init_data data(func, 
+            desc ? desc : "<unknown>", lva, priority);
         app->get_thread_manager().register_work(data, state, ec);
     }
 

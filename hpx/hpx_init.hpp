@@ -197,11 +197,11 @@ namespace hpx
              int argc, char* argv[])
     {
         int result = 0;
-        
+
         try
         {
             using boost::program_options::variables_map; 
-    
+
             // Analyze the command line.
             variables_map vm;
 
@@ -213,8 +213,8 @@ namespace hpx
                     return 0;
                 default:
                     break;
-            }  
-  
+            }
+
             // Check command line arguments.
             std::string hpx_host("localhost"), agas_host;
             boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
@@ -222,7 +222,7 @@ namespace hpx
             std::size_t num_localities = 1;
             std::string queueing = "local";
             hpx::runtime::mode mode = hpx::runtime::console;
-    
+
             if (vm.count("random-ports")
                 && !vm.count("agas") && !vm.count("hpx"))
             {
@@ -242,32 +242,32 @@ namespace hpx
             if (vm.count("agas")) 
                 detail::split_ip_address
                     (vm["agas"].as<std::string>(), agas_host, agas_port);
-    
+
             if (vm.count("hpx")) 
                 detail::split_ip_address
                     (vm["hpx"].as<std::string>(), hpx_host, hpx_port);
-    
+
             if (vm.count("localities"))
                 num_localities = vm["localities"].as<std::size_t>();
-    
+
             if (vm.count("threads"))
                 num_threads = vm["threads"].as<std::size_t>();
-    
+
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
-    
+
             if (vm.count("worker"))
             {
                 mode = hpx::runtime::worker;
             }
-    
+
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
-    
+
             if (vm.count("run_agas_server") || num_localities == 1)  
                 agas_server.reset
                     (new detail::agas_server_helper(agas_host, agas_port));
-    
+
             // Initialize and start the HPX runtime.
             if (queueing == "global")
             {
@@ -275,7 +275,7 @@ namespace hpx
                     global_queue_policy;
                 typedef hpx::runtime_impl<global_queue_policy>
                     runtime_type;
-    
+
                 // Build and configure this runtime instance.
                 runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
                 if (vm.count("config"))
@@ -284,7 +284,7 @@ namespace hpx
                     rt.get_config().load_application_configuration
                         (config.c_str());
                 }
-    
+
                 // Run this runtime instance.
                 if (mode != hpx::runtime::worker)
                     result = rt.run(boost::bind
@@ -299,9 +299,9 @@ namespace hpx
                     local_queue_policy;
                 typedef hpx::runtime_impl<local_queue_policy> 
                     runtime_type;
-    
+
                 local_queue_policy::init_parameter_type init(num_threads, 1000);
-    
+
                 // Build and configure this runtime instance.
                 runtime_type rt
                     (hpx_host, hpx_port, agas_host, agas_port, mode, init);
@@ -319,11 +319,34 @@ namespace hpx
                 else
                     result = rt.run(num_threads, num_localities);
             }
+            else if (queueing == "priority_local") {
+                // local scheduler with priority queue (one queue for ech OS threads
+                // plus one separate queue for high priority PX-threads)
+                typedef hpx::threads::policies::local_priority_queue_scheduler 
+                    local_queue_policy;
+                typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+                local_queue_policy::init_parameter_type init(num_threads, 1000);
 
+                // Build and configure this runtime instance
+                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+                if (mode != hpx::runtime::worker && vm.count("config"))
+                {
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+
+                // Run this runtime instance
+                if (mode != hpx::runtime::worker) {
+                      result = rt.run(boost::bind(hpx_main, vm), 
+                          num_threads, num_localities);
+                }
+                else {
+                  result = rt.run(num_threads, num_localities);
+                }
+            }
             else 
                 throw std::logic_error("bad value for parameter --queuing/-q");
         }
-        
         catch (std::exception& e)
         {
             std::cerr << "hpx::init: std::exception caught: " << e.what()
@@ -346,7 +369,7 @@ namespace hpx
         using boost::program_options::options_description; 
 
         options_description desc_commandline
-            (std::string("usage: ") + app_name + " [options]");
+            ("usage: " + app_name +  " [options]");
 
         if (argc == 0 || argv == 0)
         {

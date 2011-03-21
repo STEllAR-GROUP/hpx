@@ -175,6 +175,9 @@ namespace hpx { namespace actions
         /// Return the thread phase of the parent thread
         virtual std::size_t get_parent_thread_phase() const = 0;
 
+        /// Return the thread priority this action has to be executed with
+        virtual threads::thread_priority get_thread_priority() const = 0;
+
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data& 
         get_thread_init_data(naming::address::address_type lva,
@@ -236,7 +239,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Arguments, 
-        typename Derived>
+      typename Derived, threads::thread_priority Priority>
     class action : public base_argument_action<Arguments>
     {
     public:
@@ -252,9 +255,15 @@ namespace hpx { namespace actions
         // generic handling of actions.
         enum { value = Action };
 
+        // This is the priority value this action has been instantiated with
+        // (statically). This value might be different from the priority member
+        // holding the runtime value an action has been created with
+        enum { priority_value = Priority };
+
         // construct an action from its arguments
-        action() 
-          : arguments_(), parent_id_(0), parent_phase_(0), parent_locality_(0)
+        explicit action(threads::thread_priority priority) 
+          : arguments_(), parent_id_(0), parent_phase_(0), parent_locality_(0),
+            priority_(priority)
         {}
 
         template <typename Arg0>
@@ -262,7 +271,17 @@ namespace hpx { namespace actions
           : arguments_(arg0), 
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
             parent_phase_(threads::get_parent_phase()),
-            parent_locality_(applier::get_prefix_id())
+            parent_locality_(applier::get_prefix_id()),
+            priority_(threads::thread_priority_normal)
+        {}
+
+        template <typename Arg0>
+        action(threads::thread_priority priority, Arg0 const& arg0) 
+          : arguments_(arg0), 
+            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+            parent_phase_(threads::get_parent_phase()),
+            parent_locality_(applier::get_prefix_id()),
+            priority_(priority)
         {}
 
         // bring in the rest of the constructors
@@ -437,6 +456,13 @@ namespace hpx { namespace actions
             return parent_phase_;
         }
 
+        /// Return the thread priority this action has to be executed with
+        threads::thread_priority get_thread_priority() const
+        {
+          return priority_ == threads::thread_priority_default ? 
+              threads::thread_priority(priority_value) : priority_;
+        }
+
         void enumerate_argument_gids(enum_gid_handler_type f)
         {
             boost::fusion::any(arguments_, enum_gid_handler(f));
@@ -453,6 +479,7 @@ namespace hpx { namespace actions
             ar & parent_locality_;
             ar & parent_id_;
             ar & parent_phase_;
+            ar & priority_;
         }
 
     protected:
@@ -460,15 +487,16 @@ namespace hpx { namespace actions
         boost::uint32_t parent_locality_;
         std::size_t parent_id_;
         std::size_t parent_phase_;
+        threads::thread_priority priority_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Component, int Action, typename Arguments, 
-        typename Derived>
+      typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Arguments, Derived>::arguments_type const, N
+        typename action<Component, Action, Arguments, Derived, Priority>::arguments_type const, N
     >::type 
-    get(action<Component, Action, Arguments, Derived> const& args) 
+    get(action<Component, Action, Arguments, Derived, Priority> const& args) 
     { 
         return args.get<N>(); 
     }

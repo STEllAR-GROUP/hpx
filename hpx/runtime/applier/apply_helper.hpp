@@ -18,32 +18,39 @@ namespace hpx { namespace applier { namespace detail
     ///////////////////////////////////////////////////////////////////////
     template <
         typename Action,
-        typename DirectExecute = typename Action::direct_execution
-    >
+        typename DirectExecute = typename Action::direct_execution>
     struct apply_helper0;
 
     template <typename Action>
     struct apply_helper0<Action, boost::mpl::false_>
     {
         static void 
-        call (Action* act, naming::address::address_type lva)
+        call (Action* act, naming::address::address_type lva,
+            threads::thread_priority priority)
         {
             hpx::applier::register_work_plain(act->get_thread_function(lva),
-                actions::detail::get_action_name<Action>(), lva);
+                actions::detail::get_action_name<Action>(), lva,
+                threads::pending, priority);
         }
 
         static void 
-        call (naming::address::address_type lva)
+        call (naming::address::address_type lva,
+            threads::thread_priority priority)
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(lva),
-                actions::detail::get_action_name<Action>(), lva);
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(lva),
+                actions::detail::get_action_name<Action>(), lva,
+                threads::pending, priority);
         }
 
         static void 
-        call (actions::continuation_type& c, naming::address::address_type lva)
+        call (actions::continuation_type& c, naming::address::address_type lva,
+            threads::thread_priority priority)
         {
-            hpx::applier::register_work_plain(Action::construct_thread_function(c, lva),
-                actions::detail::get_action_name<Action>(), lva);
+            hpx::applier::register_work_plain(
+                Action::construct_thread_function(c, lva),
+                actions::detail::get_action_name<Action>(), lva,
+                threads::pending, priority);
         }
     };
 
@@ -51,20 +58,23 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper0<Action, boost::mpl::true_>
     {
         static void 
-        call (Action* act, naming::address::address_type lva)
+        call (Action* act, naming::address::address_type lva,
+            threads::thread_priority /*priority*/)
         {
             BOOST_ASSERT(false);    // shouldn't be called at all
         }
 
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type lva)
+        call (naming::address::address_type lva, 
+            threads::thread_priority /*priority*/)
         {
             Action::execute_function(lva);
         }
 
         static typename Action::result_type 
-        call (actions::continuation_type& c, naming::address::address_type lva)
+        call (actions::continuation_type& c, naming::address::address_type lva,
+            threads::thread_priority /*priority*/)
         {
             try {
                 return c->trigger(Action::execute_function(lva));
@@ -80,28 +90,30 @@ namespace hpx { namespace applier { namespace detail
     ///////////////////////////////////////////////////////////////////////
     template <
         typename Action, typename Arg0, 
-        typename DirectExecute = typename Action::direct_execution
-    >
+        typename DirectExecute = typename Action::direct_execution>
     struct apply_helper1;
 
     template <typename Action, typename Arg0>
     struct apply_helper1<Action, Arg0, boost::mpl::false_>
     {
         static void 
-        call (naming::address::address_type lva, Arg0 const& arg0)
+        call (naming::address::address_type lva,
+            threads::thread_priority priority, Arg0 const& arg0)
         {
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(lva, arg0),
-                actions::detail::get_action_name<Action>(), lva);
+                actions::detail::get_action_name<Action>(), lva,
+                threads::pending, priority);
         }
 
         static void 
-        call (actions::continuation_type& c, naming::address::address_type lva, 
-            Arg0 const& arg0)
+        call (actions::continuation_type& c, naming::address::address_type lva,
+            threads::thread_priority priority, Arg0 const& arg0)
         {
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(c, lva, arg0),
-                actions::detail::get_action_name<Action>(), lva);
+                actions::detail::get_action_name<Action>(), lva,
+                threads::pending, priority);
         }
     };
 
@@ -110,14 +122,15 @@ namespace hpx { namespace applier { namespace detail
     {
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type lva, Arg0 const& arg0)
+        call (naming::address::address_type lva,
+            threads::thread_priority priority, Arg0 const& arg0)
         {
             Action::execute_function(lva, arg0);
         }
 
         static typename Action::result_type  
-        call (actions::continuation_type& c, naming::address::address_type lva, 
-            Arg0 const& arg0)
+        call (actions::continuation_type& c, naming::address::address_type lva,
+            threads::thread_priority priority, Arg0 const& arg0)
         {
             try {
                 return c->trigger(Action::execute_function(lva, arg0));

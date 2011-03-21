@@ -77,6 +77,8 @@ namespace hpx { namespace threads
         ///                 referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                 thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns        This function returns the previous state of the 
         ///                 thread referenced by the \a id parameter. It will 
@@ -92,7 +94,8 @@ namespace hpx { namespace threads
         ///                 function returns \a thread_state#active in this case. 
         virtual thread_state set_state(thread_id_type id, 
             thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex = wait_signaled) = 0;
+            thread_state_ex_enum newstate_ex = wait_signaled,
+            thread_priority priority = thread_priority_normal) = 0;
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
@@ -109,11 +112,14 @@ namespace hpx { namespace threads
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                   thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns
         virtual thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout) = 0;
+            thread_state_ex_enum newstate_ex = wait_timeout,
+            thread_priority priority = thread_priority_normal) = 0;
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -128,11 +134,14 @@ namespace hpx { namespace threads
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                   thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns
         virtual thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout) = 0;
+            thread_state_ex_enum newstate_ex = wait_timeout,
+            thread_priority priority = thread_priority_normal) = 0;
 
         /// The function get_thread_gid is part of the thread related API 
         /// allows to query the GID of one of the threads known to the 
@@ -368,6 +377,8 @@ namespace hpx { namespace threads
         ///                 referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                 thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a newstate is pending.
         ///
         /// \returns        This function returns the previous state of the 
         ///                 thread referenced by the \a id parameter. It will 
@@ -382,7 +393,8 @@ namespace hpx { namespace threads
         ///                 the thread as soon as its not active anymore. The
         ///                 function returns \a thread_state#active in this case. 
         thread_state set_state(thread_id_type id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex = wait_signaled);
+            thread_state_ex_enum newstate_ex = wait_signaled,
+            thread_priority priority = thread_priority_normal);
 
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -426,11 +438,14 @@ namespace hpx { namespace threads
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                   thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
         thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout);
+            thread_state_ex_enum newstate_ex = wait_timeout,
+            thread_priority priority = thread_priority_normal);
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -445,11 +460,14 @@ namespace hpx { namespace threads
         ///                   referenced by the \a id parameter.
         /// \param newstate_ex [in] The new extended state to be set for the 
         ///                   thread referenced by the \a id parameter.
+        /// \param priority   [in] The priority with which the thread will be
+        ///                   executed if the parameter \a new_state is pending.
         ///
         /// \returns
         thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout);
+            thread_state_ex_enum newstate_ex = wait_timeout,
+            thread_priority priority = thread_priority_normal);
 
         /// The get_description function is part of the thread related API and 
         /// allows to query the description of one of the threads known to the 
@@ -476,7 +494,8 @@ namespace hpx { namespace threads
         // thread function registered for set_state if thread is currently 
         // active
         thread_state set_active_state(thread_id_type id, 
-                thread_state_enum newstate, thread_state_ex_enum newstate_ex);
+                thread_state_enum newstate, thread_state_ex_enum newstate_ex,
+                thread_priority priority);
 
     public:
         /// this notifies the thread manager that there is some more work 
@@ -500,14 +519,15 @@ namespace hpx { namespace threads
         /// the required action.
         thread_state_enum wake_timer_thread (thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
-            thread_id_type timer_id, 
+            thread_priority priority, thread_id_type timer_id, 
             boost::shared_ptr<boost::atomic<bool> > triggered);
 
         /// This thread function initiates the required set_state action (on 
         /// behalf of one of the threadmanager#set_state functions).
         template <typename TimeType>
         thread_state_enum at_timer (TimeType const& expire, thread_id_type id, 
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex);
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
+            thread_priority priority);
 
     private:
         /// this thread manager has exactly as much threads as requested

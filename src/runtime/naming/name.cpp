@@ -60,7 +60,8 @@ namespace hpx { namespace naming
                 error_code ec;
                 applier::register_work(boost::bind(decrement_refcnt, p), 
                     "decrement global gid reference count", 
-                    threads::thread_state(threads::pending), ec);
+                    threads::thread_state(threads::pending), 
+                    threads::thread_priority_normal, ec);
                 if (ec) 
                 {
                     // if we are not able to spawn a new thread, we need to execute 

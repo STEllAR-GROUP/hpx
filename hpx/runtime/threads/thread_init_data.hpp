@@ -20,7 +20,8 @@ namespace hpx { namespace threads
 
         template <typename F>
         thread_init_data(F f, char const* desc = 0, 
-                naming::address::address_type lva = 0) 
+                naming::address::address_type lva = 0,
+                thread_priority priority = thread_priority_normal) 
           : func(f), description(desc), 
             lva(lva), parent_prefix(0), parent_id(0), parent_phase(0)
         {}
@@ -31,6 +32,7 @@ namespace hpx { namespace threads
         boost::uint32_t parent_prefix;
         threads::thread_id_type parent_id;
         std::size_t parent_phase;
+        thread_priority priority;
     };
 }}
 

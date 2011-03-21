@@ -47,7 +47,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mutex_tests", "mutex_tests\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HAD_AMR_3D", "HAD_AMR_3D", "{D8ED4ED0-AF99-4227-BF45-8F8515F1FFB0}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\examples\had_amr\had_config.hpp = ..\..\examples\had_amr\had_config.hpp
+		..\..\examples\had_amr3d\had_config.hpp = ..\..\examples\had_amr3d\had_config.hpp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "had_amr_3d", "components\had_amr_3d\had_amr_3d.vcxproj", "{D83D9D6B-617B-4713-87CA-CE8E15D0D2BB}"
@@ -65,6 +65,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "queue_of_ints", "components\queue_of_ints\queue_of_ints.vcxproj", "{89ECC3A5-5C4C-4CF7-A0CF-8AF891BE42B2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "queue_of_ints_client", "deque_test\queue_of_ints\queue_of_ints.vcxproj", "{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "barrier_tests", "barrier_tests\barrier_tests.vcxproj", "{CBE66815-854E-475C-9DA8-8C2DF39215A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -316,6 +318,20 @@ Global
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|Win32.ActiveCfg = Release|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|x64.ActiveCfg = Release|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|x64.Build.0 = Release|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|Win32.Build.0 = Debug|Win32
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|x64.ActiveCfg = Debug|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Debug|x64.Build.0 = Debug|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|Any CPU.ActiveCfg = Release|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|Mixed Platforms.Build.0 = Release|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|Win32.ActiveCfg = Release|Win32
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|Win32.Build.0 = Release|Win32
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|x64.ActiveCfg = Release|x64
+		{CBE66815-854E-475C-9DA8-8C2DF39215A2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

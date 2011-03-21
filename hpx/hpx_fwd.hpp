@@ -148,6 +148,14 @@ namespace hpx
                                      garbage collected */
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        enum thread_priority
+        {
+            thread_priority_default = 0,      ///< use default priority
+            thread_priority_normal = 1,       ///< normal thread priority (default)
+            thread_priority_critical = 2      ///< high thread priority
+        };
+
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
 
         HPX_API_EXPORT char const* const get_thread_state_name(thread_state_enum state);
