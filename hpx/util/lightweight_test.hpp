@@ -12,62 +12,122 @@
 
 #include <iostream>
 
+#include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-namespace hpx { namespace util { namespace detail
+#include <hpx/util/spinlock_pool.hpp>
+
+namespace hpx { namespace util
+{ 
+
+enum counter_type
+{
+    counter_sanity,
+    counter_test
+};
+
+namespace detail
 {
 
-std::size_t sanity_failures = 0;
-std::size_t test_failures = 0;
-
-template <typename T>
-inline bool check(char const* file, int line, char const* function,
-                  std::size_t& counter, T const& t, char const* msg)
+struct fixture
 {
-    if (!t)
+  public:
+    typedef boost::detail::spinlock mutex_type;
+
+  private:
+    std::ostream& stream_;
+    std::size_t sanity_failures_;
+    std::size_t test_failures_;
+    mutex_type mutex_;
+
+  public:
+    fixture(std::ostream& stream):
+      stream_(stream), sanity_failures_(0), test_failures_(0)
     { 
-        std::cerr 
-            << file << "(" << line << "): "
-            << msg << " failed in function '"
-            << function << "'" << std::endl;
-        ++counter;
-        return false;
+        mutex_type l = BOOST_DETAIL_SPINLOCK_INIT;
+        mutex_ = l;
     }
-    return true;
-}
 
-template <typename T, typename U>
-inline bool check_eq(char const* file, int line, char const* function,
-                     std::size_t& counter, T const& t, U const& u,
-                     char const* msg)
-{
-    if (!(t == u))
+    void increment(counter_type c)
     {
-        std::cerr 
-            << file << "(" << line << "): " << msg  
-            << " failed in function '" << function << "': "
-            << "'" << t << "' != '" << u << "'" << std::endl;
-        ++counter;
-        return false;
+        switch (c)
+        {
+            case counter_sanity:
+                ++sanity_failures_; return;
+            case counter_test:
+                ++test_failures_; return;
+            default:
+                { BOOST_ASSERT(false); return; }
+        }
     }
-    return true;
-}
+
+    std::size_t get(counter_type c) const
+    {
+        switch (c)
+        {
+            case counter_sanity:
+                return sanity_failures_;
+            case counter_test:
+                return test_failures_;
+            default:
+                { BOOST_ASSERT(false); return 0; }
+        }
+    }
+
+    template <typename T>
+    bool check(char const* file, int line, char const* function,
+               counter_type c, T const& t, char const* msg)
+    {
+        if (!t)
+        { 
+            mutex_type::scoped_lock l(mutex_);
+            stream_ 
+                << file << "(" << line << "): "
+                << msg << " failed in function '"
+                << function << "'" << std::endl;
+            increment(c);
+            return false;
+        }
+        return true;
+    }
+
+    template <typename T, typename U>
+    bool check_eq(char const* file, int line, char const* function,
+                  counter_type c, T const& t, U const& u, char const* msg)
+    {
+        if (!(t == u))
+        {
+            mutex_type::scoped_lock l(mutex_);
+            stream_ 
+                << file << "(" << line << "): " << msg  
+                << " failed in function '" << function << "': "
+                << "'" << t << "' != '" << u << "'" << std::endl;
+            increment(c);
+            return false;
+        }
+        return true;
+    }
+};
+
+fixture global_fixture = fixture(std::cerr);
 
 } // hpx::util::detail
 
 inline int report_errors()
 {
-    if ((detail::sanity_failures == 0) && (detail::test_failures == 0))
+    std::size_t sanity = detail::global_fixture.get(counter_sanity),
+                test   = detail::global_fixture.get(counter_test); 
+    if (sanity == 0 && test == 0)
         return 0;
 
     else
     {
-        std::cerr << detail::sanity_failures << " sanity check"
-                  << ((detail::sanity_failures == 1) ? " and " : "s and ")
-                  << detail::test_failures << " test"
-                  << ((detail::test_failures == 1) ? " failed." : "s failed.")
+        std::cerr << sanity << " sanity check"
+                  << ((sanity == 1) ? " and " : "s and ")
+                  << test << " test"
+                  << ((test == 1) ? " failed." : "s failed.")
                   << std::endl;
         return 1;
     }
@@ -76,60 +136,60 @@ inline int report_errors()
 }} // hpx::util
 
 #define HPX_TEST(expr)                                                      \
-    ::hpx::util::detail::check                                              \
+    ::hpx::util::detail::global_fixture.check                               \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::test_failures,                                \
+         ::hpx::util::counter_test,                                         \
          expr, "test '" BOOST_PP_STRINGIZE(expr) "'")                       \
     /***/
 
 #define HPX_TEST_MSG(expr, msg)                                             \
-    ::hpx::util::detail::check                                              \
+    ::hpx::util::detail::global_fixture.check                               \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::test_failures,                                \
+         ::hpx::util::counter_test,                                         \
          expr, msg)                                                         \
     /***/
 
 #define HPX_TEST_EQ(expr1, expr2)                                           \
-    ::hpx::util::detail::check_eq                                           \
+    ::hpx::util::detail::global_fixture.check_eq                            \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::test_failures,                                \
+         ::hpx::util::counter_test,                                         \
          expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " == "            \
                                 BOOST_PP_STRINGIZE(expr2) "'")              \
     /***/
 
 #define HPX_TEST_EQ_MSG(expr1, expr2, msg)                                  \
-    ::hpx::util::detail::check_eq                                           \
+    ::hpx::util::detail::global_fixture.check_eq                            \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::test_failures,                                \
+         ::hpx::util::counter_test,                                         \
          expr1, expr2, msg)                                                 \
     /***/
 
 #define HPX_SANITY(expr)                                                    \
-    ::hpx::util::detail::check                                              \
+    ::hpx::util::detail::global_fixture.check                               \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::sanity_failures,                              \
+         ::hpx::util::counter_sanity,                                       \
          expr, "sanity check '" BOOST_PP_STRINGIZE(expr) "'")               \
     /***/
 
 #define HPX_SANITY_MSG(expr, msg)                                           \
-    ::hpx::util::detail::check                                              \
+    ::hpx::util::detail::global_fixture.check                               \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::sanity_failures,                              \
+         ::hpx::util::counter_sanity,                                       \
          expr, msg)                                                         \
     /***/
 
 #define HPX_SANITY_EQ(expr1, expr2)                                         \
-    ::hpx::util::detail::check_eq                                           \
+    ::hpx::util::detail::global_fixture.check_eq                            \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::sanity_failures,                              \
+         ::hpx::util::counter_sanity,                                       \
          expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " == "    \
                                         BOOST_PP_STRINGIZE(expr2) "'")      \
     /***/
 
 #define HPX_SANITY_EQ_MSG(expr1, expr2, msg)                                \
-    ::hpx::util::detail::check_eq                                           \
+    ::hpx::util::detail::global_fixture.check_eq                            \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
-         ::hpx::util::detail::sanity_failures,                              \
+         ::hpx::util::counter_sanity,                                       \
          expr1, expr2)                                                      \
     /***/
 
