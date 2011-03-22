@@ -78,7 +78,7 @@ template <typename Tag, typename Enable = void>
 struct bind_hook;
 
 template <typename Tag>
-inline typename key_type<Tag>::type
+inline typename bind_hook<Tag>::result_type
 bind(typename registry_type<Tag>::type&,
      typename key_type<Tag>::type const&,
      typename mapped_type<Tag>::type const&);
@@ -87,7 +87,7 @@ template <typename Tag, typename Enable = void>
 struct update_hook;
 
 template <typename Tag>
-inline bool 
+inline typename update_hook<Tag>::result_type
 update(typename registry_type<Tag>::type&,
        typename key_type<Tag>::type const&,
        typename mapped_type<Tag>::type const&);
@@ -96,7 +96,7 @@ template <typename Tag, typename Enable = void>
 struct resolve_hook;
 
 template <typename Tag>
-inline typename mapped_type<Tag>::type
+inline typename resolve_hook<Tag>::result_type
 resolve(typename registry_type<Tag>::type&,
         typename key_type<Tag>::type const&);
 
@@ -104,7 +104,7 @@ template <typename Tag, typename Enable = void>
 struct unbind_hook;
 
 template <typename Tag>
-inline bool 
+inline typename unbind_hook<Tag>::result_type
 unbind(typename registry_type<Tag>::type&,
        typename key_type<Tag>::type const&);
 

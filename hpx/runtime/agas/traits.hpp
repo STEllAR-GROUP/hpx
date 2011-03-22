@@ -114,7 +114,7 @@ struct bind_hook
 };
 
 template <typename Tag>
-inline typename key_type<Tag>::type
+inline typename bind_hook<Tag>::result_type
 bind(typename registry_type<Tag>::type& reg,
      typename key_type<Tag>::type const& key,
      typename mapped_type<Tag>::type const& value)
@@ -143,7 +143,7 @@ struct update_hook
 };
 
 template <typename Tag>
-inline bool 
+inline typename update_hook<Tag>::result_type
 update(typename registry_type<Tag>::type& reg,
        typename key_type<Tag>::type const& key,
        typename mapped_type<Tag>::type const& value)
@@ -170,7 +170,7 @@ struct resolve_hook
 };
 
 template <typename Tag>
-inline typename mapped_type<Tag>::type
+inline typename resolve_hook<Tag>::result_type
 resolve(typename registry_type<Tag>::type& reg,
         typename key_type<Tag>::type const& key)
 { return resolve_hook<Tag>::call(reg, key); }
@@ -197,7 +197,7 @@ struct unbind_hook
 };
 
 template <typename Tag>
-inline bool 
+inline typename unbind_hook<Tag>::result_type
 unbind(typename registry_type<Tag>::type& reg,
        typename key_type<Tag>::type const& key)
 { return unbind_hook<Tag>::call(reg, key); }
