@@ -27,10 +27,10 @@ namespace traits // hpx::agas::traits
 template <>
 struct protocal_name_hook<tag::udp_ip_protocal>
 {
-    typedef std::string result_type;
+    typedef char const* result_type;
 
     static result_type call()
-    { return "UDP/IP"; }
+    { return "udp_ip"; }
 };
 
 template <>

@@ -28,10 +28,10 @@ namespace traits // hpx::agas::traits
 template <>
 struct protocal_name_hook<tag::ib_protocal>
 {
-    typedef std::string result_type;
+    typedef char const* result_type;
 
     static result_type call()
-    { return "IB"; }
+    { return "ib"; }
 };
 
 template <>
