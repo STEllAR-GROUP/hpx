@@ -155,35 +155,38 @@ namespace hpx { namespace components { namespace amr
     void stencil::interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
                                       access_memory_block<stencil_data> &val, 
                                       nodedata &result, Parameter const& par) {
+      static const int grain = par->granularity;
 
       int ii = -1;
       int jj = -1;
       int kk = -1;
 
+      // FIXME: this might be more efficient if a separate boolean value was
+      // used to track which variables were found (a la findindex), because
+      // checking if a register is equal to zero should be faster than any
+      // other comparison on some processors (or so I hear).
+
       // set up index bounds
-      for (int i=0;i<par->granularity;++i) {
-        if ( floatcmp_ge(val->x_[i],x) ) {
+      for (int i=0;i<grain;++i) {
+        if ( ii == -1 && floatcmp_ge(val->x_[i],x) ) {
           ii = i;
-          break;
+          if ( jj != -1 && kk != -1 ) break;
         }         
-      }
-      for (int i=0;i<par->granularity;++i) {
-        if ( floatcmp_ge(val->y_[i],y) ) {
+        if ( jj == -1 && floatcmp_ge(val->y_[i],y) ) {
           jj = i;
-          break;
+          if ( ii != -1 && kk != -1 ) break;
         }         
-      }
-      for (int i=0;i<par->granularity;++i) {
-        if ( floatcmp_ge(val->z_[i],z) ) {
+        if ( kk == -1 && floatcmp_ge(val->z_[i],z) ) {
           kk = i;
-          break;
+          if ( ii != -1 && jj != -1 ) break;
         }         
       }
       BOOST_ASSERT(ii > -1 && jj > -1 && kk > -1);
 
-      int nx = par->granularity;
-      int ny = par->granularity;
-      int nz = par->granularity;
+      // Use the static const variable grain instead.
+      //int nx = par->granularity;
+      //int ny = par->granularity;
+      //int nz = par->granularity;
 
       bool no_interp_x = false;
       bool no_interp_y = false;
@@ -207,7 +210,7 @@ namespace hpx { namespace components { namespace amr
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
         for (int ll=0;ll<num_eqns;++ll) {
-          result.phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+          result.phi[0][ll] = val->value_[ii+grain*(jj+grain*kk)].phi[0][ll];
         }
         return;
       }
@@ -231,8 +234,8 @@ namespace hpx { namespace components { namespace amr
         for (int k=kk-1;k<kk+1;++k) {
           for (int j=jj-1;j<jj+1;++j) {
             for (int ll=0;ll<num_eqns;++ll) {
-              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*k)].phi[0][ll],
-                                                   val->value_[ii  +nx*(j+ny*k)].phi[0][ll],
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+grain*(j+grain*k)].phi[0][ll],
+                                                   val->value_[ii  +grain*(j+grain*k)].phi[0][ll],
                                                    x,
                                                    val->x_[ii-1],val->x_[ii]);
             }
@@ -242,15 +245,15 @@ namespace hpx { namespace components { namespace amr
         for (int k=kk-1;k<kk+1;++k) {
           for (int j=jj-1;j<jj+1;++j) {
             for (int ll=0;ll<num_eqns;++ll) {
-              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+grain*(j+grain*k)].phi[0][ll];
             }
           }
         }
       } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
         for (int k=kk-1;k<kk+1;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*k)].phi[0][ll],
-                                              val->value_[ii  +nx*(jj+ny*k)].phi[0][ll],
+            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+grain*(jj+grain*k)].phi[0][ll],
+                                              val->value_[ii  +grain*(jj+grain*k)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
@@ -258,8 +261,8 @@ namespace hpx { namespace components { namespace amr
       } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj-1;j<jj+1;++j) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*kk)].phi[0][ll],
-                                              val->value_[ii  +nx*(j+ny*kk)].phi[0][ll],
+            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+grain*(j+grain*kk)].phi[0][ll],
+                                              val->value_[ii  +grain*(j+grain*kk)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
@@ -267,19 +270,19 @@ namespace hpx { namespace components { namespace amr
       } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
         for (int k=kk-1;k<kk+1;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[0][k-(kk-1)][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
+            tmp2[0][k-(kk-1)][ll] = val->value_[ii+grain*(jj+grain*k)].phi[0][ll];
           }
         }
       } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj-1;j<jj+1;++j) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[j-(jj-1)][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
+            tmp2[j-(jj-1)][0][ll] = val->value_[ii+grain*(j+grain*kk)].phi[0][ll];
           }
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;++ll) {
-          result.phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
-                                            val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
+          result.phi[0][ll] = interp_linear(val->value_[ii-1+grain*(jj+grain*kk)].phi[0][ll],
+                                            val->value_[ii  +grain*(jj+grain*kk)].phi[0][ll],
                                             x,
                                             val->x_[ii-1],val->x_[ii]);
         }
