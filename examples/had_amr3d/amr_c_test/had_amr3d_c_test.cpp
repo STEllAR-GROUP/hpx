@@ -48,7 +48,7 @@ calcrhs(struct nodedata * rhs, Array const& vecval,
     had_double_type const& dx, bool boundary, 
     int const i, int const j, int const k, Par const& par)
 {
-  int const n = 3*par.granularity;
+  static int const n = 3*par.granularity;
 
   if ( !boundary ) {
     rhs->phi[0][0] = phi<flag, 4>(vecval[i+n*(j+n*k)]); 
@@ -241,14 +241,14 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
   boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
   boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
 
-  hpx::memory::default_vector<nodedata* >::type pwork, pwork2;
+  //hpx::memory::default_vector<nodedata* >::type pwork, pwork2;
   static had_double_type const c_0_75 = 0.75;
   static had_double_type const c_0_25 = 0.25;
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
-  int n = 3*par.granularity;
-  int n2 = par.granularity;
+  static int const n = 3*par.granularity;
+  static int const n2 = par.granularity;
 
   // -------------------------------------------------------------------------
   // iter 0
