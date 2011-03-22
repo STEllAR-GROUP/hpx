@@ -350,7 +350,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 28;
+        std::size_t memsize = 100;
         Array3D dst_port(num_rows,numvalues,memsize);
         Array3D dst_src(num_rows,numvalues,memsize);
         Array3D dst_step(num_rows,numvalues,memsize);
@@ -446,7 +446,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 28;
+        std::size_t memsize = 100;
         Array3D dst_port(num_rows,numvalues,memsize);
         Array3D dst_src(num_rows,numvalues,memsize);
         Array3D dst_step(num_rows,numvalues,memsize);
@@ -611,6 +611,8 @@ namespace hpx { namespace components { namespace nbody { namespace server
         src_column = vsrc_column[j]; src_step = vsrc_step[j];
         column = vcolumn[j]; step = vstep[j];
         port = vport[j];
+        
+        std::cout<< "ERROR CHECK: "<<dst_size(step,column,0) <<std::endl;
         dst_port( step,column,dst_size(step,column,0) ) = port;
         dst_src(  step,column,dst_size(step,column,0) ) = src_column;
         dst_step( step,column,dst_size(step,column,0) ) = src_step;
