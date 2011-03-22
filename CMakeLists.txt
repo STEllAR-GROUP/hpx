@@ -53,13 +53,6 @@ else()
   hpx_warn("environment" "Couldn't determine build environment (install python).") 
 endif()
 
-# TODO: auto-detect this with NT2 stuff
-option(HPX_USE_SSE2 "Use SSE2 hardware support (Default: OFF)" OFF)
-
-if(HPX_USE_SSE2)
-  add_definitions(-DHPX_USE_SSE2)
-endif()
-
 ################################################################################
 # Boost configuration
 ################################################################################
@@ -157,14 +150,6 @@ hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 ################################################################################
-# variant configuration
-################################################################################
-if(   "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
-   OR "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-  add_definitions(-DDEBUG)
-endif()
-
-################################################################################
 # rpath configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
@@ -192,6 +177,10 @@ endif()
 # Windows specific configuration 
 ################################################################################
 if(MSVC)
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+  endif()
+
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-D_WIN32_WINNT=0x0501)
@@ -212,6 +201,23 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
+  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG"
+    CACHE STRING "Debug flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
+    CACHE STRING "MinSizeRel flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
+    CACHE STRING "Release flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+    CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+  set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DDEBUG"
+    CACHE STRING "Debug flags (C)" FORCE)
+  set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG"
+    CACHE STRING "MinSizeRel flags (C)" FORCE)
+  set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG"
+    CACHE STRING "Release flags (C)" FORCE)
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+    CACHE STRING "RelWithDebInfo flags (C)" FORCE)
+
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
