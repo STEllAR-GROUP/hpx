@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace amr
       register bool foundx = false;
       register bool foundy = false;
       register bool foundz = false;
-      for (int i=0;i<n;i++) {
+      for (int i=0;i<n;++i) {
         if ( !foundx && floatcmp(y,val->y_[i]) == 1 ) {
           yindex = i;
           if ( foundy && foundz ) break;
@@ -161,19 +161,19 @@ namespace hpx { namespace components { namespace amr
       int kk = -1;
 
       // set up index bounds
-      for (int i=0;i<par->granularity;i++) {
+      for (int i=0;i<par->granularity;++i) {
         if ( floatcmp_ge(val->x_[i],x) ) {
           ii = i;
           break;
         }         
       }
-      for (int i=0;i<par->granularity;i++) {
+      for (int i=0;i<par->granularity;++i) {
         if ( floatcmp_ge(val->y_[i],y) ) {
           jj = i;
           break;
         }         
       }
-      for (int i=0;i<par->granularity;i++) {
+      for (int i=0;i<par->granularity;++i) {
         if ( floatcmp_ge(val->z_[i],z) ) {
           kk = i;
           break;
@@ -206,7 +206,7 @@ namespace hpx { namespace components { namespace amr
 
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
         }
         return;
@@ -228,9 +228,9 @@ namespace hpx { namespace components { namespace amr
 
       // interpolate in x {{{
       if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;k++) {
-          for (int j=jj-1;j<jj+1;j++) {
-            for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int j=jj-1;j<jj+1;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
               tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*k)].phi[0][ll],
                                                    val->value_[ii  +nx*(j+ny*k)].phi[0][ll],
                                                    x,
@@ -239,16 +239,16 @@ namespace hpx { namespace components { namespace amr
           }
         }
       } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;k++) {
-          for (int j=jj-1;j<jj+1;j++) {
-            for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int j=jj-1;j<jj+1;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
               tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
             }
           }
         }
       } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;k++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*k)].phi[0][ll],
                                               val->value_[ii  +nx*(jj+ny*k)].phi[0][ll],
                                               x,
@@ -256,8 +256,8 @@ namespace hpx { namespace components { namespace amr
           }
         }
       } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
-        for (int j=jj-1;j<jj+1;j++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int j=jj-1;j<jj+1;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+nx*(j+ny*kk)].phi[0][ll],
                                               val->value_[ii  +nx*(j+ny*kk)].phi[0][ll],
                                               x,
@@ -265,19 +265,19 @@ namespace hpx { namespace components { namespace amr
           }
         }
       } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
-        for (int k=kk-1;k<kk+1;k++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp2[0][k-(kk-1)][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
           }
         }
       } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
-        for (int j=jj-1;j<jj+1;j++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int j=jj-1;j<jj+1;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp2[j-(jj-1)][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
           }
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = interp_linear(val->value_[ii-1+nx*(jj+ny*kk)].phi[0][ll],
                                             val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
                                             x,
@@ -291,20 +291,20 @@ namespace hpx { namespace components { namespace amr
 
       // interpolate in y {{{
       if ( !no_interp_y && !no_interp_z ) {
-        for (int k=0;k<2;k++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
                                          val->y_[jj-1],val->y_[jj]);
           }
         }
       } else if ( no_interp_y && !no_interp_z ) {
-        for (int k=0;k<2;k++) {
-          for (int ll=0;ll<num_eqns;ll++) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
             tmp3[k][ll] = tmp2[0][k][ll];
           }
         }
       } else if ( !no_interp_y && no_interp_z ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
                                                               val->y_[jj-1],val->y_[jj]);
         }
@@ -316,7 +316,7 @@ namespace hpx { namespace components { namespace amr
 
       // interpolate in z {{{
       if ( !no_interp_z ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                                               z,
                                                               val->z_[kk-1],val->z_[kk]);
@@ -361,7 +361,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -372,7 +372,7 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
@@ -383,7 +383,7 @@ namespace hpx { namespace components { namespace amr
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
       rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
         }
       } else {
@@ -394,7 +394,7 @@ namespace hpx { namespace components { namespace amr
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
       rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
         }
       } else {
@@ -405,7 +405,7 @@ namespace hpx { namespace components { namespace amr
       z[4] = zt + lk*dx; y[4] = yt + lj*dx; x[4] = xt + li*dx;
       rc = findindex(x[4],y[4],z[4],val4,xindex[4],yindex[4],zindex[4],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[4].phi[0][ll] = val4->value_[xindex[4]+n*(yindex[4]+n*zindex[4])].phi[0][ll];
         }
       } else {
@@ -416,7 +416,7 @@ namespace hpx { namespace components { namespace amr
       z[5] = zt + lk*dx; y[5] = yt + lj*dx; x[5] = xt + li*dx;
       rc = findindex(x[5],y[5],z[5],val5,xindex[5],yindex[5],zindex[5],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[5].phi[0][ll] = val5->value_[xindex[5]+n*(yindex[5]+n*zindex[5])].phi[0][ll];
         }
       } else {
@@ -427,7 +427,7 @@ namespace hpx { namespace components { namespace amr
       z[6] = zt + lk*dx; y[6] = yt + lj*dx; x[6] = xt + li*dx;
       rc = findindex(x[6],y[6],z[6],val6,xindex[6],yindex[6],zindex[6],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[6].phi[0][ll] = val6->value_[xindex[6]+n*(yindex[6]+n*zindex[6])].phi[0][ll];
         }
       } else {
@@ -438,7 +438,7 @@ namespace hpx { namespace components { namespace amr
       z[7] = zt + lk*dx; y[7] = yt + lj*dx; x[7] = xt + li*dx;
       rc = findindex(x[7],y[7],z[7],val7,xindex[7],yindex[7],zindex[7],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[7].phi[0][ll] = val7->value_[xindex[7]+n*(yindex[7]+n*zindex[7])].phi[0][ll];
         }
       } else {
@@ -450,7 +450,7 @@ namespace hpx { namespace components { namespace amr
       had_double_type tmp3[2][num_eqns];
 
       // interp x
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         tmp2[0][0][ll] = interp_linear(work[0].phi[0][ll],
                                        work[1].phi[0][ll],
                                              xt,
@@ -474,7 +474,7 @@ namespace hpx { namespace components { namespace amr
       }
    
       // interp y
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         tmp3[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],yt,
                                      y[0],y[2]);
 
@@ -483,7 +483,7 @@ namespace hpx { namespace components { namespace amr
       }
 
       // interp z
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
                                           zt,
                                           z[0],z[4]);
@@ -519,7 +519,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -530,7 +530,7 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
@@ -541,7 +541,7 @@ namespace hpx { namespace components { namespace amr
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
       rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
         }
       } else {
@@ -552,7 +552,7 @@ namespace hpx { namespace components { namespace amr
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
       rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
         }
       } else {
@@ -564,7 +564,7 @@ namespace hpx { namespace components { namespace amr
       // TEST
       //std::cout << " TEST BEFORE " << result.phi[0][3]  << std::endl;
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate x
         tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
                                     work[1].phi[0][ll], 
@@ -614,7 +614,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -625,7 +625,7 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
@@ -636,7 +636,7 @@ namespace hpx { namespace components { namespace amr
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
       rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
         }
       } else {
@@ -647,7 +647,7 @@ namespace hpx { namespace components { namespace amr
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
       rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
         }
       } else {
@@ -656,7 +656,7 @@ namespace hpx { namespace components { namespace amr
 
       had_double_type tmp3[2][num_eqns];
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate x
         tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
                                     work[1].phi[0][ll], 
@@ -703,7 +703,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -714,7 +714,7 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
@@ -725,7 +725,7 @@ namespace hpx { namespace components { namespace amr
       z[2] = zt + lk*dx; y[2] = yt + lj*dx; x[2] = xt + li*dx;
       rc = findindex(x[2],y[2],z[2],val2,xindex[2],yindex[2],zindex[2],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[2].phi[0][ll] = val2->value_[xindex[2]+n*(yindex[2]+n*zindex[2])].phi[0][ll];
         }
       } else {
@@ -736,7 +736,7 @@ namespace hpx { namespace components { namespace amr
       z[3] = zt + lk*dx; y[3] = yt + lj*dx; x[3] = xt + li*dx;
       rc = findindex(x[3],y[3],z[3],val3,xindex[3],yindex[3],zindex[3],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[3].phi[0][ll] = val3->value_[xindex[3]+n*(yindex[3]+n*zindex[3])].phi[0][ll];
         }
       } else {
@@ -745,7 +745,7 @@ namespace hpx { namespace components { namespace amr
 
       had_double_type tmp3[2][num_eqns];
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate y
         tmp3[0][ll] = interp_linear(work[0].phi[0][ll],
                                     work[1].phi[0][ll], 
@@ -790,7 +790,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -801,14 +801,14 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
         interp3d(x[1],y[1],z[1],val1,work[1],par);
       }
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate x
         result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
                                           xt,
@@ -842,7 +842,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -853,14 +853,14 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
         interp3d(x[1],y[1],z[1],val1,work[1],par);
       }
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate y
         result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
                                           yt,
@@ -894,7 +894,7 @@ namespace hpx { namespace components { namespace amr
       z[0] = zt + lk*dx; y[0] = yt + lj*dx; x[0] = xt + li*dx;
       rc = findindex(x[0],y[0],z[0],val0,xindex[0],yindex[0],zindex[0],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[0].phi[0][ll] = val0->value_[xindex[0]+n*(yindex[0]+n*zindex[0])].phi[0][ll];
         }
       } else {
@@ -905,14 +905,14 @@ namespace hpx { namespace components { namespace amr
       z[1] = zt + lk*dx; y[1] = yt + lj*dx; x[1] = xt + li*dx;
       rc = findindex(x[1],y[1],z[1],val1,xindex[1],yindex[1],zindex[1],n);
       if ( rc == 0 ) {
-        for (int ll=0;ll<num_eqns;ll++) {
+        for (int ll=0;ll<num_eqns;++ll) {
           work[1].phi[0][ll] = val1->value_[xindex[1]+n*(yindex[1]+n*zindex[1])].phi[0][ll];
         }
       } else {
         interp3d(x[1],y[1],z[1],val1,work[1],par);
       }
 
-      for (int ll=0;ll<num_eqns;ll++) {
+      for (int ll=0;ll<num_eqns;++ll) {
         // interpolate z
         result.phi[0][ll] = interp_linear(work[0].phi[0][ll],work[1].phi[0][ll],
                                           zt,
@@ -981,7 +981,8 @@ namespace hpx { namespace components { namespace amr
             had_double_type y = par->min[level] + b*dx*par->granularity;
             had_double_type z = par->min[level] + c*dx*par->granularity;
             compute_index = -1;
-            for (int i=0;i<val.size();i++) {
+            for (int i=0;i<val.size();++i) {
+              // LIFT MATH HERE
               if ( floatcmp(x,val[i]->x_[0]) == 1 && 
                    floatcmp(y,val[i]->y_[0]) == 1 && 
                    floatcmp(z,val[i]->z_[0]) == 1 &&
@@ -1010,7 +1011,7 @@ namespace hpx { namespace components { namespace amr
             // We may be dealing with either restriction or prolongation (both are performed at the same time)
             bool restriction = false;
             bool prolongation = false;
-            for (int i=0;i<val.size();i++) {
+            for (int i=0;i<val.size();++i) {
               if ( resultval->level_ < val[i]->level_ ) restriction = true;
               if ( resultval->level_ > val[i]->level_ ) prolongation = true;
               if ( restriction && prolongation ) break;
@@ -1027,11 +1028,11 @@ namespace hpx { namespace components { namespace amr
               had_double_type zmin = val[compute_index]->z_[0];
               had_double_type zmax = val[compute_index]->z_[n-1];
 
-              for (int k=0;k<n;k++) {
+              for (int k=0;k<n;++k) {
                 had_double_type zt = resultval->z_[k];
-              for (int j=0;j<n;j++) {
+              for (int j=0;j<n;++j) {
                 had_double_type yt = resultval->y_[j];
-              for (int i=0;i<n;i++) {
+              for (int i=0;i<n;++i) {
                 had_double_type xt = resultval->x_[i];
 
                 // check if this is a prolongation point
@@ -1044,7 +1045,7 @@ namespace hpx { namespace components { namespace amr
                    ) {
                   // this is a prolongation point -- overwrite the value with an interpolated value from the coarse mesh
                   bool found = false;
-                  for (int ii=0;ii<val.size();ii++) {
+                  for (int ii=0;ii<val.size();++ii) {
                     if ( ii != compute_index ) {
                       if ( floatcmp_ge(xt,val[ii]->x_[0])  && floatcmp_le(xt,val[ii]->x_[n-1]) &&
                            floatcmp_ge(yt,val[ii]->y_[0])  && floatcmp_le(yt,val[ii]->y_[n-1]) &&
@@ -1061,14 +1062,14 @@ namespace hpx { namespace components { namespace amr
                   int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
                   if ( !found ) {
                     // find the interpolating the anchors needed  
-                    for (int lk=-1;lk<2;lk++) {
+                    for (int lk=-1;lk<2;++lk) {
                       had_double_type zn = zt + lk*dx;
-                    for (int lj=-1;lj<2;lj++) {
+                    for (int lj=-1;lj<2;++lj) {
                       had_double_type yn = yt + lj*dx;
-                    for (int li=-1;li<2;li++) {
+                    for (int li=-1;li<2;++li) {
                       had_double_type xn = xt + li*dx;
                       
-                      for (int ii=0;ii<val.size();ii++) {
+                      for (int ii=0;ii<val.size();++ii) {
                         if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[n-1]) &&
                              floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[n-1]) &&
                              floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[n-1]) &&
@@ -1251,14 +1252,14 @@ namespace hpx { namespace components { namespace amr
                   if ( !found ) {
                     std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " BBOX : " <<  par->min[level] << " " << par->min[level]+2*par->gw*dx << " " <<  par->max[level] << " " << par->max[level]-2*par->gw*dx << std::endl;
                     std::cout << " Available data: " << std::endl;
-                     for (int ii=0;ii<val.size();ii++) {
+                     for (int ii=0;ii<val.size();++ii) {
                        if ( ii != compute_index ) {
                          std::cout << val[ii]->x_[0] << " " << val[ii]->x_[n-1] << std::endl;
                          std::cout << val[ii]->y_[0] << " " << val[ii]->y_[n-1] << std::endl;
                          std::cout << val[ii]->z_[0] << " " << val[ii]->z_[n-1] << std::endl;
                        }
                      }      
-                     for (int ii=0;ii<27;ii++) {
+                     for (int ii=0;ii<27;++ii) {
                        std::cout << " Has corner : " << ii << " " << has_corner[ii] << std::endl;
                      }      
                             
@@ -1278,11 +1279,11 @@ namespace hpx { namespace components { namespace amr
               int last_time = -1;
               bool found = false;
               had_double_type xx,yy,zz;
-              for (int k=0;k<n;k++) {
+              for (int k=0;k<n;++k) {
                 zz = z + k*dx;
-              for (int j=0;j<n;j++) {
+              for (int j=0;j<n;++j) {
                 yy = y + j*dx;
-              for (int i=0;i<n;i++) {
+              for (int i=0;i<n;++i) {
                 xx = x + i*dx;
 
                 // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
@@ -1310,7 +1311,7 @@ namespace hpx { namespace components { namespace amr
                   }
 
                   if ( !found ) {
-                    for (int ii=0;ii<val.size();ii++) {
+                    for (int ii=0;ii<val.size();++ii) {
                       if ( ii != compute_index ) {
                         // check the bounding box of the finer mesh
                         had_double_type xmin = val[ii]->x_[0];                      
@@ -1333,7 +1334,7 @@ namespace hpx { namespace components { namespace amr
 
                   if ( !found ) {
                     std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
-                    for (int ii=0;ii<val.size();ii++) {
+                    for (int ii=0;ii<val.size();++ii) {
                       std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
                       std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
                       std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
@@ -1347,7 +1348,7 @@ namespace hpx { namespace components { namespace amr
                   int aa = -1;
                   int bb = -1;
                   int cc = -1;
-                  for (int ii=0;ii<par->granularity;ii++) {
+                  for (int ii=0;ii<par->granularity;++ii) {
                     if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
                     if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
                     if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
@@ -1357,7 +1358,7 @@ namespace hpx { namespace components { namespace amr
                   BOOST_ASSERT(bb != -1); 
                   BOOST_ASSERT(cc != -1); 
                   
-                  for (int ll=0;ll<num_eqns;ll++) {
+                  for (int ll=0;ll<num_eqns;++ll) {
                     resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
                   }
                 }
@@ -1382,7 +1383,7 @@ namespace hpx { namespace components { namespace amr
             had_double_type y = par->min[level] + b*dx*par->granularity;
             had_double_type z = par->min[level] + c*dx*par->granularity;
             compute_index = -1;
-            for (int i=0;i<val.size();i++) {
+            for (int i=0;i<val.size();++i) {
               if ( floatcmp(x,val[i]->x_[0]) == 1 && 
                    floatcmp(y,val[i]->y_[0]) == 1 && 
                    floatcmp(z,val[i]->z_[0]) == 1 ) {
@@ -1391,7 +1392,7 @@ namespace hpx { namespace components { namespace amr
               }
             }
             if ( compute_index == -1 ) {
-              for (int i=0;i<val.size();i++) {
+              for (int i=0;i<val.size();++i) {
                 std::cout << " DEBUG " << val[i]->x_[0] << " " << val[i]->y_[0] << " "<< val[i]->z_[0] << std::endl;
               }
               std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
@@ -1415,16 +1416,16 @@ namespace hpx { namespace components { namespace amr
             bbox[0] = 1; bbox[1] = 1; bbox[2] = 1;
             bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
           }
-          for (int i=0;i<val.size();i++) {
+          for (int i=0;i<val.size();++i) {
             int ii,jj,kk;
             if ( val.size() == 27 ) {
               kk = i/9 - 1;
               jj = count_j - 1;
               ii = count_i - 1;
-              count_i++;
+              ++count_i;
               if ( count_i%3 == 0 ) {
                 count_i = 0; 
-                count_j++;
+                ++count_j;
               }
               if ( count_j%3 == 0 ) count_j = 0;
             } else {
@@ -1477,18 +1478,20 @@ namespace hpx { namespace components { namespace amr
               }
             }
 
+            static const int grain = par->granularity;
+            static const int grainx3 = 3 * grain;
             int count = 0;
             for (niter=val[i]->value_.begin();niter!=val[i]->value_.end();++niter) {
-              int tmp_index = count/par->granularity;
-              int c = tmp_index/par->granularity;
-              int b = tmp_index%par->granularity;
-              int a = count - par->granularity*(b+c*par->granularity);
+              int tmp_index = count/grain;
+              int c = tmp_index/grain;
+              int b = tmp_index%grain;
+              int a = count - grain*(b+c*grain);
 
-              vecval[row][a+(ii+1)*par->granularity 
-                        + 3*par->granularity*( 
-                             (b+(jj+1)*par->granularity)
-                                +3*par->granularity*(c+(kk+1)*par->granularity) )] = &(*niter); 
-              count++;
+              vecval[row][a+(ii+1)*grain 
+                        + grainx3*( 
+                             (b+(jj+1)*grain)
+                                +grainx3*(c+(kk+1)*grain) )] = &(*niter); 
+              ++count;
             }
           }
 
