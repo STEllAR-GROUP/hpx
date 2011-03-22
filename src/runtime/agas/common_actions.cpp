@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <vector>
 #include <string>
 
 #include <boost/serialization/version.hpp>
@@ -17,8 +18,17 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<bool>::set_result_action,
-    set_result_action_int);
-HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco_with_value<std::string>::set_result_action,
-    set_result_action_string);
+using hpx::lcos::base_lco_with_value;
+
+HPX_REGISTER_ACTION_EX
+    (base_lco_with_value<bool>::set_result_action,
+     set_result_action_int);
+
+HPX_REGISTER_ACTION_EX
+    (base_lco_with_value<std::string>::set_result_action,
+     set_result_action_string);
+
+HPX_REGISTER_ACTION_EX
+    (base_lco_with_value<std::vector<boost::uint32_t> >::set_result_action,
+     set_result_action_prefix_vector);
 
