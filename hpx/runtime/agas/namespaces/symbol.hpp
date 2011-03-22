@@ -34,7 +34,57 @@ template <>
 struct registry_type<tag::symbol_namespace>
 { typedef std::map<std::string, naming::gid_type> type; };
 
-// TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
+template <>
+struct bind_hook<tag::symbol_namespace>
+{
+    typedef registry_type<tag::symbol_namespace>::type registry_type;
+    typedef key_type<tag::symbol_namespace>::type key_type;
+    typedef mapped_type<tag::symbol_namespace>::type mapped_type;
+
+    typedef key_type result_type;
+
+    static result_type call(registry_type& reg, key_type const& key,
+                            mapped_type const& value)
+    {
+        if (reg.count(key))
+        {
+            HPX_THROW_EXCEPTION(hpx::repeated_request,
+                make_function_name<tag::symbol_namespace>("bind"),
+                "supplied key is already bound")
+        }
+
+        // TODO: strip on the client side.
+        mapped_type id = value;
+        naming::strip_credit_from_gid(id);
+
+        return (reg.insert(registry_type::value_type(key, id)).first)->first;
+    }
+};
+
+template <>
+struct update_hook<tag::symbol_namespace>
+{
+    typedef registry_type<tag::symbol_namespace>::type registry_type;
+    typedef key_type<tag::symbol_namespace>::type key_type;
+    typedef mapped_type<tag::symbol_namespace>::type mapped_type;
+
+    typedef bool result_type;
+
+    static result_type call(registry_type& reg, key_type const& key,
+                            mapped_type const& value)
+    {
+        registry_type::iterator it = reg.find(key);
+
+        if (it == reg.end());
+            return false;
+
+        // TODO: strip on the client side.
+        it->second = value;
+        naming::strip_credit_from_gid(it->second);
+
+        return true;
+    }
+};
 
 } // hpx::agas::traits
 } // hpx::agas

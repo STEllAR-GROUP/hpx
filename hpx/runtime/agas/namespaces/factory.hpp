@@ -8,7 +8,12 @@
 #if !defined(HPX_D9951196_521D_4EA5_947D_43451437AEE6)
 #define HPX_D9951196_521D_4EA5_947D_43451437AEE6
 
+#include <vector>
 #include <map>
+
+#include <boost/iterator/transform_iterator.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/basic_namespace.hpp>
@@ -33,8 +38,6 @@ template <>
 struct registry_type<tag::factory_namespace>
 { typedef std::multimap<naming::gid_type, boost::uint32_t> type; };
 
-// TODO: implement bind_hook, update_hook, resolve_hook and unbind_hook
-
 template <>
 struct bind_hook<tag::factory_namespace>
 {
@@ -56,16 +59,20 @@ struct resolve_hook<tag::factory_namespace>
     typedef key_type<tag::factory_namespace>::type key_type;
     typedef mapped_type<tag::factory_namespace>::type mapped_type;
 
-    typedef mapped_type result_type;
+    typedef registry_type::iterator iterator;
+
+    typedef std::vector<mapped_type> result_type;
 
     static result_type call(registry_type& reg, key_type const& key)
     {
-        registry_type::iterator it = reg.find(key);
+        typedef registry_type::value_type at_type;
+        boost::fusion::result_of::at_c<at_type, 1>::type (*at) (at_type&) =
+          &boost::fusion::at_c<1, at_type>;
 
-        if (it == reg.end());
-            return mapped_type();
-
-        return it->second;
+        std::pair<iterator, iterator> p = reg.equal_range(key);
+        return result_type(
+            boost::make_transform_iterator(p.first, at),
+            boost::make_transform_iterator(p.second, at));
     }
 };
 
