@@ -54,7 +54,12 @@ Options:
 
 
 # write string to each open file descriptor in the list
-def writeres(s, fdlist): map(lambda x: x.write(s), fdlist)
+def writeres(s, fdlist):
+  for x in fdlist:
+    x.write(s)
+    x.flush()
+    if x.fileno() != 1:
+      os.fsync(x.fileno())
 
 
 # select next option set to run
