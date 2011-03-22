@@ -10,6 +10,7 @@
 
 #include <boost/mpl/integral_c.hpp>
 
+#include <hpx/exception.hpp>
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
@@ -53,6 +54,29 @@ template <typename Mutex>
 inline void initialize_mutex (Mutex& m)
 { initialize_mutex_hook<Mutex>::call(m); }
 
+template <typename Tag>
+inline char const* namespace_name()
+{ return namespace_name_hook<Tag>::call(); }
+
+template <typename Tag, typename Enable> 
+struct make_function_name_hook
+{
+    typedef char const* result_type;
+
+    template <std::size_t N>
+    static char const* call(char const(&f)[N])
+    {
+        std::string tag_name = namespace_name<Tag>();
+        tag_name += "/";
+        tag_name += f;
+        return tag_name.c_str();
+    }
+};
+
+template <typename Tag, std::size_t N>
+inline char const* make_function_name(char const(&f)[N])
+{ return make_function_name_hook<Tag>::call(f); }
+
 template <typename Tag, typename Enable> 
 struct key_type
 { typedef typename registry_type<Tag>::type::key_type type; };
@@ -60,6 +84,10 @@ struct key_type
 template <typename Tag, typename Enable> 
 struct mapped_type
 { typedef typename registry_type<Tag>::type::mapped_type type; };
+
+template <typename Protocal>
+inline char const* protocal_name()
+{ return protocal_name_hook<Protocal>::call(); }
 
 template <typename Tag, typename Enable>
 struct bind_hook
@@ -74,7 +102,11 @@ struct bind_hook
                             mapped_type const& value)
     {
         if (reg.count(key))
-            return key_type();
+        {
+            HPX_THROW_EXCEPTION(hpx::repeated_request,
+                make_function_name<Tag>("bind"),
+                "supplied key is already bound")
+        }
 
         return (reg.insert
             (typename registry_type::value_type(key, value)).first)->first;

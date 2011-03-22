@@ -31,6 +31,20 @@ inline void initialize_mutex(Mutex&);
 ///////////////////////////////////////////////////////////////////////////////
 // AGAS namespace traits. 
 
+// Spirit-style CP
+template <typename Tag, typename Enable = void> 
+struct namespace_name_hook;
+
+template <typename Tag>
+inline char const* namespace_name();
+
+// Spirit-style CP
+template <typename Tag, typename Enable = void> 
+struct make_function_name_hook;
+
+template <typename Tag, std::size_t N>
+inline char const* make_function_name(char const(&)[N]);
+
 // MPL metafunction
 template <typename Tag, typename Enable = void> 
 struct registry_type;
@@ -55,7 +69,7 @@ template <typename Protocal, typename Enable = void>
 struct protocal_name_hook;
 
 template <typename Protocal>
-inline std::string protocal_name();
+inline char const* protocal_name();
 
 ///////////////////////////////////////////////////////////////////////////////
 // basic_namespace implementation hooks (Spirit-style CPs).
