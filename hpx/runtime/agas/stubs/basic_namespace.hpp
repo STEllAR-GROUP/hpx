@@ -22,70 +22,73 @@ struct basic_namespace : components::stubs::stub_base<Tag>
 {
     typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
     typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
+    
+    typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
+        bind_result_type;
+    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
+        update_result_type;
+    typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
+        resolve_result_type;
+    typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
+        unbind_result_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<key_type>
+    static lcos::future_value<bind_result_type>
     bind_async(naming::id_type const& gid, key_type const& key,
                mapped_type const& value)
     {
         typedef typename server::basic_namespace<Tag>::bind_action
             action_type;
-        return lcos::eager_future<action_type, key_type>(gid, key, value);
+        return lcos::eager_future<action_type, bind_result_type>
+            (gid, key, value);
     }
 
-    static key_type
+    static bind_result_type
     bind(naming::id_type const& gid, key_type const& key,
          mapped_type const& value)
-    {
-        return bind_async(gid, key, value).get();
-    } 
+    { return bind_async(gid, key, value).get(); } 
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<bool>
+    static lcos::future_value<update_result_type>
     update_async(naming::id_type const& gid, key_type const& key,
-               mapped_type const& value)
+                 mapped_type const& value)
     {
         typedef typename server::basic_namespace<Tag>::update_action
             action_type;
-        return lcos::eager_future<action_type, key_type>(gid, key, value);
+        return lcos::eager_future<action_type, update_result_type>
+            (gid, key, value);
     }
 
-    static bool
+    static update_result_type
     update(naming::id_type const& gid, key_type const& key,
-         mapped_type const& value)
-    {
-        return update_async(gid, key, value).get();
-    } 
+           mapped_type const& value)
+    { return update_async(gid, key, value).get(); } 
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<mapped_type>
+    static lcos::future_value<resolve_result_type>
     resolve_async(naming::id_type const& gid, key_type const& key)
     {
         typedef typename server::basic_namespace<Tag>::resolve_action
             action_type;
-        return lcos::eager_future<action_type, mapped_type>(gid, key);
+        return lcos::eager_future<action_type, resolve_result_type>(gid, key);
     }
     
-    static mapped_type
+    static resolve_result_type
     resolve(naming::id_type const& gid, key_type const& key)
-    {
-        return resolve_async(gid, key).get();
-    } 
+    { return resolve_async(gid, key).get(); } 
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<bool>
+    static lcos::future_value<unbind_result_type>
     unbind_async(naming::id_type const& gid, key_type const& key)
     {
         typedef typename server::basic_namespace<Tag>::resolve_action
             action_type;
-        return lcos::eager_future<action_type, bool>(gid, key);
+        return lcos::eager_future<action_type, unbind_result_type>(gid, key);
     }
     
-    static bool
+    static unbind_result_type
     unbind(naming::id_type const& gid, key_type const& key)
-    {
-        return unbind_async(gid, key).get();
-    } 
+    { return unbind_async(gid, key).get(); } 
 };            
 
 }}}}

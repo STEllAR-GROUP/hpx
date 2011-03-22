@@ -24,6 +24,15 @@ struct HPX_COMPONENT_EXPORT basic_namespace
     typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
     typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
 
+    typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
+        bind_result_type;
+    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
+        update_result_type;
+    typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
+        resolve_result_type;
+    typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
+        unbind_result_type;
+
     enum actions
     {
         namespace_bind,
@@ -40,25 +49,25 @@ struct HPX_COMPONENT_EXPORT basic_namespace
     basic_namespace()
     { hpx::agas::traits::initialize_mutex(_mutex); }
 
-    key_type bind(key_type const& key, mapped_type const& value)
+    bind_result_type bind(key_type const& key, mapped_type const& value)
     {
         typename mutex_type::scoped_lock l(_mutex);
         return hpx::agas::traits::bind<Tag>(_registry, key, value);
     }
 
-    bool update(key_type const& key, mapped_type const& value)
+    update_result_type update(key_type const& key, mapped_type const& value)
     {
         typename mutex_type::scoped_lock l(_mutex);
         return hpx::agas::traits::update<Tag>(_registry, key, value);
     }
     
-    mapped_type resolve(key_type const& key)
+    resolve_result_type resolve(key_type const& key)
     {
         typename mutex_type::scoped_lock l(_mutex);
         return hpx::agas::traits::resolve<Tag>(_registry, key);
     } 
     
-    bool unbind(key_type const& key)
+    unbind_result_type unbind(key_type const& key)
     {
         typename mutex_type::scoped_lock l(_mutex);
         return hpx::agas::traits::unbind<Tag>(_registry, key);
@@ -66,33 +75,33 @@ struct HPX_COMPONENT_EXPORT basic_namespace
 
     typedef hpx::actions::result_action2<
         basic_namespace<Tag>,
-        key_type,                           // return type
-        namespace_bind,                     // action type
+        bind_result_type,                    // return type
+        namespace_bind,                      // action type
         key_type const&, mapped_type const&, // arguments 
         &basic_namespace<Tag>::bind
     > bind_action;
 
     typedef hpx::actions::result_action2<
         basic_namespace<Tag>,
-        bool,                               // return type
-        namespace_update,                   // action type
+        update_result_type,                  // return type
+        namespace_update,                    // action type
         key_type const&, mapped_type const&, // arguments 
         &basic_namespace<Tag>::update
     > update_action;
     
     typedef hpx::actions::result_action1<
         basic_namespace<Tag>,
-        mapped_type,       // return type
-        namespace_resolve, // action type
-        key_type const&,   // arguments 
+        resolve_result_type,                 // return type
+        namespace_resolve,                   // action type
+        key_type const&,                     // arguments 
         &basic_namespace<Tag>::resolve
     > resolve_action;
     
     typedef hpx::actions::result_action1<
         basic_namespace<Tag>,
-        bool,             // return type
-        namespace_unbind, // action type
-        key_type const&,  // arguments 
+        unbind_result_type,                  // return type
+        namespace_unbind,                    // action type
+        key_type const&,                     // arguments 
         &basic_namespace<Tag>::unbind
     > unbind_action;
 };

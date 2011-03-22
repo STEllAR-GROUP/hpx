@@ -25,47 +25,56 @@ struct basic_namespace
 
     typedef typename hpx::agas::traits::key_type<Tag>::type key_type;
     typedef typename hpx::agas::traits::mapped_type<Tag>::type mapped_type;
+    
+    typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
+        bind_result_type;
+    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
+        update_result_type;
+    typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
+        resolve_result_type;
+    typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
+        unbind_result_type;
 
     explicit basic_namespace(naming::id_type const& gid = naming::invalid_id)
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    // Bind value to key. Behavior is Tag specific if the key is already bound. 
-    lcos::future_value<key_type>
+    // Bind value to key. 
+    lcos::future_value<bind_result_type>
     bind_async(key_type const& key, mapped_type const& value)
     { return this->base_type::bind_async(this->gid_, key, value); }
 
-    key_type
+    bind_result_type
     bind(key_type const& key, mapped_type const& value)
     { return this->base_type::bind(this->gid_, key, value); }
     
     ///////////////////////////////////////////////////////////////////////////
-    // Update key. Behavior is Tag specific if the key is not bound. 
-    lcos::future_value<bool>
+    // Update key. 
+    lcos::future_value<update_result_type>
     update_async(key_type const& key, mapped_type const& value)
     { return this->base_type::update_async(this->gid_, key, value); }
 
-    bool
+    update_result_type
     update(key_type const& key, mapped_type const& value)
     { return this->base_type::update(this->gid_, key, value); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Resolve key to value. Returns an invalid/empty type if key is unbound.
-    lcos::future_value<mapped_type>
+    // Resolve key to value.
+    lcos::future_value<resolve_result_type>
     resolve_async(key_type const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
-    mapped_type
+    resolve_result_type
     resolve(key_type const& key)
     { return this->base_type::resolve(this->gid_, key); }
     
     ///////////////////////////////////////////////////////////////////////////
-    // Remove key. Returns false if the key wasn't bound, true otherwise. 
-    lcos::future_value<bool>
+    // Remove key. 
+    lcos::future_value<unbind_result_type>
     unbind_async(key_type const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
-    bool
+    unbind_result_type
     unbind(key_type const& key)
     { return this->base_type::resolve(this->gid_, key); }
 };            
