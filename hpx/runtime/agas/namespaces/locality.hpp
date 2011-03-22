@@ -27,6 +27,19 @@ struct locality_namespace;
 namespace traits { // hpx::agas::traits
 
 template <typename Protocal>
+struct namespace_name_hook<tag::locality_namespace<Protocal> >
+{
+    typedef char const* result_type;
+
+    static result_type call()
+    {
+        std::string tag_name = protocal_name<Protocal>();
+        tag_name += "/locality";
+        return tag_name.c_str();
+    }
+};
+
+template <typename Protocal>
 struct registry_type<tag::locality_namespace<Protocal> >
 {
     typedef std::map<typename locality_type<Protocal>::type, partition>

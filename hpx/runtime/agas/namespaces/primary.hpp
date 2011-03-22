@@ -29,6 +29,19 @@ struct primary_namespace;
 namespace traits { // hpx::agas::traits
 
 template <typename Protocal>
+struct namespace_name_hook<tag::primary_namespace<Protocal> >
+{
+    typedef char const* result_type;
+
+    static result_type call()
+    {
+        std::string tag_name = protocal_name<Protocal>();
+        tag_name += "/primary";
+        return tag_name.c_str();
+    }
+};
+
+template <typename Protocal>
 struct registry_type<tag::primary_namespace<Protocal> >
 {
     typedef std::map<naming::gid_type,

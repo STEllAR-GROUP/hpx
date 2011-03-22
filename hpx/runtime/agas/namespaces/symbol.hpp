@@ -17,13 +17,18 @@
 namespace hpx { namespace agas // hpx::agas
 {
 
-namespace tag { // hpx::agas::tag
-
-struct symbol_namespace;
-
-} // hpx::agas::tag
+namespace tag { struct symbol_namespace; } // hpx::agas::tag
 
 namespace traits { // hpx::agas::traits
+
+template <>
+struct namespace_name_hook<tag::symbol_namespace>
+{
+    typedef char const* result_type;
+
+    static result_type call()
+    { return "symbol"; }
+};
 
 template <>
 struct registry_type<tag::symbol_namespace>

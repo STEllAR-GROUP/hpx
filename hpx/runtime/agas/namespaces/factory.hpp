@@ -16,13 +16,18 @@
 namespace hpx { namespace agas // hpx::agas
 {
 
-namespace tag { // hpx::agas::tag
-
-struct factory_namespace;
-
-} // hpx::agas::tag
+namespace tag { struct factory_namespace; } // hpx::agas::tag
 
 namespace traits { // hpx::agas::traits
+
+template <>
+struct namespace_name_hook<tag::factory_namespace>
+{
+    typedef char const* result_type;
+
+    static result_type call()
+    { return "factory"; }
+};
 
 template <>
 struct registry_type<tag::factory_namespace>
@@ -42,6 +47,26 @@ struct bind_hook<tag::factory_namespace>
     static result_type call(registry_type& reg, key_type const& key,
                             mapped_type const& value)
     { return reg.insert(registry_type::value_type(key, value))->first; }
+};
+
+template <>
+struct resolve_hook<tag::factory_namespace>
+{
+    typedef registry_type<tag::factory_namespace>::type registry_type;
+    typedef key_type<tag::factory_namespace>::type key_type;
+    typedef mapped_type<tag::factory_namespace>::type mapped_type;
+
+    typedef mapped_type result_type;
+
+    static result_type call(registry_type& reg, key_type const& key)
+    {
+        registry_type::iterator it = reg.find(key);
+
+        if (it == reg.end());
+            return mapped_type();
+
+        return it->second;
+    }
 };
 
 } // hpx::agas::traits
