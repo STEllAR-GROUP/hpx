@@ -798,13 +798,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             }
             
             
-            std::vector< std::vector<int> >  bilist ;
+            //std::vector< std::vector<int> >  bilist ;
             par->num_pxpar = (max_count/par->granularity);
             par->extra_pxpar = max_count % par->granularity;
             if(par->extra_pxpar != 0)
                 par->num_pxpar += 1;
             
-            bilist.resize(par->num_pxpar);
+            par->bilist.resize(par->num_pxpar);
             
             std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
             
@@ -834,7 +834,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                            old_val = new_val;
                            rep_test[new_val] = true;
                     //       std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
-                           bilist[p].push_back(bal_conn);
+                           par->bilist[p].push_back(bal_conn);
                        }
                        
                     }
@@ -853,12 +853,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                     loopend += par->granularity;
             }
             
-            for (int p = 0; p < bilist.size(); ++p)
+            for (int p = 0; p < par->bilist.size(); ++p)
             {
                 std::cout << "B p : " << p << " list : " ;
-                for (int q = 0; q < bilist[p].size(); ++q)
+                for (int q = 0; q < par->bilist[p].size(); ++q)
                 {
-                    std::cout << " " << bilist[p][q];
+                    std::cout << " " << par->bilist[p][q];
                 }
                 std::cout << std::endl;
             }

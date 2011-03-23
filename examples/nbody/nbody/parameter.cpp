@@ -27,6 +27,7 @@ namespace hpx { namespace components { namespace nbody
         ar & rowsize;
         ar & input_file;
         ar & iList;
+        ar & bilist;
         ar & dtime;
         ar & eps;
         ar & tolerance;

@@ -73,6 +73,7 @@ struct Par {
       int rowsize;
       std::string input_file;
       std::vector <std::vector<int> > iList;
+      std::vector <std::vector<int> > bilist;
       std::vector<body> bodies; 
       double dtime;
       double eps;
