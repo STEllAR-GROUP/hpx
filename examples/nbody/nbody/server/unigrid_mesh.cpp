@@ -590,10 +590,10 @@ namespace hpx { namespace components { namespace nbody { namespace server
           {
             
 
-                for (int p=0; p < par->iList[i].size() ; ++p)
+                for (int p=0; p < par->bilist[i].size() ; ++p)
                 {
                     
-                    j = par->iList[i][p];
+                    j = par->bilist[i][p];
                //     std::cout << "i :" << i << " j: " << j <<std::endl;
                     if (i!=j)
                     {

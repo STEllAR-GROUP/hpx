@@ -766,7 +766,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //            std::cout << "body size " << par->bodies.size() << " body 7 X:" << par->bodies[6].px << std::endl;
             std::cout << "ilist.size" << par->iList.size() <<std::endl;
             
-           numvals = par->iList.size();
+          // numvals = par->iList.size();
            par->rowsize = par->iList.size();
             
             double temp_box_size = box_size;
@@ -803,7 +803,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             par->extra_pxpar = max_count % par->granularity;
             if(par->extra_pxpar != 0)
                 par->num_pxpar += 1;
-            
+            numvals = par->num_pxpar;
             par->bilist.resize(par->num_pxpar);
             
             std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;

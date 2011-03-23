@@ -68,10 +68,10 @@ struct stencil_data
 
     hpx::lcos::mutex mtx_;    // lock for this data block
 
-    int node_type;
-    had_double_type x,y,z;
-    had_double_type ax,ay,az;
-    had_double_type vx,vy,vz;
+    std::vector<int> node_type;
+    std::vector<had_double_type> x,y,z;
+    std::vector<had_double_type> ax,ay,az;
+    std::vector<had_double_type> vx,vy,vz;
     std::size_t row;
     std::size_t column;
     

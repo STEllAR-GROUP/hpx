@@ -137,23 +137,79 @@ namespace hpx { namespace components { namespace nbody
           resultval->ay = 0.0;
           resultval->az = 0.0;
           
-          for (int i=0;i<val.size();i++)
+          //handling uneven distribution
+          int end_loop;
+          if (par->extra_pxpar != 0 )
+              end_loop = val.size()-1;
+          else
+              end_loop = val.size();
+          
+          for (int i=0;i< end_loop;i++)
           {
-              
-              if ( i != compute_index ) {
-                double dx = val[compute_index]->x - val[i]->x;
-                double dy = val[compute_index]->y - val[i]->y;
-                double dz = val[compute_index]->z - val[i]->z;
-                
-                double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                resultval->ax += dx + acc_factor;
-                resultval->ay += dy + acc_factor;
-                resultval->az += dz + acc_factor;
-              }
+              for (int j=0; j < par->bilist[compute_index].size() ; ++j)
+              {
+                    int global_idx = ( compute_index * par->granularity)+j;
+                    int remote_idx = (i * par->granularity) + j;
+                    double dx, dy, dz;
+                    for (int p = 0; p < par->iList[global_idx].size; ++p)
+                        if (remote_idx == par->iList[global_idx][p])
+                        {
+                            dx = val[compute_index]->x[j] - val[i]->x[j];
+                            dy = val[compute_index]->y[j] - val[i]->y[j];
+                            dz = val[compute_index]->z[j] - val[i]->z[j];
+                        }
+                            
+                    double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                    double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+                    resultval->ax += dx + acc_factor;
+                    resultval->ay += dy + acc_factor;
+                    resultval->az += dz + acc_factor;
+               }
 //               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
           }
           
+          
+          if (par->extra_pxpar != 0 )
+          {
+                int i = val.size();
+               
+                for (int j=0; j < par->bilist[compute_index].size() ; ++j)
+                {
+                        int global_idx = ( compute_index * par->granularity)+j;
+                        int remote_idx = (i * par->granularity) + j;
+                        double dx, dy, dz;
+                        for (int p = 0; p < par->iList[global_idx].size; ++p)
+                            if (remote_idx == par->iList[global_idx][p])
+                            {
+                                dx = val[compute_index]->x[j] - val[i]->x[j];
+                                dy = val[compute_index]->y[j] - val[i]->y[j];
+                                dz = val[compute_index]->z[j] - val[i]->z[j];
+                            }
+                                
+                        double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                        double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+                        resultval->ax += dx + acc_factor;
+                        resultval->ay += dy + acc_factor;
+                        resultval->az += dz + acc_factor;
+                }
+        //               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
+             
+                
+//               for (int j=0; j < par->bilist[compute_index].size() ; ++j)
+//                     if ( i != compute_index ) {
+//                     double dx = val[compute_index]->x - val[i]->x;
+//                     double dy = val[compute_index]->y - val[i]->y;
+//                     double dz = val[compute_index]->z - val[i]->z;
+//                     
+//                     double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+//                     double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+//                     resultval->ax += dx + acc_factor;
+//                     resultval->ay += dy + acc_factor;
+//                     resultval->az += dz + acc_factor;
+//                     }
+          }
+          
+          //TODO UPDATE THIS
           double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
           double v_half_x, v_half_y, v_half_z;
           resultval->node_type = val[compute_index]->node_type;
