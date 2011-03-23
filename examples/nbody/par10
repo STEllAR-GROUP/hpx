@@ -1,0 +1,8 @@
+[nbody]
+allowedl     = 2
+linearbounds = 0
+loglevel     = 2
+output       = 5.0
+output_stdout = 1
+scheduler = 1
+input_file = 10_file

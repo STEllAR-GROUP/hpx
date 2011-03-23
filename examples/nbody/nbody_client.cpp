@@ -323,7 +323,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
                 bodies[bod_idx].vx = ((TreeLeaf *) temp_branch)->v[0];
                 bodies[bod_idx].vy = ((TreeLeaf *) temp_branch)->v[1];
                 bodies[bod_idx].vz = ((TreeLeaf *) temp_branch)->v[2];
-                std::cout << "bod_idx : " << bod_idx << "built TAG " << temp_branch->tag << "Node Type : " << temp_branch->node_type << std::endl;
+//                 std::cout << "bod_idx : " << bod_idx << "built TAG " << temp_branch->tag << "Node Type : " << temp_branch->node_type << std::endl;
                 ++bod_idx;
 
                // std::cout << "bod_idx : " << bod_idx << "built TAG " << temp_branch->tag << "Node Type : " << temp_branch->node_type << std::endl;
@@ -357,7 +357,7 @@ void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, i
         bodies[bod_idx].vx = 0.0;
         bodies[bod_idx].vy = 0.0;
         bodies[bod_idx].vz = 0.0;
-        std::cout << "bod_idx : " << bod_idx  << "built TAG " << tag << "Node Type : " << node_type << std::endl;
+//         std::cout << "bod_idx : " << bod_idx  << "built TAG " << tag << "Node Type : " << node_type << std::endl;
          
 //     if(node_type == CELL)
 //     { // Intermediate Node
@@ -407,14 +407,14 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
             if(temp_branch->node_type == 1)
             { // Intermediate Node
                 //temp_branch->tag ;
-                std::cout << "I am A PAR " << temp_branch->tag << std::endl;
+  /* */             std::cout << "I am A PAR " << temp_branch->tag << std::endl;
                ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
                // iListGen(n, box_size_2, iList, temp_branch->tag);
             }
             if(temp_branch->node_type == 0)
             { // Intermediate Node
              //   std::cout << "Tag : " << temp_branch->tag << std::endl;
-                std::cout << "I am A CELL " << temp_branch->tag << std::endl;
+//                 std::cout << "I am A CELL " << temp_branch->tag << std::endl;
                 ((IntrTreeNode *) temp_branch)->interList(n, box_size_2, iList);
             }
 
@@ -426,7 +426,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
 // //call with box_size_buf * box_size_buf * inv_tolerance_2
 void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx )
 {
-    std::cout << "idx : "  << idx << std::endl;
+ //   std::cout << "idx : "  << idx << std::endl;
     register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
     for (int i=0; i < 3; ++i)
         distance_r[i] = n->p[i] - p[i];
@@ -476,7 +476,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
         {
             if (n != this) 
             {
-                std::cout << "TAG Pushed "<< n->tag <<"idx : "  << idx << std::endl;
+//                 std::cout << "TAG Pushed "<< n->tag <<"idx : "  << idx << std::endl;
 
                 iList[idx].push_back(n->tag);
             }
@@ -485,7 +485,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
     else 
     {
         
-             std::cout << "TAG Pushed "<< n->tag  << "idx : "  << idx << std::endl;
+//              std::cout << "TAG Pushed "<< n->tag  << "idx : "  << idx << std::endl;
 
 
 //        if (n != this) 
@@ -747,7 +747,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             bht_root->calculateCM(current_index);
             int tag_id = 0;
             bht_root->tagTree(current_index, max_count, tag_id, 0);
-             std::cout << "TADA : " << max_count << std::endl;
+//              std::cout << "TADA : " << max_count << std::endl;
 
 //            bht_root->printTag(current_index);
             
@@ -797,10 +797,43 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << std::endl;
             }
             
-            std::cout << "Granularity " << par->granularity <<std::endl;
-            //std::vector< std::vector<int> >  bilist ;
             
+            std::vector< std::vector<int> >  bilist ;
+            int num_pxpar = (max_count/par->granularity) + 1 ;
+            int extra_pxpar = max_count % par->granularity;
+            bilist.resize(num_pxpar);
             
+            std::cout << "Granularity " << par->granularity  << " Num PX Par " << num_pxpar << " Extra PX Par " << extra_pxpar <<std::endl;
+            
+//             for (int p = 0; p < num_pxpar-1; ++p)
+//                 bilist[p].resize(par->granularity);
+//             bilist[num_pxpar].resize();
+            
+            for (int p = 0; p < num_pxpar; ++p)
+            {
+                bool rep_test[par->granularity];
+                for (int x = 0; x < par->iList.size();++x)
+                    rep_test[x] = false;
+                for (int q = 0; q < par->iList.size();++q)
+                {
+
+                    int old_val = 0;
+                    int new_val = 0;
+                    for (int r = 0; r < par->iList[q].size(); ++r)
+                    {
+                       int bal_conn = par->iList[q][r] / par->granularity;
+                       new_val = bal_conn;
+                       if (new_val != old_val && rep_test[new_val] != true)
+                       {
+                           old_val = new_val;
+                           rep_test[new_val] = true;
+                           std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
+                           bilist[p].push_back(bal_conn);
+                       }
+                       
+                    }
+                }
+            }
 //            } /// extra brace
             
 
@@ -815,7 +848,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
               {
                   components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
-                  std::cout << i << " VALrow : " << val->row << " VALcolumn : " <<  val->column << std::endl;
+//                   std::cout << i << " VALrow : " << val->row << " VALcolumn : " <<  val->column << std::endl;
                   val->column = i;
               }
                result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
@@ -848,24 +881,24 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
 ////////commenttest             
             std::cout << par->iter << std::endl;  
-            for (int i =0; i < par->num_bodies ; ++i)
+/*            for (int i =0; i < par->num_bodies ; ++i)
             {
                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
-            }    
-            std::cout << "Results: " << std::endl;
+            }   */ 
+//             std::cout << "Results: " << std::endl;
             par->iList.clear();
-            std::cout << "Result data size: " << result_data.size() << std::endl;
+//             std::cout << "Result data size: " << result_data.size() << std::endl;
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
  //               std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
-                std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type << std::endl;
+//                 std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type << std::endl;
                 if(val->node_type == 1){
-                    std::cout << "updating particles" << std::endl;
+//                     std::cout << "updating particles" << std::endl;
                     particles[j]->p[0] = val->x;
                     particles[j]->p[1] = val->y;
                     particles[j]->p[2] = val->z;
@@ -880,13 +913,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                
             }
             
-            for (int i =0; i < par->num_bodies ; ++i)
-            {
-                std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
-                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
-                << " : " << particles[i]->v[2] << std::endl;
-            }
+//             for (int i =0; i < par->num_bodies ; ++i)
+//             {
+//                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
+//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//                 << " : " << particles[i]->v[2] << std::endl;
+//             }
             
             //bht_root=NULL;
 
@@ -1037,7 +1070,7 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
         
-        std::size_t granularity = 3;
+        std::size_t granularity = 5;
         if (vm.count("granularity"))
             granularity = vm["granularity"].as<std::size_t>();
 
