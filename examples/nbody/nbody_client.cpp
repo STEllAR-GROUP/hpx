@@ -799,40 +799,68 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             
             std::vector< std::vector<int> >  bilist ;
-            int num_pxpar = (max_count/par->granularity) + 1 ;
-            int extra_pxpar = max_count % par->granularity;
-            bilist.resize(num_pxpar);
+            par->num_pxpar = (max_count/par->granularity);
+            par->extra_pxpar = max_count % par->granularity;
+            if(par->extra_pxpar != 0)
+                par->num_pxpar += 1;
             
-            std::cout << "Granularity " << par->granularity  << " Num PX Par " << num_pxpar << " Extra PX Par " << extra_pxpar <<std::endl;
+            bilist.resize(par->num_pxpar);
             
-//             for (int p = 0; p < num_pxpar-1; ++p)
+            std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
+            
+//             for (int p = 0; p < par->num_pxpar-1; ++p)
 //                 bilist[p].resize(par->granularity);
-//             bilist[num_pxpar].resize();
-            
-            for (int p = 0; p < num_pxpar; ++p)
+//             bilist[par->num_pxpar].resize();
+            int q = 0;
+            int loopend = par->granularity;
+            for (int p = 0; p < par->num_pxpar; ++p)
             {
                 bool rep_test[par->granularity];
                 for (int x = 0; x < par->iList.size();++x)
                     rep_test[x] = false;
-                for (int q = 0; q < par->iList.size();++q)
-                {
 
+                while (q < loopend)
+                {
                     int old_val = 0;
                     int new_val = 0;
                     for (int r = 0; r < par->iList[q].size(); ++r)
                     {
                        int bal_conn = par->iList[q][r] / par->granularity;
                        new_val = bal_conn;
+                      // std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
+
                        if (new_val != old_val && rep_test[new_val] != true)
                        {
                            old_val = new_val;
                            rep_test[new_val] = true;
-                           std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
+                    //       std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
                            bilist[p].push_back(bal_conn);
                        }
                        
                     }
+                    ++q;
                 }
+                q = loopend;
+                
+                if (par->extra_pxpar != 0)
+                {
+                    if (p < (par->num_pxpar-2))
+                        loopend += par->granularity;
+                    else
+                        loopend += par->extra_pxpar;
+                }
+                else 
+                    loopend += par->granularity;
+            }
+            
+            for (int p = 0; p < bilist.size(); ++p)
+            {
+                std::cout << "B p : " << p << " list : " ;
+                for (int q = 0; q < bilist[p].size(); ++q)
+                {
+                    std::cout << " " << bilist[p][q];
+                }
+                std::cout << std::endl;
             }
 //            } /// extra brace
             

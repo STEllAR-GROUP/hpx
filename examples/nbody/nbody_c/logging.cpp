@@ -39,11 +39,11 @@ namespace hpx { namespace components { namespace nbody { namespace server
         int i;
 
         if ( par->output_stdout == 1 ) {
-             std::cout << " X: " <<  val.x 
-                       << " Y: " << val.y  
-                       << " Z: " << val.z  
-                       << " row: " << val.row  
-                       << " column: " << val.column  << std::endl;
+//              std::cout << " X: " <<  val.x 
+//                        << " Y: " << val.y  
+//                        << " Z: " << val.z  
+//                        << " row: " << val.row  
+//                        << " column: " << val.column  << std::endl;
         }
     }
 
