@@ -786,9 +786,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
 //             << " : " << particles[i]->v[2] << std::endl;
 //         }
-            
-            
-            
+          
             for (int p = 0; p < par->iList.size(); ++p)
             {
                 std::cout << " p : " << p << " list : " ;
@@ -799,14 +797,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << std::endl;
             }
             
+            std::cout << "Granularity " << par->granularity <<std::endl;
+            //std::vector< std::vector<int> >  bilist ;
             
             
 //            } /// extra brace
             
-            
-            
-            
-            
+
 ////////commenttest             
           if (par->iter == 0)
                 result_data = 
@@ -935,6 +932,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
+            ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
             ("verbose,v", "print calculated values after each time step")
@@ -1038,6 +1036,10 @@ int main(int argc, char* argv[])
         std::auto_ptr<agas_server_helper> agas_server;
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
+        
+        std::size_t granularity = 3;
+        if (vm.count("granularity"))
+            granularity = vm["granularity"].as<std::size_t>();
 
         std::size_t numvals;
 
@@ -1047,6 +1049,7 @@ int main(int argc, char* argv[])
         par->loglevel    = 2;
         par->output      = 1.0;
         par->output_stdout = 1;
+        par->granularity = granularity;
         
         //par->rowsize =  4;
         par->input_file="5_file";
@@ -1080,6 +1083,14 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("input_file") ) {
                 std::string tmp = sec->get_entry("input_file");
                 par->input_file = tmp;
+              }
+              if ( sec->has_entry("granularity") ) {
+                std::string tmp = sec->get_entry("granularity");
+                par->granularity = atoi(tmp.c_str());
+               // if ( par->granularity < 3 ) {
+               //   std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
+               //   BOOST_ASSERT(false);
+               // }
               }
             }
         }

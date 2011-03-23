@@ -84,6 +84,7 @@ struct Par {
       int num_bodies;
       int num_iterations;
       double part_mass;
+      int granularity;
 };
 
 #if defined(__cplusplus)
