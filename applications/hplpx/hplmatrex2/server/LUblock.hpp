@@ -15,10 +15,10 @@ class LUblock
 	~LUblock();
 
 	//functions for assignment and data access
-	int getrows(){return rows;}
-	int getcolumns(){return columns;}
-	double get(unsigned int row, unsigned int col);
-	void set(unsigned int row, unsigned int col, double val);
+	inline int getrows(){return rows;}
+	inline int getcolumns(){return columns;}
+	inline double get(unsigned int row, unsigned int col);
+	inline void set(unsigned int row, unsigned int col, double val);
 
     private://data members
 	int rows;
@@ -29,8 +29,8 @@ class LUblock
 
 //the constructor initializes the matrix
 LUblock::LUblock(unsigned int h, unsigned int w){
-	rows=h;
-	columns=w;
+	rows = h;
+	columns = w;
 
 	data = (double**) std::malloc(h*sizeof(double*));
 	for(int i=0;i<h;i++){data[i]=(double*) std::malloc(w*sizeof(double));}

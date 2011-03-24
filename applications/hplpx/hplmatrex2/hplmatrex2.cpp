@@ -31,11 +31,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX2::swap_action,HPLswap_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatreX2::gtop_action,HPLgtop_action);
+	hpx::components::server::HPLMatreX2::gmain_action,HPLgmain_action);
 HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatreX2::gleft_action,HPLgleft_action);
-HPX_REGISTER_ACTION_EX(
-	hpx::components::server::HPLMatreX2::gtrail_action,HPLgtrail_action);
+	hpx::components::server::HPLMatreX2::mintrail_action,HPLmintrail_action);
 HPX_REGISTER_ACTION_EX(
 	hpx::components::server::HPLMatreX2::bsubst_action,HPLbsubst_action);
 HPX_REGISTER_ACTION_EX(

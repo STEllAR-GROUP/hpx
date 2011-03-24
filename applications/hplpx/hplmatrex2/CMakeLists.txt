@@ -9,7 +9,9 @@ set (HPLMatreX2_HEADERS
 set (HPLMatreX2_SOURCES
     hplmatrex2.cpp)
 
-add_hpx_component(HPLMatreX2 
-    SOURCES ${HPLMatreX2_SOURCES} 
+add_hpx_component(HPLMatreX2
+    MODULE hplmatrex2
+    SOURCES ${HPLMatreX2_SOURCES}
     HEADERS ${HPLMatreX2_HEADERS})
+
 
