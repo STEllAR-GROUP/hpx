@@ -133,9 +133,10 @@ namespace hpx { namespace components { namespace nbody
           BOOST_ASSERT(compute_index != -1);
 
       //    if (resultval->node_type == 1){
-          resultval->ax = 0.0;
-          resultval->ay = 0.0;
-          resultval->az = 0.0;
+          
+//           resultval->ax = 0.0;
+//           resultval->ay = 0.0;
+//           resultval->az = 0.0;
           
           //handling uneven distribution
           int end_loop;
@@ -151,19 +152,19 @@ namespace hpx { namespace components { namespace nbody
                     int global_idx = ( compute_index * par->granularity)+j;
                     int remote_idx = (i * par->granularity) + j;
                     double dx, dy, dz;
-                    for (int p = 0; p < par->iList[global_idx].size; ++p)
-                        if (remote_idx == par->iList[global_idx][p])
+                    for (int r = 0; r < par->iList[global_idx].size(); ++r)
+                        if (remote_idx == par->iList[global_idx][r])
                         {
                             dx = val[compute_index]->x[j] - val[i]->x[j];
                             dy = val[compute_index]->y[j] - val[i]->y[j];
                             dz = val[compute_index]->z[j] - val[i]->z[j];
+                            double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                            double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+                            resultval->ax[j] += dx + acc_factor;
+                            resultval->ay[j] += dy + acc_factor;
+                            resultval->az[j] += dz + acc_factor;
                         }
-                            
-                    double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                    double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                    resultval->ax += dx + acc_factor;
-                    resultval->ay += dy + acc_factor;
-                    resultval->az += dz + acc_factor;
+
                }
 //               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
           }
@@ -178,19 +179,18 @@ namespace hpx { namespace components { namespace nbody
                         int global_idx = ( compute_index * par->granularity)+j;
                         int remote_idx = (i * par->granularity) + j;
                         double dx, dy, dz;
-                        for (int p = 0; p < par->iList[global_idx].size; ++p)
-                            if (remote_idx == par->iList[global_idx][p])
+                        for (int r = 0; r < par->iList[global_idx].size(); ++r)
+                            if (remote_idx == par->iList[global_idx][r])
                             {
                                 dx = val[compute_index]->x[j] - val[i]->x[j];
                                 dy = val[compute_index]->y[j] - val[i]->y[j];
                                 dz = val[compute_index]->z[j] - val[i]->z[j];
+                                double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                                double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+                                resultval->ax[j] += dx + acc_factor;
+                                resultval->ay[j] += dy + acc_factor;
+                                resultval->az[j] += dz + acc_factor;
                             }
-                                
-                        double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                        double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                        resultval->ax += dx + acc_factor;
-                        resultval->ay += dy + acc_factor;
-                        resultval->az += dz + acc_factor;
                 }
         //               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
              
@@ -210,31 +210,91 @@ namespace hpx { namespace components { namespace nbody
           }
           
           //TODO UPDATE THIS
-          double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
-          double v_half_x, v_half_y, v_half_z;
-          resultval->node_type = val[compute_index]->node_type;
-          resultval->x = val[compute_index]->x;
-          resultval->y = val[compute_index]->y;
-          resultval->z = val[compute_index]->z;            
-          resultval->vx = val[compute_index]->vx;
-          resultval->vy = val[compute_index]->vy;
-          resultval->vz = val[compute_index]->vz;
-            
-          vel_dt_half_x = resultval->ax * par->half_dt;
-          vel_dt_half_y = resultval->ay * par->half_dt;
-          vel_dt_half_z = resultval->az * par->half_dt;
-            
-          v_half_x = resultval->vx * par->half_dt;
-          v_half_y = resultval->vy * par->half_dt;
-          v_half_z = resultval->vz * par->half_dt;
-            
-          resultval->x += v_half_x * par->dtime;
-          resultval->y += v_half_y * par->dtime;
-          resultval->z += v_half_z * par->dtime;
-            
-          resultval->vx += v_half_x + vel_dt_half_x;
-          resultval->vy += v_half_y + vel_dt_half_y;
-          resultval->vz += v_half_z + vel_dt_half_z;
+          
+          for (int i=0;i< end_loop;i++)
+          {
+              for (int j=0; j < par->bilist[compute_index].size() ; ++j)
+              {
+                    int global_idx = ( compute_index * par->granularity)+j;
+                    int remote_idx = (i * par->granularity) + j;
+                    double dx, dy, dz;
+                    for (int r = 0; r < par->iList[global_idx].size(); ++r)
+                        if (remote_idx == par->iList[global_idx][r])
+                        {
+                            double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
+                            double v_half_x, v_half_y, v_half_z;
+                            resultval->node_type[j] = val[compute_index]->node_type[j];
+                            resultval->x[j] = val[compute_index]->x[j];
+                            resultval->y[j] = val[compute_index]->y[j];
+                            resultval->z[j] = val[compute_index]->z[j];            
+                            resultval->vx[j] = val[compute_index]->vx[j];
+                            resultval->vy[j] = val[compute_index]->vy[j];
+                            resultval->vz[j] = val[compute_index]->vz[j]; 
+                            
+                                
+                            vel_dt_half_x = resultval->ax[j] * par->half_dt;
+                            vel_dt_half_y = resultval->ay[j] * par->half_dt;
+                            vel_dt_half_z = resultval->az[j] * par->half_dt;
+                                
+                            v_half_x = resultval->vx[j] * par->half_dt;
+                            v_half_y = resultval->vy[j] * par->half_dt;
+                            v_half_z = resultval->vz[j] * par->half_dt;
+                                
+                            resultval->x[j] += v_half_x * par->dtime;
+                            resultval->y[j] += v_half_y * par->dtime;
+                            resultval->z[j] += v_half_z * par->dtime;
+                                
+                            resultval->vx[j] += v_half_x + vel_dt_half_x;
+                            resultval->vy[j] += v_half_y + vel_dt_half_y;
+                            resultval->vz[j] += v_half_z + vel_dt_half_z;
+                        }
+
+               }
+          }
+          
+          if (par->extra_pxpar != 0 )
+          {
+                int i = val.size();
+               
+                for (int j=0; j < par->bilist[compute_index].size() ; ++j)
+                {
+                        int global_idx = ( compute_index * par->granularity)+j;
+                        int remote_idx = (i * par->granularity) + j;
+                        double dx, dy, dz;
+                        for (int r = 0; r < par->iList[global_idx].size(); ++r)
+                            if (remote_idx == par->iList[global_idx][r])
+                            {
+                                double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
+                                double v_half_x, v_half_y, v_half_z;
+                                resultval->node_type[j] = val[compute_index]->node_type[j];
+                                resultval->x[j] = val[compute_index]->x[j];
+                                resultval->y[j] = val[compute_index]->y[j];
+                                resultval->z[j] = val[compute_index]->z[j];            
+                                resultval->vx[j] = val[compute_index]->vx[j];
+                                resultval->vy[j] = val[compute_index]->vy[j];
+                                resultval->vz[j] = val[compute_index]->vz[j]; 
+                                
+                                    
+                                vel_dt_half_x = resultval->ax[j] * par->half_dt;
+                                vel_dt_half_y = resultval->ay[j] * par->half_dt;
+                                vel_dt_half_z = resultval->az[j] * par->half_dt;
+                                    
+                                v_half_x = resultval->vx[j] * par->half_dt;
+                                v_half_y = resultval->vy[j] * par->half_dt;
+                                v_half_z = resultval->vz[j] * par->half_dt;
+                                    
+                                resultval->x[j] += v_half_x * par->dtime;
+                                resultval->y[j] += v_half_y * par->dtime;
+                                resultval->z[j] += v_half_z * par->dtime;
+                                    
+                                resultval->vx[j] += v_half_x + vel_dt_half_x;
+                                resultval->vy[j] += v_half_y + vel_dt_half_y;
+                                resultval->vz[j] += v_half_z + vel_dt_half_z;
+                            }
+                }
+
+          }
+
 
 //           std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
 //           std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;

@@ -923,21 +923,21 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
- //               std::cout << i << ": " << val->x << " Type: " << val->node_type << std::endl;
-//                 std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type << std::endl;
-                if(val->node_type == 1){
-//                     std::cout << "updating particles" << std::endl;
-                    particles[j]->p[0] = val->x;
-                    particles[j]->p[1] = val->y;
-                    particles[j]->p[2] = val->z;
-                    particles[j]->v[0] = val->vx;
-                    particles[j]->v[1] = val->vy;
-                    particles[j]->v[2] = val->vz;
-                    particles[j]->a[0] = val->ax;
-                    particles[j]->a[1] = val->ay;
-                    particles[j]->a[2] = val->az;    
-                    ++j;
-                }
+//               std::cout << i << ": " << val->x[i] << " Type: " << val->node_type[i] << std::endl;
+                 std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type[i]<< std::endl;
+//                 if(val->node_type == 1){
+// //                     std::cout << "updating particles" << std::endl;
+//                     particles[j]->p[0] = val->x;
+//                     particles[j]->p[1] = val->y;
+//                     particles[j]->p[2] = val->z;
+//                     particles[j]->v[0] = val->vx;
+//                     particles[j]->v[1] = val->vy;
+//                     particles[j]->v[2] = val->vz;
+//                     particles[j]->a[0] = val->ax;
+//                     particles[j]->a[1] = val->ay;
+//                     particles[j]->a[2] = val->az;    
+//                     ++j;
+//                 }
                
             }
             
