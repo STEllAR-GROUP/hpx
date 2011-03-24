@@ -816,24 +816,30 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             for (int p = 0; p < par->num_pxpar; ++p)
             {
                 bool rep_test[par->granularity];
-                for (int x = 0; x < par->iList.size();++x)
+                for (int x = 0; x < par->granularity;++x)
+                {
                     rep_test[x] = false;
+                    //cout << "blist creation x :" << x << " size : " 
+                    //possible bug rep_test is of size par->granularity but is being initialized 
+                    // x goes from iList.size()
+                }
 
                 while (q < loopend)
                 {
-                    int old_val = 0;
+                    int old_val = -1;
                     int new_val = 0;
                     for (int r = 0; r < par->iList[q].size(); ++r)
                     {
                        int bal_conn = par->iList[q][r] / par->granularity;
+                       std::cout << par->iList[q][r] << "gran " << par->granularity << std::endl;
                        new_val = bal_conn;
-                      // std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
+//                       std::cout << " outer P: " << p << " connects to "<< bal_conn << std::endl;
 
                        if (new_val != old_val && rep_test[new_val] != true)
                        {
                            old_val = new_val;
                            rep_test[new_val] = true;
-                    //       std::cout << " P: " << p << " connects to "<< bal_conn << std::endl;
+        //                 std::cout << " inner P: " << p << " connects to "<< bal_conn << " because of " << par->iList[q][r] << std::endl;
                            par->bilist[p].push_back(bal_conn);
                        }
                        
@@ -848,9 +854,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                         loopend += par->granularity;
                     else
                         loopend += par->extra_pxpar;
+                    std::cout << p << " extra_pxpar >0 : loopend " << loopend << "q = " << q << std::endl;
                 }
-                else 
+                else
+                {
                     loopend += par->granularity;
+                    std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
+                }
             }
             
             for (int p = 0; p < par->bilist.size(); ++p)
@@ -924,7 +934,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
 //               std::cout << i << ": " << val->x[i] << " Type: " << val->node_type[i] << std::endl;
-                 std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type[i]<< std::endl;
+//                  std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type[i]<< std::endl;
 //                 if(val->node_type == 1){
 // //                     std::cout << "updating particles" << std::endl;
 //                     particles[j]->p[0] = val->x;
@@ -1159,6 +1169,7 @@ int main(int argc, char* argv[])
         
         // figure out the number of points for row 0
        //numvals = par->rowsize;
+       
 
         // initialize and start the HPX runtime
         std::size_t executed_threads = 0;

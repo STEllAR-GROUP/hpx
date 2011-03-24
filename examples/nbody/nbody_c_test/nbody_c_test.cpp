@@ -62,6 +62,8 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 //     
 //     val->row = row;
 //     val->column = item;
+
+   std::cout << "gen_init_data: item : " << item << " item.size : " << par.bilist[item].size() << std::endl;
    for (int i = 0; i < par.bilist[item].size(); ++i)
    {
         int iidx = (item * par.granularity) + i;
@@ -80,12 +82,27 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
             val->ay.push_back(0.0); 
             val->az.push_back(0.0); 
         }
-    //     std::cout << "Row: " << row << " item: " << item << " x: " << val->x << " y: " << val->y << " z: " << val->z << std::endl;
+        std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
     //     std::cout << " Maxitems " << maxitems << std::endl;
+//        std::cout << "I get till here"<< std::endl;
         val->row = row;
         val->column = item;
    }
-
+   
+   if (par.bilist[item].size() == 0)
+   {
+//         int iidx = (item * par.granularity) + i;
+//         val->node_type.push_back(par.bodies[iidx].node_type); 
+//         val->x.push_back(par.bodies[iidx].px); 
+//         val->y.push_back(par.bodies[iidx].py);
+//         val->z.push_back(par.bodies[iidx].pz);  
+// 
+//         val->vx.push_back(par.bodies[iidx].vx);
+//         val->vy.push_back(par.bodies[iidx].vy); 
+//         val->vz.push_back(par.bodies[iidx].vz);
+        val->row = row;
+        val->column = item;
+   }
 
     return 1;
 }
