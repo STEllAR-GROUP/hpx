@@ -972,7 +972,7 @@ namespace hpx { namespace components { namespace amr
           if ( val.size() == 1 ) {
             // no restriction needed
             resultval.get() = val[0].get();
-            if ( val[0]->timestep_ >= par->nt0-2*par->time_granularity ) {
+            if ( val[0]->timestep_ >= par->nt0-2 ) {
               return 0;
             } 
             return 1;
@@ -1725,7 +1725,7 @@ namespace hpx { namespace components { namespace amr
               // }}}
             }
 
-            if ( val[compute_index]->timestep_ >= par->nt0-2*par->time_granularity ) {
+            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
               return 0;
             }
             return 1;
@@ -1889,7 +1889,7 @@ namespace hpx { namespace components { namespace amr
           }
           // set return value difference between actual and required number of
           // timesteps (>0: still to go, 0: last step, <0: overdone)
-          if ( val[compute_index]->timestep_ >= par->nt0-2*par->time_granularity ) {
+          if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
             return 0;
           }
           return 1;

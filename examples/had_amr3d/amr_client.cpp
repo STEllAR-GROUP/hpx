@@ -325,8 +325,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
                 par->nt0 = atoi(tmp.c_str());
-                // over-ride command line argument if present
-                numsteps = par->nt0;
               }
               if ( sec->has_entry("thread_scheduler") ) {
                 std::string tmp = sec->get_entry("thread_scheduler");
@@ -395,10 +393,8 @@ int main(int argc, char* argv[])
 
         // the number of timesteps each px thread can take independent of communication
         par->time_granularity = par->granularity/3;
-        if ( par->nt0%par->time_granularity != 0 ) {
-          std::cout << " Adjusting nt0 to be " << par->nt0 + (3-par->nt0%par->time_granularity) << std::endl;
-          par->nt0 = par->nt0 + (3-par->nt0%par->time_granularity);
-        }
+        
+        numsteps = par->nt0;
 
         // set up refinement centered around the middle of the grid
         par->nx[0] = nx0/par->granularity;

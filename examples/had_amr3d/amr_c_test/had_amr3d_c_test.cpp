@@ -363,6 +363,20 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       // -------------------------------------------------------------------------
       // iter 2
       int ii,jj,kk;
+
+      // special termination condition 
+      bool terminate_early = false;
+      had_double_type eps = 1.e-4;
+      if ( result->timestep_ + 1.0/pow(2.0,level) + eps >= par.nt0 ) {
+        terminate_early = true;
+        k_sf = n2;
+        k_ef = 2*n2;
+        j_sf = n2;
+        j_ef = 2*n2;
+        i_sf = n2;
+        i_ef = 2*n2;
+      }
+
       for (int k=k_sf; k<k_ef;k++) {
       for (int j=j_sf; j<j_ef;j++) {
       for (int i=i_sf; i<i_ef;i++) {
@@ -375,7 +389,7 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
         nodedata& nd = work[i+n*(j+n*k)];
         nodedata& nd2 = work2[i+n*(j+n*k)];
 
-        if ( timestep == 1 ) {
+        if ( timestep == 1 || terminate_early ) {
           nodedata& ndresult = result->value_[ii + n2*(jj + n2*kk)];
           // last local rk update
           for (int ll=0;ll<num_eqns;ll++) {
@@ -391,7 +405,8 @@ int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stenc
       }}}
 
       result->timestep_ += 1.0/pow(2.0,level);
-
+ 
+      if ( terminate_early ) break;
     }
 
     return 1;
