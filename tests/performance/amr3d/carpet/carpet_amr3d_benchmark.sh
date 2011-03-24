@@ -15,7 +15,7 @@ REFS=(0 1 2 3)
 CORES=(1 2 5 10 20 30 40)
 
 INTEL_ROOT="/opt/intel/fc/11.1"
-MPI_ROOT="/opt/mpich2/1.2.1p1/intel-11.1/bin/mpiexec"
+MPI_ROOT="/opt/mpich2/1.2.1p1/intel-11.1"
 CACTUS_ROOT="/home/wash/vcs/cactus-intel/Cactus"
 
 ###############################################################################
@@ -30,14 +30,16 @@ for REF in ${REFS[@]}
 do
   for CPU in ${CORES[@]}
   do
-    TIME_CMD="/usr/bin/time -f \"\\\"$CPU $REF - %e %x\\\"\" --append -o $OUT"
+    TIME_CMD="/usr/bin/time --output=$OUT --append"
     MPIEXEC_CMD="$MPI_ROOT/bin/mpiexec -np $CPU"
     INPUT="wavetoy_lor$REF.par"
     for ((I = 0; I <= ${RUNS}; I += 1))
     do
       echo "=================================================" >> $LOG 
-      echo "$TIME_CMD $MPIEXEC_CMD $CACTUS_ROOT/exe/cactus_sim3 $INPUT" >> $LOG 
-      $TIME_CMD $MPIEXEC_CMD $CACTUS_ROOT/exe/cactus_sim3 $INPUT >> $LOG 2>&1 
+      echo -n "$TIME_CMD -f \"$CPU $REF N %e %x\" $MPIEXEC_CMD" >> $LOG
+      echo "$CACTUS_ROOT/exe/cactus_sim3 $INPUT" >> $LOG 
+      $TIME_CMD -f "$CPU $REF N %e %x" $MPIEXEC_CMD      \
+        $CACTUS_ROOT/exe/cactus_sim3 $INPUT >> $LOG 2>&1
     done
   done
 done
