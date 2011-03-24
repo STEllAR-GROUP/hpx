@@ -1001,6 +1001,9 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
 
+            // TEST
+            //resultval.get() = val[compute_index].get();
+
             // copy over critical info
             resultval->x_ = val[compute_index]->x_;
             resultval->y_ = val[compute_index]->y_;
@@ -1020,10 +1023,11 @@ namespace hpx { namespace components { namespace amr
               if ( restriction && prolongation ) break;
             }
 
-            if ( prolongation ) {
-              // prolongation {{{
+            int n = par->granularity;
+
+            if ( prolongation && restriction ) {
+              // prolongation and restriction {{{
               // interpolation
-              int n = par->granularity;
               had_double_type xmin = val[compute_index]->x_[0];
               had_double_type xmax = val[compute_index]->x_[n-1];
               had_double_type ymin = val[compute_index]->y_[0];
@@ -1269,32 +1273,12 @@ namespace hpx { namespace components { namespace amr
                     BOOST_ASSERT(false);
                   }
 //#endif
-                }
-
-              } } }
-
-              // }}}
-            }
-
-            if ( restriction ) {
-              // restriction {{{
-              int n = par->granularity;
-              int last_time = -1;
-              bool found = false;
-              had_double_type xx,yy,zz;
-              for (int k=0;k<n;++k) {
-                zz = z + k*dx;
-              for (int j=0;j<n;++j) {
-                yy = y + j*dx;
-              for (int i=0;i<n;++i) {
-                xx = x + i*dx;
-
-                // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
-                if ( par->min[level+1]+par->gw*dx < xx && xx < par->max[level+1]-par->gw*dx &&
-                     par->min[level+1]+par->gw*dx < yy && yy < par->max[level+1]-par->gw*dx &&
-                     par->min[level+1]+par->gw*dx < zz && zz < par->max[level+1]-par->gw*dx ) {
-
-                  found = false;
+                      // Check if this is a restriction point
+                } else if ( par->min[level+1]+par->gw*dx < xt && xt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < yt && yt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < zt && zt < par->max[level+1]-par->gw*dx ) {
+                  int last_time = -1;
+                  bool found = false;
                   if ( last_time != -1 ) {
                     // check the bounding box of the finer mesh
                     had_double_type xmin = val[last_time]->x_[0];                      
@@ -1304,9 +1288,9 @@ namespace hpx { namespace components { namespace amr
                     had_double_type zmin = val[last_time]->z_[0];                      
                     had_double_type zmax = val[last_time]->z_[n-1];                      
 
-                    if ( floatcmp_ge(xx,xmin) && floatcmp_le(xx,xmax) &&
-                         floatcmp_ge(yy,ymin) && floatcmp_le(yy,ymax) &&
-                         floatcmp_ge(zz,zmin) && floatcmp_le(zz,zmax) ) {
+                    if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                         floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                         floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
                       found = true;
                     } else {
                       last_time = -1;
@@ -1324,9 +1308,9 @@ namespace hpx { namespace components { namespace amr
                         had_double_type zmin = val[ii]->z_[0];                      
                         had_double_type zmax = val[ii]->z_[n-1];                      
 
-                        if ( floatcmp_ge(xx,xmin) && floatcmp_le(xx,xmax) &&
-                             floatcmp_ge(yy,ymin) && floatcmp_le(yy,ymax) &&
-                             floatcmp_ge(zz,zmin) && floatcmp_le(zz,zmax) ) {
+                        if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                             floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                             floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
                           found = true;
                           last_time = ii;
                           break;
@@ -1336,7 +1320,7 @@ namespace hpx { namespace components { namespace amr
                   }
 
                   if ( !found ) {
-                    std::cout << " DEBUG coords " << xx << " " << yy << " " << zz <<  std::endl;
+                    std::cout << " DEBUG coords " << xt << " " << yt << " " << zt <<  std::endl;
                     for (int ii=0;ii<val.size();++ii) {
                       std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
                       std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
@@ -1352,9 +1336,9 @@ namespace hpx { namespace components { namespace amr
                   int bb = -1;
                   int cc = -1;
                   for (int ii=0;ii<par->granularity;++ii) {
-                    if ( floatcmp(xx,val[last_time]->x_[ii]) == 1 ) aa = ii;
-                    if ( floatcmp(yy,val[last_time]->y_[ii]) == 1 ) bb = ii;
-                    if ( floatcmp(zz,val[last_time]->z_[ii]) == 1 ) cc = ii;
+                    if ( floatcmp(xt,val[last_time]->x_[ii]) == 1 ) aa = ii;
+                    if ( floatcmp(yt,val[last_time]->y_[ii]) == 1 ) bb = ii;
+                    if ( floatcmp(zt,val[last_time]->z_[ii]) == 1 ) cc = ii;
                     if ( aa != -1 && bb != -1 && cc != -1 ) break;
                   }
                   BOOST_ASSERT(aa != -1); 
@@ -1364,7 +1348,382 @@ namespace hpx { namespace components { namespace amr
                   for (int ll=0;ll<num_eqns;++ll) {
                     resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
                   }
+                } else {
+                  // neither a prolongation nor restriction point -- copy the value
+                  for (int ll=0;ll<num_eqns;++ll) {
+                    resultval->value_[i+n*(j+n*k)].phi[0][ll] =  
+                          val[compute_index]->value_[i+n*(j+n*k)].phi[0][ll];
+                  } 
+                } 
+              } } }
+
+              // }}}
+            } else if ( prolongation && !restriction ) {
+              // prolongation {{{
+              // interpolation
+              had_double_type xmin = val[compute_index]->x_[0];
+              had_double_type xmax = val[compute_index]->x_[n-1];
+              had_double_type ymin = val[compute_index]->y_[0];
+              had_double_type ymax = val[compute_index]->y_[n-1];
+              had_double_type zmin = val[compute_index]->z_[0];
+              had_double_type zmax = val[compute_index]->z_[n-1];
+
+              for (int k=0;k<n;++k) {
+                had_double_type zt = resultval->z_[k];
+              for (int j=0;j<n;++j) {
+                had_double_type yt = resultval->y_[j];
+              for (int i=0;i<n;++i) {
+                had_double_type xt = resultval->x_[i];
+
+                // check if this is a prolongation point
+                if ( ( floatcmp_le(xt,par->min[level]+par->gw*dx) && floatcmp_ge(xt,par->min[level]) ) ||
+                     ( floatcmp_le(xt,par->max[level])            && floatcmp_ge(xt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(yt,par->min[level]+par->gw*dx) && floatcmp_ge(yt,par->min[level]) ) ||
+                     ( floatcmp_le(yt,par->max[level])            && floatcmp_ge(yt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(zt,par->min[level]+par->gw*dx) && floatcmp_ge(zt,par->min[level]) ) ||
+                     ( floatcmp_le(zt,par->max[level])            && floatcmp_ge(zt,par->max[level]-par->gw*dx) ) 
+                   ) {
+                  // this is a prolongation point -- overwrite the value with an interpolated value from the coarse mesh
+                  bool found = false;
+                  for (int ii=0;ii<val.size();++ii) {
+                    if ( ii != compute_index ) {
+                      if ( floatcmp_ge(xt,val[ii]->x_[0])  && floatcmp_le(xt,val[ii]->x_[n-1]) &&
+                           floatcmp_ge(yt,val[ii]->y_[0])  && floatcmp_le(yt,val[ii]->y_[n-1]) &&
+                           floatcmp_ge(zt,val[ii]->z_[0])  && floatcmp_le(zt,val[ii]->z_[n-1]) ) {
+                        found = true;
+                        // interpolate
+                        interp3d(xt,yt,zt,val[ii],resultval->value_[i+n*(j+n*k)],par);
+                        break;
+                      }
+                    }
+                  }
+
+                  int anchor_index[27];
+                  int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+                  if ( !found ) {
+                    // find the interpolating the anchors needed  
+                    for (int lk=-1;lk<2;++lk) {
+                      had_double_type zn = zt + lk*dx;
+                    for (int lj=-1;lj<2;++lj) {
+                      had_double_type yn = yt + lj*dx;
+                    for (int li=-1;li<2;++li) {
+                      had_double_type xn = xt + li*dx;
+                      
+                      for (int ii=0;ii<val.size();++ii) {
+                        if ( floatcmp_ge(xn,val[ii]->x_[0])  && floatcmp_le(xn,val[ii]->x_[n-1]) &&
+                             floatcmp_ge(yn,val[ii]->y_[0])  && floatcmp_le(yn,val[ii]->y_[n-1]) &&
+                             floatcmp_ge(zn,val[ii]->z_[0])  && floatcmp_le(zn,val[ii]->z_[n-1]) &&
+                             ii != compute_index ) {
+                          if (li == -1 && lj == -1 && lk == -1 ) {
+                            has_corner[0] = 1;
+                            anchor_index[0] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk == -1 ) {
+                            has_corner[1] = 1;
+                            anchor_index[1] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk == -1 ) {
+                            has_corner[2] = 1;
+                            anchor_index[2] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk == -1 ) {
+                            has_corner[3] = 1;
+                            anchor_index[3] = ii;
+                          }
+                          if (li == -1 && lj == -1 && lk ==  1 ) {
+                            has_corner[4] = 1;
+                            anchor_index[4] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk ==  1 ) {
+                            has_corner[5] = 1;
+                            anchor_index[5] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[6] = 1;
+                            anchor_index[6] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[7] = 1;
+                            anchor_index[7] = ii;
+                          }
+
+                          if (li == -1 && lj == -1 && lk == 0 ) {
+                            has_corner[8]   = 1;
+                            anchor_index[8] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk == 0 ) {
+                            has_corner[9]  = 1;
+                            anchor_index[9] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk == 0 ) {
+                            has_corner[10] = 1;
+                            anchor_index[10] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk == 0 ) {
+                            has_corner[11] = 1;
+                            anchor_index[11] = ii;
+                          }
+
+                         if (li == 0 && lj == -1 && lk == -1 ) {
+                            has_corner[12] = 1;
+                            anchor_index[12] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk == -1 ) {
+                            has_corner[13] = 1;
+                            anchor_index[13] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk == -1 ) {
+                            has_corner[14] = 1;
+                            anchor_index[14] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == -1 ) {
+                            has_corner[15] = 1;
+                            anchor_index[15] = ii;
+                          }
+
+                          if (li == 0 && lj == -1 && lk == 0 ) {
+                            has_corner[16] = 1;
+                            anchor_index[16] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk ==  0 ) {
+                            has_corner[17] = 1;
+                            anchor_index[17] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk ==  0 ) {
+                            has_corner[18] = 1;
+                            anchor_index[18] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == 0 ) {
+                            has_corner[19] = 1;
+                            anchor_index[19] = ii;
+                          }
+
+                          if (li == 0 && lj == -1 && lk == 1 ) {
+                            has_corner[20] = 1;
+                            anchor_index[20] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk ==  1 ) {
+                            has_corner[21] = 1;
+                            anchor_index[21] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk ==  1 ) {
+                            has_corner[22] = 1;
+                            anchor_index[22] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == 1 ) {
+                            has_corner[23] = 1;
+                            anchor_index[23] = ii;
+                          }
+
+                          if (li == 0 && lj == 0 && lk == 1 ) {
+                            has_corner[24] = 1;
+                            anchor_index[24] = ii;
+                          }
+
+                          if (li == 0 && lj == 0 && lk == -1 ) {
+                            has_corner[25] = 1;
+                            anchor_index[25] = ii;
+                          }
+                          if (li == 0 && lj == 0 && lk == 0 ) {
+                            has_corner[26] = 1;
+                            anchor_index[26] = ii;
+                          }
+                        }
+                      }
+                          
+                    } } }
+                  }
+
+                  // Now we have the complete picture.  Determine what the interpolation options are and proceed. 
+                  if ( has_corner[0] == 1 && has_corner[1] == 1 && has_corner[2] == 1 &&
+                       has_corner[3] == 1 && has_corner[4] == 1 && has_corner[5] == 1 &&
+                       has_corner[6] == 1 && has_corner[7] == 1 ) {
+                    // 3D interpolation
+                    found = true;
+
+                    special_interp3d(xt,yt,zt,dx,
+                                       val[anchor_index[0]],
+                                       val[anchor_index[1]],
+                                       val[anchor_index[2]],
+                                       val[anchor_index[3]],
+                                       val[anchor_index[4]],
+                                       val[anchor_index[5]],
+                                       val[anchor_index[6]],
+                                       val[anchor_index[7]],
+                                       resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
+                    // 1D interp
+                    found = true;
+                    special_interp1d_y(xt,yt,zt,dx,
+                                       val[anchor_index[16]],val[anchor_index[18]],
+                                       resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[19] == 1 && has_corner[17] == 1 ) {
+                    // 1D interp
+                    found = true;
+                    special_interp1d_x(xt,yt,zt,dx,
+                                       val[anchor_index[19]],val[anchor_index[17]],
+                                       resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[24] == 1 && has_corner[25] == 1 ) {
+                    // 1D interp
+                    found = true;
+                    special_interp1d_z(xt,yt,zt,dx,
+                                       val[anchor_index[25]],val[anchor_index[24]],
+                                       resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_xy(xt,yt,zt,dx,
+                                        val[anchor_index[8]],val[anchor_index[9]],
+                                        val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_yz(xt,yt,zt,dx,
+                                        val[anchor_index[12]],val[anchor_index[14]],
+                                        val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
+                    // 2D interp
+                    found = true;
+                    special_interp2d_xz(xt,yt,zt,dx,
+                                        val[anchor_index[15]],val[anchor_index[13]],
+                                        val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
+                  }
+//#if 0
+                  if ( !found ) {
+                    std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " BBOX : " <<  par->min[level] << " " << par->min[level]+2*par->gw*dx << " " <<  par->max[level] << " " << par->max[level]-2*par->gw*dx << std::endl;
+                    std::cout << " Available data: " << std::endl;
+                     for (int ii=0;ii<val.size();++ii) {
+                       if ( ii != compute_index ) {
+                         std::cout << val[ii]->x_[0] << " " << val[ii]->x_[n-1] << std::endl;
+                         std::cout << val[ii]->y_[0] << " " << val[ii]->y_[n-1] << std::endl;
+                         std::cout << val[ii]->z_[0] << " " << val[ii]->z_[n-1] << std::endl;
+                       }
+                     }      
+                     for (int ii=0;ii<27;++ii) {
+                       std::cout << " Has corner : " << ii << " " << has_corner[ii] << std::endl;
+                     }      
+                            
+                    BOOST_ASSERT(false);
+                  }
+//#endif
+                } else {
+                  // not a prolongation point -- copy values
+                  for (int ll=0;ll<num_eqns;++ll) {
+                    resultval->value_[i+n*(j+n*k)].phi[0][ll] =  
+                          val[compute_index]->value_[i+n*(j+n*k)].phi[0][ll];
+                  } 
+                } 
+
+              } } }
+
+              // }}}
+            } else if ( restriction && !prolongation ) {
+              // restriction {{{
+              int last_time = -1;
+              bool found = false;
+              had_double_type xt,yt,zt;
+              for (int k=0;k<n;++k) {
+                zt = resultval->z_[k];
+              for (int j=0;j<n;++j) {
+                yt = resultval->y_[j];
+              for (int i=0;i<n;++i) {
+                xt = resultval->x_[i];
+
+                // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
+                if ( par->min[level+1]+par->gw*dx < xt && xt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < yt && yt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < zt && zt < par->max[level+1]-par->gw*dx ) {
+
+                  found = false;
+                  if ( last_time != -1 ) {
+                    // check the bounding box of the finer mesh
+                    had_double_type xmin = val[last_time]->x_[0];                      
+                    had_double_type xmax = val[last_time]->x_[n-1];                      
+                    had_double_type ymin = val[last_time]->y_[0];                      
+                    had_double_type ymax = val[last_time]->y_[n-1];                      
+                    had_double_type zmin = val[last_time]->z_[0];                      
+                    had_double_type zmax = val[last_time]->z_[n-1];                      
+
+                    if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                         floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                         floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
+                      found = true;
+                    } else {
+                      last_time = -1;
+                    }
+                  }
+
+                  if ( !found ) {
+                    for (int ii=0;ii<val.size();++ii) {
+                      if ( ii != compute_index ) {
+                        // check the bounding box of the finer mesh
+                        had_double_type xmin = val[ii]->x_[0];                      
+                        had_double_type xmax = val[ii]->x_[n-1];                      
+                        had_double_type ymin = val[ii]->y_[0];                      
+                        had_double_type ymax = val[ii]->y_[n-1];                      
+                        had_double_type zmin = val[ii]->z_[0];                      
+                        had_double_type zmax = val[ii]->z_[n-1];                      
+
+                        if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                             floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                             floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
+                          found = true;
+                          last_time = ii;
+                          break;
+                        }
+                      }
+                    }
+                  }
+
+                  if ( !found ) {
+                    std::cout << " DEBUG coords " << xt << " " << yt << " " << zt <<  std::endl;
+                    for (int ii=0;ii<val.size();++ii) {
+                      std::cout << " DEBUG available x " << val[ii]->x_[0] << " " << val[ii]->x_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG available y " << val[ii]->y_[0] << " " << val[ii]->y_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG available z " << val[ii]->z_[0] << " " << val[ii]->z_[par->granularity-1] << " " <<  std::endl;
+                      std::cout << " DEBUG level: " << val[ii]->level_ << std::endl;
+                      std::cout << " " << std::endl;
+                    }
+                  }
+                  BOOST_ASSERT(found);
+
+                  // identify the finer mesh index
+                  int aa = -1;
+                  int bb = -1;
+                  int cc = -1;
+                  for (int ii=0;ii<par->granularity;++ii) {
+                    if ( floatcmp(xt,val[last_time]->x_[ii]) == 1 ) aa = ii;
+                    if ( floatcmp(yt,val[last_time]->y_[ii]) == 1 ) bb = ii;
+                    if ( floatcmp(zt,val[last_time]->z_[ii]) == 1 ) cc = ii;
+                    if ( aa != -1 && bb != -1 && cc != -1 ) break;
+                  }
+                  BOOST_ASSERT(aa != -1); 
+                  BOOST_ASSERT(bb != -1); 
+                  BOOST_ASSERT(cc != -1); 
+                  
+                  for (int ll=0;ll<num_eqns;++ll) {
+                    resultval->value_[i+n*(j+n*k)].phi[0][ll] = val[last_time]->value_[aa+n*(bb+n*cc)].phi[0][ll]; 
+                  }
+                } else {
+                  // This case shouldn't happen ( I would think...)
+                  BOOST_ASSERT(false);
+                  // not a restriction point -- copy values
+                  for (int ll=0;ll<num_eqns;++ll) {
+                    resultval->value_[i+n*(j+n*k)].phi[0][ll] =  
+                          val[compute_index]->value_[i+n*(j+n*k)].phi[0][ll];
+                  } 
                 }
+              } } }
+              // }}}
+            } else {
+              // copy over previous values {{{
+              for (int k=0;k<n;++k) {
+              for (int j=0;j<n;++j) {
+              for (int i=0;i<n;++i) {
+                for (int ll=0;ll<num_eqns;++ll) {
+                  resultval->value_[i+n*(j+n*k)].phi[0][ll] =  
+                        val[compute_index]->value_[i+n*(j+n*k)].phi[0][ll];
+                } 
               } } }
               // }}}
             }
