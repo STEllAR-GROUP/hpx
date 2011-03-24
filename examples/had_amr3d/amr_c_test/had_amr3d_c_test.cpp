@@ -14,8 +14,6 @@
 
 #include <boost/scoped_array.hpp>
 
-#define UGLIFY 1
-
 ///////////////////////////////////////////////////////////////////////////////
 // windows needs to initialize MPFR in each shared library
 #if defined(BOOST_WINDOWS) 
@@ -233,113 +231,169 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stencil_data* result, 
   bool boundary,
   int *bbox, int compute_index, 
-  had_double_type const& dt, had_double_type const& dx, had_double_type const& timestep,
+  had_double_type const& dt, had_double_type const& dx, had_double_type const& tstep,
   int level, Par const& par)
 {
-  // allocate some temporary arrays for calculating the rhs
-  nodedata rhs;
-  boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
-  boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
+    // allocate some temporary arrays for calculating the rhs
+    nodedata rhs;
+    boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
+    boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
+    boost::scoped_array<nodedata> work3(new nodedata[vecval.size()]);
 
-  //hpx::memory::default_vector<nodedata* >::type pwork, pwork2;
-  static had_double_type const c_0_75 = 0.75;
-  static had_double_type const c_0_25 = 0.25;
-  static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
-  static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
+    static had_double_type const c_0_75 = 0.75;
+    static had_double_type const c_0_25 = 0.25;
+    static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
+    static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
-  int const n = 3*par.granularity;
-  int const n2 = par.granularity;
+    int const n = 3*par.granularity;
+    int const n2 = par.granularity;
 
-  // -------------------------------------------------------------------------
-  // iter 0
     std::size_t i_start,i_end,j_start,j_end,k_start,k_end;
-    if ( !boundary ) {
-      i_start = n2-3;
-      i_end = 2*n2+3;
-      j_start = i_start;
-      j_end = i_end;
-      k_start = i_start;
-      k_end = i_end;
-    } 
-    else {
-      if ( bbox[0] == 1 ) i_start = n2;
-      else i_start = n2-3;
+    std::size_t i_sf,i_ef,j_sf,j_ef,k_sf,k_ef;
 
-      if ( bbox[1] == 1 ) i_end = 2*n2;
-      else i_end = 2*n2+3;
+    result->timestep_ = tstep;
+    for (int timestep = par.time_granularity; timestep > 0; timestep-- ) {
 
-      if ( bbox[2] == 1 ) j_start = n2;
-      else j_start = n2-3;
+      if ( !boundary ) {
+        i_start = n2 - 3*timestep + 1 ;
+        i_end = 2*n2 + 3*timestep - 1;
+        j_start = i_start;
+        j_end = i_end;
+        k_start = i_start;
+        k_end = i_end;
 
-      if ( bbox[3] == 1 ) j_end = 2*n2;
-      else j_end = 2*n2+3;
+        i_sf = n2 -3*(timestep-1);
+        i_ef = 2*n2 +3*(timestep-1);
+        j_sf = i_sf;
+        j_ef = i_ef;
+        k_sf = i_sf;
+        k_ef = i_ef;
+      } 
+      else {
+        if ( bbox[0] == 1 ) {
+          i_start = n2;
+          i_sf = n2;
+        } else {
+          i_start = n2-3*timestep + 1;
+          i_sf = n2-3*(timestep-1);
+        }
+    
+        if ( bbox[1] == 1 ) {
+          i_end = 2*n2;
+          i_ef = 2*n2;
+        } else {
+          i_end = 2*n2+3*timestep - 1;
+          i_ef = 2*n2+3*(timestep-1);
+        }
+    
+        if ( bbox[2] == 1 ) {
+          j_start = n2;
+          j_sf = n2;
+        } else {
+          j_start = n2-3*timestep + 1;
+          j_sf = n2-3*(timestep-1);
+        }
 
-      if ( bbox[4] == 1 ) k_start = n2;
-      else k_start = n2-3;
+        if ( bbox[3] == 1 ) {
+          j_end = 2*n2;
+          j_ef = 2*n2;
+        } else {
+          j_end = 2*n2+3*timestep - 1;
+          j_ef = 2*n2+3*(timestep-1);
+        }
+    
+        if ( bbox[4] == 1 ) {
+          k_start = n2;
+          k_sf = n2;
+        } else {
+          k_start = n2-3*timestep + 1;
+          k_sf = n2-3*(timestep-1);
+        }
 
-      if ( bbox[5] == 1 ) k_end = 2*n2;
-      else k_end = 2*n2+3;
+        if ( bbox[5] == 1 ) {
+          k_end = 2*n2;
+          k_ef = 2*n2;
+        } else {
+          k_end = 2*n2+3*timestep - 1;
+          k_ef = 2*n2+3*(timestep-1);
+        }
+      }
+
+      // -------------------------------------------------------------------------
+      // iter 0
+      for (int k=k_start; k<k_end;k++) {
+      for (int j=j_start; j<j_end;j++) {
+      for (int i=i_start; i<i_end;i++) {
+        if ( timestep == par.time_granularity ) {
+          calcrhs<0>(&rhs,vecval,dx,boundary,i,j,k,par); 
+        } else {
+          calcrhs<1>(&rhs,work3,dx,boundary,i,j,k,par); 
+        }
+
+        nodedata& nd = work[i+n*(j+n*k)];
+        if ( timestep == par.time_granularity ) {
+          nodedata const *ndvecval = vecval[i+n*(j+n*k)];
+          for (int ll=0;ll<num_eqns;ll++) {
+            nd.phi[0][ll] = ndvecval->phi[0][ll];
+            nd.phi[1][ll] = ndvecval->phi[0][ll] + rhs.phi[0][ll]*dt; 
+          }
+        } else {
+          nodedata& nd3 = work3[i+n*(j+n*k)];
+          for (int ll=0;ll<num_eqns;ll++) {
+            nd.phi[0][ll] = nd3.phi[0][ll];
+            nd.phi[1][ll] = nd3.phi[0][ll] + rhs.phi[0][ll]*dt; 
+          }
+        }
+      }}}
+
+      // -------------------------------------------------------------------------
+      // iter 1
+      for (int k=k_start; k<k_end;k++) {
+      for (int j=j_start; j<j_end;j++) {
+      for (int i=i_start; i<i_end;i++) {
+        calcrhs<1>(&rhs,work,dx,boundary,i,j,k,par); 
+        nodedata& nd = work[i+n*(j+n*k)];
+        nodedata& nd2 = work2[i+n*(j+n*k)];
+        for (int ll=0;ll<num_eqns;ll++) {
+          nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
+            c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
+        }
+      }}}
+
+      // -------------------------------------------------------------------------
+      // iter 2
+      int ii,jj,kk;
+      for (int k=k_sf; k<k_ef;k++) {
+      for (int j=j_sf; j<j_ef;j++) {
+      for (int i=i_sf; i<i_ef;i++) {
+        calcrhs<1>(&rhs,work2,dx,boundary,i,j,k,par); 
+
+        ii = i - n2;
+        jj = j - n2;
+        kk = k - n2;
+
+        nodedata& nd = work[i+n*(j+n*k)];
+        nodedata& nd2 = work2[i+n*(j+n*k)];
+
+        if ( timestep == 1 ) {
+          nodedata& ndresult = result->value_[ii + n2*(jj + n2*kk)];
+          // last local rk update
+          for (int ll=0;ll<num_eqns;ll++) {
+            ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
+          }
+        } else {
+          nodedata& nd3 = work3[i+n*(j+n*k)];
+          // more timesteps to compute
+          for (int ll=0;ll<num_eqns;ll++) {
+            nd3.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
+          }
+        }
+      }}}
+
+      result->timestep_ += 1.0/pow(2.0,level);
+
     }
 
-    for (int k=k_start; k<k_end;k++) {
-    for (int j=j_start; j<j_end;j++) {
-    for (int i=i_start; i<i_end;i++) {
-      calcrhs<0>(&rhs,vecval,dx,boundary,i,j,k,par); 
-
-      nodedata& nd = work[i+n*(j+n*k)];
-      nodedata const *ndvecval = vecval[i+n*(j+n*k)];
-      for (int ll=0;ll<num_eqns;ll++) {
-        nd.phi[0][ll] = ndvecval->phi[0][ll];
-        nd.phi[1][ll] = ndvecval->phi[0][ll] + rhs.phi[0][ll]*dt; 
-      }
-    }}}
-
-    //nodedata* n_iter;
-    //pwork.reserve(vecval.size());
-    //for (n_iter=&work[0];n_iter!=&work[vecval.size()];++n_iter) pwork.push_back( n_iter );
-
-    // -------------------------------------------------------------------------
-    // iter 1
-    for (int k=k_start; k<k_end;k++) {
-    for (int j=j_start; j<j_end;j++) {
-    for (int i=i_start; i<i_end;i++) {
-      // calcrhs(&rhs,pwork,1,dx,boundary,i,j,k,par); 
-      calcrhs<1>(&rhs,work,dx,boundary,i,j,k,par); 
-      nodedata& nd = work[i+n*(j+n*k)];
-      nodedata& nd2 = work2[i+n*(j+n*k)];
-      for (int ll=0;ll<num_eqns;ll++) {
-        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
-          c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
-      }
-    }}}
-
-    //pwork2.reserve(vecval.size());
-    //for (n_iter=&work2[0];n_iter!=&work2[vecval.size()];++n_iter) pwork2.push_back( n_iter );
-
-    // -------------------------------------------------------------------------
-    // iter 2
-    int ii,jj,kk;
-    for (int k=n2; k<2*n2;k++) {
-    for (int j=n2; j<2*n2;j++) {
-    for (int i=n2; i<2*n2;i++) {
-      // calcrhs(&rhs,pwork2,1,dx,boundary,i,j,k,par); 
-      calcrhs<1>(&rhs,work2,dx,boundary,i,j,k,par); 
-
-      ii = i - n2;
-      jj = j - n2;
-      kk = k - n2;
-
-      nodedata& nd = work[i+n*(j+n*k)];
-      nodedata& nd2 = work2[i+n*(j+n*k)];
-      nodedata& ndresult = result->value_[ii + n2*(jj + n2*kk)];
-
-      for (int ll=0;ll<num_eqns;ll++) {
-        ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
-      }
-    }}}
-
-    result->timestep_ = timestep + 1.0/pow(2.0,level);
-
-  return 1;
+    return 1;
 }
 

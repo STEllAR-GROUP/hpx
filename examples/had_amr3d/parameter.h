@@ -57,6 +57,7 @@ struct Par {
       had_double_type eps;
       int output_level;
       int granularity;
+      int time_granularity;
       int gw;
       std::vector<std::size_t> rowsize,level_row;
       std::vector<std::size_t> level_begin, level_end;

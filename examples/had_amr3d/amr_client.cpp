@@ -372,10 +372,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
                 par->granularity = atoi(tmp.c_str());
-               // if ( par->granularity < 3 ) {
-               //   std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
-               //   BOOST_ASSERT(false);
-               // }
               }
               for (int i=0;i<par->allowedl;i++) {
                 char tmpname[80];
@@ -397,7 +393,14 @@ int main(int argc, char* argv[])
           BOOST_ASSERT(false);
         }
 
-        // step up refinement centered around the middle of the grid
+        // the number of timesteps each px thread can take independent of communication
+        par->time_granularity = par->granularity/3;
+        if ( par->nt0%par->time_granularity != 0 ) {
+          std::cout << " Adjusting nt0 to be " << par->nt0 + (3-par->nt0%par->time_granularity) << std::endl;
+          par->nt0 = par->nt0 + (3-par->nt0%par->time_granularity);
+        }
+
+        // set up refinement centered around the middle of the grid
         par->nx[0] = nx0/par->granularity;
         for (int i=1;i<par->allowedl+1;i++) {
           par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);

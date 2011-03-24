@@ -972,7 +972,7 @@ namespace hpx { namespace components { namespace amr
           if ( val.size() == 1 ) {
             // no restriction needed
             resultval.get() = val[0].get();
-            if ( val[0]->timestep_ >= par->nt0-2 ) {
+            if ( val[0]->timestep_ >= par->nt0-2*par->time_granularity ) {
               return 0;
             } 
             return 1;
@@ -1000,9 +1000,6 @@ namespace hpx { namespace components { namespace amr
               std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
               BOOST_ASSERT(false);
             }
-
-            // TEST
-            //resultval.get() = val[compute_index].get();
 
             // copy over critical info
             resultval->x_ = val[compute_index]->x_;
@@ -1728,7 +1725,7 @@ namespace hpx { namespace components { namespace amr
               // }}}
             }
 
-            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+            if ( val[compute_index]->timestep_ >= par->nt0-2*par->time_granularity ) {
               return 0;
             }
             return 1;
@@ -1892,7 +1889,7 @@ namespace hpx { namespace components { namespace amr
           }
           // set return value difference between actual and required number of
           // timesteps (>0: still to go, 0: last step, <0: overdone)
-          if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+          if ( val[compute_index]->timestep_ >= par->nt0-2*par->time_granularity ) {
             return 0;
           }
           return 1;
