@@ -12,7 +12,7 @@
 
 set(subdirs 
     accumulator
-    amr
+    #amr
     bhpx
     bh
     cosmo
