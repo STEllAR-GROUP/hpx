@@ -22,7 +22,7 @@ time2_demo contained this comment:
                    Peter Dimov,
                    Jeff Garland,
                    Terry Golubiewski,
-                   Daniel Krügler,
+                   Daniel Krogler,
                    Anthony Williams.
 */
 
@@ -362,7 +362,7 @@ public:
 template <class R1, class R2>
 struct ratio_equal
     : public boost::integral_constant<bool,
-                               R1::num == R2::num && R1::den == R2::den> {}; 
+                               (R1::num == R2::num) && (R1::den == R2::den)> {}; 
 
 template <class R1, class R2>
 struct ratio_not_equal
