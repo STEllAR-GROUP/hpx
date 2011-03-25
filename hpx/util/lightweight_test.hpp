@@ -17,7 +17,9 @@
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#include <hpx/util/spinlock_pool.hpp>
+// Use smart_ptr's spinlock header because this header is used by the CMake
+// config tests, and therefore we can't include other hpx headers in this file.
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 namespace hpx { namespace util
 { 
