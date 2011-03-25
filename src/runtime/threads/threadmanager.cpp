@@ -52,15 +52,15 @@ namespace hpx { namespace threads
             util::io_service_pool& timer_pool, 
             scheduling_policy_type& scheduler,
             notification_policy_type& notifier)
-      : running_(false),
+      : startup_(NULL),
+        thread_count_(0),
+        running_(false),
         timer_pool_(timer_pool), 
-        scheduler_(scheduler),
-        notifier_(notifier),
-
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
-        startup_(NULL), thread_count_(0)
+        scheduler_(scheduler),
+        notifier_(notifier)
     {
         LTM_(debug) << "threadmanager_impl ctor";
     }
