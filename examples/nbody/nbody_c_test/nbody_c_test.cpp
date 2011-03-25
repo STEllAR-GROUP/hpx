@@ -63,7 +63,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 //     val->row = row;
 //     val->column = item;
 
-   std::cout << "gen_init_data: item : " << item << " item.size : " << par.bilist[item].size() << std::endl;
+  // std::cout << "gen_init_data: item : " << item << " item.size : " << par.bilist[item].size() << std::endl;
    for (int i = 0; i < par.bilist[item].size(); ++i)
    {
         int iidx = (item * par.granularity) + i;
@@ -82,7 +82,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
             val->ay.push_back(0.0); 
             val->az.push_back(0.0); 
         }
-        std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
+ //       std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
     //     std::cout << " Maxitems " << maxitems << std::endl;
 //        std::cout << "I get till here"<< std::endl;
         val->row = row;

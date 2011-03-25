@@ -123,44 +123,44 @@ namespace hpx { namespace components { namespace nbody { namespace server
             BOOST_ASSERT(function != functions.second);
 
 //#if 0       // DEBUG
-           std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
+//           std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
 
 //#endif
 //#if 0
-            if ( dst_size(static_step,column,0) > 0 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 1 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,1) << " in column " << dst_src(static_step,column,1) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 2 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,2) << " in column " << dst_src(static_step,column,2) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 3 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 4 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,4) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 5 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,5) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 6 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,6) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 7 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,7) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 8 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,8) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 9 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,9) << std::endl;
-            }
-            if ( dst_size(static_step,column,0) > 10 ) {
-              std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,10) << std::endl;
-            }
-            
+//             if ( dst_size(static_step,column,0) > 0 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 1 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,1) << " in column " << dst_src(static_step,column,1) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 2 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,2) << " in column " << dst_src(static_step,column,2) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 3 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 4 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,4) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 5 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,5) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 6 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,6) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 7 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,7) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 8 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,8) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 9 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,9) << std::endl;
+//             }
+//             if ( dst_size(static_step,column,0) > 10 ) {
+//               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,10) << std::endl;
+//             }
+//             
 //#endif
 
             lazyvals.push_back(
@@ -594,7 +594,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
                 {
                     
                     j = par->bilist[i][p];
-                    std::cout << "i :" << i << " j: " << j <<std::endl;
+  //                  std::cout << "i :" << i << " j: " << j <<std::endl;
                     if (i!=j)
                     {
                         vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);

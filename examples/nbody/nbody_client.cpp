@@ -407,7 +407,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
             if(temp_branch->node_type == 1)
             { // Intermediate Node
                 //temp_branch->tag ;
-  /* */             std::cout << "I am A PAR " << temp_branch->tag << std::endl;
+//   /* */             std::cout << "I am A PAR " << temp_branch->tag << std::endl;
                ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
                // iListGen(n, box_size_2, iList, temp_branch->tag);
             }
@@ -764,7 +764,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 << " " << par->bodies[i].pz << " " << par->bodies[i].vx << " " << par->bodies[i].vy << " " << par->bodies[i].vz << std::endl;
 //             }
 //            std::cout << "body size " << par->bodies.size() << " body 7 X:" << par->bodies[6].px << std::endl;
-            std::cout << "ilist.size" << par->iList.size() <<std::endl;
+ //           std::cout << "ilist.size" << par->iList.size() <<std::endl;
             
           // numvals = par->iList.size();
            par->rowsize = par->iList.size();
@@ -806,7 +806,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             numvals = par->num_pxpar;
             par->bilist.resize(par->num_pxpar);
             
-            std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
+  //          std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
             
 //             for (int p = 0; p < par->num_pxpar-1; ++p)
 //                 bilist[p].resize(par->granularity);
@@ -831,7 +831,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                     for (int r = 0; r < par->iList[q].size(); ++r)
                     {
                        int bal_conn = par->iList[q][r] / par->granularity;
-                       std::cout << par->iList[q][r] << "gran " << par->granularity << std::endl;
+        //               std::cout << par->iList[q][r] << "gran " << par->granularity << std::endl;
                        new_val = bal_conn;
 //                       std::cout << " outer P: " << p << " connects to "<< bal_conn << std::endl;
 
@@ -854,12 +854,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                         loopend += par->granularity;
                     else
                         loopend += par->extra_pxpar;
-                    std::cout << p << " extra_pxpar >0 : loopend " << loopend << "q = " << q << std::endl;
+                  //  std::cout << p << " extra_pxpar >0 : loopend " << loopend << "q = " << q << std::endl;
                 }
                 else
                 {
                     loopend += par->granularity;
-                    std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
+                 //   std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
                 }
             }
             
@@ -901,11 +901,21 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             
 //            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
-//            access_memory_block<stencil_data> resultval = get_memory_block_async(val, gids, result);     
+//            access_memory_block<stencil_data> resultval = get_memory_block_async(val, gids, result);   
+
+
+// block async get stuff
 //            naming::id_type const & result;
 //            std::vector<naming::id_type> const & gids;
-//            hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
-//            access_memory_block<stencil_data> resultval = get_memory_block_async(val, gids, result);
+//            hpx::memory::default_vector<components::access_memory_block<stencil_data> >::type val;
+//            components::access_memory_block<stencil_data> resultval = components::get_memory_block_async(val, gids, result);
+//            std::cout << "result_data size: " << result_data.size() << std::endl;
+//            std::cout << "val size: "<<val.size() << std::endl;
+
+
+
+
+
 //            for (std::size_t i = 0; i < result_data.size(); ++i)
 //            {
 //                access_memory_block<stencil_data> temp_data = components::stubs::memory_block::get(result_data[i]);
@@ -918,21 +928,40 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             
 ////////commenttest             
-            std::cout << par->iter << std::endl;  
-/*            for (int i =0; i < par->num_bodies ; ++i)
+//             std::cout << par->iter << std::endl;  
+            for (int i =0; i < par->num_bodies ; ++i)
             {
                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
-            }   */ 
+            }    
 //             std::cout << "Results: " << std::endl;
-            par->iList.clear();
+
 //             std::cout << "Result data size: " << result_data.size() << std::endl;
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
+//                std::cout << "Result data size: " << val->node_type.size() << std::endl;
+                
+                for (std::size_t k = 0; k < val->node_type.size(); ++k)
+                {
+                    if(val->node_type[k] == 1)
+                    {
+//                     std::cout << "updating particles" << std::endl;
+                        particles[j]->p[0] = val->x[k];
+                        particles[j]->p[1] = val->y[k];
+                        particles[j]->p[2] = val->z[k];
+                        particles[j]->v[0] = val->vx[k];
+                        particles[j]->v[1] = val->vy[k];
+                        particles[j]->v[2] = val->vz[k];
+                        particles[j]->a[0] = val->ax[k];
+                        particles[j]->a[1] = val->ay[k];
+                        particles[j]->a[2] = val->az[k];    
+                        ++j;
+                    }
+                }
 //               std::cout << i << ": " << val->x[i] << " Type: " << val->node_type[i] << std::endl;
 //                  std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type[i]<< std::endl;
 //                 if(val->node_type == 1){
@@ -951,15 +980,18 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                
             }
             
-//             for (int i =0; i < par->num_bodies ; ++i)
-//             {
-//                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
-//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-//                 std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
-//                 << " : " << particles[i]->v[2] << std::endl;
-//             }
+            for (int i =0; i < par->num_bodies ; ++i)
+            {
+                std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
+                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
+                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+                << " : " << particles[i]->v[2] << std::endl;
+            }
             
             //bht_root=NULL;
+            par->iList.clear();
+            par->bilist.clear();
+            std::cout << " \n \n ITERATION: " << par->iter << "\n \n" << std::endl;
 
             
                  

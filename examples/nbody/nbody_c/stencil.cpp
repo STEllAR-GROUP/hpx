@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace nbody
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         
-       std::cout << " EVAL row: " << row << " column : " << column << std::endl;
+       //std::cout << " EVAL row: " << row << " column : " << column << std::endl;
         
 
         if ( val.size() == 0 ) {
@@ -117,7 +117,7 @@ namespace hpx { namespace components { namespace nbody
         } else {
           compute_index = -1;
           for (int i=0;i<val.size();i++) {
-             std::cout << " column: " << column << " val ["<<i<<"] column: " << val[i]->column << std::endl;
+            // std::cout << " column: " << column << " val ["<<i<<"] column: " << val[i]->column << std::endl;
             if ( column == val[i]->column ) {
            //   std::cout<< "Compute Index: " << i << " column: " << column << "val ["<<i<<"] column: " << val[i]->column << std::endl;
               compute_index = i;
@@ -126,7 +126,7 @@ namespace hpx { namespace components { namespace nbody
             
             if (compute_index == -1)
             {
-                std::cout << "column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
+             //   std::cout << "column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
             }
           }    
           
@@ -147,7 +147,7 @@ namespace hpx { namespace components { namespace nbody
 //               end_loop = val.size()-1;
 //           else
 //               end_loop = val.size();
-          std::cout << "compute_index "<< compute_index <<std::endl;
+         // std::cout << "compute_index "<< compute_index <<std::endl;
           
 
           for (int i=0;i< val.size();i++)
@@ -164,7 +164,7 @@ namespace hpx { namespace components { namespace nbody
                             double dx, dy, dz;
                             for (int r = 0; r < par->iList[global_idx].size(); ++r)
                             {
-                                std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i  << " r val " << r << "iList[global] sz" << par->iList[global_idx].size() << std::endl;
+                                //std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i  << " r val " << r << "iList[global] sz" << par->iList[global_idx].size() << std::endl;
                                 if (remote_idx == par->iList[global_idx][r])
                                 {
                                     dx = val[compute_index]->x[j] - val[i]->x[j];
@@ -172,12 +172,12 @@ namespace hpx { namespace components { namespace nbody
                                     dz = val[compute_index]->z[j] - val[i]->z[j];
                                     double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
                                     double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                                    std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
+                                   // std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
                                     resultval->ax[j] += dx + acc_factor;
                                     resultval->ay[j] += dy + acc_factor;
                                     resultval->az[j] += dz + acc_factor;
                                     
-                                    std::cout << "ax size of j " << j << " is " << resultval->ax.size() << std::endl;
+                                   // std::cout << "ax size of j " << j << " is " << resultval->ax.size() << std::endl;
 
 
                                 }
