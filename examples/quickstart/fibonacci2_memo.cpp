@@ -223,7 +223,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("csv,s", "generate statistics of the run in comma separated format")
             ("busywait,b", po::value<int>(),
                 "add this amount of busy wait workload to each of the iterations"
-                " [in steps of 1µs], i.e. -b1000 == 1ms")
+                " [in steps of 1 microsecond], i.e. -b1000 == 1ms")
         ;
 
         po::store(po::command_line_parser(argc, argv)
