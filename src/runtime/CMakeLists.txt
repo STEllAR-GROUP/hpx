@@ -4,7 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_subdirectory(actions)
-add_subdirectory(agas)
+
+# AGAS v2 is still young, and I don't want to worry about Windows compatibility
+# at this point.
+if(NOT MSVC)
+  add_subdirectory(agas)
+endif()
+
 add_subdirectory(applier)
 add_subdirectory(components)
 add_subdirectory(naming)
