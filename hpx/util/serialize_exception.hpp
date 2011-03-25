@@ -58,9 +58,9 @@ namespace boost { namespace serialization
     template <typename Archive>
     void save(Archive& ar, boost::exception_ptr const& ep, unsigned int)
     {
-        hpx::util::exception_type type;
+        hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value;
+        int err_value(0);
         std::string err_message;
 
         std::string throw_function;
@@ -170,9 +170,9 @@ namespace boost { namespace serialization
     template <typename Archive>
     void load(Archive& ar, boost::exception_ptr& e, unsigned int)
     {
-        hpx::util::exception_type type;
+        hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value;
+        int err_value(0);
         std::string err_message;
 
         std::string throw_function;
