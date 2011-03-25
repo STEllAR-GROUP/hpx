@@ -100,7 +100,7 @@ section::section (std::string const& filename, section* root)
 }
 
 section::section (const section & in)
-  : root_(this_()), name_(in.get_name()), section_env_(in.section_env_)
+  : root_(this_()), section_env_(in.section_env_), name_(in.get_name())
 {
     regex_init();
 
