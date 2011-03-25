@@ -27,5 +27,5 @@ OUT="timing.$TIMESTAMP.dat"
 $HPX_ROOT/bin/hpx_optsweep.py -w 1800 -o $LOG -r $RUNS             \
   -a 'REF',"$REFS" -a 'CPU',"$CORES" -a 'GRAIN',"$GRAINS"          \
   /usr/bin/time -f 'CPU REF GRAIN %%e %%x' --output=$OUT --append  \
-  $HPX_ROOT/bin/had_amr3d_client -r -eREF -pgGRAIN.ini -tCPU
+  $HPX_ROOT/bin/had_amr3d_client --random_ports -r -eREF -pgGRAIN.ini -tCPU
 
