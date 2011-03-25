@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <cstddef>
 #include <cstdlib>
 
 #include <hpx/hpx_fwd.hpp>
@@ -102,7 +103,9 @@ namespace hpx { namespace util
         case boost::logging::level::fatal:
             return "   <fatal>";
         }
-        return "<" + boost::lexical_cast<std::string>(level) + ">";
+        // FIXME: This one will screw up the formatting.
+        //return "<" + boost::lexical_cast<std::string>(level) + ">";
+        return     " <unknown>";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,7 +127,7 @@ namespace hpx { namespace util
                 prefix = naming::get_prefix_from_gid(appl->get_prefix());
 
             std::stringstream out;
-            out << std::hex << std::setw(4) << std::setfill('0') << prefix;
+            out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0') << prefix;
             str.prepend_string(out.str());
         }
     };
@@ -142,13 +145,13 @@ namespace hpx { namespace util
             if (0 != self) {
                 // called from inside a PX thread 
                 std::stringstream out;
-                out << std::hex << std::setw(8) << std::setfill('0') 
-                    << self->get_thread_id();
+                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0') 
+                    << reinterpret_cast<std::ptrdiff_t>(self->get_thread_id());
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a PX thread 
-                str.prepend_string("--------");
+                str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
     };
@@ -191,13 +194,13 @@ namespace hpx { namespace util
             if (0 != parent_prefix) {
                 // called from inside a PX thread 
                 std::stringstream out;
-                out << std::hex << std::setw(4) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0') 
                     << parent_prefix;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a PX thread 
-                str.prepend_string("----");
+                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
             }
         }
     };
@@ -216,13 +219,13 @@ namespace hpx { namespace util
             if (0 != parent_id) {
                 // called from inside a PX thread 
                 std::stringstream out;
-                out << std::hex << std::setw(8) << std::setfill('0') 
-                    << parent_id;
+                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0') 
+                    << reinterpret_cast<std::ptrdiff_t>(parent_id);
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a PX thread 
-                str.prepend_string("--------");
+                str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
     };
@@ -266,13 +269,13 @@ namespace hpx { namespace util
             if (0 != component_id) {
                 // called from inside a PX thread 
                 std::stringstream out;
-                out << std::hex << std::setw(8) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0') 
                     << component_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a PX thread 
-                str.prepend_string("--------");
+                str.prepend_string(std::string(sizeof(boost::uint64_t)*2, '-'));
             }
         }
     };
@@ -326,7 +329,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -374,7 +377,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -425,7 +428,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -509,7 +512,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -554,7 +557,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -591,7 +594,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -628,7 +631,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
@@ -664,7 +667,7 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        int lvl = boost::logging::level::disable_all;
+        unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
             lvl = detail::get_log_level(loglevel);
 
