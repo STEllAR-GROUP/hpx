@@ -54,9 +54,9 @@ struct rolling_file_settings {
     {}
 
     /// maximum size in bytes, by default 1Mb
-    flag::t<int> max_size_bytes;
+    flag::t<unsigned> max_size_bytes;
     /// how many files has a rolling file, by default, 10
-    flag::t<int> file_count;
+    flag::t<unsigned> file_count;
     /// if true, it initially erases all files from the rolling file (by default, false)
     flag::t<bool> initial_erase;
     /// if true, it starts with the first file that hasn't exceeded the max size;
@@ -96,7 +96,7 @@ namespace detail {
             namespace fs = boost::filesystem;
             
             if ( m_flags.initial_erase()) {
-                for ( int idx = 0; idx < m_flags.file_count(); ++idx)
+                for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx)
                     if ( fs::exists( file_name(idx) ))
                         fs::remove( file_name(idx) );
             }
@@ -121,7 +121,7 @@ namespace detail {
             recreate_file();
         }
 
-        std::string file_name(int idx) {
+        std::string file_name(unsigned idx) {
             std::ostringstream out; 
             if ( idx > 0)
                 out << m_name_prefix << "." << (idx+1);
@@ -161,7 +161,7 @@ namespace detail {
         std::string m_name_prefix;
         rolling_file_settings m_flags;
         // the index of the current file
-        int m_cur_idx;
+        unsigned m_cur_idx;
     };
 }
 
