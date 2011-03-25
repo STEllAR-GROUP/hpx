@@ -363,11 +363,12 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t max_count = max_thread_count)
-          : work_items_(/*"work_items"*/), work_items_count_(0),
+          : work_items_(/*"work_items"*/),
+            work_items_count_(0),
             terminated_items_(/*"terminated_items"*/), 
             max_count_((0 == max_count) ? max_thread_count : max_count),
-            add_new_logger_("thread_queue::add_new"),
-            new_tasks_count_(0)
+            new_tasks_count_(0),
+            add_new_logger_("thread_queue::add_new")
         {}
 
         void set_max_count(std::size_t max_count = max_thread_count)
