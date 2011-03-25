@@ -8,62 +8,91 @@ set(HPX_ADDCONFIGTEST_LOADED TRUE)
 include(HPX_Include)
 
 hpx_include(Message
+            Compile
             ParseArguments)
 
 macro(add_hpx_config_test name var)
-  hpx_parse_arguments(${name} "SOURCE;FLAGS" "ESSENTIAL" ${ARGN})
+  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE"
+                              "ESSENTIAL;FILE" ${ARGN})
 
-  file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cpp"
-       "${${name}_SOURCE}\n")
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
 
-  try_compile(${var}
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${${name}_FLAGS}
-    OUTPUT_VARIABLE output)
+  set(test_source "")
 
-  if(${var})
-    set(${var} TRUE CACHE INTERNAL "Test ${name} result.")
-    hpx_info("config_test.${name}" "Test passed.")
-    file(APPEND ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
-      "Test ${name} passed with the following output:\n"
-      "${output}\n"
-      "Source code was:\n${${name}_SOURCE}\n")
+  if(${name}_FILE)
+    set(test_source "${${name}_SOURCE}")
+  else()
+    set(test_source
+        "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/src.cpp")
+    file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/src.cpp"
+         "${${name}_SOURCE}\n")
+  endif()
+
+  hpx_compile(${name} SOURCE ${test_source} LANGUAGE ${${name}_LANGUAGE}
+    OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name} 
+    FLAGS ${${name}_FLAGS})
+
+  if("${${name}_RESULT}" STREQUAL "0")
+    set(test_result 0)
+  
+    execute_process(
+      COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name}"
+      RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET) 
+
+    if("${test_result}" STREQUAL "0")
+      set(${var} TRUE CACHE INTERNAL "Test ${name} result.")
+      hpx_info("config_test.${name}" "Test passed.")
+      foreach(definition ${${name}_DEFINITIONS})
+        add_definitions(-D${definition})
+      endforeach()
+    else()
+      set(${var} FALSE CACHE INTERNAL "Test ${name} result.")
+      if(${name}_ESSENTIAL)
+        hpx_fail("config_test.${name}" "Test failed, returned ${test_result}.") 
+      else()
+        hpx_warn("config_test.${name}" "Test failed, returned ${test_result}.") 
+      endif()
+    endif()
   else()
     set(${var} FALSE CACHE INTERNAL "Test ${name} result.")
     if(${name}_ESSENTIAL)
-      hpx_fail("config_test.${name}" "Test failed (check ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log).")
+      hpx_fail("config_test.${name}" "Test failed to compile.") 
     else()
-      hpx_warn("config_test.${name}" "Test failed (check ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log).")
+      hpx_warn("config_test.${name}" "Test failed to compile.") 
     endif()
-    file(APPEND ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/CMakeError.log
-      "Test ${name} failed with the following output:\n"
-      "${output}\n"
-      "Source code was:\n${${name}_SOURCE}\n")
   endif()
 endmacro()
 
 ###############################################################################
-macro(hpx_check_pthreads_affinity variable)
-  add_hpx_config_test(
-   "pthreads_affinity"
-   ${variable}
-   SOURCE
-   "#include <pthread.h>
-    
-    int f()
-    {
-        pthread_t th;
-        size_t cpusetsize;
-        cpu_set_t* cpuset;
-        pthread_setaffinity_np(th, cpusetsize, cpuset);
-        pthread_getaffinity_np(th, cpusetsize, cpuset);
-    }
-    
-    int main()
-    {
-        return 0;
-    }"
-    FLAGS -pthread)
+macro(hpx_check_for_gnu_128bit_integers variable)
+  add_hpx_config_test("gnu_int128" ${variable} LANGUAGE CXX
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/gnu_128bit_integers.cpp
+    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+endmacro()
+
+macro(hpx_check_for_gnu_mcx16 variable)
+  add_hpx_config_test("gnu_mcx16" ${variable} LANGUAGE CXX
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
+    FLAGS -mcx16 FILE ${ARGN})
+endmacro()
+
+macro(hpx_check_for_gnu_march variable)
+  add_hpx_config_test("gnu_march" ${variable} LANGUAGE CXX
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
+    FLAGS -march=native FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_pthread_affinity_np variable)
+  add_hpx_config_test("pthread_affinity_np" ${variable} LANGUAGE CXX
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/pthread_affinity_np.cpp
+    FLAGS -pthread -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_rdtscp variable)
+  add_hpx_config_test("rdtscp" ${variable} LANGUAGE CXX
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/rdtscp.cpp
+    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
 endmacro()
 
