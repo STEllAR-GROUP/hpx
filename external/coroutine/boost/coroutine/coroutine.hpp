@@ -397,10 +397,12 @@ namespace boost { namespace coroutines {
 //         impl_type::rebind(f, id);
 //     }
 // 
-// #define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type)           \
-//     typedef BOOST_DEDUCED_TYPENAME traits_type ::template at<n>::type         \
-//     BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
-//     /**/
+#if 0
+ #define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type)           \
+     typedef BOOST_DEDUCED_TYPENAME traits_type ::template at<n>::type         \
+     BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
+     /**/
+#endif
 // 
 //     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
 //                     BOOST_COROUTINE_generate_argument_n_type,
@@ -415,14 +417,14 @@ namespace boost { namespace coroutines {
 //       static const int arity = result_slot_traits::length;
 //     };
 // #undef BOOST_COROUTINE_generate_argument_n_type
-// 
-// #define BOOST_COROUTINE_param_with_default(z, n, type_prefix)                 \
-//     BOOST_DEDUCED_TYPENAME                                                    \
-//     call_traits<BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type\
-//     BOOST_PP_CAT(arg, n) =                                                    \
-//         BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()                   \
-//     /**/
-// 
+#if 0 
+ #define BOOST_COROUTINE_param_with_default(z, n, type_prefix)                 \
+     BOOST_DEDUCED_TYPENAME                                                    \
+     call_traits<BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type\
+     BOOST_PP_CAT(arg, n) =                                                    \
+         BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()                   \
+     /**/
+#endif 
 //     result_type operator()(
 //         BOOST_PP_ENUM(BOOST_COROUTINE_ARG_MAX, BOOST_COROUTINE_param_with_default, arg)) 
 //     {
