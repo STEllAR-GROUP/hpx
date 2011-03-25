@@ -21,7 +21,7 @@ time2_demo contained this comment:
                    Peter Dimov,
                    Jeff Garland,
                    Terry Golubiewski,
-                   Daniel Krügler,
+                   Daniel Krogler,
                    Anthony Williams.
 */
 
@@ -432,8 +432,8 @@ namespace chrono {
               typename boost::enable_if_c
               <
                   treat_as_floating_point<rep>::value
-                  || (ratio_divide<Period2, period>::type::den == 1
-                    && !treat_as_floating_point<Rep2>::value)
+                  || ((ratio_divide<Period2, period>::type::den == 1)
+                    && (!treat_as_floating_point<Rep2>::value))
               >::type* = 0)
 #ifdef        __GNUC__
               // GCC 4.2.4 refused to accept a definition at this point,
@@ -954,8 +954,8 @@ template <class Clock, class Duration>
           typename boost::enable_if_c
           <
               treat_as_floating_point<rep>::value
-              || (ratio_divide<Period2, period>::type::den == 1
-                && !treat_as_floating_point<Rep2>::value)
+              || ((ratio_divide<Period2, period>::type::den == 1)
+                && (!treat_as_floating_point<Rep2>::value))
           >::type*)
           : rep_(duration_cast<duration>(d).count()) {}
 #endif
