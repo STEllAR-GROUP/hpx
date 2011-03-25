@@ -243,7 +243,7 @@ namespace hpx { namespace threads
         std::string thread_map = "linear";
         thread_map = get_config_entry("system_topology.thread_map", thread_map);
 
-        std::size_t affinity;
+        std::size_t affinity(0);
         if (thread_map == "linear")
         {
           affinity = (num_thread) % num_of_cores;
@@ -259,7 +259,7 @@ namespace hpx { namespace threads
         }
 
         CPU_SET(affinity, &cpu);
-#if defined(HPX_USE_PTHREADS_AFFINITY)
+#if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
 #else
         if (0 == sched_setaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))

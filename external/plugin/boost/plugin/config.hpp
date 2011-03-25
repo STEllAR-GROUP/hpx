@@ -35,7 +35,7 @@ inline std::string BOOST_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
 
 # else // BOOST_WINDOWS
 
-#   if defined(HPX_GCC_HAVE_VISIBILITY)
+#   if defined(BOOST_PLUGIN_GCC_HAVE_VISIBILITY)
 #     define BOOST_PLUGIN_EXPORT_API    __attribute__((visibility ("default")))
 #   endif
 

@@ -74,7 +74,6 @@ if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
                       system
                       signals
                       thread)
-  add_definitions(-DHPX_CHRONO_DONT_USE_INTERNAL_VERSION)
 else()
   set(BOOST_LIBRARIES date_time
                       filesystem
@@ -84,6 +83,7 @@ else()
                       system
                       signals
                       thread)
+  add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
 endif()
@@ -181,6 +181,8 @@ if(MSVC)
     add_definitions(-DDEBUG)
   endif()
 
+  add_definitions(-DHPX_HIDDEN_VISIBILITY)
+
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-D_WIN32_WINNT=0x0501)
@@ -196,6 +198,12 @@ if(MSVC)
   if(CMAKE_CL_64)
     add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
   endif()
+
+  # TODO: implement
+  #hpx_check_for_msvc_128bit_interlocked(hpx_HAVE_MSVC_128BIT_INTERLOCKED
+  #  DEFINITIONS HPX_HAVE_CMPXCHG16B
+  #              BOOST_ATOMIC_HAVE_MSVC_128BIT_INTERLOCKED # for the msvc code
+  #              BOOST_ATOMIC_HAVE_CMPXCHG16B)             # for the fallback 
 
 ################################################################################
 # POSIX specific configuration 
@@ -225,8 +233,9 @@ else()
     "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if(HPX_ELF_HIDDEN_VISIBILITY)
-      add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+      add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+      add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
       set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
@@ -258,12 +267,54 @@ else()
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
   endif()
 
-  hpx_check_pthreads_affinity(hpx_HAVE_PTHREADS_AFFINITY)
+  ##############################################################################
+  # POSIX configuration tests 
+  ##############################################################################
+  option(HPX_AUTO_TUNE
+    "If supported, auto-tune generated code for the hosted environment via compiler support (POSIX only, default: ON)" ON)
 
-  if(hpx_HAVE_PTHREADS_AFFINITY)
-    add_definitions(-DHPX_USE_PTHREADS_AFFINITY)
-  endif()
+  # -march=native will automatically tune generated code for the host
+  # environment. This is available on newish versions of gcc only. If this flag
+  # is used, the generated binaries will be less portable. This is why we
+  # define the HPX_AUTO_TUNED macro.
+  hpx_check_for_gnu_march(hpx_HAVE_GNU_MARCH
+     DEFINITIONS HPX_AUTO_TUNED) 
   
+  if(hpx_HAVE_GNU_MARCH)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+  endif() 
+
+  # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
+  # It allows us to do double quadword (128bit) atomic compare and swap
+  # operations, which is AWESOME. Note that early x86-64 processors do lack
+  # this instruction.
+  hpx_check_for_gnu_mcx16(hpx_HAVE_GNU_MCX16
+    DEFINITIONS HPX_HAVE_CMPXCHG16B
+                BOOST_ATOMIC_HAVE_GNU_SYNC_16 # for the fallback code
+                BOOST_ATOMIC_HAVE_CMPXCHG16B) # for the gnu code
+
+  if(hpx_HAVE_GNU_MCX16)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcx16")
+  endif() 
+
+  # __uint128_t and __int128_t are a nifty, albeit undocumented, GNU extension
+  # that's been supported in GCC (4.1ish and up) and clang-linux for awhile
+  # (strangely, intel-linux doesn't support this). This is particularly useful
+  # for use with cmpxchg16b
+  hpx_check_for_gnu_128bit_integers(hpx_HAVE_GNU_128BIT_INTEGERS
+    DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
+                BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
+
+  # rdtscp is an x86 extension to the rdtsc (read time stamp counter)
+  # instruction. The difference is that rdtscp is serializing.
+  hpx_check_for_rdtscp(hpx_HAVE_RDTSCP
+    DEFINITIONS HPX_HAVE_RDTSCP)
+  
+  hpx_check_for_pthread_affinity_np(hpx_HAVE_PTHREAD_AFFINITY_NP
+    DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
+
   add_definitions(-D_GNU_SOURCE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
@@ -292,6 +343,7 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-valloc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-memalign")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-posix_memalign")
+    add_definitions(-DHPX_TCMALLOC)
   else()
     hpx_warn("tcmalloc" "HPX will perform poorly without tcmalloc.")
   endif()
@@ -353,7 +405,6 @@ install( # install all hpx cmake utility files
   DIRECTORY cmake/ 
   DESTINATION share/cmake 
   COMPONENT core
-  FILES_MATCHING PATTERN "*.cmake"
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 

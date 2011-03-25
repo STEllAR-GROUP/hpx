@@ -22,7 +22,7 @@
 
 #include <boost/version.hpp>
 
-#if !defined(HPX_CHRONO_DONT_USE_INTERNAL_VERSION) && BOOST_VERSION < 104700
+#if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700
 
 #include <boost/chrono/process_times.hpp>
 #include <iostream>

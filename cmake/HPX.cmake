@@ -67,7 +67,6 @@ if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
                       system
                       signals
                       thread)
-  add_definitions(-DHPX_CHRONO_DONT_USE_INTERNAL_VERSION)
 else()
   set(BOOST_LIBRARIES date_time
                       filesystem
@@ -77,6 +76,7 @@ else()
                       system
                       signals
                       thread)
+  add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
 endif()
 
