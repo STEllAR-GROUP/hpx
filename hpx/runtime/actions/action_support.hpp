@@ -262,25 +262,25 @@ namespace hpx { namespace actions
 
         // construct an action from its arguments
         explicit action(threads::thread_priority priority) 
-          : arguments_(), parent_id_(0), parent_phase_(0), parent_locality_(0),
+          : arguments_(), parent_locality_(0), parent_id_(0), parent_phase_(0),
             priority_(priority)
         {}
 
         template <typename Arg0>
         action(Arg0 const& arg0) 
           : arguments_(arg0), 
+            parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
             parent_phase_(threads::get_parent_phase()),
-            parent_locality_(applier::get_prefix_id()),
             priority_(threads::thread_priority_normal)
         {}
 
         template <typename Arg0>
         action(threads::thread_priority priority, Arg0 const& arg0) 
           : arguments_(arg0), 
+            parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
             parent_phase_(threads::get_parent_phase()),
-            parent_locality_(applier::get_prefix_id()),
             priority_(priority)
         {}
 
