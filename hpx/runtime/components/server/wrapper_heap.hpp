@@ -88,7 +88,7 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit wrapper_heap(char const* class_name, bool, bool, 
-                int count, std::size_t step = (std::size_t)-1)
+                std::size_t count, std::size_t step = static_cast<std::size_t>(-1))
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid), get_agas_client_(NULL),
             class_name_(class_name), alloc_count_(0), free_count_(0),
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
-            if ((std::size_t)(-1) == step_ || step_ < heap_step) 
+            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step) 
                 step_ = heap_step;
             else 
                 step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
@@ -122,8 +122,8 @@ namespace hpx { namespace components { namespace detail
             tidy();
         }
 
-        int size() const { return int(size_ - free_size_); }
-        int free_size() const { return free_size_; }
+        std::size_t size() const { return size_ - free_size_; }
+        std::size_t free_size() const { return free_size_; }
         bool is_empty() const { return NULL == pool_; }
         bool has_allocatable_slots() const { return first_free_ < pool_+size_; }
 
@@ -137,13 +137,13 @@ namespace hpx { namespace components { namespace detail
             if (!ensure_pool(count))
                 return false;
 
-            alloc_count_ += (int)count;
+            alloc_count_ += count;
 
             value_type* p = static_cast<value_type*>(first_free_->address());
             BOOST_ASSERT(p != NULL);
 
             first_free_ += count;
-            free_size_ -= (int)count;
+            free_size_ -= count;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
             // init memory blocks
@@ -164,12 +164,13 @@ namespace hpx { namespace components { namespace detail
 #else
             scoped_lock l(mtx_);
 #endif
-            storage_type* p1 = static_cast<storage_type*>(p);
+            storage_type* p1 = 0;
+            p1 = static_cast<storage_type*>(p);
 
             BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
             BOOST_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
-            BOOST_ASSERT((std::size_t)free_size_ + count <= size_);
+            BOOST_ASSERT(free_size_ + count <= size_);
 #if HPX_DEBUG_WRAPPER_HEAP != 0
             // make sure this has not been freed yet
             BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value, 
@@ -178,8 +179,8 @@ namespace hpx { namespace components { namespace detail
             // give memory back to pool
             debug::fill_bytes(p1->address(), freed_value, sizeof(storage_type));
 #endif
-            free_count_ += (int)count;
-            free_size_ += (int)count;
+            free_count_ += count;
+            free_size_ += count;
 
             // release the pool if this one was the last allocated item
             test_release();
@@ -277,7 +278,7 @@ namespace hpx { namespace components { namespace detail
     protected:
         bool test_release()
         {
-            if (pool_ == NULL || (std::size_t)free_size_ < size_ || first_free_ < pool_+size_)
+            if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
             BOOST_ASSERT(free_size_ == size_);
 
@@ -313,7 +314,7 @@ namespace hpx { namespace components { namespace detail
 
             first_free_ = pool_;
             size_ = s / heap_size;
-            free_size_ = (int)size_;
+            free_size_ = size_;
 
             LOSH_(info) 
                 << "wrapper_heap (" 
@@ -351,7 +352,7 @@ namespace hpx { namespace components { namespace detail
         storage_type* first_free_;
         std::size_t step_;
         std::size_t size_;
-        int free_size_;
+        std::size_t free_size_;
 
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
@@ -364,9 +365,9 @@ namespace hpx { namespace components { namespace detail
 
     public:
         std::string const class_name_;
-        int alloc_count_;
-        int free_count_;
-        int heap_count_;
+        std::size_t alloc_count_;
+        std::size_t free_count_;
+        std::size_t heap_count_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
