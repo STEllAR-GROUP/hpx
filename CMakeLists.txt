@@ -270,17 +270,14 @@ else()
   ##############################################################################
   # POSIX configuration tests 
   ##############################################################################
-  option(HPX_AUTO_TUNE
-    "If supported, auto-tune generated code for the hosted environment via compiler support (POSIX only, default: ON)" ON)
-
-  # -march=native will automatically tune generated code for the host
-  # environment. This is available on newish versions of gcc only. If this flag
-  # is used, the generated binaries will be less portable. This is why we
-  # define the HPX_AUTO_TUNED macro.
-  hpx_check_for_gnu_march(hpx_HAVE_GNU_MARCH
-     DEFINITIONS HPX_AUTO_TUNED) 
+  # GNU GCC's -march=native will automatically tune generated code for the host
+  # environment. This is available on newish versions of GCC only (4.3ish). If
+  # this flag is used, the generated binaries will be less portable. This is why
+  # we define the HPX_COMPILER_AUTO_TUNED macro.
+  hpx_check_for_compiler_auto_tune(HPX_COMPILER_AUTO_TUNE
+     DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
   
-  if(hpx_HAVE_GNU_MARCH)
+  if(HPX_COMPILER_AUTO_TUNE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
   endif() 
@@ -289,12 +286,12 @@ else()
   # It allows us to do double quadword (128bit) atomic compare and swap
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
-  hpx_check_for_gnu_mcx16(hpx_HAVE_GNU_MCX16
+  hpx_check_for_gnu_mcx16(HPX_GNU_MCX16
     DEFINITIONS HPX_HAVE_CMPXCHG16B
                 BOOST_ATOMIC_HAVE_GNU_SYNC_16 # for the fallback code
                 BOOST_ATOMIC_HAVE_CMPXCHG16B) # for the gnu code
 
-  if(hpx_HAVE_GNU_MCX16)
+  if(HPX_GNU_MCX16)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcx16")
   endif() 
@@ -303,16 +300,16 @@ else()
   # that's been supported in GCC (4.1ish and up) and clang-linux for awhile
   # (strangely, intel-linux doesn't support this). This is particularly useful
   # for use with cmpxchg16b
-  hpx_check_for_gnu_128bit_integers(hpx_HAVE_GNU_128BIT_INTEGERS
+  hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
 
   # rdtscp is an x86 extension to the rdtsc (read time stamp counter)
   # instruction. The difference is that rdtscp is serializing.
-  hpx_check_for_rdtscp(hpx_HAVE_RDTSCP
+  hpx_check_for_rdtscp(HPX_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
   
-  hpx_check_for_pthread_affinity_np(hpx_HAVE_PTHREAD_AFFINITY_NP
+  hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
   add_definitions(-D_GNU_SOURCE)
