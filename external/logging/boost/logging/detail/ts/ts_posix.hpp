@@ -63,7 +63,8 @@ public:
 
         res = pthread_mutex_init(&m_mutex, &attr);
         {
-            int res = pthread_mutexattr_destroy(&attr);
+            int res = 0;
+            res = pthread_mutexattr_destroy(&attr);
             BOOST_ASSERT(res == 0);
         }
         if (res != 0)
