@@ -103,9 +103,9 @@ namespace hpx { namespace threads { namespace detail
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""), 
             lco_description_(""),
+            parent_locality_prefix_(init_data.parent_prefix),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
-            parent_locality_prefix_(init_data.parent_prefix),
             component_id_(init_data.lva),
             marked_state_(unknown),
             pool_(&pool)
