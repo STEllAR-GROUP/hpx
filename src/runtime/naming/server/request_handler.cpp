@@ -567,7 +567,7 @@ namespace hpx { namespace naming { namespace server
         if (it != registry_.end()) {
             if ((*it).first == gid) {
                 // found the exact match in the registry
-                components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                //components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
                 return (components::component_type)at_c<0>((*it).second).type_;
             }
             else if (it != registry_.begin()) {
@@ -578,7 +578,7 @@ namespace hpx { namespace naming { namespace server
                     // the only limitation while binding blocks of global 
                     // ids is that these have to have identical msb's
                     if (gid.get_msb() == (*it).first.get_msb()) {
-                        components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                        //components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
                         return (components::component_type)at_c<0>((*it).second).type_;
                     }
                 }
@@ -588,7 +588,7 @@ namespace hpx { namespace naming { namespace server
             --it;
             if ((*it).first + at_c<1>((*it).second) >= gid) {
                 // the previous range covers the id to resolve
-                components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
+                //components::component_type t = (components::component_type)at_c<0>((*it).second).type_;
                 return (components::component_type)at_c<0>((*it).second).type_;
             }
         }
