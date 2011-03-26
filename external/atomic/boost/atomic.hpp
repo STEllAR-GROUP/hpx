@@ -47,7 +47,7 @@ public:
     using super::is_lock_free;
     
     operator bool(void) const volatile {return load();}
-    bool operator=(bool v) volatile {store(v); return v;}	
+    bool operator=(bool v) volatile {store(v); return v;}    
 private:
     atomic(const atomic &);
     void operator=(const atomic &);
