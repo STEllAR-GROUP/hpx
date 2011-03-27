@@ -12,7 +12,7 @@ hpx_include(Message
             ParseArguments)
 
 macro(add_hpx_config_test name variable)
-  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;DEFAULT"
+  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;DEFAULT;ARGS"
                               "FILE" ${ARGN})
 
   # FIXME: Sadly, CMake doesn't support non-boolean options with the option
@@ -53,6 +53,7 @@ macro(add_hpx_config_test name variable)
     
       execute_process(
         COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name}"
+                ${${name}_ARGS}
         RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET) 
   
       if("${test_result}" STREQUAL "0")
@@ -79,6 +80,12 @@ macro(hpx_check_for_gnu_128bit_integers variable)
     FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
 endmacro()
 
+macro(hpx_check_for_gnu_aligned_16 variable)
+  add_hpx_config_test("gnu_aligned_16" ${variable} LANGUAGE CXX 
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/gnu_aligned_16.cpp
+    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+endmacro()
+
 macro(hpx_check_for_gnu_mcx16 variable)
   add_hpx_config_test("gnu_mcx16" ${variable} LANGUAGE CXX 
     SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
@@ -93,16 +100,18 @@ macro(hpx_check_for_pthread_affinity_np variable)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_rdtscp variable)
-  add_hpx_config_test("rdtscp" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/rdtscp.cpp
-    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
-endmacro()
-
 macro(hpx_check_for_compiler_auto_tune variable)
   # TODO: add support for MSVC-esque compilers
   add_hpx_config_test("compiler_auto_tune" ${variable} LANGUAGE CXX 
     SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
     FLAGS -march=native FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_cpuid target variable)
+  add_hpx_config_test("${target}" ${variable} LANGUAGE CXX 
+    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/cpuid.cpp
+    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN}
+    ARGS "${target}")
 endmacro()
 
