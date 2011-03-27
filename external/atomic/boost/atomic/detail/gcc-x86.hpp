@@ -447,7 +447,12 @@ public:
 };
 #endif
 
-#if (defined(__amd64__) || defined(__x86_64__)) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16)
+// TODO: only use the sync intrinsics as a fallback, prefer inline asm as it
+// allows us to do relaxed memory ordering.
+#if (defined(__amd64__) || defined(__x86_64__)) && \
+    defined(BOOST_ATOMIC_HAVE_SSE2) && \
+    defined(BOOST_ATOMIC_HAVE_GNU_SYNC_16) && \
+    defined(BOOST_ATOMIC_HAVE_GNU_ALIGNED_16)
 template<typename T>
 class atomic_x86_128 {
 public:
@@ -455,18 +460,26 @@ public:
     atomic_x86_128() {}
     T load(memory_order order=memory_order_seq_cst) const volatile
     {
-        T v=*reinterpret_cast<volatile const T *>(&i);
-        fence_after_load(order);
+        T v;
+        __asm__ __volatile__ (
+            "movdqa %1, %%xmm0 ;\n"
+            "movdqa %%xmm0, %0 ;\n"
+          : "=m" (v)
+          : "m" (i)
+          : "xmm0", "memory"
+          );
         return v;
     }
     void store(T v, memory_order order=memory_order_seq_cst) volatile
     {
-        if (order!=memory_order_seq_cst) {
-            fence_before(order);
-            *reinterpret_cast<volatile T *>(&i)=v;
-        } else {
-            exchange(v);
-        }
+        // Atomically stores 128bit value by SSE instruction movdqa
+        __asm__ __volatile__ (
+            "movdqa %1, %%xmm0 ;\n"
+            "movdqa %%xmm0, %0 ;\n"
+          : "=m" (i)
+          : "m" (v)
+          : "xmm0", "memory"
+          );
     }
     bool compare_exchange_strong(
         T &expected,
