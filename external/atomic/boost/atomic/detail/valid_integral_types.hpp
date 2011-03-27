@@ -30,7 +30,10 @@ template<> struct is_integral_type<long> {typedef int test;};
 template<> struct is_integral_type<boost::ulong_long_type> {typedef int test;};
 template<> struct is_integral_type<boost::long_long_type> {typedef int test;};
 #endif
-
+#ifdef BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS
+template<> struct is_integral_type<__uint128_t> {typedef int test;};
+template<> struct is_integral_type<__int128_t> {typedef int test;};
+#endif
 }
 }
 }
