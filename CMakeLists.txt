@@ -287,14 +287,21 @@ else()
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
   hpx_check_for_gnu_mcx16(HPX_GNU_MCX16
-    DEFINITIONS HPX_HAVE_CMPXCHG16B
-                BOOST_ATOMIC_HAVE_GNU_SYNC_16 # for the fallback code
-                BOOST_ATOMIC_HAVE_CMPXCHG16B) # for the gnu code
+    DEFINITIONS HPX_HAVE_GNU_SYNC_16
+                BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
 
   if(HPX_GNU_MCX16)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcx16")
   endif() 
+
+  # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
+  # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
+  # and some versions don't warn if you ask for an alignment above said limit.
+  # Instead, they'll just silently use the maximum, which can be problematical. 
+  hpx_check_for_gnu_mcx16(HPX_GNU_ALIGNED_16
+    DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
+                BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
 
   # __uint128_t and __int128_t are a nifty, albeit undocumented, GNU extension
   # that's been supported in GCC (4.1ish and up) and clang-linux for awhile
@@ -303,12 +310,25 @@ else()
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
-
-  # rdtscp is an x86 extension to the rdtsc (read time stamp counter)
-  # instruction. The difference is that rdtscp is serializing.
-  hpx_check_for_rdtscp(HPX_RDTSCP
-    DEFINITIONS HPX_HAVE_RDTSCP)
+ 
+  # we use movdqa for atomic 128bit loads and stores 
+  hpx_cpuid("sse2" HPX_SSE2
+    DEFINITIONS HPX_HAVE_SSE2
+                BOOST_ATOMIC_HAVE_SSE2)
   
+  if(HPX_SSE2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
+  endif() 
+
+  # rdtsc is an x86 instruction that reads the value of a CPU time stamp
+  # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
+  # a serializing instruction.
+  hpx_cpuid("rdtsc" HPX_RDTSC
+    DEFINITIONS HPX_HAVE_RDTSC)
+  hpx_cpuid("rdtscp" HPX_RDTSCP
+    DEFINITIONS HPX_HAVE_RDTSCP)
+
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
