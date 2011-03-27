@@ -195,6 +195,10 @@ typedef atomic<boost::int64_t> atomic_int64_t;
 typedef atomic<boost::ulong_long_type> atomic_ullong;
 typedef atomic<boost::long_long_type> atomic_llong;
 #endif
+#ifdef BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS
+typedef atomic<__uint128_t> atomic_uint128_t;
+typedef atomic<__int128_t> atomic_int128_t;
+#endif
 typedef atomic<void*> atomic_address;
 typedef atomic<bool> atomic_bool;
 
