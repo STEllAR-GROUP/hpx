@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace nbody
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         
-       std::cout << "stencil::eval:: EVAL row: " << row << " column : " << column  << " val.size() " << val.size() << std::endl;
+//        std::cout << "stencil::eval:: EVAL row: " << row << " column : " << column  << " val.size() " << val.size() << std::endl;
         
 
         if ( val.size() == 0 ) {
@@ -120,14 +120,14 @@ namespace hpx { namespace components { namespace nbody
           for (int i=0;i<val.size();i++) {
              std::cout << "stencil::eval:: column: " << column << " val ["<<i<<"] column: " << val[i]->column << " val.size() " << val.size() << std::endl;
             if ( column == val[i]->column ) {
-           //   std::cout<< "Compute Index: " << i << " column: " << column << "val ["<<i<<"] column: " << val[i]->column << std::endl;
               compute_index = i;
+              std::cout<< "i: " << i << " Compute_index " << compute_index  << " column: " << column << "val ["<<i<<"] column: " << val[i]->column << std::endl;
               break; 
             }   
             
             if (compute_index == -1)
             {
-               std::cout << "stencil::eval::  compute_index = -1 column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
+               std::cout << "stencil::eval::  compute_index = -1 column: " << column << "val ["<<i<<"] column:" << val[i]->column << " val.size() " << val.size() << std::endl;
             }
           }    
           
@@ -166,15 +166,15 @@ namespace hpx { namespace components { namespace nbody
          
           for (int i=0;i< val.size();i++)
           {
-              std::cout << "\n VAL i " << i <<  "COMPUTE_INDEX " << compute_index << " val.size() " << val.size() <<std::endl;
-              std::cout << "resultval sizes node_type " << resultval->node_type.size() << " x " << resultval->x.size() <<std::endl;
+//               std::cout << "\n VAL i " << i <<  "COMPUTE_INDEX " << compute_index << " val.size() " << val.size() <<std::endl;
+//               std::cout << "resultval sizes node_type " << resultval->node_type.size() << " x " << resultval->x.size() <<std::endl;
 
               
               int global_idx[ci_num_par];               
               for(int d = 0; d < ci_num_par; ++d)
               {
                   global_idx[d] = (compute_index * par->granularity) + d;
-                  std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
+//                   std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
               }
               
               int i_num_par = 0;
@@ -200,23 +200,24 @@ namespace hpx { namespace components { namespace nbody
               for(int d = 0; d < i_num_par; ++d)
               {                   
                   remote_idx[d] = (i * par->granularity) + d;
-                  std::cout << "stencil::eval:: i "<< i << " remote_idx " << remote_idx[d] << std::endl;
+//                   std::cout << "stencil::eval:: i "<< i << " remote_idx " << remote_idx[d] << std::endl;
               }
               
-              
+              if (i != compute_index)
+              {
               for(int d = 0; d < ci_num_par; ++d)
               {
                   if(val[compute_index]->node_type[d] == 1)
                   {
                         for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
                         {
-                            std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
+//                             std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
                             for(int f=0; f < i_num_par; ++f)
                             {
-                                std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
+//                                 std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
                                 if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1) 
                                 {
-                                std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
+//                                 std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
                                 
                                 double dx = val[compute_index]->x[d] - val[i]->x[f];
                                 double dy = val[compute_index]->y[d] - val[i]->y[f];
@@ -231,6 +232,7 @@ namespace hpx { namespace components { namespace nbody
                             }
                         }
                   }
+              }
               }
 
           }
@@ -260,7 +262,7 @@ namespace hpx { namespace components { namespace nbody
                     
                     v_half_x = resultval->vx[d] + vel_dt_half_x;
                     v_half_y = resultval->vy[d] + vel_dt_half_y;
-                    v_half_z = resultval->vz[d] + vel_dt_half_y;  
+                    v_half_z = resultval->vz[d] + vel_dt_half_z;  
                     
                     resultval->x[d] += v_half_x * par->dtime;
                     resultval->y[d] += v_half_y * par->dtime;
@@ -269,12 +271,15 @@ namespace hpx { namespace components { namespace nbody
                     resultval->vx[d] += v_half_x + vel_dt_half_x;
                     resultval->vy[d] += v_half_y + vel_dt_half_y;
                     resultval->vz[d] += v_half_z + vel_dt_half_z;
+                    
+                    std::cout << "Result Val Type: " << resultval->node_type[d] << " compute_index " << compute_index << " d " << d <<std::endl;
+                    std::cout << "Result Val X" << resultval->x[d] <<" "<<resultval->y[d] << " " << resultval->z[d] << std::endl;
+                    std::cout << "Result Val VX" << resultval->vx[d] <<" "<<resultval->vy[d] << " " << resultval->vz[d] << std::endl;                    
+                    
               }
               
           }
-//           std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
-//           std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
-//           std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
+
 
         //  } // if node_type == 1 (par)
 

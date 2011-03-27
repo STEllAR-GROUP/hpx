@@ -70,14 +70,31 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 //  if (par.bilist[item].size() != 0)
 //  {  
         int num_real_par = 0;
-        if (item < par.num_pxpar-1)
-            num_real_par = par.granularity;
-        else if (item == par.num_pxpar-1 && par.extra_pxpar == 0)
-            num_real_par = par.granularity;
-        else if (item == par.num_pxpar-1 && par.extra_pxpar != 0)
-            num_real_par = par.extra_pxpar;
-        else if (item >= par.num_pxpar)
-            BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
+        if (par.extra_pxpar != 0)
+        {
+            if (item < par.num_pxpar-1)
+                num_real_par = par.granularity;
+            else if (item == par.num_pxpar-1)
+                num_real_par = par.extra_pxpar;
+            else if (item >= par.num_pxpar)
+                BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
+        }
+        else if(par.extra_pxpar == 0)
+        {
+            if (item < par.num_pxpar)
+                num_real_par = par.granularity;
+            else if (item >= par.num_pxpar)
+                BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
+        }
+
+//         if (item < par.num_pxpar-1)
+//             num_real_par = par.granularity;
+//         else if (item == par.num_pxpar-1 && par.extra_pxpar == 0)
+//             num_real_par = par.granularity;
+//         else if (item == par.num_pxpar-1 && par.extra_pxpar != 0)
+//             num_real_par = par.extra_pxpar;
+//         else if (item >= par.num_pxpar)
+//             BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
      
         for (int i = 0; i < num_real_par; ++i)
         {
@@ -95,11 +112,20 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
                 val->vx.push_back(par.bodies[iidx].vx);
                 val->vy.push_back(par.bodies[iidx].vy); 
                 val->vz.push_back(par.bodies[iidx].vz);
-                val->ax.push_back(0.0); 
-                val->ay.push_back(0.0); 
-                val->az.push_back(0.0); 
-
-                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << std::endl;
+                
+                if (par.bodies[iidx].node_type == 1 && par.iter > 0)
+                {
+                    val->ax.push_back(par.bodies[iidx].ax); 
+                    val->ay.push_back(par.bodies[iidx].ay); 
+                    val->az.push_back(par.bodies[iidx].az);
+                }
+                else
+                {
+                    val->ax.push_back(0.0); 
+                    val->ay.push_back(0.0); 
+                    val->az.push_back(0.0); 
+                }
+                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type  <<std::endl;
         //       std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
             //     std::cout << " Maxitems " << maxitems << std::endl;
         //        std::cout << "I get till here"<< std::endl;

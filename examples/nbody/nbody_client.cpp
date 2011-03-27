@@ -1029,7 +1029,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 << " : " << particles[i]->v[2] << std::endl;
             }
 ////////blockcomment --- END
-
+/*
+            for (std::size_t i = 0; i < result_data.size(); ++i)
+                components::stubs::memory_block::free(result_data[i]);*/
             
             //bht_root=NULL;
             par->iList.clear();
