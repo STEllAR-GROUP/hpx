@@ -108,23 +108,33 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
                 val->x.push_back(par.bodies[iidx].px); 
                 val->y.push_back(par.bodies[iidx].py);
                 val->z.push_back(par.bodies[iidx].pz);  
-
-                val->vx.push_back(par.bodies[iidx].vx);
-                val->vy.push_back(par.bodies[iidx].vy); 
-                val->vz.push_back(par.bodies[iidx].vz);
-                
                 if (par.bodies[iidx].node_type == 1 && par.iter > 0)
                 {
-                    val->ax.push_back(par.bodies[iidx].ax); 
-                    val->ay.push_back(par.bodies[iidx].ay); 
-                    val->az.push_back(par.bodies[iidx].az);
+                    val->vx.push_back((par.bodies[iidx].vx+(0 -par.bodies[iidx].ax)*par.half_dt)); 
+                    val->vy.push_back((par.bodies[iidx].vy+(0 -par.bodies[iidx].ay)*par.half_dt)); 
+                    val->vz.push_back((par.bodies[iidx].vz+(0 -par.bodies[iidx].az)*par.half_dt));
                 }
                 else
                 {
+                    val->vx.push_back(par.bodies[iidx].vx);
+                    val->vy.push_back(par.bodies[iidx].vy); 
+                    val->vz.push_back(par.bodies[iidx].vz);
+                }
+                
+                
+                
+//                 if (par.bodies[iidx].node_type == 1 && par.iter > 0)
+//                 {
+//                     val->ax.push_back((0 -par.bodies[iidx].ax)*par.half_dt); 
+//                     val->ay.push_back((0 -par.bodies[iidx].ay)*par.half_dt); 
+//                     val->az.push_back((0 -par.bodies[iidx].az)*par.half_dt);
+//                 }
+//                 else
+//                 {
                     val->ax.push_back(0.0); 
                     val->ay.push_back(0.0); 
                     val->az.push_back(0.0); 
-                }
+//                 }
                 std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type  <<std::endl;
         //       std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
             //     std::cout << " Maxitems " << maxitems << std::endl;
