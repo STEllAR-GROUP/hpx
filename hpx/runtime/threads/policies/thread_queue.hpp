@@ -76,6 +76,8 @@ namespace hpx { namespace threads { namespace policies
         return work_items.dequeue(thrd);
     }
 
+    // FIXME: lockfree::fifo<>::empty() is NOT thread safe. Is this function
+    // expected to be thread safe?
     inline bool 
     empty(work_item_queue_type& work_items, std::size_t num_thread)
     {
