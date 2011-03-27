@@ -906,23 +906,23 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
 
 ///////blockcomment  
-          if (par->iter == 0)
+//           if (par->iter == 0)
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
-          else 
-          {
-              for (std::size_t i = 0; i < result_data.size(); ++i)
-              {
-                  components::access_memory_block<stencil_data> val(
-                    components::stubs::memory_block::get(result_data[i]));
-//                   std::cout << i << " VALrow : " << val->row << " VALcolumn : " <<  val->column << std::endl;
-                  val->column = i;
-              }
-               result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
-                numsteps, do_logging ? logging_type : components::component_invalid,par );
-
-          }
+//           else 
+//           {
+//               for (std::size_t i = 0; i < result_data.size(); ++i)
+//               {
+//                   components::access_memory_block<stencil_data> val(
+//                     components::stubs::memory_block::get(result_data[i]));
+// //                   std::cout << i << " VALrow : " << val->row << " VALcolumn : " <<  val->column << std::endl;
+//                   val->column = i;
+//               }
+//                result_data = unigrid_mesh.execute(result_data,function_type, numvals, 
+//                 numsteps, do_logging ? logging_type : components::component_invalid,par );
+// 
+//           }
 ////////blockcomment --- END          
 //            
 //             
