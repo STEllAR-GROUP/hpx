@@ -11,6 +11,7 @@ set(groups
     component_memory_block
     hardware
     lcos
+    lockfree_deque
     naming
     performance_counters
     sanity
