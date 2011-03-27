@@ -1,0 +1,209 @@
+//  tagged pointer pair, for aba prevention (intended for use with 128bit
+//  atomics)
+//
+//  Copyright (C) 2008-2011 Tim Blechmann
+//  Copyright (C) 2011      Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
+//  Disclaimer: Not a Boost library.
+
+#ifndef BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
+#define BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
+
+#include <boost/lockfree/detail/branch_hints.hpp>
+
+#include <cstddef> // for std::size_t
+
+#include <boost/cstdint.hpp>
+
+namespace boost { namespace lockfree
+{
+
+#if defined(BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS)
+template <class Left, class Right>
+struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
+{
+    typedef __uint128_t compressed_ptr_pair_type;
+    typedef boost::uint64_t compressed_ptr_type;
+    typedef boost::uint16_t tag_type;
+
+    union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
+    {
+        compressed_ptr_pair_type value;
+        compressed_ptr_type ptrs[2];
+        tag_type tags[8];
+    };
+
+    BOOST_STATIC_CONSTANT(std::size_t, left_tag_index = 3);
+    BOOST_STATIC_CONSTANT(std::size_t, right_tag_index = 7);
+    BOOST_STATIC_CONSTANT(std::size_t, left_ptr_index = 0);
+    BOOST_STATIC_CONSTANT(std::size_t, right_ptr_index = 1);
+    BOOST_STATIC_CONSTANT(compressed_ptr_type, ptr_mask = 0xffffffffffff);
+
+    static Left* extract_left_ptr(volatile compressed_ptr_pair_type const& i)
+    {
+        cast_unit cu;
+        cu.value = i;
+        return reinterpret_cast<Left*>(cu.ptrs[left_ptr_index] & ptr_mask);
+    }
+    
+    static Right* extract_right_ptr(volatile compressed_ptr_pair_type const& i)
+    {
+        cast_unit cu;
+        cu.value = i;
+        return reinterpret_cast<Right*>(cu.ptrs[right_ptr_index] & ptr_mask);
+    }
+
+    static tag_type extract_left_tag(volatile compressed_ptr_pair_type const& i)
+    {
+        cast_unit cu;
+        cu.value = i;
+        return cu.tags[left_tag_index];
+    }
+    
+    static tag_type
+    extract_right_tag(volatile compressed_ptr_pair_type const& i)
+    {
+        cast_unit cu;
+        cu.value = i;
+        return cu.tags[right_tag_index];
+    }
+
+    template <typename IntegralL, typename IntegralR>
+    static compressed_ptr_pair_type
+    pack_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
+    {
+        cast_unit ret;
+        ret.ptrs[left_ptr_index] = reinterpret_cast<compressed_ptr_type>(lptr);
+        ret.ptrs[right_ptr_index] = reinterpret_cast<compressed_ptr_type>(rptr);
+        ret.tags[left_tag_index] = static_cast<tag_type>(ltag);
+        ret.tags[right_tag_index] = static_cast<tag_type>(rtag);
+        return ret.value;
+    }
+
+    /** uninitialized constructor */
+    tagged_ptr_pair(): pair_(0) {}
+   
+    template <typename IntegralL>
+    tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag):
+        pair_(pack_ptr_pair(lptr, rptr, ltag, 0)) {}
+
+    template <typename IntegralL, typename IntegralR>
+    tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag):
+        pair_(pack_ptr_pair(lptr, rptr, ltag, rtag)) {}
+
+    /** copy constructors */
+    tagged_ptr_pair(tagged_ptr_pair const& p): pair_(p.pair_) {}
+
+    tagged_ptr_pair(Left* lptr, Right* rptr):
+        pair_(pack_ptr_pair(lptr, rptr, 0, 0)) {}
+
+    /** unsafe set operations */
+    /* @{ */
+    void operator= (tagged_ptr_pair const& p)
+    { pair_ = p.pair_; }
+
+    void set(Left* lptr, Right* rptr)
+    { pair_ = pack_ptr_pair(lptr, rptr, 0, 0); }
+
+    void reset(Left* lptr, Right* rptr)
+    { set(lptr, rptr, 0, 0); }
+
+    template <typename IntegralL>
+    void set(Left* lptr, Right* rptr, IntegralL ltag)
+    { pair_ = pack_ptr_pair(lptr, rptr, ltag, 0); }
+
+    template <typename IntegralL, typename IntegralR>
+    void set(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
+    { pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag); }
+    
+    template <typename IntegralL>
+    void reset(Left* lptr, Right* rptr, IntegralL ltag)
+    { set(lptr, rptr, ltag, 0); }
+    
+    template <typename IntegralL, typename IntegralR>
+    void reset(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
+    { set(lptr, rptr, ltag, rtag); }
+    /* @} */
+
+    /** comparing semantics */
+    /* @{ */
+    bool operator== (volatile tagged_ptr_pair const& p) const
+    { return (pair_ == p.pair_); }
+
+    bool operator!= (volatile tagged_ptr_pair const& p) const
+    { return !operator==(p); }
+    /* @} */
+
+    /** pointer access */
+    /* @{ */
+    Left* get_left_ptr() const volatile
+    { return extract_left_ptr(pair_); }
+    
+    Right* get_right_ptr() const volatile
+    { return extract_right_ptr(pair_); }
+
+    void set_left_ptr(Left* lptr) volatile
+    {
+        Right* rptr = get_right_ptr();
+        tag_type ltag = get_left_tag();
+        tag_type rtag = get_right_tag();
+        pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
+    }
+    
+    void set_right_ptr(Right* rptr) volatile
+    {
+        Left* lptr = get_left_ptr();
+        tag_type ltag = get_left_tag();
+        tag_type rtag = get_right_tag();
+        pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
+    }
+    /* @} */
+
+    /** tag access */
+    /* @{ */
+    tag_type get_left_tag() const volatile
+    { return extract_left_tag(pair_); }
+    
+    tag_type get_right_tag() const volatile
+    { return extract_right_tag(pair_); }
+
+    template <typename Integral> 
+    void set_left_tag(Integral ltag) volatile
+    {
+        Left* lptr = get_left_ptr();
+        Right* rptr = get_right_ptr();
+        tag_type rtag = get_right_tag();
+        pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
+    }
+   
+    template <typename Integral> 
+    void set_right_tag(Integral rtag) volatile
+    {
+        Left* lptr = get_left_ptr();
+        Right* rptr = get_right_ptr();
+        tag_type ltag = get_left_tag();
+        pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
+    }
+    /* @} */
+
+    /** smart pointer support  */
+    /* @{ */
+    operator bool() const
+    { return (get_left_ptr() != 0) && (get_right_ptr() != 0); }
+    /* @} */
+
+  private:
+    compressed_ptr_pair_type pair_;
+};
+#else
+    #error unsupported platform
+#endif
+
+}}
+
+#endif // BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB 
+
