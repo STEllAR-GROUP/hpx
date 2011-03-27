@@ -25,37 +25,36 @@ namespace lockfree
 #if defined (__x86_64__) || defined (_M_X64) || defined(__alpha__)
 
 template <class T>
-class tagged_ptr
+struct tagged_ptr
 {
-    typedef boost::uint64_t compressed_ptr_t;
-    typedef boost::uint16_t tag_t;
+    typedef boost::uint64_t compressed_ptr_type;
+    typedef boost::uint16_t tag_type;
 
-private:
     union cast_unit
     {
-        compressed_ptr_t value;
-        tag_t tag[4];
+        compressed_ptr_type value;
+        tag_type tag[4];
     };
 
-    static const int tag_index = 3;
-    static const compressed_ptr_t ptr_mask = 0xffffffffffff; //(1L<<48L)-1;
+    BOOST_STATIC_CONSTANT(std::size_t, tag_index = 3);
+    BOOST_STATIC_CONSTANT(compressed_ptr_type, ptr_mask = 0xffffffffffff);
 
-    static T* extract_ptr(volatile compressed_ptr_t const & i)
+    static T* extract_ptr(volatile compressed_ptr_type const & i)
     {
-        return (T*)(i & ptr_mask);
+        return reinterpret_cast<T*>(i & ptr_mask);
     }
 
-    static tag_t extract_tag(volatile compressed_ptr_t const & i)
+    static tag_type extract_tag(volatile compressed_ptr_type const & i)
     {
         cast_unit cu;
         cu.value = i;
         return cu.tag[tag_index];
     }
 
-    static compressed_ptr_t pack_ptr(T * ptr, int tag)
+    static compressed_ptr_type pack_ptr(T * ptr, tag_type tag)
     {
         cast_unit ret;
-        ret.value = compressed_ptr_t(ptr);
+        ret.value = reinterpret_cast<compressed_ptr_type>(ptr);
         ret.tag[tag_index] = tag;
         return ret.value;
     }
@@ -71,7 +70,11 @@ public:
         ptr(p.ptr)
     {}
 
-    explicit tagged_ptr(T * p, tag_t t = 0):
+    explicit tagged_ptr(T * p):
+        ptr(pack_ptr(p, 0))
+    {}
+
+    tagged_ptr(T * p, tag_type t):
         ptr(pack_ptr(p, t))
     {}
 
@@ -82,10 +85,15 @@ public:
         ptr = p.ptr;
     }
 
-    void set(T * p, tag_t t)
+    void set(T * p, tag_type t)
     {
         ptr = pack_ptr(p, t);
     }
+    
+    void reset(T * p, tag_type t)
+    {
+        set(p, t);
+    } 
     /* @} */
 
     /** comparing semantics */
@@ -110,19 +118,19 @@ public:
 
     void set_ptr(T * p) volatile
     {
-        tag_t tag = get_tag();
+        tag_type tag = get_tag();
         ptr = pack_ptr(p, tag);
     }
     /* @} */
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const volatile
+    tag_type get_tag() const volatile
     {
         return extract_tag(ptr);
     }
 
-    void set_tag(tag_t t) volatile
+    void set_tag(tag_type t) volatile
     {
         T * p = get_ptr();
         ptr = pack_ptr(p, t);
@@ -148,10 +156,10 @@ public:
     /* @} */
 
 protected:
-    compressed_ptr_t ptr;
+    compressed_ptr_type ptr;
 };
 #else
-#error unsupported platform
+    #error unsupported platform
 #endif
 
 } /* namespace lockfree */

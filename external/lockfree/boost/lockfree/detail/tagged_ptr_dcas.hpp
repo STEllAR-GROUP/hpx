@@ -21,10 +21,9 @@ namespace lockfree
 {
 
 template <class T>
-class BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
+struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
 {
-public:
-    typedef std::size_t tag_t;
+    typedef std::size_t tag_type;
 
     /** uninitialized constructor */
     tagged_ptr(void)//: ptr(0), tag(0)
@@ -34,7 +33,11 @@ public:
         ptr(p.ptr), tag(p.tag)
     {}
 
-    explicit tagged_ptr(T * p, tag_t t = 0):
+    explicit tagged_ptr(T * p):
+        ptr(p), tag(0)
+    {}
+
+    tagged_ptr(T * p, tag_type t):
         ptr(p), tag(t)
     {}
 
@@ -45,10 +48,15 @@ public:
         set(p.ptr, p.tag);
     }
 
-    void set(T * p, tag_t t)
+    void set(T * p, tag_type t = 0)
     {
         ptr = p;
         tag = t;
+    }
+    
+    void reset(T * p, tag_type t = 0)
+    {
+        set(p);
     }
     /* @} */
 
@@ -80,12 +88,12 @@ public:
 
     /** tag access */
     /* @{ */
-    tag_t get_tag() const volatile
+    tag_type get_tag() const volatile
     {
         return tag;
     }
 
-    void set_tag(tag_t t) volatile
+    void set_tag(tag_type t) volatile
     {
         tag = t;
     }
@@ -111,7 +119,7 @@ public:
 
 protected:
     T * ptr;
-    tag_t tag;
+    tag_type tag;
 };
 
 } /* namespace lockfree */
