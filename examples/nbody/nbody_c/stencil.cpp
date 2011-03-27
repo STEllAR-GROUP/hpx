@@ -207,11 +207,13 @@ namespace hpx { namespace components { namespace nbody
               bool interaction = false;
               for(int d = 0; d < ci_num_par; ++d)
               {
+                  if(val[compute_index]->node_type[d] == 1)
+                  {
                   for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
                   {
                       for(int f=0; f < i_num_par; ++f)
                       {
-                          std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << std::endl;
+                          std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
                           if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1) 
                           {
                             interaction = true;
@@ -228,6 +230,7 @@ namespace hpx { namespace components { namespace nbody
                             resultval->az[d] += dz + acc_factor;
                           }
                       }
+                  }
                   }
               }
 

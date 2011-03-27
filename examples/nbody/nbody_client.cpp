@@ -772,7 +772,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             bht_root->tagTree(current_index, max_count, tag_id, 0);
 //              std::cout << "TADA : " << max_count << std::endl;
 
-           bht_root->printTag(current_index);
+//            bht_root->printTag(current_index);
             
 
  //           std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
@@ -863,7 +863,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                     for (int r = 0; r < par->iList[q].size(); ++r)
                     { 
                        int bal_conn = par->iList[q][r] / par->granularity;
-                       std::cout <<"p " << p << " q " << q << " r " << r << " par->iList[q][r] " << par->iList[q][r] << " bal_conn " << bal_conn << std::endl;
+//                        std::cout <<"p " << p << " q " << q << " r " << r << " par->iList[q][r] " << par->iList[q][r] << " bal_conn " << bal_conn << std::endl;
                        if (bal_conn != p)
                            match_vec.push_back(bal_conn);
                        remove_unsorted_dupes(match_vec);
@@ -982,7 +982,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 
                 for (std::size_t k = 0; k < val->node_type.size(); ++k)
                 {
-                    if(val->node_type[k] == 1 && j != par->num_bodies)
+//                     if(val->node_type[k] == 1 && j != par->num_bodies)
+                    if(val->node_type[k] == 1)
                     {
                         std::cout << "updating particle # " << j << " ax vector size " <<val->ax.size() << " x vector size " << val->x.size()   << std::endl;
                         particles[j]->p[0] = val->x[k];
