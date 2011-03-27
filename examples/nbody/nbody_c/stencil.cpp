@@ -204,33 +204,32 @@ namespace hpx { namespace components { namespace nbody
               }
               
               
-              bool interaction = false;
               for(int d = 0; d < ci_num_par; ++d)
               {
                   if(val[compute_index]->node_type[d] == 1)
                   {
-                  for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
-                  {
-                      for(int f=0; f < i_num_par; ++f)
-                      {
-                          std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
-                          if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1) 
-                          {
-                            interaction = true;
-                            std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
-                            
-                            double dx = val[compute_index]->x[d] - val[i]->x[f];
-                            double dy = val[compute_index]->y[d] - val[i]->y[f];
-                            double dz = val[compute_index]->z[d] - val[i]->z[f];
-                            double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                            double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-//                             std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
-                            resultval->ax[d] += dx + acc_factor;
-                            resultval->ay[d] += dy + acc_factor;
-                            resultval->az[d] += dz + acc_factor;
-                          }
-                      }
-                  }
+                        for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
+                        {
+                            std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
+                            for(int f=0; f < i_num_par; ++f)
+                            {
+                                std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
+                                if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1) 
+                                {
+                                std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
+                                
+                                double dx = val[compute_index]->x[d] - val[i]->x[f];
+                                double dy = val[compute_index]->y[d] - val[i]->y[f];
+                                double dz = val[compute_index]->z[d] - val[i]->z[f];
+                                double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                                double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+        //                             std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
+                                resultval->ax[d] += dx + acc_factor;
+                                resultval->ay[d] += dy + acc_factor;
+                                resultval->az[d] += dz + acc_factor;
+                                }
+                            }
+                        }
                   }
               }
 
@@ -255,10 +254,14 @@ namespace hpx { namespace components { namespace nbody
                     vel_dt_half_y = resultval->ay[d] * par->half_dt;
                     vel_dt_half_z = resultval->az[d] * par->half_dt;
                         
-                    v_half_x = resultval->vx[d] * par->half_dt;
-                    v_half_y = resultval->vy[d] * par->half_dt;
-                    v_half_z = resultval->vz[d] * par->half_dt;
-                        
+//                     v_half_x = resultval->vx[d] * par->half_dt;
+//                     v_half_y = resultval->vy[d] * par->half_dt;
+//                     v_half_z = resultval->vz[d] * par->half_dt;
+                    
+                    v_half_x = resultval->vx[d] + vel_dt_half_x;
+                    v_half_y = resultval->vy[d] + vel_dt_half_y;
+                    v_half_z = resultval->vz[d] + vel_dt_half_y;  
+                    
                     resultval->x[d] += v_half_x * par->dtime;
                     resultval->y[d] += v_half_y * par->dtime;
                     resultval->z[d] += v_half_z * par->dtime;
