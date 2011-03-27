@@ -295,7 +295,7 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, in
     if (max_ctr < tag_id)
         max_count = tag_id+1;
     else 
-        max_count = max_ctr;
+        max_count = max_ctr+1;
 //    std::cout << "particleid : " << tag << "Node Type : " << node_type<< std::endl;
 }
 
@@ -625,7 +625,30 @@ static inline void computeRootPos(const int num_bodies, double &box_dim, double 
     center_position[2] = (maxPos[2] + minPos[2]) / 2;
 }
 
+struct less {
+  template<class T>
+  bool operator()(T &a, T &b) {
+    return std::less<T>()(a, b);
+  }
+};
+struct deref_less {
+  template<class T>
+  bool operator()(T a, T b) {
+    return less()(*a, *b);
+  }
+};
 
+void remove_unsorted_dupes(std::list<int> &the_list) {
+  std::set<std::list<int>::iterator, deref_less> found;
+  for (std::list<int>::iterator x = the_list.begin(); x != the_list.end();) {
+    if (!found.insert(x).second) {
+      x = the_list.erase(x);
+    }
+    else {
+      ++x;
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
@@ -749,11 +772,19 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             bht_root->tagTree(current_index, max_count, tag_id, 0);
 //              std::cout << "TADA : " << max_count << std::endl;
 
-//            bht_root->printTag(current_index);
+           bht_root->printTag(current_index);
             
 
  //           std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
 //             std::cout << bht_root->tag << std::endl;
+            
+            if(par->granularity > max_count)
+            {
+                std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
+                par->granularity = max_count;
+                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+            }
+            
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
             int box_idx = 0;
@@ -766,8 +797,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //            std::cout << "body size " << par->bodies.size() << " body 7 X:" << par->bodies[6].px << std::endl;
  //           std::cout << "ilist.size" << par->iList.size() <<std::endl;
             
-          // numvals = par->iList.size();
-           par->rowsize = par->iList.size();
+            // numvals = par->iList.size();
+            par->rowsize = par->iList.size();
             
             double temp_box_size = box_size;
             
@@ -806,47 +837,46 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             numvals = par->num_pxpar;
             par->bilist.resize(par->num_pxpar);
             
-  //          std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
+           std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
             
 //             for (int p = 0; p < par->num_pxpar-1; ++p)
 //                 bilist[p].resize(par->granularity);
 //             bilist[par->num_pxpar].resize();
+           
+
+           
             int q = 0;
             int loopend = par->granularity;
             for (int p = 0; p < par->num_pxpar; ++p)
             {
-                bool rep_test[par->granularity];
-                for (int x = 0; x < par->granularity;++x)
-                {
-                    rep_test[x] = false;
-                    //cout << "blist creation x :" << x << " size : " 
-                    //possible bug rep_test is of size par->granularity but is being initialized 
-                    // x goes from iList.size()
-                }
-
+//                 bool rep_test[par->granularity];
+//                 for (int x = 0; x < par->granularity;++x)
+//                 {
+//                     rep_test[x] = false;
+//                 }
+                std::list<int> match_vec;
                 while (q < loopend)
                 {
-                    int old_val = -1;
-                    int new_val = 0;
+                    //int old_val = -1;
+                    //int new_val = 0;
+                    bool dup_val = false;
                     for (int r = 0; r < par->iList[q].size(); ++r)
-                    {
+                    { 
                        int bal_conn = par->iList[q][r] / par->granularity;
-        //               std::cout << par->iList[q][r] << "gran " << par->granularity << std::endl;
-                       new_val = bal_conn;
-//                       std::cout << " outer P: " << p << " connects to "<< bal_conn << std::endl;
-
-                       if (new_val != old_val && rep_test[new_val] != true)
-                       {
-                           old_val = new_val;
-                           rep_test[new_val] = true;
-        //                 std::cout << " inner P: " << p << " connects to "<< bal_conn << " because of " << par->iList[q][r] << std::endl;
-                           par->bilist[p].push_back(bal_conn);
-                       }
-                       
+                       std::cout <<"p " << p << " q " << q << " r " << r << " par->iList[q][r] " << par->iList[q][r] << " bal_conn " << bal_conn << std::endl;
+                       if (bal_conn != p)
+                           match_vec.push_back(bal_conn);
+                       remove_unsorted_dupes(match_vec);
+                      //std::cout << " outer P: " << p << " connects to "<< bal_conn << std::endl
                     }
                     ++q;
+
                 }
                 q = loopend;
+                for (std::list<int>::iterator it=match_vec.begin(); it!=match_vec.end(); ++it)
+                        par->bilist[p].push_back(*it);
+                match_vec.clear();
+
                 
                 if (par->extra_pxpar != 0)
                 {
@@ -859,7 +889,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 else
                 {
                     loopend += par->granularity;
-                 //   std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
+                    //std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
                 }
             }
             
@@ -875,7 +905,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //            } /// extra brace
             
 
-////////commenttest             
+///////blockcomment  
           if (par->iter == 0)
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
@@ -893,8 +923,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 numsteps, do_logging ? logging_type : components::component_invalid,par );
 
           }
-           
-            
+////////blockcomment --- END          
+//            
+//             
             
             
             
@@ -927,29 +958,33 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             
             
-////////commenttest             
+///////////block comment   
 //             std::cout << par->iter << std::endl;  
             for (int i =0; i < par->num_bodies ; ++i)
             {
                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
-                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
-            }    
+            }   
+////////blockcomment --- END
+
+
 //             std::cout << "Results: " << std::endl;
 
 //             std::cout << "Result data size: " << result_data.size() << std::endl;
+
+////////blockcomment
             for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
-//                std::cout << "Result data size: " << val->node_type.size() << std::endl;
+               std::cout << "Result data size: " << result_data.size() << std::endl;
                 
                 for (std::size_t k = 0; k < val->node_type.size(); ++k)
                 {
-                    if(val->node_type[k] == 1)
+                    if(val->node_type[k] == 1 && j != par->num_bodies)
                     {
-//                     std::cout << "updating particles" << std::endl;
+                        std::cout << "updating particle # " << j << " ax vector size " <<val->ax.size() << " x vector size " << val->x.size()   << std::endl;
                         particles[j]->p[0] = val->x[k];
                         particles[j]->p[1] = val->y[k];
                         particles[j]->p[2] = val->z[k];
@@ -961,7 +996,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                         particles[j]->a[2] = val->az[k];    
                         ++j;
                     }
-                }
+
+                }               
+////////blockcomment --- END
+                
+                
+                
 //               std::cout << i << ": " << val->x[i] << " Type: " << val->node_type[i] << std::endl;
 //                  std::cout << "i=" << i << ", j=" << j << ", val->node_type=" << val->node_type[i]<< std::endl;
 //                 if(val->node_type == 1){
@@ -978,15 +1018,17 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                     ++j;
 //                 }
                
-            }
+            } ////////block comment
             
+////////block comment            
             for (int i =0; i < par->num_bodies ; ++i)
             {
                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
-                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << std::endl;
-                std::cout <<"           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
             }
+////////blockcomment --- END
+
             
             //bht_root=NULL;
             par->iList.clear();
@@ -1004,7 +1046,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         // end for loop
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
-
+        
+////////block comment            
         for (std::size_t i = 0; i < result_data.size(); ++i)
             components::stubs::memory_block::free(result_data[i]);
     }   // nbody_mesh needs to go out of scope before shutdown

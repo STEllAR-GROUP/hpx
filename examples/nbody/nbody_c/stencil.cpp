@@ -102,22 +102,23 @@ namespace hpx { namespace components { namespace nbody
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         
-       //std::cout << " EVAL row: " << row << " column : " << column << std::endl;
+       std::cout << "stencil::eval:: EVAL row: " << row << " column : " << column  << " val.size() " << val.size() << std::endl;
         
 
         if ( val.size() == 0 ) {
           // This should not happen
           BOOST_ASSERT(false);
         }
-
+/*
         if ( val.size() == 1 ) {
           // no restriction needed
-          resultval.get() = val[0].get();
+  //        resultval.get() = val[0].get();
           return 0;
-        } else {
+        } else*/ 
+        {
           compute_index = -1;
           for (int i=0;i<val.size();i++) {
-            // std::cout << " column: " << column << " val ["<<i<<"] column: " << val[i]->column << std::endl;
+             std::cout << "stencil::eval:: column: " << column << " val ["<<i<<"] column: " << val[i]->column << " val.size() " << val.size() << std::endl;
             if ( column == val[i]->column ) {
            //   std::cout<< "Compute Index: " << i << " column: " << column << "val ["<<i<<"] column: " << val[i]->column << std::endl;
               compute_index = i;
@@ -126,7 +127,7 @@ namespace hpx { namespace components { namespace nbody
             
             if (compute_index == -1)
             {
-             //   std::cout << "column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
+               std::cout << "stencil::eval::  compute_index = -1 column: " << column << "val ["<<i<<"] column:" << val[i]->column << std::endl;
             }
           }    
           
@@ -141,198 +142,130 @@ namespace hpx { namespace components { namespace nbody
 //           resultval->ay = 0.0;
 //           resultval->az = 0.0;
           
-          //handling uneven distribution
-//           int end_loop;
-//           if (par->extra_pxpar != 0 )
-//               end_loop = val.size()-1;
-//           else
-//               end_loop = val.size();
-         // std::cout << "compute_index "<< compute_index <<std::endl;
           
-
+            int ci_num_par = 0;
+            if (par->extra_pxpar != 0)
+            {
+                if (compute_index < par->num_pxpar-1)
+                    ci_num_par = par->granularity;
+                else if (compute_index == par->num_pxpar-1)
+                    ci_num_par = par->extra_pxpar;
+                else if (compute_index >= par->num_pxpar)
+                    BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
+//                         std::cout << "stencil::eval:: num actual particles in px_par(compute_index) " << compute_index << " is " << ci_num_par << std::endl;
+            }
+            else if(par->extra_pxpar == 0)
+            {
+                if (compute_index < par->num_pxpar)
+                    ci_num_par = par->granularity;
+                else if (compute_index >= par->num_pxpar)
+                    BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
+//                         std::cout << "stencil::eval:: num actual particles in px_par(compute_index) " << compute_index << " is " << ci_num_par << std::endl;         
+            }
+        
+         
           for (int i=0;i< val.size();i++)
           {
-              if (par->bilist[compute_index].size() == par->granularity)
+              std::cout << "\n VAL i " << i <<  "COMPUTE_INDEX " << compute_index << " val.size() " << val.size() <<std::endl;
+              std::cout << "resultval sizes node_type " << resultval->node_type.size() << " x " << resultval->x.size() <<std::endl;
+
+              
+              int global_idx[ci_num_par];               
+              for(int d = 0; d < ci_num_par; ++d)
               {
-                    for (int j=0; j < par->bilist[compute_index].size() ; ++j)
-                    {
-                            int global_idx = 0;
-                            for (int k =0; k < column; ++k)
-                                global_idx += par->bilist[k].size();
-                            global_idx = global_idx+j;
-                            int remote_idx = (i * par->granularity) + j;
-                            double dx, dy, dz;
-                            for (int r = 0; r < par->iList[global_idx].size(); ++r)
-                            {
-                                //std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i  << " r val " << r << "iList[global] sz" << par->iList[global_idx].size() << std::endl;
-                                if (remote_idx == par->iList[global_idx][r])
-                                {
-                                    dx = val[compute_index]->x[j] - val[i]->x[j];
-                                    dy = val[compute_index]->y[j] - val[i]->y[j];
-                                    dz = val[compute_index]->z[j] - val[i]->z[j];
-                                    double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                                    double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                                   // std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
-                                    resultval->ax[j] += dx + acc_factor;
-                                    resultval->ay[j] += dy + acc_factor;
-                                    resultval->az[j] += dz + acc_factor;
-                                    
-                                   // std::cout << "ax size of j " << j << " is " << resultval->ax.size() << std::endl;
-
-
-                                }
-
-                            }
-                    }
+                  global_idx[d] = (compute_index * par->granularity) + d;
+                  std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
               }
-              else if (par->bilist[compute_index].size() < par->granularity)
+              
+              int i_num_par = 0;
+              if (par->extra_pxpar != 0)
               {
-                    for (int j=0; j < par->bilist[compute_index].size() ; ++j)
-                    {
-                            int global_idx = 0;
-                            for (int k =0; k < column; ++k)
-                                global_idx += par->bilist[k].size();
-                            global_idx = global_idx+j;
-                            int remote_idx = (i * par->granularity) + j;
-                            double dx, dy, dz;
-                            for (int r = 0; r < par->iList[global_idx].size(); ++r)
-                            {
-                                if (remote_idx == par->iList[global_idx][r])
-                                {
-                                    dx = val[compute_index]->x[j] - val[i]->x[j];
-                                    dy = val[compute_index]->y[j] - val[i]->y[j];
-                                    dz = val[compute_index]->z[j] - val[i]->z[j];
-                                    double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-                                    double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-                                    resultval->ax[j] += dx + acc_factor;
-                                    resultval->ay[j] += dy + acc_factor;
-                                    resultval->az[j] += dz + acc_factor;    
-                                }
-                            }
-                    }
+                    if (i < par->num_pxpar-1)
+                        i_num_par = par->granularity;
+                    else if (i == par->num_pxpar-1)
+                        i_num_par = par->extra_pxpar;
+                    else if (i >= par->num_pxpar)
+                        BOOST_ASSERT("ERROR: i is more than number of PX particles");
+//                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;
               }
-//               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
+              else if(par->extra_pxpar == 0)
+              {
+                    if (i < par->num_pxpar)
+                        i_num_par = par->granularity;
+                    else if (i >= par->num_pxpar)
+                        BOOST_ASSERT("ERROR: i is more than number of PX particles");
+//                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;         
+              }
+              int remote_idx[i_num_par];
+              for(int d = 0; d < i_num_par; ++d)
+              {                   
+                  remote_idx[d] = (i * par->granularity) + d;
+                  std::cout << "stencil::eval:: i "<< i << " remote_idx " << remote_idx[d] << std::endl;
+              }
+              
+              
+              bool interaction = false;
+              for(int d = 0; d < ci_num_par; ++d)
+              {
+                  for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
+                  {
+                      for(int f=0; f < i_num_par; ++f)
+                      {
+                          std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << std::endl;
+                          if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1) 
+                          {
+                            interaction = true;
+                            std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
+                            
+                            double dx = val[compute_index]->x[d] - val[i]->x[f];
+                            double dy = val[compute_index]->y[d] - val[i]->y[f];
+                            double dz = val[compute_index]->z[d] - val[i]->z[f];
+                            double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
+                            double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
+//                             std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
+                            resultval->ax[d] += dx + acc_factor;
+                            resultval->ay[d] += dy + acc_factor;
+                            resultval->az[d] += dz + acc_factor;
+                          }
+                      }
+                  }
+              }
+
           }
           
-          
-//           if (par->extra_pxpar != 0 )
-//           {
-//               std::cout << " I Get till here " << std::endl;
-//               
-//                 int i = val.size();
-//                
-                
-        //               std::cout << "Result Val" << resultval->ax <<" "<<resultval->ay << " " << resultval->az << std::endl;
-             
-                
-//               for (int j=0; j < par->bilist[compute_index].size() ; ++j)
-//                     if ( i != compute_index ) {
-//                     double dx = val[compute_index]->x - val[i]->x;
-//                     double dy = val[compute_index]->y - val[i]->y;
-//                     double dz = val[compute_index]->z - val[i]->z;
-//                     
-//                     double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
-//                     double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
-//                     resultval->ax += dx + acc_factor;
-//                     resultval->ay += dy + acc_factor;
-//                     resultval->az += dz + acc_factor;
-//                     }
-//           }
-          
-          //TODO UPDATE THIS
-          
-          for (int i=0;i< val.size();i++)
+          for(int d = 0; d < ci_num_par; ++d)
           {
-              if (par->bilist[compute_index].size() == par->granularity)
+              if (resultval->node_type[d] == 1)
               {
-                    for (int j=0; j < par->bilist[compute_index].size() ; ++j)
-                    {
-                            int global_idx = 0;
-                            for (int k =0; k < column; ++k)
-                                global_idx += par->bilist[k].size();
-                            global_idx = global_idx+j;
-                            int remote_idx = (i * par->granularity) + j;
-                            double dx, dy, dz;
-                            for (int r = 0; r < par->iList[global_idx].size(); ++r)
-                                if (remote_idx == par->iList[global_idx][r])
-                                {
-                                    double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
-                                    double v_half_x, v_half_y, v_half_z;
-                                    resultval->node_type[j] = val[compute_index]->node_type[j];
-                                    resultval->x[j] = val[compute_index]->x[j];
-                                    resultval->y[j] = val[compute_index]->y[j];
-                                    resultval->z[j] = val[compute_index]->z[j];            
-                                    resultval->vx[j] = val[compute_index]->vx[j];
-                                    resultval->vy[j] = val[compute_index]->vy[j];
-                                    resultval->vz[j] = val[compute_index]->vz[j]; 
-                                    
-                                        
-                                    vel_dt_half_x = resultval->ax[j] * par->half_dt;
-                                    vel_dt_half_y = resultval->ay[j] * par->half_dt;
-                                    vel_dt_half_z = resultval->az[j] * par->half_dt;
-                                        
-                                    v_half_x = resultval->vx[j] * par->half_dt;
-                                    v_half_y = resultval->vy[j] * par->half_dt;
-                                    v_half_z = resultval->vz[j] * par->half_dt;
-                                        
-                                    resultval->x[j] += v_half_x * par->dtime;
-                                    resultval->y[j] += v_half_y * par->dtime;
-                                    resultval->z[j] += v_half_z * par->dtime;
-                                        
-                                    resultval->vx[j] += v_half_x + vel_dt_half_x;
-                                    resultval->vy[j] += v_half_y + vel_dt_half_y;
-                                    resultval->vz[j] += v_half_z + vel_dt_half_z;
-                                }
-
-                    }
+                    double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
+                    double v_half_x, v_half_y, v_half_z;
+                    resultval->node_type[d] = val[compute_index]->node_type[d];
+                    resultval->x[d] = val[compute_index]->x[d];
+                    resultval->y[d] = val[compute_index]->y[d];
+                    resultval->z[d] = val[compute_index]->z[d];            
+                    resultval->vx[d] = val[compute_index]->vx[d];
+                    resultval->vy[d] = val[compute_index]->vy[d];
+                    resultval->vz[d] = val[compute_index]->vz[d]; 
+                    
+                        
+                    vel_dt_half_x = resultval->ax[d] * par->half_dt;
+                    vel_dt_half_y = resultval->ay[d] * par->half_dt;
+                    vel_dt_half_z = resultval->az[d] * par->half_dt;
+                        
+                    v_half_x = resultval->vx[d] * par->half_dt;
+                    v_half_y = resultval->vy[d] * par->half_dt;
+                    v_half_z = resultval->vz[d] * par->half_dt;
+                        
+                    resultval->x[d] += v_half_x * par->dtime;
+                    resultval->y[d] += v_half_y * par->dtime;
+                    resultval->z[d] += v_half_z * par->dtime;
+                        
+                    resultval->vx[d] += v_half_x + vel_dt_half_x;
+                    resultval->vy[d] += v_half_y + vel_dt_half_y;
+                    resultval->vz[d] += v_half_z + vel_dt_half_z;
               }
-              else if (par->bilist[compute_index].size() < par->granularity)
-              {
-                    for (int j=0; j < par->bilist[compute_index].size() ; ++j)
-                    {
-                            int global_idx = 0;
-                            for (int k =0; k < column; ++k)
-                                global_idx += par->bilist[k].size();
-                            global_idx = global_idx+j;
-                            int remote_idx = (i * par->granularity) + j;
-                            double dx, dy, dz;
-                            for (int r = 0; r < par->iList[global_idx].size(); ++r)
-                                if (remote_idx == par->iList[global_idx][r])
-                                {
-                                    double vel_dt_half_x, vel_dt_half_y, vel_dt_half_z;
-                                    double v_half_x, v_half_y, v_half_z;
-                                    resultval->node_type[j] = val[compute_index]->node_type[j];
-                                    resultval->x[j] = val[compute_index]->x[j];
-                                    resultval->y[j] = val[compute_index]->y[j];
-                                    resultval->z[j] = val[compute_index]->z[j];            
-                                    resultval->vx[j] = val[compute_index]->vx[j];
-                                    resultval->vy[j] = val[compute_index]->vy[j];
-                                    resultval->vz[j] = val[compute_index]->vz[j]; 
-                                    
-                                        
-                                    vel_dt_half_x = resultval->ax[j] * par->half_dt;
-                                    vel_dt_half_y = resultval->ay[j] * par->half_dt;
-                                    vel_dt_half_z = resultval->az[j] * par->half_dt;
-                                        
-                                    v_half_x = resultval->vx[j] * par->half_dt;
-                                    v_half_y = resultval->vy[j] * par->half_dt;
-                                    v_half_z = resultval->vz[j] * par->half_dt;
-                                        
-                                    resultval->x[j] += v_half_x * par->dtime;
-                                    resultval->y[j] += v_half_y * par->dtime;
-                                    resultval->z[j] += v_half_z * par->dtime;
-                                        
-                                    resultval->vx[j] += v_half_x + vel_dt_half_x;
-                                    resultval->vy[j] += v_half_y + vel_dt_half_y;
-                                    resultval->vz[j] += v_half_z + vel_dt_half_z;
-                                }
-                    }  
-              }
+              
           }
-          
-
-
-
 //           std::cout << "Result Val Type: " << resultval->node_type <<std::endl;
 //           std::cout << "Result Val X" << resultval->x <<" "<<resultval->y << " " << resultval->z << std::endl;
 //           std::cout << "Result Val VX" << resultval->vx <<" "<<resultval->vy << " " << resultval->vz << std::endl;
