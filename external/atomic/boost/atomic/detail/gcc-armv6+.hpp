@@ -89,40 +89,40 @@ namespace atomic {
 
 static inline void fence_before(memory_order order)
 {
-	// FIXME I don't understand enough about barriers to know what this should do.
-	switch(order) {
-		case memory_order_release:
-		case memory_order_acq_rel:
-		case memory_order_seq_cst:
-			int brtmp;
-			__asm__ __volatile__ (
-				BOOST_ATOMIC_ARM_ASM_START(%0)
-				BOOST_ATOMIC_ARM_DMB
-				BOOST_ATOMIC_ARM_ASM_END(%0)
-				: "=&l" (brtmp) :: "memory"
-			);
-		default:;
-	}
+    // FIXME I don't understand enough about barriers to know what this should do.
+    switch(order) {
+        case memory_order_release:
+        case memory_order_acq_rel:
+        case memory_order_seq_cst:
+            int brtmp;
+            __asm__ __volatile__ (
+                BOOST_ATOMIC_ARM_ASM_START(%0)
+                BOOST_ATOMIC_ARM_DMB
+                BOOST_ATOMIC_ARM_ASM_END(%0)
+                : "=&l" (brtmp) :: "memory"
+            );
+        default:;
+    }
 }
 
 static inline void fence_after(memory_order order)
 {
-	// FIXME I don't understand enough about barriers to know what this should do.
-	switch(order) {
-		case memory_order_acquire:
-		case memory_order_acq_rel:
-		case memory_order_seq_cst:
-			int brtmp;
-			__asm__ __volatile__ (
-				BOOST_ATOMIC_ARM_ASM_START(%0)
-				BOOST_ATOMIC_ARM_DMB
-				BOOST_ATOMIC_ARM_ASM_END(%0)
-				: "=&l" (brtmp) :: "memory"
-			);
-		case memory_order_consume:
-			__asm__ __volatile__ ("" ::: "memory");
-		default:;
-	}
+    // FIXME I don't understand enough about barriers to know what this should do.
+    switch(order) {
+        case memory_order_acquire:
+        case memory_order_acq_rel:
+        case memory_order_seq_cst:
+            int brtmp;
+            __asm__ __volatile__ (
+                BOOST_ATOMIC_ARM_ASM_START(%0)
+                BOOST_ATOMIC_ARM_DMB
+                BOOST_ATOMIC_ARM_ASM_END(%0)
+                : "=&l" (brtmp) :: "memory"
+            );
+        case memory_order_consume:
+            __asm__ __volatile__ ("" ::: "memory");
+        default:;
+    }
 }
 
 #undef BOOST_ATOMIC_ARM_DMB
@@ -131,126 +131,126 @@ static inline void fence_after(memory_order order)
 template<typename T>
 class atomic_arm_4 {
 public:
-	typedef T integral_type;
-	explicit atomic_arm_4(T v) : i(v) {}
-	atomic_arm_4() {}
-	T load(memory_order order=memory_order_seq_cst) const volatile
-	{
-		T v=const_cast<volatile const T &>(i);
-		fence_after(order);
-		return v;
-	}
-	void store(T v, memory_order order=memory_order_seq_cst) volatile
-	{
-		fence_before(order);
-		const_cast<volatile T &>(i)=v;
-	}
+    typedef T integral_type;
+    explicit atomic_arm_4(T v) : i(v) {}
+    atomic_arm_4() {}
+    T load(memory_order order=memory_order_seq_cst) const volatile
+    {
+        T v=const_cast<volatile const T &>(i);
+        fence_after(order);
+        return v;
+    }
+    void store(T v, memory_order order=memory_order_seq_cst) volatile
+    {
+        fence_before(order);
+        const_cast<volatile T &>(i)=v;
+    }
         bool compare_exchange_weak(
                 T &expected,
                 T desired,
                 memory_order success_order,
                 memory_order failure_order) volatile
-	{
-		fence_before(success_order);
-		int success;
-		int tmp;
-		__asm__ __volatile__(
-			BOOST_ATOMIC_ARM_ASM_START(%2)
-			"mov     %1, #0\n"        // success = 0
-			"ldrex   %0, [%3]\n"      // expected' = *(&i)
-			"teq     %0, %4\n"        // flags = expected'==expected
-			"ittt    eq\n"
-			"strexeq %2, %5, [%3]\n"  // if (flags.equal) *(&i) = desired, tmp = !OK
-			"teqeq   %2, #0\n"        // if (flags.equal) flags = tmp==0
-			"moveq   %1, #1\n"        // if (flags.equal) success = 1
-			BOOST_ATOMIC_ARM_ASM_END(%2)
-				: "=&r" (expected),  // %0
-				  "=&r" (success),   // %1
-				  "=&l" (tmp)        // %2
+    {
+        fence_before(success_order);
+        int success;
+        int tmp;
+        __asm__ __volatile__(
+            BOOST_ATOMIC_ARM_ASM_START(%2)
+            "mov     %1, #0\n"        // success = 0
+            "ldrex   %0, [%3]\n"      // expected' = *(&i)
+            "teq     %0, %4\n"        // flags = expected'==expected
+            "ittt    eq\n"
+            "strexeq %2, %5, [%3]\n"  // if (flags.equal) *(&i) = desired, tmp = !OK
+            "teqeq   %2, #0\n"        // if (flags.equal) flags = tmp==0
+            "moveq   %1, #1\n"        // if (flags.equal) success = 1
+            BOOST_ATOMIC_ARM_ASM_END(%2)
+                : "=&r" (expected),  // %0
+                  "=&r" (success),   // %1
+                  "=&l" (tmp)        // %2
                                 : "r" (&i),          // %3
-				  "r" (expected),    // %4
-				  "r" ((int)desired) // %5
-				: "cc"
-			);
+                  "r" (expected),    // %4
+                  "r" ((int)desired) // %5
+                : "cc"
+            );
                 if (success) fence_after(success_order);
                 else fence_after(failure_order);
-		return success;
-	}
-	
-	bool is_lock_free(void) const volatile {return true;}
+        return success;
+    }
+    
+    bool is_lock_free(void) const volatile {return true;}
 protected:
-	inline T fetch_add_var(T c, memory_order order) volatile
-	{
-		fence_before(order);
-		T original, tmp;
-		int tmp2;
-		__asm__ __volatile__(
-			BOOST_ATOMIC_ARM_ASM_START(%2)
-			"1: ldrex %0, [%3]\n"      // original = *(&i)
-			"add      %1, %0, %4\n"    // tmp = original + c
-			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
-			"teq      %2, #0\n"        // flags = tmp2==0
-			"it       ne\n"
-			"bne      1b\n"            // if (!flags.equal) goto 1
-			BOOST_ATOMIC_ARM_ASM_END(%2)
-				: "=&r" (original), // %0
-				  "=&r" (tmp),      // %1
-				  "=&l" (tmp2)      // %2
-				: "r" (&i),         // %3
-				  "r" (c)           // %4
-				: "cc"
-			);
-		fence_after(order);
-		return original;
-	}
-	inline T fetch_inc(memory_order order) volatile
-	{
-		fence_before(order);
-		T original, tmp;
-		int tmp2;
-		__asm__ __volatile__(
-			BOOST_ATOMIC_ARM_ASM_START(%2)
-			"1: ldrex %0, [%3]\n"      // original = *(&i)
-			"add      %1, %0, #1\n"    // tmp = original + 1
-			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
-			"teq      %2, #0\n"        // flags = tmp2==0
-			"it       ne\n"
-			"bne      1b\n"            // if (!flags.equal) goto 1
-			BOOST_ATOMIC_ARM_ASM_END(%2)
-				: "=&r" (original), // %0
-				  "=&r" (tmp),      // %1
-				  "=&l" (tmp2)      // %2
-				: "r" (&i)          // %3
-				: "cc"
-			);
-		fence_after(order);
-		return original;
-	}
-	inline T fetch_dec(memory_order order) volatile
-	{
-		fence_before(order);
-		T original, tmp;
-		int tmp2;
-		__asm__ __volatile__(
-			BOOST_ATOMIC_ARM_ASM_START(%2)
-			"1: ldrex %0, [%3]\n"      // original = *(&i)
-			"sub      %1, %0, #1\n"    // tmp = original - 1
-			"strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
-			"teq      %2, #0\n"        // flags = tmp2==0
-			"it       ne\n"
-			"bne      1b\n"            // if (!flags.equal) goto 1
-			BOOST_ATOMIC_ARM_ASM_END(%2)
-				: "=&r" (original), // %0
-				  "=&r" (tmp),      // %1
-				  "=&l" (tmp2)      // %2
-				: "r" (&i)          // %3
-				: "cc"
-			);
-		fence_after(order);
-		return original;
-	}
+    inline T fetch_add_var(T c, memory_order order) volatile
+    {
+        fence_before(order);
+        T original, tmp;
+        int tmp2;
+        __asm__ __volatile__(
+            BOOST_ATOMIC_ARM_ASM_START(%2)
+            "1: ldrex %0, [%3]\n"      // original = *(&i)
+            "add      %1, %0, %4\n"    // tmp = original + c
+            "strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
+            "teq      %2, #0\n"        // flags = tmp2==0
+            "it       ne\n"
+            "bne      1b\n"            // if (!flags.equal) goto 1
+            BOOST_ATOMIC_ARM_ASM_END(%2)
+                : "=&r" (original), // %0
+                  "=&r" (tmp),      // %1
+                  "=&l" (tmp2)      // %2
+                : "r" (&i),         // %3
+                  "r" (c)           // %4
+                : "cc"
+            );
+        fence_after(order);
+        return original;
+    }
+    inline T fetch_inc(memory_order order) volatile
+    {
+        fence_before(order);
+        T original, tmp;
+        int tmp2;
+        __asm__ __volatile__(
+            BOOST_ATOMIC_ARM_ASM_START(%2)
+            "1: ldrex %0, [%3]\n"      // original = *(&i)
+            "add      %1, %0, #1\n"    // tmp = original + 1
+            "strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
+            "teq      %2, #0\n"        // flags = tmp2==0
+            "it       ne\n"
+            "bne      1b\n"            // if (!flags.equal) goto 1
+            BOOST_ATOMIC_ARM_ASM_END(%2)
+                : "=&r" (original), // %0
+                  "=&r" (tmp),      // %1
+                  "=&l" (tmp2)      // %2
+                : "r" (&i)          // %3
+                : "cc"
+            );
+        fence_after(order);
+        return original;
+    }
+    inline T fetch_dec(memory_order order) volatile
+    {
+        fence_before(order);
+        T original, tmp;
+        int tmp2;
+        __asm__ __volatile__(
+            BOOST_ATOMIC_ARM_ASM_START(%2)
+            "1: ldrex %0, [%3]\n"      // original = *(&i)
+            "sub      %1, %0, #1\n"    // tmp = original - 1
+            "strex    %2, %1, [%3]\n"  // *(&i) = tmp;  tmp2 = !OK
+            "teq      %2, #0\n"        // flags = tmp2==0
+            "it       ne\n"
+            "bne      1b\n"            // if (!flags.equal) goto 1
+            BOOST_ATOMIC_ARM_ASM_END(%2)
+                : "=&r" (original), // %0
+                  "=&r" (tmp),      // %1
+                  "=&l" (tmp2)      // %2
+                : "r" (&i)          // %3
+                : "cc"
+            );
+        fence_after(order);
+        return original;
+    }
 private:
-	T i;
+    T i;
 };
 
 
@@ -261,27 +261,27 @@ private:
 template<typename T>
 class platform_atomic_integral<T, 4> : public build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > {
 public:
-	typedef build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > super;
-	explicit platform_atomic_integral(T v) : super(v) {}
-	platform_atomic_integral(void) {}
+    typedef build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > super;
+    explicit platform_atomic_integral(T v) : super(v) {}
+    platform_atomic_integral(void) {}
 };
 
 template<typename T>
 class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
-	typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
-	
-	explicit platform_atomic_integral(T v) : super(v) {}
-	platform_atomic_integral(void) {}
+    typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
+    
+    explicit platform_atomic_integral(T v) : super(v) {}
+    platform_atomic_integral(void) {}
 };
 
 template<typename T>
 class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
-	typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
-	
-	explicit platform_atomic_integral(T v) : super(v) {}
-	platform_atomic_integral(void) {}
+    typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
+    
+    explicit platform_atomic_integral(T v) : super(v) {}
+    platform_atomic_integral(void) {}
 };
 
 
