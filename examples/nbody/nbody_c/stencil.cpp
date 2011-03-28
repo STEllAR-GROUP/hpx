@@ -225,9 +225,9 @@ namespace hpx { namespace components { namespace nbody
                                 double inv_dr = sqrt (1/(((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2));
                                 double acc_factor = par->part_mass * inv_dr * inv_dr * inv_dr;
         //                             std::cout << " Global index: " << global_idx << " remote index: "<< remote_idx <<" j val " << j << " i val " << i << std::endl;
-                                resultval->ax[d] += dx + acc_factor;
-                                resultval->ay[d] += dy + acc_factor;
-                                resultval->az[d] += dz + acc_factor;
+                                resultval->ax[d] += dx * acc_factor;
+                                resultval->ay[d] += dy * acc_factor;
+                                resultval->az[d] += dz * acc_factor;
                                 }
                             }
                         }
