@@ -224,7 +224,7 @@ else()
     CACHE STRING "MinSizeRel flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG"
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
   set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DDEBUG"
     CACHE STRING "Debug flags (C)" FORCE)
@@ -232,8 +232,11 @@ else()
     CACHE STRING "MinSizeRel flags (C)" FORCE)
   set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C)" FORCE)
-  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG"
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C)" FORCE)
+
+  option(HPX_DISABLE_WARNINGS
+    "Disable all warnings (default: OFF)" OFF)
 
   ##############################################################################
   # GNU specific configuration
