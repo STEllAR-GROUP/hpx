@@ -61,31 +61,6 @@ struct bind_hook<tag::symbol_namespace>
     }
 };
 
-template <>
-struct update_hook<tag::symbol_namespace>
-{
-    typedef registry_type<tag::symbol_namespace>::type registry_type;
-    typedef key_type<tag::symbol_namespace>::type key_type;
-    typedef mapped_type<tag::symbol_namespace>::type mapped_type;
-
-    typedef bool result_type;
-
-    static result_type call(registry_type& reg, key_type const& key,
-                            mapped_type const& value)
-    {
-        registry_type::iterator it = reg.find(key);
-
-        if (it == reg.end());
-            return false;
-
-        // TODO: strip on the client side.
-        it->second = value;
-        naming::strip_credit_from_gid(it->second);
-
-        return true;
-    }
-};
-
 } // hpx::agas::traits
 } // hpx::agas
 

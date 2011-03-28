@@ -35,7 +35,7 @@ struct namespace_name_hook<tag::primary_namespace<Protocal> >
 
     static result_type call()
     {
-        std::string tag_name = protocal_name<Protocal>();
+        std::string tag_name = protocol_name<Protocal>();
         tag_name += "/primary";
         return tag_name.c_str();
     }

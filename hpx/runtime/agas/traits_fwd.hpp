@@ -66,10 +66,10 @@ struct locality_type;
 
 // Spirit-style CP
 template <typename Protocal, typename Enable = void> 
-struct protocal_name_hook;
+struct protocol_name_hook;
 
 template <typename Protocal>
-inline char const* protocal_name();
+inline char const* protocol_name();
 
 ///////////////////////////////////////////////////////////////////////////////
 // basic_namespace implementation hooks (Spirit-style CPs).
@@ -82,15 +82,6 @@ inline typename bind_hook<Tag>::result_type
 bind(typename registry_type<Tag>::type&,
      typename key_type<Tag>::type const&,
      typename mapped_type<Tag>::type const&);
-
-template <typename Tag, typename Enable = void>
-struct update_hook;
-
-template <typename Tag>
-inline typename update_hook<Tag>::result_type
-update(typename registry_type<Tag>::type&,
-       typename key_type<Tag>::type const&,
-       typename mapped_type<Tag>::type const&);
 
 template <typename Tag, typename Enable = void>
 struct resolve_hook;

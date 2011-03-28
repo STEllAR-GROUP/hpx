@@ -33,7 +33,7 @@ struct namespace_name_hook<tag::locality_namespace<Protocal> >
 
     static result_type call()
     {
-        std::string tag_name = protocal_name<Protocal>();
+        std::string tag_name = protocol_name<Protocal>();
         tag_name += "/locality";
         return tag_name.c_str();
     }

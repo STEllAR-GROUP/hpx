@@ -116,7 +116,7 @@ operator<< (std::basic_ostream<Char, Traits>& os,
             local_address<Protocal> const& addr)
 {
     boost::io::ios_flags_saver ifs(os); 
-    os << "(" << traits::protocal_name<Protocal>() << " "
+    os << "(" << traits::protocol_name<Protocal>() << " "
        << addr.get_locality() << " " 
        << components::get_component_type_name((int)addr.get_type()) 
        << " " << std::showbase << std::hex << addr.get_lva() << ")"; 

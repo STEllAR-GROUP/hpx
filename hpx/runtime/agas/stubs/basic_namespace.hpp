@@ -25,8 +25,6 @@ struct basic_namespace : components::stubs::stub_base<Tag>
     
     typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
         bind_result_type;
-    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
-        update_result_type;
     typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
         resolve_result_type;
     typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
@@ -47,22 +45,6 @@ struct basic_namespace : components::stubs::stub_base<Tag>
     bind(naming::id_type const& gid, key_type const& key,
          mapped_type const& value)
     { return bind_async(gid, key, value).get(); } 
-
-    ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<update_result_type>
-    update_async(naming::id_type const& gid, key_type const& key,
-                 mapped_type const& value)
-    {
-        typedef typename server::basic_namespace<Tag>::update_action
-            action_type;
-        return lcos::eager_future<action_type, update_result_type>
-            (gid, key, value);
-    }
-
-    static update_result_type
-    update(naming::id_type const& gid, key_type const& key,
-           mapped_type const& value)
-    { return update_async(gid, key, value).get(); } 
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<resolve_result_type>

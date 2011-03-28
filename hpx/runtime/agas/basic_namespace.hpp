@@ -28,8 +28,6 @@ struct basic_namespace
     
     typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
         bind_result_type;
-    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
-        update_result_type;
     typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
         resolve_result_type;
     typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
@@ -47,16 +45,6 @@ struct basic_namespace
     bind_result_type
     bind(key_type const& key, mapped_type const& value)
     { return this->base_type::bind(this->gid_, key, value); }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // Update key. 
-    lcos::future_value<update_result_type>
-    update_async(key_type const& key, mapped_type const& value)
-    { return this->base_type::update_async(this->gid_, key, value); }
-
-    update_result_type
-    update(key_type const& key, mapped_type const& value)
-    { return this->base_type::update(this->gid_, key, value); }
 
     ///////////////////////////////////////////////////////////////////////////
     // Resolve key to value.

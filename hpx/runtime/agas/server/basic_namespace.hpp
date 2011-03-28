@@ -26,8 +26,6 @@ struct HPX_COMPONENT_EXPORT basic_namespace
 
     typedef typename hpx::agas::traits::bind_hook<Tag>::result_type
         bind_result_type;
-    typedef typename hpx::agas::traits::update_hook<Tag>::result_type
-        update_result_type;
     typedef typename hpx::agas::traits::resolve_hook<Tag>::result_type
         resolve_result_type;
     typedef typename hpx::agas::traits::unbind_hook<Tag>::result_type
@@ -36,7 +34,6 @@ struct HPX_COMPONENT_EXPORT basic_namespace
     enum actions
     {
         namespace_bind,
-        namespace_update,
         namespace_resolve,
         namespace_unbind
     };
@@ -55,12 +52,6 @@ struct HPX_COMPONENT_EXPORT basic_namespace
         return hpx::agas::traits::bind<Tag>(_registry, key, value);
     }
 
-    update_result_type update(key_type const& key, mapped_type const& value)
-    {
-        typename mutex_type::scoped_lock l(_mutex);
-        return hpx::agas::traits::update<Tag>(_registry, key, value);
-    }
-    
     resolve_result_type resolve(key_type const& key)
     {
         typename mutex_type::scoped_lock l(_mutex);
@@ -80,14 +71,6 @@ struct HPX_COMPONENT_EXPORT basic_namespace
         key_type const&, mapped_type const&, // arguments 
         &basic_namespace<Tag>::bind
     > bind_action;
-
-    typedef hpx::actions::result_action2<
-        basic_namespace<Tag>,
-        update_result_type,                  // return type
-        namespace_update,                    // action type
-        key_type const&, mapped_type const&, // arguments 
-        &basic_namespace<Tag>::update
-    > update_action;
     
     typedef hpx::actions::result_action1<
         basic_namespace<Tag>,

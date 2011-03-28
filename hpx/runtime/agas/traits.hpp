@@ -17,7 +17,7 @@
 
 namespace hpx { namespace agas {
 
-namespace tag { struct protocal_independent; }
+namespace tag { struct protocol_independent; }
 
 namespace traits
 {
@@ -86,8 +86,8 @@ struct mapped_type
 { typedef typename registry_type<Tag>::type::mapped_type type; };
 
 template <typename Protocal>
-inline char const* protocal_name()
-{ return protocal_name_hook<Protocal>::call(); }
+inline char const* protocol_name()
+{ return protocol_name_hook<Protocal>::call(); }
 
 template <typename Tag, typename Enable>
 struct bind_hook
@@ -119,35 +119,6 @@ bind(typename registry_type<Tag>::type& reg,
      typename key_type<Tag>::type const& key,
      typename mapped_type<Tag>::type const& value)
 { return bind_hook<Tag>::call(reg, key, value); }
-
-template <typename Tag, typename Enable>
-struct update_hook
-{
-    typedef typename registry_type<Tag>::type registry_type;
-    typedef typename key_type<Tag>::type key_type;
-    typedef typename mapped_type<Tag>::type mapped_type;
-
-    typedef bool result_type;
-
-    static result_type call(registry_type& reg, key_type const& key,
-                            mapped_type const& value)
-    {
-        typename registry_type::iterator it = reg.find(key);
-
-        if (it == reg.end());
-            return false;
-
-        it->second = value;
-        return true;
-    }
-};
-
-template <typename Tag>
-inline typename update_hook<Tag>::result_type
-update(typename registry_type<Tag>::type& reg,
-       typename key_type<Tag>::type const& key,
-       typename mapped_type<Tag>::type const& value)
-{ return update_hook<Tag>::call(reg, key, value); }
 
 template <typename Tag, typename Enable>
 struct resolve_hook
