@@ -16,7 +16,7 @@
 #include <hpx/runtime/agas/namespaces/factory.hpp>
 
 typedef hpx::components::agas::server::factory_namespace_type<
-    hpx::agas::tag::protocal_independent
+    hpx::agas::tag::protocol_independent
 >::type agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY
@@ -27,8 +27,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(agas_component);
 
 HPX_REGISTER_ACTION_EX
     (agas_component::bind_action, factory_namespace_bind_action);
-HPX_REGISTER_ACTION_EX
-    (agas_component::update_action, factory_namespace_update_action);
 HPX_REGISTER_ACTION_EX
     (agas_component::resolve_action, factory_namespace_resolve_action);
 HPX_REGISTER_ACTION_EX
