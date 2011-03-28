@@ -55,17 +55,10 @@ struct registry_type<tag::locality_namespace<Protocal> >
 namespace components { namespace agas // hpx::components::agas
 {
 
-template <typename Protocal>
-struct locality_namespace
-  : private basic_namespace<hpx::agas::tag::locality_namespace<Protocal> >
-{
-    // TODO: implement interface
-};
-
-// MPL metafunction (syntactic sugar)
+// MPL metafunction
 template <typename Protocal>
 struct locality_namespace_type
-{ typedef locality_namespace<Protocal> type; }; 
+{ typedef basic_namespace<hpx::agas::tag::locality_namespace<Protocal> > type; }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server

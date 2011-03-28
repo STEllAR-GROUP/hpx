@@ -137,17 +137,10 @@ struct bind_hook<tag::primary_namespace<Protocal> >
 namespace components { namespace agas // hpx::components::agas
 {
 
-template <typename Protocal>
-struct primary_namespace
-  : private basic_namespace<hpx::agas::tag::primary_namespace<Protocal> >
-{
-    // TODO: implement interface
-};
-
-// MPL metafunction (syntactic sugar)
+// MPL metafunction
 template <typename Protocal>
 struct primary_namespace_type
-{ typedef primary_namespace<Protocal> type; }; 
+{ typedef basic_namespace<hpx::agas::tag::primary_namespace<Protocal> > type; }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server

@@ -68,20 +68,20 @@ struct bind_hook<tag::symbol_namespace>
 namespace components { namespace agas // hpx::components::agas
 {
 
-struct symbol_namespace
-  : private basic_namespace<hpx::agas::tag::symbol_namespace>
-{
-    // TODO: implement interface
-};
+typedef basic_namespace<hpx::agas::tag::symbol_namespace>
+    symbol_namespace;
 
 // MPL metafunction (syntactic sugar)
 template <typename Protocal>
 struct symbol_namespace_type
-{ typedef symbol_namespace type; }; 
+{ typedef basic_namespace<hpx::agas::tag::symbol_namespace> type; }; 
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
+
+typedef server::basic_namespace<hpx::agas::tag::symbol_namespace>
+    symbol_namespace;
 
 // MPL metafunction
 template <typename Protocal>
@@ -93,6 +93,9 @@ struct symbol_namespace_type
 ///////////////////////////////////////////////////////////////////////////////
 namespace stubs // hpx::components::agas::stubs
 {
+
+typedef stubs::basic_namespace<hpx::agas::tag::symbol_namespace>
+    symbol_namespace;
 
 // MPL metafunction
 template <typename Protocal>

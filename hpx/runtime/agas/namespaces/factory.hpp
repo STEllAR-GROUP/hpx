@@ -83,20 +83,20 @@ struct resolve_hook<tag::factory_namespace>
 namespace components { namespace agas // hpx::components::agas
 {
 
-struct factory_namespace
-  : private basic_namespace<hpx::agas::tag::factory_namespace>
-{
-    // TODO: implement interface
-};
+typedef basic_namespace<hpx::agas::tag::symbol_namespace>
+    symbol_namespace;
 
 // MPL metafunction (syntactic sugar)
 template <typename Protocal>
 struct factory_namespace_type
-{ typedef factory_namespace type; }; 
+{ typedef basic_namespace<hpx::agas::tag::symbol_namespace> type; }; 
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace server // hpx::components::agas::server
 {
+
+typedef server::basic_namespace<hpx::agas::tag::factory_namespace>
+    factory_namespace;
 
 // MPL metafunction
 template <typename Protocal>
@@ -108,6 +108,9 @@ struct factory_namespace_type
 ///////////////////////////////////////////////////////////////////////////////
 namespace stubs // hpx::components::agas::stubs
 {
+
+typedef stubs::basic_namespace<hpx::agas::tag::factory_namespace>
+    factory_namespace;
 
 // MPL metafunction
 template <typename Protocal>
