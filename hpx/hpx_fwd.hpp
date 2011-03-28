@@ -110,6 +110,9 @@ namespace hpx
         {
             class HPX_API_EXPORT global_queue_scheduler;
             class HPX_API_EXPORT local_queue_scheduler;
+            class HPX_API_EXPORT local_priority_queue_scheduler;
+            class HPX_API_EXPORT abp_queue_scheduler;
+
             class HPX_API_EXPORT callback_notifier;
 
             // define the default scheduler to use

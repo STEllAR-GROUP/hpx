@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>

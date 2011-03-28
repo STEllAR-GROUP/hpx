@@ -188,6 +188,8 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler>
     local_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_priority_queue_scheduler> 
     local_priority_runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::abp_queue_scheduler> 
+    abp_runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -287,6 +289,7 @@ int main(int argc, char* argv[])
         int scheduler = 1;  // 0: global scheduler
                             // 1: parallel scheduler
                             // 2: parallel scheduler with priority queue
+                            // 3: abp scheduler
         std::string parfile;
         if (vm.count("parfile")) {
             parfile = vm["parfile"].as<std::string>();
@@ -329,7 +332,7 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("thread_scheduler") ) {
                 std::string tmp = sec->get_entry("thread_scheduler");
                 scheduler = atoi(tmp.c_str());
-                BOOST_ASSERT( scheduler == 0 || scheduler == 1 );
+                BOOST_ASSERT( scheduler >= 0 && scheduler <= 3 );
               }
               if ( sec->has_entry("maxx0") ) {
                 std::string tmp = sec->get_entry("maxx0");
@@ -486,6 +489,16 @@ int main(int argc, char* argv[])
         else if (scheduler == 2) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_priority_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+          if (mode == hpx::runtime::worker) 
+              rt.run(num_threads);
+          else 
+              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+
+          executed_threads = rt.get_executed_threads();
+        } 
+        else if (scheduler == 3) {
+          std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
+          abp_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
           if (mode == hpx::runtime::worker) 
               rt.run(num_threads);
           else 

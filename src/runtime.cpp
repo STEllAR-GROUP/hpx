@@ -384,7 +384,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stop(bool blocking)
     {
-        LRT_(info) << "runtime_impl: about to stop services";
+        LRT_(warning) << "runtime_impl: about to stop services";
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stop();
@@ -588,3 +588,8 @@ template HPX_EXPORT class hpx::runtime_impl<
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;
+
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::abp_queue_scheduler, 
+    hpx::threads::policies::callback_notifier>;
+

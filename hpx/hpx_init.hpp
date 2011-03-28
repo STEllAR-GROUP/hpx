@@ -119,8 +119,8 @@ namespace hpx
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
                     ("queueing,q", value<std::string>(),
-                     "the queue scheduling policy to use, options are `global' "
-                     "and `local' (default: local)")
+                     "the queue scheduling policy to use, options are `global', "
+                     "`local', `local_priority' and `abp' (default: local)")
                 ;
 
                 options_description desc_cmdline;
@@ -326,6 +326,31 @@ namespace hpx
                     local_queue_policy;
                 typedef hpx::runtime_impl<local_queue_policy> runtime_type;
                 local_queue_policy::init_parameter_type init(num_threads, 1000);
+
+                // Build and configure this runtime instance
+                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+                if (mode != hpx::runtime::worker && vm.count("config"))
+                {
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+
+                // Run this runtime instance
+                if (mode != hpx::runtime::worker) {
+                      result = rt.run(boost::bind(hpx_main, vm), 
+                          num_threads, num_localities);
+                }
+                else {
+                  result = rt.run(num_threads, num_localities);
+                }
+            }
+            else if (queueing == "abp") {
+                // abp scheduler: local deques for each OS thread, with work
+                // stealing from the "bottom" of each.
+                typedef hpx::threads::policies::abp_queue_scheduler 
+                    abp_queue_policy;
+                typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
+                abp_queue_policy::init_parameter_type init(num_threads, 1000);
 
                 // Build and configure this runtime instance
                 runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);

@@ -150,6 +150,15 @@ hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 ################################################################################
+# log configuration
+################################################################################
+option(HPX_DISABLE_LOGGING "Disable all HPX logging at compile time. (Default: OFF)" OFF)
+
+if(HPX_DISABLE_LOGGING)
+  add_definitions(-DHPX_DISABLE_LOGGING)
+endif()
+
+################################################################################
 # rpath configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
@@ -215,7 +224,7 @@ else()
     CACHE STRING "MinSizeRel flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
   set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DDEBUG"
     CACHE STRING "Debug flags (C)" FORCE)
@@ -223,7 +232,7 @@ else()
     CACHE STRING "MinSizeRel flags (C)" FORCE)
   set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C)" FORCE)
-  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C)" FORCE)
 
   ##############################################################################
