@@ -52,9 +52,12 @@ set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY_NAME=${name}"
   "HPX_LIBRARY_STRING=\"${name}\"")
-#set_property(TARGET hpx_serialization APPEND
-#  PROPERTY COMPILE_FLAGS
-#  "-Wall -Wold-style-cast -Wno-strict-aliasing -Wsign-promo")
+
+if(NOT HPX_DISABLE_WARNINGS)
+  set_property(TARGET hpx_serialization APPEND
+    PROPERTY COMPILE_FLAGS
+    "-Wall -Wno-strict-aliasing -Wsign-promo")
+endif()
 
 ###############################################################################
 # build instructions for main shared HPX library
@@ -78,9 +81,12 @@ set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY_NAME=${name}"
   "HPX_LIBRARY_STRING=\"${name}\"")
-#set_property(TARGET hpx APPEND
-#  PROPERTY COMPILE_FLAGS
-#  "-Wall -Wold-style-cast -Wno-strict-aliasing -Wsign-promo")
+
+if(NOT HPX_DISABLE_WARNINGS)
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_FLAGS
+    "-Wall -Wno-strict-aliasing -Wsign-promo")
+endif()
 
 ###############################################################################
 # installation instructions
