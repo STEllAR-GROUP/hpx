@@ -105,14 +105,15 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
         //         iidx = iidx+i;
         //         std::cout << "gen_init_data::   old index " << (item * par.granularity) + i << " new index " << iidx << std::endl;
                 val->node_type.push_back(par.bodies[iidx].node_type); 
+                val->mass.push_back(par.bodies[iidx].mass);
                 val->x.push_back(par.bodies[iidx].px); 
                 val->y.push_back(par.bodies[iidx].py);
                 val->z.push_back(par.bodies[iidx].pz);  
                 if (par.bodies[iidx].node_type == 1 && par.iter > 0)
                 {
-                    val->vx.push_back((par.bodies[iidx].vx+(0 -par.bodies[iidx].ax)*par.half_dt)); 
-                    val->vy.push_back((par.bodies[iidx].vy+(0 -par.bodies[iidx].ay)*par.half_dt)); 
-                    val->vz.push_back((par.bodies[iidx].vz+(0 -par.bodies[iidx].az)*par.half_dt));
+                    val->vx.push_back((par.bodies[iidx].vx+(0 - par.bodies[iidx].ax)*par.half_dt)); 
+                    val->vy.push_back((par.bodies[iidx].vy+(0 - par.bodies[iidx].ay)*par.half_dt)); 
+                    val->vz.push_back((par.bodies[iidx].vz+(0 - par.bodies[iidx].az)*par.half_dt));
                 }
                 else
                 {
@@ -135,7 +136,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
                     val->ay.push_back(0.0); 
                     val->az.push_back(0.0); 
 //                 }
-                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type  <<std::endl;
+                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type << " X val " << par.bodies[iidx].px <<std::endl;
         //       std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
             //     std::cout << " Maxitems " << maxitems << std::endl;
         //        std::cout << "I get till here"<< std::endl;

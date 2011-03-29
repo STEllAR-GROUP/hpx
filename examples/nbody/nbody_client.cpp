@@ -121,7 +121,8 @@ class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate n
             a[1] = 0.0; /* Initialize acceleration vector to 0 */
             a[2] = 0.0; /* Initialize acceleration vector to 0 */
         }
-        void moveParticles(); /* moves particles according to acceleration and velocity calculated */
+        void moveParticles( components::nbody::Parameter & par);
+     //   void moveParticles(); /* moves particles according to acceleration and velocity calculated */
         void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
         void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx );
         ~TreeLeaf() { }       /* TreeLeaf Destructor */
@@ -625,6 +626,30 @@ static inline void computeRootPos(const int num_bodies, double &box_dim, double 
     center_position[2] = (maxPos[2] + minPos[2]) / 2;
 }
 
+void TreeLeaf::moveParticles( components::nbody::Parameter & par) 
+{
+    double vel_dt_half [3];
+    double v_half[3];
+    /*Vel_t = dr/dt
+      acc_t = a[r_t] = dv/dt 
+      => dv_t = a[i] * dt 
+      => vel_dt/2 = a [i] * (dt/2) */
+    for(int i=0; i < 3; ++i)
+        vel_dt_half [i] = a[i] * par->half_dt;
+    //vel_half = vel (t + (dt/2))
+    //         = vel (t) + vel (dt/2) 
+    for(int i=0; i < 3; ++i)
+        v_half[i] = v[i] + vel_dt_half [i];  
+
+    // r1 = r0 + (Vel_half * dt )
+    for(int i=0; i < 3; ++i)
+        p[i] += v_half[i] * par->dtime;  
+    // v_3/2 = vel_half + (accel_1 * dt)
+    for(int i=0; i < 3; ++i)
+        v[i] = v_half[i] + vel_dt_half [i];  
+}
+
+
 struct less {
   template<class T>
   bool operator()(T &a, T &b) {
@@ -986,12 +1011,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                     if(val->node_type[k] == 1)
                     {
                         std::cout << "updating particle # " << j << " ax vector size " <<val->ax.size() << " x vector size " << val->x.size()   << std::endl;
-                        particles[j]->p[0] = val->x[k];
-                        particles[j]->p[1] = val->y[k];
-                        particles[j]->p[2] = val->z[k];
-                        particles[j]->v[0] = val->vx[k];
-                        particles[j]->v[1] = val->vy[k];
-                        particles[j]->v[2] = val->vz[k];
+//                         particles[j]->mass = val->mass[k];
+//                         particles[j]->p[0] = val->x[k];
+//                         particles[j]->p[1] = val->y[k];
+//                         particles[j]->p[2] = val->z[k];
+//                         particles[j]->v[0] = val->vx[k];
+//                         particles[j]->v[1] = val->vy[k];
+//                         particles[j]->v[2] = val->vz[k];
                         particles[j]->a[0] = val->ax[k];
                         particles[j]->a[1] = val->ay[k];
                         particles[j]->a[2] = val->az[k];    
@@ -1021,6 +1047,10 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                
             } ////////block comment
             
+         for (int i = 0; i < par->num_bodies; ++i) 
+        { 
+            particles[i]->moveParticles(par); 
+        }
 ////////block comment            
             for (int i =0; i < par->num_bodies ; ++i)
             {
@@ -1032,10 +1062,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 /*
             for (std::size_t i = 0; i < result_data.size(); ++i)
                 components::stubs::memory_block::free(result_data[i]);*/
-            
+            bht_root->treeReuse();
             //bht_root=NULL;
             par->iList.clear();
             par->bilist.clear();
+            for (std::size_t i = 0; i < result_data.size(); ++i)
+                components::stubs::memory_block::free(result_data[i]);
             std::cout << " \n \n ITERATION: " << par->iter << "\n \n" << std::endl;
 
             
@@ -1051,8 +1083,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
         
 ////////block comment            
-        for (std::size_t i = 0; i < result_data.size(); ++i)
-            components::stubs::memory_block::free(result_data[i]);
+//         for (std::size_t i = 0; i < result_data.size(); ++i)
+//             components::stubs::memory_block::free(result_data[i]);
     }   // nbody_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
