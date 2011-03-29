@@ -22,7 +22,7 @@ driver::ghost_size = 5
 
 #Carpet::verbose = yes
 #Carpet::veryverbose = yes
-Carpet::max_refinement_levels = 1 # CHANGE HERE
+Carpet::max_refinement_levels = 1
 Carpet::prolongation_order_space = 3
 Carpet::prolongation_order_time = 2
 #Carpet::init_3_timelevels = yes
@@ -35,7 +35,7 @@ Carpet::use_tapered_grids = yes
 
 #CarpetLib::output_bboxes = yes
 
-CarpetRegrid2::num_levels_1 =  1 # CHANGE HERE
+CarpetRegrid2::num_levels_1 =  1
 CarpetRegrid2::num_centres =  1
 CarpetRegrid2::position_x_1 = +0.0
 CarpetRegrid2::position_y_1 = +0.0
@@ -110,8 +110,8 @@ IO::out_dir = "wavetoy"
 
 IOBasic::outInfo_every = 0
 #IOBasic::outInfo_vars = "WaveToyFO::d4phi"
-iohdf5::out_vars = "WaveToyFO::d4phi"
-iohdf5::out_every = 0
+iohdf5::out_vars = "WaveToyFO::d4phi WaveToyFO::d3phi WaveToyFO::d2phi WaveToyFO::d1phi WaveToyFO::phi"
+iohdf5::out_every = 100
  
 #IOBasic::outScalar_every = 16
 #IOBasic::outScalar_reductions = "minimum maximum norm1 norm2 norm_inf"

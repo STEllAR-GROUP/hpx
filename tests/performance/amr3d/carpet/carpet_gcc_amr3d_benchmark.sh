@@ -10,13 +10,12 @@
 ###############################################################################
 # configuration 
 
-RUNS=2
-REFS=(0 1 2 3)
-CORES=(1 2 4 6 8 12 16 18 24 30 32 36 40 42)
+RUNS=3
+REFS=(0 1 2 3 4)
+CORES=(1 2 4 5 6 8 10 12 16 18 20 24 30 32 36 40 42)
 
-INTEL_ROOT="/opt/intel/fc/11.1"
-MPI_ROOT="/opt/mpich2/1.2.1p1/intel-11.1"
-CACTUS_ROOT="/home/wash/vcs/cactus-intel/Cactus"
+MPI_ROOT="/opt/mpich2/1.2.1p1/gcc-4.4.4"
+CACTUS_ROOT="/home/wash/vcs/cactus-gcc/Cactus"
 
 ###############################################################################
 TIMESTAMP=`date '+%Y.%m.%d_%H.%M.%S'`
