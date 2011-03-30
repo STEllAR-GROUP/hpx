@@ -13,8 +13,6 @@
 set(subdirs 
     accumulator
     #amr
-    bhpx
-    bh
     cosmo
     generic
     had_amr
