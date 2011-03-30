@@ -18,6 +18,8 @@
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/basic_namespace.hpp>
 
+#include <hpx/runtime/agas/namespaces/symbol.hpp>
+
 namespace hpx { namespace agas // hpx::agas
 {
 
