@@ -136,7 +136,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
                     val->ay.push_back(0.0); 
                     val->az.push_back(0.0); 
 //                 }
-                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type << " X val " << par.bodies[iidx].px <<std::endl;
+                std::cout << "gen_init_data: PX Par-item " << item << " par.bodies.size " << par.bodies.size() << " global index " << iidx << " num_real_par " << num_real_par << " NodeType " <<  par.bodies[iidx].node_type << " AX val " << par.bodies[iidx].ax <<std::endl;
         //       std::cout << "gen_init_data: Row: " << row << " item: " << item << " x: " << val->x[i] << " y: " << val->y[i] << " z: " << val->z[i] << " iidx : " << iidx << std::endl;
             //     std::cout << " Maxitems " << maxitems << std::endl;
         //        std::cout << "I get till here"<< std::endl;
