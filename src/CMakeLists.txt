@@ -40,11 +40,8 @@ set_target_properties(hpx_serialization PROPERTIES
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx_serialization)
 
-if(TCMALLOC_FOUND)
-  target_link_libraries(hpx_serialization ${TCMALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
-else()
-  target_link_libraries(hpx_serialization ${BOOST_FOUND_LIBRARIES})
-endif()
+target_link_libraries(hpx_serialization
+  ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
 
 get_target_property(path hpx_serialization LOCATION)
 get_filename_component(name "${path}" NAME)
@@ -69,11 +66,8 @@ set_target_properties(hpx PROPERTIES
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx)
 
-if(TCMALLOC_FOUND)
-  target_link_libraries(hpx hpx_serialization ${TCMALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
-else()
-  target_link_libraries(hpx hpx_serialization ${BOOST_FOUND_LIBRARIES})
-endif()
+target_link_libraries(hpx hpx_serialization
+  ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
  
 get_target_property(path hpx LOCATION)
 get_filename_component(name "${path}" NAME)

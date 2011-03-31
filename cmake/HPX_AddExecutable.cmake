@@ -45,6 +45,9 @@ macro(add_hpx_executable name)
       ${hpx_LIBRARIES}
       ${BOOST_FOUND_LIBRARIES}
       ${pxaccel_LIBRARIES})
+  else()
+    target_link_libraries(${name}_exe
+      ${${name}_DEPENDENCIES})
   endif()
 
   if(NOT ${name}_MODULE)

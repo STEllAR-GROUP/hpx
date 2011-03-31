@@ -226,14 +226,6 @@ else()
     CACHE STRING "Release flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
-  set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DDEBUG"
-    CACHE STRING "Debug flags (C)" FORCE)
-  set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG"
-    CACHE STRING "MinSizeRel flags (C)" FORCE)
-  set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG"
-    CACHE STRING "Release flags (C)" FORCE)
-  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
-    CACHE STRING "RelWithDebInfo flags (C)" FORCE)
 
   option(HPX_DISABLE_WARNINGS
     "Disable all warnings (default: OFF)" OFF)
@@ -250,8 +242,6 @@ else()
       add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden")
     endif()
   ##############################################################################
   # Intel specific configuration
@@ -274,9 +264,6 @@ else()
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
-    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo")
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
   endif()
 
   ##############################################################################
@@ -291,7 +278,6 @@ else()
   
   if(HPX_COMPILER_AUTO_TUNE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
   endif() 
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
@@ -304,7 +290,6 @@ else()
 
   if(HPX_GNU_MCX16)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcx16")
   endif() 
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
@@ -330,7 +315,6 @@ else()
   
   if(HPX_SSE2)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
   endif() 
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -346,35 +330,57 @@ else()
 
   add_definitions(-D_GNU_SOURCE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
-  find_package(HPX_TCMalloc)
+  set(HPX_MALLOC "tcmalloc" CACHE STRING
+    "HPX malloc allocator (default: tcmalloc)" FORCE)
 
-  if(TCMALLOC_FOUND)
-    set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-malloc")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-free")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-calloc")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-cfree")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-realloc")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-pvalloc")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-valloc")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-memalign")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-posix_memalign")
-    add_definitions(-DHPX_TCMalloc)
+  find_package(HPX_TCMalloc)
+  find_package(HPX_Jemalloc)
+
+  if("${HPX_MALLOC}" STREQUAL "tcmalloc" AND NOT TCMALLOC_FOUND)
+    hpx_warn("malloc" "tcmalloc allocator not found.")
+  endif()
+
+  if("${HPX_MALLOC}" STREQUAL "jemalloc" AND NOT JEMALLOC_FOUND)
+    hpx_warn("malloc" "jemalloc allocator not found.")
+  endif()
+  
+  set(hpx_MALLOC_LIBRARY "")
+
+  if(NOT "${HPX_MALLOC}" STREQUAL "system")
+    if(TCMALLOC_FOUND OR JEMALLOC_FOUND)
+      if("${HPX_MALLOC}" STREQUAL "tcmalloc" OR NOT JEMALLOC_FOUND)
+        hpx_info("malloc" "Using tcmalloc allocator.")
+        set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
+        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
+        add_definitions(-DHPX_TCMALLOC)
+      else()
+        hpx_info("malloc" "Using jemalloc allocator.")
+        set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
+        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
+        add_definitions(-DHPX_JEMALLOC)
+      endif()
+ 
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
+    else()
+      hpx_info("malloc" "Using system allocator.")
+      hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
+    endif()
   else()
-    hpx_warn("tcmalloc" "HPX will perform poorly without tcmalloc.")
+    hpx_info("malloc" "Using system allocator.")
+    hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
   endif()
 endif()
 

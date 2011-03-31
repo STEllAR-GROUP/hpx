@@ -37,6 +37,9 @@ macro(add_hpx_test name)
         ${hpx_LIBRARIES}
         ${BOOST_FOUND_LIBRARIES}
         ${pxaccel_LIBRARIES})
+    else()
+      target_link_libraries(${name}_test
+        ${${name}_DEPENDENCIES})
     endif()
 
     if(NOT ${name}_DONTRUN)

@@ -18,13 +18,24 @@ set(benchmarks
     new_and_delete_random_object_size
     )
 
-foreach(benchmark ${benchmarks})
-  add_hpx_executable(${type}.${group}.${benchmark}_benchmark
-    MODULE ${type}.${group}
-    SOURCES ${benchmark}.cpp)
+set(allocators
+    system
+    tcmalloc
+    jemalloc)
 
-  # depend on the executable
-  add_dependencies(tests.${type}.${group}
-                   ${type}.${group}.${benchmark}_benchmark_exe)
+foreach(allocator ${allocators})
+  string(TOUPPER ${allocator} name)
+
+  foreach(benchmark ${benchmarks})
+    add_hpx_executable(${type}.${group}.${allocator}.${benchmark}_benchmark
+      MODULE ${type}.${group}
+      SOURCES ${benchmark}.cpp
+      DEPENDENCIES ${BOOST_FOUND_LIBRARIES} ${${name}_LIBRARY}
+      NOLIBS)
+
+    # depend on the executable
+    add_dependencies(tests.${type}.${group}
+                     ${type}.${group}.${allocator}.${benchmark}_benchmark_exe)
+  endforeach()
 endforeach()
 
