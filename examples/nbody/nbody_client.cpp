@@ -821,10 +821,10 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             int box_idx = 0;
             bht_root->buildBodies(current_index,par->bodies, box_idx);
             for(int i=0; i<par->bodies.size(); ++i)
-            {
-                std::cout << par->bodies[i].node_type << " " << par->bodies[i].mass << " " << par->bodies[i].px << " " << par->bodies[i].py 
-                << " " << par->bodies[i].pz << " " << par->bodies[i].vx << " " << par->bodies[i].vy << " " << par->bodies[i].vz << std::endl;
-            }
+//             {
+//                 std::cout << par->bodies[i].node_type << " " << par->bodies[i].mass << " " << par->bodies[i].px << " " << par->bodies[i].py 
+//                 << " " << par->bodies[i].pz << " " << par->bodies[i].vx << " " << par->bodies[i].vy << " " << par->bodies[i].vz << std::endl;
+//             }
 //            std::cout << "body size " << par->bodies.size() << " body 7 X:" << par->bodies[6].px << std::endl;
  //           std::cout << "ilist.size" << par->iList.size() <<std::endl;
             
@@ -1130,7 +1130,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
-            ("theta,c", po::value<std::size_t>(), "theta value")
+            ("theta,c", po::value<double>(), "theta value")
             ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
