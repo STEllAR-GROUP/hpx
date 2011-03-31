@@ -92,7 +92,7 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         void tagTree(int &current_node, int & max_count, int & tag_id, int max_ctr);
         void buildBodies(int &current_node, std::vector<body> & bodies, int & bod_idx);
         void printTag(int &current_node);
-        void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList);
+        void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList, double theta);
 
 
         static void treeReuse()      /* function to recycle tree */
@@ -124,7 +124,7 @@ class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate n
         void moveParticles( components::nbody::Parameter & par);
      //   void moveParticles(); /* moves particles according to acceleration and velocity calculated */
         void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
-        void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx );
+        void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx , double theta);
         ~TreeLeaf() { }       /* TreeLeaf Destructor */
     private:
 
@@ -397,7 +397,7 @@ void IntrTreeNode::printTag(int &current_node)
         std::cout << "CELL tag : " << tag << std::endl;
 }
 
-void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList)
+void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList, double theta)
 {
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
@@ -409,14 +409,14 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
             { // Intermediate Node
                 //temp_branch->tag ;
 //   /* */             std::cout << "I am A PAR " << temp_branch->tag << std::endl;
-               ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag);
+               ((TreeLeaf*) temp_branch)->interactionList(n, box_size_2, iList ,temp_branch->tag, theta);
                // iListGen(n, box_size_2, iList, temp_branch->tag);
             }
             if(temp_branch->node_type == 0)
             { // Intermediate Node
              //   std::cout << "Tag : " << temp_branch->tag << std::endl;
 //                 std::cout << "I am A CELL " << temp_branch->tag << std::endl;
-                ((IntrTreeNode *) temp_branch)->interList(n, box_size_2, iList);
+                ((IntrTreeNode *) temp_branch)->interList(n, box_size_2, iList, theta);
             }
 
         }
@@ -425,7 +425,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
 
 
 // //call with box_size_buf * box_size_buf * inv_tolerance_2
-void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx )
+void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx, double theta )
 {
  //   std::cout << "idx : "  << idx << std::endl;
     register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
@@ -434,7 +434,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
     
     distance_r_2 = square<double>(distance_r[0]) + square<double>(distance_r[1]) + square<double>(distance_r[2]);
     
-    if (distance_r_2 < box_size_2) 
+    if ((box_size_2/distance_r_2) < theta )
     {
         if (n->node_type == 0) 
         {
@@ -760,11 +760,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //         }
 
         infile.close();  
-        
+        double fullForceTime=0.0;
         std::vector<naming::id_type> result_data;
         for (par->iter = 0; par->iter < par->num_iterations; ++par->iter)
         {
-            
+
+            double iterForceTime=0.0;   
             std::cout << "\n \n ITERATION Number: " << par->iter << " \n \n " << std::endl;
 //            { /// extra brace
             double box_size, cPos[3];
@@ -781,7 +782,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 << " : " << particles[i]->v[2] << std::endl;
 //             }
             computeRootPos(par->num_bodies, box_size, cPos);
-            std::cout << "CPOS : " <<cPos[0] << " " << cPos[1]<< " "  << cPos[2]<< " "  << std::endl;
+//             std::cout << "CPOS : " <<cPos[0] << " " << cPos[1]<< " "  << cPos[2]<< " "  << std::endl;
             IntrTreeNode *bht_root = IntrTreeNode::newNode(cPos);
             const double sub_box_size = box_size * 0.5;
             
@@ -833,7 +834,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             double temp_box_size = box_size;
             
             
-           bht_root->interList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, par->iList);
+           bht_root->interList(bht_root, temp_box_size * temp_box_size * par->inv_tolerance_2, par->iList, par->theta);
             
 //             for (int i = 0; i != par->num_bodies; ++i) 
 //             {
@@ -937,9 +938,17 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
 ///////blockcomment  
 //           if (par->iter == 0)
+                hpx::util::high_resolution_timer forcetime;
+
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
+                
+               iterForceTime = forcetime.elapsed();
+               fullForceTime += iterForceTime;
+               std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [s]" << std::endl;
+
+               
 //           else 
 //           {
 //               for (std::size_t i = 0; i < result_data.size(); ++i)
@@ -990,12 +999,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
 ///////////block comment   
 //             std::cout << par->iter << std::endl;  
-            for (int i =0; i < par->num_bodies ; ++i)
+/*            for (int i =0; i < par->num_bodies ; ++i)
             {
                 std::cout << "OLD body : "<< i << " : " << particles[i]->mass << " : " <<
                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
                 << " : " << particles[i]->v[2] << std::endl;
-            }   
+            }  */ 
 ////////blockcomment --- END
 
 
@@ -1008,16 +1017,16 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
-               std::cout << "Result data size: " << result_data.size() << std::endl;
+//                std::cout << "Result data size: " << result_data.size() << std::endl;
                 
                 for (std::size_t k = 0; k < val->ax.size(); ++k)
                 {
 //                     if(val->node_type[k] == 1 && j != par->num_bodies)
 
-                    std::cout << " AX " << val->ax[k] << " " << val->ay[k] << " " << val->az[k] << std::endl;
+//                     std::cout << " AX " << val->ax[k] << " " << val->ay[k] << " " << val->az[k] << std::endl;
                     if(val->node_type[k] == 1)
                     {
-                        std::cout << "updating particle # " << j << " ax vector size " <<val->ax.size() << std::endl;
+//                         std::cout << "updating particle # " << j << " ax vector size " <<val->ax.size() << std::endl;
 //                         particles[j]->mass = val->mass[k];
 //                         particles[j]->p[0] = val->x[k];
 //                         particles[j]->p[1] = val->y[k];
@@ -1059,12 +1068,12 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             particles[i]->moveParticles(par); 
         }
 ////////block comment            
-            for (int i =0; i < par->num_bodies ; ++i)
-            {
-                std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
-                particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
-                << " : " << particles[i]->v[2] << std::endl;
-            }
+//             for (int i =0; i < par->num_bodies ; ++i)
+//             {
+//                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
+//                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
+//                 << " : " << particles[i]->v[2] << std::endl;
+//             }
 ////////blockcomment --- END
 /*
             for (std::size_t i = 0; i < result_data.size(); ++i)
@@ -1087,7 +1096,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
         // end for loop
 
-        std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
+//          std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [s]" << std::endl;
+
+        std::cout << "Elapsed time: " << t.elapsed() << " [s] :: FULL Force Calculation Time: " << fullForceTime << " [s] " << std::endl;
         
 ////////block comment            
 //         for (std::size_t i = 0; i < result_data.size(); ++i)
@@ -1106,8 +1117,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
     try {
         po::options_description desc_cmdline ("Usage:nbody_client [options]");
         desc_cmdline.add_options()
-            ("input_file,i", po::value<std::string>(), 
-            "Input File")
+            ("input_file,i", po::value<std::string>(), "Input File")
             ("help,h", "print out program usage (this message)")
             ("run_agas_server,r", "run AGAS server as part of this runtime instance")
             ("worker,w", "run this instance in worker (non-console) mode")
@@ -1120,6 +1130,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
+            ("theta,c", po::value<std::size_t>(), "theta value")
             ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
@@ -1238,6 +1249,7 @@ int main(int argc, char* argv[])
         par->output      = 1.0;
         par->output_stdout = 1;
         par->granularity = granularity;
+        par->theta = 1.0;
         
         //par->rowsize =  4;
         par->input_file="5_file";
@@ -1271,6 +1283,10 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("input_file") ) {
                 std::string tmp = sec->get_entry("input_file");
                 par->input_file = tmp;
+              }
+              if ( sec->has_entry("theta") ) {
+                std::string tmp = sec->get_entry("theta");
+                par->theta = atof(tmp.c_str());
               }
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");

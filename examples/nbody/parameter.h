@@ -88,6 +88,7 @@ struct Par {
       int granularity;
       int num_pxpar;
       int extra_pxpar;
+      double theta;
 };
 
 #if defined(__cplusplus)
