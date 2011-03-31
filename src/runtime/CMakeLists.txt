@@ -8,7 +8,7 @@ add_subdirectory(actions)
 # AGAS v2 is still young, and I don't want to worry about Windows compatibility
 # at this point.
 if(NOT MSVC)
-  add_subdirectory(agas)
+#  add_subdirectory(agas)
 endif()
 
 add_subdirectory(applier)
