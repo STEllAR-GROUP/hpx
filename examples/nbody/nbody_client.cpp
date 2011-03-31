@@ -442,28 +442,28 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
             box_size_2 *= 0.25;
             if (temp_node->branch[0] != NULL) 
             {
-                interactionList(temp_node->branch[0], box_size_2, iList, idx);
+                interactionList(temp_node->branch[0], box_size_2, iList, idx, theta);
                 if (temp_node->branch[1] != NULL) 
                 {
-                    interactionList(temp_node->branch[1], box_size_2, iList, idx);
+                    interactionList(temp_node->branch[1], box_size_2, iList, idx, theta);
                     if (temp_node->branch[2] != NULL) 
                     {
-                        interactionList(temp_node->branch[2], box_size_2, iList, idx);
+                        interactionList(temp_node->branch[2], box_size_2, iList, idx , theta);
                         if (temp_node->branch[3] != NULL) 
                         {
-                            interactionList(temp_node->branch[3], box_size_2, iList, idx);
+                            interactionList(temp_node->branch[3], box_size_2, iList, idx, theta);
                             if (temp_node->branch[4] != NULL) 
                             {
-                                interactionList(temp_node->branch[4], box_size_2, iList, idx);
+                                interactionList(temp_node->branch[4], box_size_2, iList, idx, theta);
                                 if (temp_node->branch[5] != NULL) 
                                 {
-                                    interactionList(temp_node->branch[5], box_size_2, iList, idx);
+                                    interactionList(temp_node->branch[5], box_size_2, iList, idx, theta);
                                     if (temp_node->branch[6] != NULL) 
                                     {
-                                        interactionList(temp_node->branch[6], box_size_2, iList, idx);
+                                        interactionList(temp_node->branch[6], box_size_2, iList, idx, theta);
                                         if (temp_node->branch[7] != NULL) 
                                         {
-                                            interactionList(temp_node->branch[7], box_size_2, iList, idx);
+                                            interactionList(temp_node->branch[7], box_size_2, iList, idx, theta);
                                         }
                                     }
                                 }
