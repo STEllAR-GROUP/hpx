@@ -157,7 +157,10 @@ namespace hpx { namespace components { namespace nbody
             else if(par->extra_pxpar == 0)
             {
                 if (compute_index < par->num_pxpar)
+                {
                     ci_num_par = par->granularity;
+                    std::cout << "stencil::evla:: ci_num_par " << ci_num_par << std::endl;
+                }
                 else if (compute_index >= par->num_pxpar)
                     BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
 //                         std::cout << "stencil::eval:: num actual particles in px_par(compute_index) " << compute_index << " is " << ci_num_par << std::endl;         
@@ -170,7 +173,8 @@ namespace hpx { namespace components { namespace nbody
 //               std::cout << "resultval sizes node_type " << resultval->node_type.size() << " x " << resultval->x.size() <<std::endl;
 
               
-              int global_idx[ci_num_par];               
+              //int global_idx[ci_num_par]; 
+              std::vector<int> global_idx(ci_num_par,0);
               for(int d = 0; d < ci_num_par; ++d)
               {
                   global_idx[d] = (compute_index * par->granularity) + d;
@@ -196,7 +200,8 @@ namespace hpx { namespace components { namespace nbody
                         BOOST_ASSERT("ERROR: i is more than number of PX particles");
 //                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;         
               }
-              int remote_idx[i_num_par];
+              //int remote_idx[i_num_par];
+              std::vector<int> remote_idx(i_num_par,0);
               for(int d = 0; d < i_num_par; ++d)
               {                   
                   remote_idx[d] = (i * par->granularity) + d;
