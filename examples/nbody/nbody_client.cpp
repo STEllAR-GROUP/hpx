@@ -649,6 +649,13 @@ void TreeLeaf::moveParticles( components::nbody::Parameter & par)
         v[i] = v_half[i] + vel_dt_half [i];  
 }
 
+double chroner(timeval &t1, timeval &t2)
+{
+	double elapsedTime;
+	elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
+	elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
+	return elapsedTime + 0.5;
+}
 
 struct less {
   template<class T>
@@ -762,6 +769,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         infile.close();  
         double fullForceTime=0.0;
         std::vector<naming::id_type> result_data;
+	timeval t1, t2;
         for (par->iter = 0; par->iter < par->num_iterations; ++par->iter)
         {
 
@@ -938,13 +946,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
 ///////blockcomment  
 //           if (par->iter == 0)
-                hpx::util::high_resolution_timer forcetime;
-
+//                hpx::util::high_resolution_timer forcetime;
+        	gettimeofday(&t1, NULL);
                 result_data = 
                 unigrid_mesh.init_execute(function_type, numvals, 
                 numsteps, do_logging ? logging_type : components::component_invalid,par);
-                
-               iterForceTime = forcetime.elapsed();
+        	gettimeofday(&t2, NULL);        
+               iterForceTime = chroner(t1,t2); 
                fullForceTime += iterForceTime;
                std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [s]" << std::endl;
 

@@ -174,7 +174,7 @@ namespace hpx { namespace components { namespace nbody
               for(int d = 0; d < ci_num_par; ++d)
               {
                   global_idx[d] = (compute_index * par->granularity) + d;
-//                   std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
+                   std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
               }
               
               int i_num_par = 0;
