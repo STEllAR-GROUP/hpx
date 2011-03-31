@@ -16,7 +16,8 @@ from types import *
 from operator import *
 from datetime import datetime
 from signal import SIGKILL
-
+from pickle import dump
+ 
 if os.path.exists(os.path.join(sys.path[0], "../hpx")):
   sys.path.append(os.path.join(sys.path[0], ".."))
 if os.path.exists(os.path.join(sys.path[0], "../share/hpx/python/hpx")):
@@ -24,6 +25,7 @@ if os.path.exists(os.path.join(sys.path[0], "../share/hpx/python/hpx")):
 
 from hpx.process import process
 
+VERSION = 0x10 # version (mostly for version tracking in pickle output)
 
 # print usage info and exit with an error code
 def usage(rc = 2):
@@ -35,15 +37,13 @@ Options:
                 "list" is a python expression producing list of values
  -n           : don\'t stream results to stdout
  -r number    : repeat each test "number" of times
- -o filename  : capture results to file "filename"
+ -o filename  : capture stdout and stderr to file "filename"
+ -t filename  : save results to file "filename" in the pickle format
  -d number    : delay test start by "number" of seconds
- -t command   : prefix application command line with profiling "command"
  -x list      : exclude cases with argument tuples matching any item in the
                 "list" (python expression)
  -w seconds   : kill runs that take longer than "seconds" to complete (default
                 360). 
- -i seconds   : interval to wait in between each poll of the run subprocesses
-                (default 10).
  -b command   : run preprocessing "command" before starting test sequence for
                 each configuration, applying option substitution
  -p command   : run postprocessing "command" after test sequence for each
@@ -73,24 +73,22 @@ def next(ixd, opts, optv):
         
 
 # run the application and optionally capture its output and error streams
-def run(cmd, outfl = None, timeout = 360, tic = 10):
-    start = datetime.now() 
+def run(cmd, outfl = None, timeout = 360):
     proc = process(cmd)
 
-    while proc.poll() is None:
-        time.sleep(tic)
-        now = datetime.now()
-        if (now - start).seconds > timeout:
-            print 'Error: "%s" timed out.' % cmd
-            os.kill(proc.pid(), SIGKILL)
-            os.waitpid(-1, os.WNOHANG)
-            return -1
+    start = datetime.now() 
+    (timed_out, returncode) = proc.wait(timeout)
+    now = datetime.now()
 
     while outfl:
         s = proc.read()
         if s: writeres(s, outfl)
         else: break
-    return proc.wait()
+
+    if timed_out: 
+      writeres('Command timed out.\n', outfl)
+
+    return (returncode, now - start)
 
 
 # wrapper for conversion of integer options
@@ -103,8 +101,8 @@ def intopt(opta, optn):
 
 
 # human-readable version of current timestamp
-def timestr():
-    return time.strftime("%Y-%m-%d %H:%M:%S")
+def timestr(t):
+    return t.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # quote option arguments to protect blanks
@@ -130,13 +128,6 @@ def sepstr(sepch = '-', s = ''):
     if nr < 3: nr = 3
     return nl*sepch+s+nr*sepch
 
-# python has no conditional expression, so we need this to call if/else from
-# eval
-def if_else(pred, then, else_):
-  if pred:
-    return then
-  return else_
-
 # substitute all option ids in string with formatting keys
 def optidsub(optids, s):
     # first pass - option subsitution
@@ -146,10 +137,10 @@ def optidsub(optids, s):
 
 
 # run pre- or postprocessor
-def runscript(cmdlst, options, ofhs, timeout, interval):
+def runscript(cmdlst, options, ofhs, timeout):
     for cmd in cmdlst:
         scr = cmd%options
-        rc = run(scr, timeout, interval)
+        (rc, walltime) = run(scr, timeout)
         if rc:
             writeres('Warning: command: "'+scr+'" returned '+str(rc)+'\n', ofhs)
 
@@ -164,18 +155,16 @@ if __name__ == '__main__':
 
     # option value lists, option names, # test repetitions, temporal pad
     options, optnames, nrep, tpad = {}, [], 1, 0
-    # external profiling command
-    profcmd = None
     # stdout usage flag, result file name, list of output file descriptors
-    stdoutf, ofile, ofhs = True, None, []
+    stdoutf, ofile, rfile, rf, ofhs = True, None, None, None, []
     # exclusion list, preprocessing command list, postprocessing command list
     excl, before, after = [], [], []
     # execution counters: app. runs, unique configs, errors, excluded configs
     runs, configs, erruns, excnt = 0, 0, 0, 0
     # separator length for pretty printing
     seplen = 78
-    # timeout length/polling interval for process management
-    timeout, interval = 360, 10
+    # timeout 
+    timeout = 360
     # non-quotable characters
     nonquot = string.letters+string.digits+'-+='
 
@@ -203,9 +192,8 @@ if __name__ == '__main__':
         elif o == '-d': tpad = intopt(a, o)
         elif o == '-r': nrep = intopt(a, o)
         elif o == '-o': ofile = a
-        elif o == '-t': profcmd = a
+        elif o == '-t': rfile = a
         elif o == '-w': timeout = intopt(a, o)
-        elif o == '-i': interval = intopt(a, o)
         elif o == '-x':
             try:
                 excl = map(tuple, eval(a))
@@ -224,26 +212,48 @@ if __name__ == '__main__':
             of = open(ofile, 'w')
             ofhs.append(of)
         except Exception, err:
-            print 'Error: failed to open "'+ofile+'"'
+            print 'Error: failed to open output file "'+ofile+'"'
+            sys.exit(1)
+    if rfile:
+        try:
+            rf = open(rfile, 'w')
+        except Exception, err:
+            print 'Error: failed to open result file "'+rfile+'"'
             sys.exit(1)
     if stdoutf: ofhs.append(sys.stdout)
 
     # form prototypes of application command line, pre- and postprocessor
     cmdproto = map(lambda o: optidsub(optnames, o), args)
-    if profcmd: cmdproto = [profcmd]+cmdproto
     if before: before = map(lambda o: optidsub(optnames, o), before)
     if after: after = map(lambda o: optidsub(optnames, o), after)
 
     # initialize current option index dictionary
+    results = {}
     optix = {}
     for k in options: optix[k] = 0
 
+    start_date = datetime.now()
+
     # beginning banner
     writeres(sepstr('=')+'\n', ofhs)
-    writeres('Start date: '+timestr()+'\n', ofhs)
+    writeres('Start date: '+timestr(start_date)+'\n', ofhs)
     writeres('Command:'+quoteopts(sys.argv)+'\n', ofhs)
+
+    if rf:
+      results['data'] = {}
+      results['header'] = {}
+      results['schema'] = {}
+
+      results['schema']['keys'] = tuple(optnames)
+      results['schema']['values'] = ('wall_time','return_code')
+
+      results['header']['version'] = VERSION
+      results['header']['start_date'] = start_date
+      results['header']['command'] = tuple(sys.argv)
+
+    try: 
     # test loop
-    while optix != None:
+      while optix != None:
         configs += 1
         # create current instance of generated options
         vallst, optd = [], {}
@@ -259,7 +269,7 @@ if __name__ == '__main__':
             excnt += 1
             continue
         # run setup program
-        # TODO: add timeout/interval options
+        # TODO: add timeout options
         if before: runscript(before, optd, ofhs)
         # build command line
         cmd = map(lambda x: x%optd, cmdproto)
@@ -272,32 +282,63 @@ if __name__ == '__main__':
             ss = p.search(cmd[e]).expand(r'\1')
             cmd[e] = cmd[e].replace("eval(\"%s\")" % ss, str(eval(ss)))
 
+        rc = 0
+        walltime = 0.0 
+
         writeres(sepstr('=')+'\nExecuting:'+quoteopts(cmd)+'\n', ofhs)
         # run test requested number of times
         for i in range(nrep):
-            txt = 'BEGIN RUN '+str(i+1)+' @ '+timestr()
+            txt = 'BEGIN RUN '+str(i+1)+' @ '+timestr(datetime.now())
             writeres(sepstr('*', txt)+'\n', ofhs)
+            (rc, walltime) = run(cmd, ofhs, timeout)
+            txt = 'END RUN '+str(i+1)+' @ '+timestr(datetime.now())
             runs += 1
-            rc = run(cmd, ofhs, timeout, interval)
-            txt = 'END RUN '+str(i+1)+' @ '+timestr()
             if rc: erruns += 1
             outs = sepstr('-', txt)
             outs += '\nReturn code: '+str(rc)+'\n'+sepstr()+'\n'
             writeres(outs, ofhs)
             time.sleep(tpad)
         # run postprocessor
-        # TODO: add timeout/interval options
+        # TODO: add timeout options
         if after: runscript(after, optd, ofhs)
+     
+        if rf:   
+          if not results['data'].has_key(tuple(vallst)):
+            results['data'][tuple(vallst)] = [(walltime, rc)]
+          else:
+            results['data'][tuple(vallst)].append((walltime, rc))
 
         optix = next(optix, optnames, options)
+        
+    except: 
+        from traceback import print_exc
+        print_exc()
+     
+    end_date = datetime.now()
+
     # final banner
     writeres('='*seplen+'\n', ofhs)
-    writeres('End date: '+timestr()+'\n', ofhs)
+    writeres('End date: '+timestr(end_date)+'\n', ofhs)
     writeres('Configurations: '+str(configs)+'\n', ofhs)
-    writeres('Excluded: '+str(excnt)+'\n', ofhs)
-    writeres('Test runs: '+str(runs)+'\n', ofhs)
-    writeres('Errors: '+str(erruns)+'\n', ofhs)
+    writeres('Exclusions: '+str(excnt)+'\n', ofhs)
+    writeres('Total runs: '+str(runs)+'\n', ofhs)
+    writeres('Failed runs: '+str(erruns)+'\n', ofhs)
     writeres('='*seplen+'\n', ofhs)
+
+    if rf:
+      results['header']['end_date'] = end_date
+      results['header']['configurations'] = configs 
+      results['header']['exclusions'] = excnt
+      results['header']['total_runs'] = runs
+      results['header']['failed_runs'] = erruns
+
+      # dump the results dictionary to the result file, using
+      # pickle protocol version 2 with binary output
+      dump(results, rf, 2)
+
+      rf.close()
+
     # cleanup
     for f in ofhs:
         if f != sys.stdout: f.close()
+
