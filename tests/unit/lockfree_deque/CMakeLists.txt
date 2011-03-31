@@ -17,6 +17,7 @@ set(testcases
     lifo
     fifo
     deque    
+    bit_manipulation
     )
 
 foreach(testcase ${testcases})

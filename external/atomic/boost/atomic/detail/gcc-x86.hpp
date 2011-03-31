@@ -468,10 +468,12 @@ public:
           : "m" (i)
           : "xmm0", "memory"
           );
+        fence_after_load(order);
         return v;
     }
     void store(T v, memory_order order=memory_order_seq_cst) volatile
     {
+        fence_before(order);
         // Atomically stores 128bit value by SSE instruction movdqa
         __asm__ __volatile__ (
             "movdqa %1, %%xmm0 ;\n"
@@ -487,7 +489,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        T prev = __sync_val_compare_and_swap_16(&i, expected, desired);
+        T prev = __sync_val_compare_and_swap_16
+                      (reinterpret_cast<volatile T*>(&i), expected, desired);
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -504,15 +507,19 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        while (!__sync_bool_compare_and_swap_16(&i, i, r))
+        while (!__sync_bool_compare_and_swap_16
+                  (reinterpret_cast<volatile T*>(&i), i, r))
         {};
 
         return r;
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        __sync_fetch_and_add(&i, c);
-        return c;
+        T expected=i, desired;;
+        do {
+            desired=expected+c;
+        } while(!compare_exchange_strong(expected, desired, order, memory_order_relaxed));
+        return expected;
     }
 
     bool is_lock_free(void) const volatile {return true;}
