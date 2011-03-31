@@ -350,7 +350,7 @@ else()
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
-  find_package(HPX_TCMALLOC)
+  find_package(HPX_TCMalloc)
 
   if(TCMALLOC_FOUND)
     set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
@@ -372,7 +372,7 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-valloc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-memalign")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin-posix_memalign")
-    add_definitions(-DHPX_TCMALLOC)
+    add_definitions(-DHPX_TCMalloc)
   else()
     hpx_warn("tcmalloc" "HPX will perform poorly without tcmalloc.")
   endif()
