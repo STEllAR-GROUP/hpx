@@ -10,26 +10,20 @@
 
 #include <boost/mpl/integral_c.hpp>
 
-#include <hpx/exception.hpp>
-#include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
+#include <hpx/runtime/agas/network/traits.hpp>
+#include <hpx/runtime/agas/database/traits.hpp>
 
-namespace hpx { namespace agas {
-
-namespace tag { struct protocol_independent; }
-
-namespace traits
+namespace hpx { namespace agas { namespace traits
 {
 
+///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Enable>
 struct serialization_version
   : boost::mpl::integral_c<unsigned, 0x10> {};
 
-template <typename T, typename Enable> 
-struct mutex_type
-{ typedef hpx::lcos::mutex type; };
-
+///////////////////////////////////////////////////////////////////////////////
 template <typename Mutex, typename Enable>
 struct initialize_mutex_hook
 {
@@ -53,125 +47,6 @@ struct initialize_mutex_hook<boost::detail::spinlock>
 template <typename Mutex>
 inline void initialize_mutex (Mutex& m)
 { initialize_mutex_hook<Mutex>::call(m); }
-
-template <typename Tag>
-inline char const* namespace_name()
-{ return namespace_name_hook<Tag>::call(); }
-
-template <typename Tag, typename Enable> 
-struct make_function_name_hook
-{
-    typedef char const* result_type;
-
-    template <std::size_t N>
-    static char const* call(char const(&f)[N])
-    {
-        std::string tag_name = namespace_name<Tag>();
-        tag_name += "/";
-        tag_name += f;
-        return tag_name.c_str();
-    }
-};
-
-template <typename Tag, std::size_t N>
-inline char const* make_function_name(char const(&f)[N])
-{ return make_function_name_hook<Tag>::call(f); }
-
-template <typename Tag, typename Enable> 
-struct key_type
-{ typedef typename registry_type<Tag>::type::key_type type; };
-
-template <typename Tag, typename Enable> 
-struct mapped_type
-{ typedef typename registry_type<Tag>::type::mapped_type type; };
-
-template <typename Protocal>
-inline char const* protocol_name()
-{ return protocol_name_hook<Protocal>::call(); }
-
-template <typename Tag, typename Enable>
-struct bind_hook
-{
-    typedef typename registry_type<Tag>::type registry_type;
-    typedef typename key_type<Tag>::type key_type;
-    typedef typename mapped_type<Tag>::type mapped_type;
-
-    typedef key_type result_type;
-
-    static result_type call(registry_type& reg, key_type const& key,
-                            mapped_type const& value)
-    {
-        if (reg.count(key))
-        {
-            HPX_THROW_EXCEPTION(hpx::repeated_request,
-                make_function_name<Tag>("bind"),
-                "supplied key is already bound")
-        }
-
-        return (reg.insert
-            (typename registry_type::value_type(key, value)).first)->first;
-    }
-};
-
-template <typename Tag>
-inline typename bind_hook<Tag>::result_type
-bind(typename registry_type<Tag>::type& reg,
-     typename key_type<Tag>::type const& key,
-     typename mapped_type<Tag>::type const& value)
-{ return bind_hook<Tag>::call(reg, key, value); }
-
-template <typename Tag, typename Enable>
-struct resolve_hook
-{
-    typedef typename registry_type<Tag>::type registry_type;
-    typedef typename key_type<Tag>::type key_type;
-    typedef typename mapped_type<Tag>::type mapped_type;
-
-    typedef mapped_type result_type;
-
-    static result_type call(registry_type& reg, key_type const& key)
-    {
-        typename registry_type::iterator it = reg.find(key);
-
-        if (it == reg.end());
-            return mapped_type();
-
-        return it->second;
-    }
-};
-
-template <typename Tag>
-inline typename resolve_hook<Tag>::result_type
-resolve(typename registry_type<Tag>::type& reg,
-        typename key_type<Tag>::type const& key)
-{ return resolve_hook<Tag>::call(reg, key); }
-
-template <typename Tag, typename Enable>
-struct unbind_hook
-{
-    typedef typename registry_type<Tag>::type registry_type;
-    typedef typename key_type<Tag>::type key_type;
-    typedef typename mapped_type<Tag>::type mapped_type;
-
-    typedef bool result_type;
-
-    static result_type call(registry_type& reg, key_type const& key)
-    {
-        typename registry_type::iterator it = reg.find(key);
-
-        if (it == reg.end());
-            return false;
-
-        reg.erase(it);
-        return true;
-    }
-};
-
-template <typename Tag>
-inline typename unbind_hook<Tag>::result_type
-unbind(typename registry_type<Tag>::type& reg,
-       typename key_type<Tag>::type const& key)
-{ return unbind_hook<Tag>::call(reg, key); }
 
 }}}
 
