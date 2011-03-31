@@ -13,7 +13,7 @@ hpx_include(Message
 macro(add_hpx_test name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;ARGS" "DONTRUN;DONTCOMPILE" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;ARGS" "DONTRUN;DONTCOMPILE;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_test.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_test.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -31,12 +31,14 @@ macro(add_hpx_test name)
                  "HPX_APPLICATION_EXPORTS")
   
     # linker instructions
-    target_link_libraries(${name}_test
-      ${${name}_DEPENDENCIES} 
-      ${hpx_LIBRARIES}
-      ${BOOST_FOUND_LIBRARIES}
-      ${pxaccel_LIBRARIES})
-  
+    if(NOT ${name}_NOLIBS)
+      target_link_libraries(${name}_test
+        ${${name}_DEPENDENCIES} 
+        ${hpx_LIBRARIES}
+        ${BOOST_FOUND_LIBRARIES}
+        ${pxaccel_LIBRARIES})
+    endif()
+
     if(NOT ${name}_DONTRUN)
       add_test(${name}
         ${CMAKE_CURRENT_BINARY_DIR}/${name}_test

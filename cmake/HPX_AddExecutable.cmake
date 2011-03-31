@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "MODULE;SOURCES;HEADERS;DEPENDENCIES" "ESSENTIAL" ${ARGN})
+    "MODULE;SOURCES;HEADERS;DEPENDENCIES" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -39,11 +39,13 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_EXPORTS")
 
   # linker instructions
-  target_link_libraries(${name}_exe
-    ${${name}_DEPENDENCIES} 
-    ${hpx_LIBRARIES}
-    ${BOOST_FOUND_LIBRARIES}
-    ${pxaccel_LIBRARIES})
+  if(NOT ${name}_NOLIBS)
+    target_link_libraries(${name}_exe
+      ${${name}_DEPENDENCIES} 
+      ${hpx_LIBRARIES}
+      ${BOOST_FOUND_LIBRARIES}
+      ${pxaccel_LIBRARIES})
+  endif()
 
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
