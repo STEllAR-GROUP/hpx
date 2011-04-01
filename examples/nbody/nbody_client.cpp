@@ -812,17 +812,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
  //           std::cout << "Center Position : " << cPos[0] << " " << cPos[1] << " " << cPos[2] << std::endl;
 //             std::cout << bht_root->tag << std::endl;
             
-            if(par->granularity > max_count)
-            {
-                std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
-                par->granularity = max_count;
-                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-            } else if(par->granularity <= 0)
-            {
-                std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
-                par->granularity = max_count/2;
-                std::cout << "Alert:: Setting par->granularity to max_count/2, new par->granularity is "<< par->granularity << std::endl;
-            }
+
             
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
@@ -867,15 +857,28 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 std::cout << std::endl;
 //             }
 // //             
-            
+            if(par->granularity > max_count)
+            {
+                std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
+                par->granularity = max_count;
+                par->num_pxpar = (max_count/par->granularity);
+                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+            } else if(par->granularity <= 0)
+            {
+                std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
+                par->granularity = max_count;
+                par->num_pxpar = (max_count/par->granularity);                
+                std::cout << "Alert:: Setting par->granularity to max_count/2, new par->granularity is "<< par->granularity << std::endl;
+            } else if (par->granularity < max_count)
+            {
             //std::vector< std::vector<int> >  bilist ;
-            par->num_pxpar = (max_count/par->granularity);
-            par->extra_pxpar = max_count % par->granularity;
-            if(par->extra_pxpar != 0)
-                par->num_pxpar += 1;
+                par->num_pxpar = (max_count/par->granularity);
+                par->extra_pxpar = max_count % par->granularity;
+                if(par->extra_pxpar != 0)
+                    par->num_pxpar += 1;
+            }
             numvals = par->num_pxpar;
             par->bilist.resize(par->num_pxpar);
-            
            std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
             
 //             for (int p = 0; p < par->num_pxpar-1; ++p)
