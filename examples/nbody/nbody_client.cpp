@@ -731,7 +731,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         par->softening_2 = par->eps * par->eps;
         par->inv_tolerance_2 = 1.0 / (par->tolerance * par->tolerance);    
         
-        std::cout << "Num Bodies " << par->num_bodies << std::endl;
+        //std::cout << "Num Bodies " << par->num_bodies << std::endl;
 //         hpx::memory::default_vector<body>::type bodies;
 //         hpx::memory::default_vector<body>::type::iterator bod_iter;
 //         bodies.resize(par->num_bodies);
@@ -954,7 +954,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         	gettimeofday(&t2, NULL);        
                iterForceTime = chroner(t1,t2); 
                fullForceTime += iterForceTime;
-               std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [s]" << std::endl;
+               std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [ms]" << std::endl;
 
                
 //           else 
@@ -1106,7 +1106,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
 //          std::cout << "Per Iteration ForceCalc() Time " << iterForceTime << " [s]" << std::endl;
 
-        std::cout << "Elapsed time: " << t.elapsed() << " [s] :: FULL Force Calculation Time: " << fullForceTime << " [s] " << std::endl;
+        std::cout << "Elapsed time: " << t.elapsed() << " [s] :: FULL Force Calculation Time: " << fullForceTime << " [ms] " << std::endl;
         
 ////////block comment            
 //         for (std::size_t i = 0; i < result_data.size(); ++i)

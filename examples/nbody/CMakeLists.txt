@@ -20,16 +20,12 @@ endforeach()
 set(sources 
     nbody_client.cpp)
 
-
 # define basic dependencies
 set(dependencies
     nbody_component 
     nbody_c_component 
     nbody_c_test_component
     distributing_factory_component)
-
-
-
 
 source_group("Source Files" FILES ${sources})
 
