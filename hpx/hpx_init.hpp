@@ -344,7 +344,6 @@ namespace hpx
                   result = rt.run(num_threads, num_localities);
                 }
             }
-#if HPX_USE_ABP_SCHEDULER != 0
             else if (queueing == "abp") {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
@@ -370,7 +369,6 @@ namespace hpx
                   result = rt.run(num_threads, num_localities);
                 }
             }
-#endif
             else 
                 throw std::logic_error("bad value for parameter --queuing/-q");
         }

@@ -188,10 +188,8 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler>
     local_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_priority_queue_scheduler> 
     local_priority_runtime_type;
-#if HPX_USE_ABP_SCHEDULER != 0
 typedef hpx::runtime_impl<hpx::threads::policies::abp_queue_scheduler> 
     abp_runtime_type;
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -498,7 +496,6 @@ int main(int argc, char* argv[])
 
           executed_threads = rt.get_executed_threads();
         } 
-#if HPX_USE_ABP_SCHEDULER != 0
         else if (scheduler == 3) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           abp_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
@@ -509,7 +506,6 @@ int main(int argc, char* argv[])
 
           executed_threads = rt.get_executed_threads();
         } 
-#endif
         else {
           BOOST_ASSERT(false);
         }

@@ -42,6 +42,7 @@ endif()
 ################################################################################
 # environment detection 
 ################################################################################
+# FIXME: broken for MSVC
 execute_process(COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
                 OUTPUT_VARIABLE build_environment
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -63,6 +64,10 @@ option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default:
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
 find_package(HPX_BoostVersion)
+
+if(NOT BOOST_VERSION_FOUND)
+  hpx_error("boost" "Failed to locate Boost.")
+endif()
 
 if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
   set(BOOST_LIBRARIES chrono
@@ -113,7 +118,7 @@ add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 
 ################################################################################
-# include configuration
+# search path configuration
 ################################################################################
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
@@ -150,15 +155,6 @@ hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 ################################################################################
-# log configuration
-################################################################################
-option(HPX_DISABLE_LOGGING "Disable all HPX logging at compile time. (Default: OFF)" OFF)
-
-if(HPX_DISABLE_LOGGING)
-  add_definitions(-DHPX_DISABLE_LOGGING)
-endif()
-
-################################################################################
 # rpath configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
@@ -189,8 +185,6 @@ if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
   endif()
-
-  add_definitions(-DHPX_HIDDEN_VISIBILITY)
 
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
