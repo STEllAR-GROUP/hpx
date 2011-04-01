@@ -17,15 +17,14 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 ################################################################################
 # cmake configuration
 ################################################################################
+set(CMAKE_MODULE_PATH ${HPX_ROOT}/share/cmake)
+
 # include additional macro definitions
 include(HPX_Utils)
 
 include(HPX_Distclean)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See INSTALL.rst. Clean your CMake cache and CMakeFiles if this message persists.")
-
-# allow more human readable "if then else" constructs
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
 # be pedantic and annoying by default
 if(NOT HPX_CMAKE_LOGLEVEL)
@@ -35,6 +34,7 @@ endif()
 ################################################################################
 # environment detection 
 ################################################################################
+# FIXME: broken for MSVC
 execute_process(COMMAND "${HPX_ROOT}/bin/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
                 OUTPUT_VARIABLE build_environment
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -56,6 +56,10 @@ option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default:
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
 find_package(HPX_BoostVersion)
+
+if(NOT BOOST_VERSION_FOUND)
+  hpx_error("boost" "Failed to locate Boost.")
+endif()
 
 if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
   set(BOOST_LIBRARIES chrono
@@ -83,9 +87,6 @@ endif()
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-include_directories("${HPX_ROOT}/include")
-link_directories("${HPX_ROOT}/lib")
-
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
 
@@ -106,6 +107,12 @@ add_definitions(-DBOOST_THREAD_DYN_DLL)
 # additional preprocessor definitions (TODO: find out what these do)
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+
+################################################################################
+# search path configuration
+################################################################################
+include_directories("${HPX_ROOT}/include")
+link_directories("${HPX_ROOT}/lib")
 
 ################################################################################
 # installation configuration
@@ -142,6 +149,10 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Windows specific configuration 
 ################################################################################
 if(MSVC)
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+  endif()
+
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-D_WIN32_WINNT=0x0501)
@@ -157,11 +168,29 @@ if(MSVC)
   if(CMAKE_CL_64)
     add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
   endif()
+  
+  # TODO: implement
+  #hpx_check_for_msvc_128bit_interlocked(hpx_HAVE_MSVC_128BIT_INTERLOCKED
+  #  DEFINITIONS HPX_HAVE_CMPXCHG16B
+  #              BOOST_ATOMIC_HAVE_MSVC_128BIT_INTERLOCKED # for the msvc code
+  #              BOOST_ATOMIC_HAVE_CMPXCHG16B)             # for the fallback 
 
 ################################################################################
 # POSIX specific configuration 
 ################################################################################
 else()
+  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG"
+    CACHE STRING "Debug flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
+    CACHE STRING "MinSizeRel flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
+    CACHE STRING "Release flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+    CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+
+  option(HPX_DISABLE_WARNINGS
+    "Disable all warnings (default: OFF)" OFF)
+
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
@@ -169,14 +198,11 @@ else()
     "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if(HPX_ELF_HIDDEN_VISIBILITY)
-      add_definitions(-DHPX_GCC_HAVE_VISIBILITY)
+      add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+      add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
       set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
-      set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fvisibility=hidden")
-      set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fvisibility=hidden")
     endif()
   ##############################################################################
   # Intel specific configuration
@@ -199,18 +225,124 @@ else()
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
-    set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -ipo")
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
   endif()
 
-  hpx_check_pthreads_setaffinity_np(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
+  ##############################################################################
+  # POSIX configuration tests 
+  ##############################################################################
+  # GNU GCC's -march=native will automatically tune generated code for the host
+  # environment. This is available on newish versions of GCC only (4.3ish). If
+  # this flag is used, the generated binaries will be less portable. This is why
+  # we define the HPX_COMPILER_AUTO_TUNED macro.
+  hpx_check_for_compiler_auto_tune(HPX_COMPILER_AUTO_TUNE
+     DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
+  
+  if(HPX_COMPILER_AUTO_TUNE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+  endif() 
 
-  if(hpx_HAVE_PTHREAD_SETAFFINITY_NP)
-    add_definitions(-DHPX_HAVE_PTHREAD_SETAFFINITY_NP)
+  # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
+  # It allows us to do double quadword (128bit) atomic compare and swap
+  # operations, which is AWESOME. Note that early x86-64 processors do lack
+  # this instruction.
+  hpx_check_for_gnu_mcx16(HPX_GNU_MCX16
+    DEFINITIONS HPX_HAVE_GNU_SYNC_16
+                BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+
+  if(HPX_GNU_MCX16)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
+  endif() 
+
+  # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
+  # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
+  # and some versions don't warn if you ask for an alignment above said limit.
+  # Instead, they'll just silently use the maximum, which can be problematical. 
+  hpx_check_for_gnu_mcx16(HPX_GNU_ALIGNED_16
+    DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
+                BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
+
+  # __uint128_t and __int128_t are a nifty, albeit undocumented, GNU extension
+  # that's been supported in GCC (4.1ish and up) and clang-linux for awhile
+  # (strangely, intel-linux doesn't support this). This is particularly useful
+  # for use with cmpxchg16b
+  hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
+    DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
+                BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
+ 
+  # we use movdqa for atomic 128bit loads and stores 
+  hpx_cpuid("sse2" HPX_SSE2
+    DEFINITIONS HPX_HAVE_SSE2
+                BOOST_ATOMIC_HAVE_SSE2)
+  
+  if(HPX_SSE2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+  endif() 
+
+  # rdtsc is an x86 instruction that reads the value of a CPU time stamp
+  # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
+  # a serializing instruction.
+  hpx_cpuid("rdtsc" HPX_RDTSC
+    DEFINITIONS HPX_HAVE_RDTSC)
+  hpx_cpuid("rdtscp" HPX_RDTSCP
+    DEFINITIONS HPX_HAVE_RDTSCP)
+
+  hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
+    DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
+
+  add_definitions(-D_GNU_SOURCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
+
+  set(HPX_MALLOC "tcmalloc" CACHE STRING
+    "HPX malloc allocator (default: tcmalloc)" FORCE)
+
+  find_package(HPX_TCMalloc)
+  find_package(HPX_Jemalloc)
+
+  if("${HPX_MALLOC}" STREQUAL "tcmalloc" AND NOT TCMALLOC_FOUND)
+    hpx_warn("malloc" "tcmalloc allocator not found.")
+  endif()
+
+  if("${HPX_MALLOC}" STREQUAL "jemalloc" AND NOT JEMALLOC_FOUND)
+    hpx_warn("malloc" "jemalloc allocator not found.")
   endif()
   
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl pthread rt)
+  set(hpx_MALLOC_LIBRARY "")
+
+  if(NOT "${HPX_MALLOC}" STREQUAL "system")
+    if(TCMALLOC_FOUND OR JEMALLOC_FOUND)
+      if("${HPX_MALLOC}" STREQUAL "tcmalloc" OR NOT JEMALLOC_FOUND)
+        hpx_info("malloc" "Using tcmalloc allocator.")
+        set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
+        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
+        add_definitions(-DHPX_TCMALLOC)
+      else()
+        hpx_info("malloc" "Using jemalloc allocator.")
+        set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
+        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
+        add_definitions(-DHPX_JEMALLOC)
+      endif()
+ 
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
+    else()
+      hpx_info("malloc" "Using system allocator.")
+      hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
+    endif()
+  else()
+    hpx_info("malloc" "Using system allocator.")
+    hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
+  endif()
 endif()
 
 ################################################################################
