@@ -19,9 +19,15 @@ set(benchmarks
     )
 
 set(allocators
-    system
-    tcmalloc
-    jemalloc)
+    system)
+
+if(TCMALLOC_FOUND)
+  set(allocators ${allocators} tcmalloc)
+endif()
+
+if(JEMALLOC_FOUND)
+  set(allocators ${allocators} jemalloc)
+endif()
 
 foreach(allocator ${allocators})
   string(TOUPPER ${allocator} name)
