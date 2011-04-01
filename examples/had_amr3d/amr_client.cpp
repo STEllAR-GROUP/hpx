@@ -498,6 +498,7 @@ int main(int argc, char* argv[])
 
           executed_threads = rt.get_executed_threads();
         } 
+#if HPX_USE_ABP_SCHEDULER != 0
         else if (scheduler == 3) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           abp_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
@@ -508,6 +509,7 @@ int main(int argc, char* argv[])
 
           executed_threads = rt.get_executed_threads();
         } 
+#endif
         else {
           BOOST_ASSERT(false);
         }
