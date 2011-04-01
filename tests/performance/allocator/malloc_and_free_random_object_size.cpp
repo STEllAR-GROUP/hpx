@@ -67,8 +67,9 @@ int main(int argc, char** argv)
  
     desc_cmdline.add_options()
         ("help,h", "print out program usage (this message)")
-        ("threads,t", value<std::size_t>(&threads)->default_value(1 << 3), 
-         "the number of worker threads")
+        ("threads,t", value<std::size_t>(&threads)->default_value(1 << 2), 
+         "the number of consumer and producer threads (total number of threads "
+         " is 2 times this)")
         // older versions of Boost.Random generators don't provide the static
         // member default_seed, so we just use the literal integer here
         ("seed,s", value<boost::uint32_t>(&seed)->default_value(5489), 
@@ -80,7 +81,7 @@ int main(int argc, char** argv)
           (&max_object_size)->default_value(1 << 12), 
          "the maximum size, in bytes, of each object") 
         ("allocation-limit,l", value<std::size_t>
-          (&alloc_limit)->default_value(1 << 24), 
+          (&alloc_limit)->default_value(1 << 26), 
          "the maximum amount of memory to allocate per thread, in bytes") 
     ;
 
@@ -153,7 +154,7 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////////////////////
     // output results
     std::cout
-        << "(((threads " << threads << ") "
+        << "(((threads " << (threads * 2) << ") "
              "(seed " << seed << ") "
              "(min-object-size " << min_object_size << ") "
              "(max-object-size " << max_object_size << ") "

@@ -59,8 +59,9 @@ int main(int argc, char** argv)
     desc_cmdline.add_options()
         ("help,h", "print out program usage (this message)")
         ("threads,t", value<std::size_t>(&threads)->default_value(1 << 2), 
-         "the number of worker threads")
-        ("count,c", value<std::size_t>(&count)->default_value(1 << 20), 
+         "the number of consumer and producer threads (total number of threads "
+         " is 2 times this)")
+        ("count,c", value<std::size_t>(&count)->default_value(1 << 22), 
          "the number of objects to allocate per producer thread") 
         ("object-size,s", value<std::size_t>
           (&object_size)->default_value(1 << 6), 
@@ -116,7 +117,7 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////////////////////
     // output results
     std::cout
-        << "(((threads " << threads << ") "
+        << "(((threads " << (threads * 2) << ") "
              "(count " << count << ") "
              "(object-size " << object_size << ")) "
             "((allocation-total " << (threads * count * object_size) << ") "
