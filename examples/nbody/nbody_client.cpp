@@ -862,14 +862,20 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
                 par->granularity = max_count;
                 par->num_pxpar = (max_count/par->granularity);
+                par->extra_pxpar = max_count % par->granularity;
+                if(par->extra_pxpar != 0)
+                    par->num_pxpar += 1;
                 std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-            } else if(par->granularity <= 0)
+            } else if(par->granularity == 0)
             {
                 std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
                 par->granularity = max_count;
                 par->num_pxpar = (max_count/par->granularity);                
-                std::cout << "Alert:: Setting par->granularity to max_count/2, new par->granularity is "<< par->granularity << std::endl;
-            } else if (par->granularity < max_count)
+                par->extra_pxpar = max_count % par->granularity;
+                if(par->extra_pxpar != 0)
+                    par->num_pxpar += 1;
+                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+            } else if (par->granularity <= max_count)
             {
             //std::vector< std::vector<int> >  bilist ;
                 par->num_pxpar = (max_count/par->granularity);
@@ -1142,7 +1148,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("theta,c", po::value<double>(), "theta value")
-            ("granularity,g", po::value<unsigned long long>(), "the granularity of the data")
+            ("granularity,g", po::value<unsigned long>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
             ("verbose,v", "print calculated values after each time step")
@@ -1249,7 +1255,7 @@ int main(int argc, char* argv[])
         
         unsigned long granularity = 0;
         if (vm.count("granularity"))
-            granularity = vm["granularity"].as<std::size_t>();
+            granularity = vm["granularity"].as<unsigned long>();
 
         std::size_t numvals;
 
@@ -1301,7 +1307,7 @@ int main(int argc, char* argv[])
               }
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
-                par->granularity = atoi(tmp.c_str());
+                par->granularity = atol(tmp.c_str());
                // if ( par->granularity < 3 ) {
                //   std::cerr << " Problem: granularity must be at least 3 : " << par->granularity << std::endl;
                //   BOOST_ASSERT(false);
