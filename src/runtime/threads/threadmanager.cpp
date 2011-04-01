@@ -1166,7 +1166,6 @@ namespace hpx { namespace threads
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
@@ -1181,7 +1180,11 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;
 
+#if HPX_USE_ABP_SCHEDULER != 0
+#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
+
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::abp_queue_scheduler, 
     hpx::threads::policies::callback_notifier>;
+#endif
 

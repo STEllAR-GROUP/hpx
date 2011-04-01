@@ -188,8 +188,10 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler>
     local_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_priority_queue_scheduler> 
     local_priority_runtime_type;
+#if HPX_USE_ABP_SCHEDULER != 0
 typedef hpx::runtime_impl<hpx::threads::policies::abp_queue_scheduler> 
     abp_runtime_type;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
