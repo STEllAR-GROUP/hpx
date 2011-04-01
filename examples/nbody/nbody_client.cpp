@@ -1247,7 +1247,7 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
         
-        unsigned long long granularity = 5;
+        unsigned long granularity = 0;
         if (vm.count("granularity"))
             granularity = vm["granularity"].as<std::size_t>();
 
