@@ -43,20 +43,21 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
 
     /** unsafe set operation */
     /* @{ */
-    void operator= (tagged_ptr const & p)
+    tagged_ptr& operator= (tagged_ptr const & p)
     {
         set(p.ptr, p.tag);
+        return *this;
     }
 
-    void set(T * p, tag_type t = 0)
+    void set(T * p, tag_type t)
     {
         ptr = p;
         tag = t;
     }
     
-    void reset(T * p, tag_type t = 0)
+    void reset(T * p, tag_type t)
     {
-        set(p);
+        set(p, t);
     }
     /* @} */
 

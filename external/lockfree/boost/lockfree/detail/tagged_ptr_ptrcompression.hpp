@@ -80,9 +80,10 @@ public:
 
     /** unsafe set operation */
     /* @{ */
-    void operator= (tagged_ptr const & p)
+    tagged_ptr& operator= (tagged_ptr const & p)
     {
         ptr = p.ptr;
+        return *this;
     }
 
     void set(T * p, tag_type t)
