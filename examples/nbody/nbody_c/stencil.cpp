@@ -143,7 +143,7 @@ namespace hpx { namespace components { namespace nbody
 //           resultval->az = 0.0;
           
           
-            int ci_num_par = 0;
+            unsigned long ci_num_par = 0;
             if (par->extra_pxpar != 0)
             {
                 if (compute_index < par->num_pxpar-1)
@@ -174,14 +174,14 @@ namespace hpx { namespace components { namespace nbody
 
               
               //int global_idx[ci_num_par]; 
-              std::vector<int> global_idx(ci_num_par,0);
-              for(int d = 0; d < ci_num_par; ++d)
+              std::vector<unsigned long> global_idx(ci_num_par,0);
+              for(unsigned long d = 0; d < ci_num_par; ++d)
               {
                   global_idx[d] = (compute_index * par->granularity) + d;
                    std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
               }
               
-              int i_num_par = 0;
+              unsigned long i_num_par = 0;
               if (par->extra_pxpar != 0)
               {
                     if (i < par->num_pxpar-1)
@@ -201,8 +201,8 @@ namespace hpx { namespace components { namespace nbody
 //                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;         
               }
               //int remote_idx[i_num_par];
-              std::vector<int> remote_idx(i_num_par,0);
-              for(int d = 0; d < i_num_par; ++d)
+              std::vector<unsigned long> remote_idx(i_num_par,0);
+              for(unsigned long d = 0; d < i_num_par; ++d)
               {                   
                   remote_idx[d] = (i * par->granularity) + d;
 //                   std::cout << "stencil::eval:: i "<< i << " remote_idx " << remote_idx[d] << std::endl;
@@ -218,13 +218,13 @@ namespace hpx { namespace components { namespace nbody
               
               if (i != compute_index)
               {
-              for(int d = 0; d < ci_num_par; ++d)
+              for(unsigned long d = 0; d < ci_num_par; ++d)
               {
                   if(val[compute_index]->node_type[d] == 1)
                   {
-                            for(int f=0; f < i_num_par; ++f)
+                            for(unsigned long f=0; f < i_num_par; ++f)
                             {
-                        for(int e=0; e < par->iList[global_idx[d]].size(); ++e)
+                        for(unsigned long e=0; e < par->iList[global_idx[d]].size(); ++e)
                         {
 //                             std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
 

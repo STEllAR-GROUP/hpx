@@ -69,7 +69,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
   
 //  if (par.bilist[item].size() != 0)
 //  {  
-        int num_real_par = 0;
+        unsigned long num_real_par = 0;
         if (par.extra_pxpar != 0)
         {
             if (item < par.num_pxpar-1)
@@ -96,9 +96,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 //         else if (item >= par.num_pxpar)
 //             BOOST_ASSERT("ERROR: Compute_index is more than number of PX particles");
      
-        for (int i = 0; i < num_real_par; ++i)
+        for (unsigned long i = 0; i < num_real_par; ++i)
         {
-            int iidx = (item * par.granularity) + i;
+            unsigned long iidx = (item * par.granularity) + i;
         //         int iidx = 0;
         //         for (int k =0; k < item; ++k)
         //             iidx += par.bilist[k].size();

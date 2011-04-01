@@ -74,7 +74,7 @@ static TreeLeaf **particles; // the n particles
 class TreeNode 
 {
     public:
-        int tag;
+        unsigned long tag;
         int node_type; /* Each node has a node type which is either NDE or PAR*/
         double mass;   /* Each node has a mass */
         double p[3];   /* position of each node is stored in a vector of type double named p */
@@ -89,10 +89,10 @@ class IntrTreeNode: public TreeNode /* Internal node inherits from base TreeNode
         static IntrTreeNode *newNode(const double pos_buf[]); /* Function to create a new node, returns an Internal Tree Node */
         void treeNodeInsert(TreeLeaf * const new_particle, const double sub_box_dim); /* Function to insert a particle (tree leaf) node  */
         void calculateCM(int &current_index); /* Recursive function to compute center of mass */
-        void tagTree(int &current_node, int & max_count, int & tag_id, int max_ctr);
-        void buildBodies(int &current_node, std::vector<body> & bodies, int & bod_idx);
+        void tagTree(int &current_node, unsigned long & max_count, unsigned long & tag_id, unsigned long max_ctr);
+        void buildBodies(int &current_node, std::vector<body> & bodies, unsigned long & bod_idx);
         void printTag(int &current_node);
-        void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList, double theta);
+        void interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<unsigned long> > & iList, double theta);
 
 
         static void treeReuse()      /* function to recycle tree */
@@ -124,7 +124,7 @@ class TreeLeaf: public TreeNode   /* Terminal / leaf nodes extend intermediate n
         void moveParticles( components::nbody::Parameter & par);
      //   void moveParticles(); /* moves particles according to acceleration and velocity calculated */
         void calculateForce(const IntrTreeNode * const root, const double box_size); /* calculates the acceleration and velocity of each particle in the tree */
-        void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx , double theta);
+        void interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<unsigned long> > & iList , const unsigned long idx , double theta);
         ~TreeLeaf() { }       /* TreeLeaf Destructor */
     private:
 
@@ -261,7 +261,7 @@ void IntrTreeNode::treeNodeInsert(TreeLeaf * const new_particle, const double su
  * across the entire tree recursively. 
  */
 
-void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, int max_ctr)
+void IntrTreeNode::tagTree(int &current_node,  unsigned long & max_count, unsigned long & tag_id, unsigned long max_ctr)
 {    
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
@@ -301,7 +301,7 @@ void IntrTreeNode::tagTree(int &current_node,  int & max_count, int & tag_id, in
 }
 
 
-void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, int & bod_idx)
+void IntrTreeNode::buildBodies(int &current_node,  std::vector<body> & bodies, unsigned long & bod_idx)
 {
 //    std::cout << "I get till here" << std::endl;
     //static int max_ctr;
@@ -397,7 +397,7 @@ void IntrTreeNode::printTag(int &current_node)
         std::cout << "CELL tag : " << tag << std::endl;
 }
 
-void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList, double theta)
+void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, std::vector< std::vector<unsigned long> > & iList, double theta)
 {
     TreeNode *temp_branch;
     for (int i = 0; i < 8; ++i) 
@@ -425,7 +425,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
 
 
 // //call with box_size_buf * box_size_buf * inv_tolerance_2
-void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<int> > & iList , const int idx, double theta )
+void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<unsigned long> > & iList , const unsigned long idx, double theta )
 {
  //   std::cout << "idx : "  << idx << std::endl;
     register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
@@ -571,7 +571,7 @@ void IntrTreeNode::calculateCM(int &current_node) // recursively summarizes info
   //  std::cout << "Center of Mass Calc : " << m << p[0] << p[0] << p[0] << std::endl;
 }
 
-static inline void computeRootPos(const int num_bodies, double &box_dim, double center_position[]) 
+static inline void computeRootPos(const unsigned long num_bodies, double &box_dim, double center_position[]) 
 {
  /* Initialize the min and max position vectors to extreme values */
     double minPos[3];
@@ -588,7 +588,7 @@ static inline void computeRootPos(const int num_bodies, double &box_dim, double 
      * the max and min values for each coordinate
      * in the maxPos and minPos vector
      */
-    for (int i = 0; i < num_bodies; ++i)
+    for (unsigned long i = 0; i < num_bodies; ++i)
     {
 //        std::cout << " x "<< particles[i]->p[0] <<" y " << particles[i]->p[1] << " z " << particles[i]->p[2] << std::endl;  
         if (minPos[0] > particles[i]->p[0])
@@ -670,9 +670,9 @@ struct deref_less {
   }
 };
 
-void remove_unsorted_dupes(std::list<int> &the_list) {
-  std::set<std::list<int>::iterator, deref_less> found;
-  for (std::list<int>::iterator x = the_list.begin(); x != the_list.end();) {
+void remove_unsorted_dupes(std::list<unsigned long> &the_list) {
+  std::set<std::list<unsigned long>::iterator, deref_less> found;
+  for (std::list<unsigned long>::iterator x = the_list.begin(); x != the_list.end();) {
     if (!found.insert(x).second) {
       x = the_list.erase(x);
     }
@@ -745,7 +745,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 particles[i] = new TreeLeaf();
         }
         
-        for (int i =0; i < par->num_bodies ; ++i)
+        for (unsigned long i =0; i < par->num_bodies ; ++i)
         {
             double dat[7] = {0,0,0,0,0,0,0};
             infile >> dat[0] >> dat[1] >> dat[2] >> dat[3] >> dat[4] >> dat[5] >> dat[6];
@@ -794,15 +794,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             IntrTreeNode *bht_root = IntrTreeNode::newNode(cPos);
             const double sub_box_size = box_size * 0.5;
             
-            for (int i = 0; i < par->num_bodies; ++i) 
+            for (unsigned long i = 0; i < par->num_bodies; ++i) 
             {
 //                std::cout << " Inserting particle i = " << i <<std::endl;
                 bht_root->treeNodeInsert(particles[i], sub_box_size); // grow the tree by inserting each body
             }
-            int max_count;
+            unsigned long max_count;
             int current_index = 0;
             bht_root->calculateCM(current_index);
-            int tag_id = 0;
+            unsigned long tag_id = 0;
             bht_root->tagTree(current_index, max_count, tag_id, 0);
 //              std::cout << "TADA : " << max_count << std::endl;
 
@@ -826,9 +826,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             
             par->iList.resize(max_count);
             par->bodies.resize(max_count);
-            int box_idx = 0;
+            unsigned long box_idx = 0;
             bht_root->buildBodies(current_index,par->bodies, box_idx);
-            for(int i=0; i<par->bodies.size(); ++i)
+//             for(unsigned long i=0; i<par->bodies.size(); ++i)
 //             {
 //                 std::cout << par->bodies[i].node_type << " " << par->bodies[i].mass << " " << par->bodies[i].px << " " << par->bodies[i].py 
 //                 << " " << par->bodies[i].pz << " " << par->bodies[i].vx << " " << par->bodies[i].vy << " " << par->bodies[i].vz << std::endl;
@@ -884,8 +884,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
            
 
            
-            int q = 0;
-            int loopend = par->granularity;
+            unsigned long q = 0;
+            unsigned long loopend = par->granularity;
             for (int p = 0; p < par->num_pxpar; ++p)
             {
 //                 bool rep_test[par->granularity];
@@ -893,15 +893,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 {
 //                     rep_test[x] = false;
 //                 }
-                std::list<int> match_vec;
+                std::list<unsigned long> match_vec;
                 while (q < loopend)
                 {
                     //int old_val = -1;
                     //int new_val = 0;
                     bool dup_val = false;
-                    for (int r = 0; r < par->iList[q].size(); ++r)
+                    for (unsigned long r = 0; r < par->iList[q].size(); ++r)
                     { 
-                       int bal_conn = par->iList[q][r] / par->granularity;
+                       unsigned long bal_conn = par->iList[q][r] / par->granularity;
 //                        std::cout <<"PXparticle p " << p << " Actual particle q " << q << " rth partcle " << r << " par->iList[q][r] " << par->iList[q][r] << " bal_conn " << bal_conn << std::endl;
                        if (bal_conn != p)
                            match_vec.push_back(bal_conn);
@@ -912,7 +912,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
                 }
                 q = loopend;
-                for (std::list<int>::iterator it=match_vec.begin(); it!=match_vec.end(); ++it)
+                for (std::list<unsigned long>::iterator it=match_vec.begin(); it!=match_vec.end(); ++it)
                         par->bilist[p].push_back(*it);
                 match_vec.clear();
 
@@ -1021,13 +1021,13 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             std::cout << "Result data size: " << result_data.size() << std::endl;
 
 ////////blockcomment
-            for (std::size_t i = 0, j=0; i < result_data.size(); ++i)
+            for (unsigned long i = 0, j=0; i < result_data.size(); ++i)
             {
                 components::access_memory_block<stencil_data> val(
                     components::stubs::memory_block::get(result_data[i]));
 //                std::cout << "Result data size: " << result_data.size() << std::endl;
                 
-                for (std::size_t k = 0; k < val->ax.size(); ++k)
+                for (unsigned long k = 0; k < val->ax.size(); ++k)
                 {
 //                     if(val->node_type[k] == 1 && j != par->num_bodies)
 
@@ -1071,7 +1071,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                
             } ////////block comment
             
-         for (int i = 0; i < par->num_bodies; ++i) 
+         for (unsigned long i = 0; i < par->num_bodies; ++i) 
         { 
             particles[i]->moveParticles(par); 
         }
@@ -1090,7 +1090,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             //bht_root=NULL;
             par->iList.clear();
             par->bilist.clear();
-            for (std::size_t i = 0; i < result_data.size(); ++i)
+            for (unsigned long i = 0; i < result_data.size(); ++i)
                 components::stubs::memory_block::free(result_data[i]);
             std::cout << " \n \n ITERATION: " << par->iter << "\n \n" << std::endl;
 
@@ -1139,7 +1139,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
             ("theta,c", po::value<double>(), "theta value")
-            ("granularity,g", po::value<std::size_t>(), "the granularity of the data")
+            ("granularity,g", po::value<unsigned long long>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
                 "the parameter file")
             ("verbose,v", "print calculated values after each time step")
@@ -1244,7 +1244,7 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
         
-        std::size_t granularity = 5;
+        unsigned long long granularity = 5;
         if (vm.count("granularity"))
             granularity = vm["granularity"].as<std::size_t>();
 

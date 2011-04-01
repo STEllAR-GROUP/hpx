@@ -72,8 +72,8 @@ struct Par {
       int output_stdout;
       int rowsize;
       std::string input_file;
-      std::vector <std::vector<int> > iList;
-      std::vector <std::vector<int> > bilist;
+      std::vector <std::vector<unsigned long> > iList;
+      std::vector <std::vector<unsigned long> > bilist;
       std::vector<body> bodies; 
       double dtime;
       double eps;
@@ -82,12 +82,12 @@ struct Par {
       double softening_2;
       double inv_tolerance_2;
       int iter;
-      int num_bodies;
+      unsigned long num_bodies;
       int num_iterations;
       double part_mass;
-      int granularity;
-      int num_pxpar;
-      int extra_pxpar;
+      unsigned long granularity;
+      unsigned long num_pxpar;
+      unsigned long extra_pxpar;
       double theta;
 };
 

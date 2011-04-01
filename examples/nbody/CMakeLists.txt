@@ -11,36 +11,6 @@ set(subdirs
     nbody_c
     nbody_c_test)
 
-find_package(HPX_GMP)
-find_package(HPX_RNPL)
-
-if(RNPL_FOUND)
-  # FIXME: HPX_* identifiers please
-  add_definitions(-DRNPL_FOUND)
-  include_directories(${RNPL_INCLUDE_DIR})
-endif()
-
-if(GMP_FOUND)
-  # FIXME: HPX_* identifiers please
-  add_definitions(-DGMP_FOUND)
-  include_directories(${GMP_INCLUDE_DIR})
-
-  # MPFR depends on GMP, so no point looking for it if we don't have GMP  
-  find_package(HPX_MPFR)
-  
-  if(MPFR_FOUND)
-    # FIXME: HPX_* identifiers please
-    add_definitions(-DMPFR_FOUND=1)
-    add_definitions(-DMPFR_USE_NED_ALLOCATOR=1)
-    
-    include_directories(${MPFR_INCLUDE_DIR})
-
-    # allow the mpreal class to take advantage of move semantics
-    # FIXME: HPX_* identifiers please
-    add_definitions(-DMPFR_USE_BOOST_MOVE=1)
-    include_directories(${hpx_SOURCE_DIR}/external/move)
-  endif()
-endif()
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
@@ -50,13 +20,6 @@ endforeach()
 set(sources 
     nbody_client.cpp)
 
-# add these MPFR specific files if we have MPFR
-if(MPFR_FOUND) 
-  set(sources 
-      ${sources}
-      mpreal.cpp 
-      serialize_mpreal.cpp)
-endif()
 
 # define basic dependencies
 set(dependencies
@@ -65,25 +28,8 @@ set(dependencies
     nbody_c_test_component
     distributing_factory_component)
 
-if(GMP_FOUND)
-  # add GMP as a dependency
-  set(dependencies 
-      ${dependencies}
-      ${GMP_LIBRARY})
-  if(MPFR_FOUND)
-    # add MPFR as a dependency
-    set(dependencies 
-        ${dependencies}
-        ${MPFR_LIBRARY})
-  endif()
-endif()
 
-if(RNPL_FOUND)
-  # add RNPL as a dependency
-  set(dependencies 
-      ${dependencies}
-      ${RNPL_LIBRARY})
-endif()
+
 
 source_group("Source Files" FILES ${sources})
 

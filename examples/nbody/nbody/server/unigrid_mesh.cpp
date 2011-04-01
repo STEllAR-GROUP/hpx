@@ -590,7 +590,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
           {
             
 
-                for (int p=0; p < par->bilist[i].size() ; ++p)
+                for (unsigned long p=0; p < par->bilist[i].size() ; ++p)
                 {
                     
                     j = par->bilist[i][p];
