@@ -857,25 +857,46 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 std::cout << std::endl;
 //             }
 // //             
-            if(par->granularity > max_count)
-            {
-                std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
-                par->granularity = max_count;
-//                par->num_pxpar = (max_count/par->granularity);
-//                par->extra_pxpar = max_count % par->granularity;
-//                if(par->extra_pxpar != 0)
-//                    par->num_pxpar += 1;
-//                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-            } else if(par->granularity == 0)
-            {
-                std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
-                par->granularity = max_count;
-    //            std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-            } 
-	    
-            //std::vector< std::vector<int> >  bilist ;
-            par->num_pxpar = (max_count/par->granularity);
-            par->extra_pxpar = max_count % par->granularity;
+
+           
+           if (par->num_pxpar <= 1)
+           {
+               par->extra_pxpar = 0;
+               par->granularity = max_count;
+               std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
+           }
+           if (par->num_pxpar >= 1)
+           {
+               par->granularity = max_count / par->num_pxpar;
+               par->extra_pxpar = max_count % par->num_pxpar;
+           }
+           
+           
+///////grain size based work distribution                    
+//             if(par->granularity > max_count)
+//             {
+//                 std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
+//                 par->granularity = max_count;
+// //                par->num_pxpar = (max_count/par->granularity);
+// //                par->extra_pxpar = max_count % par->granularity;
+// //                if(par->extra_pxpar != 0)
+// //                    par->num_pxpar += 1;
+// //                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+//             } else if(par->granularity == 0)
+//             {
+//                 std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
+//                 par->granularity = max_count;
+//     //            std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+//             } 
+// 	    
+//             //std::vector< std::vector<int> >  bilist ;
+//             par->num_pxpar = (max_count/par->granularity);
+//             par->extra_pxpar = max_count % par->granularity;
+///////grain size based work distribution       
+
+
+
+
             if(par->extra_pxpar != 0)
                 par->num_pxpar += 1;
             numvals = par->num_pxpar;
@@ -1142,6 +1163,9 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
+            ("pxpar,n", po::value<int>(), 
+                "the number of px particles to create for this "
+                "HPX locality")
             ("theta,c", po::value<double>(), "theta value")
             ("granularity,g", po::value<unsigned long>(), "the granularity of the data")
             ("parfile,p", po::value<std::string>(), 
@@ -1300,6 +1324,11 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("theta");
                 par->theta = atof(tmp.c_str());
               }
+              if ( sec->has_entry("pxpar") ) {
+                std::string tmp = sec->get_entry("pxpar");
+                par->num_pxpar = atoi(tmp.c_str());
+              }
+              /////I AM HERE
               if ( sec->has_entry("granularity") ) {
                 std::string tmp = sec->get_entry("granularity");
                 par->granularity = atol(tmp.c_str());
