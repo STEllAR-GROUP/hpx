@@ -9,6 +9,7 @@
 #include <boost/foreach.hpp>
 
 #include <math.h>
+#include <algorithm>
 
 #include "stencil.hpp"
 #include "logging.hpp"
@@ -172,16 +173,13 @@ namespace hpx { namespace components { namespace nbody
               global_idx[d] = (compute_index * par->granularity) + d;
             //std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
           }
-         
+
           for (int i=0;i< val.size();++i)
           {
 //               std::cout << "\n VAL i " << i <<  "COMPUTE_INDEX " << compute_index << " val.size() " << val.size() <<std::endl;
 //               std::cout << "resultval sizes node_type " << resultval->node_type.size() << " x " << resultval->x.size() <<std::endl;
 
-              
-              //int global_idx[ci_num_par]; 
 
-              
               unsigned long i_num_par = 0;
               if (par->extra_pxpar != 0)
               {
@@ -235,27 +233,44 @@ namespace hpx { namespace components { namespace nbody
                             {
                                 if(global_idx[d] != remote_idx[f] )     
                                 {
-                                    register unsigned long e;
-                                    for(e=0; e < par->iList[global_idx[d]].size(); ++e)
-                                    {
-            //                             std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
 
-            //                                 std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
-                                            if(par->iList[global_idx[d]][e] == remote_idx[f]) 
-                                            {
-                                        // std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
-                                            
-                                            register double dx = val[i]->x[f] - val[compute_index]->x[d] ;
-                                            register double dy = val[i]->y[f] - val[compute_index]->y[d] ;
-                                            register double dz = val[i]->z[f] - val[compute_index]->z[d] ;
-                                            register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
-                                            register double acc_factor = val[i]->mass[f] * inv_dr * inv_dr * inv_dr;
-                                            //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
-                                            resultval->ax[d] += dx * acc_factor;
-                                            resultval->ay[d] += dy * acc_factor;
-                                            resultval->az[d] += dz * acc_factor;
-                                            }
-                                        }
+                                //	std::vector<unsigned long> vect = par->iList[global_id[d]];
+                                	///using algorithms with vectors so as not to iterate through a vector
+                                	if (std::binary_search (par->iList[global_idx[d]].begin(),par->iList[global_idx[d]].end(), remote_idx[f]) )
+                                	{
+                                        register double dx = val[i]->x[f] - val[compute_index]->x[d] ;
+                                        register double dy = val[i]->y[f] - val[compute_index]->y[d] ;
+                                        register double dz = val[i]->z[f] - val[compute_index]->z[d] ;
+                                        register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
+                                        register double acc_factor = val[i]->mass[f] * inv_dr * inv_dr * inv_dr;
+                                        //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
+                                        resultval->ax[d] += dx * acc_factor;
+                                        resultval->ay[d] += dy * acc_factor;
+                                        resultval->az[d] += dz * acc_factor;
+                                	}
+
+
+//                                    register unsigned long e;
+//                                    for(e=0; e < par->iList[global_idx[d]].size(); ++e)
+//                                    {
+//            //                             std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
+//
+//            //                                 std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
+//                                            if(par->iList[global_idx[d]][e] == remote_idx[f])
+//                                            {
+//                                        // std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
+//
+//                                            register double dx = val[i]->x[f] - val[compute_index]->x[d] ;
+//                                            register double dy = val[i]->y[f] - val[compute_index]->y[d] ;
+//                                            register double dz = val[i]->z[f] - val[compute_index]->z[d] ;
+//                                            register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
+//                                            register double acc_factor = val[i]->mass[f] * inv_dr * inv_dr * inv_dr;
+//                                            //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
+//                                            resultval->ax[d] += dx * acc_factor;
+//                                            resultval->ay[d] += dy * acc_factor;
+//                                            resultval->az[d] += dz * acc_factor;
+//                                            }
+//                                        }
                                 }
                             }
                         }
