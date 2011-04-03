@@ -189,15 +189,20 @@ namespace hpx { namespace components { namespace nbody
                     else if (i == par->num_pxpar-1)
                         i_num_par = par->extra_pxpar;
                     else if (i >= par->num_pxpar)
+                    {
                         BOOST_ASSERT("ERROR: i is more than number of PX particles");
-//                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;
+                        std::cout << "ERROR i: " << i << " is >= par->num_pxpar" << i_num_par << std::endl;
+                    }
               }
               else if(par->extra_pxpar == 0)
               {
                     if (i < par->num_pxpar)
                         i_num_par = par->granularity;
                     else if (i >= par->num_pxpar)
+                    {
                         BOOST_ASSERT("ERROR: i is more than number of PX particles");
+                        std::cout << "ERROR i: " << i << " is > par->num_pxpar" << i_num_par << std::endl;
+                    }
 //                     std::cout << "stencil::eval:: num actual particles in px_par(i) " << i << " is " << i_num_par << std::endl;         
               }
               //int remote_idx[i_num_par];
@@ -229,16 +234,16 @@ namespace hpx { namespace components { namespace nbody
 //                             std::cout << "stencil::eval::  E " << e << " par->iList[global_idx[d]].size() " << par->iList[global_idx[d]].size() << std::endl;
 
 //                                 std::cout << "ilist size " << par->iList[global_idx[d]].size() << " val[compute_index]->node_type " << val[compute_index]->node_type.size() << " d " << d << " ci_num_par " << ci_num_par << " f " << f << " i_num_par " << i_num_par << std::endl;
-                                if(par->iList[global_idx[d]][e] == remote_idx[f] && val[compute_index]->node_type[d] == 1 && global_idx[d] != remote_idx[f]) 
+                                if(par->iList[global_idx[d]][e] == remote_idx[f] && global_idx[d] != remote_idx[f]) 
                                 {
-                                std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
+                               // std::cout << "stencil::eval:: " << global_idx[d] << " iteracts with " << remote_idx[f] << std::endl;
                                 
-                                double dx = val[i]->x[f] - val[compute_index]->x[d] ;
-                                double dy = val[i]->y[f] - val[compute_index]->y[d] ;
-                                double dz = val[i]->z[f] - val[compute_index]->z[d] ;
-                                double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2))));
-                                double acc_factor = val[i]->mass[f] * inv_dr * inv_dr * inv_dr;
-                                std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
+                                register double dx = val[i]->x[f] - val[compute_index]->x[d] ;
+                                register double dy = val[i]->y[f] - val[compute_index]->y[d] ;
+                                register double dz = val[i]->z[f] - val[compute_index]->z[d] ;
+                                register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+par->softening_2))));
+                                register double acc_factor = val[i]->mass[f] * inv_dr * inv_dr * inv_dr;
+                                //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
                                 resultval->ax[d] += dx * acc_factor;
                                 resultval->ay[d] += dy * acc_factor;
                                 resultval->az[d] += dz * acc_factor;

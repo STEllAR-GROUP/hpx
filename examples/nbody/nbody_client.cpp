@@ -434,7 +434,7 @@ void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std:
     
     distance_r_2 = square<double>(distance_r[0]) + square<double>(distance_r[1]) + square<double>(distance_r[2]);
     
-    if ((box_size_2/distance_r_2) < theta )
+    if ((box_size_2/distance_r_2) > theta )
     {
         if (n->node_type == 0) 
         {
@@ -639,14 +639,14 @@ void TreeLeaf::moveParticles( components::nbody::Parameter & par)
     //vel_half = vel (t + (dt/2))
     //         = vel (t) + vel (dt/2) 
     for(int i=0; i < 3; ++i)
-        v_half[i] = v[i] + vel_dt_half [i];  
+        v_half[i] = v[i] + vel_dt_half[i];  
 
     // r1 = r0 + (Vel_half * dt )
     for(int i=0; i < 3; ++i)
         p[i] += v_half[i] * par->dtime;  
     // v_3/2 = vel_half + (accel_1 * dt)
     for(int i=0; i < 3; ++i)
-        v[i] = v_half[i] + vel_dt_half [i];  
+        v[i] = v_half[i] + vel_dt_half[i];  
 }
 
 double chroner(timeval &t1, timeval &t2)
@@ -869,6 +869,10 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
            {
                par->granularity = max_count / par->num_pxpar;
                par->extra_pxpar = max_count % par->num_pxpar;
+                           if(par->extra_pxpar != 0)
+               par->num_pxpar += 1;
+               std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
+
            }
            
            
@@ -897,8 +901,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 
 
 
-            if(par->extra_pxpar != 0)
-                par->num_pxpar += 1;
+
             numvals = par->num_pxpar;
             par->bilist.resize(par->num_pxpar);
             std::cout << "Granularity " << par->granularity  << " Num PX Par " << par->num_pxpar << " Extra PX Par " << par->extra_pxpar <<std::endl;
@@ -911,7 +914,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
            
             unsigned long q = 0;
             unsigned long loopend = par->granularity;
-            for (int p = 0; p < par->num_pxpar; ++p)
+            for (unsigned long p = 0; p < par->num_pxpar; ++p)
             {
 //                 bool rep_test[par->granularity];
 //                 for (int x = 0; x < par->granularity;++x)
@@ -956,16 +959,16 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                     //std::cout << p << " extra_pxpar =0 : loopend " << loopend  << "q = " << q << std::endl;
                 }
             }
-/*            
-            for (int p = 0; p < par->bilist.size(); ++p)
+            
+            for (unsigned long p = 0; p < par->bilist.size(); ++p)
             {
                 std::cout << "B p : " << p << " list : " ;
-                for (int q = 0; q < par->bilist[p].size(); ++q)
+                for (unsigned long q = 0; q < par->bilist[p].size(); ++q)
                 {
                     std::cout << " " << par->bilist[p][q];
                 }
                 std::cout << std::endl;
-            }*/
+            }
 //            } /// extra brace
             
 
@@ -1064,9 +1067,9 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                         particles[j]->p[0] = val->x[k];
 //                         particles[j]->p[1] = val->y[k];
 //                         particles[j]->p[2] = val->z[k];
-//                         particles[j]->v[0] = val->vx[k];
-//                         particles[j]->v[1] = val->vy[k];
-//                         particles[j]->v[2] = val->vz[k];
+                        particles[j]->v[0] = val->vx[k];
+                        particles[j]->v[1] = val->vy[k];
+                        particles[j]->v[2] = val->vz[k];
                         particles[j]->a[0] = val->ax[k];
                         particles[j]->a[1] = val->ay[k];
                         particles[j]->a[2] = val->az[k];    
@@ -1095,13 +1098,14 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //                 }
                
             } ////////block comment
-            
+            if (par->extra_pxpar !=0 )
+              --par->num_pxpar ;
          for (unsigned long i = 0; i < par->num_bodies; ++i) 
         { 
             particles[i]->moveParticles(par); 
         }
 ////////block comment            
-//             for (int i =0; i < par->num_bodies ; ++i)
+//             for (unsigned long i =0; i < par->num_bodies ; ++i)
 //             {
 //                 std::cout << "NEW body : "<< i << " : " << particles[i]->mass << " : " <<
 //                 particles[i]->p[0] << " : " << particles[i]->p[1] << " : " << particles[i]->p[2] << "           " << " : " << particles[i]->v[0] << " : " << particles[i]->v[1] 
@@ -1163,7 +1167,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("threads,t", po::value<int>(), 
                 "the number of operating system threads to spawn for this "
                 "HPX locality")
-            ("pxpar,n", po::value<int>(), 
+            ("pxpar,z", po::value<unsigned long>(), 
                 "the number of px particles to create for this "
                 "HPX locality")
             ("theta,c", po::value<double>(), "theta value")
@@ -1272,6 +1276,10 @@ int main(int argc, char* argv[])
         if (vm.count("run_agas_server"))  // run the AGAS server instance here
             agas_server.reset(new agas_server_helper(agas_host, agas_port));
         
+        unsigned long temppxpar = 0;
+        if (vm.count("pxpar"))
+            temppxpar = vm["pxpar"].as<unsigned long>();
+        
         unsigned long granularity = 0;
         if (vm.count("granularity"))
             granularity = vm["granularity"].as<unsigned long>();
@@ -1286,6 +1294,7 @@ int main(int argc, char* argv[])
         par->output_stdout = 1;
         par->granularity = granularity;
         par->theta = 1.0;
+        par->num_pxpar = temppxpar;
         
         //par->rowsize =  4;
         par->input_file="5_file";
@@ -1323,10 +1332,6 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("theta") ) {
                 std::string tmp = sec->get_entry("theta");
                 par->theta = atof(tmp.c_str());
-              }
-              if ( sec->has_entry("pxpar") ) {
-                std::string tmp = sec->get_entry("pxpar");
-                par->num_pxpar = atoi(tmp.c_str());
               }
               /////I AM HERE
               if ( sec->has_entry("granularity") ) {
