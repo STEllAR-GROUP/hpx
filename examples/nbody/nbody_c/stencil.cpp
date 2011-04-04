@@ -167,42 +167,47 @@ namespace hpx { namespace components { namespace nbody
 //                         std::cout << "stencil::eval:: num actual particles in px_par(compute_index) " << compute_index << " is " << ci_num_par << std::endl;         
             }
         
-          std::vector<unsigned long> global_idx(ci_num_par,0);
-          for(unsigned long d = 0; d < ci_num_par; ++d)
-          {
-              global_idx[d] = (compute_index * par->granularity) + d;
-            //std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
-          }
+//           std::vector<unsigned long> global_idx(ci_num_par,0);
+//           for(unsigned long d = 0; d < ci_num_par; ++d)
+//           {
+//               global_idx[d] = (compute_index * par->granularity) + d;
+//             //std::cout << "stencil::eval:: compute index "<< compute_index << " global_idx " << global_idx[d] << std::endl;
+//           }
 
 //           if (i != compute_index)
 //           {
-              register unsigned long d;
-              register double softening_2 = par->softening_2;
+              unsigned long d;
+              double softening_2 = par->softening_2;
+              unsigned long gran = par->granularity;
               
-              std::cout << "val size " << val.size() <<std::endl;
+/*              std::cout << "val size " << val.size() <<std::endl;*/
               
-              if (val.size() >= 2)
-              {
-                    for(d = 0; d < ci_num_par; ++d)
+              
+
+                for(d = 0; d < ci_num_par; ++d)
+                {
+                    for (int i=0;i< val.size();++i)
                     {
-                        if(val[compute_index]->node_type[d] == 1)
+                        if(val[compute_index]->node_type[d] == 1 && i != compute_index )
                         {   
-                            register unsigned long e;
-                            for(e=0; e < par->iList[global_idx[d]].size(); ++e)
+                            unsigned long e;
+                            unsigned long pxpar_ci =  (compute_index * gran) + d;
+                            for(e=0; e < par->iList[pxpar_ci].size(); ++e)
                             {
-                                unsigned long pxpar_i = par->iList[global_idx[d]][e] / par->granularity;
-                                if (pxpar_i != compute_index)
+                                unsigned long pxpar_i = par->iList[pxpar_ci][e] / gran;
+                                if ( i == pxpar_i )
                                 {
-                                    unsigned long acpar_i = par->iList[global_idx[d]][e] - (pxpar_i * par->granularity);
-                                    std::cout << "Compute Index: "<< compute_index << " CI Global ID: " << global_idx[d] << " iteracts with " << " Val Index " << pxpar_i << " VI global index " << acpar_i << " actual remote id " << (pxpar_i * par->granularity)+acpar_i << std::endl;
-                                    std::cout << "val index :" << pxpar_i << " size : " << val[pxpar_i]->x.size() << " for " << par->iList[global_idx[d]][e] << std::endl;
+                                    unsigned long acpar_i = par->iList[pxpar_ci][e] - (pxpar_i * gran);
+                                    std::cout << "Compute Index: "<< compute_index << " CI Global ID: " << pxpar_ci << " iteracts with " << " Val Index " << pxpar_i << " VI global index " << acpar_i << " actual remote id " << (pxpar_i * gran)+acpar_i << std::endl;
+                                    std::cout << "val index :" << pxpar_i << " size : " << val[i]->x.size() << " for " << par->iList[pxpar_ci][e] << " val.size() " << val.size() << std::endl;
                                     
-                                    register double dx = val[pxpar_i]->x[acpar_i] - val[compute_index]->x[d] ;
-                                    register double dy = val[pxpar_i]->y[acpar_i] - val[compute_index]->y[d] ;
-                                    register double dz = val[pxpar_i]->z[acpar_i] - val[compute_index]->z[d] ;
-                                    register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
-                                    register double acc_factor = val[pxpar_i]->mass[acpar_i] * inv_dr * inv_dr * inv_dr;
+                                    double dx = val[i]->x[acpar_i] - val[compute_index]->x[d] ;
+                                    double dy = val[i]->y[acpar_i] - val[compute_index]->y[d] ;
+                                    double dz = val[i]->z[acpar_i] - val[compute_index]->z[d] ;
+                                    double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
+                                    double acc_factor = val[i]->mass[acpar_i] * inv_dr * inv_dr * inv_dr;
                                     //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
+                                    std::cout << "I get till here " << std::endl;
                                     resultval->ax[d] += dx * acc_factor;
                                     resultval->ay[d] += dy * acc_factor;
                                     resultval->az[d] += dz * acc_factor;
@@ -365,7 +370,7 @@ namespace hpx { namespace components { namespace nbody
         //  } // if node_type == 1 (par)
 
        //   resultval.get() = val[compute_index].get();
-          std::cout <<" Result Val X Size " <<  resultval->vx.size() << std::endl;
+/*          std::cout <<" Result Val X Size " <<  resultval->vx.size() << std::endl;*/
           return 0;
         }
         BOOST_ASSERT(false);

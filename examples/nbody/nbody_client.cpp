@@ -847,15 +847,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             << " : " << particles[i]->v[2] << std::endl;
 //         }
           
-            for (int p = 0; p < par->iList.size(); ++p)
-            {
-                std::cout << " p : " << p << " list : " ;
-                for (int q = 0; q < par->iList[p].size(); ++q)
-                {
-                    std::cout << " " << par->iList[p][q];
-                }
-                std::cout << std::endl;
-            }
+//             for (int p = 0; p < par->iList.size(); ++p)
+//             {
+//                 std::cout << " p : " << p << " list : " ;
+//                 for (int q = 0; q < par->iList[p].size(); ++q)
+//                 {
+//                     std::cout << " " << par->iList[p][q];
+//                 }
+//                 std::cout << std::endl;
+//             }
 // //             
 
            
@@ -1119,8 +1119,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             //bht_root=NULL;
             par->iList.clear();
             par->bilist.clear();
-            for (unsigned long i = 0; i < result_data.size(); ++i)
-                components::stubs::memory_block::free(result_data[i]);
+//             for (unsigned long i = 0; i < result_data.size(); ++i)
+//                 components::stubs::memory_block::free(result_data[i]);
             std::cout << " \n \n ITERATION: " << par->iter << "\n \n" << std::endl;
 
             
@@ -1138,8 +1138,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         std::cout << "Elapsed time: " << t.elapsed() << " [s] :: FULL Force Calculation Time: " << fullForceTime << " [ms] " << std::endl;
         
 ////////block comment            
-//         for (std::size_t i = 0; i < result_data.size(); ++i)
-//             components::stubs::memory_block::free(result_data[i]);
+        for (std::size_t i = 0; i < result_data.size(); ++i)
+            components::stubs::memory_block::free(result_data[i]);
     }   // nbody_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
