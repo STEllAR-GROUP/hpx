@@ -847,15 +847,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             << " : " << particles[i]->v[2] << std::endl;
 //         }
           
-//             for (int p = 0; p < par->iList.size(); ++p)
-//             {
-//                 std::cout << " p : " << p << " list : " ;
-//                 for (int q = 0; q < par->iList[p].size(); ++q)
-//                 {
-//                     std::cout << " " << par->iList[p][q];
-//                 }
-//                 std::cout << std::endl;
-//             }
+            for (int p = 0; p < par->iList.size(); ++p)
+            {
+                std::cout << " p : " << p << " list : " ;
+                for (int q = 0; q < par->iList[p].size(); ++q)
+                {
+                    std::cout << " " << par->iList[p][q];
+                }
+                std::cout << std::endl;
+            }
 // //             
 
            
