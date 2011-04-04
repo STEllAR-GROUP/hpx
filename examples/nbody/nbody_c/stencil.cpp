@@ -198,16 +198,16 @@ namespace hpx { namespace components { namespace nbody
                                 if ( i == pxpar_i )
                                 {
                                     unsigned long acpar_i = par->iList[pxpar_ci][e] - (pxpar_i * gran);
-                                    std::cout << "Compute Index: "<< compute_index << " CI Global ID: " << pxpar_ci << " iteracts with " << " Val Index " << pxpar_i << " VI global index " << acpar_i << " actual remote id " << (pxpar_i * gran)+acpar_i << std::endl;
+/*                                    std::cout << "Compute Index: "<< compute_index << " CI Global ID: " << pxpar_ci << " iteracts with " << " Val Index " << pxpar_i << " VI global index " << acpar_i << " actual remote id " << (pxpar_i * gran)+acpar_i << std::endl;
                                     std::cout << "val index :" << pxpar_i << " size : " << val[i]->x.size() << " for " << par->iList[pxpar_ci][e] << " val.size() " << val.size() << std::endl;
-                                    
+                        */            
                                     double dx = val[i]->x[acpar_i] - val[compute_index]->x[d] ;
                                     double dy = val[i]->y[acpar_i] - val[compute_index]->y[d] ;
                                     double dz = val[i]->z[acpar_i] - val[compute_index]->z[d] ;
                                     double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
                                     double acc_factor = val[i]->mass[acpar_i] * inv_dr * inv_dr * inv_dr;
                                     //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
-                                    std::cout << "I get till here " << std::endl;
+//                                     std::cout << "I get till here " << std::endl;
                                     resultval->ax[d] += dx * acc_factor;
                                     resultval->ay[d] += dy * acc_factor;
                                     resultval->az[d] += dz * acc_factor;
