@@ -350,7 +350,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
         init(locality_results(functions), locality_results(logging), numsteps);
 
         // prep the connections
-        std::size_t memsize = 28;
+        std::size_t memsize = 100;
         Array3D dst_port(num_rows,numvalues,memsize);
         Array3D dst_src(num_rows,numvalues,memsize);
         Array3D dst_step(num_rows,numvalues,memsize);
