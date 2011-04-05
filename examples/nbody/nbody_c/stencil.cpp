@@ -101,7 +101,7 @@ namespace hpx { namespace components { namespace nbody
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
-        int compute_index;
+        register int compute_index;
         
 //        std::cout << "stencil::eval:: EVAL row: " << row << " column : " << column  << " val.size() " << val.size() << std::endl;
         
@@ -144,7 +144,7 @@ namespace hpx { namespace components { namespace nbody
 //           resultval->az = 0.0;
           
           
-            unsigned long ci_num_par = 0;
+            register unsigned long ci_num_par = 0;
             if (par->extra_pxpar != 0)
             {
                 if (compute_index < par->num_pxpar-1)
@@ -176,9 +176,9 @@ namespace hpx { namespace components { namespace nbody
 
 //           if (i != compute_index)
 //           {
-              unsigned long d;
-              double softening_2 = par->softening_2;
-              unsigned long gran = par->granularity;
+              register unsigned long d;
+              register double softening_2 = par->softening_2;
+              register unsigned long gran = par->granularity;
               
 /*              std::cout << "val size " << val.size() <<std::endl;*/
               
@@ -190,22 +190,22 @@ namespace hpx { namespace components { namespace nbody
                     {
                         if(val[compute_index]->node_type[d] == 1 && i != compute_index )
                         {   
-                            unsigned long e;
-                            unsigned long pxpar_ci =  (compute_index * gran) + d;
+                            register unsigned long e;
+                            register unsigned long pxpar_ci =  (compute_index * gran) + d;
                             for(e=0; e < par->iList[pxpar_ci].size(); ++e)
                             {
-                                unsigned long pxpar_i = par->iList[pxpar_ci][e] / gran;
+                                register unsigned long pxpar_i = par->iList[pxpar_ci][e] / gran;
                                 if ( i == pxpar_i )
                                 {
-                                    unsigned long acpar_i = par->iList[pxpar_ci][e] - (pxpar_i * gran);
+                                    register unsigned long acpar_i = par->iList[pxpar_ci][e] - (pxpar_i * gran);
 /*                                    std::cout << "Compute Index: "<< compute_index << " CI Global ID: " << pxpar_ci << " iteracts with " << " Val Index " << pxpar_i << " VI global index " << acpar_i << " actual remote id " << (pxpar_i * gran)+acpar_i << std::endl;
                                     std::cout << "val index :" << pxpar_i << " size : " << val[i]->x.size() << " for " << par->iList[pxpar_ci][e] << " val.size() " << val.size() << std::endl;
                         */            
-                                    double dx = val[i]->x[acpar_i] - val[compute_index]->x[d] ;
-                                    double dy = val[i]->y[acpar_i] - val[compute_index]->y[d] ;
-                                    double dz = val[i]->z[acpar_i] - val[compute_index]->z[d] ;
-                                    double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
-                                    double acc_factor = val[i]->mass[acpar_i] * inv_dr * inv_dr * inv_dr;
+                                    register double dx = val[i]->x[acpar_i] - val[compute_index]->x[d] ;
+                                    register double dy = val[i]->y[acpar_i] - val[compute_index]->y[d] ;
+                                    register double dz = val[i]->z[acpar_i] - val[compute_index]->z[d] ;
+                                    register double inv_dr = (1/ (sqrt ((((dx * dx) + (dy * dy) + (dz * dz))+softening_2))));
+                                    register double acc_factor = val[i]->mass[acpar_i] * inv_dr * inv_dr * inv_dr;
                                     //std::cout << " dx " << dx << " dy "<< dy <<" dz " << dz << " inv_dr " << inv_dr << " accFactor " << acc_factor << std::endl;
 //                                     std::cout << "I get till here " << std::endl;
                                     resultval->ax[d] += dx * acc_factor;
