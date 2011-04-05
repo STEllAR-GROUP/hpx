@@ -66,10 +66,8 @@ namespace hpx { namespace components { namespace server
 	void LUgausstop(unsigned int iter, unsigned int bcol);
 	void LUgaussleft(unsigned int brow, unsigned int iter);
 	void LUgausstrail(unsigned int brow, unsigned int bcol, unsigned int iter);
-	int minitrail(unsigned int start, unsigned int brow, unsigned int bcol,
-		unsigned int iter, bool trail_offset, unsigned int i, unsigned int j);
-	int LUgaussmain(unsigned int brow, unsigned int bcol, int iter,
-		unsigned int type);
+	int minitrail(unsigned int brow, unsigned int bcol, unsigned int iter, unsigned int i);
+	int LUgaussmain(unsigned int brow, unsigned int bcol, int iter, unsigned int type);
 	int LUbacksubst();
 	double checksolve(unsigned int row, unsigned int offset, bool complete);
 	void print();
@@ -118,9 +116,8 @@ namespace hpx { namespace components { namespace server
 	typedef actions::result_action4<HPLMatreX2, int, hpl_gmain, unsigned int, unsigned
 		int, int, unsigned int, &HPLMatreX2::LUgaussmain> gmain_action;
 	//the mini gauss trail function
-	typedef actions::result_action7<HPLMatreX2, int, hpl_mintrail, unsigned int,
-		unsigned int, unsigned int, unsigned int, bool,
-		unsigned int, unsigned int, &HPLMatreX2::minitrail> mintrail_action;
+	typedef actions::result_action4<HPLMatreX2, int, hpl_mintrail, unsigned int, unsigned
+		int, unsigned int, unsigned int, &HPLMatreX2::minitrail> mintrail_action;
 	//backsubstitution function
 	typedef actions::result_action0<HPLMatreX2, int, hpl_bsubst,
 		&HPLMatreX2::LUbacksubst> bsubst_action;
@@ -143,6 +140,7 @@ namespace hpx { namespace components { namespace server
 	//the backsubst future is used to make sure all computations are complete before
 	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
 	//it is still being worked on
+
 	typedef lcos::eager_future<server::HPLMatreX2::bsubst_action> bsubst_future;
 
 	//the final future type for the class is used for checking the accuracy of
@@ -545,9 +543,7 @@ namespace hpx { namespace components { namespace server
     //computations. These blocks will still require further computations to be
     //performed in future iterations.
     void HPLMatreX2::LUgausstrail(unsigned int brow, unsigned int bcol, unsigned int iter){
-	unsigned int i,j;
-	unsigned int offset = brow*blocksize;		//factordata row offset
-	unsigned int offset_col = iter*blocksize;	//factordata column offset
+	unsigned int i;
 	std::vector<mintrail_future> g_futures;
 
 	//outermost loop: iterates over the f_factors of the most recent corner block
@@ -556,31 +552,26 @@ namespace hpx { namespace components { namespace server
 	//inner loop: iterates across the columns of the current block
 
 	for(i=0;i<datablock[iter][iter]->getrows();i++){
-		for(j=0;j<datablock[brow][bcol]->getrows();j+=allocblock){
-		    g_futures.push_back(mintrail_future(_gid,0,brow,bcol,iter,true,i,j));
-		}   
-        	BOOST_FOREACH(mintrail_future mf, g_futures){
-                	mf.get();
-	        }
-		g_futures.clear();
+		g_futures.push_back(mintrail_future(_gid,brow,bcol,iter,i));   
+        }	
+	BOOST_FOREACH(mintrail_future mf, g_futures){
+               	mf.get();
 	}
-   }
+    }
 
     //This function was made to allow the gaussian elimination step to proceed in parallel for LUgausstrail
-    int HPLMatreX2::minitrail(unsigned int start, unsigned int brow, unsigned int bcol, unsigned int iter,
-		bool trail_offset, unsigned int i, unsigned int j){
-	unsigned int m,k;
+    int HPLMatreX2::minitrail(unsigned int brow, unsigned int bcol, unsigned int iter, unsigned int i){
+	unsigned int j,k;
 	unsigned int offset = brow*blocksize;
 	unsigned int offset_col;
-	if(trail_offset){
-		offset_col = iter*blocksize;
-	}
-	else{offset_col = offset;}
 	
-	for(m=j;m<std::min((int)(j+allocblock),datablock[brow][bcol]->getrows());m++){
-	    for(k=start;k<datablock[brow][bcol]->getcolumns();k++){
-		datablock[brow][bcol]->set(m,k,datablock[brow][bcol]->get(m,k) -
-		    factordata[m+offset][i+offset_col]*datablock[iter][bcol]->get(i,k));
+	offset_col = iter*blocksize;
+		
+	for(j=0;j<datablock[brow][bcol]->getrows();j++){
+	    for(k=0;k<datablock[brow][bcol]->getcolumns();k++){
+		//lcos::mutex::scoped_lock l(mtex);
+		datablock[brow][bcol]->set(j,k,datablock[brow][bcol]->get(j,k) -
+		    factordata[j+offset][i+offset_col]*datablock[iter][bcol]->get(i,k));
 	    }
 	}
 	return 1;

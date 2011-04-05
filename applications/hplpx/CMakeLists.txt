@@ -12,11 +12,13 @@ add_subdirectory(hplmatrex2)
 add_hpx_executable(hplpx1
         MODULE hplmatrex
         SOURCES hplpx.cpp
-        DEPENDENCIES HPLMatreX_component)
+        DEPENDENCIES HPLMatreX_component
+        ESSENTIAL)
 add_hpx_executable(hplpx2
         MODULE hplmatrex2
         SOURCES hplpx2.cpp
-        DEPENDENCIES HPLMatreX2_component)
+        DEPENDENCIES HPLMatreX2_component
+        ESSENTIAL)
 
 add_custom_target(applications.hplpx.hplmatrex)
 add_dependencies(applications.hplpx hplpx.hplmatrex)

@@ -533,16 +533,17 @@ namespace hpx { namespace components { namespace server
 	unsigned int i,j,k;
 	unsigned int offset = brow*blocksize;		//factordata row offset
 	unsigned int offset_col = iter*blocksize;	//factordata column offset
+	double factor;
 
 	//outermost loop: iterates over the f_factors of the most recent corner block
 	//	(f_factors are used indirectly through factordata)
 	//middle loop: iterates over the rows of the current block
 	//inner loop: iterates across the columns of the current block
-	for(i=0;i<datablock[iter][iter]->getrows();i++){
-		for(j=0;j<datablock[brow][bcol]->getrows();j++){
+	for(j=0;j<datablock[brow][bcol]->getrows();j++){
+		for(i=0;i<datablock[iter][iter]->getrows();i++){
+		    factor = factordata[j+offset][i+offset_col];
 		    for(k=0;k<datablock[brow][bcol]->getcolumns();k++){
-			datablock[brow][bcol]->set(j,k,datablock[brow][bcol]->get(j,k) -
-			    factordata[j+offset][i+offset_col]*datablock[iter][bcol]->get(i,k));
+			datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
 	}	}   }
     }
 

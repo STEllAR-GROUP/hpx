@@ -20,7 +20,7 @@ class LUblock
 	inline double get(unsigned int row, unsigned int col);
 	inline void set(unsigned int row, unsigned int col, double val);
 
-    private://data members
+//    private://data members
 	int rows;
 	int columns;
 	double** data;
