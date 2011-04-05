@@ -858,44 +858,45 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
 //             }
 // //             
 
-           
-           if (par->num_pxpar <= 1)
-           {
-               par->extra_pxpar = 0;
-               par->granularity = max_count;
-               std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
-           }
-           if (par->num_pxpar >= 1)
-           {
-               par->granularity = max_count / par->num_pxpar;
-               par->extra_pxpar = max_count % par->num_pxpar;
-                           if(par->extra_pxpar != 0)
-               par->num_pxpar += 1;
-               std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
 
-           }
-           
+///////thread based work distribution            
+//            if (par->num_pxpar <= 1)
+//            {
+//                par->extra_pxpar = 0;
+//                par->granularity = max_count;
+//                std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
+//            }
+//            if (par->num_pxpar >= 1)
+//            {
+//                par->granularity = max_count / par->num_pxpar;
+//                par->extra_pxpar = max_count % par->num_pxpar;
+//                            if(par->extra_pxpar != 0)
+//                par->num_pxpar += 1;
+//                std::cout << " granularity: " << par->granularity << " Num PX Particles " << par->num_pxpar << " Num Extra particles " << std::endl;               
+// 
+//            }
+//////////////////////           
            
 ///////grain size based work distribution                    
-//             if(par->granularity > max_count)
-//             {
-//                 std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
-//                 par->granularity = max_count;
-// //                par->num_pxpar = (max_count/par->granularity);
-// //                par->extra_pxpar = max_count % par->granularity;
-// //                if(par->extra_pxpar != 0)
-// //                    par->num_pxpar += 1;
-// //                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-//             } else if(par->granularity == 0)
-//             {
-//                 std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
-//                 par->granularity = max_count;
-//     //            std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
-//             } 
-// 	    
-//             //std::vector< std::vector<int> >  bilist ;
-//             par->num_pxpar = (max_count/par->granularity);
-//             par->extra_pxpar = max_count % par->granularity;
+            if(par->granularity > max_count)
+            {
+                std::cout << "Alert:: par-> granularity : " << par->granularity << " > max_count " << max_count << std::endl;
+                par->granularity = max_count;
+//                par->num_pxpar = (max_count/par->granularity);
+//                par->extra_pxpar = max_count % par->granularity;
+//                if(par->extra_pxpar != 0)
+//                    par->num_pxpar += 1;
+//                std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+            } else if(par->granularity == 0)
+            {
+                std::cout << "Alert:: par-> granularity : " << par->granularity << " < = 0 " << std::endl;
+                par->granularity = max_count;
+    //            std::cout << "Alert:: Setting par->granularity to max_count, new par->granularity is "<< par->granularity << std::endl;
+            } 
+	    
+            //std::vector< std::vector<int> >  bilist ;
+            par->num_pxpar = (max_count/par->granularity);
+            par->extra_pxpar = max_count % par->granularity;
 ///////grain size based work distribution       
 
 
