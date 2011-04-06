@@ -453,7 +453,7 @@ struct deque: private boost::noncopyable
         }
     } 
 
-    bool pop_left(T* r) { pop_left(*r); }
+    bool pop_left(T* r) { return pop_left(*r); }
 
     // Thread-safe and non-blocking. Returns false if the deque is empty.
     // Complexity: O(Processes)
@@ -514,7 +514,7 @@ struct deque: private boost::noncopyable
         }
     } 
     
-    bool pop_right(T* r) { pop_right(*r); }
+    bool pop_right(T* r) { return pop_right(*r); }
 };
 
 }}
