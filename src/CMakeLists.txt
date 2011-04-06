@@ -89,7 +89,7 @@ if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set_property(TARGET hpx APPEND
       PROPERTY COMPILE_FLAGS
-      "-DHPX_EMULATE_SWAP_CONTEXT=1"
+      "-DHPX_EMULATE_SWAP_CONTEXT=1")
   endif()
 endif()
 
