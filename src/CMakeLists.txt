@@ -50,7 +50,7 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_LIBRARY_NAME=${name}"
   "HPX_LIBRARY_STRING=\"${name}\"")
 
-if(NOT HPX_DISABLE_WARNINGS)
+if(NOT HPX_DISABLE_WARNINGS AND NOT MSVC)
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_FLAGS
     "-Wall -Wno-strict-aliasing -Wsign-promo")
@@ -76,10 +76,21 @@ set_property(TARGET hpx APPEND
   "HPX_LIBRARY_NAME=${name}"
   "HPX_LIBRARY_STRING=\"${name}\"")
 
-if(NOT HPX_DISABLE_WARNINGS)
+if(NOT HPX_DISABLE_WARNINGS AND NOT MSVC)
   set_property(TARGET hpx APPEND
     PROPERTY COMPILE_FLAGS
     "-Wall -Wno-strict-aliasing -Wsign-promo")
+endif()
+
+if(MSVC)
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_FLAGS
+    "-bigobj")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set_property(TARGET hpx APPEND
+      PROPERTY COMPILE_FLAGS
+      "-DHPX_EMULATE_SWAP_CONTEXT=1"
+  endif()
 endif()
 
 ###############################################################################

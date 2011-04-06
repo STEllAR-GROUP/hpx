@@ -194,6 +194,7 @@ if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+  add_definitions(-DBOOST_ALL_NO_LIB)       # we specify all libraries explicitly
 
   # suppress certain warnings
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
