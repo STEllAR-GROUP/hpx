@@ -476,7 +476,9 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausscorner(int iter){
 	int i, j, k;
 	int offset = iter*blocksize;		//factordata index offset
+	int itercols = datablock[iter][iter]->getcolumns();
 	double f_factor;
+	double factor;
 
 	for(i=0;i<datablock[iter][iter]->getrows();i++){
 		if(datablock[iter][iter]->get(i,i) == 0){
@@ -484,10 +486,9 @@ namespace hpx { namespace components { namespace server
 		}
 		f_factor = 1/datablock[iter][iter]->get(i,i);
 		for(j=i+1;j<datablock[iter][iter]->getrows();j++){
-		    factordata[j+offset][i+offset] = f_factor*datablock[iter][iter]->get(j,i);
-		    for(k=i+1;k<datablock[iter][iter]->getcolumns();k++){
-			datablock[iter][iter]->data[j][k] -= 
-			    factordata[j+offset][i+offset]*datablock[iter][iter]->data[i][k];
+		    factor = factordata[j+offset][i+offset] = f_factor*datablock[iter][iter]->get(j,i);
+		    for(k=i+1;k<itercols;k++){
+			datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
 	}	}   }
     }
 
@@ -497,12 +498,14 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausstop(int iter, int bcol){
 	int i,j,k;
 	int offset = iter*blocksize;		//factordata index offset
+	int itercols = datablock[iter][bcol]->getcolumns();
+	double factor;
 
 	for(i=0;i<datablock[iter][bcol]->getrows();i++){
 		for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
+		    factor = factordata[j+offset][i+offset];
 		    for(k=0;k<datablock[iter][bcol]->getcolumns();k++){
-			datablock[iter][bcol]->data[j][k] -= 
-			    factordata[j+offset][i+offset]*datablock[iter][bcol]->data[i][k];
+			datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
 	}	}   }
     }
 
@@ -513,15 +516,16 @@ namespace hpx { namespace components { namespace server
 	int i,j,k;
 	int offset = brow*blocksize;
 	int offset_col = iter*blocksize;	//factordata offset
+	int itercols = datablock[brow][iter]->getcolumns();
 	double f_factor;
+	double factor;
 
 	for(i=0;i<datablock[brow][iter]->getcolumns();i++){
 		f_factor = 1/datablock[iter][iter]->get(i,i);
 		for(j=0;j<datablock[brow][iter]->getrows();j++){
-		    factordata[j+offset][i+offset_col] = f_factor*datablock[brow][iter]->get(j,i);
-		    for(k=i+1;k<datablock[brow][iter]->getcolumns();k++){
-			datablock[brow][iter]->data[j][k] -= 
-			    factordata[j+offset][i+offset_col]*datablock[iter][iter]->data[i][k];
+		    factor = factordata[j+offset][i+offset_col] = f_factor*datablock[brow][iter]->get(j,i);
+		    for(k=i+1;k<itercols;k++){
+			datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
 	}	}   }
     }
 
