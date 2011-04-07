@@ -408,8 +408,8 @@ namespace hpx { namespace components { namespace server
 	datablock[brow][bcol] = new LUblock(numrows,numcols);
 	for(unsigned int i=0;i<numrows;i++){
 	    for(unsigned int j=0;j<numcols;j++){
-		datablock[brow][bcol]->set(i, j,
-		    truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j]);
+		datablock[brow][bcol]->data[i][j] =
+		    truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j];
 	}   }
     }
 
@@ -486,8 +486,8 @@ namespace hpx { namespace components { namespace server
 		for(j=i+1;j<datablock[iter][iter]->getrows();j++){
 		    factordata[j+offset][i+offset] = f_factor*datablock[iter][iter]->get(j,i);
 		    for(k=i+1;k<datablock[iter][iter]->getcolumns();k++){
-			datablock[iter][iter]->set(j,k,datablock[iter][iter]->get(j,k) -
-			    factordata[j+offset][i+offset]*datablock[iter][iter]->get(i,k));
+			datablock[iter][iter]->data[j][k] -= 
+			    factordata[j+offset][i+offset]*datablock[iter][iter]->data[i][k];
 	}	}   }
     }
 
@@ -501,8 +501,8 @@ namespace hpx { namespace components { namespace server
 	for(i=0;i<datablock[iter][bcol]->getrows();i++){
 		for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
 		    for(k=0;k<datablock[iter][bcol]->getcolumns();k++){
-			datablock[iter][bcol]->set(j,k,datablock[iter][bcol]->get(j,k) -
-			    factordata[j+offset][i+offset]*datablock[iter][bcol]->get(i,k));
+			datablock[iter][bcol]->data[j][k] -= 
+			    factordata[j+offset][i+offset]*datablock[iter][bcol]->data[i][k];
 	}	}   }
     }
 
@@ -520,8 +520,8 @@ namespace hpx { namespace components { namespace server
 		for(j=0;j<datablock[brow][iter]->getrows();j++){
 		    factordata[j+offset][i+offset_col] = f_factor*datablock[brow][iter]->get(j,i);
 		    for(k=i+1;k<datablock[brow][iter]->getcolumns();k++){
-			datablock[brow][iter]->set(j,k,datablock[brow][iter]->get(j,k) -
-			    factordata[j+offset][i+offset_col]*datablock[iter][iter]->get(i,k));
+			datablock[brow][iter]->data[j][k] -= 
+			    factordata[j+offset][i+offset_col]*datablock[iter][iter]->data[i][k];
 	}	}   }
     }
 
