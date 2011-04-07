@@ -372,14 +372,15 @@ namespace hpx { namespace components { namespace server
 	int temp_piv;
 	double temp;
 	int h = (int)std::ceil(((float)rows)*.5);
+	int i,j;
 
 	//This first section of the pivot() function finds all of the pivot
 	//values to compute the final pivot array
-	for(int i=0;i<rows-1;i++){
+	for(i=0;i<rows-1;i++){
 	    max_row = i;
 	    max = (int)fabs(truedata[pivotarr[i]][i]);
 	    temp_piv = pivotarr[i];
-	    for(int j=i+1;j<rows;j++){
+	    for(j=i+1;j<rows;j++){
 		temp = (int)fabs(truedata[pivotarr[j]][i]);
 		if(temp > max){
 		    max = (int)temp;
@@ -390,8 +391,8 @@ namespace hpx { namespace components { namespace server
 	}
 
 	//call the swap function for each datablock in the matrix
-	for(int i=0;i<brows;i++){
-		for(int j=0;j<brows;j++){
+	for(i=0;i<brows;i++){
+		for(j=0;j<brows;j++){
 			swap(i,j);
 	}	}
     }
@@ -486,7 +487,8 @@ namespace hpx { namespace components { namespace server
 		}
 		f_factor = 1/datablock[iter][iter]->get(i,i);
 		for(j=i+1;j<datablock[iter][iter]->getrows();j++){
-		    factor = factordata[j+offset][i+offset] = f_factor*datablock[iter][iter]->get(j,i);
+		    factor = f_factor*datablock[iter][iter]->get(j,i);
+		    factordata[j+offset][i+offset] = factor;
 		    for(k=i+1;k<itercols;k++){
 			datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
 	}	}   }
@@ -504,7 +506,7 @@ namespace hpx { namespace components { namespace server
 	for(i=0;i<datablock[iter][bcol]->getrows();i++){
 		for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
 		    factor = factordata[j+offset][i+offset];
-		    for(k=0;k<datablock[iter][bcol]->getcolumns();k++){
+		    for(k=0;k<itercols;k++){
 			datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
 	}	}   }
     }
@@ -523,7 +525,8 @@ namespace hpx { namespace components { namespace server
 	for(i=0;i<datablock[brow][iter]->getcolumns();i++){
 		f_factor = 1/datablock[iter][iter]->get(i,i);
 		for(j=0;j<datablock[brow][iter]->getrows();j++){
-		    factor = factordata[j+offset][i+offset_col] = f_factor*datablock[brow][iter]->get(j,i);
+		    factor = f_factor*datablock[brow][iter]->get(j,i);
+		    factordata[j+offset][i+offset_col] = factor;
 		    for(k=i+1;k<itercols;k++){
 			datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
 	}	}   }
@@ -536,7 +539,7 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
 	int i,j,k;
 	int offset = brow*blocksize;		//factordata row offset
-	int offset_col = iter*blocksize;	//factordata column offset
+	int offset_col = bcol*blocksize;	//factordata column offset
 	int iterrows = datablock[iter][iter]->getrows();
 	int itercols = datablock[brow][bcol]->getcolumns();
 	double factor;
