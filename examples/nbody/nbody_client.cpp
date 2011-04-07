@@ -963,15 +963,15 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 }
             }
             
-            for (unsigned long p = 0; p < par->bilist.size(); ++p)
-            {
-                std::cout << "B p : " << p << " list : " ;
-                for (unsigned long q = 0; q < par->bilist[p].size(); ++q)
-                {
-                    std::cout << " " << par->bilist[p][q];
-                }
-                std::cout << std::endl;
-            }
+//            for (unsigned long p = 0; p < par->bilist.size(); ++p)
+//            {
+//                std::cout << "B p : " << p << " list : " ;
+//                for (unsigned long q = 0; q < par->bilist[p].size(); ++q)
+//                {
+//                    std::cout << " " << par->bilist[p][q];
+//                }
+//                std::cout << std::endl;
+//            }
 //            } /// extra brace
             
 

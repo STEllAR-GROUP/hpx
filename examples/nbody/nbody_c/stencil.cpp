@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace nbody
             get_memory_block_async(val, gids, result);
 
         // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(resultval, val); 
+//        scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
         register int compute_index;
