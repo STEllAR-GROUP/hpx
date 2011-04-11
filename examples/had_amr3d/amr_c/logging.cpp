@@ -62,7 +62,6 @@ namespace hpx { namespace components { namespace amr { namespace server
           }
         }
 
-        // output to file "output.dat"
         if ( logcode == 0 ) {
 #if 0
           FILE *fdata;
@@ -83,26 +82,29 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
 #if defined(RNPL_FOUND)
-          int i;
+          int i,j,k;
+          int n = par->granularity + 2*par->buffer;
           double datatime;
           hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
-            for (i=0;i<par->granularity;i++) {
-              x.push_back(val.x_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+              x.push_back(val.x_[i]);
             }
-            for (i=0;i<par->granularity;i++) {
-              x.push_back(val.y_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+              x.push_back(val.y_[i]);
             }
-            for (i=0;i<par->granularity;i++) {
-              x.push_back(val.z_[0]+i*par->dx0/pow(2.0,(int)val.level_));
+            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+              x.push_back(val.z_[i]);
             }
 
-            for (i=0;i<par->granularity*par->granularity*par->granularity;i++) {
-              phi.push_back(val.value_[i].phi[0][0]);
-              d1phi.push_back(val.value_[i].phi[0][1]);
-              d2phi.push_back(val.value_[i].phi[0][2]);
-              d3phi.push_back(val.value_[i].phi[0][3]);
-              d4phi.push_back(val.value_[i].phi[0][4]);
+            for (k=par->buffer;k<par->buffer+par->granularity;k++) {
+            for (j=par->buffer;j<par->buffer+par->granularity;j++) {
+            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+              phi.push_back(val.value_[i+n*(j+n*k)].phi[0][0]);
+              d1phi.push_back(val.value_[i+n*(j+n*k)].phi[0][1]);
+              d2phi.push_back(val.value_[i+n*(j+n*k)].phi[0][2]);
+              d3phi.push_back(val.value_[i+n*(j+n*k)].phi[0][3]);
+              d4phi.push_back(val.value_[i+n*(j+n*k)].phi[0][4]);
               datatime = val.timestep_*par->dx0*par->lambda;
 #if 0
               std::string x_str = convert(val.x_[i]);
@@ -124,7 +126,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               fclose(fdata);
 
 #endif
-            }
+            } } }
             int shape[3];
             char cnames[80] = { "x|y|z" };
             shape[0] = par->granularity;
@@ -135,8 +137,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             gft_out_full("0d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
             gft_out_full("0d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
             gft_out_full("0d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
-          }
 #endif
+          }
         }
     }
 

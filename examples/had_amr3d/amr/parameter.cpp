@@ -41,7 +41,6 @@ namespace hpx { namespace components { namespace amr
         ar & eps;
         ar & output_level;
         ar & granularity;
-        ar & time_granularity;
         ar & rowsize;
         ar & level_row;
         ar & level_begin;
@@ -49,6 +48,7 @@ namespace hpx { namespace components { namespace amr
         ar & min;
         ar & max;
         ar & gw;
+        ar & buffer;
         ar & num_rows;
     }
 

@@ -42,7 +42,8 @@ struct stencil_data
       : max_index_(rhs.max_index_), index_(rhs.index_), 
         timestep_(rhs.timestep_),
         level_(rhs.level_), 
-        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_)
+        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_),
+        compute_(rhs.compute_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -58,6 +59,7 @@ struct stencil_data
             x_ = rhs.x_; 
             y_ = rhs.y_; 
             z_ = rhs.z_; 
+            compute_ = rhs.compute_; 
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;
@@ -73,6 +75,7 @@ struct stencil_data
     hpx::memory::default_vector< had_double_type >::type x_;      // x coordinate value
     hpx::memory::default_vector< had_double_type >::type y_;      // x coordinate value
     hpx::memory::default_vector< had_double_type >::type z_;      // x coordinate value
+    hpx::memory::default_vector< bool >::type compute_;      // x coordinate value
 
 private:
     // serialization support
@@ -82,7 +85,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & level_ & value_;
-        ar & x_ & y_ & z_;
+        ar & x_ & y_ & z_ & compute_;
     }
 };
 

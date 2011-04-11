@@ -99,7 +99,7 @@ namespace hpx { namespace components { namespace amr
     }
 
     inline std::size_t stencil::findlevel3D(std::size_t step, std::size_t item, 
-                                            std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
+                                            int &a, int &b, int &c, Parameter const& par)
     {
       int ll = par->level_row[step];
       // discover what level to which this point belongs
@@ -967,7 +967,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         // Check if this is a prolongation/restriction step
-        if ( (row+5)%3 == 0 && par->allowedl != 0 ) {
+        if ( (row+5)%3 == 0 || ( par->allowedl == 0 && row == 0 ) ) {
           // This is a prolongation/restriction step
           if ( val.size() == 1 ) {
             // no restriction needed
@@ -977,7 +977,7 @@ namespace hpx { namespace components { namespace amr
             } 
             return 1;
           } else {
-            std::size_t a,b,c;
+            int a,b,c;
             int level = findlevel3D(row,column,a,b,c,par);
             had_double_type dx = par->dx0/pow(2.0,level);
             had_double_type x = par->min[level] + a*dx*par->granularity;
@@ -985,13 +985,12 @@ namespace hpx { namespace components { namespace amr
             had_double_type z = par->min[level] + c*dx*par->granularity;
             compute_index = -1;
             for (int i=0;i<val.size();++i) {
-              // LIFT MATH HERE
-              if ( floatcmp(x,val[i]->x_[0]) == 1 && 
-                   floatcmp(y,val[i]->y_[0]) == 1 && 
-                   floatcmp(z,val[i]->z_[0]) == 1 &&
-                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[par->granularity-1]) == 1 && 
-                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[par->granularity-1]) == 1 && 
-                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[par->granularity-1]) == 1 ) {
+              if ( floatcmp(x,val[i]->x_[par->buffer]) == 1 && 
+                   floatcmp(y,val[i]->y_[par->buffer]) == 1 && 
+                   floatcmp(z,val[i]->z_[par->buffer]) == 1 &&
+                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[par->buffer+par->granularity-1]) == 1 ) {
                 compute_index = i;
                 break;
               }
@@ -1001,27 +1000,95 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
 
+            resultval.get() = val[compute_index].get();
+
             // copy over critical info
-            resultval->x_ = val[compute_index]->x_;
-            resultval->y_ = val[compute_index]->y_;
-            resultval->z_ = val[compute_index]->z_;
-            resultval->timestep_ = val[compute_index]->timestep_;
-            resultval->value_.resize(val[compute_index]->value_.size());
-            resultval->level_ = val[compute_index]->level_;
-            resultval->max_index_ = val[compute_index]->max_index_;
-            resultval->index_ = val[compute_index]->index_;
+            //resultval->x_ = val[compute_index]->x_;
+            //resultval->y_ = val[compute_index]->y_;
+            //resultval->z_ = val[compute_index]->z_;
+            //resultval->timestep_ = val[compute_index]->timestep_;
+            //resultval->value_.resize(val[compute_index]->value_.size());
+            //resultval->level_ = val[compute_index]->level_;
+            //resultval->max_index_ = val[compute_index]->max_index_;
+            //resultval->index_ = val[compute_index]->index_;
 
             // We may be dealing with either restriction or prolongation (both are performed at the same time)
             bool restriction = false;
             bool prolongation = false;
+            bool buffer = false;
             for (int i=0;i<val.size();++i) {
-              if ( resultval->level_ < val[i]->level_ ) restriction = true;
-              if ( resultval->level_ > val[i]->level_ ) prolongation = true;
-              if ( restriction && prolongation ) break;
+              if ( i != compute_index ) {
+                if ( resultval->level_ == val[i]->level_ ) buffer = true;
+                if ( resultval->level_ < val[i]->level_ ) restriction = true;
+                if ( resultval->level_ > val[i]->level_ ) prolongation = true;
+              }
+              if ( restriction && prolongation && buffer ) break;
             }
 
-            int n = par->granularity;
+            int n = par->granularity + 2*par->buffer;
 
+            if ( buffer ) {
+              int level = resultval->level_;
+              had_double_type dx = par->dx0/pow(2.0,level);
+              for (int kk=0;kk<n;kk++) {
+              for (int jj=0;jj<n;jj++) {
+              for (int ii=0;ii<n;ii++) {
+                if ( !(ii >= par->buffer && ii < par->granularity+par->buffer &&
+                       jj >= par->buffer && jj < par->granularity+par->buffer &&
+                       kk >= par->buffer && kk < par->granularity+par->buffer) &&
+                       resultval->x_[ii] > par->min[level] && resultval->x_[ii] < par->max[level] &&
+                       resultval->y_[jj] > par->min[level] && resultval->y_[jj] < par->max[level] &&
+                       resultval->z_[kk] > par->min[level] && resultval->z_[kk] < par->max[level] 
+                   ) {
+                  // We need this value -- this is a buffer point
+                  // find out who has it
+                  had_double_type xx = resultval->x_[ii];
+                  had_double_type yy = resultval->y_[jj];
+                  had_double_type zz = resultval->z_[kk];
+                  bool found = false;
+                  for (int i=0;i<val.size();++i) {
+                    if ( i != compute_index ) {
+                      if ( floatcmp_ge(xx,val[i]->x_[par->buffer]) && floatcmp_le(xx,val[i]->x_[par->granularity+par->buffer-1]) &&
+                           floatcmp_ge(yy,val[i]->y_[par->buffer]) && floatcmp_le(yy,val[i]->y_[par->granularity+par->buffer-1]) &&
+                           floatcmp_ge(zz,val[i]->z_[par->buffer]) && floatcmp_le(zz,val[i]->z_[par->granularity+par->buffer-1]) ) {
+                        found = true;
+                        had_double_type c_aa = (xx-val[i]->x_[0])/dx;
+                        had_double_type c_bb = (yy-val[i]->y_[0])/dx;
+                        had_double_type c_cc = (zz-val[i]->z_[0])/dx;
+                        int aa = (int) (c_aa+0.5);
+                        int bb = (int) (c_bb+0.5);
+                        int cc = (int) (c_cc+0.5);
+
+                        BOOST_ASSERT( floatcmp(xx,val[i]->x_[aa]) );
+                        BOOST_ASSERT( floatcmp(yy,val[i]->y_[bb]) );
+                        BOOST_ASSERT( floatcmp(zz,val[i]->z_[cc]) );
+                        for (int ll=0;ll<num_eqns;ll++) {
+                          resultval->value_[ii+ n*(jj+n*kk)].phi[0][ll] = val[i]->value_[aa+ n*(bb+n*cc)].phi[0][ll];
+                        }
+                      }
+                    }
+                  } 
+                  if ( !found ) {
+                    std::cout << " Looking for " << xx << " " << yy << " " << zz << std::endl;
+                    std::cout << " Available bboxes: " << std::endl;
+                    for (int i=0;i<val.size();++i) {
+                      if ( i != compute_index ) {
+                        std::cout << val[i]->x_[par->buffer] << " " << val[i]->x_[par->granularity+par->buffer-1] << std::endl;
+                        std::cout << val[i]->y_[par->buffer] << " " << val[i]->y_[par->granularity+par->buffer-1] << std::endl;
+                        std::cout << val[i]->z_[par->buffer] << " " << val[i]->z_[par->granularity+par->buffer-1] << std::endl;
+                        std::cout << " " << std::endl;
+                      }
+                    }
+                  }
+                  BOOST_ASSERT(found);
+                } 
+              } } }
+            } else {
+              // shouldn't happen
+              BOOST_ASSERT(false);
+            }
+
+#if 0
             if ( prolongation && restriction ) {
               // prolongation and restriction {{{
               // interpolation
@@ -1724,135 +1791,14 @@ namespace hpx { namespace components { namespace amr
               } } }
               // }}}
             }
-
+#endif
             if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
               return 0;
             }
             return 1;
           }
         } else {
-          compute_index = -1;
-          if ( val.size() == 27 ) {
-            compute_index = (val.size()-1)/2;
-          } else {
-            std::size_t a,b,c;
-            int level = findlevel3D(row,column,a,b,c,par);
-            had_double_type dx = par->dx0/pow(2.0,level);
-            had_double_type x = par->min[level] + a*dx*par->granularity;
-            had_double_type y = par->min[level] + b*dx*par->granularity;
-            had_double_type z = par->min[level] + c*dx*par->granularity;
-            compute_index = -1;
-            for (int i=0;i<val.size();++i) {
-              if ( floatcmp(x,val[i]->x_[0]) == 1 && 
-                   floatcmp(y,val[i]->y_[0]) == 1 && 
-                   floatcmp(z,val[i]->z_[0]) == 1 ) {
-                compute_index = i;
-                break;
-              }
-            }
-            if ( compute_index == -1 ) {
-              for (int i=0;i<val.size();++i) {
-                std::cout << " DEBUG " << val[i]->x_[0] << " " << val[i]->y_[0] << " "<< val[i]->z_[0] << std::endl;
-              }
-              std::cout << " PROBLEM LOCATING x " << x << " y " << y << " z " << z << " val size " << val.size() << " level " << level << std::endl;
-              BOOST_ASSERT(false);
-            }
-            boundary = true;
-          } 
-
-          //hpx::memory::default_vector<nodedata*>::type vecval;
-          if ( vecval.size() == 0 ) {
-            vecval.resize(par->num_rows);
-          }
-          if ( vecval[row].size() == 0 ) {
-            vecval[row].resize(3*par->granularity * 3*par->granularity * 3*par->granularity);
-          }
-          hpx::memory::default_vector<nodedata>::type::iterator niter;
-
-          int count_i = 0;
-          int count_j = 0;
-          if ( boundary ) {
-            bbox[0] = 1; bbox[1] = 1; bbox[2] = 1;
-            bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
-          }
-          for (int i=0;i<val.size();++i) {
-            int ii,jj,kk;
-            if ( val.size() == 27 ) {
-              kk = i/9 - 1;
-              jj = count_j - 1;
-              ii = count_i - 1;
-              ++count_i;
-              if ( count_i%3 == 0 ) {
-                count_i = 0; 
-                ++count_j;
-              }
-              if ( count_j%3 == 0 ) count_j = 0;
-            } else {
-              had_double_type x = val[compute_index]->x_[0];
-              had_double_type y = val[compute_index]->y_[0];
-              had_double_type z = val[compute_index]->z_[0];
-
-              bool xchk = floatcmp(x,val[i]->x_[0]);
-              bool ychk = floatcmp(y,val[i]->y_[0]);
-              bool zchk = floatcmp(z,val[i]->z_[0]);
-
-              if ( xchk ) ii = 0;
-              else if ( x > val[i]->x_[0] ) ii = -1;
-              else if ( x < val[i]->x_[0] ) ii = 1;
-              else BOOST_ASSERT(false);
-
-              if ( ychk ) jj = 0;
-              else if ( y > val[i]->y_[0] ) jj = -1;
-              else if ( y < val[i]->y_[0] ) jj = 1;
-              else BOOST_ASSERT(false);
-
-              if ( zchk ) kk = 0;
-              else if ( z > val[i]->z_[0] ) kk = -1;
-              else if ( z < val[i]->z_[0] ) kk = 1;
-              else BOOST_ASSERT(false);
-
-              // figure out bounding box
-              if ( x > val[i]->x_[0] && ychk && zchk ) {
-                bbox[0] = 0;
-              }
-
-              if ( x < val[i]->x_[0] && ychk && zchk ) {
-                bbox[1] = 0;
-              }
-
-              if ( xchk && y > val[i]->y_[0]  && zchk ) {
-                bbox[2] = 0;
-              }
-
-              if ( xchk && y < val[i]->y_[0]  && zchk ) {
-                bbox[3] = 0;
-              }
-
-              if ( xchk && ychk && z > val[i]->z_[0] ) {
-                bbox[4] = 0;
-              }
-
-              if ( xchk && ychk && z < val[i]->z_[0] ) {
-                bbox[5] = 0;
-              }
-            }
-
-            static const int grain = par->granularity;
-            static const int grainx3 = 3 * grain;
-            int count = 0;
-            for (niter=val[i]->value_.begin();niter!=val[i]->value_.end();++niter) {
-              int tmp_index = count/grain;
-              int c = tmp_index/grain;
-              int b = tmp_index%grain;
-              int a = count - grain*(b+c*grain);
-
-              vecval[row][a+(ii+1)*grain 
-                        + grainx3*( 
-                             (b+(jj+1)*grain)
-                                +grainx3*(c+(kk+1)*grain) )] = &(*niter); 
-              ++count;
-            }
-          }
+          compute_index = 0;
 
           // copy over critical info
           resultval->x_ = val[compute_index]->x_;
@@ -1863,6 +1809,7 @@ namespace hpx { namespace components { namespace amr
 
           resultval->max_index_ = val[compute_index]->max_index_;
           resultval->index_ = val[compute_index]->index_;
+          resultval->compute_ = val[compute_index]->compute_;
 
           if (val[compute_index]->timestep_ < (int)numsteps_) {
 
@@ -1873,8 +1820,8 @@ namespace hpx { namespace components { namespace amr
 
               // call rk update 
               int adj_index = 0;
-              int gft = rkupdate(vecval[row],resultval.get_ptr(),
-                                   boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
+              int gft = rkupdate(val[compute_index].get(),resultval.get_ptr(),
+                                   dt,dx,val[compute_index]->timestep_,
                                    level,*par.p);
 
               if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
@@ -1887,6 +1834,7 @@ namespace hpx { namespace components { namespace amr
               // the last time step has been reached, just copy over the data
               resultval.get() = val[compute_index].get();
           }
+
           // set return value difference between actual and required number of
           // timesteps (>0: still to go, 0: last step, <0: overdone)
           if ( val[compute_index]->timestep_ >= par->nt0-2 ) {

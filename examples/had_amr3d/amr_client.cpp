@@ -188,8 +188,6 @@ typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler>
     local_runtime_type;
 typedef hpx::runtime_impl<hpx::threads::policies::local_priority_queue_scheduler> 
     local_priority_runtime_type;
-typedef hpx::runtime_impl<hpx::threads::policies::abp_queue_scheduler> 
-    abp_runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -278,6 +276,7 @@ int main(int argc, char* argv[])
         par->amp_dot     =  0.1;
         par->delta       =  1.0;
         par->gw          =  5;
+        par->buffer      =  3;
         par->eps         =  0.0;
         par->output_level =  0;
         par->granularity =  granularity;
@@ -289,7 +288,6 @@ int main(int argc, char* argv[])
         int scheduler = 1;  // 0: global scheduler
                             // 1: parallel scheduler
                             // 2: parallel scheduler with priority queue
-                            // 3: abp scheduler
         std::string parfile;
         if (vm.count("parfile")) {
             parfile = vm["parfile"].as<std::string>();
@@ -328,11 +326,13 @@ int main(int argc, char* argv[])
               if ( sec->has_entry("nt0") ) {
                 std::string tmp = sec->get_entry("nt0");
                 par->nt0 = atoi(tmp.c_str());
+                // over-ride command line argument if present
+                numsteps = par->nt0;
               }
               if ( sec->has_entry("thread_scheduler") ) {
                 std::string tmp = sec->get_entry("thread_scheduler");
                 scheduler = atoi(tmp.c_str());
-                BOOST_ASSERT( scheduler >= 0 && scheduler <= 3 );
+                BOOST_ASSERT( scheduler == 0 || scheduler == 1 );
               }
               if ( sec->has_entry("maxx0") ) {
                 std::string tmp = sec->get_entry("maxx0");
@@ -366,6 +366,10 @@ int main(int argc, char* argv[])
                 std::string tmp = sec->get_entry("ghostwidth");
                 par->gw = atoi(tmp.c_str());
               }
+              if ( sec->has_entry("buffer") ) {
+                std::string tmp = sec->get_entry("buffer");
+                par->buffer = atoi(tmp.c_str());
+              }
               if ( sec->has_entry("eps") ) {
                 std::string tmp = sec->get_entry("eps");
                 par->eps = atof(tmp.c_str());
@@ -394,17 +398,10 @@ int main(int argc, char* argv[])
           BOOST_ASSERT(false);
         }
 
-        // the number of timesteps each px thread can take independent of communication
-        par->time_granularity = par->granularity/3;
-        
-        numsteps = par->nt0;
-
-        // set up refinement centered around the middle of the grid
+        // step up refinement centered around the middle of the grid
         par->nx[0] = nx0/par->granularity;
         for (int i=1;i<par->allowedl+1;i++) {
-          par->nx[i] = int(par->refine_level[i-1]*par->nx[i-1]);
-          if ( par->nx[i]%2 == 0 ) par->nx[i] += 1;
-          if ( par->nx[i] > 2*par->nx[i-1] - 5 ) par->nx[i] = 2*par->nx[i-1] - 5;
+          par->nx[i] = nx0/par->granularity;
         }
 
         // for each row, record what the lowest level on the row is
@@ -414,10 +411,12 @@ int main(int argc, char* argv[])
           num_rows += (int) pow(2.,par->allowedl)/2;
         }
         num_rows *= 2; // we take two timesteps in the mesh
+        if ( par->allowedl == 0 ) num_rows = 3;
         par->num_rows = num_rows;
+
         int ii = -1; 
         for (int i=0;i<num_rows;i++) {
-          if (  (i+5)%3 != 0 || par->allowedl == 0 ) {
+          if (  (i+5)%3 != 0 ) {
             ii++;
           } 
           int level = -1;
@@ -431,21 +430,28 @@ int main(int argc, char* argv[])
           }
         }
 
+        // DEBUG
+        //for (int i=0;i<num_rows;i++) {
+        //  std::cout << " DEBUG level_row " << par->level_row[i] << std::endl;
+        //}
+
         par->dx0 = (par->maxx0 - par->minx0)/(nx0-1);
         par->dt0 = par->lambda*par->dx0;
 
         par->min.resize(par->allowedl+1);
+        par->max.resize(par->allowedl+1);
         par->min[0] = par->minx0;
-        for (int i=par->allowedl;i>0;i--) {
-          par->min[i] = 0.5*(par->maxx0 - par->minx0) + par->minx0  
-                            - (par->nx[i]-1)/2 * par->dx0/pow(2.0,i) * par->granularity;
+        par->max[0] = par->maxx0;
+        for (int i=1;i<=par->allowedl;i++) {
+          par->min[i] = 0.5*par->min[i-1];
+          par->max[i] = 0.5*par->max[i-1];
         }
 
-        par->max.resize(par->allowedl+1);
-        par->max[0] = par->maxx0;
-        for (int i=par->allowedl;i>0;i--) {
-          par->max[i] = par->min[i] + ((par->nx[i]-1)*par->granularity + par->granularity-1)*par->dx0/pow(2.0,i);
-        }
+        // DEBUG
+        //for (int i=0;i<=par->allowedl;i++) {
+        //  std::cout << " DEBUG " << par->min[i] << " " << par->max[i] << std::endl;
+        //  std::cout << " DEBUG " << par->min[i] << " " << par->min[i]+((par->nx[i]-1)*par->granularity + par->granularity-1)*par->dx0/pow(2.0,i) << std::endl;
+        //}
 
         par->rowsize.resize(par->allowedl+1);
         for (int i=0;i<=par->allowedl;i++) {
@@ -489,16 +495,6 @@ int main(int argc, char* argv[])
         else if (scheduler == 2) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_priority_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-          if (mode == hpx::runtime::worker) 
-              rt.run(num_threads);
-          else 
-              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
-
-          executed_threads = rt.get_executed_threads();
-        } 
-        else if (scheduler == 3) {
-          std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
-          abp_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
           if (mode == hpx::runtime::worker) 
               rt.run(num_threads);
           else 

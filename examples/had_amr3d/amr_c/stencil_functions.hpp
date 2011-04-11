@@ -19,9 +19,8 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int rkupdate(hpx::memory::default_vector< nodedata* >::type const& val, 
+HPX_COMPONENT_EXPORT int rkupdate(stencil_data const& vecval, 
     stencil_data* result,  
-    bool boundary, int *bbox, int compute_index, 
     had_double_type const&, had_double_type const&, had_double_type const&,
     int level, Par const& par);
 

@@ -116,7 +116,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                                     std::vector<std::size_t> &each_row,
                                     Parameter const& par);
 
-        static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par);
+        static std::size_t findlevel3D(std::size_t step, std::size_t item, int &a, int &b, int &c, Parameter const& par);
         static bool intersection(had_double_type xmin,had_double_type xmax,
                                     had_double_type ymin,had_double_type ymax,
                                     had_double_type zmin,had_double_type zmax,

@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // Follow up TEST
             if ( dst_size(static_step,column,0) == 0 ) {
               // figure out the index and level of this point
-              std::size_t a,b,c;
+              int a,b,c;
               int level = findlevel3D(static_step,column,a,b,c,par);
               std::cout << "                 PROBLEM: level " << level << " index " << a << " " << b << " " << c << std::endl;
             } 
@@ -527,7 +527,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       int step,dst;
 //      int found;
 
-      std::size_t a,b,c;
+      int a,b,c;
       for (step=0;step<num_rows;step = step + 1) {
         for (i=0;i<each_row[step];i++) {
           counter = 0;
@@ -536,58 +536,89 @@ namespace hpx { namespace components { namespace amr { namespace server
           // i.e. i = a + nx*(b+c*nx);
           int level = findlevel3D(step,i,a,b,c,par);
 
-          // communicate 27
-          int kstart = c-1;
-          if ( kstart < 0 ) kstart = 0;
-          int kend = c+2;
-          if ( kend > par->nx[level] ) kend = par->nx[level];
-
-          int jstart = b-1;
-          if ( jstart < 0 ) jstart = 0;
-          int jend = b+2;
-          if ( jend > par->nx[level] ) jend = par->nx[level];
-
-          int istart = a-1;
-          if ( istart < 0 ) istart = 0;
-          int iend = a+2;
-          if ( iend > par->nx[level] ) iend = par->nx[level];
-
           bool prolongation;
           dst = step;
-          if ( (step+3)%3 != 0 || par->allowedl == 0 ) {
-            // anytime there is a difference of more than one level between src and dst rows,
-            // you need to account for the prolongation/restriction rows going on inbetween them.
-            // That is given by 2^{L-l-1}-1
-            int intermediate = (int) pow(2.,par->allowedl-level) ;
-            if ( par->allowedl-level > 1 ) {
-              dst += intermediate + intermediate/2 - 1;
+
+          // Special case for allowedl==0
+          if ( par->allowedl == 0 ) {
+            dst += 1;
+            if ( step == 0 || step == 1 ) {
+              prolongation = false;
             } else {
-              dst += intermediate;
+              prolongation = true;
             }
-            prolongation = false;
           } else {
-            dst += 1; // this is a prolongation/restriction step
-            prolongation = true;
+            if ( (step+3)%3 != 0 ) {
+              // anytime there is a difference of more than one level between src and dst rows,
+              // you need to account for the prolongation/restriction rows going on inbetween them.
+              // That is given by 2^{L-l-1}-1
+              int intermediate = (int) pow(2.,par->allowedl-level) ;
+              if ( par->allowedl-level > 1 ) {
+                dst += intermediate + intermediate/2 - 1;
+              } else {
+                dst += intermediate;
+              }
+              prolongation = false;
+            } else {
+              dst += 1; // this is a prolongation/restriction step
+              prolongation = true;
+            }
           }
           if ( dst >= num_rows ) dst = 0;
 
-          if ( prolongation == false ) {
-            for (int kk=kstart;kk<kend;kk++) {
-            for (int jj=jstart;jj<jend;jj++) {
-            for (int ii=istart;ii<iend;ii++) {
-              j = ii + par->nx[level]*(jj+kk*par->nx[level]);
+          //std::cout << " TEST step: " << step << " prolongation " << prolongation << " dst " << dst << std::endl;
 
-              if ( level != par->allowedl ) {
-                j += par->rowsize[level+1];
-              }
-              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-              counter++;
-            }}}
+          if ( prolongation == false ) {
+            j = a + par->nx[level]*(b+c*par->nx[level]);
+
+            if ( level != par->allowedl ) {
+              j += par->rowsize[level+1];
+            }
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
           } else {
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
 
+            // exchange overlap information
+            had_double_type dx = par->dx0/pow(2.0,level);
+            had_double_type xmin = par->min[level] + a*par->granularity*dx;
+            had_double_type xmax = par->min[level] + (a*par->granularity+par->granularity-1)*dx; 
+            had_double_type ymin = par->min[level] + b*par->granularity*dx;  
+            had_double_type ymax = par->min[level] + (b*par->granularity+par->granularity-1)*dx;
+            had_double_type zmin = par->min[level] + c*par->granularity*dx;  
+            had_double_type zmax = par->min[level] + (c*par->granularity+par->granularity-1)*dx;
+            for (int kk=0;kk<par->nx[level];kk++) {
+            for (int jj=0;jj<par->nx[level];jj++) {
+            for (int ii=0;ii<par->nx[level];ii++) {
+              // Avoid intersections with itself
+              if ( !(ii == a && jj == b && kk == c) ) {
+                // candidate bbox
+                had_double_type pxmin = par->min[level] + ii*par->granularity*dx;
+                had_double_type pxmax = par->min[level] + (ii*par->granularity+par->granularity-1)*dx; 
+                had_double_type pymin = par->min[level] + jj*par->granularity*dx;  
+                had_double_type pymax = par->min[level] + (jj*par->granularity+par->granularity-1)*dx;
+                had_double_type pzmin = par->min[level] + kk*par->granularity*dx;  
+                had_double_type pzmax = par->min[level] + (kk*par->granularity+par->granularity-1)*dx;
+
+                // check if this bbox overlaps with the buffer of any other bbox in the same level 
+                // -- if so, schedule a communication
+                if ( intersection(xmin-par->buffer*dx,xmax+par->buffer*dx,
+                                  ymin-par->buffer*dx,ymax+par->buffer*dx,
+                                  zmin-par->buffer*dx,zmax+par->buffer*dx,
+                                  pxmin,pxmax,pymin,pymax,pzmin,pzmax) )
+                { 
+                  j = ii + par->nx[level]*(jj+kk*par->nx[level]);
+                  if ( level != par->allowedl ) {
+                    j += par->rowsize[level+1];
+                  }
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                  counter++;
+                }
+              }
+            } } }
+#if 0
             if ( level != par->allowedl ) { 
               // prolongation {{{
               // send data to higher level boundary points
@@ -732,7 +763,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               }
             // }}}
             }
-
+#endif
           }
         }
       }
@@ -835,7 +866,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     }
 
     // This routine finds the level of a specified point given its row (step) and column (point)
-    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, Parameter const& par)
+    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t item, int &a, int &b, int &c, Parameter const& par)
     {
       int ll = par->level_row[step];
       // discover what level to which this point belongs
