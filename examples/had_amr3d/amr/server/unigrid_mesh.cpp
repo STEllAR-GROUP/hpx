@@ -582,6 +582,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             counter++;
 
             // exchange overlap information
+            int factor = 1;
+            if ( level == par->allowedl ) factor = 2;
             had_double_type dx = par->dx0/pow(2.0,level);
             had_double_type xmin = par->min[level] + a*par->granularity*dx;
             had_double_type xmax = par->min[level] + (a*par->granularity+par->granularity-1)*dx; 
@@ -604,9 +606,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
                 // check if this bbox overlaps with the buffer of any other bbox in the same level 
                 // -- if so, schedule a communication
-                if ( intersection(xmin-par->buffer*dx,xmax+par->buffer*dx,
-                                  ymin-par->buffer*dx,ymax+par->buffer*dx,
-                                  zmin-par->buffer*dx,zmax+par->buffer*dx,
+                if ( intersection(xmin-factor*par->buffer*dx,xmax+factor*par->buffer*dx,
+                                  ymin-factor*par->buffer*dx,ymax+factor*par->buffer*dx,
+                                  zmin-factor*par->buffer*dx,zmax+factor*par->buffer*dx,
                                   pxmin,pxmax,pymin,pymax,pzmin,pzmax) )
                 { 
                   j = ii + par->nx[level]*(jj+kk*par->nx[level]);
