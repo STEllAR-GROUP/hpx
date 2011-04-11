@@ -979,18 +979,22 @@ namespace hpx { namespace components { namespace amr
           } else {
             int a,b,c;
             int level = findlevel3D(row,column,a,b,c,par);
+
+            int factor = 1;
+            if ( level == par->allowedl ) factor = 2;
+
             had_double_type dx = par->dx0/pow(2.0,level);
             had_double_type x = par->min[level] + a*dx*par->granularity;
             had_double_type y = par->min[level] + b*dx*par->granularity;
             had_double_type z = par->min[level] + c*dx*par->granularity;
             compute_index = -1;
             for (int i=0;i<val.size();++i) {
-              if ( floatcmp(x,val[i]->x_[par->buffer]) == 1 && 
-                   floatcmp(y,val[i]->y_[par->buffer]) == 1 && 
-                   floatcmp(z,val[i]->z_[par->buffer]) == 1 &&
-                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[par->buffer+par->granularity-1]) == 1 && 
-                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[par->buffer+par->granularity-1]) == 1 && 
-                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[par->buffer+par->granularity-1]) == 1 ) {
+              if ( floatcmp(x,val[i]->x_[factor*par->buffer]) == 1 && 
+                   floatcmp(y,val[i]->y_[factor*par->buffer]) == 1 && 
+                   floatcmp(z,val[i]->z_[factor*par->buffer]) == 1 &&
+                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[factor*par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[factor*par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[factor*par->buffer+par->granularity-1]) == 1 ) {
                 compute_index = i;
                 break;
               }
@@ -1025,7 +1029,7 @@ namespace hpx { namespace components { namespace amr
               if ( restriction && prolongation && buffer ) break;
             }
 
-            int n = par->granularity + 2*par->buffer;
+            int n = par->granularity + 2*factor*par->buffer;
 
             if ( buffer ) {
               int level = resultval->level_;
@@ -1033,9 +1037,9 @@ namespace hpx { namespace components { namespace amr
               for (int kk=0;kk<n;kk++) {
               for (int jj=0;jj<n;jj++) {
               for (int ii=0;ii<n;ii++) {
-                if ( !(ii >= par->buffer && ii < par->granularity+par->buffer &&
-                       jj >= par->buffer && jj < par->granularity+par->buffer &&
-                       kk >= par->buffer && kk < par->granularity+par->buffer) &&
+                if ( !(ii >= factor*par->buffer && ii < par->granularity+factor*par->buffer &&
+                       jj >= factor*par->buffer && jj < par->granularity+factor*par->buffer &&
+                       kk >= factor*par->buffer && kk < par->granularity+factor*par->buffer) &&
                        resultval->x_[ii] > par->min[level] && resultval->x_[ii] < par->max[level] &&
                        resultval->y_[jj] > par->min[level] && resultval->y_[jj] < par->max[level] &&
                        resultval->z_[kk] > par->min[level] && resultval->z_[kk] < par->max[level] 
@@ -1048,9 +1052,9 @@ namespace hpx { namespace components { namespace amr
                   bool found = false;
                   for (int i=0;i<val.size();++i) {
                     if ( i != compute_index ) {
-                      if ( floatcmp_ge(xx,val[i]->x_[par->buffer]) && floatcmp_le(xx,val[i]->x_[par->granularity+par->buffer-1]) &&
-                           floatcmp_ge(yy,val[i]->y_[par->buffer]) && floatcmp_le(yy,val[i]->y_[par->granularity+par->buffer-1]) &&
-                           floatcmp_ge(zz,val[i]->z_[par->buffer]) && floatcmp_le(zz,val[i]->z_[par->granularity+par->buffer-1]) ) {
+                      if ( floatcmp_ge(xx,val[i]->x_[factor*par->buffer]) && floatcmp_le(xx,val[i]->x_[par->granularity+factor*par->buffer-1]) &&
+                           floatcmp_ge(yy,val[i]->y_[factor*par->buffer]) && floatcmp_le(yy,val[i]->y_[par->granularity+factor*par->buffer-1]) &&
+                           floatcmp_ge(zz,val[i]->z_[factor*par->buffer]) && floatcmp_le(zz,val[i]->z_[par->granularity+factor*par->buffer-1]) ) {
                         found = true;
                         had_double_type c_aa = (xx-val[i]->x_[0])/dx;
                         had_double_type c_bb = (yy-val[i]->y_[0])/dx;
@@ -1073,9 +1077,9 @@ namespace hpx { namespace components { namespace amr
                     std::cout << " Available bboxes: " << std::endl;
                     for (int i=0;i<val.size();++i) {
                       if ( i != compute_index ) {
-                        std::cout << val[i]->x_[par->buffer] << " " << val[i]->x_[par->granularity+par->buffer-1] << std::endl;
-                        std::cout << val[i]->y_[par->buffer] << " " << val[i]->y_[par->granularity+par->buffer-1] << std::endl;
-                        std::cout << val[i]->z_[par->buffer] << " " << val[i]->z_[par->granularity+par->buffer-1] << std::endl;
+                        std::cout << val[i]->x_[factor*par->buffer] << " " << val[i]->x_[par->granularity+factor*par->buffer-1] << std::endl;
+                        std::cout << val[i]->y_[factor*par->buffer] << " " << val[i]->y_[par->granularity+factor*par->buffer-1] << std::endl;
+                        std::cout << val[i]->z_[factor*par->buffer] << " " << val[i]->z_[par->granularity+factor*par->buffer-1] << std::endl;
                         std::cout << " " << std::endl;
                       }
                     }
@@ -1809,7 +1813,6 @@ namespace hpx { namespace components { namespace amr
 
           resultval->max_index_ = val[compute_index]->max_index_;
           resultval->index_ = val[compute_index]->index_;
-          resultval->compute_ = val[compute_index]->compute_;
 
           if (val[compute_index]->timestep_ < (int)numsteps_) {
 

@@ -83,23 +83,25 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #if defined(RNPL_FOUND)
           int i,j,k;
-          int n = par->granularity + 2*par->buffer;
+          int factor = 1;
+          if ( val.level_ == par->allowedl ) factor = 2;
+          int n = par->granularity + 2*factor*par->buffer;
           double datatime;
           hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
-            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+            for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               x.push_back(val.x_[i]);
             }
-            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+            for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               x.push_back(val.y_[i]);
             }
-            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+            for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               x.push_back(val.z_[i]);
             }
 
-            for (k=par->buffer;k<par->buffer+par->granularity;k++) {
-            for (j=par->buffer;j<par->buffer+par->granularity;j++) {
-            for (i=par->buffer;i<par->buffer+par->granularity;i++) {
+            for (k=factor*par->buffer;k<factor*par->buffer+par->granularity;k++) {
+            for (j=factor*par->buffer;j<factor*par->buffer+par->granularity;j++) {
+            for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               phi.push_back(val.value_[i+n*(j+n*k)].phi[0][0]);
               d1phi.push_back(val.value_[i+n*(j+n*k)].phi[0][1]);
               d2phi.push_back(val.value_[i+n*(j+n*k)].phi[0][2]);

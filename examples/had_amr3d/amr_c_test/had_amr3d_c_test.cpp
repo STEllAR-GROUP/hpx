@@ -52,9 +52,9 @@ template <int flag, typename Array>
 inline void 
 calcrhs(struct nodedata * rhs, Array const& vecval, 
     had_double_type const& dx,
-    int const i, int const j, int const k, Par const& par)
+    int const i, int const j, int const k, int const factor, Par const& par)
 {
-  int const n = par.granularity + 2*par.buffer;
+  int const n = par.granularity + 2*factor*par.buffer;
 
   rhs->phi[0][0] = phi<flag, 4>(vecval[i+n*(j+n*k)]); 
 
@@ -151,13 +151,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->index_ = item;
     val->timestep_ = 0;
 
-    int n = par.granularity+2*par.buffer;
-    val->x_.resize(n);
-    val->y_.resize(n);
-    val->z_.resize(n);
-    val->value_.resize( n*n*n );
-    val->compute_.resize( n*n*n );
-
     //number of values per stencil_data
     nodedata node;
 
@@ -168,6 +161,15 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     int a,b,c;
     val->level_ = findlevel3D(row,item,a,b,c,par);    
 
+    int factor = 1;
+    if ( val->level_ == par.allowedl ) factor = 2;
+
+    int n = par.granularity+2*factor*par.buffer;
+    val->x_.resize(n);
+    val->y_.resize(n);
+    val->z_.resize(n);
+    val->value_.resize( n*n*n );
+
     int level = val->level_;
     had_double_type dx = par.dx0/pow(2.0,level);
 
@@ -176,14 +178,14 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     static had_double_type const c_6 = 6.0;
     static had_double_type const c_8 = 8.0;
 
-    for (int i=-par.buffer;i<par.granularity+par.buffer;i++) {
+    for (int i=-factor*par.buffer;i<par.granularity+factor*par.buffer;i++) {
       had_double_type x = par.min[level] + (a*par.granularity + i)*dx;
       had_double_type y = par.min[level] + (b*par.granularity + i)*dx;
       had_double_type z = par.min[level] + (c*par.granularity + i)*dx;
 
-      val->x_[i+par.buffer] = x;
-      val->y_[i+par.buffer] = y;
-      val->z_[i+par.buffer] = z;
+      val->x_[i+factor*par.buffer] = x;
+      val->y_[i+factor*par.buffer] = y;
+      val->z_[i+factor*par.buffer] = z;
     }
 
     for (int k=0;k<n;k++) {
@@ -192,17 +194,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       had_double_type y = val->y_[j];
     for (int i=0;i<n;i++) {
       had_double_type x = val->x_[i];
-
-      if ( val->level_ == par.allowedl ) val->compute_[i+n*(j+k*n)] = true;
-      else {
-        if ( x > par.min[level+1] && x < par.max[level+1] &&
-             y > par.min[level+1] && y < par.max[level+1] &&
-             z > par.min[level+1] && z < par.max[level+1] ) {
-          val->compute_[i+n*(j+k*n)] = false;
-        } else {
-          val->compute_[i+n*(j+k*n)] = true;
-        }
-      }
 
       had_double_type r = sqrt(x*x+y*y+z*z);
 
@@ -251,12 +242,15 @@ int rkupdate( stencil_data const& vecval,
   boost::scoped_array<nodedata> work(new nodedata[vecval.value_.size()]);
   boost::scoped_array<nodedata> work2(new nodedata[vecval.value_.size()]);
 
+  int factor = 1;
+  if ( level == par.allowedl ) factor = 2;
+
   static had_double_type const c_0_75 = 0.75;
   static had_double_type const c_0_25 = 0.25;
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
-  int const n = par.granularity + 2*par.buffer;
+  int const n = par.granularity + 2*factor*par.buffer;
 
   // -------------------------------------------------------------------------
   // iter 0
@@ -265,15 +259,13 @@ int rkupdate( stencil_data const& vecval,
     for (int k=1; k<n-1;k++) {
     for (int j=1; j<n-1;j++) {
     for (int i=1; i<n-1;i++) {
-      if ( vecval.compute_[i+n*(j+n*k)] ) {
-        calcrhs<0>(&rhs,vecval.value_,dx,i,j,k,par); 
+      calcrhs<0>(&rhs,vecval.value_,dx,i,j,k,factor,par); 
 
-        nodedata& nd = work[i+n*(j+n*k)];
-        nodedata const & ndvecval = vecval.value_[i+n*(j+n*k)];
-        for (int ll=0;ll<num_eqns;ll++) {
-          nd.phi[0][ll] = ndvecval.phi[0][ll];
-          nd.phi[1][ll] = ndvecval.phi[0][ll] + rhs.phi[0][ll]*dt; 
-        }
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata const & ndvecval = vecval.value_[i+n*(j+n*k)];
+      for (int ll=0;ll<num_eqns;ll++) {
+        nd.phi[0][ll] = ndvecval.phi[0][ll];
+        nd.phi[1][ll] = ndvecval.phi[0][ll] + rhs.phi[0][ll]*dt; 
       }
     }}}
 
@@ -282,14 +274,12 @@ int rkupdate( stencil_data const& vecval,
     for (int k=2; k<n-2;k++) {
     for (int j=2; j<n-2;j++) {
     for (int i=2; i<n-2;i++) {
-      if ( vecval.compute_[i+n*(j+n*k)] ) {
-        calcrhs<1>(&rhs,work,dx,i,j,k,par); 
-        nodedata& nd = work[i+n*(j+n*k)];
-        nodedata& nd2 = work2[i+n*(j+n*k)];
-        for (int ll=0;ll<num_eqns;ll++) {
-          nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
-            c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
-        }
+      calcrhs<1>(&rhs,work,dx,i,j,k,factor,par); 
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata& nd2 = work2[i+n*(j+n*k)];
+      for (int ll=0;ll<num_eqns;ll++) {
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + 
+          c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
       }
     }}}
 
@@ -299,16 +289,14 @@ int rkupdate( stencil_data const& vecval,
     for (int k=3; k<n-3;k++) {
     for (int j=3; j<n-3;j++) {
     for (int i=3; i<n-3;i++) {
-      if ( vecval.compute_[i+n*(j+n*k)] ) {
-        calcrhs<1>(&rhs,work2,dx,i,j,k,par); 
+      calcrhs<1>(&rhs,work2,dx,i,j,k,factor,par); 
 
-        nodedata& nd = work[i+n*(j+n*k)];
-        nodedata& nd2 = work2[i+n*(j+n*k)];
-        nodedata& ndresult = result->value_[i+n*(j+n*k)];
+      nodedata& nd = work[i+n*(j+n*k)];
+      nodedata& nd2 = work2[i+n*(j+n*k)];
+      nodedata& ndresult = result->value_[i+n*(j+n*k)];
 
-        for (int ll=0;ll<num_eqns;ll++) {
-          ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
-        }
+      for (int ll=0;ll<num_eqns;ll++) {
+        ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }}}
 
