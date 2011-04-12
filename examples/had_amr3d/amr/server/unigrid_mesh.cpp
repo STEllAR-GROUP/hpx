@@ -620,7 +620,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 }
               }
             } } }
-#if 0
+//#if 0
             if ( level != par->allowedl ) { 
               // prolongation {{{
               // send data to higher level boundary points
@@ -648,25 +648,25 @@ namespace hpx { namespace components { namespace amr { namespace server
               if ( intersection(xmin,xmax,ymin,ymax,zmin,zmax,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1],
-                                par->min[level+1],par->min[level+1]+par->gw*fdx) ||
+                                par->min[level+1],par->min[level+1]+par->gw*dx) ||
                    intersection(xmin,xmax,ymin,ymax,zmin,zmax,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1],
-                                par->max[level+1]-par->gw*fdx,par->max[level+1]) ||
+                                par->max[level+1]-par->gw*dx,par->max[level+1]) ||
                    intersection(xmin,xmax,ymin,ymax,zmin,zmax,
                                 par->min[level+1],par->max[level+1],
-                                par->min[level+1],par->min[level+1]+par->gw*fdx,
+                                par->min[level+1],par->min[level+1]+par->gw*dx,
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin,xmax,ymin,ymax,zmin,zmax,
                                 par->min[level+1],par->max[level+1],
-                                par->max[level+1]-par->gw*fdx,par->max[level+1],
+                                par->max[level+1]-par->gw*dx,par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin,xmax,ymin,ymax,zmin,zmax,
-                                par->min[level+1],par->min[level+1]+par->gw*fdx,
+                                par->min[level+1],par->min[level+1]+par->gw*dx,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin,xmax,ymin,ymax,zmin,zmax,
-                                par->max[level+1]-par->gw*fdx,par->max[level+1],
+                                par->max[level+1]-par->gw*dx,par->max[level+1],
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ) 
               { 
@@ -687,25 +687,25 @@ namespace hpx { namespace components { namespace amr { namespace server
                  (  intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1],
-                                par->min[level+1],par->min[level+1]+par->gw*fdx) ||
+                                par->min[level+1],par->min[level+1]+par->gw*dx) ||
                    intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1],
-                                par->max[level+1]-par->gw*fdx,par->max[level+1]) ||
+                                par->max[level+1]-par->gw*dx,par->max[level+1]) ||
                    intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
                                 par->min[level+1],par->max[level+1],
-                                par->min[level+1],par->min[level+1]+par->gw*fdx,
+                                par->min[level+1],par->min[level+1]+par->gw*dx,
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
                                 par->min[level+1],par->max[level+1],
-                                par->max[level+1]-par->gw*fdx,par->max[level+1],
+                                par->max[level+1]-par->gw*dx,par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
-                                par->min[level+1],par->min[level+1]+par->gw*fdx,
+                                par->min[level+1],par->min[level+1]+par->gw*dx,
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ||
                    intersection(xmin2,xmax2,ymin2,ymax2,zmin2,zmax2,
-                                par->max[level+1]-par->gw*fdx,par->max[level+1],
+                                par->max[level+1]-par->gw*dx,par->max[level+1],
                                 par->min[level+1],par->max[level+1],
                                 par->min[level+1],par->max[level+1]) ) ) {
 
@@ -723,7 +723,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               }
               // }}}
             }
-#endif
+//#endif
 //#if 0
             if ( level != par->level_row[step] ) { 
               // restriction {{{

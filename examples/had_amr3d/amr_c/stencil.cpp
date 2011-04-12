@@ -336,6 +336,192 @@ namespace hpx { namespace components { namespace amr
       return;
     }
     // }}}
+
+    // interp3d {{{
+    void stencil::interp3dB(had_double_type &x,had_double_type &y, had_double_type &z,
+                                      access_memory_block<stencil_data> &val, 
+                                      nodedata &result, int factor,Parameter const& par) {
+      //static const int grain = par->granularity;
+      int n2 = par->granularity + 2*factor*par->buffer;
+      int start = 0;
+      int stop = n2-1;
+
+      int ii = -1;
+      int jj = -1;
+      int kk = -1;
+
+      // FIXME: this might be more efficient if a separate boolean value was
+      // used to track which variables were found (a la findindex), because
+      // checking if a register is equal to zero should be faster than any
+      // other comparison on some processors (or so I hear).
+
+      // set up index bounds
+      for (int i=start;i<stop;++i) {
+        if ( ii == -1 && floatcmp_ge(val->x_[i],x) ) {
+          ii = i;
+          if ( jj != -1 && kk != -1 ) break;
+        }         
+        if ( jj == -1 && floatcmp_ge(val->y_[i],y) ) {
+          jj = i;
+          if ( ii != -1 && kk != -1 ) break;
+        }         
+        if ( kk == -1 && floatcmp_ge(val->z_[i],z) ) {
+          kk = i;
+          if ( ii != -1 && jj != -1 ) break;
+        }         
+      }
+      BOOST_ASSERT(ii > -1 && jj > -1 && kk > -1);
+
+      // Use the static const variable grain instead.
+      //int nx = par->granularity;
+      //int ny = par->granularity;
+      //int nz = par->granularity;
+
+      bool no_interp_x = false;
+      bool no_interp_y = false;
+      bool no_interp_z = false;
+      if ( ii == start ) {
+        // we may have a problem unless x doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->x_[ii],x) );
+        no_interp_x = true;
+      }
+      if ( jj == start ) {
+        // we may have a problem unless y doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->y_[jj],y) );
+        no_interp_y = true;
+      }
+      if ( kk == start ) {
+        // we may have a problem unless z doesn't need to be interpolated -- check
+        BOOST_ASSERT( floatcmp(val->z_[kk],z) );
+        no_interp_z = true;
+      }
+
+      if ( no_interp_x && no_interp_y && no_interp_z ) {
+        // no interp needed -- this probably will never be called but is added for completeness
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = val->value_[ii+n2*(jj+n2*kk)].phi[0][ll];
+        }
+        return;
+      }
+
+      // Quick sanity check to be sure we have bracketed the point we wish to interpolate
+      if ( !no_interp_x ) {
+        BOOST_ASSERT(floatcmp_le(val->x_[ii-1],x) && floatcmp_ge(val->x_[ii],x) );
+      }
+      if ( !no_interp_y ) {
+        BOOST_ASSERT(floatcmp_le(val->y_[jj-1],y) && floatcmp_ge(val->y_[jj],y) );
+      }
+      if ( !no_interp_z ) {
+        BOOST_ASSERT(floatcmp_le(val->z_[kk-1],z) && floatcmp_ge(val->z_[kk],z) );
+      }
+
+      had_double_type tmp2[2][2][num_eqns];
+      had_double_type tmp3[2][num_eqns];
+
+      // interpolate in x {{{
+      if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int j=jj-1;j<jj+1;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+n2*(j+n2*k)].phi[0][ll],
+                                                   val->value_[ii  +n2*(j+n2*k)].phi[0][ll],
+                                                   x,
+                                                   val->x_[ii-1],val->x_[ii]);
+            }
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int j=jj-1;j<jj+1;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+n2*(j+n2*k)].phi[0][ll];
+            }
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+n2*(jj+n2*k)].phi[0][ll],
+                                              val->value_[ii  +n2*(jj+n2*k)].phi[0][ll],
+                                              x,
+                                              val->x_[ii-1],val->x_[ii]);
+          }
+        }
+      } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj-1;j<jj+1;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+n2*(j+n2*kk)].phi[0][ll],
+                                              val->value_[ii  +n2*(j+n2*kk)].phi[0][ll],
+                                              x,
+                                              val->x_[ii-1],val->x_[ii]);
+          }
+        }
+      } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk-1;k<kk+1;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[0][k-(kk-1)][ll] = val->value_[ii+n2*(jj+n2*k)].phi[0][ll];
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj-1;j<jj+1;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[j-(jj-1)][0][ll] = val->value_[ii+n2*(j+n2*kk)].phi[0][ll];
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(val->value_[ii-1+n2*(jj+n2*kk)].phi[0][ll],
+                                            val->value_[ii  +n2*(jj+n2*kk)].phi[0][ll],
+                                            x,
+                                            val->x_[ii-1],val->x_[ii]);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in y {{{
+      if ( !no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
+                                         val->y_[jj-1],val->y_[jj]);
+          }
+        }
+      } else if ( no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp3[k][ll] = tmp2[0][k][ll];
+          }
+        }
+      } else if ( !no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+                                                              val->y_[jj-1],val->y_[jj]);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in z {{{
+      if ( !no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                                              z,
+                                                              val->z_[kk-1],val->z_[kk]);
+        } 
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      return;
+    }
+    // }}}
 #if 0
     // special interp 3d {{{
     void stencil::special_interp3d(had_double_type &xt,had_double_type &yt, had_double_type &zt,had_double_type &dx,
@@ -1036,6 +1222,277 @@ namespace hpx { namespace components { namespace amr
             }
 
             int n = par->granularity + 2*factor*par->buffer;
+
+            if ( prolongation ) {
+              // prolongation {{{
+              // interpolation
+              int start = factor*par->buffer;
+              int stop = factor*par->buffer + par->granularity;
+              had_double_type xmin = val[compute_index]->x_[start];
+              had_double_type xmax = val[compute_index]->x_[stop-1];
+              had_double_type ymin = val[compute_index]->y_[start];
+              had_double_type ymax = val[compute_index]->y_[stop-1];
+              had_double_type zmin = val[compute_index]->z_[start];
+              had_double_type zmax = val[compute_index]->z_[stop-1];
+
+              for (int k=start;k<stop;++k) {
+                had_double_type zt = resultval->z_[k];
+              for (int j=start;j<stop;++j) {
+                had_double_type yt = resultval->y_[j];
+              for (int i=start;i<stop;++i) {
+                had_double_type xt = resultval->x_[i];
+
+                // check if this is a prolongation point
+                if ( ( floatcmp_le(xt,par->min[level]+par->gw*dx) && floatcmp_ge(xt,par->min[level]) ) ||
+                     ( floatcmp_le(xt,par->max[level])            && floatcmp_ge(xt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(yt,par->min[level]+par->gw*dx) && floatcmp_ge(yt,par->min[level]) ) ||
+                     ( floatcmp_le(yt,par->max[level])            && floatcmp_ge(yt,par->max[level]-par->gw*dx) ) ||
+                     ( floatcmp_le(zt,par->min[level]+par->gw*dx) && floatcmp_ge(zt,par->min[level]) ) ||
+                     ( floatcmp_le(zt,par->max[level])            && floatcmp_ge(zt,par->max[level]-par->gw*dx) ) 
+                   ) {
+                  // this is a prolongation point -- overwrite the value with an interpolated value from the coarse mesh
+                  bool found = false;
+                  for (int ii=0;ii<val.size();++ii) {
+                    if ( ii != compute_index && val[ii]->level_ < resultval->level_ ) {
+                      int f2 = 1;
+                      if ( val[ii]->level_ == par->allowedl ) f2 = 2;
+                      //int tstart = f2*par->buffer;
+                      int tstart = 0;
+                      //int tstop = f2*par->buffer + par->granularity-1;
+                      int tstop = 2*f2*par->buffer + par->granularity-1;
+
+                      if ( floatcmp_ge(xt,val[ii]->x_[tstart])  && floatcmp_le(xt,val[ii]->x_[tstop]) &&
+                           floatcmp_ge(yt,val[ii]->y_[tstart])  && floatcmp_le(yt,val[ii]->y_[tstop]) &&
+                           floatcmp_ge(zt,val[ii]->z_[tstart])  && floatcmp_le(zt,val[ii]->z_[tstop]) ) {
+                        found = true;
+                        // interpolate
+                        interp3dB(xt,yt,zt,val[ii],resultval->value_[i+n*(j+n*k)],f2,par);
+                        break;
+                      }
+                    }
+                  }
+
+#if 0
+                  int anchor_index[27];
+                  int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+                  if ( !found ) {
+                    // find the interpolating the anchors needed  
+                    for (int lk=-1;lk<2;++lk) {
+                      had_double_type zn = zt + lk*dx;
+                    for (int lj=-1;lj<2;++lj) {
+                      had_double_type yn = yt + lj*dx;
+                    for (int li=-1;li<2;++li) {
+                      had_double_type xn = xt + li*dx;
+                      
+                      for (int ii=0;ii<val.size();++ii) {
+                        int f2 = 1;
+                        if ( val[ii]->level_ == par->allowedl ) f2 = 2;
+                        int tstart = f2*par->buffer;
+                        int tstop = f2*par->buffer + par->granularity-1;
+
+                        if ( floatcmp_ge(xn,val[ii]->x_[tstart])  && floatcmp_le(xn,val[ii]->x_[tstop]) &&
+                             floatcmp_ge(yn,val[ii]->y_[tstart])  && floatcmp_le(yn,val[ii]->y_[tstop]) &&
+                             floatcmp_ge(zn,val[ii]->z_[tstart])  && floatcmp_le(zn,val[ii]->z_[tstop]) &&
+                             ii != compute_index && val[ii]->level_ < resultval->level_  ) {
+                          if (li == -1 && lj == -1 && lk == -1 ) {
+                            has_corner[0] = 1;
+                            anchor_index[0] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk == -1 ) {
+                            has_corner[1] = 1;
+                            anchor_index[1] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk == -1 ) {
+                            has_corner[2] = 1;
+                            anchor_index[2] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk == -1 ) {
+                            has_corner[3] = 1;
+                            anchor_index[3] = ii;
+                          }
+                          if (li == -1 && lj == -1 && lk ==  1 ) {
+                            has_corner[4] = 1;
+                            anchor_index[4] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk ==  1 ) {
+                            has_corner[5] = 1;
+                            anchor_index[5] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[6] = 1;
+                            anchor_index[6] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk ==  1 ) {
+                            has_corner[7] = 1;
+                            anchor_index[7] = ii;
+                          }
+
+                          if (li == -1 && lj == -1 && lk == 0 ) {
+                            has_corner[8]   = 1;
+                            anchor_index[8] = ii;
+                          }
+                          if (li ==  1 && lj == -1 && lk == 0 ) {
+                            has_corner[9]  = 1;
+                            anchor_index[9] = ii;
+                          }
+                          if (li ==  1 && lj ==  1 && lk == 0 ) {
+                            has_corner[10] = 1;
+                            anchor_index[10] = ii;
+                          }
+                          if (li == -1 && lj ==  1 && lk == 0 ) {
+                            has_corner[11] = 1;
+                            anchor_index[11] = ii;
+                          }
+
+                         if (li == 0 && lj == -1 && lk == -1 ) {
+                            has_corner[12] = 1;
+                            anchor_index[12] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk == -1 ) {
+                            has_corner[13] = 1;
+                            anchor_index[13] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk == -1 ) {
+                            has_corner[14] = 1;
+                            anchor_index[14] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == -1 ) {
+                            has_corner[15] = 1;
+                            anchor_index[15] = ii;
+                          }
+
+                          if (li == 0 && lj == -1 && lk == 0 ) {
+                            has_corner[16] = 1;
+                            anchor_index[16] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk ==  0 ) {
+                            has_corner[17] = 1;
+                            anchor_index[17] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk ==  0 ) {
+                            has_corner[18] = 1;
+                            anchor_index[18] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == 0 ) {
+                            has_corner[19] = 1;
+                            anchor_index[19] = ii;
+                          }
+
+                          if (li == 0 && lj == -1 && lk == 1 ) {
+                            has_corner[20] = 1;
+                            anchor_index[20] = ii;
+                          }
+                          if (li == 1 && lj == 0 && lk ==  1 ) {
+                            has_corner[21] = 1;
+                            anchor_index[21] = ii;
+                          }
+                          if (li == 0 && lj == 1 && lk ==  1 ) {
+                            has_corner[22] = 1;
+                            anchor_index[22] = ii;
+                          }
+                          if (li == -1 && lj == 0 && lk == 1 ) {
+                            has_corner[23] = 1;
+                            anchor_index[23] = ii;
+                          }
+
+                          if (li == 0 && lj == 0 && lk == 1 ) {
+                            has_corner[24] = 1;
+                            anchor_index[24] = ii;
+                          }
+
+                          if (li == 0 && lj == 0 && lk == -1 ) {
+                            has_corner[25] = 1;
+                            anchor_index[25] = ii;
+                          }
+                          if (li == 0 && lj == 0 && lk == 0 ) {
+                            has_corner[26] = 1;
+                            anchor_index[26] = ii;
+                          }
+                        }
+                      }
+                          
+                    } } }
+                  }
+
+                  // Now we have the complete picture.  Determine what the interpolation options are and proceed. 
+                  if ( has_corner[0] == 1 && has_corner[1] == 1 && has_corner[2] == 1 &&
+                       has_corner[3] == 1 && has_corner[4] == 1 && has_corner[5] == 1 &&
+                       has_corner[6] == 1 && has_corner[7] == 1 ) {
+                    // 3D interpolation
+                    found = true;
+
+                 //   special_interp3d(xt,yt,zt,dx,
+                 //                      val[anchor_index[0]],
+                 //                      val[anchor_index[1]],
+                 //                      val[anchor_index[2]],
+                 //                      val[anchor_index[3]],
+                 //                      val[anchor_index[4]],
+                 //                      val[anchor_index[5]],
+                 //                      val[anchor_index[6]],
+                 //                      val[anchor_index[7]],
+                 //                      resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[16] == 1 && has_corner[18] == 1 ) {
+                    // 1D interp
+                    found = true;
+                 //   special_interp1d_y(xt,yt,zt,dx,
+                 //                      val[anchor_index[16]],val[anchor_index[18]],
+                 //                      resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[19] == 1 && has_corner[17] == 1 ) {
+                    // 1D interp
+                    found = true;
+                 //   special_interp1d_x(xt,yt,zt,dx,
+                 //                      val[anchor_index[19]],val[anchor_index[17]],
+                 //                      resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[24] == 1 && has_corner[25] == 1 ) {
+                    // 1D interp
+                    found = true;
+                 //   special_interp1d_z(xt,yt,zt,dx,
+                 //                      val[anchor_index[25]],val[anchor_index[24]],
+                 //                      resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[8] == 1 && has_corner[9] == 1 && has_corner[10] == 1 && has_corner[11] == 1 ) {
+                    // 2D interp
+                    found = true;
+                 //   special_interp2d_xy(xt,yt,zt,dx,
+                 //                       val[anchor_index[8]],val[anchor_index[9]],
+                 //                       val[anchor_index[10]],val[anchor_index[11]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[12] == 1 && has_corner[14] == 1 && has_corner[20] ==1 && has_corner[22] == 1 ) {
+                    // 2D interp
+                    found = true;
+                 //   special_interp2d_yz(xt,yt,zt,dx,
+                 //                       val[anchor_index[12]],val[anchor_index[14]],
+                 //                       val[anchor_index[20]],val[anchor_index[22]],resultval->value_[i+n*(j+n*k)],par);
+                  } else if ( has_corner[15] == 1 && has_corner[13] == 1 && has_corner[23] == 1 && has_corner[21] == 1) {
+                    // 2D interp
+                    found = true;
+                 //   special_interp2d_xz(xt,yt,zt,dx,
+                 //                       val[anchor_index[15]],val[anchor_index[13]],
+                 //                       val[anchor_index[23]],val[anchor_index[21]],resultval->value_[i+n*(j+n*k)],par);
+                  }
+#endif
+//#if 0
+                  if ( !found ) {
+                    std::cout << " PROBLEM: point " << xt << " " << yt << " " << zt << " BBOX : " <<  par->min[level] << " " << par->min[level]+2*par->gw*dx << " " <<  par->max[level] << " " << par->max[level]-2*par->gw*dx << std::endl;
+                    std::cout << " Available data: " << std::endl;
+                     for (int ii=0;ii<val.size();++ii) {
+                       if ( ii != compute_index ) {
+                         std::cout << val[ii]->x_[0] << " " << val[ii]->x_[n-1] << std::endl;
+                         std::cout << val[ii]->y_[0] << " " << val[ii]->y_[n-1] << std::endl;
+                         std::cout << val[ii]->z_[0] << " " << val[ii]->z_[n-1] << std::endl;
+                       }
+                     }      
+                    // for (int ii=0;ii<27;++ii) {
+                    //   std::cout << " Has corner : " << ii << " " << has_corner[ii] << std::endl;
+                    // }      
+                            
+                    BOOST_ASSERT(false);
+                  }
+//#endif
+                }
+
+              } } }
+
+              // }}}
+            }
 
             if ( restriction ) {
               // restriction {{{
