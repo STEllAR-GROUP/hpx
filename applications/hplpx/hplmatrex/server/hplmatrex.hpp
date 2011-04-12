@@ -539,7 +539,7 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
 	int i,j,k;
 	int offset = brow*blocksize;		//factordata row offset
-	int offset_col = bcol*blocksize;	//factordata column offset
+	int offset_col = iter*blocksize;	//factordata column offset
 	int iterrows = datablock[iter][iter]->getrows();
 	int itercols = datablock[brow][bcol]->getcolumns();
 	double factor;
