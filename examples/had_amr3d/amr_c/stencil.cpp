@@ -154,8 +154,11 @@ namespace hpx { namespace components { namespace amr
     // interp3d {{{
     void stencil::interp3d(had_double_type &x,had_double_type &y, had_double_type &z,
                                       access_memory_block<stencil_data> &val, 
-                                      nodedata &result, Parameter const& par) {
-      static const int grain = par->granularity;
+                                      nodedata &result, int factor,Parameter const& par) {
+      //static const int grain = par->granularity;
+      int start = factor*par->buffer;
+      int stop = factor*par->buffer + par->granularity;
+      int n2 = par->granularity + 2*factor*par->buffer;
 
       int ii = -1;
       int jj = -1;
@@ -167,7 +170,7 @@ namespace hpx { namespace components { namespace amr
       // other comparison on some processors (or so I hear).
 
       // set up index bounds
-      for (int i=0;i<grain;++i) {
+      for (int i=start;i<stop;++i) {
         if ( ii == -1 && floatcmp_ge(val->x_[i],x) ) {
           ii = i;
           if ( jj != -1 && kk != -1 ) break;
@@ -191,17 +194,17 @@ namespace hpx { namespace components { namespace amr
       bool no_interp_x = false;
       bool no_interp_y = false;
       bool no_interp_z = false;
-      if ( ii == 0 ) {
+      if ( ii == start ) {
         // we may have a problem unless x doesn't need to be interpolated -- check
         BOOST_ASSERT( floatcmp(val->x_[ii],x) );
         no_interp_x = true;
       }
-      if ( jj == 0 ) {
+      if ( jj == start ) {
         // we may have a problem unless y doesn't need to be interpolated -- check
         BOOST_ASSERT( floatcmp(val->y_[jj],y) );
         no_interp_y = true;
       }
-      if ( kk == 0 ) {
+      if ( kk == start ) {
         // we may have a problem unless z doesn't need to be interpolated -- check
         BOOST_ASSERT( floatcmp(val->z_[kk],z) );
         no_interp_z = true;
@@ -210,7 +213,7 @@ namespace hpx { namespace components { namespace amr
       if ( no_interp_x && no_interp_y && no_interp_z ) {
         // no interp needed -- this probably will never be called but is added for completeness
         for (int ll=0;ll<num_eqns;++ll) {
-          result.phi[0][ll] = val->value_[ii+grain*(jj+grain*kk)].phi[0][ll];
+          result.phi[0][ll] = val->value_[ii+n2*(jj+n2*kk)].phi[0][ll];
         }
         return;
       }
@@ -234,8 +237,8 @@ namespace hpx { namespace components { namespace amr
         for (int k=kk-1;k<kk+1;++k) {
           for (int j=jj-1;j<jj+1;++j) {
             for (int ll=0;ll<num_eqns;++ll) {
-              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+grain*(j+grain*k)].phi[0][ll],
-                                                   val->value_[ii  +grain*(j+grain*k)].phi[0][ll],
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+n2*(j+n2*k)].phi[0][ll],
+                                                   val->value_[ii  +n2*(j+n2*k)].phi[0][ll],
                                                    x,
                                                    val->x_[ii-1],val->x_[ii]);
             }
@@ -245,15 +248,15 @@ namespace hpx { namespace components { namespace amr
         for (int k=kk-1;k<kk+1;++k) {
           for (int j=jj-1;j<jj+1;++j) {
             for (int ll=0;ll<num_eqns;++ll) {
-              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+grain*(j+grain*k)].phi[0][ll];
+              tmp2[j-(jj-1)][k-(kk-1)][ll] = val->value_[ii+n2*(j+n2*k)].phi[0][ll];
             }
           }
         }
       } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
         for (int k=kk-1;k<kk+1;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+grain*(jj+grain*k)].phi[0][ll],
-                                              val->value_[ii  +grain*(jj+grain*k)].phi[0][ll],
+            tmp2[0][k-(kk-1)][ll] = interp_linear(val->value_[ii-1+n2*(jj+n2*k)].phi[0][ll],
+                                              val->value_[ii  +n2*(jj+n2*k)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
@@ -261,8 +264,8 @@ namespace hpx { namespace components { namespace amr
       } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj-1;j<jj+1;++j) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+grain*(j+grain*kk)].phi[0][ll],
-                                              val->value_[ii  +grain*(j+grain*kk)].phi[0][ll],
+            tmp2[j-(jj-1)][0][ll] = interp_linear(val->value_[ii-1+n2*(j+n2*kk)].phi[0][ll],
+                                              val->value_[ii  +n2*(j+n2*kk)].phi[0][ll],
                                               x,
                                               val->x_[ii-1],val->x_[ii]);
           }
@@ -270,19 +273,19 @@ namespace hpx { namespace components { namespace amr
       } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
         for (int k=kk-1;k<kk+1;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[0][k-(kk-1)][ll] = val->value_[ii+grain*(jj+grain*k)].phi[0][ll];
+            tmp2[0][k-(kk-1)][ll] = val->value_[ii+n2*(jj+n2*k)].phi[0][ll];
           }
         }
       } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj-1;j<jj+1;++j) {
           for (int ll=0;ll<num_eqns;++ll) {
-            tmp2[j-(jj-1)][0][ll] = val->value_[ii+grain*(j+grain*kk)].phi[0][ll];
+            tmp2[j-(jj-1)][0][ll] = val->value_[ii+n2*(j+n2*kk)].phi[0][ll];
           }
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;++ll) {
-          result.phi[0][ll] = interp_linear(val->value_[ii-1+grain*(jj+grain*kk)].phi[0][ll],
-                                            val->value_[ii  +grain*(jj+grain*kk)].phi[0][ll],
+          result.phi[0][ll] = interp_linear(val->value_[ii-1+n2*(jj+n2*kk)].phi[0][ll],
+                                            val->value_[ii  +n2*(jj+n2*kk)].phi[0][ll],
                                             x,
                                             val->x_[ii-1],val->x_[ii]);
         }
@@ -333,7 +336,7 @@ namespace hpx { namespace components { namespace amr
       return;
     }
     // }}}
-
+#if 0
     // special interp 3d {{{
     void stencil::special_interp3d(had_double_type &xt,had_double_type &yt, had_double_type &zt,had_double_type &dx,
                                       access_memory_block<stencil_data> &val0, 
@@ -924,7 +927,7 @@ namespace hpx { namespace components { namespace amr
 
       return;
     } // }}}
-        
+#endif       
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -989,12 +992,15 @@ namespace hpx { namespace components { namespace amr
             had_double_type z = par->min[level] + c*dx*par->granularity;
             compute_index = -1;
             for (int i=0;i<val.size();++i) {
-              if ( floatcmp(x,val[i]->x_[factor*par->buffer]) == 1 && 
-                   floatcmp(y,val[i]->y_[factor*par->buffer]) == 1 && 
-                   floatcmp(z,val[i]->z_[factor*par->buffer]) == 1 &&
-                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[factor*par->buffer+par->granularity-1]) == 1 && 
-                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[factor*par->buffer+par->granularity-1]) == 1 && 
-                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[factor*par->buffer+par->granularity-1]) == 1 ) {
+              int f2 = 1;
+              if ( val[i]->level_ == par->allowedl ) f2 = 2;
+
+              if ( floatcmp(x,val[i]->x_[f2*par->buffer]) == 1 && 
+                   floatcmp(y,val[i]->y_[f2*par->buffer]) == 1 && 
+                   floatcmp(z,val[i]->z_[f2*par->buffer]) == 1 &&
+                   floatcmp(x+dx*(par->granularity-1),val[i]->x_[f2*par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(y+dx*(par->granularity-1),val[i]->y_[f2*par->buffer+par->granularity-1]) == 1 && 
+                   floatcmp(z+dx*(par->granularity-1),val[i]->z_[f2*par->buffer+par->granularity-1]) == 1 ) {
                 compute_index = i;
                 break;
               }
@@ -1031,9 +1037,94 @@ namespace hpx { namespace components { namespace amr
 
             int n = par->granularity + 2*factor*par->buffer;
 
+            if ( restriction ) {
+              // restriction {{{
+              int last_time = -1;
+              int last_factor = 1;
+              bool found = false;
+              had_double_type xt,yt,zt;
+              for (int k=factor*par->buffer;k<factor*par->buffer+par->granularity;++k) {
+                zt = resultval->z_[k];
+              for (int j=factor*par->buffer;j<factor*par->buffer+par->granularity;++j) {
+                yt = resultval->y_[j];
+              for (int i=factor*par->buffer;i<factor*par->buffer+par->granularity;++i) {
+                xt = resultval->x_[i];
+
+                // Check if this is a restriction point -- is it further than gw coarse dx points away from a fine mesh boundary?
+                if ( par->min[level+1]+par->gw*dx < xt && xt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < yt && yt < par->max[level+1]-par->gw*dx &&
+                     par->min[level+1]+par->gw*dx < zt && zt < par->max[level+1]-par->gw*dx ) {
+
+                  found = false;
+                  if ( last_time != -1 ) {
+                    // check the bounding box of the finer mesh
+                    had_double_type xmin = val[last_time]->x_[last_factor*par->buffer];                      
+                    had_double_type xmax = val[last_time]->x_[last_factor*par->buffer+par->granularity-1];                      
+                    had_double_type ymin = val[last_time]->y_[last_factor*par->buffer];                      
+                    had_double_type ymax = val[last_time]->y_[last_factor*par->buffer+par->granularity-1];                      
+                    had_double_type zmin = val[last_time]->z_[last_factor*par->buffer];                      
+                    had_double_type zmax = val[last_time]->z_[last_factor*par->buffer+par->granularity-1];                      
+
+                    if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                         floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                         floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
+                      found = true;
+                    } else {
+                      last_time = -1;
+                    }
+                  }
+
+                  if ( !found ) {
+                    for (int ii=0;ii<val.size();++ii) {
+                      if ( ii != compute_index && resultval->level_ < val[ii]->level_ ) {
+                        int f2 = 1;
+                        if ( val[ii]->level_ == par->allowedl ) f2 = 2;
+
+                        // check the bounding box of the finer mesh
+                        had_double_type xmin = val[ii]->x_[f2*par->buffer];                      
+                        had_double_type xmax = val[ii]->x_[f2*par->buffer+par->granularity-1]; 
+                        had_double_type ymin = val[ii]->y_[f2*par->buffer];                      
+                        had_double_type ymax = val[ii]->y_[f2*par->buffer+par->granularity-1];
+                        had_double_type zmin = val[ii]->z_[f2*par->buffer];                      
+                        had_double_type zmax = val[ii]->z_[f2*par->buffer+par->granularity-1];
+
+                        if ( floatcmp_ge(xt,xmin) && floatcmp_le(xt,xmax) &&
+                             floatcmp_ge(yt,ymin) && floatcmp_le(yt,ymax) &&
+                             floatcmp_ge(zt,zmin) && floatcmp_le(zt,zmax) ) {
+                          found = true;
+                          last_time = ii;
+                          last_factor = f2;
+                          break;
+                        }
+                      }
+                    }
+                  }
+
+                  if ( !found ) {
+                    std::cout << " DEBUG coords " << xt << " " << yt << " " << zt <<  std::endl;
+                    for (int ii=0;ii<val.size();++ii) {
+                      int f2 = 1;
+                      if ( val[ii]->level_ == par->allowedl ) f2 = 2;
+                      if ( val[ii]->level_ > resultval->level_ ) {
+                        std::cout << " DEBUG available x " << val[ii]->x_[f2*par->buffer] << " " << val[ii]->x_[f2*par->buffer+par->granularity-1] << " " <<  std::endl;
+                        std::cout << " DEBUG available y " << val[ii]->y_[f2*par->buffer] << " " << val[ii]->y_[f2*par->buffer+par->granularity-1] << " " <<  std::endl;
+                        std::cout << " DEBUG available z " << val[ii]->z_[f2*par->buffer] << " " << val[ii]->z_[f2*par->buffer+par->granularity-1] << " " <<  std::endl;
+                        std::cout << " DEBUG level: " << val[ii]->level_ << std::endl;
+                        std::cout << " " << std::endl;
+                      }
+                    }
+                  }
+                  BOOST_ASSERT(found);
+
+                  // interpolate
+                  interp3d(xt,yt,zt,val[last_time],resultval->value_[i+n*(j+n*k)],last_factor,par);
+                } 
+              } } }
+              // }}}
+            }
+
             if ( buffer ) {
-              int level = resultval->level_;
-              had_double_type dx = par->dx0/pow(2.0,level);
+            // buffer {{{
               for (int kk=0;kk<n;kk++) {
               for (int jj=0;jj<n;jj++) {
               for (int ii=0;ii<n;ii++) {
@@ -1051,7 +1142,7 @@ namespace hpx { namespace components { namespace amr
                   had_double_type zz = resultval->z_[kk];
                   bool found = false;
                   for (int i=0;i<val.size();++i) {
-                    if ( i != compute_index ) {
+                    if ( i != compute_index && val[i]->level_ == resultval->level_ ) {
                       if ( floatcmp_ge(xx,val[i]->x_[factor*par->buffer]) && floatcmp_le(xx,val[i]->x_[par->granularity+factor*par->buffer-1]) &&
                            floatcmp_ge(yy,val[i]->y_[factor*par->buffer]) && floatcmp_le(yy,val[i]->y_[par->granularity+factor*par->buffer-1]) &&
                            floatcmp_ge(zz,val[i]->z_[factor*par->buffer]) && floatcmp_le(zz,val[i]->z_[par->granularity+factor*par->buffer-1]) ) {
@@ -1076,7 +1167,7 @@ namespace hpx { namespace components { namespace amr
                     std::cout << " Looking for " << xx << " " << yy << " " << zz << std::endl;
                     std::cout << " Available bboxes: " << std::endl;
                     for (int i=0;i<val.size();++i) {
-                      if ( i != compute_index ) {
+                      if ( i != compute_index && val[i]->level_ == resultval->level_ ) {
                         std::cout << val[i]->x_[factor*par->buffer] << " " << val[i]->x_[par->granularity+factor*par->buffer-1] << std::endl;
                         std::cout << val[i]->y_[factor*par->buffer] << " " << val[i]->y_[par->granularity+factor*par->buffer-1] << std::endl;
                         std::cout << val[i]->z_[factor*par->buffer] << " " << val[i]->z_[par->granularity+factor*par->buffer-1] << std::endl;
@@ -1087,6 +1178,7 @@ namespace hpx { namespace components { namespace amr
                   BOOST_ASSERT(found);
                 } 
               } } }
+              // }}}
             } else {
               // shouldn't happen
               BOOST_ASSERT(false);

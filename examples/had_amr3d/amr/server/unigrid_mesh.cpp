@@ -723,7 +723,8 @@ namespace hpx { namespace components { namespace amr { namespace server
               }
               // }}}
             }
-
+#endif
+//#if 0
             if ( level != par->level_row[step] ) { 
               // restriction {{{
               // send data to the level immediately less than this one (for restriction)
@@ -738,9 +739,9 @@ namespace hpx { namespace components { namespace amr { namespace server
 
               // first, check if this px thread is in the restriction region
               if ( intersection(xmin,xmax,ymin,ymax,zmin,zmax,
-                                par->min[level]+par->gw*dx,par->max[level]-par->gw*dx,
-                                par->min[level]+par->gw*dx,par->max[level]-par->gw*dx,
-                                par->min[level]+par->gw*dx,par->max[level]-par->gw*dx) ) {
+                                par->min[level]+par->gw*cdx,par->max[level]-par->gw*cdx,
+                                par->min[level]+par->gw*cdx,par->max[level]-par->gw*cdx,
+                                par->min[level]+par->gw*cdx,par->max[level]-par->gw*cdx) ) {
                 // this px thread is in the restriction region.  Find out to which coarse thread we should restrict
                 for (int kk=0;kk<par->nx[level-1];kk++) {
                 for (int jj=0;jj<par->nx[level-1];jj++) {
@@ -765,7 +766,7 @@ namespace hpx { namespace components { namespace amr { namespace server
               }
             // }}}
             }
-#endif
+//#endif
           }
         }
       }
