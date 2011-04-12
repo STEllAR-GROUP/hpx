@@ -282,9 +282,6 @@ if __name__ == '__main__':
             ss = p.search(cmd[e]).expand(r'\1')
             cmd[e] = cmd[e].replace("eval(\"%s\")" % ss, str(eval(ss)))
 
-        rc = 0
-        walltime = 0.0 
-
         writeres(sepstr('=')+'\nExecuting:'+quoteopts(cmd)+'\n', ofhs)
         # run test requested number of times
         for i in range(nrep):
@@ -297,17 +294,16 @@ if __name__ == '__main__':
             outs = sepstr('-', txt)
             outs += '\nReturn code: '+str(rc)+'\n'+sepstr()+'\n'
             writeres(outs, ofhs)
+            if rf:   
+              if not results['data'].has_key(tuple(vallst)):
+                results['data'][tuple(vallst)] = [(walltime, rc)]
+              else:
+                results['data'][tuple(vallst)].append((walltime, rc))
             time.sleep(tpad)
         # run postprocessor
         # TODO: add timeout options
         if after: runscript(after, optd, ofhs)
      
-        if rf:   
-          if not results['data'].has_key(tuple(vallst)):
-            results['data'][tuple(vallst)] = [(walltime, rc)]
-          else:
-            results['data'][tuple(vallst)].append((walltime, rc))
-
         optix = next(optix, optnames, options)
         
     except: 
