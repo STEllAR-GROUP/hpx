@@ -23,9 +23,10 @@ struct component_namespace
       stubs::component_namespace<Database>
     >
 {
+    // {{{ nested types 
     typedef client_base<
         component_namespace<Database>,
-        stubs::basic_namespace<Tag>
+        stubs::component_namespace<Database>
     > base_type;
 
     typedef server::component_namespace<Database> server_type;
@@ -34,11 +35,13 @@ struct component_namespace
     typedef typename server_type::component_id_type component_id_type;
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
+    // }}}
 
     explicit component_namespace(naming::id_type const& id = naming::invalid_id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
+    // bind interface 
     lcos::future_value<component_id_type>
     bind_async(component_name_type const& key, prefix_type prefix)
     { return this->base_type::bind_async(this->gid_, key, prefix); }
@@ -48,6 +51,7 @@ struct component_namespace
     { return this->base_type::bind(this->gid_, key, prefix); }
 
     ///////////////////////////////////////////////////////////////////////////
+    // resolve_id interface
     lcos::future_value<prefixes_type>
     resolve_id_async(component_id_type key)
     { return this->base_type::resolve_id_async(this->gid_, key); }
@@ -56,14 +60,16 @@ struct component_namespace
     { return this->base_type::resolve_id(this->gid_, key); }
 
     ///////////////////////////////////////////////////////////////////////////
+    // resolve_name interface 
     lcos::future_value<component_id_type>
     resolve_name_async(component_name_type const& key)
     { return this->base_type::resolve_name_async(this->gid_, key); }
     
     component_id_type resolve_name(component_name_type const& key)
     { return this->base_type::resolve_name(this->gid_, key); }
-    
+ 
     ///////////////////////////////////////////////////////////////////////////
+    // unbind interface 
     lcos::future_value<void>
     unbind_async(component_name_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }

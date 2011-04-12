@@ -5,14 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_35F63321_8107_4EAE_8E9B_A2F9C2A1B426)
-#define HPX_35F63321_8107_4EAE_8E9B_A2F9C2A1B426
+#if !defined(HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D)
+#define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/namespace/server/component_namespace.hpp>
+#include <hpx/runtime/agas/namespace/server/component.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -21,14 +21,16 @@ template <typename Database>
 struct component_namespace
   : components::stubs::stub_base<server::component_namespace<Database> >
 {
+    // {{{ nested types
     typedef server::component_namespace<Database> server_type;
 
     typedef typename server_type::component_name_type component_name_type;
     typedef typename server_type::component_id_type component_id_type;
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
+    // }}}
 
-    ///////////////////////////////////////////////////////////////////////////
+    // {{{ bind dispatch
     static lcos::future_value<component_id_type>
     bind_async(naming::id_type const& gid, component_name_type const& key,
                prefix_type prefix)
@@ -42,8 +44,9 @@ struct component_namespace
     bind(naming::id_type const& gid, component_name_type const& key,
          prefix_type prefix)
     { return bind_async(gid, key, prefix).get(); } 
+    // }}}
 
-    ///////////////////////////////////////////////////////////////////////////
+    // {{{ resolve_id dispatch
     static lcos::future_value<prefixes_type>
     resolve_id_async(naming::id_type const& gid, component_id_type key)
     {
@@ -54,8 +57,9 @@ struct component_namespace
     static prefixes_type
     resolve_id(naming::id_type const& gid, component_id_type key)
     { return resolve_id_async(gid, key).get(); } 
+    // }}}
 
-    ///////////////////////////////////////////////////////////////////////////
+    // {{{ resolve_name dispatch 
     static lcos::future_value<component_id_type>
     resolve_name_async(naming::id_type const& gid,
                        component_name_type const& key)
@@ -66,9 +70,10 @@ struct component_namespace
     
     static component_id_type
     resolve_name(naming::id_type const& gid, component_name_type const& key)
-    { return resolve_id_async(gid, key).get(); } 
+    { return resolve_name_async(gid, key).get(); } 
+    // }}}
 
-    ///////////////////////////////////////////////////////////////////////////
+    // {{{ unbind dispatch 
     static lcos::future_value<void>
     unbind_async(naming::id_type const& gid, component_name_type const& key)
     {
@@ -79,9 +84,10 @@ struct component_namespace
     static void
     unbind(naming::id_type const& gid, component_name_type const& key)
     { return unbind_async(gid, key).get(); } 
+    // }}}
 };            
 
 }}}
 
-#endif // HPX_35F63321_8107_4EAE_8E9B_A2F9C2A1B426
+#endif // HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 

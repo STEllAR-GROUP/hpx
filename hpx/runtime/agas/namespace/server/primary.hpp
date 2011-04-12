@@ -8,7 +8,10 @@
 #if !defined(HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21)
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
+#include <boost/fusion/include/vector.hpp>
+
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
@@ -22,6 +25,7 @@ template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT primary_namespace
   : simple_component_base<primary_namespace<Database, Protocol> >
 {
+    // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
         database_mutex_type;
 
@@ -30,7 +34,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
     typedef gva<Protocol> gva_type;
     typedef full_gva<Protocol> full_gva_type;
-    typedef boost::uint64_t refcnt_type;
+    typedef boost::uint64_t count_type;
+    typedef components::component_type component_type;
 
     typedef table<Database, naming::gid_type, full_gva_type>
         gva_table_type; 
@@ -40,19 +45,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     
     typedef table<Database, naming::gid_type, refcnt>
         refcnt_table_type;
-
-    enum actions
-    {
-        namespace_bind_gid_range,
-        namespace_bind_locality,
-        namespace_resolve_locality,
-        namespace_resolve_gid,
-        namespace_unbind_locality,
-        namespace_unbind_gid_range,
-        namespace_increment,
-        namespace_decrement
-    };
-  
+    // }}}
+ 
   private:
     database_mutex_type mutex_;
     gva_table_type gvas_;
@@ -67,7 +61,117 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         refcnts_("hpx.agas.primary_namespace.refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    // TODO: implement actions
+    partition bind(gva_type const& gva)
+    { // {{{ bind implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+
+    partition rebind(endpoint_type const& ep, count_type count)
+    { // {{{ rebind implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+
+    partition resolve_endpoint(endpoint_type const& ep)
+    { // {{{ resolve_endpoint implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+
+    gva_type resolve_gid(naming::gid_type const& gid)
+    { // {{{ resolve_gid implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+
+    bool unbind(endpoint_type const& ep, count_type count)
+    { // {{{ unbind implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+
+    count_type increment(naming::gid_type const& gid, count_type credits)
+    { // {{{ increment implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+    
+    boost::fusion::vector2<count_type, component_type>
+    decrement(naming::gid_type const& gid, count_type credits)
+    { // {{{ decrement implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        // TODO: implement
+    } // }}}
+ 
+    // {{{ action types
+    enum actions 
+    {
+        namespace_bind,
+        namespace_rebind,
+        namespace_resolve_endpoint,
+        namespace_resolve_gid,
+        namespace_unbind,
+        namespace_increment,
+        namespace_decrement
+    };
+
+    typedef hpx::actions::result_action1<
+        primary_namespace<Database, Protocol>,
+        /* return type */ partition,
+        /* enum value */  namespace_bind,
+        /* arguments */   gva_type const&,
+        &primary_namespace<Database, Protocol>::bind
+    > bind_action; 
+   
+    typedef hpx::actions::result_action2<
+        primary_namespace<Database, Protocol>,
+        /* return type */ partition,
+        /* enum value */  namespace_rebind,
+        /* arguments */   endpoint_type const&, count_type,
+        &primary_namespace<Database, Protocol>::rebind
+    > rebind_action;
+    
+    typedef hpx::actions::result_action1<
+        primary_namespace<Database, Protocol>,
+        /* return type */ partition,
+        /* enum value */  namespace_resolve_endpoint,
+        /* arguments */   endpoint_type const&,
+        &primary_namespace<Database, Protocol>::resolve_endpoint
+    > resolve_endpoint_action;
+
+    typedef hpx::actions::result_action1<
+        primary_namespace<Database, Protocol>,
+        /* return type */ gva_type,
+        /* enum value */  namespace_resolve_gid,
+        /* arguments */   naming::gid_type const&,
+        &primary_namespace<Database, Protocol>::resolve_gid
+    > resolve_gid_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace<Database, Protocol>,
+        /* return type */ bool, 
+        /* enum value */  namespace_unbind,
+        /* arguments */   endpoint_type const&, count_type,
+        &primary_namespace<Database, Protocol>::unbind
+    > unbind_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace<Database, Protocol>,
+        /* return type */ count_type,  
+        /* enum value */  namespace_increment,
+        /* arguments */   naming::gid_type const&, count_type,
+        &primary_namespace<Database, Protocol>::increment
+    > increment_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace<Database, Protocol>,
+        /* return type */ boost::fusion::vector2<count_type, component_type>,
+        /* enum value */  namespace_decrement,
+        /* arguments */   naming::gid_type const&, count_type,
+        &primary_namespace<Database, Protocol>::decrement
+    > decrement_action;
+    // }}}
 };
 
 }}}}

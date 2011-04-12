@@ -19,6 +19,7 @@ template <typename Database>
 struct HPX_COMPONENT_EXPORT symbol_namespace
   : simple_component_base<symbol_namespace<Database> >
 {
+    // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
         database_mutex_type;
 
@@ -26,14 +27,8 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
 
     typedef table<Database, symbol_type, naming::gid_type>
         gid_table_type; 
-
-    enum actions
-    {
-        namespace_bind,
-        namespace_resolve,
-        namespace_unbind,
-    };
-  
+    // }}} 
+ 
   private:
     database_mutex_type mutex_;
     gid_table_type gids_;
@@ -45,46 +40,55 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     { traits::initialize_mutex(mutex_); }
 
     void bind(symbol_type const& key, naming::gid_type const& gid)
-    {
+    { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
         // TODO: implement
-    }
+    } // }}}
 
     naming::gid_type resolve(symbol_type const& key)
-    {
+    { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
         // TODO: implement
-    } 
+    } // }}}  
     
     void unbind(symbol_type const& key)
-    {
+    { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
         // TODO: implement
-    } 
+    } // }}} 
+
+    // {{{ action types
+    enum actions
+    {
+        namespace_bind,
+        namespace_resolve,
+        namespace_unbind,
+    };
 
     typedef hpx::actions::result_action2<
         symbol_namespace<Database>,
-        void,                                            // return type
-        namespace_bind,                                  // action type
-        symbol_type const&, naming::gid_type const&,     // arguments 
+        /* return type */ void,
+        /* enum value */  namespace_bind,
+        /* arguments */   symbol_type const&, naming::gid_type const&,
         &symbol_namespace<Database>::bind
     > bind_action;
     
     typedef hpx::actions::result_action1<
         symbol_namespace<Database>,
-        naming::gid_type,                                // return type
-        namespace_resolve_id,                            // action type
-        symbol_type const&,                              // arguments 
+        /* return type */ naming::gid_type,
+        /* enum value */  namespace_resolve_id,
+        /* arguments */   symbol_type const&,
         &symbol_namespace<Database>::resolve_id
     > resolve_action;
     
     typedef hpx::actions::result_action1<
         symbol_namespace<Database>,
-        void,                                            // return type
-        namespace_unbind,                                // action type
-        symbol_type const&,                              // arguments 
+        /* return type */ void,
+        /* enum value */  namespace_unbind,
+        /* arguments */   symbol_type const&,
         &symbol_namespace<Database>::unbind
     > unbind_action;
+    // }}}
 };
 
 }}}}
