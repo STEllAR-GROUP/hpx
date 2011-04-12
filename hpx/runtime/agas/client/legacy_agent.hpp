@@ -77,7 +77,7 @@ struct legacy_client
     // }}}
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ get_console_prefix
     /// \brief Get locality prefix of the console locality
@@ -100,7 +100,7 @@ struct legacy_client
     // }}}
     bool get_console_prefix(naming::gid_type& prefix,
                             error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ get_prefixes specification
     /// \brief Query for the prefixes of all known localities.
@@ -132,7 +132,7 @@ struct legacy_client
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       components::component_type type,
                       error_code& ec = throws) const 
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) const
@@ -163,7 +163,7 @@ struct legacy_client
     // }}}
     components::component_type get_component_id(std::string const& name, 
                                                 error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ register_factory specification
     /// \brief Register a factory for a specific component type
@@ -196,7 +196,7 @@ struct legacy_client
     components::component_type register_factory(naming::gid_type const& prefix,
                                                 std::string const& name, 
                                                 error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ get_id_range specification
     /// \brief Get unique range of freely assignable global ids 
@@ -247,7 +247,7 @@ struct legacy_client
                       naming::gid_type& lower_bound,
                       naming::gid_type& upper_bound, 
                       error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ bind specification
     /// \brief Bind a global address to a local address.
@@ -327,7 +327,7 @@ struct legacy_client
     bool bind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                     naming::address const& baseaddr, std::ptrdiff_t offset, 
                     error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ incref specification
     /// \brief Increment the global reference count for the given id
@@ -345,7 +345,7 @@ struct legacy_client
     boost::uint32_t incref(naming::gid_type const& id,
                            boost::uint32_t credits = 1, 
                            error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ decref specification
     /// \brief Decrement the global reference count for the given id
@@ -369,7 +369,7 @@ struct legacy_client
                            components::component_type& t,
                            boost::uint32_t credits = 1,
                            error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ unbind specification
     /// \brief Unbind a global address
@@ -533,7 +533,7 @@ struct legacy_client
     // }}}
     bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                       naming::address& addr, error_code& ec = throws) const
-    { /* TODO */ } 
+    { /* IMPLEMENT */ } 
 
     // {{{ resolve specification
     /// \brief Resolve a given global address (id) to its associated local 
@@ -568,7 +568,7 @@ struct legacy_client
     // }}}
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) const
@@ -576,7 +576,7 @@ struct legacy_client
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
                         error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ registerid specification
     /// \brief Register a global name with a global address (id)
@@ -609,7 +609,7 @@ struct legacy_client
     // }}}
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ unregisterid specification
     /// \brief Unregister a global name (release any existing association)
@@ -636,7 +636,7 @@ struct legacy_client
     ///                   of hpx#exception.
     // }}}
     bool unregisterid(std::string const& name, error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ queryid specification
     /// Query for the global address associated with a given global name.
@@ -667,7 +667,7 @@ struct legacy_client
     // }}}
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ get_statistics_count specification
     /// \brief Query for the gathered statistics of this AGAS instance 
@@ -692,7 +692,7 @@ struct legacy_client
     // }}}
     bool get_statistics_count(std::vector<std::size_t>& counts,
                               error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ get_statistics_mean specification
     /// \brief Query for the gathered statistics of this AGAS instance 
@@ -716,7 +716,7 @@ struct legacy_client
     // }}}
     bool get_statistics_mean(std::vector<double>& timings,
                              error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     // {{{ get_statistics_moment2 specification
     /// \brief Query for the gathered statistics of this AGAS instance 
@@ -741,18 +741,18 @@ struct legacy_client
     // }}}
     bool get_statistics_moment2(std::vector<double>& moments,
                                 error_code& ec = throws) const
-    { /* TODO */ }
+    { /* IMPLEMENT */ }
 
     /// \brief Return the locality of the resolver server this resolver 
     ///        client instance is using to serve requests
-    naming::locality const& there() const { /* TODO */ }
+    naming::locality const& there() const { /* IMPLEMENT */ }
 
     /// \brief Returns whether this resolver_client represents the console 
     ///        locality
-    bool is_console() const { /* TODO */ }
+    bool is_console() const { /* IMPLEMENT */ }
 
     /// \brief Returns whether this resolver_client runs in SMP mode
-    bool is_smp_mode() const { /* TODO */ }
+    bool is_smp_mode() const { /* IMPLEMENT */ }
 };
 
 }}

@@ -20,7 +20,7 @@ namespace tag { namespace database { struct std_map; }}
 namespace traits { namespace database
 {
 
-// TODO: Consider using HPX allocator stuff (possibly moot because of malloc
+// REVIEW: Consider using HPX allocator stuff (possibly moot because of malloc
 // overloading that we do).
 template <typename Key, typename Value>
 struct map_type<tag::database::std_map, Key, Value>

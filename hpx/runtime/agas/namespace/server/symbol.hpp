@@ -42,19 +42,19 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     void bind(symbol_type const& key, naming::gid_type const& gid)
     { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     naming::gid_type resolve(symbol_type const& key)
     { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}  
     
     void unbind(symbol_type const& key)
     { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}} 
 
     // {{{ action types

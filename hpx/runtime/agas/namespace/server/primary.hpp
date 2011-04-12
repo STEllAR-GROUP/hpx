@@ -64,44 +64,44 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     partition bind(gva_type const& gva)
     { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     partition rebind(endpoint_type const& ep, count_type count)
     { // {{{ rebind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     partition resolve_endpoint(endpoint_type const& ep)
     { // {{{ resolve_endpoint implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     gva_type resolve_gid(naming::gid_type const& gid)
     { // {{{ resolve_gid implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     bool unbind(endpoint_type const& ep, count_type count)
     { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
 
     count_type increment(naming::gid_type const& gid, count_type credits)
     { // {{{ increment implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
     
     boost::fusion::vector2<count_type, component_type>
     decrement(naming::gid_type const& gid, count_type credits)
     { // {{{ decrement implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+        // IMPLEMENT
     } // }}}
  
     // {{{ action types
