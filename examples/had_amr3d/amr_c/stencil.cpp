@@ -142,8 +142,9 @@ namespace hpx { namespace components { namespace amr
       return level;
     }
 
-    had_double_type stencil::interp_linear(had_double_type y1, had_double_type y2,
-                                           had_double_type x, had_double_type x1, had_double_type x2) {
+    inline had_double_type 
+    stencil::interp_linear(had_double_type y1, had_double_type y2,
+                           had_double_type x, had_double_type x1, had_double_type x2) {
       had_double_type xx1 = x - x1;
       had_double_type xx2 = x - x2;
       had_double_type result = xx2*y1/( (x1-x2) ) + xx1*y2/( (x2-x1) );
