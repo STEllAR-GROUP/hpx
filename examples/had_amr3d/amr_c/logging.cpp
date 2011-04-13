@@ -139,8 +139,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             gft_out_full("0d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
             gft_out_full("0d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
             gft_out_full("0d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
-#endif
           }
+#endif
         }
     }
 
