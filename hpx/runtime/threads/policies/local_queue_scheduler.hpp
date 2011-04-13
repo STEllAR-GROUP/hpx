@@ -116,14 +116,12 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
-            if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
-                return queues_[num_thread]->create_thread(data, initial_state, 
-                    run_now, num_thread, ec);
-            }
+            if (std::size_t(-1) == num_thread) 
+                num_thread = ++curr_queue_ % queues_.size();
 
-            return queues_[++curr_queue_ % queues_.size()]->create_thread(
-                data, initial_state, run_now, num_thread, ec);
+            BOOST_ASSERT(num_thread < queues_.size());
+            return queues_[num_thread]->create_thread(data, initial_state, 
+                run_now, num_thread, ec);
         }
 
         /// Return the next thread to be executed, return false if non is 
@@ -200,8 +198,9 @@ namespace hpx { namespace threads { namespace policies
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
 
-            if (!result) {
-                // steal work items: first try to steal from other cores in the same numa node
+            if (0 == added) {
+                // steal work items: first try to steal from other cores in the 
+                // same numa node
                 std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
                 std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
@@ -216,7 +215,7 @@ namespace hpx { namespace threads { namespace policies
                         std::size_t idx = least_significant_bit_set(m);
                         BOOST_ASSERT(idx < queues_.size());
 
-                        queues_[num_thread]->wait_or_add_new(
+                        result = result || queues_[num_thread]->wait_or_add_new(
                             idx, running, idle_loop_count, added, queues_[idx]);
                     }
                 }
@@ -224,7 +223,7 @@ namespace hpx { namespace threads { namespace policies
                 // if nothing found ask everybody else
                 for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
                     std::size_t idx = (i + num_thread) % queues_.size();
-                    queues_[num_thread]->wait_or_add_new(
+                    result = result || queues_[num_thread]->wait_or_add_new(
                         idx, running, idle_loop_count, added, queues_[idx]);
                 }
 
@@ -243,7 +242,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
             }
-            return result;
+            return result && 0 == added;
         }
 
         /// This function gets called by the threadmanager whenever new work

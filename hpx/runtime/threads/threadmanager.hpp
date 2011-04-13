@@ -367,6 +367,12 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         bool is_running() const { return thread_count_ != 0 || running_; }
 
+        /// \brief Return the number of OS threads running in this threadmanager
+        ///
+        /// This function will return correct results only if is_running() 
+        /// would return true.
+        std::size_t get_num_os_threads() const { return threads_.size(); }
+
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this 
         /// threadmanager.

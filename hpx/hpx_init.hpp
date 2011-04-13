@@ -119,8 +119,8 @@ namespace hpx
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
                     ("queueing,q", value<std::string>(),
-                     "the queue scheduling policy to use, options are `global', "
-                     "`local', `local_priority' and `abp' (default: local)")
+                     "the queue scheduling policy to use, options are `global/g', "
+                     "`local/l', `priority_local/p' and `abp' (default: local/l)")
                 ;
 
                 options_description desc_cmdline;
@@ -269,8 +269,7 @@ namespace hpx
                     (new detail::agas_server_helper(agas_host, agas_port));
 
             // Initialize and start the HPX runtime.
-            if (queueing == "global")
-            {
+            if (0 == std::string("global").find(queueing)) {
                 typedef hpx::threads::policies::global_queue_scheduler
                     global_queue_policy;
                 typedef hpx::runtime_impl<global_queue_policy>
@@ -292,9 +291,7 @@ namespace hpx
                 else 
                     result = rt.run(num_threads, num_localities);
             }
-
-            else if (queueing == "local")
-            {
+            else if (0 == std::string("local").find(queueing)) {
                 typedef hpx::threads::policies::local_queue_scheduler
                     local_queue_policy;
                 typedef hpx::runtime_impl<local_queue_policy> 
@@ -311,7 +308,7 @@ namespace hpx
                     rt.get_config().load_application_configuration
                         (config.c_str());
                 }
-    
+
                 // Run this runtime instance.
                 if (mode != hpx::runtime::worker)
                     result = rt.run(boost::bind
@@ -319,7 +316,7 @@ namespace hpx
                 else
                     result = rt.run(num_threads, num_localities);
             }
-            else if (queueing == "priority_local") {
+            else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for ech OS threads
                 // plus one separate queue for high priority PX-threads)
                 typedef hpx::threads::policies::local_priority_queue_scheduler 
@@ -344,7 +341,7 @@ namespace hpx
                   result = rt.run(num_threads, num_localities);
                 }
             }
-            else if (queueing == "abp") {
+            else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
                 typedef hpx::threads::policies::abp_queue_scheduler 
@@ -369,8 +366,9 @@ namespace hpx
                   result = rt.run(num_threads, num_localities);
                 }
             }
-            else 
+            else {
                 throw std::logic_error("bad value for parameter --queuing/-q");
+            }
         }
         catch (std::exception& e)
         {

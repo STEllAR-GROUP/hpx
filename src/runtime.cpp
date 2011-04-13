@@ -278,7 +278,8 @@ namespace hpx
             BOOST_FOREACH(naming::gid_type& gid, tmp_localities)
                 prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
-            this->runtime::get_process().set_localities(here_lid, prefixes);
+            this->process_.set_num_os_threads(num_threads);
+            this->process_.set_localities(here_lid, prefixes);
         }
 
         // register the given main function with the thread manager

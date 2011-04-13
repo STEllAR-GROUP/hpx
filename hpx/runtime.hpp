@@ -38,7 +38,8 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     class HPX_EXPORT runtime_impl;
 
-    struct process {
+    struct process 
+    {
     protected:
         template <typename SchedulingPolicy, typename NotificationPolicy> 
         friend class runtime_impl; 
@@ -51,7 +52,16 @@ namespace hpx
             localities_= localities;
         }
 
+        void set_num_os_threads(std::size_t num_os_threads)
+        {
+            num_os_threads_ = num_os_threads;
+        }
+
     public:
+        process() 
+          : num_os_threads_(0)
+        {}
+
         // Return the set of localities
         std::vector<naming::id_type>& localities(void)
         {
@@ -97,10 +107,17 @@ namespace hpx
             return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
         }
 
+        /// \brief Return the number of OS threads running in this threadmanager
+        ///
+        /// This function will return correct results only if is_running() 
+        /// would return true.
+        std::size_t get_num_os_threads() const { return num_os_threads_; }
+
     private:
         // Locality information
         std::size_t here_lid_;
         std::vector<naming::id_type> localities_;
+        std::size_t num_os_threads_;
     };
 
     /// \class runtime runtime.hpp hpx/runtime.hpp

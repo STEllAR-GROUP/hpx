@@ -130,10 +130,12 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();
+        if (std::size_t(-1)  == data.num_os_thread) 
+            data.num_os_thread = get_thread_num();
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
-            data, initial_state, run_now, ec, get_thread_num());
+            data, initial_state, run_now, ec, data.num_os_thread);
 
         LTM_(info) << "register_thread(" << newid << "): initial_state(" 
                    << get_thread_state_name(initial_state) << "), "
@@ -200,8 +202,11 @@ namespace hpx { namespace threads
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();
 
+        if (std::size_t(-1)  == data.num_os_thread) 
+            data.num_os_thread = get_thread_num();
+
         // create the new thread
-        scheduler_.create_thread(data, initial_state, false, ec, get_thread_num());
+        scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
     }
 
     ///////////////////////////////////////////////////////////////////////////

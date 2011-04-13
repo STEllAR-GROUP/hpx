@@ -292,6 +292,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread(
@@ -300,6 +301,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
@@ -308,6 +310,7 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending, 
         bool run_now = true, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
@@ -327,6 +330,7 @@ namespace hpx { namespace applier
         boost::function<void()> const& func, char const* description = 0, 
         threads::thread_state_enum initial_state = threads::pending, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work(
@@ -334,6 +338,7 @@ namespace hpx { namespace applier
         char const* description = 0, 
         threads::thread_state_enum initial_state = threads::pending, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(
@@ -341,6 +346,7 @@ namespace hpx { namespace applier
         char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending, 
         threads::thread_priority priority = threads::thread_priority_normal, 
+        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     HPX_API_EXPORT void register_work_plain(

@@ -61,7 +61,7 @@ namespace hpx { namespace naming
                 applier::register_work(boost::bind(decrement_refcnt, p), 
                     "decrement global gid reference count", 
                     threads::thread_state(threads::pending), 
-                    threads::thread_priority_normal, ec);
+                    threads::thread_priority_normal, std::size_t(-1), ec);
                 if (ec) 
                 {
                     // if we are not able to spawn a new thread, we need to execute 

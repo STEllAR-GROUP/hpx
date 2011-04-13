@@ -254,7 +254,7 @@ int rkupdate( stencil_data const& vecval,
 
   // -------------------------------------------------------------------------
   // iter 0
-    std::size_t i_start,i_end,j_start,j_end,k_start,k_end;
+//    std::size_t i_start,i_end,j_start,j_end,k_start,k_end;
 
     for (int k=1; k<n-1;k++) {
     for (int j=1; j<n-1;j++) {
@@ -285,7 +285,7 @@ int rkupdate( stencil_data const& vecval,
 
     // -------------------------------------------------------------------------
     // iter 2
-    int ii,jj,kk;
+//    int ii,jj,kk;
     for (int k=3; k<n-3;k++) {
     for (int j=3; j<n-3;j++) {
     for (int i=3; i<n-3;i++) {
