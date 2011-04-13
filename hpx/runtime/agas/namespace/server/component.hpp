@@ -32,6 +32,8 @@ struct HPX_COMPONENT_EXPORT component_namespace
     typedef table<Database, component_name_type, component_id_type>
         component_id_table_type; 
 
+    // FIXME: this shouldn't hold prefixes_type, it needs to hold a vector of
+    // component_id_types (yes?).
     typedef table<Database, component_id_type, prefixes_type>
         factory_table_type;
     // }}}
@@ -40,18 +42,39 @@ struct HPX_COMPONENT_EXPORT component_namespace
     database_mutex_type mutex_;
     component_id_table_type component_ids_;
     factory_table_type factories_;
-  
+    component_id_type type_counter; 
+ 
   public:
     component_namespace()
       : mutex_(),
         component_ids_("hpx.agas.component_namespace.id"),
-        factories_("hpx.agas.component_namespace.factory")
+        factories_("hpx.agas.component_namespace.factory"),
+        type_counter(components::component_first_dynamic)
     { traits::initialize_mutex(mutex_); }
 
     component_id_type bind(component_name_type const& key, prefix_type prefix)
     { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // TODO: implement
+
+        // always load the table once, as the operation might be expensive for
+        // some backends and the compiler may not be able to optimize this away
+        // if the database backend has implicit/builtin atomic semantics.
+        typename component_id_table_type::map_type& c_id_table =
+            component_ids_.get();
+        
+        typename factory_table_type::map_type& factory_table =
+            factory_table_type.get();
+
+        typename component_id_table_type::map_type::iterator
+            it = c_id_table.begin(), end = c_id_table.end();
+
+        // this is the first request, so we use the type counter, and then
+        // increment it.
+        if (it == end)
+            it = c_id_table.insert(key, type_counter++);
+
+        // TODO: finish
+
     } // }}}
 
     prefixes_type resolve_id(component_id_type key)
