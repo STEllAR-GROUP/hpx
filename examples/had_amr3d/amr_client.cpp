@@ -493,9 +493,9 @@ int main(int argc, char* argv[])
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
           if (mode == hpx::runtime::worker) 
-              rt.run(num_threads);
+              rt.run(num_threads,num_localities);
           else 
-              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads,num_localities);
 
           executed_threads = rt.get_executed_threads();
         } 
@@ -503,9 +503,9 @@ int main(int argc, char* argv[])
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_priority_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
           if (mode == hpx::runtime::worker) 
-              rt.run(num_threads);
+              rt.run(num_threads,num_localities);
           else 
-              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
+              rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads,num_localities);
 
           executed_threads = rt.get_executed_threads();
         } 
