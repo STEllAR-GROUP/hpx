@@ -28,6 +28,9 @@ namespace hpx { namespace lcos { namespace server
       : public lcos::base_lco
       , public components::managed_component_base<barrier> 
     {
+    public:
+        typedef lcos::base_lco base_type_holder;
+
     private:
         typedef components::managed_component_base<barrier> base_type;
 

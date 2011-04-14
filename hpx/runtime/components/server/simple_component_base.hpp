@@ -27,6 +27,7 @@ namespace hpx { namespace components
 
     public:
         typedef this_component_type wrapped_type;
+        typedef this_component_type base_type_holder;
 
         /// \brief Construct an empty simple_component
         simple_component_base() 

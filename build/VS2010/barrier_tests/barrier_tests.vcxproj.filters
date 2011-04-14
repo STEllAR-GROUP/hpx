@@ -10,5 +10,8 @@
     <ClCompile Include="..\..\..\tests\unit\lcos\barrier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tests\name_resolver_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

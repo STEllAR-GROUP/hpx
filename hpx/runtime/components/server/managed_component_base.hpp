@@ -34,6 +34,7 @@ namespace hpx { namespace components
         // managed_component type used to encapsulate instances of this 
         // component
         typedef managed_component<Component, Wrapper> wrapping_type;
+        typedef Component base_type_holder;
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
@@ -132,6 +133,7 @@ namespace hpx { namespace components
     public:
         typedef Component wrapped_type;
         typedef Component type_holder;
+        typedef typename Component::base_type_holder base_type_holder;
 
         /// \brief Construct a managed_component instance holding a 
         ///        wrapped instance. This constructor takes ownership of the 

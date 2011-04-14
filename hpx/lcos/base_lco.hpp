@@ -44,6 +44,7 @@ namespace hpx { namespace lcos
         // managed_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_lco> wrapping_type;
+        typedef base_lco base_type_holder;
 
         static components::component_type get_component_type() 
         { 
@@ -142,6 +143,7 @@ namespace hpx { namespace lcos
         // managed_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
+        typedef base_lco_with_value base_type_holder;
 
         static components::component_type get_component_type() 
         { 
@@ -212,6 +214,7 @@ namespace hpx { namespace lcos
         // managed_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
+        typedef base_lco_with_value base_type_holder;
     };
 }}
 

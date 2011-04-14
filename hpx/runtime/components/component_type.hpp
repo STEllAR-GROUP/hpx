@@ -24,20 +24,19 @@ namespace hpx { namespace components
 
         // LCO's
         component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
-
-        component_base_lco_with_value = 
-            ((4 << 16) | component_base_lco),
+        component_base_lco_with_value = 4,
+//             ((4 << 8) | component_base_lco),
                                         ///< base LCO's blocking on a value
         component_future =              ///< a future executing the action and 
                                         ///< allowing to wait for the result
-            ((5 << 16) | component_base_lco),
+            ((5 << 16) | component_base_lco_with_value),
         component_value_adaptor = 5,    ///< an adaptor to access specific slot of an LCO
         component_barrier =             ///< a LCO implementing a barrier
-            ((6 << 16) | component_base_lco),
+            ((6 << 16) | component_base_lco_with_value),
         component_thread =              ///< a ParalleX thread
-            ((7 << 16) | component_base_lco),
+            ((7 << 16) | component_base_lco_with_value),
         component_dataflow_variable =   ///< a LCO implementing dataflow var.
-            ((8 << 16) | component_base_lco),
+            ((8 << 16) | component_base_lco_with_value),
         component_thunk =               ///< a LCO implementing a thunk
             ((9 << 16) | component_base_lco_with_value),
 
@@ -82,7 +81,16 @@ namespace hpx { namespace components
         if (component_runtime_support == rhs || component_runtime_support == lhs)
             return true;
 
-        return get_base_type(lhs) == get_base_type(rhs);
+        component_type lhs_base = get_base_type(lhs);
+        component_type rhs_base = get_base_type(rhs);
+
+        // special case for lco's
+        if (lhs_base == component_base_lco && rhs_base == component_base_lco_with_value ||
+            rhs_base == component_base_lco && lhs_base == component_base_lco_with_value)
+        {
+            return true;
+        }
+        return lhs_base == rhs_base;
     }
 
     ///////////////////////////////////////////////////////////////////////////

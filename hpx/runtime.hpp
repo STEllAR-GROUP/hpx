@@ -539,7 +539,7 @@ namespace hpx
         applier::applier applier_;
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
-        boost::signals::scoped_connection default_error_sink_;
+        boost::signals2::scoped_connection default_error_sink_;
     };
 
 }   // namespace hpx

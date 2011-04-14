@@ -8,7 +8,7 @@
 
 #include <list>
 #include <boost/thread.hpp>
-#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -66,7 +66,7 @@ namespace hpx { namespace parcelset { namespace server
         parcelhandler& parcelhandler_;
 
         typedef void callback_type(parcelhandler&, naming::address const&);
-        boost::signal<callback_type> notify_;
+        boost::signals2::signal<callback_type> notify_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

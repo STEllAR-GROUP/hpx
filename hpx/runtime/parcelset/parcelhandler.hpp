@@ -7,7 +7,7 @@
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
 #include <boost/noncopyable.hpp>
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 
 #include <hpx/config.hpp>
@@ -388,7 +388,7 @@ namespace hpx { namespace parcelset
         /// The 'scoped_connection_type' typedef simplifies to manage registered
         /// event handlers. Instances of this type may be passed as the second 
         /// parameter to the \a register_event_handler() function
-        typedef boost::signals::scoped_connection scoped_connection_type;
+        typedef boost::signals2::scoped_connection scoped_connection_type;
 
         double get_current_time() const
         {

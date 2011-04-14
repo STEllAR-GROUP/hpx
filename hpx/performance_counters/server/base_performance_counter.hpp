@@ -39,6 +39,7 @@ namespace hpx { namespace performance_counters { namespace server
         // simple_component type used to encapsulate instances of this 
         // component
         typedef components::managed_component<base_performance_counter> wrapping_type;
+        typedef base_performance_counter base_type_holder;
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed

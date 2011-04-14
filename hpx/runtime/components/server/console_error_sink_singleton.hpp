@@ -12,7 +12,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <boost/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server
         typedef void dispatcher_type(boost::uint32_t, std::string const&);
 
     public:
-        typedef boost::signals::scoped_connection scoped_connection_type;
+        typedef boost::signals2::scoped_connection scoped_connection_type;
 
         template <typename F, typename Connection>
         bool register_error_sink(F sink, Connection& conn)
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace server
 
     private:
         mutex_type mtx_;
-        boost::signal<dispatcher_type> dispatcher_;
+        boost::signals2::signal<dispatcher_type> dispatcher_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
