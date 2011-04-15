@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -207,22 +208,29 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from prefix
+    inline gid_type get_gid_from_prefix(boost::uint32_t prefix) HPX_SUPER_PURE;
+
     inline gid_type get_gid_from_prefix(boost::uint32_t prefix)
     {
         return gid_type(boost::uint64_t(prefix) << 32, 0);
     }
 
-    inline boost::uint32_t get_prefix_from_gid(gid_type const& id)
+    inline boost::uint32_t get_prefix_from_gid(gid_type const& id) HPX_PURE;
+
+    inline boost::uint32_t get_prefix_from_gid(gid_type const& id) 
     {
         return boost::uint32_t(id.get_msb() >> 32);
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline boost::uint16_t get_credit_from_gid(gid_type const& id) HPX_PURE;
+
     inline boost::uint16_t get_credit_from_gid(gid_type const& id)
     {
         return boost::uint16_t((id.get_msb() & gid_type::credit_mask) >> 16);
     }
 
+    // has side effects, can't be pure
     inline boost::uint16_t add_credit_to_gid(gid_type& id, boost::uint16_t credit)
     {
         boost::uint64_t msb = id.get_msb();
@@ -234,10 +242,13 @@ namespace hpx { namespace naming
         return c;
     }
 
+    inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
+
     inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
     {
         return msb & ~gid_type::credit_mask;
     }
+
     inline void strip_credit_from_gid(gid_type& id)
     {
         id.set_msb(strip_credit_from_gid(id.get_msb()));
@@ -262,6 +273,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline bool is_local_address(gid_type const& gid, gid_type const& prefix) HPX_PURE;
+
     inline bool is_local_address(gid_type const& gid, gid_type const& prefix)
     {
         return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();
@@ -529,10 +542,14 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from prefix
+    inline id_type get_id_from_prefix(boost::uint32_t prefix) HPX_SUPER_PURE;
+
     inline id_type get_id_from_prefix(boost::uint32_t prefix)
     {
         return id_type(boost::uint64_t(prefix) << 32, 0, id_type::unmanaged);
     }
+
+    inline boost::uint32_t get_prefix_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_prefix_from_id(id_type const& id)
     {
@@ -540,6 +557,8 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////
+    inline bool is_local_address(id_type const& gid, id_type const& prefix) HPX_PURE;
+
     inline bool is_local_address(id_type const& gid, id_type const& prefix)
     {
         return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();

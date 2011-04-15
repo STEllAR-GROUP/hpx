@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <map>
 #include <memory>
 
+#include <hpx/config.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
@@ -21,7 +23,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #ifdef HPX_ACCEL_QUEUING
-#   include "hpx/runtime/threads/policies/accel_fifo.hpp"
+#   include <hpx/runtime/threads/policies/accel_fifo.hpp>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +59,6 @@ namespace hpx { namespace threads { namespace policies
     // software queuing
     typedef boost::lockfree::fifo<thread*> work_item_queue_type;
 
-
     inline void 
     enqueue(work_item_queue_type& work_items, thread* thrd, 
         std::size_t num_thread)
@@ -72,8 +73,6 @@ namespace hpx { namespace threads { namespace policies
         return work_items.dequeue(thrd);
     }
 
-    // FIXME: lockfree::fifo<>::empty() is NOT thread safe. Is this function
-    // expected to be thread safe?
     inline bool 
     empty(work_item_queue_type& work_items, std::size_t num_thread)
     {
@@ -126,7 +125,7 @@ namespace hpx { namespace threads { namespace policies
         std::size_t add_new(long add_count, thread_queue* addfrom, 
             std::size_t num_thread)
         {
-            if (0 == add_count)
+            if (HPX_UNLIKELY(0 == add_count))
                 return 0;
 
             long added = 0;
@@ -151,7 +150,7 @@ namespace hpx { namespace threads { namespace policies
                 std::pair<thread_map_type::iterator, bool> p =
                     thread_map_.insert(id, thrd.get());
 
-                if (!p.second) {
+                if (HPX_UNLIKELY(!p.second)) {
                     HPX_THROW_EXCEPTION(hpx::no_success, 
                         "threadmanager::add_new", 
                         "Couldn't add new thread to the map of threads");
@@ -190,7 +189,8 @@ namespace hpx { namespace threads { namespace policies
             long add_count = -1;                  // default is no constraint
 
             // if the map doesn't hold max_count threads yet add some
-            if (max_count_) {
+            // FIXME: why do we have this test? can max_count_ ever be zero?
+            if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) {
                     add_count = max_count_ - count;
@@ -219,7 +219,7 @@ namespace hpx { namespace threads { namespace policies
 
             // if we are desperate (no work in the queues), add some even if the 
             // map holds more than max_count
-            if (max_count_) {
+            if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) {
                     add_count = max_count_ - count;
@@ -247,7 +247,7 @@ namespace hpx { namespace threads { namespace policies
         bool cleanup_terminated()
         {
             {
-                long delete_count = max_delete_count;   // delete only this much threads
+                long delete_count = max_delete_count;   // delete only this many threads
                 thread_id_type todelete;
                 while (delete_count && terminated_items_.dequeue(&todelete)) 
                 {
@@ -306,7 +306,7 @@ namespace hpx { namespace threads { namespace policies
                 std::pair<thread_map_type::iterator, bool> p =
                     thread_map_.insert(id, thrd.get());
 
-                if (!p.second) {
+                if (HPX_UNLIKELY(!p.second)) {
                     HPX_THROWS_IF(ec, hpx::no_success, 
                         "threadmanager::register_thread", 
                         "Couldn't add new thread to the map of threads");
@@ -373,104 +373,7 @@ namespace hpx { namespace threads { namespace policies
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running, 
             std::size_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom_ = 0)
-        {
-            thread_queue* addfrom = addfrom_ ? addfrom_ : this;
-
-            // only one dedicated OS thread is allowed to acquire the 
-            // lock for the purpose of inserting the new threads into the 
-            // thread-map and deleting all terminated threads
-            if (Global && 0 == num_thread) {
-                // first clean up terminated threads
-                detail::try_lock_wrapper<mutex_type> lk(mtx_);
-                if (lk) {
-                    // no point in having a thread waiting on the lock 
-                    // while another thread is doing the maintenance
-                    cleanup_terminated();
-
-                    // now, add new threads from the queue of task descriptions
-                    add_new_if_possible(added, addfrom, num_thread);    // calls notify_all
-                }
-            }
-
-            bool terminate = false;
-            while (0 == work_items_count_) {
-                // No obvious work has to be done, so a lock won't hurt too much
-                // but we lock only one of the threads, assuming this thread
-                // will do the maintenance
-                //
-                // We prefer to exit this while loop (some kind of very short 
-                // busy waiting) to blocking on this lock. Locking fails either
-                // when a thread is currently doing thread maintenance, which
-                // means there might be new work, or the thread owning the lock 
-                // just falls through to the wait below (no work is available)
-                // in which case the current thread (which failed to acquire 
-                // the lock) will just retry to enter this loop.
-                detail::try_lock_wrapper<mutex_type> lk(mtx_);
-                if (!lk)
-                    break;            // avoid long wait on lock
-
-                // this thread acquired the lock, do maintenance and finally
-                // call wait() if no work is available
-                LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-                           << ", threads left: " << thread_map_.size();
-
-                // stop running after all PX threads have been terminated
-                bool added_new = add_new_always(added, addfrom, num_thread);
-                if (!added_new && !running) {
-                    // Before exiting each of the OS threads deletes the 
-                    // remaining terminated PX threads 
-                    if (cleanup_terminated()) {
-                        // we don't have any registered work items anymore
-                        do_some_work();       // notify possibly waiting threads
-                        terminate = true;
-                        break;                // terminate scheduling loop
-                    }
-
-                    LTM_(info) << "tfunc(" << num_thread 
-                               << "): threadmap not empty";
-                }
-                else {
-                    cleanup_terminated();
-                }
-
-                if (!Global)
-                    break;
-
-                if (added_new) {
-                    // dump list of suspended threads once a second
-                    if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
-                        detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
-
-                    break;    // we got work, exit loop
-                }
-
-                // Wait until somebody needs some action (if no new work 
-                // arrived in the meantime).
-                // Ask again if queues are empty to avoid race conditions (we 
-                // needed to lock anyways...), this way no notify_all() gets lost
-                if (0 == work_items_count_) {
-                    LTM_(info) << "tfunc(" << num_thread 
-                               << "): queues empty, entering wait";
-
-                    // dump list of suspended threads once a second
-                    if (LHPX_ENABLED(error) && addfrom->new_tasks_.empty())
-                        detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
-
-                    namespace bpt = boost::posix_time;
-                    bool timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
-                        
-                    LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
-
-                    // make sure all pending new threads are properly queued
-                    // but do that only if the lock has been acquired while 
-                    // exiting the condition.wait() above
-                    if ((lk && add_new_always(added, addfrom, num_thread)) || timed_out)
-                        break;
-                }
-            }
-            return terminate;
-        }
+            thread_queue* addfrom_ = 0) HPX_HOT;
 
         /// This function gets called by the threadmanager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
@@ -523,6 +426,110 @@ namespace hpx { namespace threads { namespace policies
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };
+
+    // FIXME: This function is HOT, we should probably disable logging here for
+    // release builds. It'll slow us down, even with log level 0.
+    template <bool Global>
+    bool thread_queue<Global>::wait_or_add_new(std::size_t num_thread,
+        bool running, std::size_t& idle_loop_count, std::size_t& added,
+        thread_queue* addfrom_)
+    {
+        thread_queue* addfrom = addfrom_ ? addfrom_ : this;
+
+        // only one dedicated OS thread is allowed to acquire the 
+        // lock for the purpose of inserting the new threads into the 
+        // thread-map and deleting all terminated threads
+        if (Global && 0 == num_thread) {
+            // first clean up terminated threads
+            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            if (lk) {
+                // no point in having a thread waiting on the lock 
+                // while another thread is doing the maintenance
+                cleanup_terminated();
+
+                // now, add new threads from the queue of task descriptions
+                add_new_if_possible(added, addfrom, num_thread);    // calls notify_all
+            }
+        }
+
+        bool terminate = false;
+        while (0 == work_items_count_) {
+            // No obvious work has to be done, so a lock won't hurt too much
+            // but we lock only one of the threads, assuming this thread
+            // will do the maintenance
+            //
+            // We prefer to exit this while loop (some kind of very short 
+            // busy waiting) to blocking on this lock. Locking fails either
+            // when a thread is currently doing thread maintenance, which
+            // means there might be new work, or the thread owning the lock 
+            // just falls through to the wait below (no work is available)
+            // in which case the current thread (which failed to acquire 
+            // the lock) will just retry to enter this loop.
+            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            if (!lk)
+                break;            // avoid long wait on lock
+
+            // this thread acquired the lock, do maintenance and finally
+            // call wait() if no work is available
+            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
+                       << ", threads left: " << thread_map_.size();
+
+            // stop running after all PX threads have been terminated
+            bool added_new = add_new_always(added, addfrom, num_thread);
+            if (!added_new && !running) {
+                // Before exiting each of the OS threads deletes the 
+                // remaining terminated PX threads 
+                if (cleanup_terminated()) {
+                    // we don't have any registered work items anymore
+                    do_some_work();       // notify possibly waiting threads
+                    terminate = true;
+                    break;                // terminate scheduling loop
+                }
+
+                LTM_(info) << "tfunc(" << num_thread 
+                           << "): threadmap not empty";
+            }
+            else {
+                cleanup_terminated();
+            }
+
+            if (!Global)
+                break;
+
+            if (added_new) {
+                // dump list of suspended threads once a second
+                if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty()))
+                    detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
+
+                break;    // we got work, exit loop
+            }
+
+            // Wait until somebody needs some action (if no new work 
+            // arrived in the meantime).
+            // Ask again if queues are empty to avoid race conditions (we 
+            // needed to lock anyways...), this way no notify_all() gets lost
+            if (0 == work_items_count_) {
+                LTM_(info) << "tfunc(" << num_thread 
+                           << "): queues empty, entering wait";
+
+                // dump list of suspended threads once a second
+                if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty()))
+                    detail::dump_suspended_threads(num_thread, thread_map_, idle_loop_count);
+
+                namespace bpt = boost::posix_time;
+                bool timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
+                    
+                LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
+
+                // make sure all pending new threads are properly queued
+                // but do that only if the lock has been acquired while 
+                // exiting the condition.wait() above
+                if ((lk && add_new_always(added, addfrom, num_thread)) || timed_out)
+                    break;
+            }
+        }
+        return terminate;
+    }
 
 }}}
 

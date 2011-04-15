@@ -24,6 +24,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
 
+// TODO: add branch prediction and function heat
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {

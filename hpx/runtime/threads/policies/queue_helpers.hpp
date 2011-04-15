@@ -49,10 +49,14 @@ namespace detail
     // debug helper function, logs all suspended threads
     // this returns true if all threads in the map are currently suspended
     template <typename Map>
-    inline bool dump_suspended_threads(std::size_t num_thread,
+    bool dump_suspended_threads(std::size_t num_thread,
+        Map& tm, std::size_t& idle_loop_count) HPX_COLD;
+
+    template <typename Map>
+    bool dump_suspended_threads(std::size_t num_thread,
         Map& tm, std::size_t& idle_loop_count)
     {
-        if (idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX)
+        if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
             return false;
 
         // reset idle loop count

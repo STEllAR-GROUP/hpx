@@ -22,6 +22,8 @@
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
+// TODO: add branch prediction and function heat
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {

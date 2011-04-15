@@ -28,6 +28,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+// TODO: add branch prediction and function heat
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
