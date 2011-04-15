@@ -17,6 +17,8 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
+// TODO: move decrement_return_type into the server class and give it a better
+// name, error code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct primary_namespace
   : components::stubs::stub_base<server::primary_namespace<Database, Protocol> >
@@ -29,50 +31,53 @@ struct primary_namespace
     typedef typename server_type::full_gva_type full_gva_type;
     typedef typename server_type::count_type count_type;
     typedef typename server_type::components_type components_type;
+    typedef typename server_type::range_type range_type;
 
     typedef boost::fusion::vector2<count_type, component_type>
         decrement_return_type;
     // }}}
 
-    // {{{ bind dispatch
-    static lcos::future_value<partition>
-    bind_async(naming::id_type const& gid, gva_type const& gva,
-               count_type count)
+    // {{{ bind_locality dispatch
+    static lcos::future_value<range_type>
+    bind_locality_async(naming::id_type const& gid, gva_type const& gva,
+                        count_type count)
     {
-        typedef typename server_type::bind_action action_type;
-        return lcos::eager_future<action_type, partition>(gid, gva, count);
+        typedef typename server_type::bind_locality_action action_type;
+        return lcos::eager_future<action_type, range_type>(gid, gva, count);
     }
 
-    static partition
-    bind(naming::id_type const& gid, gva_type const& gva, count_type count)
-    { return bind_async(gid, gva, count).get(); } 
+    static range_type
+    bind_locality(naming::id_type const& gid, gva_type const& gva,
+                  count_type count)
+    { return bind_locality_async(gid, gva, count).get(); } 
     // }}}
     
-    // {{{ rebind dispatch
-    static lcos::future_value<partition>
-    rebind_async(naming::id_type const& gid, endpoint_type const& ep,
-                 count_type count)
+    // {{{ bind_gid dispatch
+    static lcos::future_value<range_type>
+    bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
+                   gva_type const& gva, count_type count)
     {
-        typedef typename server_type::rebind_action action_type;
-        return lcos::eager_future<action_type, partition>(gid, ep, count);
+        typedef typename server_type::bind_gid_action action_type;
+        return lcos::eager_future<action_type, range_type>(gid, id, gva, count);
     }
 
-    static partition rebind(naming::id_type const& gid, endpoint_type const& ep,
-                            count_type count)
-    { return bind_async(gid, ep, count).get(); } 
+    static range_type
+    bind_gid(naming::id_type const& gid, naming::gid_type const& id,
+             gva_type const& gva, count_type count)
+    { return bind_gid_async(gid, id, gva, count).get(); } 
     // }}}
 
-    // {{{ resolve_endpoint dispatch
-    static lcos::future_value<partition>
-    resolve_endpoint_async(naming::id_type const& gid, endpoint_type const& ep)
+    // {{{ resolve_locality dispatch
+    static lcos::future_value<range_type>
+    resolve_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
-        typedef typename server_type::resolve_endpoint_action action_type;
-        return lcos::eager_future<action_type, partition>(gid, ep);
+        typedef typename server_type::resolve_locality_action action_type;
+        return lcos::eager_future<action_type, range_type>(gid, ep);
     }
     
-    static partition
-    resolve_endpoint(naming::id_type const& gid, endpoint_type const& ep)
-    { return resolve_endpoint_async(gid, ep).get(); } 
+    static range_type
+    resolve_locality(naming::id_type const& gid, endpoint_type const& ep)
+    { return resolve_locality_async(gid, ep).get(); } 
     // }}}
 
     // {{{ resolve_gid dispatch 

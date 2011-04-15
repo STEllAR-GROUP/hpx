@@ -15,6 +15,7 @@
 namespace hpx { namespace agas { namespace server
 {
 
+// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct HPX_COMPONENT_EXPORT symbol_namespace
   : simple_component_base<symbol_namespace<Database> >
@@ -30,7 +31,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     // }}} 
  
   private:
-    database_mutex_type mutex_;
+    mutable database_mutex_type mutex_;
     gid_table_type gids_;
   
   public:
@@ -57,7 +58,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         return true; 
     } // }}}
 
-    naming::gid_type resolve(symbol_type const& key)
+    naming::gid_type resolve(symbol_type const& key) const
     { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 

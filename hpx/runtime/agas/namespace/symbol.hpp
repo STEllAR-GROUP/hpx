@@ -16,6 +16,7 @@
 namespace hpx { namespace agas 
 {
 
+// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct symbol_namespace
   : client_base<

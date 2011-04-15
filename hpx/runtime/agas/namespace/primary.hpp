@@ -16,6 +16,7 @@
 namespace hpx { namespace agas 
 {
 
+// TODO: error code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct primary_namespace
   : client_base<
@@ -36,45 +37,44 @@ struct primary_namespace
     typedef typename server_type::full_gva_type full_gva_type;
     typedef typename server_type::count_type count_type;
     typedef typename server_type::components_type components_type;
+    typedef typename server_type::range_type range_type;
     // }}}
 
     explicit primary_namespace(naming::id_type const& id = naming::invalid_id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    // bind interface 
-    lcos::future_value<partition>
+    // bind_locality and bind_gid interface 
+    lcos::future_value<range_type>
     bind_async(gva_type const& gva, count_type count)
-    { return this->base_type::bind_async(this->gid_, gva); }
+    { return this->base_type::bind_locality_async(this->gid_, gva, count); }
 
-    partition bind(gva_type const& gva, count_type count)
-    { return this->base_type::bind(this->gid_, gva, count); }
+    range_type bind(gva_type const& gva, count_type count)
+    { return this->base_type::bind_locality(this->gid_, gva, count); }
     
-    ///////////////////////////////////////////////////////////////////////////
-    // rebind interface 
-    lcos::future_value<partition>
-    rebind_async(endpoint_type const& ep, count_type count)
-    { return this->base_type::rebind_async(this->gid_, ep, count); }
+    lcos::future_value<range_type>
+    bind_async(naming::gid_type const& gid, gva_type const& gva,
+               count_type count)
+    { return this->base_type::bind_gid_async(this->gid_, gid, gva, count); }
 
-    partition rebind(endpoint_type const& ep, count_type count)
-    { return this->base_type::rebind(this->gid_, ep, count); }
+    range_type bind(naming::gid_type const& gid, gva_type const& gva,
+                   count_type count)
+    { return this->base_type::bind_gid(this->gid_, gid, gva, count); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // resolve_endpoint interface
-    lcos::future_value<partition>
-    resolve_endpoint_async(endpoint_type const& ep)
-    { return this->base_type::resolve_endpoint_async(this->gid_, ep); }
+    // resolve_endpoint and resolve_gid interface
+    lcos::future_value<range_type>
+    resolve_async(endpoint_type const& ep)
+    { return this->base_type::resolve_locality_async(this->gid_, ep); }
     
-    partition resolve_endpoint(endpoint_type const& ep)
-    { return this->base_type::resolve_endpoint(this->gid_, ep); }
+    range_type resolve(endpoint_type const& ep)
+    { return this->base_type::resolve_locality(this->gid_, ep); }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // resolve_gid interface 
     lcos::future_value<gva_type>
-    resolve_gid_async(naming::gid_type const& gid)
+    resolve_async(naming::gid_type const& gid)
     { return this->base_type::resolve_gid_async(this->gid_, gid); }
     
-    gva_type resolve_gid(naming::gid_type const& gid)
+    gva_type resolve(naming::gid_type const& gid)
     { return this->base_type::resolve_gid(this->gid_, gid); }
  
     ///////////////////////////////////////////////////////////////////////////

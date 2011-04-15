@@ -17,6 +17,7 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
+// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct symbol_namespace
   : components::stubs::stub_base<server::symbol_namespace<Database> >

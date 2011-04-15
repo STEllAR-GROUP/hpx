@@ -10,7 +10,9 @@
 
 #include <boost/fusion/include/vector.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
@@ -21,6 +23,8 @@
 namespace hpx { namespace agas { namespace server
 {
 
+// TODO: typedef decrement's return type, do the todos for partition, add error
+// code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT primary_namespace
   : simple_component_base<primary_namespace<Database, Protocol> >
@@ -37,108 +41,150 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef boost::uint64_t count_type;
     typedef components::component_type component_type;
 
+    typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
+        range_type;
+
     typedef table<Database, naming::gid_type, full_gva_type>
         gva_table_type; 
 
     typedef table<Database, endpoint_type, partition>
-        locality_table_type;
+        partition_table_type;
     
     typedef table<Database, naming::gid_type, refcnt>
         refcnt_table_type;
     // }}}
  
   private:
-    database_mutex_type mutex_;
+    mutable database_mutex_type mutex_;
     gva_table_type gvas_;
-    locality_table_type localities_;
+    partition_table_type partitions_;
     refcnt_table_type refcnts_;
   
   public:
     primary_namespace()
       : mutex_(),
         gvas_("hpx.agas.primary_namespace.gva"),
-        localities_("hpx.agas.primary_namespace.locality"),
+        partitions_("hpx.agas.primary_namespace.partition"),
         refcnts_("hpx.agas.primary_namespace.refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    partition bind(gva_type const& gva, count_type count)
-    { // {{{ bind implementation
+    range_type bind_locality(gva_type const& gva, count_type count)
+    { // {{{ bind_locality implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
+
+        // Load the actual table to the stack.
+        typename partition_table_type::map_type&
+            partition_table = partitions_.get();
+
+        typename partition_table_type::map_type::iterator
+            it = partition_table.find(gva.endpoint),
+            end = partition_table.end(); 
+
+        if (it != end)
+        {
+            // Compute the new allocation.
+            naming::gid_type lower(it->second.upper_bound + 1),
+                             upper(lower + (count - 1));
+
+            // Check for overflow.
+            if (upper.get_msb() != lower.get_msb())
+            {
+                // Check for address space exhaustion 
+                if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) === 0xFFFFFFF))
+                {
+                    HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                        "primary namespace has been exhausted");
+                }
+
+                // Otherwise, correct
+                lower = naming::gid_type(upper.get_msb(), 0);
+                upper = lower + (count - 1); 
+            }
+            
+            // Store the new upper bound.
+            it->second.upper_bound = upper;
+
+            naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+            naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
+
+            return range_type(lower, upper);
+        }
+
+        else
+        {
+            // New locality. TODO
+        }
     } // }}}
 
-    partition rebind(endpoint_type const& ep, count_type count)
-    { // {{{ rebind implementation
+    range_type bind_gid(naming::gid_type const& gid, gva_type const& gva,
+                       count_type count)
+    { // {{{ bind_gid implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
 
-    partition resolve_endpoint(endpoint_type const& ep)
-    { // {{{ resolve_endpoint implementation
+    // REVIEW: right return type, yes/no?
+    range_type resolve_locality(endpoint_type const& ep) const
+    { // {{{ resolve_endpoint implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
 
-    gva_type resolve_gid(naming::gid_type const& gid)
-    { // {{{ resolve_gid implementation
+    gva_type resolve_gid(naming::gid_type const& gid) const
+    { // {{{ resolve_gid implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
 
     bool unbind(endpoint_type const& ep, count_type count)
-    { // {{{ unbind implementation
+    { // {{{ unbind implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
 
     count_type increment(naming::gid_type const& gid, count_type credits)
-    { // {{{ increment implementation
+    { // {{{ increment implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
     
     boost::fusion::vector2<count_type, component_type>
     decrement(naming::gid_type const& gid, count_type credits)
-    { // {{{ decrement implementation
+    { // {{{ decrement implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
     } // }}}
  
     // {{{ action types
     enum actions 
     {
-        namespace_bind,
-        namespace_rebind,
-        namespace_resolve_endpoint,
+        namespace_bind_locality,
+        namespace_bind_gid,
+        namespace_resolve_locality,
         namespace_resolve_gid,
         namespace_unbind,
         namespace_increment,
         namespace_decrement
     };
 
-    typedef hpx::actions::result_action1<
-        primary_namespace<Database, Protocol>,
-        /* return type */ partition,
-        /* enum value */  namespace_bind,
-        /* arguments */   gva_type const&,
-        &primary_namespace<Database, Protocol>::bind
-    > bind_action; 
-   
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ partition,
-        /* enum value */  namespace_rebind,
-        /* arguments */   endpoint_type const&, count_type,
-        &primary_namespace<Database, Protocol>::rebind
-    > rebind_action;
+        /* return type */ range_type,
+        /* enum value */  namespace_bind_locality,
+        /* arguments */   gva_type const&, count_type,
+        &primary_namespace<Database, Protocol>::bind_locality
+    > bind_locality_action; 
+   
+    typedef hpx::actions::result_action3<
+        primary_namespace<Database, Protocol>,
+        /* return type */ range_type,
+        /* enum value */  namespace_bind_gid,
+        /* arguments */   naming::gid_type const&, endpoint_type const&,
+                          count_type,
+        &primary_namespace<Database, Protocol>::bind_gid
+    > bind_gid_action;
     
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
-        /* return type */ partition,
-        /* enum value */  namespace_resolve_endpoint,
+        /* return type */ range_type,
+        /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
-        &primary_namespace<Database, Protocol>::resolve_endpoint
-    > resolve_endpoint_action;
+        &primary_namespace<Database, Protocol>::resolve_locality
+    > resolve_locality_action;
 
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,

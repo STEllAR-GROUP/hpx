@@ -23,41 +23,34 @@
 namespace hpx { namespace agas
 {
 
+// TODO: This class currently implements the backend that should be a fusion
+// vector, and a boost::fusion::vector2<naming::gid_type, naming::gid_type>
+// implements the frontend that should be a structure. Debately, we need both
+// the backend and the frontend to be structs so that we can control the
+// serialization versioning.
 struct partition
 {
     typedef boost::uint32_t prefix_type;
     typedef naming::gid_type upper_bound_type;
 
-    partition(prefix_type prefix, upper_bound_type const& upper)
-      : prefix_(prefix), upper_(upper) {}
+    partition(prefix_type prefix_, upper_bound_type const& upper_bound_)
+      : prefix(prefix_), upper_bound(upper_bound_) {}
 
     bool operator==(partition const& rhs) const
     {
-        return prefix_ == rhs.prefix_
-            && upper_  == rhs.upper_; 
+        return prefix      == rhs.prefix
+            && upper_bound == rhs.upper_bound; 
     }
 
-    prefix_type get_prefix() const
-    { return prefix_; }
-
-    void set_prefix(prefix_type prefix)
-    { prefix_ = prefix; }
-
-    upper_bound_type get_upper_bound() const
-    { return upper_; }
-
-    void set_upper_bound(upper_bound_type upper_bound)
-    { upper_ = upper_bound; }
+    prefix_type prefix;
+    upper_bound_type upper_bound;
 
   private:
-    prefix_type prefix_;
-    upper_bound_type upper_;
-
     friend class boost::serialization::access;
 
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
-    { ar << prefix_ << upper_; }
+    { ar << prefix << upper_bound; }
 
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
@@ -66,7 +59,7 @@ struct partition
             throw exception(version_too_new, 
                 "trying to load partition with unknown version");
         }
-        ar >> prefix_ >> upper_; 
+        ar >> prefix >> upper_bound; 
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -78,8 +71,8 @@ operator<< (std::basic_ostream<Char, Traits>& os, partition const& part)
 {
     boost::io::ios_flags_saver ifs(os); 
     os << std::showbase << std::hex << "(" 
-       << part.get_prefix() << " "
-       << part.get_upper_bound() << ")";
+       << part.prefix << " "
+       << part.upper_bound << ")";
     return os;
 } 
 
