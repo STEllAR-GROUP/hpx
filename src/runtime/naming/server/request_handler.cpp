@@ -352,7 +352,7 @@ namespace hpx { namespace naming { namespace server
                     upper = lower + (req.get_count() - 1);
                 }
 
-                // store the new lower bound
+                // store the new upper bound
                 (*it).second.second = upper;
 
                 LAGAS_(debug) << "handle_getidrange: new upper: " 
