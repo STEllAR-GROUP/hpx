@@ -16,7 +16,11 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     struct thread_init_data
     {
-        thread_init_data() {}
+        thread_init_data() 
+          : description(0), lva(0), parent_prefix(0), parent_id(0), 
+            parent_phase(0), priority(thread_priority_normal), 
+            num_os_thread(std::size_t(-1))
+        {}
 
         template <typename F>
         thread_init_data(F f, char const* desc = 0, 
@@ -25,7 +29,7 @@ namespace hpx { namespace threads
                 std::size_t os_thread = std::size_t(-1)) 
           : func(f), description(desc), 
             lva(lva), parent_prefix(0), parent_id(0), parent_phase(0),
-            num_os_thread(os_thread)
+            priority(priority), num_os_thread(os_thread)
         {}
 
         boost::function<threads::thread_function_type> func;
