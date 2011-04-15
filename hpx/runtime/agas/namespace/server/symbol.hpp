@@ -39,22 +39,43 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         gids_("hpx.agas.symbol_namespace.gid")
     { traits::initialize_mutex(mutex_); }
 
-    void bind(symbol_type const& key, naming::gid_type const& gid)
+    bool bind(symbol_type const& key, naming::gid_type const& gid)
     { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
+
+        // Always load the table once, as this operation might be slow for some
+        // database backends.
+        typename gid_table_type::map_type& table = gids_.get();
+
+        typename gid_table_type::map_type::iterator
+            it = table.begin(), end = table.end();
+
+        if (it != end)
+            return false;
+
+        table.insert(key, gid);
+        return true; 
     } // }}}
 
     naming::gid_type resolve(symbol_type const& key)
     { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
+
+        typename gid_table_type::map_type& table = gids_.get();
+
+        typename gid_table_type::map_type::iterator
+            it = table.begin(), end = table.end();
+
+        if (it == end)
+            return naming::invalid_gid;
+
+        return it->second;
     } // }}}  
     
     void unbind(symbol_type const& key)
     { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        // IMPLEMENT
+        gids_.get().erase(key);
     } // }}} 
 
     // {{{ action types
@@ -67,7 +88,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
 
     typedef hpx::actions::result_action2<
         symbol_namespace<Database>,
-        /* return type */ void,
+        /* return type */ bool,
         /* enum value */  namespace_bind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
         &symbol_namespace<Database>::bind

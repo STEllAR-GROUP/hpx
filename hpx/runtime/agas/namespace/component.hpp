@@ -51,21 +51,20 @@ struct component_namespace
     { return this->base_type::bind(this->gid_, key, prefix); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // resolve_id interface
+    // resolve_id and resolve_name interface - note the clever use of overloads
+    // in the client.
     lcos::future_value<prefixes_type>
-    resolve_id_async(component_id_type key)
+    resolve_async(component_id_type key)
     { return this->base_type::resolve_id_async(this->gid_, key); }
     
-    prefixes_type resolve_id(component_id_type key)
+    prefixes_type resolve(component_id_type key)
     { return this->base_type::resolve_id(this->gid_, key); }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // resolve_name interface 
     lcos::future_value<component_id_type>
-    resolve_name_async(component_name_type const& key)
+    resolve_async(component_name_type const& key)
     { return this->base_type::resolve_name_async(this->gid_, key); }
     
-    component_id_type resolve_name(component_name_type const& key)
+    component_id_type resolve(component_name_type const& key)
     { return this->base_type::resolve_name(this->gid_, key); }
  
     ///////////////////////////////////////////////////////////////////////////

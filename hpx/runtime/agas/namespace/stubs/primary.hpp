@@ -36,14 +36,16 @@ struct primary_namespace
 
     // {{{ bind dispatch
     static lcos::future_value<partition>
-    bind_async(naming::id_type const& gid, gva_type const& gva)
+    bind_async(naming::id_type const& gid, gva_type const& gva,
+               count_type count)
     {
         typedef typename server_type::bind_action action_type;
-        return lcos::eager_future<action_type, partition>(gid, gva);
+        return lcos::eager_future<action_type, partition>(gid, gva, count);
     }
 
-    static partition bind(naming::id_type const& gid, gva_type const& gva)
-    { return bind_async(gid, gva).get(); } 
+    static partition
+    bind(naming::id_type const& gid, gva_type const& gva, count_type count)
+    { return bind_async(gid, gva, count).get(); } 
     // }}}
     
     // {{{ rebind dispatch

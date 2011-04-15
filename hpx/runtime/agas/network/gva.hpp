@@ -27,7 +27,7 @@ struct gva
         lva(0) {}
 
     gva(endpoint_type const& ep,
-         component_type t = components::component_invalid, lva_type a = 0)
+        component_type t = components::component_invalid, lva_type a = 0)
       : endpoint(ep),
         type(t),
         lva(a) {}

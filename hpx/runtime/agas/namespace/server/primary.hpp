@@ -61,7 +61,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         refcnts_("hpx.agas.primary_namespace.refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    partition bind(gva_type const& gva)
+    partition bind(gva_type const& gva, count_type count)
     { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
         // IMPLEMENT

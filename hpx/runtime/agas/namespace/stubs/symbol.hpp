@@ -28,15 +28,15 @@ struct symbol_namespace
     // }}}
 
     // {{{ bind dispatch
-    static lcos::future_value<void>
+    static lcos::future_value<bool>
     bind_async(naming::id_type const& gid, symbol_type const& key,
                naming::gid_type const& value)
     {
         typedef typename server_type::bind_action action_type;
-        return lcos::eager_future<action_type, void>(gid, key, value);
+        return lcos::eager_future<action_type, bool>(gid, key, value);
     }
 
-    static void bind(naming::id_type const& gid, symbol_type const& key,
+    static bool bind(naming::id_type const& gid, symbol_type const& key,
                      naming::gid_type const& value)
     { return bind_async(gid, key, value).get(); } 
     // }}}

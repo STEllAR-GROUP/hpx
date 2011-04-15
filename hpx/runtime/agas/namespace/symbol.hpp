@@ -39,11 +39,11 @@ struct symbol_namespace
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<void>
+    lcos::future_value<bool>
     bind_async(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind_async(this->gid_, key, gid); }
 
-    void bind(symbol_type const& key, naming::gid_type const& gid)
+    bool bind(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind(this->gid_, key, gid); }
 
     ///////////////////////////////////////////////////////////////////////////

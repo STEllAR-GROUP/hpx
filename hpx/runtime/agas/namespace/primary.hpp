@@ -43,11 +43,12 @@ struct primary_namespace
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<partition> bind_async(gva_type const& gva)
+    lcos::future_value<partition>
+    bind_async(gva_type const& gva, count_type count)
     { return this->base_type::bind_async(this->gid_, gva); }
 
-    partition bind(gva_type const& gva)
-    { return this->base_type::bind(this->gid_, gva); }
+    partition bind(gva_type const& gva, count_type count)
+    { return this->base_type::bind(this->gid_, gva, count); }
     
     ///////////////////////////////////////////////////////////////////////////
     // rebind interface 
