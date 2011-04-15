@@ -16,6 +16,7 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/current_function.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
@@ -342,6 +343,14 @@ namespace boost { namespace system
             ec = make_error_code((hpx::error)errcode, msg);                   \
         }                                                                     \
     }                                                                         \
+    /**/
+
+#define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
+    HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
+    /**/
+
+#define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                             \
+    HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)               \
     /**/
 
 #include <hpx/config/warnings_suffix.hpp>
