@@ -48,7 +48,9 @@ get_filename_component(name "${path}" NAME)
 set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY_NAME=${name}"
-  "HPX_LIBRARY_STRING=\"${name}\"")
+  "HPX_LIBRARY_STRING=\"${name}\""
+  "BOOST_SERIALIZATION_DYN_LINK"
+  "BOOST_ARCHIVE_DYN_LINK")
 
 if(NOT HPX_DISABLE_WARNINGS AND NOT MSVC)
   set_property(TARGET hpx_serialization APPEND

@@ -115,7 +115,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
       "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds).")
     set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
   elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug|RelWithDebInfo")
-    set(BOOST_LIB_SUFFIX "-d") 
+    set(BOOST_LIB_SUFFIX "-gd") 
   endif()
 
   if(BOOST_USE_MULTITHREADED)
@@ -123,15 +123,14 @@ macro(build_boost_libname BOOST_RAW_NAME)
   endif()
 
   set(BOOST_LIBNAMES
-      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
       libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
-      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
+      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
       libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
-      boost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
+      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
       libboost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
-      boost_${BOOST_RAW_NAME}
-      libboost_${BOOST_RAW_NAME})
-
+      boost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
+      libboost_${BOOST_RAW_NAME}
+      boost_${BOOST_RAW_NAME})
 endmacro()
 
 macro(find_boost_library TARGET_LIB)

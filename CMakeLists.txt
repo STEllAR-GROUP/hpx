@@ -100,18 +100,18 @@ include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
 
 # the Boost serialization library needs to be linked as a shared library
-add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
+#add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
+#add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
 
 # all other Boost libraries don't need to be loaded as shared libraries
 # (but it's easier configuration wise to do so)
-add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
-add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
-add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
-add_definitions(-DBOOST_REGEX_DYN_LINK)
-add_definitions(-DBOOST_SYSTEM_DYN_LINK)
-add_definitions(-DBOOST_THREAD_DYN_DLL)
-add_definitions(-DBOOST_SIGNALS2_DYN_LINK)
+#add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
+#add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
+#add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
+#add_definitions(-DBOOST_REGEX_DYN_LINK)
+#add_definitions(-DBOOST_SYSTEM_DYN_LINK)
+#add_definitions(-DBOOST_THREAD_DYN_DLL)
+#add_definitions(-DBOOST_SIGNALS2_DYN_LINK)
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 
 # additional preprocessor definitions (TODO: find out what these do)
@@ -203,6 +203,9 @@ if(MSVC)
   if(CMAKE_CL_64)
     add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
   endif()
+
+  # multiproccessor build
+  add_definitions(-MP) 
 
   # TODO: implement
   #hpx_check_for_msvc_128bit_interlocked(hpx_HAVE_MSVC_128BIT_INTERLOCKED
