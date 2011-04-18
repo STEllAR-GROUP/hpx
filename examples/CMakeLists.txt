@@ -16,6 +16,7 @@ set(subdirs
     generic
     had_amr
     had_amr3d
+    had_amr3d_stable
     nbody
     nqueen
     parcelset
@@ -32,6 +33,7 @@ add_custom_target(chirag)
 add_custom_target(matt)
 add_custom_target(nbody)
 add_custom_target(matt.all)
+add_custom_target(wash)
 
 add_dependencies(nbody examples.nbody)
 
@@ -39,4 +41,6 @@ add_dependencies(matt examples.had_amr3d)
 add_dependencies(matt.all examples.cosmo)
 add_dependencies(matt.all examples.had_amr)
 add_dependencies(matt.all examples.had_amr3d)
+
+add_dependencies(wash examples.had_amr3d_stable)
 

@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+@corelist = (10,20,30); 
+@levellist = (0,1,2,3,4); 
+@parfilelist = ("id3d_g8","id3d_g9","id3d_g10","id3d_g11","id3d_g12","id3d_g20"); 
+
+foreach $levels (@levellist) {
+foreach $parfile (@parfilelist) {
+  # modify the par file
+  open(OUT,">tempfile") || die "cannot open tempfile: $!";
+  open(IN,$parfile) || die "$parfile: $!";
+  while(<IN>) {
+    $full = $_;
+    chomp($full);
+    $full =~ s/ //g; 
+    ($name,$value) = split(/=/,$full);
+    if ( $name eq "allowedl" ) {
+      print OUT "allowedl = $levels\n";
+    } else {
+      print OUT "$_";  
+    }
+  }
+  close(IN) || die "cannot close: $!";
+  close(OUT) || die "cannot close: $!";
+  unlink ($parfile);
+  rename("tempfile","$parfile");
+
+
+  foreach $cores (@corelist) {
+    print " parfile: $parfile number of cores: $cores number of levels: $levels\n";
+    @args = ("./had_amr3d_client","-r","-p",$parfile,"-t",$cores,"-a","localhost:5005","-x","localhost:5006");
+    $rc = 0xffff & system @args;
+    printf "system(%s) returned %#04x: ", "@args", $rc;
+  } 
+} }
