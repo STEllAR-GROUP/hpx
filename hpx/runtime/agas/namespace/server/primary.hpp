@@ -36,7 +36,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
     typedef gva<Protocol> gva_type;
     typedef full_gva<Protocol> full_gva_type;
-    typedef boost::uint64_t count_type;
+    typedef typename full_gva_type::count_type count_type;
+    typedef typename full_gva_type::offset_type offset_type;
     typedef components::component_type component_type;
 
     typedef boost::fusion::vector2<count_type, component_type>
@@ -78,7 +79,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
         typename database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the actual table to the stack.
+        // Load the GVA table 
         typename partition_table_type::map_type&
             partition_table = partitions_.get();
 
@@ -138,6 +139,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 pit = partition_table.insert(ep,
                     partition_type(prefix, lower_id));
 
+            // REVIEW: Should this be an assertion?
             // Check for an insertion failure. If this branch is triggered, then
             // the partition table was updated at some point after we first
             // checked it, which would indicate memory corruption or a locking
@@ -149,7 +151,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     "error");
             }
 
-            // Load the GVA table. Now  that we've inserted the locality into
+            // Load the GVA table. Now that we've inserted the locality into
             // the partition table successfully, we need to put the locality's
             // GID into the GVA table so that parcels can be sent to the memory
             // of a locality.
@@ -159,6 +161,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 git = gva_table.insert(id, full_gva_type
                     (ep, components::component_runtime_support, 1, 0));
 
+            // REVIEW: Should this be an assertion?
+            // Check for insertion failure.
             if (HPX_UNLIKELY(!git.second))
             {
                 // REVIEW: Is this the right error code to use?
@@ -181,9 +185,93 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     } // }}}
 
     range_type bind_gid(naming::gid_type const& gid, gva_type const& gva,
-                        count_type count)
-    { // {{{ bind_gid implementation (TODO)
+                        count_type count, offset_type offset)
+    { // {{{ bind_gid implementation
+        using boost::fusion::at_c;
+
         typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Load the GVA table 
+        typename gva_table_type::map_type& gva_table = gvas_.get();
+
+        typename gva_table_type::map_type::iterator
+            it = gva_table.lower_bound(id),
+            begin = gva_table.begin(),
+            end = gva_table.end();
+
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
+
+        if (it != end)
+        {
+            // If we got an exact match, this is a request to update an existing
+            // locality binding (e.g. move semantics).
+            if (it->first == id)
+            {
+                // Check for count mismatch (we can't change block sizes of
+                // existing bindings).
+                if (it->second.count != count)
+                {
+                    // REVIEW: Is this the right error code to use?
+                    HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                        "cannot change block size of existing binding");
+                }
+
+                // Store the new endpoint and offset
+                it->second.endpoint = gva.endpoint;
+                it->second.type = gva.type;
+                it->second.lva = gva.lva;
+                it->second.offset = offset;
+            }
+
+            // We're about to decrement it, so make sure it's safe to do so.
+            else if (it != begin)
+            {
+                --it;
+
+                // Check that a previous range doesn't cover the new id.
+                if (HPX_UNLIKELY((it->first + it->second.count) > id))
+                {
+                    // REVIEW: Is this the right error code to use?
+                    HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                        "the new GID is contained in an existing range");
+                }
+            }
+        }            
+
+        else if (HPX_LIKELY(!gva_table.empty()))
+        {
+            --it;
+            // Check that a previous range doesn't cover the new id.
+            if (HPX_UNLIKELY((it->first + it->second.count) > id))
+            {
+                // REVIEW: Is this the right error code to use?
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "the new GID is contained in an existing range");
+            }
+        }
+
+        naming::gid_type upper_bound(id + (count - 1));
+
+        if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb())) {
+            HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                "msb's of lower and upper range bound do not match");
+        }
+
+        std::pair<typename gva_table_type::map_type::iterator, bool>
+            p = gva_table.insert(id, full_gva_type
+                (gva.endpoint, gva.type, gva.lva, count, offset));
+        
+        // REVIEW: Should this be an assertion?
+        // Check for an insertion failure. 
+        if (HPX_UNLIKELY(!p.second))
+        {
+            HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                "insertion failed due to memory corruption or a locking "
+                "error");
+        }
     } // }}}
 
     // REVIEW: Right return type, yes/no?
@@ -229,16 +317,16 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         primary_namespace<Database, Protocol>,
         /* return type */ range_type,
         /* enum value */  namespace_bind_locality,
-        /* arguments */   gva_type const&, count_type,
+        /* arguments */   endpoint_type const&, count_type,
         &primary_namespace<Database, Protocol>::bind_locality
     > bind_locality_action; 
    
-    typedef hpx::actions::result_action3<
+    typedef hpx::actions::result_action4<
         primary_namespace<Database, Protocol>,
         /* return type */ range_type,
         /* enum value */  namespace_bind_gid,
-        /* arguments */   naming::gid_type const&, endpoint_type const&,
-                          count_type,
+        /* arguments */   naming::gid_type const&, gva_type const&, count_type,
+                          offset_type,
         &primary_namespace<Database, Protocol>::bind_gid
     > bind_gid_action;
     
