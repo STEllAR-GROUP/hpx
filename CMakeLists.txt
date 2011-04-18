@@ -416,13 +416,15 @@ add_subdirectory(runtime)
 ################################################################################
 # test configuration 
 ################################################################################
-set(DART_TESTING_TIMEOUT "60" CACHE STRING
-  "CTest timeout, in seconds (Default: 60).")
+if(NOT MSVC)
+  set(DART_TESTING_TIMEOUT "60" CACHE STRING
+    "CTest timeout, in seconds (Default: 60).")
 
-enable_testing()
-include(CTest)
-add_hpx_pseudo_target(tests) 
-add_subdirectory(tests)
+  enable_testing()
+  include(CTest)
+  add_hpx_pseudo_target(tests) 
+  add_subdirectory(tests)
+endif()
 
 ################################################################################
 # installation instructions
