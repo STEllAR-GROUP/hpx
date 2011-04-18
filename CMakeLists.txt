@@ -43,15 +43,17 @@ endif()
 # environment detection 
 ################################################################################
 # FIXME: broken for MSVC
-execute_process(COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
-                OUTPUT_VARIABLE build_environment
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT MSVC)
+  execute_process(COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
+                  OUTPUT_VARIABLE build_environment
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(build_environment)
-  set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-  hpx_info("environment" "Build environment is ${BUILDNAME}.")
-else()
-  hpx_warn("environment" "Couldn't determine build environment (install python).") 
+  if(build_environment)
+    set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
+    hpx_info("environment" "Build environment is ${BUILDNAME}.")
+  else()
+    hpx_warn("environment" "Couldn't determine build environment (install python).") 
+  endif()
 endif()
 
 ################################################################################
@@ -176,9 +178,6 @@ if(MSVC)
 
   # we auto-link on Windows
   set(BOOST_FOUND_LIBRARIES "")
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -libpath:${BOOST_LIB_DIR}"
-    CACHE STRING "Compiler flags" FORCE)
 
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
