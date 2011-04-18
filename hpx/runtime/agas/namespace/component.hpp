@@ -16,16 +16,15 @@
 namespace hpx { namespace agas 
 {
 
-// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct component_namespace
-  : client_base<
+  : components::client_base<
       component_namespace<Database>,
       stubs::component_namespace<Database>
     >
 {
     // {{{ nested types 
-    typedef client_base<
+    typedef components::client_base<
         component_namespace<Database>,
         stubs::component_namespace<Database>
     > base_type;
@@ -78,7 +77,7 @@ struct component_namespace
     { return this->base_type::unbind(this->gid_, key); }
 };            
 
-}}}
+}}
 
 #endif // HPX_E425A0E2_3462_4C0F_ADB2_854881DBE6F1
 

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7)_
+#if !defined(HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7)
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
 #include <hpx/hpx_fwd.hpp>
@@ -16,16 +16,15 @@
 namespace hpx { namespace agas 
 {
 
-// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct symbol_namespace
-  : client_base<
+  : components::client_base<
       symbol_namespace<Database>,
       stubs::symbol_namespace<Database>
     >
 {
     // {{{ nested types 
-    typedef client_base<
+    typedef components::client_base<
         symbol_namespace<Database>,
         stubs::symbol_namespace<Database>
     > base_type;
@@ -64,7 +63,7 @@ struct symbol_namespace
     { return this->base_type::unbind(this->gid_, key); }
 };            
 
-}}}
+}}
 
 #endif // HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 

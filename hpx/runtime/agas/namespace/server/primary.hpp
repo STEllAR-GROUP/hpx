@@ -9,6 +9,7 @@
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -17,17 +18,14 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
-#include <hpx/runtime/agas/network/full_gva.hpp>
-#include <hpx/runtime/agas/partition.hpp>
+#include <hpx/runtime/agas/network/gva.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-// TODO: typedef decrement's return type, do the todos for partition, add error
-// code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT primary_namespace
-  : simple_component_base<primary_namespace<Database, Protocol> >
+  : components::simple_component_base<primary_namespace<Database, Protocol> >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -41,16 +39,22 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef boost::uint64_t count_type;
     typedef components::component_type component_type;
 
+    typedef boost::fusion::vector2<count_type, component_type>
+        decrement_result_type;
+
+    typedef boost::fusion::vector2<boost::uint32_t, naming::gid_type>
+        partition_type;
+
     typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
         range_type;
 
     typedef table<Database, naming::gid_type, full_gva_type>
         gva_table_type; 
 
-    typedef table<Database, endpoint_type, partition>
+    typedef table<Database, endpoint_type, partition_type>
         partition_table_type;
     
-    typedef table<Database, naming::gid_type, refcnt>
+    typedef table<Database, naming::gid_type, count_type>
         refcnt_table_type;
     // }}}
  
@@ -70,6 +74,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
     range_type bind_locality(gva_type const& gva, count_type count)
     { // {{{ bind_locality implementation (TODO)
+        using boost::fusion::at_c;
+
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Load the actual table to the stack.
@@ -83,14 +89,14 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         if (it != end)
         {
             // Compute the new allocation.
-            naming::gid_type lower(it->second.upper_bound + 1),
+            naming::gid_type lower(at_c<1>(it->second) + 1),
                              upper(lower + (count - 1));
 
             // Check for overflow.
             if (upper.get_msb() != lower.get_msb())
             {
                 // Check for address space exhaustion 
-                if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) === 0xFFFFFFF))
+                if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFF))
                 {
                     HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
                         "primary namespace has been exhausted");
@@ -102,7 +108,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             }
             
             // Store the new upper bound.
-            it->second.upper_bound = upper;
+            at_c<1>(it->second) = upper;
 
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
@@ -116,8 +122,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         }
     } // }}}
 
-    range_type bind_gid(naming::gid_type const& gid, gva_type const& gva,
-                       count_type count)
+    range_type bind_gid(naming::gid_type const& gid,
+                                 gva_type const& gva, count_type count)
     { // {{{ bind_gid implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
     } // }}}
@@ -143,7 +149,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         typename database_mutex_type::scoped_lock l(mutex_);
     } // }}}
     
-    boost::fusion::vector2<count_type, component_type>
+    decrement_result_type 
     decrement(naming::gid_type const& gid, count_type credits)
     { // {{{ decrement implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
@@ -212,7 +218,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ boost::fusion::vector2<count_type, component_type>,
+        /* return type */ decrement_result_type,
         /* enum value */  namespace_decrement,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::decrement
@@ -220,7 +226,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     // }}}
 };
 
-}}}}
+}}}
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

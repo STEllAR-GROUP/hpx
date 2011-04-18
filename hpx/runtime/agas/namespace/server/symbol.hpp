@@ -11,14 +11,14 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/database/table.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct HPX_COMPONENT_EXPORT symbol_namespace
-  : simple_component_base<symbol_namespace<Database> >
+  : components::simple_component_base<symbol_namespace<Database> >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -98,9 +98,9 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     typedef hpx::actions::result_action1<
         symbol_namespace<Database>,
         /* return type */ naming::gid_type,
-        /* enum value */  namespace_resolve_id,
+        /* enum value */  namespace_resolve,
         /* arguments */   symbol_type const&,
-        &symbol_namespace<Database>::resolve_id
+        &symbol_namespace<Database>::resolve
     > resolve_action;
     
     typedef hpx::actions::result_action1<
@@ -113,7 +113,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     // }}}
 };
 
-}}}}
+}}}
 
 #endif // HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 

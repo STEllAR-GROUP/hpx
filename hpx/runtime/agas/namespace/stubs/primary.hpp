@@ -17,8 +17,6 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-// TODO: move decrement_return_type into the server class and give it a better
-// name, error code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct primary_namespace
   : components::stubs::stub_base<server::primary_namespace<Database, Protocol> >
@@ -32,9 +30,7 @@ struct primary_namespace
     typedef typename server_type::count_type count_type;
     typedef typename server_type::components_type components_type;
     typedef typename server_type::range_type range_type;
-
-    typedef boost::fusion::vector2<count_type, component_type>
-        decrement_return_type;
+    typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
 
     // {{{ bind_locality dispatch
@@ -123,16 +119,16 @@ struct primary_namespace
     // }}}
     
     // {{{ decrement dispatch 
-    static lcos::future_value<decrement_return_type>
+    static lcos::future_value<decrement_result_type>
     decrement_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
         typedef typename server_type::decrement_action action_type;
-        return lcos::eager_future<action_type, decrement_return_type>
+        return lcos::eager_future<action_type, decrement_result_type>
             (gid, key, count);
     }
     
-    static decrement_return_type
+    static decrement_result_type
     decrement(naming::id_type const& gid, naming::gid_type const& key,
               count_type count)
     { return decrement_async(gid, key, count).get(); } 

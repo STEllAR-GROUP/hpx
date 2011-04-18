@@ -20,10 +20,9 @@
 namespace hpx { namespace agas { namespace server
 {
 
-// TODO: error code parameters for functions that can throw
 template <typename Database>
 struct HPX_COMPONENT_EXPORT component_namespace
-  : simple_component_base<component_namespace<Database> >
+  : components::simple_component_base<component_namespace<Database> >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -31,7 +30,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
 
     typedef std::string component_name_type;
     typedef int component_id_type;
-    typedef boost::uint32_t prefix_type
+    typedef boost::uint32_t prefix_type;
 
     // I want this to be a boost::unordered_set<>, but for backwards
     // compatibility, it's an std::vector<>
@@ -69,7 +68,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
             component_ids_.get();
         
         typename factory_table_type::map_type& factory_table =
-            factory_table_type.get();
+            factories_.get();
 
         typename component_id_table_type::map_type::iterator
             cit = c_id_table.find(key), cend = c_id_table.end();
@@ -104,7 +103,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
 
         // Load the table.
         typename factory_table_type::map_type const& factory_table =
-            factory_table_type.get();
+            factories_.get();
         
         typename factory_table_type::map_type::const_iterator
             it = factory_table.find(key), end = factory_table.end();
@@ -141,7 +140,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
             component_ids_.get();
         
         typename factory_table_type::map_type& factory_table =
-            factory_table_type.get();
+            factories_.get();
 
         typename component_id_table_type::map_type::const_iterator
             it = c_id_table.find(key), end = c_id_table.end();
@@ -199,7 +198,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
     // }}}
 };
 
-}}}}
+}}}
 
 #endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

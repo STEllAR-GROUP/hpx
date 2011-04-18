@@ -16,16 +16,15 @@
 namespace hpx { namespace agas 
 {
 
-// TODO: error code parameters for functions that can throw
 template <typename Database, typename Protocol>
 struct primary_namespace
-  : client_base<
+  : components::client_base<
       primary_namespace<Database, Protocol>,
       stubs::primary_namespace<Database, Protocol>
     >
 {
     // {{{ nested types 
-    typedef client_base<
+    typedef components::client_base<
         primary_namespace<Database, Protocol>,
         stubs::primary_namespace<Database, Protocol>
     > base_type;
@@ -38,6 +37,7 @@ struct primary_namespace
     typedef typename server_type::count_type count_type;
     typedef typename server_type::components_type components_type;
     typedef typename server_type::range_type range_type;
+    typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
 
     explicit primary_namespace(naming::id_type const& id = naming::invalid_id)
@@ -97,16 +97,16 @@ struct primary_namespace
     
     ///////////////////////////////////////////////////////////////////////////
     // decrement interface 
-    lcos::future_value<boost::fusion::vector2<count_type, component_type> >
+    lcos::future_value<decrement_result_type>
     decrement_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::decrement_async(this->gid_, gid, credits); }
     
-    boost::fusion::vector2<count_type, component_type>
+    decrement_result_type 
     decrement(naming::gid_type const& gid, count_type credits)
     { return this->base_type::decrement(this->gid_, gid, credits); }
 }; 
 
-}}}
+}}
 
 #endif // HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 
