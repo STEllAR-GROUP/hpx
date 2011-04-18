@@ -23,24 +23,21 @@ set(subdirs
     quickstart
     )
 
-foreach(subdir ${subdirs})
-  add_custom_target(examples.${subdir})
-  add_subdirectory(${subdir})
-  add_dependencies(examples examples.${subdir})
-endforeach()
+if(NOT MSVC)
+  foreach(subdir ${subdirs})
+    add_custom_target(examples.${subdir})
+    add_subdirectory(${subdir})
+    add_dependencies(examples examples.${subdir})
+  endforeach()
 
-add_custom_target(chirag)
-add_custom_target(matt)
-add_custom_target(nbody)
-add_custom_target(matt.all)
-add_custom_target(wash)
-
-add_dependencies(nbody examples.nbody)
-
-add_dependencies(matt examples.had_amr3d)
-add_dependencies(matt.all examples.cosmo)
-add_dependencies(matt.all examples.had_amr)
-add_dependencies(matt.all examples.had_amr3d)
-
-add_dependencies(wash examples.had_amr3d_stable)
-
+  add_custom_target(chirag)
+  add_custom_target(matt)
+  add_custom_target(wash)
+  add_dependencies(chirag examples.nbody)
+  add_dependencies(matt examples.had_amr3d)
+  add_dependencies(wash examples.had_amr3d_stable)
+else()
+  foreach(subdir ${subdirs})
+    add_subdirectory(${subdir})
+  endforeach()
+endif()
