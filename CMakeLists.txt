@@ -409,9 +409,7 @@ add_subdirectory(src)
 add_subdirectory(hpx/components)
 
 # executables that depend on libraries above
-if(NOT MSVC)
-  add_custom_target(examples) 
-endif()
+add_hpx_pseudo_target(examples) 
 
 add_subdirectory(examples)
 
@@ -425,7 +423,7 @@ set(DART_TESTING_TIMEOUT "60" CACHE STRING
 
 enable_testing()
 include(CTest)
-add_custom_target(tests) 
+add_hpx_pseudo_target(tests) 
 add_subdirectory(tests)
 
 ################################################################################

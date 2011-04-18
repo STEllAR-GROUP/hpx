@@ -15,6 +15,8 @@ hpx_include(Message
             AddExecutable
             AddTest
             AddConfigTest
+            AddPseudoDependencies
+            AddPseudoTarget
             AddLibrarySources
             Compile
             ForceOutOfTreeBuild)
