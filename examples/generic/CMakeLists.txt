@@ -18,6 +18,5 @@ add_hpx_executable(generic_client
   DEPENDENCIES generic_component)
 
 # add dependencies to pseudo-target 
-add_dependencies(examples.generic
-                 generic_client_exe) 
+add_hpx_pseudo_dependencies(examples.generic generic_client_exe) 
 

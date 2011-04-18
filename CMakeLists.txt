@@ -174,6 +174,9 @@ if(MSVC)
     add_definitions(-DDEBUG)
   endif()
 
+  # we auto-link on Windows
+  set(BOOST_FOUND_LIBRARIES "")
+
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -libpath:${BOOST_LIB_DIR}"
     CACHE STRING "Compiler flags" FORCE)
 

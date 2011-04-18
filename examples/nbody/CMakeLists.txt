@@ -35,6 +35,5 @@ add_hpx_executable(nbody_client
   DEPENDENCIES ${dependencies})
 
 # add a dependency to the pseudo-target  
-add_dependencies(examples.nbody
-                 nbody_client_exe) 
+add_dependencies(examples.nbody nbody_client_exe) 
 

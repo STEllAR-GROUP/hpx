@@ -21,14 +21,14 @@ foreach(example_program ${example_programs})
                      SOURCES ${sources})
 
   # add a custom target for this example 
-  add_custom_target(examples.parcelset.${example_program})
+  add_hpx_pseudo_target(examples.parcelset.${example_program})
 
   # make pseudo-targets depend on master pseudo-target
-  add_dependencies(examples.parcelset
+  add_hpx_pseudo_dependencies(examples.parcelset
                    examples.parcelset.${example_program})
 
   # add dependencies to pseudo-target 
-  add_dependencies(examples.parcelset.${example_program}
+  add_hpx_pseudo_dependencies(examples.parcelset.${example_program}
                    ${example_program}_exe)
 endforeach() 
 

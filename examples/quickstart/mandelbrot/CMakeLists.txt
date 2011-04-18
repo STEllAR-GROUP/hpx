@@ -13,7 +13,7 @@ foreach(hpx_MANDELBROT_SUBDIR ${hpx_MANDELBROT_SUBDIRS})
 endforeach()
 
 # add pesudo-target
-add_custom_target(examples.quickstart.mandelbrot)
+add_hpx_pseudo_target(examples.quickstart.mandelbrot)
 
 # define build targets for this directory
 add_hpx_executable(mandelbrot 
@@ -21,5 +21,5 @@ add_hpx_executable(mandelbrot
   DEPENDENCIES mandelbrot_component_component)
 
 # add pseudo-target dependencies
-add_dependencies(examples.quickstart.mandelbrot mandelbrot_exe)
+add_hpx_pseudo_dependencies(examples.quickstart.mandelbrot mandelbrot_exe)
 

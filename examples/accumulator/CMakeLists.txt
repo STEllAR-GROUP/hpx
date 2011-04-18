@@ -25,14 +25,14 @@ foreach(subdir ${subdirs})
     DEPENDENCIES ${subdir}_component)
 
   # add a custom target for this example 
-  add_custom_target(examples.accumulator.${subdir})
+  add_hpx_pseudo_target(examples.accumulator.${subdir})
 
   # make pseudo-targets depend on master pseudo-target
-  add_dependencies(examples.accumulator
-                   examples.accumulator.${subdir})
+  add_hpx_pseudo_dependencies(examples.accumulator
+                              examples.accumulator.${subdir})
 
   # add dependencies to pseudo-target 
-  add_dependencies(examples.accumulator.${subdir}
-                   ${subdir}_client_exe) 
+  add_hpx_pseudo_dependencies(examples.accumulator.${subdir}
+                              ${subdir}_client_exe) 
 endforeach()
 
