@@ -35,6 +35,7 @@ struct primary_namespace
     typedef typename server_type::gva_type gva_type;
     typedef typename server_type::full_gva_type full_gva_type;
     typedef typename server_type::count_type count_type;
+    typedef typename server_type::offset_type offset_type;
     typedef typename server_type::components_type components_type;
     typedef typename server_type::range_type range_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
@@ -54,12 +55,15 @@ struct primary_namespace
     
     lcos::future_value<range_type>
     bind_async(naming::gid_type const& gid, gva_type const& gva,
-               count_type count)
-    { return this->base_type::bind_gid_async(this->gid_, gid, gva, count); }
+               count_type count, offset_type offset)
+    {
+        return this->base_type::bind_gid_async
+            (this->gid_, gid, gva, count, offset);
+    }
 
     range_type bind(naming::gid_type const& gid, gva_type const& gva,
-                   count_type count)
-    { return this->base_type::bind_gid(this->gid_, gid, gva, count); }
+                   count_type count, offset_type offset)
+    { return this->base_type::bind_gid(this->gid_, gid, gva, count, offset); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_endpoint and resolve_gid interface

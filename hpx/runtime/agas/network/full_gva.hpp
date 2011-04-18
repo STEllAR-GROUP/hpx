@@ -31,9 +31,8 @@ struct full_gva
 
     typedef int component_type;
     typedef boost::uint64_t lva_type;
-
-    typedef std::size_t count_type;
-    typedef std::ptrdiff_t offset_type;
+    typedef boost::uint64_t count_type;
+    typedef boost::uint64_t offset_type;
 
     full_gva()
       : endpoint(),
