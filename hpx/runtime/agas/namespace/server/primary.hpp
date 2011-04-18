@@ -72,8 +72,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         refcnts_("hpx.agas.primary_namespace.refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    range_type bind_locality(gva_type const& gva, count_type count)
-    { // {{{ bind_locality implementation (TODO)
+    range_type bind_locality(endpoint_type const& ep, count_type count)
+    { // {{{ bind_locality implementation
         using boost::fusion::at_c;
 
         typename database_mutex_type::scoped_lock l(mutex_);
@@ -83,7 +83,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             partition_table = partitions_.get();
 
         typename partition_table_type::map_type::iterator
-            it = partition_table.find(gva.endpoint),
+            it = partition_table.find(ep),
             end = partition_table.end(); 
 
         if (it != end)
@@ -110,6 +110,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             // Store the new upper bound.
             at_c<1>(it->second) = upper;
 
+            // Set the initial credit count.
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
@@ -118,17 +119,74 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
         else
         {
-            // New locality. TODO
+            // Check for address space exhaustion.
+            if (HPX_UNLIKELY(partition_table.size() > 0xFFFFFFFE))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    "primary namespace has been exhausted");
+            }
+
+            // Compute the locality's prefix
+            boost::uint32_t prefix = reinterpret_cast<boost::uint32_t>
+                (partition_table.size() + 1);
+            naming::gid_type id(naming::get_gid_from_prefix(prefix));
+
+            // Start assigning ids with the seconds block of 64bit numbers only
+            naming::gid_type lower_id(id.get_msb() + 1, 0);
+
+            std::pair<typename partition_table_type::map_type::iterator, bool>
+                pit = partition_table.insert(ep,
+                    partition_type(prefix, lower_id));
+
+            // Check for an insertion failure. If this branch is triggered, then
+            // the partition table was updated at some point after we first
+            // checked it, which would indicate memory corruption or a locking
+            // failure.
+            if (HPX_UNLIKELY(!pit.second))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    "insertion failed due to memory corruption or a locking "
+                    "error");
+            }
+
+            // Load the GVA table. Now  that we've inserted the locality into
+            // the partition table successfully, we need to put the locality's
+            // GID into the GVA table so that parcels can be sent to the memory
+            // of a locality.
+            typename gva_table_type::map_type& gva_table = gvas_.get();
+
+            std::pair<typename gva_table_type::map_type::iterator, bool>
+                git = gva_table.insert(id, full_gva_type
+                    (ep, components::component_runtime_support, 1, 0));
+
+            if (HPX_UNLIKELY(!git.second))
+            {
+                // REVIEW: Is this the right error code to use?
+                HPX_THROW_IN_CURRENT_FUNC(no_success, 
+                    "insertion failed due to memory corruption or a locking "
+                    "error");
+            }
+
+            // Generate the requested GID range
+            naming::gid_type lower(lower_id + 1), upper(lower + (count - 1));
+
+            at_c<1>((*pit.first).second) = upper;
+
+            // Set the initial credit count.
+            naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+            naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
+
+            return range_type(lower, upper);
         }
     } // }}}
 
-    range_type bind_gid(naming::gid_type const& gid,
-                                 gva_type const& gva, count_type count)
+    range_type bind_gid(naming::gid_type const& gid, gva_type const& gva,
+                        count_type count)
     { // {{{ bind_gid implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
     } // }}}
 
-    // REVIEW: right return type, yes/no?
+    // REVIEW: Right return type, yes/no?
     range_type resolve_locality(endpoint_type const& ep) const
     { // {{{ resolve_endpoint implementation (TODO)
         typename database_mutex_type::scoped_lock l(mutex_);
