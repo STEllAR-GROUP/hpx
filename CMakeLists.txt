@@ -133,6 +133,11 @@ include_directories(${hpx_SOURCE_DIR}/external/jemalloc)
 include_directories(${hpx_SOURCE_DIR}/external/nedmalloc)
 
 ################################################################################
+# source groups 
+################################################################################
+include(HPX_SourceGroups)
+
+################################################################################
 # installation configuration
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
