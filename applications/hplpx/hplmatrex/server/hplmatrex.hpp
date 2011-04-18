@@ -44,8 +44,7 @@ namespace hpx { namespace components { namespace server
 
 	//constructors and destructor
 	HPLMatreX(){}
-	int construct(naming::id_type gid, int h, int w,
-		int ab, int bs);
+	int construct(naming::id_type gid, int h, int w, int ab, int bs);
 	~HPLMatreX(){destruct();}
 	void destruct();
 
@@ -65,8 +64,7 @@ namespace hpx { namespace components { namespace server
 	void LUgausstop(int iter, int bcol);
 	void LUgaussleft(int brow, int iter);
 	void LUgausstrail(int brow, int bcol, int iter);
-	int LUgaussmain(int brow, int bcol, int iter,
-		int type);
+	int LUgaussmain(int brow, int bcol, int iter, int type);
 	int LUbacksubst();
 	double checksolve(int row, int offset, bool complete);
 	void print();
@@ -91,8 +89,7 @@ namespace hpx { namespace components { namespace server
 	//here we define the actions that will be used
 	//the construct function
 	typedef actions::result_action5<HPLMatreX, int, hpl_construct, naming::id_type,
-		int, int, int, int,
-		&HPLMatreX::construct> construct_action;
+		int, int, int, int, &HPLMatreX::construct> construct_action;
 	//the destruct function
 	typedef actions::action0<HPLMatreX, hpl_destruct,
 		&HPLMatreX::destruct> destruct_action;
@@ -538,7 +535,7 @@ namespace hpx { namespace components { namespace server
     //performed in future iterations.
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
 	int i,j,k;
-	int offset = brow*blocksize;		//factordata row offset
+	int offset = brow*blocksize - 1;	//factordata row offset
 	int offset_col = iter*blocksize;	//factordata column offset
 	int iterrows = datablock[iter][iter]->getrows();
 	int itercols = datablock[brow][bcol]->getcolumns();
@@ -549,8 +546,9 @@ namespace hpx { namespace components { namespace server
 	//middle loop: iterates over the rows of the current block
 	//inner loop: iterates across the columns of the current block
 	for(j=0;j<datablock[brow][bcol]->getrows();j++){
+		offset++;
 		for(i=0;i<iterrows;i++){
-		    factor = factordata[j+offset][i+offset_col];
+		    factor = factordata[offset][i+offset_col];
 		    for(k=0;k<itercols;k++){
 			datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
 	}	}   }
