@@ -1,3 +1,10 @@
+//  Copyright (c) 2011 Vinay C Amatya
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+//  Parts of this nqueen_client.cpp has been taken from the accumulator example
+//  by Hartmut Kaiser.
 
 #include <cstring>
 #include <iostream>
@@ -47,8 +54,8 @@ threads::thread_state_enum hpx_main()
             board.solveNqueen(board.accessBoard(), sz_temp, 0);
         }
         else if(cmd == "default"){
-            board.initBoard(N,N);
-            board.solveNqueen(board.accessBoard(), N, 0);
+            board.initBoard(DS,DS);
+            board.solveNqueen(board.accessBoard(), DS, 0);
         }
         else if(cmd == "print"){
             board.printBoard();

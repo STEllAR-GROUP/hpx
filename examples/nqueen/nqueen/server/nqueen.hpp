@@ -1,7 +1,7 @@
-/*
- * nqueen.hpp
- *      Author: vamatya
- */
+//  Copyright (c) 2011 Vinay C Amatya
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
 
@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#define N 8
+#define DS 8         //default size
 
 unsigned int c_soln = 0;
 
