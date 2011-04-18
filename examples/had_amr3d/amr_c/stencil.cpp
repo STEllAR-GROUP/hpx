@@ -1149,7 +1149,8 @@ namespace hpx { namespace components { namespace amr
         // TEST
         resultval.get() = val[0].get();
         resultval->timestep_ = val[0]->timestep_ + 1;
-        if ( val[0]->timestep_ >= par->nt0-2 ) {
+        if ( resultval->timestep_ >= par->nt0-2 ) {
+          //std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
           return 0;
         }
         return 1;

@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
 
         std::size_t numvals;
 
-        std::size_t numsteps = 10;
+        std::size_t numsteps = 12;
         if (vm.count("numsteps"))
             numsteps = vm["numsteps"].as<std::size_t>();
         
