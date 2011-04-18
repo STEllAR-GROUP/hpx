@@ -4,35 +4,35 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(client_sources
-	nqueen.cpp)
-	
-	
+    nqueen.cpp)
+    
+    
 set(client_headers
-	nqueen.hpp)
-	
+    nqueen.hpp)
+    
 set(stubs_headers
-	stubs/nqueen.hpp)
+    stubs/nqueen.hpp)
 
 set(server_headers
-	server/nqueen.hpp)
-	
-	
+    server/nqueen.hpp)
+    
+    
 set(headers
-	${client_headers}
-	${stubs_headers}
-	${server_headers})
-	
-	
+    ${client_headers}
+    ${stubs_headers}
+    ${server_headers})
+    
+    
 source_group("Source Files\\Client" FILES ${client_sources})
 source_group("Header Files\\Client" FILES ${client_headers})
-source_group("Header Files\\Stubs" 	FILES ${stubs_headers})
+source_group("Header Files\\Stubs"     FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 
 add_hpx_component(nqueen
-	MODULE Board
-	SOURCES ${client_sources}
-	HEADERS ${headers})
-	
-	
-	
+    MODULE Board
+    SOURCES ${client_sources}
+    HEADERS ${headers})
+    
+    
+    
