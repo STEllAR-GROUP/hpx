@@ -18,12 +18,6 @@ add_subdirectory(performance_counters)
 add_subdirectory(runtime)
 add_subdirectory(util)
 
-# add source file from coroutine library 
-if(NOT MSVC)
-  add_hpx_library_sources(hpx
-    ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
-endif()
-
 # Boost Chrono sources (as long as this library is not in Boost)
 if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
   add_hpx_library_sources(hpx
@@ -31,83 +25,72 @@ if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
 endif()
 
 ###############################################################################
-# build instructions for serialization support library
-add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES})
-set_target_properties(hpx_serialization PROPERTIES
-  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-  VERSION ${HPX_VERSION}
-  SOVERSION ${HPX_SOVERSION}
-  CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx_serialization)
+# POSIX 
+if(NOT MSVC)
+  add_hpx_library_sources(hpx
+    ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 
-target_link_libraries(hpx_serialization
-  ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+  # libhpx_serialization
+  add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES})
 
-get_target_property(path hpx_serialization LOCATION)
-get_filename_component(name "${path}" NAME)
-set_property(TARGET hpx_serialization APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_LIBRARY_NAME=${name}"
-  "HPX_LIBRARY_STRING=\"${name}\""
-  "BOOST_SERIALIZATION_DYN_LINK"
-  "BOOST_ARCHIVE_DYN_LINK")
+  set_target_properties(hpx_serialization PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_serialization)
 
-if(NOT HPX_DISABLE_WARNINGS AND NOT MSVC)
+  target_link_libraries(hpx_serialization
+    ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+
+  get_target_property(path hpx_serialization LOCATION)
+  get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx_serialization APPEND
-    PROPERTY COMPILE_FLAGS
-    "-Wall -Wno-strict-aliasing -Wsign-promo")
-endif()
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_LIBRARY_NAME=${name}"
+    "HPX_LIBRARY_STRING=\"${name}\"")
 
-###############################################################################
-# build instructions for main shared HPX library
-add_library(hpx SHARED ${hpx_SOURCES})
-set_target_properties(hpx PROPERTIES
-  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-  VERSION ${HPX_VERSION}
-  SOVERSION ${HPX_SOVERSION}
-  CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx)
+  if(NOT HPX_DISABLE_WARNINGS)
+    set_property(TARGET hpx_serialization APPEND
+      PROPERTY COMPILE_FLAGS
+      "-Wall -Wno-strict-aliasing -Wsign-promo")
+  endif()
 
-target_link_libraries(hpx hpx_serialization
-  ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+  # libhpx
+  add_library(hpx SHARED ${hpx_SOURCES})
+  set_target_properties(hpx PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx)
+
+  target_link_libraries(hpx hpx_serialization
+    ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
  
-get_target_property(path hpx LOCATION)
-get_filename_component(name "${path}" NAME)
-set_property(TARGET hpx APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_LIBRARY_NAME=${name}"
-  "HPX_LIBRARY_STRING=\"${name}\"")
-
-if(NOT HPX_DISABLE_WARNINGS AND NOT MSVC)
+  get_target_property(path hpx LOCATION)
+  get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx APPEND
-    PROPERTY COMPILE_FLAGS
-    "-Wall -Wno-strict-aliasing -Wsign-promo")
-endif()
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_LIBRARY_NAME=${name}"
+    "HPX_LIBRARY_STRING=\"${name}\"")
 
-if(MSVC)
-  set_property(TARGET hpx APPEND
-    PROPERTY COMPILE_FLAGS
-    "-bigobj")
-  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  if(NOT HPX_DISABLE_WARNINGS)
     set_property(TARGET hpx APPEND
       PROPERTY COMPILE_FLAGS
-      "-DHPX_EMULATE_SWAP_CONTEXT=1")
+      "-Wall -Wno-strict-aliasing -Wsign-promo")
   endif()
-endif()
 
+  install(TARGETS hpx hpx_serialization
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+      COMPONENT core
+      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                  GROUP_READ GROUP_EXECUTE
+                  WORLD_READ WORLD_EXECUTE)
+else()
 ###############################################################################
-# installation instructions
-install(TARGETS hpx hpx_serialization
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    COMPONENT core
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                GROUP_READ GROUP_EXECUTE
-                WORLD_READ WORLD_EXECUTE)
-
-###############################################################################
-# source groups
-if(MSVC)
+# MSVC 
   # global
   set (hpxlib_global_HEADERS
       ${hpx_SOURCE_DIR}/hpx/config.hpp
@@ -494,4 +477,64 @@ if(MSVC)
       util/portable_binary_oarchive.cpp)
   source_group ("Source Files\\serialization" 
       FILES ${hpxserializationlib_SOURCES})
+  
+  # libhpx_serialization
+  add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES}
+                                       ${hpxserializationlib_HEADERS})
+
+  set_target_properties(hpx_serialization PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_serialization)
+
+  get_target_property(path hpx_serialization LOCATION)
+  get_filename_component(name "${path}" NAME)
+  set_property(TARGET hpx_serialization APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_LIBRARY_NAME=${name}"
+    "HPX_LIBRARY_STRING=\"${name}\"")
+
+  if(NOT HPX_DISABLE_WARNINGS)
+    set_property(TARGET hpx_serialization APPEND
+      PROPERTY COMPILE_FLAGS
+      "-Wall -Wno-strict-aliasing -Wsign-promo")
+  endif()
+
+  # libhpx
+  add_library(hpx SHARED ${hpx_SOURCES}
+                         ${hpxlib_HEADERS})
+
+  set_target_properties(hpx PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx)
+
+  get_target_property(path hpx LOCATION)
+  get_filename_component(name "${path}" NAME)
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_LIBRARY_NAME=${name}"
+    "HPX_LIBRARY_STRING=\"${name}\"")
+
+  install(TARGETS hpx hpx_serialization
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+      COMPONENT core
+      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                  GROUP_READ GROUP_EXECUTE
+                  WORLD_READ WORLD_EXECUTE)
+  
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_FLAGS
+    "-bigobj")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set_property(TARGET hpx APPEND
+      PROPERTY COMPILE_FLAGS
+      "-DHPX_EMULATE_SWAP_CONTEXT=1")
+  endif()
 endif()
+
