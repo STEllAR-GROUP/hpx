@@ -253,7 +253,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
         {
             HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                "msb's of lower and upper range bound do not match");
+                "MSBs of lower and upper range bound do not match");
         }
 
         std::pair<typename gva_table_type::map_type::iterator, bool>
@@ -336,7 +336,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                     {
                         HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                            "msb's of lower and upper range bound do not match");
+                            "MSBs of lower and upper range bound do not match");
                     }
  
                     // Calculation of the local address occurs in the gva ctor
@@ -355,7 +355,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
                     HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                        "msb's of lower and upper range bound do not match");
+                        "MSBs of lower and upper range bound do not match");
                 }
  
                 // Calculation of the local address occurs in the gva ctor
@@ -446,7 +446,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         } 
         
         typename database_mutex_type::scoped_lock l(mutex_);
-            
+        
+        // Load the reference count table    
         typename refcnt_table_type::map_type& refcnt_table = refcnts_.get();
 
         typename refcnt_table_type::map_type::iterator
@@ -466,7 +467,60 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             
             if (0 == cnt)
             {
-                // TODO: erase, find type in gva table, return (0, type)
+                refcnt_table.erase(it);
+
+                // Load the GVA table 
+                typename gva_table_type::map_type& gva_table = gvas_.get();
+
+                typename gva_table_type::map_type::iterator
+                    git = gva_table.lower_bound(id),
+                    gbegin = gva_table.begin(),
+                    gend = gva_table.end();
+
+                if (git != gend)
+                {
+                    // Did we get an exact match?
+                    if (git->first == id)
+                        return decrement_result_type(cnt,
+                            reinterpret_cast<components::component_type>
+                                (git->second.type));
+
+                    // Check if we can safely decrement the iterator.
+                    else if (git != gbegin)
+                    {
+                        --git;
+
+                        // See if the previous range covers this GID
+                        if ((git->first + git->second.count) > id)
+                        {
+                            // Make sure that the msbs match
+                            if (id.get_msb() == git->first.get_msb())
+                                return decrement_result_type(cnt,
+                                    reinterpret_cast<components::component_type>
+                                        (git->second.type));
+                        } 
+                    }
+                }
+                
+                else if (HPX_LIKELY(!gva_table.empty()))
+                {
+                    --git;
+
+                    // See if the previous range covers this GID
+                    if ((git->first + git->second.count) > id)
+                    {
+                        // Make sure that the msbs match
+                        if (id.get_msb() == git->first.get_msb())
+                            return decrement_result_type(cnt,
+                                reinterpret_cast<components::component_type>
+                                    (git->second.type));
+                    } 
+                }
+
+                // If we didn't find anything, we've got a problem
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "unknown component type encountered while decrement global "
+                    "reference count");
             }
 
             else
@@ -477,6 +531,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         // binding has already created a first reference + credits.
         else 
         {
+            BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
+
             std::pair<typename refcnt_table_type::map_type::iterator, bool>
                 p = refcnt_table.insert(id, HPX_INITIAL_GLOBALCREDIT);
 
@@ -496,8 +552,11 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     "count");
             }
             
-            return decrement_result_type
-                ((it->second -= credits), components::component_invalid);
+            count_type cnt = (it->second -= credits);
+           
+            BOOST_ASSERT(0 != cnt);
+ 
+            return decrement_result_type(cnt, components::component_invalid);
         }   
     } // }}}
  
