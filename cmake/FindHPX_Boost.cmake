@@ -112,7 +112,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
   if(BOOST_SUFFIX)
     # user suffix
     set(BOOST_SUFFIX ${BOOST_SUFFIX} CACHE STRING
-      "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds).")
+      "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds)." FORCE)
     set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
   elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug|RelWithDebInfo")
     set(BOOST_LIB_SUFFIX "-gd") 
@@ -178,11 +178,11 @@ macro(find_boost_library TARGET_LIB)
         unset(BOOST_${TARGET_LIB}_LIBRARY)
       else()
         set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-          CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
+          CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
       endif()
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-        CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
+        CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
     endif()
     
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
@@ -210,7 +210,7 @@ macro(find_boost_library TARGET_LIB)
       unset(BOOST_${TARGET_LIB}_LIBRARY)
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-        CACHE FILEPATH "Boost ${TARGET_LIB} shared library.")
+        CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
     endif()
   
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})

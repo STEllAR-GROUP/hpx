@@ -32,6 +32,10 @@ macro(get_boost_version)
     if(NOT BOOST_LIB_DIR)
       find_path(BOOST_LIB_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
       set(BOOST_LIB_DIR "${BOOST_LIB_DIR}/lib")
+      if(NOT BOOST_LIB_DIR)
+        find_path(BOOST_LIB_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+        set(BOOST_LIB_DIR "${BOOST_LIB_DIR}/lib64" )
+      endif()
       hpx_debug("boost.version" "Using ${BOOST_LIB_DIR} as Boost shared library directory")
     endif()
     
@@ -89,32 +93,32 @@ macro(get_boost_version)
     hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}.")
   endif()
   
-  set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}
-    CACHE FILEPATH "Boost version.hpp header.")
-  set(BOOST_VERSION ${BOOST_VERSION}
-    CACHE STRING "Boost version (M_mm string version).")
-  set(BOOST_VERSION_NUM ${BOOST_VERSION_NUM}
-    CACHE STRING "Boost version (unsigned integer version).")
-  set(BOOST_MAJOR_VERSION ${BOOST_MAJOR_VERSION}
-    CACHE STRING "Boost major version (M).")
-  set(BOOST_MINOR_VERSION ${BOOST_MINOR_VERSION}
-    CACHE STRING "Boost minor version (mm).")
-  set(BOOST_PATCH_VERSION ${BOOST_PATCH_VERSION}
-    CACHE STRING "Boost patch version (p).")
+  set(BOOST_VERSION_HPP "${BOOST_VERSION_HPP}"
+    CACHE FILEPATH "Boost version.hpp header." FORCE)
+  set(BOOST_VERSION "${BOOST_VERSION}"
+    CACHE STRING "Boost version (M_mm string version)." FORCE)
+  set(BOOST_VERSION_NUM "${BOOST_VERSION_NUM}"
+    CACHE STRING "Boost version (unsigned integer version)." FORCE)
+  set(BOOST_MAJOR_VERSION "${BOOST_MAJOR_VERSION}"
+    CACHE STRING "Boost major version (M)." FORCE)
+  set(BOOST_MINOR_VERSION "${BOOST_MINOR_VERSION}"
+    CACHE STRING "Boost minor version (mm)." FORCE)
+  set(BOOST_PATCH_VERSION "${BOOST_PATCH_VERSION}"
+    CACHE STRING "Boost patch version (p)." FORCE)
   set(BOOST_VERSION_STR
     "${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}"
-    CACHE STRING "Boost version (M.mm.p string version).")
+    CACHE STRING "Boost version (M.mm.p string version)." FORCE)
   
   hpx_info("boost.version" "Boost version is ${BOOST_VERSION_STR}.")
 
-  set(BOOST_USE_SYSTEM ${BOOST_USE_SYSTEM} CACHE BOOL
-    "Set to true to search for a system install of Boost (default ON).")
-  set(BOOST_ROOT ${BOOST_ROOT} CACHE FILEPATH
-    "The Boost source tree to use (default: BOOST_ROOT or BOOST environmental variable).")
-  set(BOOST_LIB_DIR ${BOOST_LIB_DIR} CACHE FILEPATH
-    "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib).")
-  set(BOOST_INCLUDE_DIR ${BOOST_INCLUDE_DIR} CACHE FILEPATH
-    "Include path for Boost (default: \${BOOST_ROOT}).")
+  set(BOOST_USE_SYSTEM "${BOOST_USE_SYSTEM}" CACHE BOOL
+    "Set to true to search for a system install of Boost (default ON)." FORCE)
+  set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH
+    "The Boost source tree to use (default: BOOST_ROOT or BOOST environmental variable)." FORCE)
+  set(BOOST_LIB_DIR "${BOOST_LIB_DIR}" CACHE PATH
+    "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib)." FORCE)
+  set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" CACHE PATH
+    "Include path for Boost (default: \${BOOST_ROOT})." FORCE)
   
   endif()
 endmacro()
