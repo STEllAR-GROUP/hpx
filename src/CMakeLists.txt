@@ -45,6 +45,7 @@ if(NOT MSVC)
 
   get_target_property(path hpx_serialization LOCATION)
   get_filename_component(name "${path}" NAME)
+
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
@@ -55,7 +56,7 @@ if(NOT MSVC)
       PROPERTY COMPILE_FLAGS
       "-Wall -Wno-strict-aliasing -Wsign-promo")
   endif()
-
+  
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES})
   set_target_properties(hpx PROPERTIES
@@ -175,7 +176,7 @@ else()
       FILES ${hpxlib_performance_counters_server_HEADERS})
   
   # runtime
-  set (hpxlib_runtime_HEADERS
+  set(hpxlib_runtime_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/get_lva.hpp)
   source_group("Header Files\\Runtime" 
       FILES ${hpxlib_runtime_HEADERS})
@@ -215,8 +216,8 @@ else()
       FILES ${hpxlib_agas_database_HEADERS})
 
   set(hpxlib_agas_database_backend_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/continuation_impl.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/manage_object_action.hpp)
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/std_map.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/default.hpp)
   source_group("Header Files\\Runtime\\AGAS\\Database\\Backend" 
       FILES ${hpxlib_agas_database_backend_HEADERS})
 
@@ -432,9 +433,9 @@ else()
       FILES ${hpxlib_global_SOURCES})
   
   # lcos
-  set (hpxlib_lcos_SOURCES
+  set(hpxlib_lcos_SOURCES
       ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
-  source_group ("Source Files\\LCOs" 
+  source_group("Source Files\\LCOs" 
       FILES ${hpxlib_lcos_SOURCES})
   
   # performance counters
@@ -551,7 +552,7 @@ else()
       util/binary_portable_archives.cpp
       util/portable_binary_iarchive.cpp
       util/portable_binary_oarchive.cpp)
-  source_group ("Source Files\\Serialization" 
+  source_group("Source Files\\Serialization" 
       FILES ${hpxserializationlib_SOURCES})
 
   # libhpx_serialization
@@ -571,12 +572,6 @@ else()
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
-
-#  if(NOT HPX_DISABLE_WARNINGS)
-#    set_property(TARGET hpx_serialization APPEND
-#      PROPERTY COMPILE_FLAGS
-#      "-Wall -Wno-strict-aliasing -Wsign-promo")
-#  endif()
 
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES}

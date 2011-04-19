@@ -179,6 +179,8 @@ if(MSVC)
     add_definitions(-DDEBUG)
   endif()
 
+  set(CMAKE_DEBUG_POSTFIX "d")
+
   # we auto-link on Windows
   set(BOOST_FOUND_LIBRARIES "")
 
