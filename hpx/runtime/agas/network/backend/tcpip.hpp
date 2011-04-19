@@ -32,7 +32,7 @@ struct name_hook<tag::network::tcpip>
     typedef char const* result_type;
 
     static result_type call()
-    { return "TCPIP"; }
+    { return "tcpip"; }
 };
 
 }}}}

@@ -5,11 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_6A8F4842_FB5A_4B32_8D20_56368768A707)
-#define HPX_6A8F4842_FB5A_4B32_8D20_56368768A707
+#if !defined(HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473)
+#define HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 
-#if defined(HPX_USE_ASIO_IB_SUPPORT)
-#include <boost/asio/ip/ib.hpp> // doesn't exist (yet)
+#include <boost/asio/ip/udp.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 
@@ -18,47 +17,43 @@
 namespace hpx { namespace agas 
 {
 
-namespace tag { namespace network { struct ib; }} 
+namespace tag { namespace network { struct udpip; }} 
 
 namespace traits { namespace network
 {
 
 template <>
-struct endpoint_type<tag::network::ib>
-{ typedef boost::asio::ib::endpoint type; };
+struct endpoint_type<tag::network::udpip>
+{ typedef boost::asio::ip::udp::endpoint type; };
 
 template <>
-struct name_hook<tag::network::ib>
+struct name_hook<tag::network::udpip>
 {
     typedef char const* result_type;
 
     static result_type call()
-    { return "IB"; }
+    { return "udpip"; }
 };
 
 }}}}
 
 BOOST_CLASS_VERSION(
-    hpx::agas::full_gva<hpx::agas::tag::network::ib>, 
+    hpx::agas::full_gva<hpx::agas::tag::network::udpip>, 
     hpx::agas::traits::serialization_version<
-        hpx::agas::tag::network::ib
+        hpx::agas::tag::network::udpip
     >::value)
 BOOST_CLASS_TRACKING(
-    hpx::agas::full_gva<hpx::agas::tag::network::ib>,
+    hpx::agas::full_gva<hpx::agas::tag::network::udpip>,
     boost::serialization::track_never)
 
 BOOST_CLASS_VERSION(
-    hpx::agas::gva<hpx::agas::tag::network::ib>, 
+    hpx::agas::gva<hpx::agas::tag::network::udpip>, 
     hpx::agas::traits::serialization_version<
-        hpx::agas::tag::network::ib
+        hpx::agas::tag::network::udpip
     >::value)
 BOOST_CLASS_TRACKING(
-    hpx::agas::gva<hpx::agas::tag::network::ib>,
+    hpx::agas::gva<hpx::agas::tag::network::udpip>,
     boost::serialization::track_never)
 
-#else
-  #warning HPX_USE_ASIO_IB_SUPPORT is not defined, IB protocol disabled.
-#endif
-
-#endif // HPX_6A8F4842_FB5A_4B32_8D20_56368768A707
+#endif // HPX_343471B7_B8A6_4DC1_8D83_FB9F754ED473
 

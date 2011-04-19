@@ -32,7 +32,7 @@ struct name_hook<tag::database::std_map>
     typedef char const* result_type;
 
     static result_type call()
-    { return "std::map"; }
+    { return "std_map"; }
 };
 
 }}}}
