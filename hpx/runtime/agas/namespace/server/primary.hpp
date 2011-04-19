@@ -40,7 +40,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef full_gva<Protocol> full_gva_type;
     typedef typename full_gva_type::count_type count_type;
     typedef typename full_gva_type::offset_type offset_type;
-    typedef components::component_type component_type;
+    typedef int component_type;
 
     typedef boost::fusion::vector2<count_type, component_type>
         decrement_result_type;
@@ -130,7 +130,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             }
 
             // Compute the locality's prefix
-            boost::uint32_t prefix = reinterpret_cast<boost::uint32_t>
+            boost::uint32_t prefix = static_cast<boost::uint32_t>
                 (partition_table.size() + 1);
             naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
@@ -227,7 +227,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 // Store the new endpoint and offset
                 it->second.endpoint = gva.endpoint;
                 it->second.type = gva.type;
-                it->second.lva = gva.lva;
+                it->second.base_lva = gva.lva;
                 it->second.offset = offset;
                 return true;
             }
@@ -284,10 +284,10 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Load the GVA table 
-        typename partition_table_type::map_type&
+        typename partition_table_type::map_type const&
             partition_table = partitions_.get();
 
-        typename partition_table_type::map_type::iterator
+        typename partition_table_type::map_type::const_iterator
             it = partition_table.find(ep),
             end = partition_table.end(); 
 
@@ -311,9 +311,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         typename database_mutex_type::scoped_lock l(mutex_);
         
         // Load the GVA table 
-        typename gva_table_type::map_type& gva_table = gvas_.get();
+        typename gva_table_type::map_type const& gva_table = gvas_.get();
 
-        typename gva_table_type::map_type::iterator
+        typename gva_table_type::map_type::const_iterator
             it = gva_table.lower_bound(id),
             begin = gva_table.begin(),
             end = gva_table.end();
@@ -325,7 +325,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             {
                 return gva_type(it->second.endpoint,
                                 it->second.type,
-                                it->second.lva);
+                                it->second.base_lva);
             }
 
             // We need to decrement the iterator, check that it's safe to do
@@ -487,9 +487,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 {
                     // Did we get an exact match?
                     if (git->first == id)
-                        return decrement_result_type(cnt,
-                            reinterpret_cast<components::component_type>
-                                (git->second.type));
+                        return decrement_result_type(cnt, git->second.type);
 
                     // Check if we can safely decrement the iterator.
                     else if (git != gbegin)
@@ -501,9 +499,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                         {
                             // Make sure that the msbs match
                             if (id.get_msb() == git->first.get_msb())
-                                return decrement_result_type(cnt,
-                                    reinterpret_cast<components::component_type>
-                                        (git->second.type));
+                                return decrement_result_type
+                                    (cnt, git->second.type);
                         } 
                     }
                 }
@@ -517,9 +514,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     {
                         // Make sure that the msbs match
                         if (id.get_msb() == git->first.get_msb())
-                            return decrement_result_type(cnt,
-                                reinterpret_cast<components::component_type>
-                                    (git->second.type));
+                            return decrement_result_type(cnt, git->second.type);
                     } 
                 }
 
@@ -613,9 +608,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         &primary_namespace<Database, Protocol>::resolve_gid
     > resolve_gid_action;
     
-    typedef hpx::actions::result_action2<
+    typedef hpx::actions::action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ void, 
         /* enum value */  namespace_unbind,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::unbind
