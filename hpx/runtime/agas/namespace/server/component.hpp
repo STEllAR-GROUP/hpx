@@ -92,7 +92,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
             // this without our help.
             fit = factory_table.insert(typename
                 factory_table_type::map_type::value_type
-                    (cit->second, prefixes_type()));
+                    (cit->second, prefixes_type())).first;
 
         BOOST_ASSERT(fit != fend);
 
@@ -146,7 +146,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
         typename factory_table_type::map_type& factory_table =
             factories_.get();
 
-        typename component_id_table_type::map_type::const_iterator
+        typename component_id_table_type::map_type::iterator
             it = c_id_table.find(key), end = c_id_table.end();
 
         // REVIEW: Should this be an error?
@@ -192,9 +192,8 @@ struct HPX_COMPONENT_EXPORT component_namespace
         &component_namespace<Database>::resolve_name
     > resolve_name_action;
     
-    typedef hpx::actions::result_action1<
+    typedef hpx::actions::action1<
         component_namespace<Database>,
-        /* return type */ void,
         /* enum value */  namespace_unbind,
         /* arguments */   component_name_type const&,
         &component_namespace<Database>::unbind
