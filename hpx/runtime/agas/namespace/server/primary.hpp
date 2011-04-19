@@ -8,6 +8,8 @@
 #if !defined(HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21)
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
+#include <boost/preprocessor/stringize.hpp>
+
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
@@ -184,10 +186,15 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         }
     } // }}}
 
-    range_type bind_gid(naming::gid_type const& gid, gva_type const& gva,
-                        count_type count, offset_type offset)
+    bool bind_gid(naming::gid_type const& gid, gva_type const& gva,
+                  count_type count, offset_type offset)
     { // {{{ bind_gid implementation
         using boost::fusion::at_c;
+
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
 
         typename database_mutex_type::scoped_lock l(mutex_);
 
@@ -198,11 +205,6 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             it = gva_table.lower_bound(id),
             begin = gva_table.begin(),
             end = gva_table.end();
-
-        // TODO: Implement and use a non-mutating version of
-        // strip_credit_from_gid()
-        naming::gid_type id = gid;
-        naming::strip_credit_from_gid(id); 
 
         if (it != end)
         {
@@ -224,6 +226,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 it->second.type = gva.type;
                 it->second.lva = gva.lva;
                 it->second.offset = offset;
+                return true;
             }
 
             // We're about to decrement it, so make sure it's safe to do so.
@@ -232,12 +235,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 --it;
 
                 // Check that a previous range doesn't cover the new id.
-                if (HPX_UNLIKELY((it->first + it->second.count) > id))
-                {
-                    // REVIEW: Is this the right error code to use?
-                    HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
-                        "the new GID is contained in an existing range");
-                }
+                if ((it->first + it->second.count) > id)
+                    return false;
             }
         }            
 
@@ -245,17 +244,14 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         {
             --it;
             // Check that a previous range doesn't cover the new id.
-            if (HPX_UNLIKELY((it->first + it->second.count) > id))
-            {
-                // REVIEW: Is this the right error code to use?
-                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
-                    "the new GID is contained in an existing range");
-            }
+            if ((it->first + it->second.count) > id)
+                return false;
         }
 
         naming::gid_type upper_bound(id + (count - 1));
 
-        if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb())) {
+        if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
+        {
             HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
                 "msb's of lower and upper range bound do not match");
         }
@@ -272,33 +268,237 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 "insertion failed due to memory corruption or a locking "
                 "error");
         }
+
+        return true;
     } // }}}
 
     // REVIEW: Right return type, yes/no?
     range_type resolve_locality(endpoint_type const& ep) const
-    { // {{{ resolve_endpoint implementation (TODO)
+    { // {{{ resolve_endpoint implementation
+        using boost::fusion::at_c;
+
         typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Load the GVA table 
+        typename partition_table_type::map_type&
+            partition_table = partitions_.get();
+
+        typename partition_table_type::map_type::iterator
+            it = partition_table.find(ep),
+            end = partition_table.end(); 
+
+        if (it != end)
+        {
+            return range_type(
+                naming::get_gid_from_prefix(at_c<0>(it->second)),
+                at_c<1>(it->second));
+        }
+
+        return range_type();
     } // }}}
 
     gva_type resolve_gid(naming::gid_type const& gid) const
-    { // {{{ resolve_gid implementation (TODO)
+    { // {{{ resolve_gid implementation 
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
+            
         typename database_mutex_type::scoped_lock l(mutex_);
+        
+        // Load the GVA table 
+        typename gva_table_type::map_type& gva_table = gvas_.get();
+
+        typename gva_table_type::map_type::iterator
+            it = gva_table.lower_bound(id),
+            begin = gva_table.begin(),
+            end = gva_table.end();
+
+        if (it != end)
+        {
+            // Check for exact match
+            if (it->first == id)
+            {
+                return gva_type(it->second.endpoint,
+                                it->second.type,
+                                it->second.lva);
+            }
+
+            // We need to decrement the iterator, check that it's safe to do
+            // so.
+            else if (it != begin)
+            {
+                --it;
+
+                // Found the GID in a range
+                if ((it->first + it->second.count) > id)
+                {
+                    if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
+                    {
+                        HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                            "msb's of lower and upper range bound do not match");
+                    }
+ 
+                    // Calculation of the local address occurs in the gva ctor
+                    return gva_type(it->second, id, it->first);
+                }
+            }
+        }
+
+        else if (HPX_LIKELY(!gva_table.empty()))
+        {
+            --it;
+
+            // Found the GID in a range
+            if ((it->first + it->second.count) > id)
+            {
+                if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
+                {
+                    HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                        "msb's of lower and upper range bound do not match");
+                }
+ 
+                // Calculation of the local address occurs in the gva ctor
+                return gva_type(it->second, id, it->first);
+            }
+        }
+
+        return gva_type();
     } // }}}
 
-    bool unbind(endpoint_type const& ep, count_type count)
-    { // {{{ unbind implementation (TODO)
+    void unbind(naming::gid_type const& gid, count_type count)
+    { // {{{ unbind implementation
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
+        
         typename database_mutex_type::scoped_lock l(mutex_);
+        
+        // Load the GVA table 
+        typename gva_table_type::map_type& gva_table = gvas_.get();
+
+        typename gva_table_type::map_type::iterator
+            it = gva_table.find(id),
+            end = gva_table.end();
+
+        if (it != end)
+        {
+            if (it->second.count != count)
+            {
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "block sizes must match");
+            }
+
+            gva_table.erase(it);
+        }       
     } // }}}
 
     count_type increment(naming::gid_type const& gid, count_type credits)
-    { // {{{ increment implementation (TODO)
+    { // {{{ increment implementation
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
+        
         typename database_mutex_type::scoped_lock l(mutex_);
+
+        typename refcnt_table_type::map_type& refcnt_table = refcnts_.get();
+
+        typename refcnt_table_type::map_type::iterator
+            it = refcnt_table.find(id),
+            end = refcnt_table.end();
+
+        // See if this is the first increment request for this GID
+        if (it == end)
+        {
+            std::pair<typename refcnt_table_type::map_type::iterator, bool>
+                p = refcnt_table.insert(id, HPX_INITIAL_GLOBALCREDIT);
+
+            if (HPX_UNLIKELY(!p.second))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    "insertion failed due to memory corruption or a locking "
+                    "error");
+            }
+
+            it = p.first;
+        }
+       
+        // Add the requested amount and return the new total 
+        return (it->second += credits);
     } // }}}
     
     decrement_result_type 
     decrement(naming::gid_type const& gid, count_type credits)
-    { // {{{ decrement implementation (TODO)
+    { // {{{ decrement implementation
+        // TODO: Implement and use a non-mutating version of
+        // strip_credit_from_gid()
+        naming::gid_type id = gid;
+        naming::strip_credit_from_gid(id); 
+
+        if (HPX_UNLIKELY(credits <= HPX_INITIAL_GLOBALCREDIT))
+        {
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                "cannot decrement more than "
+                BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
+                " credits");
+        } 
+        
         typename database_mutex_type::scoped_lock l(mutex_);
+            
+        typename refcnt_table_type::map_type& refcnt_table = refcnts_.get();
+
+        typename refcnt_table_type::map_type::iterator
+            it = refcnt_table.find(id),
+            end = refcnt_table.end();
+
+        if (it != end)
+        {
+            if (HPX_UNLIKELY(it->second < credits))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "bogus credit encountered while decrement global reference "
+                    "count");
+            }
+
+            count_type cnt = (it->second -= credits);
+            
+            if (0 == cnt)
+            {
+                // TODO: erase, find type in gva table, return (0, type)
+            }
+
+            else
+                return decrement_result_type(cnt, components::component_invalid);
+        }
+        
+        // We need to insert a new reference count entry. We assume that
+        // binding has already created a first reference + credits.
+        else 
+        {
+            std::pair<typename refcnt_table_type::map_type::iterator, bool>
+                p = refcnt_table.insert(id, HPX_INITIAL_GLOBALCREDIT);
+
+            if (HPX_UNLIKELY(!p.second))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    "insertion failed due to memory corruption or a locking "
+                    "error");
+            }
+            
+            it = p.first;
+            
+            if (HPX_UNLIKELY(it->second < credits))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "bogus credit encountered while decrement global reference "
+                    "count");
+            }
+            
+            return decrement_result_type
+                ((it->second -= credits), components::component_invalid);
+        }   
     } // }}}
  
     // {{{ action types
@@ -323,7 +523,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
    
     typedef hpx::actions::result_action4<
         primary_namespace<Database, Protocol>,
-        /* return type */ range_type,
+        /* return type */ bool,
         /* enum value */  namespace_bind_gid,
         /* arguments */   naming::gid_type const&, gva_type const&, count_type,
                           offset_type,
@@ -348,9 +548,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ bool, 
+        /* return type */ void, 
         /* enum value */  namespace_unbind,
-        /* arguments */   endpoint_type const&, count_type,
+        /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::unbind
     > unbind_action;
     

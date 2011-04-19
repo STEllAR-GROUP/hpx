@@ -53,7 +53,7 @@ struct primary_namespace
     range_type bind(gva_type const& gva, count_type count)
     { return this->base_type::bind_locality(this->gid_, gva, count); }
     
-    lcos::future_value<range_type>
+    lcos::future_value<bool>
     bind_async(naming::gid_type const& gid, gva_type const& gva,
                count_type count, offset_type offset)
     {
@@ -61,8 +61,8 @@ struct primary_namespace
             (this->gid_, gid, gva, count, offset);
     }
 
-    range_type bind(naming::gid_type const& gid, gva_type const& gva,
-                   count_type count, offset_type offset)
+    bool bind(naming::gid_type const& gid, gva_type const& gva,
+              count_type count, offset_type offset)
     { return this->base_type::bind_gid(this->gid_, gid, gva, count, offset); }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -83,12 +83,12 @@ struct primary_namespace
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<bool>
-    unbind_async(endpoint_type const& ep, count_type count)
-    { return this->base_type::unbind_async(this->gid_, ep, count); }
+    lcos::future_value<void>
+    unbind_async(naming::gid_type const& gid, count_type count)
+    { return this->base_type::unbind_async(this->gid_, gid, count); }
     
-    bool unbind(endpoint_type const& ep, count_type count)
-    { return this->base_type::unbind(this->gid_, ep, count); }
+    void unbind(naming::gid_type const& gid, count_type count)
+    { return this->base_type::unbind(this->gid_, gid, count); }
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 

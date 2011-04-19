@@ -48,7 +48,7 @@ struct gva
         lva(reinterpret_cast<lva_type>(a)) {}
 
     gva(full_gva<Protocol> const& f, naming::gid_type const& gid,
-         naming::gid_type const& gidbase)
+        naming::gid_type const& gidbase)
       : endpoint(f.endpoint),
         type(f.type)
     { lva = (gid.get_lsb() - gidbase.get_lsb()) * f.offset; }

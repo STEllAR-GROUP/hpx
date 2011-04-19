@@ -50,16 +50,16 @@ struct primary_namespace
     // }}}
     
     // {{{ bind_gid dispatch
-    static lcos::future_value<range_type>
+    static lcos::future_value<bool>
     bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                    gva_type const& gva, count_type count, offset_type offset)
     {
         typedef typename server_type::bind_gid_action action_type;
-        return lcos::eager_future<action_type, range_type>
+        return lcos::eager_future<action_type, bool>
             (gid, id, gva, count, offset);
     }
 
-    static range_type
+    static bool
     bind_gid(naming::id_type const& gid, naming::gid_type const& id,
              gva_type const& gva, count_type count, offset_type offset)
     { return bind_gid_async(gid, id, gva, count, offset).get(); } 
@@ -92,17 +92,17 @@ struct primary_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<bool>
-    unbind_async(naming::id_type const& gid, endpoint_type const& ep,
+    static lcos::future_value<void>
+    unbind_async(naming::id_type const& gid, naming::gid_type const& id,
                  count_type count)
     {
         typedef typename server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, bool>(gid, ep, count);
+        return lcos::eager_future<action_type, void>(gid, id, count);
     }
     
-    static bool unbind(naming::id_type const& gid, endpoint_type const& ep,
+    static void unbind(naming::id_type const& gid, naming::gid_type const& id,
                        count_type count)
-    { return unbind_async(gid, ep, count).get(); } 
+    { return unbind_async(gid, id, count).get(); } 
     // }}}
     
     // {{{ increment dispatch 
