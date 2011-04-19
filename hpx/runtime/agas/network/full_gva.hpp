@@ -42,8 +42,8 @@ struct full_gva
         offset(0) {}
 
     full_gva(endpoint_type const& ep,
-              component_type t = components::component_invalid, lva_type a = 0,
-              count_type c = 0, offset_type o = 0)
+             component_type t = components::component_invalid, lva_type a = 0,
+             count_type c = 0, offset_type o = 0)
       : endpoint(ep),
         type(t),
         base_lva(a),
@@ -51,7 +51,7 @@ struct full_gva
         offset(o) {}
 
     full_gva(endpoint_type const& ep, component_type t, void* a,
-              count_type c = 0, offset_type o = 0)
+             count_type c = 0, offset_type o = 0)
       : endpoint(ep),
         type(t),
         base_lva(reinterpret_cast<lva_type>(a)),
