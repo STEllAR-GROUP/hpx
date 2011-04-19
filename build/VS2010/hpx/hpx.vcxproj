@@ -145,6 +145,7 @@
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\process_clock.cpp" />
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer.cpp" />
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer_static.cpp" />
+    <ClCompile Include="..\..\..\src\util\serialize_exception.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp" />

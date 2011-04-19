@@ -101,6 +101,8 @@ find_package(HPX_Boost)
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
 
+# the Boost serialization library needs to be linked as a shared library
+add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 
 # additional preprocessor definitions (TODO: find out what these do)

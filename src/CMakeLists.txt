@@ -455,7 +455,8 @@ else()
       ${hpx_SOURCE_DIR}/src/util/io_service_pool.cpp
       ${hpx_SOURCE_DIR}/src/util/logging.cpp
       ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
-      ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp)
+      ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp
+      ${hpx_SOURCE_DIR}/src/util/serialize_exception.cpp)
   source_group("Source Files\\util" 
       FILES ${hpxlib_util_SOURCES})
   
@@ -494,11 +495,11 @@ else()
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
 
-  if(NOT HPX_DISABLE_WARNINGS)
-    set_property(TARGET hpx_serialization APPEND
-      PROPERTY COMPILE_FLAGS
-      "-Wall -Wno-strict-aliasing -Wsign-promo")
-  endif()
+#  if(NOT HPX_DISABLE_WARNINGS)
+#    set_property(TARGET hpx_serialization APPEND
+#      PROPERTY COMPILE_FLAGS
+#      "-Wall -Wno-strict-aliasing -Wsign-promo")
+#  endif()
 
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES}

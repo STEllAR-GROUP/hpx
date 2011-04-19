@@ -20,8 +20,36 @@ namespace hpx { namespace components
     inline void console_logging_locked(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
     {
-        if (NULL != applier::get_applier_ptr()) 
-            applier::apply<server::console_logging_action>(prefix, dest, level, msg);
+        try {
+            if (NULL != applier::get_applier_ptr()) 
+                applier::apply<server::console_logging_action>(prefix, dest, level, msg);
+        }
+        catch(hpx::exception const& e) {
+            // if this is not the console locality (or any other error occurs)
+            // we might be too late for any logging, write to local file
+            switch (dest) {
+            default:
+            case server::destination_hpx:
+                LHPX_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LHPX_CONSOLE_(level) << msg;
+                break;
+
+            case server::destination_timing:
+                LTIM_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LTIM_CONSOLE_(level) << msg;
+                break;
+
+            case server::destination_agas:
+                LAGAS_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LAGAS_CONSOLE_(level) << msg;
+                break;
+
+            case server::destination_app:
+                LAPP_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LAPP_CONSOLE_(level) << msg;
+                break;
+            }
+        }
     }
 
     struct pending_logs

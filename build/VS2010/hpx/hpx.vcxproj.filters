@@ -287,6 +287,9 @@
     <ClCompile Include="..\..\..\external\nedmalloc\src\nedmalloc.c">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\serialize_exception.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">

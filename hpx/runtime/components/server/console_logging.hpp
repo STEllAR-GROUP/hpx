@@ -34,8 +34,28 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     BOOST_DECLARE_LOG_FILTER(app_console_level, filter_type)
     BOOST_DECLARE_LOG(app_console_logger, logger_type)
-
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+#define LAGAS_CONSOLE_(lvl)                                                   \
+    BOOST_LOG_USE_LOG(util::agas_console_logger(), read_msg().gather().out(), \
+        util::agas_console_level()->is_enabled(lvl))                          \
+/**/
+
+#define LTIM_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(util::timing_console_logger(), read_msg().gather().out(),\
+        util::timing_console_level()->is_enabled(lvl))                        \
+/**/
+
+#define LHPX_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(util::hpx_console_logger(), read_msg().gather().out(),  \
+        util::hpx_console_level()->is_enabled(lvl))                           \
+/**/
+
+#define LAPP_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(util::app_console_logger(), read_msg().gather().out(),  \
+        util::app_console_level()->is_enabled(lvl))                           \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 

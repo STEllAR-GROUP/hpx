@@ -16,5 +16,6 @@ add_hpx_library_sources(hpx
   itt_notify.cpp
   logging.cpp
   performance_counters.cpp
-  runtime_configuration.cpp)
+  runtime_configuration.cpp
+  serialize_exception.cpp)
 

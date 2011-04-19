@@ -50,10 +50,11 @@ namespace hpx { namespace lcos
             > hook_type;
 
             queue_entry(threads::thread_id_type id)
-              : id_(id)
+              : id_(id), aborted_waiting_(false)
             {}
 
             threads::thread_id_type id_;
+            bool aborted_waiting_;
             hook_type list_hook_;
         };
 
@@ -83,13 +84,14 @@ namespace hpx { namespace lcos
 
         ~counting_semaphore()
         {
-            if (!queue_.empty() && LHPX_ENABLED(fatal)) {
-                LERR_(fatal) << "~counting_semaphore: queue is not empty";
+            if (!queue_.empty()) {
+                LERR_(fatal) << "~counting_semaphore: queue is not empty, aborting threads";
 
                 mutex_type::scoped_lock l(this);
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
+                    queue_.front().aborted_waiting_ = true;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -97,9 +99,10 @@ namespace hpx { namespace lcos
                     LERR_(fatal) << "~counting_semaphore: pending thread: " 
                             << get_thread_state_name(thrd->get_state()) 
                             << "(" << id << "): " << thrd->get_description();
+
+                    set_thread_state(id, threads::pending);
                 }
             }
-            BOOST_ASSERT(queue_.empty());   // queue has to be empty
         }
 
         /// \brief Wait for the semaphore to be signaled
@@ -131,6 +134,12 @@ namespace hpx { namespace lcos
 
                 if (e.id_)
                     queue_.erase(last);     // remove entry from queue
+
+                if (e.aborted_waiting_) {
+                    HPX_THROW_EXCEPTION(no_success, "counting_semaphore::wait",
+                        "aborted wait on counting_semaphore");
+                    return;
+                }
             }
 
             value_ -= count;
