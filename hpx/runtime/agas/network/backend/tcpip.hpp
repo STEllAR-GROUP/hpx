@@ -13,6 +13,7 @@
 #include <boost/serialization/tracking.hpp>
 
 #include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/util/serialize_asio_basic_endpoint.hpp>
 
 namespace hpx { namespace agas 
 {

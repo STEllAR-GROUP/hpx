@@ -8,7 +8,7 @@
 #if !defined(HPX_C57BB004_6631_4940_82EF_7F1A7990149A)
 #define HPX_C57BB004_6631_4940_82EF_7F1A7990149A
 
-#include <hpx/runtime/agas/database/backend/tcpip.hpp>
+#include <hpx/runtime/agas/network/backend/tcpip.hpp>
 
 namespace hpx { namespace agas
 {
