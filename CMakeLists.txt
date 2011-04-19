@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
+# Copyright (c)      2011 Vinay C Amatya
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -99,7 +100,7 @@ endif()
 find_package(HPX_Boost)
 
 include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIB_DIR}/lib)
+link_directories(${BOOST_LIB_DIR})
 
 # the Boost serialization library needs to be linked as a shared library
 add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
