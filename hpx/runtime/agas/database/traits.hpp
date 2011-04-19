@@ -32,7 +32,7 @@ struct connect_table_hook
     { /* default is a no-op */ }
 };
 
-template <typename Map, typename Database, typename Key, typename Value>
+template <typename Database, typename Key, typename Value, typename Map>
 inline void connect_table(Map& table, std::string const& name)
 { connect_table_hook<Database, Key, Value>::call(table, name); } 
 
@@ -45,7 +45,7 @@ struct disconnect_table_hook
     { /* default is a no-op */ }
 };
 
-template <typename Map, typename Database, typename Key, typename Value>
+template <typename Database, typename Key, typename Value, typename Map>
 inline void disconnect_table(Map& table)
 { disconnect_table_hook<Database, Key, Value>::call(table); } 
 

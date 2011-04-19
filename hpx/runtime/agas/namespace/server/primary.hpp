@@ -62,7 +62,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     // }}}
  
   private:
-    mutable database_mutex_type mutex_;
+    database_mutex_type mutex_;
     gva_table_type gvas_;
     partition_table_type partitions_;
     refcnt_table_type refcnts_;
@@ -138,8 +138,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             naming::gid_type lower_id(id.get_msb() + 1, 0);
 
             std::pair<typename partition_table_type::map_type::iterator, bool>
-                pit = partition_table.insert(ep,
-                    partition_type(prefix, lower_id));
+                pit = partition_table.insert(typename
+                    partition_table_type::map_type::value_type
+                        (ep, partition_type(prefix, lower_id)));
 
             // REVIEW: Should this be an assertion?
             // Check for an insertion failure. If this branch is triggered, then
@@ -160,8 +161,10 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             typename gva_table_type::map_type& gva_table = gvas_.get();
 
             std::pair<typename gva_table_type::map_type::iterator, bool>
-                git = gva_table.insert(id, full_gva_type
-                    (ep, components::component_runtime_support, 1, 0));
+                git = gva_table.insert(typename
+                    gva_table_type::map_type::value_type
+                        (id, full_gva_type
+                            (ep, components::component_runtime_support, 1, 0)));
 
             // REVIEW: Should this be an assertion?
             // Check for insertion failure.
@@ -257,8 +260,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         }
 
         std::pair<typename gva_table_type::map_type::iterator, bool>
-            p = gva_table.insert(id, full_gva_type
-                (gva.endpoint, gva.type, gva.lva, count, offset));
+            p = gva_table.insert(typename gva_table_type::map_type::value_type
+                (id, full_gva_type
+                    (gva.endpoint, gva.type, gva.lva, count, offset)));
         
         // REVIEW: Should this be an assertion?
         // Check for an insertion failure. 
@@ -273,7 +277,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     } // }}}
 
     // REVIEW: Right return type, yes/no?
-    range_type resolve_locality(endpoint_type const& ep) const
+    range_type resolve_locality(endpoint_type const& ep) 
     { // {{{ resolve_endpoint implementation
         using boost::fusion::at_c;
 
@@ -297,7 +301,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return range_type();
     } // }}}
 
-    gva_type resolve_gid(naming::gid_type const& gid) const
+    gva_type resolve_gid(naming::gid_type const& gid) 
     { // {{{ resolve_gid implementation 
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
@@ -413,7 +417,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         if (it == end)
         {
             std::pair<typename refcnt_table_type::map_type::iterator, bool>
-                p = refcnt_table.insert(id, HPX_INITIAL_GLOBALCREDIT);
+                p = refcnt_table.insert(typename
+                    refcnt_table_type::map_type::value_type
+                        (id, HPX_INITIAL_GLOBALCREDIT));
 
             if (HPX_UNLIKELY(!p.second))
             {
@@ -534,7 +540,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
 
             std::pair<typename refcnt_table_type::map_type::iterator, bool>
-                p = refcnt_table.insert(id, HPX_INITIAL_GLOBALCREDIT);
+                p = refcnt_table.insert(typename
+                    refcnt_table_type::map_type::value_type
+                        (id, HPX_INITIAL_GLOBALCREDIT));
 
             if (HPX_UNLIKELY(!p.second))
             {

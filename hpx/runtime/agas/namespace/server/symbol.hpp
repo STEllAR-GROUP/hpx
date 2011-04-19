@@ -31,7 +31,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     // }}} 
  
   private:
-    mutable database_mutex_type mutex_;
+    database_mutex_type mutex_;
     gid_table_type gids_;
   
   public:
@@ -46,26 +46,27 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
 
         // Always load the table once, as this operation might be slow for some
         // database backends.
-        typename gid_table_type::map_type& table = gids_.get();
+        typename gid_table_type::map_type& gid_table = gids_.get();
 
         typename gid_table_type::map_type::iterator
-            it = table.begin(), end = table.end();
+            it = gid_table.begin(), end = gid_table.end();
 
         if (it != end)
             return false;
 
-        table.insert(key, gid);
+        gid_table.insert(typename
+            gid_table_type::map_type::value_type(key, gid));
         return true; 
     } // }}}
 
-    naming::gid_type resolve(symbol_type const& key) const
+    naming::gid_type resolve(symbol_type const& key)
     { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
-        typename gid_table_type::map_type& table = gids_.get();
+        typename gid_table_type::map_type& gid_table = gids_.get();
 
         typename gid_table_type::map_type::iterator
-            it = table.begin(), end = table.end();
+            it = gid_table.begin(), end = gid_table.end();
 
         if (it == end)
             return naming::invalid_gid;
@@ -103,9 +104,8 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         &symbol_namespace<Database>::resolve
     > resolve_action;
     
-    typedef hpx::actions::result_action1<
+    typedef hpx::actions::action1<
         symbol_namespace<Database>,
-        /* return type */ void,
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
         &symbol_namespace<Database>::unbind

@@ -28,7 +28,4 @@ HPX_REGISTER_ACTION_EX
     (base_lco_with_value<std::string>::set_result_action,
      set_result_action_string);
 
-HPX_REGISTER_ACTION_EX
-    (base_lco_with_value<std::vector<boost::uint32_t> >::set_result_action,
-     set_result_action_prefix_vector);
 

@@ -13,11 +13,12 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/runtime/agas/namespaces/symbol.hpp>
 
-typedef hpx::components::agas::server::symbol_namespace_type<
-    hpx::agas::tag::protocol_independent
->::type agas_component;
+#include <hpx/runtime/agas/namespace/symbol.hpp>
+#include <hpx/runtime/agas/database/backend/default.hpp>
+
+typedef hpx::agas::server::symbol_namespace<hpx::agas::tag::database::std_map>
+    agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY
     (hpx::components::simple_component<agas_component>,

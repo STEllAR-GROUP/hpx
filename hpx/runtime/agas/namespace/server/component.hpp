@@ -44,7 +44,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
     // }}}
 
   private:
-    mutable database_mutex_type mutex_;
+    database_mutex_type mutex_;
     component_id_table_type component_ids_;
     factory_table_type factories_;
     component_id_type type_counter; 
@@ -76,7 +76,9 @@ struct HPX_COMPONENT_EXPORT component_namespace
         // This is the first request, so we use the type counter, and then
         // increment it.
         if (cit == cend)
-            cit = c_id_table.insert(key, type_counter++).first;
+            cit = c_id_table.insert(typename
+                component_id_table_type::map_type::value_type
+                    (key, type_counter++)).first;
 
         BOOST_ASSERT(cit != cend);
         
@@ -88,7 +90,9 @@ struct HPX_COMPONENT_EXPORT component_namespace
             // an empty set, then put the prefix into said set. This should
             // prevent a copy, though most compilers should be able to optimize
             // this without our help.
-            fit = factory_table.insert(cit->second, prefixes_type());
+            fit = factory_table.insert(typename
+                factory_table_type::map_type::value_type
+                    (cit->second, prefixes_type()));
 
         BOOST_ASSERT(fit != fend);
 
@@ -97,7 +101,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
         return cit->second;
     } // }}}
 
-    prefixes_type resolve_id(component_id_type key) const
+    prefixes_type resolve_id(component_id_type key) 
     { // {{{ resolve_id implementation 
         typename database_mutex_type::scoped_lock l(mutex_);
 
@@ -114,7 +118,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
         return it->second;
     } // }}}
     
-    component_id_type resolve_name(component_name_type const& key) const
+    component_id_type resolve_name(component_name_type const& key) 
     { // {{{ resolve_name implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 

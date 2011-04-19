@@ -34,7 +34,7 @@ template <typename Database, typename Key, typename Value,
           typename Enable = void>
 struct connect_table_hook;
 
-template <typename Map, typename Database, typename Key, typename Value>
+template <typename Database, typename Key, typename Value, typename Map>
 inline void connect_table(Map&, std::string const&);
 
 // Spirit-style CP
@@ -42,7 +42,7 @@ template <typename Database, typename Key, typename Value,
           typename Enable = void>
 struct disconnect_table_hook;
 
-template <typename Map, typename Database, typename Key, typename Value>
+template <typename Database, typename Key, typename Value, typename Map>
 inline void disconnect_table(Map&);
 
 }}}}
