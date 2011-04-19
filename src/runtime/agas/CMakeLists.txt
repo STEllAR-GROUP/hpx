@@ -5,7 +5,7 @@
 
 add_hpx_library_sources(hpx
   common_actions.cpp
-#  primary_namespace.cpp
-#  component_namespace.cpp
+  primary_namespace.cpp
+  component_namespace.cpp
   symbol_namespace.cpp)
 

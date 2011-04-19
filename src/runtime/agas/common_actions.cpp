@@ -6,12 +6,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
-#include <string>
 
+#include <boost/fusion/include/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -19,13 +20,29 @@
 #include <hpx/lcos/base_lco.hpp>
 
 using hpx::lcos::base_lco_with_value;
+using hpx::naming::gid_type;
+using boost::fusion::vector2;
 
-HPX_REGISTER_ACTION_EX
-    (base_lco_with_value<bool>::set_result_action,
-     set_result_action_int);
+HPX_REGISTER_ACTION_EX(
+    base_lco_with_value<bool>::set_result_action,
+    set_result_action_bool);
 
-HPX_REGISTER_ACTION_EX
-    (base_lco_with_value<std::string>::set_result_action,
-     set_result_action_string);
+// component_namespace's prefixes_type
+HPX_REGISTER_ACTION_EX(
+    base_lco_with_value<std::vector<boost::uint32_t> >::set_result_action,
+    set_result_action_agas_prefixes_type);
 
+typedef vector2<gid_type, gid_type> agas_range_type; 
+
+// primary_namespaces's range_type
+HPX_REGISTER_ACTION_EX(
+    base_lco_with_value<agas_range_type>::set_result_action,
+    set_result_action_agas_range_type);
+
+typedef vector2<boost::uint64_t, int> agas_decrement_result_type;
+ 
+// primary_namespaces's decrement_result_type
+HPX_REGISTER_ACTION_EX(
+    base_lco_with_value<agas_decrement_result_type>::set_result_action,
+    set_result_action_agas_decrement_result_type);
 
