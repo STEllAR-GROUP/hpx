@@ -177,7 +177,7 @@ else()
   # runtime
   set (hpxlib_runtime_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/get_lva.hpp)
-  source_group("Header Files\\runtime" 
+  source_group("Header Files\\Runtime" 
       FILES ${hpxlib_runtime_HEADERS})
   
   # actions 
@@ -192,9 +192,71 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/manage_object_action.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action_implementations.hpp)
-  source_group("Header Files\\runtime\\actions" 
+  source_group("Header Files\\Runtime\\Actions" 
       FILES ${hpxlib_actions_HEADERS})
-  
+
+  # AGAS
+  set(hpxlib_agas_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits.hpp.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits_fwd.hpp)
+  source_group("Header Files\\Runtime\\AGAS" 
+      FILES ${hpxlib_agas_HEADERS})
+
+  set(hpxlib_agas_client_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/client/legacy_agent.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Client" 
+      FILES ${hpxlib_agas_client_HEADERS})
+
+  set(hpxlib_agas_database_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/table.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits_fwd.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Database" 
+      FILES ${hpxlib_agas_database_HEADERS})
+
+  set(hpxlib_agas_database_backend_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/continuation_impl.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/manage_object_action.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Database\\Backend" 
+      FILES ${hpxlib_agas_database_backend_HEADERS})
+
+  set(hpxlib_agas_network_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/full_gva.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/table.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits_fwd.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Network" 
+      FILES ${hpxlib_agas_network_HEADERS})
+
+  set(hpxlib_agas_network_backend_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/default.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/ib.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/tcpip.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/udpip.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Network\\Backend" 
+      FILES ${hpxlib_agas_network_backend_HEADERS})
+
+  set(hpxlib_agas_namespace_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/component.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/primary.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/symbol.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Namespace" 
+      FILES ${hpxlib_agas_namespace_HEADERS})
+
+  set(hpxlib_agas_namespace_server_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/component.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/primary.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/symbol.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Namespace\\Server" 
+      FILES ${hpxlib_agas_namespace_server_HEADERS})
+
+  set(hpxlib_agas_namespace_stubs_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/component.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/primary.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/symbol.hpp)
+  source_group("Header Files\\Runtime\\AGAS\\Namespace\\Stubs" 
+      FILES ${hpxlib_agas_namespace_stubs_HEADERS})
+
   # applier
   set(hpxlib_applier_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/applier/applier.hpp
@@ -202,9 +264,9 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply_helper_implementations.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/applier/apply_implementations.hpp)
-  source_group("Header Files\\runtime\\applier" 
+  source_group("Header Files\\Runtime\\applier" 
       FILES ${hpxlib_applier_HEADERS})
-  
+
   # components
   set(hpxlib_components_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/components/client_base.hpp
@@ -221,9 +283,9 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/plain_component_factory.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp)
-  source_group("Header Files\\runtime\\components" 
+  source_group("Header Files\\Runtime\\Components" 
       FILES ${hpxlib_components_HEADERS})
-  
+
   set(hpxlib_components_server_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_error_sink.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/server/console_error_sink_singleton.hpp
@@ -237,16 +299,16 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/components/server/simple_component_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/server/wrapper_heap.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/server/wrapper_heap_list.hpp)
-  source_group("Header Files\\runtime\\components\\server" 
+  source_group("Header Files\\Runtime\\Components\\Server" 
       FILES ${hpxlib_components_server_HEADERS})
-  
+
   set(hpxlib_components_stubs_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/memory_block.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/runtime_support.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/stubs/stub_base.hpp)
-  source_group("Header Files\\runtime\\components\\stubs" 
+  source_group("Header Files\\Runtime\\Components\\Stubs" 
       FILES ${hpxlib_components_stubs_HEADERS})
-  
+
   # naming
   set(hpxlib_naming_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/naming/address.hpp
@@ -261,9 +323,9 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/reply.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/request.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/naming/server/request_handler.hpp)
-  source_group("Header Files\\runtime\\naming" 
+  source_group("Header Files\\Runtime\\Naming" 
       FILES ${hpxlib_naming_HEADERS})
-  
+
   # parcelset
   set(hpxlib_parcelset_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcel.hpp
@@ -273,9 +335,9 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelhandler_queue.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelport_queue.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelport_server_connection.hpp)
-  source_group("Header Files\\parcelset" 
+  source_group("Header Files\\Parcelset" 
       FILES ${hpxlib_parcelset_HEADERS})
-  
+
   # threadmanager
   set(hpxlib_threadmanager_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread.hpp
@@ -285,17 +347,24 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/detail/tagged_thread_state.hpp)
-  source_group("Header Files\\runtime\\threads" 
+  source_group("Header Files\\Runtime\\Threads" 
       FILES ${hpxlib_threadmanager_HEADERS})
-  
+
   set(hpxlib_threadmanager_policies_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/abp_queue_scheduler.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/callback_notifier.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/global_queue_scheduler.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/local_queue_scheduler.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/thread_queue.hpp)
-  source_group("Header Files\\runtime\\threads\\policies" 
+  source_group("Header Files\\Runtime\\Threads\\Policies" 
       FILES ${hpxlib_threadmanager_policies_HEADERS})
-  
+
+  set(hpxlib_threadmanager_detail_HEADERS
+      ${hpx_SOURCE_DIR}/hpx/runtime/threads/policies/tagged_thread_state.hpp)
+  source_group("Header Files\\Runtime\\Threads\\Detail" 
+      FILES ${hpxlib_threadmanager_detail_HEADERS})
+
   # util
   set(hpxlib_util_HEADERS
       ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
@@ -331,7 +400,7 @@ else()
       ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
       ${hpx_SOURCE_DIR}/hpx/util/util.hpp
       ${hpx_SOURCE_DIR}/hpx/util/value_logger.hpp)
-  source_group("Header Files\\util" 
+  source_group("Header Files\\Util" 
       FILES ${hpxlib_util_HEADERS})
   
   set(hpxlib_HEADERS 
@@ -365,45 +434,52 @@ else()
   # lcos
   set (hpxlib_lcos_SOURCES
       ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
-  source_group ("Source Files\\lcos" 
+  source_group ("Source Files\\LCOs" 
       FILES ${hpxlib_lcos_SOURCES})
   
   # performance counters
   set(hpxlib_performance_counters_SOURCES
       ${hpx_SOURCE_DIR}/src/performance_counters/counters.cpp
       ${hpx_SOURCE_DIR}/src/performance_counters/registry.cpp)
-  source_group("Source Files\\performance_counters" 
+  source_group("Source Files\\Performance Counters" 
       FILES ${hpxlib_performance_counters_SOURCES})
   
   set(hpxlib_performance_counters_stubs_SOURCES
       ${hpx_SOURCE_DIR}/src/performance_counters/stubs/performance_counter.cpp)
-  source_group("Source Files\\performance_counters\\stubs" 
+  source_group("Source Files\\Performance Counters\\Stubs" 
       FILES ${hpxlib_performance_counters_stubs_SOURCES})
   
   set(hpxlib_performance_counters_server_SOURCES
       ${hpx_SOURCE_DIR}/src/performance_counters/server/raw_counter.cpp)
-  source_group("Source Files\\performance_counters\\server" 
+  source_group("Source Files\\Performance Counters\\Server" 
       FILES ${hpxlib_performance_counters_server_SOURCES})
-  
+
   # actions 
   set(hpxlib_actions_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/actions/action_manager.cpp
       ${hpx_SOURCE_DIR}/src/runtime/actions/continuation.cpp)
-  source_group("Source Files\\runtime\\actions" 
+  source_group("Source Files\\Runtime\\Actions" 
       FILES ${hpxlib_actions_SOURCES})
-  
+
+  # AGAS 
+  set(hpxlib_agas_SOURCES
+      ${hpx_SOURCE_DIR}/src/runtime/agas/common_actions.cpp
+      ${hpx_SOURCE_DIR}/src/runtime/agas/symbol_namespace.cpp)
+  source_group("Source Files\\Runtime\\AGAS" 
+      FILES ${hpxlib_agas_SOURCES})
+
   # applier
   set(hpxlib_applier_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/applier/applier.cpp)
-  source_group("Source Files\\runtime\\applier" 
+  source_group("Source Files\\Runtime\\Applier" 
       FILES ${hpxlib_applier_SOURCES})
-  
+
   # components
   set(hpxlib_components_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/components/component_type.cpp)
-  source_group("Source Files\\runtime\\components" 
+  source_group("Source Files\\Runtime\\Components" 
       FILES ${hpxlib_components_SOURCES})
-  
+
   set(hpxlib_components_server_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/components/server/console_error_sink.cpp
       ${hpx_SOURCE_DIR}/src/runtime/components/server/console_error_sink_singleton.cpp
@@ -411,7 +487,7 @@ else()
       ${hpx_SOURCE_DIR}/src/runtime/components/server/memory.cpp
       ${hpx_SOURCE_DIR}/src/runtime/components/server/memory_block.cpp
       ${hpx_SOURCE_DIR}/src/runtime/components/server/runtime_support.cpp)
-  source_group("Source Files\\runtime\\components\\server" 
+  source_group("Source Files\\Runtime\\Somponents\\Server" 
       FILES ${hpxlib_components_server_SOURCES})
   
   # naming 
@@ -426,7 +502,7 @@ else()
       ${hpx_SOURCE_DIR}/src/runtime/naming/server/reply.cpp
       ${hpx_SOURCE_DIR}/src/runtime/naming/server/request.cpp
       ${hpx_SOURCE_DIR}/src/runtime/naming/server/request_handler.cpp)
-  source_group("Source Files\\runtime\\naming" 
+  source_group("Source Files\\Runtime\\Naming" 
       FILES ${hpxlib_naming_SOURCES})
   
   # parcelset
@@ -436,16 +512,16 @@ else()
       ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport.cpp
       ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport_connection.cpp
       ${hpx_SOURCE_DIR}/src/runtime/parcelset/server/parcelhandler_queue.cpp)
-  source_group("Source Files\\runtime\\parcelset" 
+  source_group("Source Files\\Runtime\\Parcelset" 
       FILES ${hpxlib_parcelset_SOURCES})
   
   # threadmanager
   set(hpxlib_threadmanager_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/threads/thread.cpp
       ${hpx_SOURCE_DIR}/src/runtime/threads/threadmanager.cpp)
-  source_group("Source Files\\runtime\\threads" 
+  source_group("Source Files\\Runtime\\Threads" 
       FILES ${hpxlib_threadmanager_SOURCES})
-  
+
   # util 
   set(hpxlib_util_SOURCES
       ${hpx_SOURCE_DIR}/src/util/asio_util.cpp
@@ -457,9 +533,10 @@ else()
       ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
       ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp
       ${hpx_SOURCE_DIR}/src/util/serialize_exception.cpp)
-  source_group("Source Files\\util" 
+  source_group("Source Files\\Util" 
       FILES ${hpxlib_util_SOURCES})
-  
+
+
   set(hpxserializationlib_HEADERS
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
       ${hpx_SOURCE_DIR}/hpx/util/binary_portable_iarchive.hpp
@@ -467,16 +544,16 @@ else()
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_archive.hpp
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_iarchive.hpp
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_oarchive.hpp)
-  source_group("Header Files\\serialization" 
+  source_group("Header Files\\Serialization" 
       FILES ${hpxserializationlib_HEADERS})
   
   set(hpxserializationlib_SOURCES
       util/binary_portable_archives.cpp
       util/portable_binary_iarchive.cpp
       util/portable_binary_oarchive.cpp)
-  source_group ("Source Files\\serialization" 
+  source_group ("Source Files\\Serialization" 
       FILES ${hpxserializationlib_SOURCES})
-  
+
   # libhpx_serialization
   add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES}
                                        ${hpxserializationlib_HEADERS})
