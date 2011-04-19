@@ -99,7 +99,7 @@ endif()
 find_package(HPX_Boost)
 
 include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIB_DIR})
+link_directories(${BOOST_LIB_DIR}/lib)
 
 # the Boost serialization library needs to be linked as a shared library
 add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
@@ -189,15 +189,7 @@ if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
-  add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
-  add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
-  add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
-  add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
-  add_definitions(-DBOOST_REGEX_DYN_LINK)
-  add_definitions(-DBOOST_SYSTEM_DYN_LINK)
-  add_definitions(-DBOOST_THREAD_DYN_DLL)
-  add_definitions(-DBOOST_SIGNALS2_DYN_LINK)
+  add_definitions(-DBOOST_ALL_DYN_LINK)
 
   # suppress certain warnings
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)

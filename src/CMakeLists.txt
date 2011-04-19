@@ -505,6 +505,8 @@ else()
   add_library(hpx SHARED ${hpx_SOURCES}
                          ${hpxlib_HEADERS})
 
+  target_link_libraries(hpx hpx_serialization)
+
   set_target_properties(hpx PROPERTIES
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
     VERSION ${HPX_VERSION}
