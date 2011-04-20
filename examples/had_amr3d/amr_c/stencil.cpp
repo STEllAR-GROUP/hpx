@@ -1147,15 +1147,14 @@ namespace hpx { namespace components { namespace amr
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // TEST
-        resultval.get() = val[0].get();
-        resultval->timestep_ = val[0]->timestep_ + 1;
-        if ( resultval->timestep_ >= par->nt0-2 ) {
+        //resultval.get() = val[0].get();
+        //resultval->timestep_ = val[0]->timestep_ + 1;
+        //if ( resultval->timestep_ >= par->nt0-2 ) {
           //std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
-          return 0;
-        }
-        return 1;
+        //  return 0;
+        //}
+        //return 1;
         // END TEST
-#if 0
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
         bool boundary = false;
@@ -1172,7 +1171,7 @@ namespace hpx { namespace components { namespace amr
           if ( val.size() == 1 ) {
             // no restriction needed
             resultval.get() = val[0].get();
-            if ( val[0]->timestep_ >= par->nt0-2 ) {
+            if ( resultval->timestep_ >= par->nt0-2 ) {
               return 0;
             } 
             return 1;
@@ -1652,7 +1651,7 @@ namespace hpx { namespace components { namespace amr
               BOOST_ASSERT(false);
             }
 
-            if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+            if ( resultval->timestep_ >= par->nt0-2 ) {
               return 0;
             }
             return 1;
@@ -1702,7 +1701,6 @@ namespace hpx { namespace components { namespace amr
           return 1;
        }
        BOOST_ASSERT(false);
-#endif
     }
 
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =

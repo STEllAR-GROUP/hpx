@@ -62,7 +62,8 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             unigrid_mesh.init_execute(function_type, numvals, numsteps,
                 do_logging ? logging_type : components::component_invalid,par);
 
-        std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
+        std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl << std::flush;
+ 
 
     // provide some wait time to read the elapsed time measurement
     //std::cout << " Hit return " << std::endl;
@@ -81,7 +82,6 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
         */
 
 //         boost::this_thread::sleep(boost::posix_time::seconds(3)); 
-
         for (std::size_t i = 0; i < result_data->size(); ++i)
             components::stubs::memory_block::free((*result_data)[i]);
     }   // amr_mesh needs to go out of scope before shutdown
@@ -278,10 +278,10 @@ int main(int argc, char* argv[])
         par->minx0       = -4.0;
         par->maxx0       =  4.0;
         par->ethreshold  =  0.005;
-        par->R0          =  8.0;
-        par->amp         =  0.1;
-        par->amp_dot     =  0.1;
-        par->delta       =  1.0;
+        par->R0          =  1.0;
+        par->amp         =  0.0;
+        par->amp_dot     =  1.0;
+        par->delta       =  0.5;
         par->gw          =  5;
         par->buffer      =  3;
         par->eps         =  0.0;
