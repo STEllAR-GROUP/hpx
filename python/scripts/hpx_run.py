@@ -102,7 +102,8 @@ class System(dict):
      
     for node_name in self:
       command = "grep %s /etc/hosts | awk '//{print $1}'" % node_name
-      process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+      process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
       (stdout, stderr) = process.communicate()
 
       ip = stdout.strip()
@@ -279,7 +280,8 @@ class DistributedRuntime(dict):
     cmd += "| awk '//{print \$1}' "
     cmd = "ssh %s \"%s\"" % (runtime.node.name, cmd)
     
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
     (stdout, stderr) = process.communicate()
     pid = stdout
 
@@ -290,7 +292,8 @@ class DistributedRuntime(dict):
       clean_cmd = "kill \-n 9 \`ps ax | grep %s | grep -v hpx_run | grep -v ctest | grep -v grep | awk '//{print \$1}'\`" % (app_name)
       ssh_cmd = "ssh %s \"%s\"" % (runtime.node.name, clean_cmd)
 
-      process = subprocess.Popen(ssh_cmd, shell=True, stdout=subprocess.PIPE)
+      process = subprocess.Popen(ssh_cmd, shell=True, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
       (stdout, stderr) = process.communicate()
 
 class LocalRuntime:
@@ -349,7 +352,8 @@ class LocalRuntime:
   def start(self):
     if self.environment.is_virtual:
       run = str(self.hpx_command)
-      self.process = subprocess.Popen(run,shell=True,stdout=subprocess.PIPE)
+      self.process = subprocess.Popen(run,shell=True,stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT)
     else:
       prefix = self.node.name
       cmd = str(self.hpx_command)
@@ -360,7 +364,8 @@ class LocalRuntime:
       run = "ssh %s \"%s %s %s\"" % (prefix, env, cmd, output)
       if not self.environment.silent_mode:
         print "$ %s" % (run)
-      self.process = subprocess.Popen(run,shell=True,stdout=subprocess.PIPE)
+      self.process = subprocess.Popen(run,shell=True,stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT)
 
 class HpxCommand:
   """
