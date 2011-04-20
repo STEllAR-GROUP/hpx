@@ -193,6 +193,17 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_DEFAULT_STACK_SIZE)
+    #if defined(BOOST_WINDOWS)
+        // four pages for windows, stack will automatically grow
+        #define HPX_DEFAULT_STACK_SIZE 0x4000
+    #else
+        // seven pages (one page is automatically added by coroutines as a buffer)
+        #define HPX_DEFAULT_STACK_SIZE 0x3000 
+    #endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #include <hpx/config/defaults.hpp>
 
 #endif

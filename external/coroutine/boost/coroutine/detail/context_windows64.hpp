@@ -59,10 +59,10 @@ namespace boost { namespace coroutines {
       std::abort();
     }
 
-    class ia64_win_context_impl_base : detail::context_impl_base  
+    class x86_64_win_context_impl_base : detail::context_impl_base  
     {
     public:
-      ia64_win_context_impl_base() : m_sp(0) {}
+      x86_64_win_context_impl_base() : m_sp(0) {}
 
       void prefetch() const 
       {
@@ -84,8 +84,8 @@ namespace boost { namespace coroutines {
        * @note This function is found by ADL.
        */     
       friend void 
-      swap_context(ia64_win_context_impl_base& from, 
-                   ia64_win_context_impl_base const& to, 
+      swap_context(x86_64_win_context_impl_base& from, 
+                   x86_64_win_context_impl_base const& to, 
                    default_hint) 
       {
         to.prefetch();
@@ -94,8 +94,8 @@ namespace boost { namespace coroutines {
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
       friend void 
-      swap_context(ia64_win_context_impl_base& from, 
-                   ia64_win_context_impl_base const& to,
+      swap_context(x86_64_win_context_impl_base& from, 
+                   x86_64_win_context_impl_base const& to,
                    yield_hint) 
       {
         to.prefetch();
@@ -103,8 +103,8 @@ namespace boost { namespace coroutines {
       }
 
       friend void 
-      swap_context(ia64_win_context_impl_base& from, 
-                   ia64_win_context_impl_base const& to,
+      swap_context(x86_64_win_context_impl_base& from, 
+                   x86_64_win_context_impl_base const& to,
                    yield_to_hint) 
       {
         to.prefetch();
@@ -137,14 +137,14 @@ namespace boost { namespace coroutines {
       delete [] static_cast<stack_aligner*>(stack);
     }
 
-    class ia64_win_context_impl : public ia64_win_context_impl_base
+    class x86_64_win_context_impl : public x86_64_win_context_impl_base
     {
     public:
-      enum { default_stack_size = 12288 };
+      enum { default_stack_size = 0x3000 };
       
-      typedef ia64_win_context_impl_base context_impl_base;
+      typedef x86_64_win_context_impl_base context_impl_base;
 
-      ia64_win_context_impl() 
+      x86_64_win_context_impl() 
         : m_stack(0) 
       {}
         
@@ -153,7 +153,7 @@ namespace boost { namespace coroutines {
        *  a new stack. The stack size can be optionally specified.
        */
       template<typename Functor>
-      ia64_win_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
+      x86_64_win_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
         : m_stack_size(stack_size == -1 ? default_stack_size : stack_size),
           m_stack(alloc_stack(m_stack_size)) 
       {
@@ -181,7 +181,7 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // r15
       }
       
-      ~ia64_win_context_impl() 
+      ~x86_64_win_context_impl() 
       {
         if(m_stack)
           free_stack(m_stack, m_stack_size);
@@ -192,7 +192,7 @@ namespace boost { namespace coroutines {
       void * m_stack;
     };
     
-    typedef ia64_win_context_impl context_impl;
+    typedef x86_64_win_context_impl context_impl;
   }
 }}}
 

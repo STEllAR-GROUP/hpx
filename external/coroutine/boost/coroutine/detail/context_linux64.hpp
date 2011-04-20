@@ -9,6 +9,7 @@
 #define BOOST_COROUTINE_CONTEXT_LINUX_HPP_20071126
 
 #if defined(__GNUC__) && defined(__x86_64__) && !defined(BOOST_COROUTINE_NO_ASM)
+#include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>
 #include <boost/coroutine/detail/posix_utility.hpp>
@@ -50,12 +51,12 @@ namespace boost { namespace coroutines {
       std::abort();
     }
 
-    class ia64_gcc_context_impl;
+    class x86_64_linux_context_impl;
 
-    class ia64_gcc_context_impl_base : detail::context_impl_base 
+    class x86_64_linux_context_impl_base : detail::context_impl_base 
     {
     public:
-      ia64_gcc_context_impl_base() {}
+      x86_64_linux_context_impl_base() {}
 
       void prefetch() const 
       {
@@ -76,29 +77,29 @@ namespace boost { namespace coroutines {
        * and restores the context in @p to.
        * @note This function is found by ADL.
        */     
-      friend void swap_context(ia64_gcc_context_impl_base& from, 
-          ia64_gcc_context_impl const& to, default_hint);
+      friend void swap_context(x86_64_linux_context_impl_base& from, 
+          x86_64_linux_context_impl const& to, default_hint);
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
-      friend void swap_context(ia64_gcc_context_impl& from, 
-          ia64_gcc_context_impl_base const& to, yield_hint);
+      friend void swap_context(x86_64_linux_context_impl& from, 
+          x86_64_linux_context_impl_base const& to, yield_hint);
 
-      friend void swap_context(ia64_gcc_context_impl& from, 
-          ia64_gcc_context_impl_base const& to, yield_to_hint);
+      friend void swap_context(x86_64_linux_context_impl& from, 
+          x86_64_linux_context_impl_base const& to, yield_to_hint);
 #endif
 
     protected:
       void ** m_sp;
     };
 
-    class ia64_gcc_context_impl : public ia64_gcc_context_impl_base
+    class x86_64_linux_context_impl : public x86_64_linux_context_impl_base
     {
     public:
-      enum { default_stack_size = 2*8192 };
+      enum { default_stack_size = 4*EXEC_PAGESIZE };
 
-      typedef ia64_gcc_context_impl_base context_impl_base;
+      typedef x86_64_linux_context_impl_base context_impl_base;
 
-      ia64_gcc_context_impl() 
+      x86_64_linux_context_impl() 
         : m_stack(0) 
       {}
 
@@ -107,7 +108,7 @@ namespace boost { namespace coroutines {
        *  a new stack. The stack size can be optionally specified.
        */
       template<typename Functor>
-      ia64_gcc_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
+      x86_64_linux_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
         : m_stack_size(stack_size == -1 ? default_stack_size : stack_size),
           m_stack(posix::alloc_stack(m_stack_size)) 
       {
@@ -137,21 +138,21 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // r15
       }
       
-      ~ia64_gcc_context_impl() 
+      ~x86_64_linux_context_impl() 
       {
         if(m_stack)
           posix::free_stack(m_stack, m_stack_size);
       }
 
-      friend void swap_context(ia64_gcc_context_impl_base& from, 
-          ia64_gcc_context_impl const& to, default_hint);
+      friend void swap_context(x86_64_linux_context_impl_base& from, 
+          x86_64_linux_context_impl const& to, default_hint);
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
-      friend void swap_context(ia64_gcc_context_impl& from, 
-          ia64_gcc_context_impl_base const& to, yield_hint);
+      friend void swap_context(x86_64_linux_context_impl& from, 
+          x86_64_linux_context_impl_base const& to, yield_hint);
 
-      friend void swap_context(ia64_gcc_context_impl& from, 
-          ia64_gcc_context_impl_base const& to, yield_to_hint);
+      friend void swap_context(x86_64_linux_context_impl& from, 
+          x86_64_linux_context_impl_base const& to, yield_to_hint);
 #endif
 
     private:
@@ -159,15 +160,15 @@ namespace boost { namespace coroutines {
       void * m_stack;
     };
     
-    typedef ia64_gcc_context_impl context_impl;
+    typedef x86_64_linux_context_impl context_impl;
 
     /**
      * Free function. Saves the current context in @p from
      * and restores the context in @p to.
      * @note This function is found by ADL.
      */     
-    inline void swap_context(ia64_gcc_context_impl_base& from, 
-        ia64_gcc_context_impl const& to, default_hint) 
+    inline void swap_context(x86_64_linux_context_impl_base& from, 
+        x86_64_linux_context_impl const& to, default_hint) 
     {
 //        BOOST_ASSERT(*(void**)to.m_stack == (void*)~0);
         to.prefetch();
@@ -175,16 +176,16 @@ namespace boost { namespace coroutines {
     }
 
 #ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
-    inline void swap_context(ia64_gcc_context_impl& from, 
-        ia64_gcc_context_impl_base const& to, yield_hint) 
+    inline void swap_context(x86_64_linux_context_impl& from, 
+        x86_64_linux_context_impl_base const& to, yield_hint) 
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack2(&from.m_sp, to.m_sp);
     }
 
-    inline void swap_context(ia64_gcc_context_impl& from, 
-        ia64_gcc_context_impl_base const& to, yield_to_hint) 
+    inline void swap_context(x86_64_linux_context_impl& from, 
+        x86_64_linux_context_impl_base const& to, yield_to_hint) 
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();

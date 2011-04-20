@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
                thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(init_data.func, id), //coroutine_type::impl_type::create(init_data.func, id)), 
+          : coroutine_(init_data.func, id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)), 
             current_state_(thread_state(newstate)), 
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""), 
