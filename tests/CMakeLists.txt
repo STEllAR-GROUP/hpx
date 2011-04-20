@@ -10,8 +10,8 @@ set(subdirs
     )
 
 foreach(subdir ${subdirs})
-  add_custom_target(tests.${subdir})
+  add_hpx_pseudo_target(tests.${subdir})
   add_subdirectory(${subdir})
-  add_dependencies(tests tests.${subdir})
+  add_hpx_pseudo_dependencies(tests tests.${subdir})
 endforeach()
 

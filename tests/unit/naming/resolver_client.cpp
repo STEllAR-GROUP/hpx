@@ -51,8 +51,8 @@ int main()
     
     gid_type last_lowerid;
     
-    for (int i = 0; i < 96; ++i)
-    {
+//    for (int i = 0; i < 96; ++i)
+//    {
         // Retrieve the id prefix of this site.
         gid_type prefix1;
         if (resolver.get_prefix(here, prefix1))
@@ -160,8 +160,9 @@ int main()
     
         HPX_TEST(resolver.unbind_range(gid_type(3), 20, addr));
         HPX_TEST_EQ(addr, address(here, 1, 2));
-    }
+//    }
 
+#if 0
     // get statistics
     std::vector<std::size_t> counts;
     std::vector<double> timings;
@@ -179,6 +180,7 @@ int main()
                   << counts[i] << ", " << timings[i] << ", " << moments[i] 
                   << std::endl;
     }
+#endif
 
     return hpx::util::report_errors();
 }

@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         // start the HPX runtime
         runtime_type rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime::console);
 
-        boost::signals::scoped_connection errorsink_connection;
+        boost::signals2::scoped_connection errorsink_connection;
         rt.register_error_sink(errorsink, errorsink_connection);
 
         rt.run(throw_error_locally);

@@ -11,8 +11,8 @@ set(hpx_FUNCTION_TEST_SUBDIRS
     )
 
 foreach(hpx_FUNCTION_TEST_SUBDIR ${hpx_FUNCTION_TEST_SUBDIRS})
-  add_custom_target(tests.function.${hpx_FUNCTION_TEST_SUBDIR})
+  add_hpx_pseudo_target(tests.function.${hpx_FUNCTION_TEST_SUBDIR})
   add_subdirectory(${hpx_FUNCTION_TEST_SUBDIR})
-  add_dependencies(tests.function tests.function.${hpx_FUNCTION_TEST_SUBDIR})
+  add_hpx_pseudo_dependencies(tests.function tests.function.${hpx_FUNCTION_TEST_SUBDIR})
 endforeach()
 

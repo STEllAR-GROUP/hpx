@@ -9,8 +9,8 @@ set(groups
     allocator)
 
 foreach(group ${groups})
-  add_custom_target(tests.${type}.${group})
+  add_hpx_pseudo_target(tests.${type}.${group})
   add_subdirectory(${group})
-  add_dependencies(tests.${type} tests.${type}.${group})
+  add_hpx_pseudo_dependencies(tests.${type} tests.${type}.${group})
 endforeach()
 

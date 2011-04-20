@@ -22,7 +22,7 @@ foreach(testcase ${testcases})
                SOURCES ${testcase}.cpp)
 
   # depend on the executable
-  add_dependencies(tests.${type}.${group}
+  add_hpx_pseudo_dependencies(tests.${type}.${group}
                    ${type}.${group}.${testcase}_test)
 endforeach()
 

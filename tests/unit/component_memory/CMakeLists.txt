@@ -24,7 +24,7 @@ foreach(testcase ${testcases})
                          "--hpx" "${HPX_TEST_PARCEL_ADDRESS}")
 
   # depend on the executable
-  add_dependencies(tests.${type}.${group}
+  add_hpx_pseudo_dependencies(tests.${type}.${group}
                    ${type}.${group}.${testcase}_test)
 endforeach()
 

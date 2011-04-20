@@ -15,7 +15,7 @@ set(hpx_MULTILOCALITY_TEST_DIR
 foreach(hpx_MULTILOCALITY_TEST ${hpx_MULTILOCALITY_TESTS})
   set(${hpx_MULTILOCALITY_TEST}_SOURCES ${hpx_MULTILOCALITY_TEST}.cpp)
   add_hpx_executable(${hpx_MULTILOCALITY_TEST} SOURCES ${${hpx_MULTILOCALITY_TEST}_SOURCES})
-  add_dependencies(tests.function.multilocality ${hpx_MULTILOCALITY_TEST}) 
+  add_hpx_pseudo_dependencies(tests.function.multilocality ${hpx_MULTILOCALITY_TEST}) 
 endforeach()
 
 add_hpx_test_sweep(

@@ -17,7 +17,7 @@ foreach(hpx_APPLIER_TEST ${hpx_APPLIER_TESTS})
   add_hpx_executable(${hpx_APPLIER_TEST}
       SOURCES ${${hpx_APPLIER_TEST}_SOURCES}
       DEPENDENCIES accumulator_component)
-  add_dependencies(tests.function.applier ${hpx_APPLIER_TEST}) 
+  add_hpx_pseudo_dependencies(tests.function.applier ${hpx_APPLIER_TEST}) 
   add_hpx_test(${hpx_APPLIER_TEST_DIR}/${hpx_APPLIER_TEST} 
       TEST 1_1 HPX -l 1:1 -s)
 endforeach()

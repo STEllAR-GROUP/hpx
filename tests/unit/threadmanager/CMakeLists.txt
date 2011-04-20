@@ -27,7 +27,7 @@ foreach(testcase ${testcases})
                          "-t" "${HPX_TEST_NUM_THREADS}")
 
   # depend on the executable
-  add_dependencies(tests.${type}.${group}
+  add_hpx_pseudo_dependencies(tests.${type}.${group}
                    ${type}.${group}.${testcase}_test)
 endforeach()
 

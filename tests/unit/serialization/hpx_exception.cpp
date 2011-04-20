@@ -28,6 +28,7 @@ int main()
     using boost::rethrow_exception;
     using boost::system::error_code;
 
+    using hpx::error;
     using hpx::rethrow;
     using hpx::make_error_code;
     using hpx::success;
@@ -50,7 +51,7 @@ int main()
     buffer_type buffer; 
     stream_type stream(buffer);
     
-    error_code err = make_error_code(repeated_request, rethrow);
+    error_code err = make_error_code(repeated_request);
     data_type data(err); 
         
     HPX_SANITY_EQ(data.code(), err);
@@ -83,8 +84,10 @@ int main()
             data_type const* loaded = current_exception_cast<data_type const>();
 
             HPX_TEST(loaded);
-            HPX_TEST_EQ(loaded->code(), err);
-            HPX_TEST_EQ(data.code(), loaded->code());
+            HPX_TEST_EQ(make_error_code
+                (static_cast<error>(loaded->code().value())), err);
+            HPX_TEST_EQ(data.code(), make_error_code
+                (static_cast<error>(loaded->code().value())));
         }
     }
 
