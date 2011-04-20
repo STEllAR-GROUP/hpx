@@ -52,7 +52,7 @@ macro(add_hpx_executable name)
 
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
-    hpx_warn("add_executable.${name}" "Module was not specified for executable.")
+    hpx_debug("add_executable.${name}" "Module was not specified for executable.")
   endif()
 
   if(${name}_ESSENTIAL) 

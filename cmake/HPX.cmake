@@ -17,6 +17,10 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 ################################################################################
 # cmake configuration
 ################################################################################
+if(NOT HPX_ROOT)
+  set(HPX_ROOT $ENV{HPX_ROOT})
+endif()
+
 set(CMAKE_MODULE_PATH ${HPX_ROOT}/share/cmake)
 
 # include additional macro definitions
@@ -90,21 +94,8 @@ find_package(HPX_Boost)
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIB_DIR})
 
-# the Boost serialization library needs to be linked as a shared library
-add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-add_definitions(-DBOOST_ARCHIVE_DYN_LINK)
-
-# all other Boost libraries don't need to be loaded as shared libraries
-# (but it's easier configuration wise to do so)
-add_definitions(-DBOOST_FILESYSTEM_DYN_LINK)
-add_definitions(-DBOOST_DATE_TIME_DYN_LINK)
-add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
-add_definitions(-DBOOST_REGEX_DYN_LINK)
-add_definitions(-DBOOST_SYSTEM_DYN_LINK)
-add_definitions(-DBOOST_SIGNALS_DYN_LINK)
-add_definitions(-DBOOST_THREAD_DYN_DLL)
-
-# additional preprocessor definitions (TODO: find out what these do)
+# Boost preprocessor definitions
+add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 
@@ -152,6 +143,11 @@ if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
   endif()
+  
+  set(CMAKE_DEBUG_POSTFIX "d")
+
+  # we auto-link on Windows
+  set(BOOST_FOUND_LIBRARIES "")
 
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
@@ -161,6 +157,7 @@ if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+  add_definitions(-DBOOST_ALL_DYN_LINK)
 
   # suppress certain warnings
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
@@ -168,6 +165,9 @@ if(MSVC)
   if(CMAKE_CL_64)
     add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
   endif()
+  
+  # multiproccessor build
+  add_definitions(-MP) 
   
   # TODO: implement
   #hpx_check_for_msvc_128bit_interlocked(hpx_HAVE_MSVC_128BIT_INTERLOCKED
@@ -235,7 +235,8 @@ else()
   # this flag is used, the generated binaries will be less portable. This is why
   # we define the HPX_COMPILER_AUTO_TUNED macro.
   hpx_check_for_compiler_auto_tune(HPX_COMPILER_AUTO_TUNE
-     DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
+    ROOT ${HPX_ROOT}
+    DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
   
   if(HPX_COMPILER_AUTO_TUNE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
@@ -246,6 +247,7 @@ else()
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
   hpx_check_for_gnu_mcx16(HPX_GNU_MCX16
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_GNU_SYNC_16
                 BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
 
@@ -257,7 +259,8 @@ else()
   # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
   # and some versions don't warn if you ask for an alignment above said limit.
   # Instead, they'll just silently use the maximum, which can be problematical. 
-  hpx_check_for_gnu_mcx16(HPX_GNU_ALIGNED_16
+  hpx_check_for_gnu_aligned_16(HPX_GNU_ALIGNED_16
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
                 BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
 
@@ -266,11 +269,13 @@ else()
   # (strangely, intel-linux doesn't support this). This is particularly useful
   # for use with cmpxchg16b
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
  
   # we use movdqa for atomic 128bit loads and stores 
   hpx_cpuid("sse2" HPX_SSE2
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_SSE2
                 BOOST_ATOMIC_HAVE_SSE2)
   
@@ -282,11 +287,14 @@ else()
   # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
   # a serializing instruction.
   hpx_cpuid("rdtsc" HPX_RDTSC
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_RDTSC)
   hpx_cpuid("rdtscp" HPX_RDTSCP
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_RDTSCP)
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
+    ROOT ${HPX_ROOT}
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
   add_definitions(-D_GNU_SOURCE)
@@ -353,4 +361,3 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 endif()
 
 set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
-

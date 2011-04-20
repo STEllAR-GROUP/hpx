@@ -9,10 +9,11 @@ include(HPX_Include)
 
 hpx_include(Message
             Compile
+            GetIncludeDirectory
             ParseArguments)
 
 macro(add_hpx_config_test name variable)
-  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;DEFAULT;ARGS"
+  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;DEFAULT;ARGS;ROOT"
                               "FILE" ${ARGN})
 
   # FIXME: Sadly, CMake doesn't support non-boolean options with the option
@@ -36,14 +37,21 @@ macro(add_hpx_config_test name variable)
     set(test_source "")
   
     if(${name}_FILE)
-      set(test_source "${${name}_SOURCE}")
+      if(${name}_ROOT)
+        set(test_source "${${name}_ROOT}/share/${${name}_SOURCE}")
+      else()
+        set(test_source "${hpx_SOURCE_DIR}/${${name}_SOURCE}")
+      endif()
     else()
       set(test_source
           "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/src.cpp")
       file(WRITE "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/src.cpp"
            "${${name}_SOURCE}\n")
     endif()
-  
+ 
+    hpx_debug("config_test.${name}" "Using ${test_source} as source file.")
+    hpx_print_list("DEBUG" "config_test.${name}" "Flags for config test" ${name}_FLAGS) 
+
     hpx_compile(${name} SOURCE ${test_source} LANGUAGE ${${name}_LANGUAGE}
       OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name} 
       FLAGS ${${name}_FLAGS})
@@ -75,43 +83,51 @@ endmacro()
 
 ###############################################################################
 macro(hpx_check_for_gnu_128bit_integers variable)
+  hpx_get_include_directory(include_dir)
+
   add_hpx_config_test("gnu_int128" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/gnu_128bit_integers.cpp
-    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+    SOURCE cmake/tests/gnu_128bit_integers.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
 endmacro()
 
 macro(hpx_check_for_gnu_aligned_16 variable)
+  hpx_get_include_directory(include_dir)
+
   add_hpx_config_test("gnu_aligned_16" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/gnu_aligned_16.cpp
-    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+    SOURCE cmake/tests/gnu_aligned_16.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
 endmacro()
 
 macro(hpx_check_for_gnu_mcx16 variable)
   add_hpx_config_test("gnu_mcx16" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
+    SOURCE cmake/tests/flag.cpp
     FLAGS -mcx16 FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_pthread_affinity_np variable)
+  hpx_get_include_directory(include_dir)
+
   add_hpx_config_test("pthread_affinity_np" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/pthread_affinity_np.cpp
-    FLAGS -pthread -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN})
+    SOURCE cmake/tests/pthread_affinity_np.cpp
+    FLAGS -pthread -I${BOOST_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_compiler_auto_tune variable)
   # TODO: add support for MSVC-esque compilers
   add_hpx_config_test("compiler_auto_tune" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/flag.cpp
+    SOURCE cmake/tests/flag.cpp
     FLAGS -march=native FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_cpuid target variable)
+  hpx_get_include_directory(include_dir)
+ 
   add_hpx_config_test("${target}" ${variable} LANGUAGE CXX 
-    SOURCE ${hpx_SOURCE_DIR}/cmake/tests/cpuid.cpp
-    FLAGS -I ${BOOST_INCLUDE_DIR} -I ${hpx_SOURCE_DIR} FILE ${ARGN}
-    ARGS "${target}")
+    SOURCE cmake/tests/cpuid.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir}
+    FILE ARGS "${target}" ${ARGN})
 endmacro()
 

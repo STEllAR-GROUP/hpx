@@ -11,6 +11,8 @@ hpx_include(Message
             ListContains
             ParseArguments
             Install
+            GetIncludeDirectory
+            Compile
             AddComponent
             AddExecutable
             AddTest
@@ -18,6 +20,5 @@ hpx_include(Message
             AddPseudoDependencies
             AddPseudoTarget
             AddLibrarySources
-            Compile
             ForceOutOfTreeBuild)
 

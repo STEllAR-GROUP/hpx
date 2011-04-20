@@ -70,7 +70,7 @@ macro(add_hpx_component name)
   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
-    hpx_warn("add_component.${name}" "Module was not specified for component.")
+    hpx_debug("add_component.${name}" "Module was not specified for component.")
   endif()
 
   if(${name}_ESSENTIAL) 
