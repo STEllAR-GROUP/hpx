@@ -16,7 +16,7 @@ set(subdirs
     generic
     had_amr
     had_amr3d
-    had_amr3d_stable
+    smp_amr3d
     nbody
     nqueen
     parcelset
@@ -34,5 +34,5 @@ add_hpx_pseudo_target(matt)
 add_hpx_pseudo_target(wash)
 add_hpx_pseudo_dependencies(chirag examples.nbody)
 add_hpx_pseudo_dependencies(matt examples.had_amr3d)
-add_hpx_pseudo_dependencies(wash examples.had_amr3d_stable)
+add_hpx_pseudo_dependencies(wash examples.smp_amr3d)
 

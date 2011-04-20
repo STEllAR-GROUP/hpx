@@ -1,8 +1,0 @@
-svn merge -rHEAD:1877 .
-svn merge --dry-run -rHEAD:1877 .
-svn merge -rHEAD:1937 stencil.cpp
-
-svn.cct.lsu.edu/trac/hpx
-
-Versions:
-Working 3-D wave equation, unigrid, rk3: 3025
