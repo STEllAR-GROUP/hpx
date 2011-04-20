@@ -51,8 +51,8 @@ int main()
     
     gid_type last_lowerid;
     
-//    for (int i = 0; i < 96; ++i)
-//    {
+    for (int i = 0; i < 96; ++i)
+    {
         // Retrieve the id prefix of this site.
         gid_type prefix1;
         if (resolver.get_prefix(here, prefix1))
@@ -61,7 +61,7 @@ int main()
     
         std::vector<gid_type> prefixes;
         resolver.get_prefixes(prefixes);
-        HPX_TEST_EQ(1, prefixes.size());
+        HPX_TEST((i != 0) ? (2 == prefixes.size()) : (1 == prefixes.size()));
         HPX_TEST_EQ(prefixes.back(), prefix1);
     
          // Identical sites should get same prefix.
@@ -73,7 +73,8 @@ int main()
         gid_type prefix3;
         resolver.get_prefix(locality("1.1.1.1", 1), prefix3);
         HPX_TEST(prefix3 != prefix2); 
-    
+   
+        prefixes.clear(); 
         resolver.get_prefixes(prefixes);
         HPX_TEST_EQ(2, prefixes.size());
         HPX_TEST_EQ(prefixes.front(), prefix3);
@@ -160,7 +161,7 @@ int main()
     
         HPX_TEST(resolver.unbind_range(gid_type(3), 20, addr));
         HPX_TEST_EQ(addr, address(here, 1, 2));
-//    }
+    }
 
 #if 0
     // get statistics

@@ -7,6 +7,7 @@
 set(subdirs 
     unit
     performance
+    function
     )
 
 foreach(subdir ${subdirs})
