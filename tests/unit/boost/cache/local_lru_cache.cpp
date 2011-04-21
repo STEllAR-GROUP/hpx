@@ -1,4 +1,5 @@
-//  Copyright (c) 2008 Hartmut Kaiser
+//  Copyright (c) 2008-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +9,7 @@
 #include <boost/cache/entries/lru_entry.hpp>
 #include <boost/cache/local_cache.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct data
@@ -40,16 +41,16 @@ void test_lru_insert()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
     for (data* d = &entries[0]; d->key != NULL; ++d) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     // there should be 3 items in the cache
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,33 +61,33 @@ void test_lru_insert_with_touch()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
     data* d = &entries[0];
 
     for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 
     // now touch the first item
     std::string white;
-    BOOST_TEST(c.get_entry("white", white));
-    BOOST_TEST(white == "255,255,255");
+    HPX_TEST(c.get_entry("white", white));
+    HPX_TEST(white == "255,255,255");
 
     // add two more items
     for (i = 0; i < 2 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 == c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 == c.size());
     }
 
     // there should be 3 items in the cache, and white should be there as well
-    BOOST_TEST(3 == c.size());
-    BOOST_TEST(c.holds_key("white"));
+    HPX_TEST(3 == c.size());
+    HPX_TEST(c.holds_key("white"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,18 +98,18 @@ void test_lru_clear()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
     for (data* d = &entries[0]; d->key != NULL; ++d) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     c.clear();
 
     // there should be no items in the cache
-    BOOST_TEST(0 == c.size());
+    HPX_TEST(0 == c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,22 +135,22 @@ void test_lru_erase_one()
 
     cache_type c(3);
 
-    BOOST_TEST(3 == c.capacity());
+    HPX_TEST(3 == c.capacity());
 
     // insert all items into the cache
     for (data* d = &entries[0]; d->key != NULL; ++d) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     entry_type blue;
-    BOOST_TEST(c.get_entry("blue", blue));
+    HPX_TEST(c.get_entry("blue", blue));
 
     c.erase(erase_func("blue"));
 
     // there should be 2 items in the cache
-    BOOST_TEST(!c.get_entry("blue", blue));
-    BOOST_TEST(2 == c.size());
+    HPX_TEST(!c.get_entry("blue", blue));
+    HPX_TEST(2 == c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,30 +161,30 @@ void test_lru_update()
 
     cache_type c(4);    // this time we can hold 4 items
 
-    BOOST_TEST(4 == c.capacity());
+    HPX_TEST(4 == c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
     data* d = &entries[0];
 
     for (/**/; i < 3 && d->key != NULL; ++d, ++i) {
-        BOOST_TEST(c.insert(d->key, d->value));
-        BOOST_TEST(3 >= c.size());
+        HPX_TEST(c.insert(d->key, d->value));
+        HPX_TEST(3 >= c.size());
     }
 
     // there should be 3 items in the cache
-    BOOST_TEST(3 == c.size());
+    HPX_TEST(3 == c.size());
 
     // now update some items
-    BOOST_TEST(c.update("black", "255,0,0"));     // isn't in the cache
-    BOOST_TEST(4 == c.size());
+    HPX_TEST(c.update("black", "255,0,0"));     // isn't in the cache
+    HPX_TEST(4 == c.size());
 
-    BOOST_TEST(c.update("yellow", "255,0,0"));
-    BOOST_TEST(4 == c.size());
+    HPX_TEST(c.update("yellow", "255,0,0"));
+    HPX_TEST(4 == c.size());
 
     std::string yellow;
-    BOOST_TEST(c.get_entry("yellow", yellow));
-    BOOST_TEST(yellow == "255,0,0");
+    HPX_TEST(c.get_entry("yellow", yellow));
+    HPX_TEST(yellow == "255,0,0");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,6 +195,6 @@ int main()
     test_lru_clear();
     test_lru_erase_one();
     test_lru_update();
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

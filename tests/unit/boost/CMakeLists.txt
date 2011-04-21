@@ -7,6 +7,7 @@
 set(group unit.boost)
 
 set(subdirs 
+    atomic
     lockfree) 
 
 foreach(subdir ${subdirs})
