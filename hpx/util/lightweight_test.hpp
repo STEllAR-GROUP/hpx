@@ -96,7 +96,7 @@ struct fixture
     }
 
     template <typename T, typename U>
-    bool check_eq(char const* file, int line, char const* function,
+    bool check_equal(char const* file, int line, char const* function,
                   counter_type c, T const& t, U const& u, char const* msg)
     {
         if (!(t == u))
@@ -106,6 +106,59 @@ struct fixture
                 << file << "(" << line << "): " << msg  
                 << " failed in function '" << function << "': "
                 << "'" << t << "' != '" << u << "'" << std::endl;
+            increment(c);
+            return false;
+        }
+        return true;
+    }
+    
+    template <typename T, typename U>
+    bool check_not_equal(char const* file, int line, char const* function,
+                         counter_type c, T const& t, U const& u,
+                         char const* msg)
+    {
+        if (!(t != u))
+        {
+            mutex_type::scoped_lock l(mutex_);
+            stream_ 
+                << file << "(" << line << "): " << msg  
+                << " failed in function '" << function << "': "
+                << "'" << t << "' != '" << u << "'" << std::endl;
+            increment(c);
+            return false;
+        }
+        return true;
+    }
+
+    template <typename T, typename U>
+    bool check_less(char const* file, int line, char const* function,
+                    counter_type c, T const& t, U const& u, char const* msg)
+    {
+        if (!(t < u))
+        {
+            mutex_type::scoped_lock l(mutex_);
+            stream_ 
+                << file << "(" << line << "): " << msg  
+                << " failed in function '" << function << "': "
+                << "'" << t << "' >= '" << u << "'" << std::endl;
+            increment(c);
+            return false;
+        }
+        return true;
+    }
+    
+    template <typename T, typename U>
+    bool check_less_equal(char const* file, int line, char const* function,
+                          counter_type c, T const& t, U const& u,
+                          char const* msg)
+    {
+        if (!(t <= u))
+        {
+            mutex_type::scoped_lock l(mutex_);
+            stream_ 
+                << file << "(" << line << "): " << msg  
+                << " failed in function '" << function << "': "
+                << "'" << t << "' > '" << u << "'" << std::endl;
             increment(c);
             return false;
         }
@@ -152,15 +205,39 @@ inline int report_errors()
     /***/
 
 #define HPX_TEST_EQ(expr1, expr2)                                           \
-    ::hpx::util::detail::global_fixture.check_eq                            \
+    ::hpx::util::detail::global_fixture.check_equal                         \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
          ::hpx::util::counter_test,                                         \
          expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " == "            \
                                 BOOST_PP_STRINGIZE(expr2) "'")              \
     /***/
 
+#define HPX_TEST_NEQ(expr1, expr2)                                          \
+    ::hpx::util::detail::global_fixture.check_not_equal                     \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_test,                                         \
+         expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " != "            \
+                                BOOST_PP_STRINGIZE(expr2) "'")              \
+    /***/
+
+#define HPX_TEST_LT(expr1, expr2)                                           \
+    ::hpx::util::detail::global_fixture.check_less                          \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_test,                                         \
+         expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " < "             \
+                                BOOST_PP_STRINGIZE(expr2) "'")              \
+    /***/
+
+#define HPX_TEST_LTE(expr1, expr2)                                          \
+    ::hpx::util::detail::global_fixture.check_less_equal                    \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_test,                                         \
+         expr1, expr2, "test '" BOOST_PP_STRINGIZE(expr1) " <= "            \
+                                BOOST_PP_STRINGIZE(expr2) "'")              \
+    /***/
+
 #define HPX_TEST_EQ_MSG(expr1, expr2, msg)                                  \
-    ::hpx::util::detail::global_fixture.check_eq                            \
+    ::hpx::util::detail::global_fixture.check_equal                         \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
          ::hpx::util::counter_test,                                         \
          expr1, expr2, msg)                                                 \
@@ -181,15 +258,39 @@ inline int report_errors()
     /***/
 
 #define HPX_SANITY_EQ(expr1, expr2)                                         \
-    ::hpx::util::detail::global_fixture.check_eq                            \
+    ::hpx::util::detail::global_fixture.check_equal                         \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
          ::hpx::util::counter_sanity,                                       \
          expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " == "    \
                                         BOOST_PP_STRINGIZE(expr2) "'")      \
     /***/
 
+#define HPX_SANITY_NEQ(expr1, expr2)                                        \
+    ::hpx::util::detail::global_fixture.check_not_equal                     \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_sanity,                                       \
+         expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " != "    \
+                                        BOOST_PP_STRINGIZE(expr2) "'")      \
+    /***/
+
+#define HPX_SANITY_LT(expr1, expr2)                                         \
+    ::hpx::util::detail::global_fixture.check_less                          \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_sanity,                                       \
+         expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " < "     \
+                                        BOOST_PP_STRINGIZE(expr2) "'")      \
+    /***/
+
+#define HPX_SANITY_LTE(expr1, expr2)                                        \
+    ::hpx::util::detail::global_fixture.check_less_equal                    \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_sanity,                                       \
+         expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " <= "    \
+                                        BOOST_PP_STRINGIZE(expr2) "'")      \
+    /***/
+
 #define HPX_SANITY_EQ_MSG(expr1, expr2, msg)                                \
-    ::hpx::util::detail::global_fixture.check_eq                            \
+    ::hpx::util::detail::global_fixture.check_equal                         \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
          ::hpx::util::counter_sanity,                                       \
          expr1, expr2)                                                      \

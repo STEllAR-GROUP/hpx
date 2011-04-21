@@ -9,10 +9,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.sanity)
+set(group unit.hpx.runtime.naming)
 
 set(testcases
-    links)
+    gid_type
+    resolver_client)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)

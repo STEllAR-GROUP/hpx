@@ -9,10 +9,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.sanity)
+set(group unit.hpx.util.serialization)
 
 set(testcases
-    links)
+    asio_address
+    asio_address_v4
+    asio_address_v6
+    asio_basic_endpoint
+    hpx_exception
+    standard_exceptions
+    system_error)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)

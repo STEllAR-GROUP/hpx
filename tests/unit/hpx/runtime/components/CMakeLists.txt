@@ -9,13 +9,17 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.sanity)
+set(group unit.hpx.runtime.components)
 
 set(testcases
-    links)
+    memory
+    memory_block)
 
 foreach(testcase ${testcases})
-  add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)
+  add_hpx_test(${group}.${testcase}
+               SOURCES ${testcase}.cpp
+               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}")
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
