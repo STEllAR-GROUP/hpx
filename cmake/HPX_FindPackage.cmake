@@ -52,7 +52,8 @@ macro(hpx_get_version name)
 
   # if not found, retry using system path
   if(NOT ${name}_ROOT)
-    find_path(${name}_INCLUDE_DIR NAMES ${${name}_HEADERS})
+    find_path(${name}_INCLUDE_DIR NAMES ${${name}_HEADERS}
+                                  PATH_SUFFIXES ${${name}_HEADER_PATHS})
     
     if(NOT ${name}_INCLUDE_DIR)
       if(${name}_ESSENTIAL)
@@ -66,21 +67,6 @@ macro(hpx_get_version name)
     endif()
   endif()
   
-#  file(READ "${BOOST_VERSION_HPP}" BOOST_VERSION_HPP_CONTENTS)
-  
-#  string(REGEX REPLACE ".*#define BOOST_LIB_VERSION \"([0-9_]+)\".*" "\\1"
-#    BOOST_VERSION "${BOOST_VERSION_HPP_CONTENTS}")
-#  string(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1"
-#    BOOST_VERSION_NUM "${BOOST_VERSION_HPP_CONTENTS}")
-    
-#  if(NOT "${BOOST_VERSION_NUM}" STREQUAL "0")
-#    math(EXPR BOOST_MAJOR_VERSION "${BOOST_VERSION_NUM} / 100000")
-#    math(EXPR BOOST_MINOR_VERSION "${BOOST_VERSION_NUM} / 100 % 1000")
-#    math(EXPR BOOST_PATCH_VERSION "${BOOST_VERSION_NUM} % 100")
-#  else()
-#    hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}.")
-#  endif()
-
   endif()
 endmacro()
 
@@ -98,32 +84,37 @@ macro(hpx_find_package name)
   endforeach()
 
   if(${name}_ROOT)
+    hpx_print_list("DEBUG" "find_package.${name}" "Library names" ${name}_LIBRARIES)
+    hpx_print_list("DEBUG" "find_package.${name}" "Library paths" rooted_lib_paths)
     find_library(${name}_LIBRARY
       NAMES ${${name}_LIBRARIES}
       PATHS ${rooted_lib_paths}
       NO_DEFAULT_PATH) 
 
     if(NOT ${name}_LIBRARY)
-      hpx_warn("find_library.${name}" "Library not found in ${${name}_ROOT}, trying system path.")
+      hpx_warn("find_package.${name}" "Library not found in ${${name}_ROOT}, trying system path.")
       unset(${name}_ROOT)
     else()
-      hpx_info("find_library.${name}" "Library found in ${${name}_ROOT}.") 
+      hpx_info("find_package.${name}" "Library found in ${${name}_ROOT}.") 
     endif()
   endif()
 
   # if not found, retry using system path
   if(NOT ${name}_ROOT)
-    find_library(${name}_LIBRARY NAMES ${${name}_LIBRARIES})
+    hpx_print_list("DEBUG" "find_package.${name}" "Library names" ${name}_LIBRARIES)
+    hpx_print_list("DEBUG" "find_package.${name}" "Library paths" ${name}_LIBRARY_PATHS)
+    find_library(${name}_LIBRARY NAMES ${${name}_LIBRARIES}
+                                 PATH_SUFFIXES ${${name}_LIBRARY_PATHS})
     
     if(NOT ${name}_LIBRARY)
       if(${name}_ESSENTIAL)
-        hpx_error("find_library.${name}" "Library not found in system path.")
+        hpx_error("find_package.${name}" "Library not found in system path.")
       else() 
-        hpx_warn("find_library.${name}" "Library not found in system path.")
+        hpx_warn("find_package.${name}" "Library not found in system path.")
       endif()
       unset(${name}_ROOT)
     else()
-      hpx_info("find_library.${name}" "Library found in system path.") 
+      hpx_info("find_package.${name}" "Library found in system path.") 
     endif()
   endif()
 
