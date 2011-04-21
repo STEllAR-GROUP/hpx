@@ -47,7 +47,7 @@ struct deque_node
     typedef tagged_ptr<deque_node> pointer;
     typedef atomic<pointer> atomic_pointer;
     
-    typedef typename pointer::tag_type tag_type;
+    typedef typename pointer::tag_t tag_t;
 
     atomic_pointer left;
     atomic_pointer right;
@@ -59,7 +59,7 @@ struct deque_node
         left(p.left.load()), right(p.right.load()) {}
     
     deque_node(deque_node* lptr, deque_node* rptr, T const& v,
-               tag_type ltag = 0, tag_type rtag = 0):
+               tag_t ltag = 0, tag_t rtag = 0):
         left(pointer(lptr, ltag)), right(pointer(rptr, rtag)), data(v) {}
 };
 
@@ -72,7 +72,7 @@ struct deque_anchor
     typedef typename node::pointer node_pointer;
     typedef typename node::atomic_pointer atomic_node_pointer;
 
-    typedef typename node::tag_type tag_type;
+    typedef typename node::tag_t tag_t;
   
     typedef tagged_ptr_pair<node, node> pair;
     typedef atomic<pair> atomic_pair;
@@ -88,7 +88,7 @@ struct deque_anchor
     deque_anchor(pair const& p): pair_(p) {}
 
     deque_anchor(node* lptr, node* rptr,
-                 tag_type status = stable, tag_type tag = 0):
+                 tag_t status = stable, tag_t tag = 0):
         pair_(pair(lptr, rptr, status, tag)) {}
 
     pair lrs() const volatile
@@ -100,10 +100,10 @@ struct deque_anchor
     node* right() const volatile
     { return pair_.load().get_right_ptr(); }        
 
-    tag_type status() const volatile
+    tag_t status() const volatile
     { return pair_.load().get_left_tag(); } 
     
-    tag_type tag() const volatile
+    tag_t tag() const volatile
     { return pair_.load().get_right_tag(); } 
 
     bool cas(deque_anchor& expected, deque_anchor const& desired) volatile
@@ -146,7 +146,7 @@ struct deque: private boost::noncopyable
     typedef typename node::pointer node_pointer;
     typedef typename node::atomic_pointer atomic_node_pointer;
 
-    typedef typename node::tag_type tag_type;
+    typedef typename node::tag_t tag_t;
   
     typedef deque_anchor<T> anchor;
     typedef typename anchor::pair anchor_pair;
@@ -169,7 +169,7 @@ struct deque: private boost::noncopyable
     char padding[padding_size];
 
     node* alloc_node(node* lptr, node* rptr, T const& v,
-                     tag_type ltag = 0, tag_type rtag = 0)
+                     tag_t ltag = 0, tag_t rtag = 0)
     {
         node* chunk = pool_.allocate();
         new (chunk) node(lptr, rptr, v, ltag, rtag);

@@ -26,46 +26,46 @@ namespace boost { namespace lockfree
 template <class Left, class Right>
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
-    typedef __uint128_t compressed_ptr_pair_type;
-    typedef boost::uint64_t compressed_ptr_type;
-    typedef boost::uint16_t tag_type;
+    typedef __uint128_t compressed_ptr_pair_t;
+    typedef boost::uint64_t compressed_ptr_t;
+    typedef boost::uint16_t tag_t;
 
     union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {
-        compressed_ptr_pair_type value;
-        compressed_ptr_type ptrs[2];
-        tag_type tags[8];
+        compressed_ptr_pair_t value;
+        compressed_ptr_t ptrs[2];
+        tag_t tags[8];
     };
 
     BOOST_STATIC_CONSTANT(std::size_t, left_tag_index = 3);
     BOOST_STATIC_CONSTANT(std::size_t, right_tag_index = 7);
     BOOST_STATIC_CONSTANT(std::size_t, left_ptr_index = 0);
     BOOST_STATIC_CONSTANT(std::size_t, right_ptr_index = 1);
-    BOOST_STATIC_CONSTANT(compressed_ptr_type, ptr_mask = 0xffffffffffff);
+    BOOST_STATIC_CONSTANT(compressed_ptr_t, ptr_mask = 0xffffffffffff);
 
-    static Left* extract_left_ptr(volatile compressed_ptr_pair_type const& i)
+    static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value = i;
         return reinterpret_cast<Left*>(cu.ptrs[left_ptr_index] & ptr_mask);
     }
     
-    static Right* extract_right_ptr(volatile compressed_ptr_pair_type const& i)
+    static Right* extract_right_ptr(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value = i;
         return reinterpret_cast<Right*>(cu.ptrs[right_ptr_index] & ptr_mask);
     }
 
-    static tag_type extract_left_tag(volatile compressed_ptr_pair_type const& i)
+    static tag_t extract_left_tag(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value = i;
         return cu.tags[left_tag_index];
     }
     
-    static tag_type
-    extract_right_tag(volatile compressed_ptr_pair_type const& i)
+    static tag_t
+    extract_right_tag(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value = i;
@@ -73,14 +73,14 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     }
 
     template <typename IntegralL, typename IntegralR>
-    static compressed_ptr_pair_type
+    static compressed_ptr_pair_t
     pack_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     {
         cast_unit ret;
-        ret.ptrs[left_ptr_index] = reinterpret_cast<compressed_ptr_type>(lptr);
-        ret.ptrs[right_ptr_index] = reinterpret_cast<compressed_ptr_type>(rptr);
-        ret.tags[left_tag_index] = static_cast<tag_type>(ltag);
-        ret.tags[right_tag_index] = static_cast<tag_type>(rtag);
+        ret.ptrs[left_ptr_index] = reinterpret_cast<compressed_ptr_t>(lptr);
+        ret.ptrs[right_ptr_index] = reinterpret_cast<compressed_ptr_t>(rptr);
+        ret.tags[left_tag_index] = static_cast<tag_t>(ltag);
+        ret.tags[right_tag_index] = static_cast<tag_t>(rtag);
         return ret.value;
     }
 
@@ -149,26 +149,26 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     void set_left_ptr(Left* lptr) volatile
     {
         Right* rptr = get_right_ptr();
-        tag_type ltag = get_left_tag();
-        tag_type rtag = get_right_tag();
+        tag_t ltag = get_left_tag();
+        tag_t rtag = get_right_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
     
     void set_right_ptr(Right* rptr) volatile
     {
         Left* lptr = get_left_ptr();
-        tag_type ltag = get_left_tag();
-        tag_type rtag = get_right_tag();
+        tag_t ltag = get_left_tag();
+        tag_t rtag = get_right_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
     /* @} */
 
     /** tag access */
     /* @{ */
-    tag_type get_left_tag() const volatile
+    tag_t get_left_tag() const volatile
     { return extract_left_tag(pair_); }
     
-    tag_type get_right_tag() const volatile
+    tag_t get_right_tag() const volatile
     { return extract_right_tag(pair_); }
 
     template <typename Integral> 
@@ -176,7 +176,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         Left* lptr = get_left_ptr();
         Right* rptr = get_right_ptr();
-        tag_type rtag = get_right_tag();
+        tag_t rtag = get_right_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
    
@@ -185,7 +185,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         Left* lptr = get_left_ptr();
         Right* rptr = get_right_ptr();
-        tag_type ltag = get_left_tag();
+        tag_t ltag = get_left_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
     /* @} */
@@ -197,7 +197,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @} */
 
   private:
-    compressed_ptr_pair_type pair_;
+    compressed_ptr_pair_t pair_;
 };
 #else
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
@@ -215,27 +215,27 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
 template <class Left, class Right>
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
-    typedef uint128_type compressed_ptr_pair_type;
-    typedef boost::uint64_t compressed_ptr_type;
-    typedef boost::uint16_t tag_type;
+    typedef uint128_type compressed_ptr_pair_t;
+    typedef boost::uint64_t compressed_ptr_t;
+    typedef boost::uint16_t tag_t;
 
     union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {
-        compressed_ptr_pair_type value;
-        tag_type tags[8];
+        compressed_ptr_pair_t value;
+        tag_t tags[8];
     };
 
     BOOST_STATIC_CONSTANT(std::size_t, left_tag_index = 3);
     BOOST_STATIC_CONSTANT(std::size_t, right_tag_index = 7);
-    BOOST_STATIC_CONSTANT(compressed_ptr_type, ptr_mask = 0xffffffffffff);
+    BOOST_STATIC_CONSTANT(compressed_ptr_t, ptr_mask = 0xffffffffffff);
 
-    static Left* extract_left_ptr(volatile compressed_ptr_pair_type const& i)
+    static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
     { return reinterpret_cast<Left*>(i.left & ptr_mask); }
     
-    static Right* extract_right_ptr(volatile compressed_ptr_pair_type const& i)
+    static Right* extract_right_ptr(volatile compressed_ptr_pair_t const& i)
     { return reinterpret_cast<Right*>(i.right & ptr_mask); }
 
-    static tag_type extract_left_tag(volatile compressed_ptr_pair_type const& i)
+    static tag_t extract_left_tag(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value.left = i.left;
@@ -243,8 +243,8 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         return cu.tags[left_tag_index];
     }
     
-    static tag_type
-    extract_right_tag(volatile compressed_ptr_pair_type const& i)
+    static tag_t
+    extract_right_tag(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
         cu.value.left = i.left;
@@ -254,14 +254,14 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 
     template <typename IntegralL, typename IntegralR>
     static void
-    pack_ptr_pair(compressed_ptr_pair_type& pair,
+    pack_ptr_pair(compressed_ptr_pair_t& pair,
                   Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     {
         cast_unit ret;
-        ret.value.left = reinterpret_cast<compressed_ptr_type>(lptr);
-        ret.value.right = reinterpret_cast<compressed_ptr_type>(rptr);
-        ret.tags[left_tag_index] = static_cast<tag_type>(ltag);
-        ret.tags[right_tag_index] = static_cast<tag_type>(rtag);
+        ret.value.left = reinterpret_cast<compressed_ptr_t>(lptr);
+        ret.value.right = reinterpret_cast<compressed_ptr_t>(rptr);
+        ret.tags[left_tag_index] = static_cast<tag_t>(ltag);
+        ret.tags[right_tag_index] = static_cast<tag_t>(rtag);
         pair = ret.value;
     }
 
@@ -338,26 +338,26 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     void set_left_ptr(Left* lptr) volatile
     {
         Right* rptr = get_right_ptr();
-        tag_type ltag = get_left_tag();
-        tag_type rtag = get_right_tag();
+        tag_t ltag = get_left_tag();
+        tag_t rtag = get_right_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
     
     void set_right_ptr(Right* rptr) volatile
     {
         Left* lptr = get_left_ptr();
-        tag_type ltag = get_left_tag();
-        tag_type rtag = get_right_tag();
+        tag_t ltag = get_left_tag();
+        tag_t rtag = get_right_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
     /* @} */
 
     /** tag access */
     /* @{ */
-    tag_type get_left_tag() const volatile
+    tag_t get_left_tag() const volatile
     { return extract_left_tag(pair_); }
     
-    tag_type get_right_tag() const volatile
+    tag_t get_right_tag() const volatile
     { return extract_right_tag(pair_); }
 
     template <typename Integral> 
@@ -365,7 +365,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         Left* lptr = get_left_ptr();
         Right* rptr = get_right_ptr();
-        tag_type rtag = get_right_tag();
+        tag_t rtag = get_right_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
    
@@ -374,7 +374,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         Left* lptr = get_left_ptr();
         Right* rptr = get_right_ptr();
-        tag_type ltag = get_left_tag();
+        tag_t ltag = get_left_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
     /* @} */
@@ -386,7 +386,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @} */
 
   private:
-    compressed_ptr_pair_type pair_;
+    compressed_ptr_pair_t pair_;
 };
 #endif
 
