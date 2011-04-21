@@ -35,6 +35,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
             "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
+            "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
 
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADRESS:" 

@@ -265,35 +265,36 @@ namespace hpx { namespace components { namespace stubs
 
         /// \brief Shutdown the given runtime system
         static lcos::future_value<int>  
-        shutdown_async(naming::id_type const& targetgid)
+        shutdown_async(naming::id_type const& targetgid, double timeout = -1)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::shutdown_action action_type;
-            return lcos::eager_future<action_type>(targetgid);
+            return lcos::eager_future<action_type>(targetgid, timeout);
         }
 
-        static int shutdown(naming::id_type const& targetgid)
+        static int shutdown(naming::id_type const& targetgid, double timeout = - 1)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return shutdown_async(targetgid).get();
+            return shutdown_async(targetgid, timeout).get();
         }
 
         /// \brief Shutdown the runtime systems of all localities
         static void 
-        shutdown_all(naming::id_type const& targetgid)
+        shutdown_all(naming::id_type const& targetgid, double timeout = -1)
         {
-            hpx::applier::apply<server::runtime_support::shutdown_all_action>(targetgid);
+            hpx::applier::apply<server::runtime_support::shutdown_all_action>(
+                targetgid, timeout);
         }
 
-        static void shutdown_all()
+        static void shutdown_all(double timeout = -1)
         {
             hpx::applier::apply<server::runtime_support::shutdown_all_action>(
                 hpx::naming::id_type(
                     hpx::applier::get_applier().get_runtime_support_raw_gid(),
-                    hpx::naming::id_type::unmanaged));
+                    hpx::naming::id_type::unmanaged), timeout);
         }
 
         /// \brief Retrieve configuration information

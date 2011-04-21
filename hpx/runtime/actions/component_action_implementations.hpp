@@ -83,7 +83,18 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+            try {
+                LTM_(debug) << "Executing component action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 
@@ -431,8 +442,18 @@
             naming::address::address_type lva, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            LTM_(debug) << "Executing component action.";
-            (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+            try {
+                LTM_(debug) << "Executing component action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 

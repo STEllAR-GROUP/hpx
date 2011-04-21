@@ -117,23 +117,31 @@ namespace hpx { namespace parcelset
     threads::thread_state parcelhandler::decode_parcel(
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
-        parcel p;
-        {
-            // create a special io stream on top of in_buffer_
-            typedef util::container_device<std::vector<char> > io_device_type;
-            boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+        // protect from unhandled exceptions bubbling up into thread manager
+        try {
+            parcel p;
+            {
+                // create a special io stream on top of in_buffer_
+                typedef util::container_device<std::vector<char> > io_device_type;
+                boost::iostreams::stream<io_device_type> io (*parcel_data.get());
 
-            // De-serialize the parcel data
+                // De-serialize the parcel data
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-            util::portable_binary_iarchive archive(io);
+                util::portable_binary_iarchive archive(io);
 #else
-            boost::archive::binary_iarchive archive(io);
+                boost::archive::binary_iarchive archive(io);
 #endif
-            archive >> p;
-        }
+                archive >> p;
+            }
 
-        // add parcel to incoming parcel queue
-        parcels_.add_parcel(p);
+            // add parcel to incoming parcel queue
+            parcels_.add_parcel(p);
+        }
+        catch (hpx::exception const& e) {
+            LPT_(error) 
+                << "Unhandled exception while executing decode_parcel: "
+                << e.what();
+        }
         return threads::thread_state(threads::terminated);
     }
 

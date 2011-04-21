@@ -99,6 +99,12 @@
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
@@ -167,6 +173,31 @@
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy_agent.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\std_map.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\ib.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\tcpip.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\udpip.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\full_gva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\gva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
@@ -179,7 +210,11 @@
     <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_defs.h" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_fifo.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
     <ClInclude Include="..\..\..\hpx\util\allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp" />
     <ClInclude Include="..\..\..\hpx\util\default_vector.hpp" />
@@ -323,12 +358,26 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt" />
+    <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept" />
+    <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept" />
     <None Include="..\..\..\misc\FindBoost.cmake" />
     <None Include="..\..\..\docs\hpx.doxy" />
     <None Include="..\..\..\misc\FindGMP.cmake" />
     <None Include="..\..\..\misc\FindMPFR.cmake" />
     <None Include="..\..\..\misc\HpxUtils.cmake" />
     <None Include="..\..\..\src\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\actions\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\agas\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\applier\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\components\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\components\server\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\naming\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\naming\detail\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\naming\server\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\parcelset\server\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\threads\CMakeLists.txt" />
+    <None Include="..\..\..\src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm" />

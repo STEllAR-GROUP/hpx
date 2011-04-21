@@ -71,7 +71,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "had_amr_3d_clientd", "..\..
 		RemoteMachine = FIFTYTWO
 		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib
 		Arguments = -w  -l 2 -x localhost:5321
-		Environment = hpx_loglevel=1	
+		Environment = hpx_loglevel=2	
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		LaunchSQLEngine = No
 		AttachLaunchAction = No
@@ -250,15 +250,13 @@ Global
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Mixed Platforms.Build.0 = Debug|x64
-		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Win32.ActiveCfg = Debug|Win32
-		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Win32.Build.0 = Debug|Win32
+		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Win32.ActiveCfg = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|x64.ActiveCfg = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|x64.Build.0 = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Any CPU.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Mixed Platforms.Build.0 = Release|x64
-		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Win32.ActiveCfg = Release|Win32
-		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Win32.Build.0 = Release|Win32
+		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Win32.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|x64.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|x64.Build.0 = Release|x64
 		{973C51D3-F306-4C6F-B9B6-A8420A20A6F1}.Debug|Any CPU.ActiveCfg = Debug|x64

@@ -120,8 +120,51 @@ namespace hpx { namespace util
         };
     }
 
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    typedef boost::logging::named_logger<>::type logger_type;
+    typedef boost::logging::level::holder filter_type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(agas_console_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(agas_console_logger, logger_type)
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(timing_console_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(timing_console_logger, logger_type)
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_console_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(hpx_console_logger, logger_type)
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(app_console_level, filter_type)
+    HPX_EXPORT BOOST_DECLARE_LOG(app_console_logger, logger_type)
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+#define LAGAS_CONSOLE_(lvl)                                                   \
+    BOOST_LOG_USE_LOG(hpx::util::agas_console_logger(),                       \
+        read_msg().gather().out(),                                            \
+        hpx::util::agas_console_level()->is_enabled(lvl))                     \
+/**/
+
+#define LTIM_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(hpx::util::timing_console_logger(),                     \
+        read_msg().gather().out(),                                            \
+        hpx::util::timing_console_level()->is_enabled(lvl))                   \
+/**/
+
+#define LHPX_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(hpx::util::hpx_console_logger(),                        \
+        read_msg().gather().out(),                                            \
+        hpx::util::hpx_console_level()->is_enabled(lvl))                      \
+/**/
+
+#define LAPP_CONSOLE_(lvl)                                                    \
+    BOOST_LOG_USE_LOG(hpx::util::app_console_logger(),                        \
+        read_msg().gather().out(),                                            \
+        hpx::util::app_console_level()->is_enabled(lvl))                      \
+/**/
 
 #endif
 

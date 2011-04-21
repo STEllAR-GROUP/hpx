@@ -87,8 +87,18 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(threads::thread_state_ex_enum)
         {
-            LTM_(debug) << "Executing action.";
-            F();      // call the function, ignoring the return value
+            try {
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                F();      // call the function, ignoring the return value
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing plain action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 
@@ -366,8 +376,18 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(threads::thread_state_ex_enum)
         {
-            LTM_(debug) << "Executing action.";
-            F();      // just call the function
+            try {
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                F();      // call the function, ignoring the return value
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing plain action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 

@@ -246,7 +246,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type id, thread_state_enum state,
-        thread_state_ex_enum stateex, error_code& ec)
+        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -260,13 +260,14 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(id, state, stateex);
+        return app->get_thread_manager().set_state(id, state, stateex, 
+            priority, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::ptime const& at_time, thread_state_enum state,
-        thread_state_ex_enum stateex, error_code& ec)
+        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -280,13 +281,14 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(at_time, id, state, stateex);
+        return app->get_thread_manager().set_state(at_time, id, state, 
+            stateex, priority, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type id, 
         boost::posix_time::time_duration const& after, thread_state_enum state,
-        thread_state_ex_enum stateex, error_code& ec)
+        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -300,7 +302,8 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(after, id, state, stateex);
+        return app->get_thread_manager().set_state(after, id, state, 
+            stateex, priority, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

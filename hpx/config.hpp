@@ -165,7 +165,11 @@
     /**/
 #endif
 
-#if !defined(HPX_APPLICATION_STRING) && defined(HPX_APPLICATION_NAME)
+#if !defined(HPX_APPLICATION_NAME)
+#define HPX_APPLICATION_NAME "unknown HPX application"
+#endif
+
+#if !defined(HPX_APPLICATION_STRING)
 #define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
 #endif
 

@@ -55,6 +55,21 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         virtual bool is_running() const = 0;
 
+        /// \brief return the number of PX-threads with the given state
+        virtual boost::uint64_t get_thread_count(
+            thread_state_enum state = unknown) const = 0;
+
+        // \brief Abort all threads which are in suspended state. This will set 
+        //        the state of all suspended threads to \a pending while 
+        //        supplying the wait_abort extended state flag
+        virtual void abort_all_suspended_threads() = 0;
+
+        // \brief Clean up terminated threads. This deletes all threads which 
+        //        have been terminated but which are still held in the queue 
+        //        of terminated threads. Some schedulers might not do anything
+        //        here.
+        virtual bool cleanup_terminated() = 0;
+
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
         ///
@@ -97,7 +112,8 @@ namespace hpx { namespace threads
         virtual thread_state set_state(thread_id_type id, 
             thread_state_enum newstate,
             thread_state_ex_enum newstate_ex = wait_signaled,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws) = 0;
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)
@@ -121,7 +137,8 @@ namespace hpx { namespace threads
         virtual thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws) = 0;
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -143,7 +160,8 @@ namespace hpx { namespace threads
         virtual thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws) = 0;
 
         /// The function get_thread_gid is part of the thread related API 
         /// allows to query the GID of one of the threads known to the 
@@ -369,6 +387,22 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         bool is_running() const { return thread_count_ != 0 || running_; }
 
+        /// \brief return the number of PX-threads with the given state
+        ///
+        /// \note This function lock the internal OS lock in the threadmanager
+        boost::uint64_t get_thread_count(thread_state_enum state = unknown) const;
+
+        // \brief Abort all threads which are in suspended state. This will set 
+        //        the state of all suspended threads to \a pending while 
+        //        supplying the wait_abort extended state flag
+        void abort_all_suspended_threads();
+
+        // \brief Clean up terminated threads. This deletes all threads which 
+        //        have been terminated but which are still held in the queue 
+        //        of terminated threads. Some schedulers might not do anything
+        //        here.
+        bool cleanup_terminated();
+
         /// \brief Return the number of OS threads running in this threadmanager
         ///
         /// This function will return correct results only if is_running() 
@@ -402,7 +436,8 @@ namespace hpx { namespace threads
         ///                 function returns \a thread_state#active in this case. 
         thread_state set_state(thread_id_type id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex = wait_signaled,
-            thread_priority priority = thread_priority_normal);
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws);
 
         /// The get_state function is part of the thread related API and allows
         /// to query the state of one of the threads known to the threadmanager
@@ -453,7 +488,8 @@ namespace hpx { namespace threads
         thread_id_type set_state (time_type const& expire_at, 
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal);
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws);
 
         /// \brief  Set the thread state of the \a thread referenced by the 
         ///         thread_id \a id.
@@ -475,7 +511,8 @@ namespace hpx { namespace threads
         thread_id_type set_state (duration_type const& expire_from_now, 
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal);
+            thread_priority priority = thread_priority_normal,
+            error_code& ec = throws);
 
         /// The get_description function is part of the thread related API and 
         /// allows to query the description of one of the threads known to the 

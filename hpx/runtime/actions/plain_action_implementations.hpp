@@ -88,8 +88,18 @@
         static threads::thread_state_enum thread_function(
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            LTM_(debug) << "Executing action.";
-            F(BOOST_PP_ENUM_PARAMS(N, arg));
+            try {
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing plain action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 
@@ -447,8 +457,18 @@
         static threads::thread_state_enum thread_function(
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            LTM_(debug) << "Executing action.";
-            F(BOOST_PP_ENUM_PARAMS(N, arg));
+            try {
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing plain action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 

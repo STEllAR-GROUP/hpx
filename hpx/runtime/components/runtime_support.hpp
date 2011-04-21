@@ -115,20 +115,20 @@ namespace hpx { namespace components
 //         }
 
         /// \brief Shutdown the given runtime system
-        lcos::future_value<int> shutdown_async()
+        lcos::future_value<int> shutdown_async(double timeout = -1)
         {
             return this->base_type::shutdown_async(gid_);
         }
 
-        int shutdown()
+        int shutdown(double timeout = -1)
         {
             return this->base_type::shutdown(gid_);
         }
 
         /// \brief Shutdown the runtime systems of all localities
-        void shutdown_all()
+        void shutdown_all(double timeout = -1)
         {
-            this->base_type::shutdown_all(gid_);
+            this->base_type::shutdown_all(gid_, timeout);
         }
 
         /// \brief Retrieve configuration information

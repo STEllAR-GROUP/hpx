@@ -52,22 +52,21 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void finalize(double microseconds = 0.0, bool user_override = true)
+    inline void finalize(double shutdown_timeout = -1.0, double localwait = -1.0)
     {
-        if (user_override)
-          get_option(microseconds, "hpx.finalize_wait_time");
+        if (localwait == -1.0)
+            get_option(localwait, "hpx.finalize_wait_time");
 
-        if (microseconds)
-        {
+        if (localwait != -1.0) {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
             do {
                 current = t.elapsed();
-            } while (current - start_time < microseconds * 1e-6);
+            } while (current - start_time < localwait * 1e-6);
         }
 
-        components::stubs::runtime_support::shutdown_all();
+        components::stubs::runtime_support::shutdown_all(shutdown_timeout);
     }
 
     namespace detail

@@ -13,5 +13,8 @@
     <ClCompile Include="..\..\..\tests\name_resolver_client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tests\unit\serialization\hpx_exception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

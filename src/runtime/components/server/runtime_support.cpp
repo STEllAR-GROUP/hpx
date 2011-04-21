@@ -261,16 +261,16 @@ namespace hpx { namespace components { namespace server
 
     // function to be called during shutdown
     // Action: shut down this runtime system instance
-    int runtime_support::shutdown()
+    int runtime_support::shutdown(double timeout)
     {
         // initiate system shutdown
-        stop();
+        stop(timeout);
         return 0;   // dummy value
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
-    void runtime_support::shutdown_all()
+    void runtime_support::shutdown_all(double timeout)
     {
         std::vector<naming::gid_type> prefixes;
         applier::applier& appl = hpx::applier::get_applier();
@@ -287,7 +287,8 @@ namespace hpx { namespace components { namespace server
             {
                 naming::id_type id(*it, naming::id_type::unmanaged);
                 lazy_actions.push_back(
-                    components::stubs::runtime_support::shutdown_async(id));
+                    components::stubs::runtime_support::shutdown_async(
+                        id, timeout));
             }
         }
 
@@ -300,7 +301,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // now make sure the local locality gets shut down as well.
-        stop();
+        stop(timeout);
     }
 
     // Retrieve configuration information
@@ -352,12 +353,59 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    void runtime_support::stop()
+    void runtime_support::stop(double timeout)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
             BOOST_ASSERT(!terminated_);
+
             stopped_ = true;
+
+            threads::thread_self* self = threads::get_self_ptr();
+            BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread 
+
+            threads::threadmanager_base& tm = 
+                hpx::applier::get_applier().get_thread_manager();
+
+            util::high_resolution_timer t;
+            double start_time = t.elapsed();
+            bool timed_out = false;
+
+            while (tm.get_thread_count() > 1) {
+                // give the scheduler some time to work on remaining tasks
+                {
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    self->yield(threads::pending);
+                }
+
+                // get rid of all terminated threads
+                tm.cleanup_terminated();
+
+                // obey timeout
+                if (timeout != -1 && timeout < (t.elapsed() - start_time)) {
+                    // we waited long enough
+                    timed_out = true;
+                    break;
+                }
+            }
+
+            if (timed_out) {
+                // now we have to wait for all threads to be aborted
+                while (tm.get_thread_count() > 1) {
+                    // abort all suspended threads
+                    tm.abort_all_suspended_threads();
+
+                    {
+                        // give the scheduler some time to work on remaining tasks
+                        util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                        self->yield(threads::pending);
+                    }
+
+                    // get rid of all terminated threads
+                    tm.cleanup_terminated();
+                }
+            }
+
             wait_condition_.notify_all();
             stop_condition_.wait(l);        // wait for termination
         }

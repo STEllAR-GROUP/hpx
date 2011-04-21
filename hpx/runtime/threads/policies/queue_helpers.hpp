@@ -50,11 +50,11 @@ namespace detail
     // this returns true if all threads in the map are currently suspended
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, std::size_t& idle_loop_count) HPX_COLD;
+        Map& tm, std::size_t& idle_loop_count, bool running) HPX_COLD;
 
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, std::size_t& idle_loop_count)
+        Map& tm, std::size_t& idle_loop_count, bool running)
     {
         if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
             return false;
@@ -76,41 +76,69 @@ namespace detail
             if (state != marked_state) {
                 // log each thread only once
                 if (!logged_headline) {
-                    LTM_(error) << "Listing suspended threads while queue ("
-                                << num_thread << ") is empty:";
+                    if (running) { 
+                        LTM_(error) 
+                            << "Listing suspended threads while queue ("
+                            << num_thread << ") is empty:";
+                    }
+                    else {
+                        LHPX_CONSOLE_(boost::logging::level::error) 
+                            << "  [TM] Listing suspended threads while queue ("
+                            << num_thread << ") is empty:\n";
+                    }
                     logged_headline = true;
                 }
 
-                LTM_(error) << "queue(" << num_thread << "): "
-                            << get_thread_state_name(state) 
-                            << "(" << std::hex << std::setw(8) 
-                                << std::setfill('0') << (*it).first 
-                            << "." << std::hex << std::setw(2) 
-                                << std::setfill('0') << thrd->get_thread_phase() 
-                            << "/" << std::hex << std::setw(8) 
-                                << std::setfill('0') << thrd->get_component_id()
-                            << ") P" << std::hex << std::setw(8) 
-                                << std::setfill('0') << thrd->get_parent_thread_id() 
-                            << ": " << thrd->get_description()
-                            << ": " << thrd->get_lco_description();
+                if (running) { 
+                    LTM_(error) 
+                                << "queue(" << num_thread << "): "
+                                << get_thread_state_name(state) 
+                                << "(" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << (*it).first 
+                                << "." << std::hex << std::setw(2) 
+                                    << std::setfill('0') << thrd->get_thread_phase() 
+                                << "/" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_component_id()
+                                << ") P" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_parent_thread_id() 
+                                << ": " << thrd->get_description()
+                                << ": " << thrd->get_lco_description();
+                }
+                else {
+                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] " 
+                                << "queue(" << num_thread << "): "
+                                << get_thread_state_name(state) 
+                                << "(" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << (*it).first 
+                                << "." << std::hex << std::setw(2) 
+                                    << std::setfill('0') << thrd->get_thread_phase() 
+                                << "/" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_component_id()
+                                << ") P" << std::hex << std::setw(8) 
+                                    << std::setfill('0') << thrd->get_parent_thread_id() 
+                                << ": " << thrd->get_description()
+                                << ": " << thrd->get_lco_description() << std::endl;
+                }
                 thrd->set_marked_state(state);
-            }
 
-            // result should be true if we found only suspended threads
-            if (collect_suspended) {
-                switch(state.get_state()) {
-                case threads::suspended:
-                    result = true;    // at least one is suspended
-                    break;
-                case threads::pending:
-                case threads::active:
-                    result = false;   // one is active, no deadlock (yet)
-                    collect_suspended = false;
-                    break;
-                default:
-                    // If the thread is terminated we don't care too much 
-                    // anymore. 
-                    break;
+                // result should be true if we found only suspended threads
+                if (collect_suspended) {
+                    switch(state.get_state()) {
+                    case threads::suspended:
+                        result = true;    // at least one is suspended
+                        break;
+
+                    case threads::pending:
+                    case threads::active:
+                        result = false;   // one is active, no deadlock (yet)
+                        collect_suspended = false;
+                        break;
+
+                    default:
+                        // If the thread is terminated we don't care too much 
+                        // anymore. 
+                        break;
+                    }
                 }
             }
         }

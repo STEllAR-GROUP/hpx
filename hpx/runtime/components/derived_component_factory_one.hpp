@@ -89,7 +89,7 @@ namespace hpx { namespace components
             typedef typename Component::type_holder type_holder;
             if (component_invalid == components::get_component_type<type_holder>()) 
             {
-                typedef typename Component::wrapped_type base_type_holder;
+                typedef typename Component::base_type_holder base_type_holder;
                 component_type base_type = 
                     components::get_component_type<base_type_holder>();
                 if (component_invalid == base_type) 

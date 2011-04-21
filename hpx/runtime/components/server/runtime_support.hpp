@@ -108,10 +108,10 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
-        int shutdown();
+        int shutdown(double timeout);
 
         /// \brief Action shut down runtime system instances on all localities
-        void shutdown_all();
+        void shutdown_all(double timeout);
 
         /// \brief Retrieve configuration information
         util::section get_config();
@@ -177,13 +177,13 @@ namespace hpx { namespace components { namespace server
             &runtime_support::free_component
         > free_component_action;
 
-        typedef hpx::actions::result_action0<
-            runtime_support, int, runtime_support_shutdown, 
+        typedef hpx::actions::result_action1<
+            runtime_support, int, runtime_support_shutdown, double, 
             &runtime_support::shutdown
         > shutdown_action;
 
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_shutdown_all, 
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_shutdown_all, double, 
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
@@ -212,7 +212,7 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop();
+        void stop(double timeout);
 
         /// called locally only
         void stopped();

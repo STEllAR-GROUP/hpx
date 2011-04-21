@@ -78,7 +78,7 @@
 //     new_list.prev->next=&new_list 
 //     // the waiting_list is now empty 
 //     waiting_list.next=waiting_list.prev=&waiting_list 
-//     unlock(gate) // noone has to wait for us any more 
+//     unlock(gate) // no one has to wait for us any more 
 // 
 //     while(new_list.prev!=&new_list) // loop until the captured list is empty 
 //         notify_and_unlink_entry(new_list.prev) 
@@ -104,7 +104,14 @@ namespace hpx { namespace lcos { namespace detail
         {
             thread_self& self = threads::get_self();
             queue_.enqueue(self.get_thread_id());
-            self.yield(threads::suspended);
+            threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+            if (statex == threads::wait_abort) {
+                HPX_OSSTREAM strm;
+                strm << "thread(" << id << ", " << threads::get_thread_description(id)
+                      << ") aborted (yield returned wait_abort)";
+                HPX_THROW_EXCEPTION(no_success, "condition::wait",
+                    HPX_OSSTREAM_GETSTRING(strm));
+            }
         }
 
         void notify_one()

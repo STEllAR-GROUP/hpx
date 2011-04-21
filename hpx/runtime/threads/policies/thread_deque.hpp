@@ -217,6 +217,7 @@ struct thread_deque
         return add_count;
     }
 
+  public:
     // This function makes sure all threads which are marked for deletion
     // (state is terminated) are properly destroyed
     bool cleanup_terminated()
@@ -234,7 +235,6 @@ struct thread_deque
         return thread_map_.empty();
     }
 
-  public:
     // The maximum number of active threads this thread manager should
     // create. This number will be a constraint only as long as the work
     // items queue is not empty. Otherwise the number of active threads 
@@ -336,8 +336,40 @@ struct thread_deque
     }
 
     // Return the number of existing threads, regardless of their state
-    std::size_t get_thread_count() const
+    boost::uint64_t get_thread_count() const
     { return thread_map_.size(); }
+
+    // return the number of existing threads with given state
+    boost::uint64_t get_thread_count(thread_state_enum state) const
+    {
+        if (state == unknown)
+            return thread_map_.size();
+
+        boost::uint64_t num_threads = 0;
+        thread_map_type::const_iterator end = thread_map_.end();
+        for (thread_map_type::const_iterator it = thread_map_.begin();
+              it != end; ++it)
+        {
+            if ((*it).second->get_state() == state)
+                ++num_threads;
+        }
+        return num_threads;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void abort_all_suspended_threads(std::size_t /*num_thread*/)
+    {
+        thread_map_type::iterator end =  thread_map_.end();
+        for (thread_map_type::iterator it = thread_map_.begin();
+              it != end; ++it)
+        {
+            if ((*it).second->get_state() == suspended) {
+                (*it).second->set_state(pending);
+                (*it).second->set_state_ex(wait_abort);
+                schedule_thread((*it).second);
+            }
+        }
+    }
 
     bool add_new_or_terminate(std::size_t num_thread, bool running, 
                               std::size_t& added)
@@ -416,11 +448,11 @@ struct thread_deque
 
     ///////////////////////////////////////////////////////////////////////
     bool dump_suspended_threads(std::size_t num_thread
-      , std::size_t& idle_loop_count)
+      , std::size_t& idle_loop_count, bool running)
     {
         mutex_type::scoped_lock lk(mtx_);
         return detail::dump_suspended_threads(num_thread, thread_map_
-          , idle_loop_count);
+          , idle_loop_count, running);
     }
 
     ///////////////////////////////////////////////////////////////////////

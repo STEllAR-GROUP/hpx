@@ -24,7 +24,9 @@ namespace hpx { namespace threads
     ///                   be modified for.
     /// \param state      [in] The new state to be set for the thread 
     ///                   referenced by the \a id parameter.
-    /// \param stateex
+    /// \param state_ex   [in] The new extended state to be set for the 
+    ///                   thread referenced by the \a id parameter.
+    /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -44,6 +46,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT thread_state set_thread_state(thread_id_type id, 
         thread_state_enum state = pending, 
         thread_state_ex_enum stateex = wait_signaled,
+        thread_priority priority = thread_priority_normal,
         hpx::error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////
@@ -60,6 +63,7 @@ namespace hpx { namespace threads
     ///                   referenced by the \a id parameter.
     /// \param state_ex   [in] The new extended state to be set for the 
     ///                   thread referenced by the \a id parameter.
+    /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -69,6 +73,7 @@ namespace hpx { namespace threads
         boost::posix_time::ptime const& at_time, 
         thread_state_enum state = pending, 
         thread_state_ex_enum stateex = wait_timeout,
+        thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,6 +90,7 @@ namespace hpx { namespace threads
     ///                   referenced by the \a id parameter.
     /// \param state_ex   [in] The new extended state to be set for the 
     ///                   thread referenced by the \a id parameter.
+    /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -94,6 +100,7 @@ namespace hpx { namespace threads
         boost::posix_time::time_duration const& after_duration,
         thread_state_enum state = pending, 
         thread_state_ex_enum stateex = wait_timeout,
+        thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////

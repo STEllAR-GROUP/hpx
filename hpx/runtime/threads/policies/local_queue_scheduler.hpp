@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        boost::int64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
+        boost::uint64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
         {
             // either return queue length of one specific queue
             if (std::size_t(-1) != num_thread) {
@@ -103,10 +103,36 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // or cumulative queue lengths of all queues
-            boost::int64_t result = 0;
+            boost::uint64_t result = 0;
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 result += queues_[i]->get_queue_lengths();
             return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        boost::uint64_t get_thread_count(thread_state_enum state)
+        {
+            // or cumulative queue lengths of all queues
+            boost::uint64_t result = 0;
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                result += queues_[i]->get_thread_count(state);
+            return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        void abort_all_suspended_threads()
+        {
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                queues_[i]->abort_all_suspended_threads(i);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool cleanup_terminated()
+        {
+            bool empty = true;
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                empty = queues_[i]->cleanup_terminated() && empty;
+            return empty;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -179,7 +205,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Return the number of existing threads, regardless of their state
-        std::size_t get_thread_count(std::size_t num_thread) const
+        boost::uint64_t get_thread_count(std::size_t num_thread) const
         {
             BOOST_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->get_thread_count();
@@ -233,12 +259,20 @@ namespace hpx { namespace threads { namespace policies
 
                     for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
                         suspended_only = queues_[i]->dump_suspended_threads(
-                            i, idle_loop_count);
+                            i, idle_loop_count, running);
                     }
 
                     if (HPX_UNLIKELY(suspended_only)) {
-                        LTM_(error) << "queue(" << num_thread << "): "
-                                    << "no new work available, are we deadlocked?";
+                        if (running) {
+                            LTM_(error) 
+                                << "queue(" << num_thread << "): "
+                                << "no new work available, are we deadlocked?";
+                        }
+                        else {
+                            LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                                  << "queue(" << num_thread << "): "
+                                  << "no new work available, are we deadlocked?\n";
+                        }
                     }
                 }
             }

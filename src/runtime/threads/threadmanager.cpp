@@ -79,6 +79,40 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::uint64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_count(thread_state_enum state) const
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        return scheduler_.get_thread_count(state);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \brief Abort all threads which are in suspended state. This will set 
+    //        the state of all suspended threads to \a pending while 
+    //        supplying the wait_abort extended state flag
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        abort_all_suspended_threads()
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        scheduler_.abort_all_suspended_threads();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \brief Clean up terminated threads. This deletes all threads which 
+    //        have been terminated but which are still held in the queue 
+    //        of terminated threads. Some schedulers might not do anything
+    //        here.
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        cleanup_terminated()
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        return scheduler_.cleanup_terminated();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         register_thread(thread_init_data& data, thread_state_enum initial_state, 
             bool run_now, error_code& ec)
@@ -141,6 +175,9 @@ namespace hpx { namespace threads
                    << get_thread_state_name(initial_state) << "), "
                    << std::boolalpha << "run_now(" << run_now << "), "
                    << "description(" << data.description << ")";
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return newid;
     }
@@ -207,6 +244,9 @@ namespace hpx { namespace threads
 
         // create the new thread
         scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -218,7 +258,8 @@ namespace hpx { namespace threads
             thread_priority priority)
     {
         // just retry, set_state will create new thread if target is still active
-        set_state(id, newstate, newstate_ex, priority);
+        error_code ec;      // do not throw
+        set_state(id, newstate, newstate_ex, priority, ec);
         return thread_state(terminated);
     }
 
@@ -228,7 +269,8 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_state(thread_id_type id, thread_state_enum new_state, 
-            thread_state_ex_enum new_state_ex, thread_priority priority)
+            thread_state_ex_enum new_state_ex, thread_priority priority,
+            error_code& ec)
     {
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 
@@ -236,10 +278,13 @@ namespace hpx { namespace threads
         if (new_state == active) {
             HPX_OSSTREAM strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROWS_IF(ec, bad_parameter, 
                 "threadmanager_impl::set_state", HPX_OSSTREAM_GETSTRING(strm));
             return thread_state(unknown);
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
@@ -367,7 +412,8 @@ namespace hpx { namespace threads
         }
 
         // then re-activate the thread holding the deadline_timer
-        set_state(timer_id, pending, wait_timeout);
+        error_code ec;    // do not throw
+        set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
         return terminated;
     }
 
@@ -400,13 +446,16 @@ namespace hpx { namespace threads
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id, 
-            thread_state(pending), thread_state_ex(wait_timeout), priority));
+            thread_state(pending), thread_state_ex(wait_timeout), priority,
+            boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns 'signalled' the timer has been canceled, otherwise 
         // the tiler fired and the wake_timer_thread above has been executed
         bool oldvalue = false;
-        if (wait_timeout != self.yield(suspended) && 
+        thread_state_ex_enum statex = self.yield(suspended);
+
+        if (wait_timeout != statex && 
             triggered->compare_exchange_strong(oldvalue, true))
         {
             // wake_timer_thread has not been executed yet, cancel timer
@@ -422,7 +471,7 @@ namespace hpx { namespace threads
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_state (time_type const& expire_at, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority)
+            thread_priority priority, error_code& ec)
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
@@ -434,7 +483,7 @@ namespace hpx { namespace threads
         thread_init_data data(
             boost::bind(f, this, expire_at, id, newstate, newstate_ex, priority),
             "at_timer (expire at)", 0, priority);
-        return register_thread(data);
+        return register_thread(data, pending, true, ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -443,7 +492,7 @@ namespace hpx { namespace threads
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_state (duration_type const& from_now, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority)
+            thread_priority priority, error_code& ec)
     {
         // this creates a new thread which creates the timer and handles the
         // requested actions
@@ -455,7 +504,7 @@ namespace hpx { namespace threads
         thread_init_data data(
             boost::bind(f, this, from_now, id, newstate, newstate_ex, priority),
             "at_timer (from now)", 0, priority);
-        return register_thread(data);
+        return register_thread(data, pending, true, ec);
     }
 
     /// Retrieve the global id of the given thread

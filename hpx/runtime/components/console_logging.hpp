@@ -17,7 +17,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    inline void console_logging_locked(naming::id_type const& prefix, 
+    inline void 
+    console_logging_locked(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
     {
         try {
@@ -30,22 +31,26 @@ namespace hpx { namespace components
             switch (dest) {
             default:
             case server::destination_hpx:
-                LHPX_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LHPX_CONSOLE_(level) << "Failed logging to console due to: " 
+                                     << e.what() << std::endl;
                 LHPX_CONSOLE_(level) << msg;
                 break;
 
             case server::destination_timing:
-                LTIM_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LTIM_CONSOLE_(level) << "Failed logging to console due to: "
+                                     << e.what() << std::endl;
                 LTIM_CONSOLE_(level) << msg;
                 break;
 
             case server::destination_agas:
-                LAGAS_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LAGAS_CONSOLE_(level) << "Failed logging to console due to: "
+                                     << e.what() << std::endl;
                 LAGAS_CONSOLE_(level) << msg;
                 break;
 
             case server::destination_app:
-                LAPP_CONSOLE_(level) << "Failed logging to console due to: " << e.what();
+                LAPP_CONSOLE_(level) << "Failed logging to console due to: "
+                                     << e.what() << std::endl;
                 LAPP_CONSOLE_(level) << msg;
                 break;
             }

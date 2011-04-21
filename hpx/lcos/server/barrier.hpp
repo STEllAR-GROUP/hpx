@@ -46,10 +46,11 @@ namespace hpx { namespace lcos { namespace server
             > hook_type;
 
             barrier_queue_entry(threads::thread_id_type id)
-              : id_(id)
+              : id_(id), aborted_waiting_(false)
             {}
 
             threads::thread_id_type id_;
+            bool aborted_waiting_;
             hook_type slist_hook_;
         };
 
@@ -80,7 +81,33 @@ namespace hpx { namespace lcos { namespace server
 
         ~barrier()
         {
-            BOOST_ASSERT(queue_.empty());
+            if (!queue_.empty()) {
+                LERR_(fatal) << "~barrier: thread_queue is not empty, aborting threads";
+
+                mutex_type::scoped_lock l(this);
+                while (!queue_.empty()) {
+                    threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
+                    queue_.front().aborted_waiting_ = true;
+                    queue_.pop_front();
+
+                    // we know that the id is actually the pointer to the thread
+                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    LERR_(fatal) << "~barrier: pending thread: " 
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+
+                    // forcefully abort thread, do not throw
+                    error_code ec;
+                    threads::set_thread_state(id, threads::pending, 
+                        threads::wait_abort, threads::thread_priority_normal, ec);
+                    if (ec) {
+                        LERR_(fatal) << "~barrier: could not abort thread"
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+                    }
+                }
+            }
         }
 
         // disambiguate base classes
@@ -113,7 +140,20 @@ namespace hpx { namespace lcos { namespace server
 
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    if (statex == threads::wait_abort) {
+                        HPX_OSSTREAM strm;
+                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+                             << ") aborted (yield returned wait_abort)";
+                        HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
+                            HPX_OSSTREAM_GETSTRING(strm));
+                        return;
+                    }
+                }
+
+                if (e.aborted_waiting_) {
+                    HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
+                        "aborted wait on queue");
                 }
 
                 if (e.id_)
@@ -156,6 +196,17 @@ namespace hpx { namespace lcos { namespace server
         void set_error(boost::exception_ptr const& e)
         {
             try {
+                mutex_type::scoped_lock l(this);
+
+                while (!queue_.empty()) {
+                    threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
+                    queue_.front().aborted_waiting_ = true;
+                    queue_.pop_front();
+
+                    threads::set_thread_state(id, threads::pending);
+                }
+
                 boost::rethrow_exception(e);
             }
             catch (boost::exception const& be) {

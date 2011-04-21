@@ -27,18 +27,26 @@ namespace hpx { namespace naming
 
         void decrement_refcnt(detail::id_type_impl* p)
         {
-            // decrement global reference count for the given gid, delete it
-            // if this was the last reference
-            boost::uint32_t credits = get_credit_from_gid(*p);
-            BOOST_ASSERT(0 != credits);
-            
-            applier::applier* app = applier::get_applier_ptr();
+            // guard for wait_abort and other shutdown issues
+            try {
+                // decrement global reference count for the given gid, delete it
+                // if this was the last reference
+                boost::uint32_t credits = get_credit_from_gid(*p);
+                BOOST_ASSERT(0 != credits);
 
-            error_code ec;
-            components::component_type t = components::component_invalid;
-            if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
-            {
-                components::stubs::runtime_support::free_component_sync(t, *p);
+                applier::applier* app = applier::get_applier_ptr();
+
+                error_code ec;
+                components::component_type t = components::component_invalid;
+                if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
+                {
+                    components::stubs::runtime_support::free_component_sync(t, *p);
+                }
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing decrement_refcnt:"
+                    << e.what();
             }
             delete p;   // delete local gid representation in any case
         }

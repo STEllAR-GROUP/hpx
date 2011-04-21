@@ -307,7 +307,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if !defined(BOOST_WINDOWS)
+// #if !defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts,
         boost::mutex& mtx, boost::condition& cond, bool& running)
     {
@@ -321,21 +321,21 @@ namespace hpx
         // wait for termination
         rts.wait();
     }
-#endif
+// #endif
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::wait()
     {
         LRT_(info) << "runtime_impl: about to enter wait state";
 
-#if defined(BOOST_WINDOWS)
-        // Set console control handler to allow server to be stopped.
-        console_ctrl_function = boost::bind(&runtime_impl::stop, this, true);
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-
-        // wait for the shutdown action to be executed
-        runtime_support_.wait();
-#else
+// #if defined(BOOST_WINDOWS)
+//         // Set console control handler to allow server to be stopped.
+//         console_ctrl_function = boost::bind(&runtime_impl::stop, this, true);
+//         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+// 
+//         // wait for the shutdown action to be executed
+//         runtime_support_.wait();
+// #else
 //         // Block all signals for background thread.
 //         sigset_t new_mask;
 //         sigfillset(&new_mask);
@@ -374,7 +374,7 @@ namespace hpx
 
         // block main thread
         t.join();
-#endif
+// #endif
         LRT_(info) << "runtime_impl: exiting wait state";
         return result_;
     }
@@ -418,12 +418,8 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stopped(
         bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
-        boost::mutex::scoped_lock l(mtx);
-        cond.notify_all();                  // we're done now
-
         // wait for thread manager to exit
         runtime_support_.stopped();         // re-activate shutdown PX-thread 
-
         thread_manager_.stop(blocking);     // wait for thread manager
 
         // unregister the runtime_support and memory instances from the AGAS 
@@ -436,6 +432,9 @@ namespace hpx
         deinit_tss();
 
         LRT_(info) << "runtime_impl: stopped all services";
+
+        boost::mutex::scoped_lock l(mtx);
+        cond.notify_all();                  // we're done now
     }
 
     ///////////////////////////////////////////////////////////////////////////

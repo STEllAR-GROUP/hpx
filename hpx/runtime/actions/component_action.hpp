@@ -59,7 +59,18 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(naming::address::address_type lva)
         {
-            (get_lva<Component>::call(lva)->*F)();      // just call the function
+            try {
+                LTM_(debug) << "Executing component action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                (get_lva<Component>::call(lva)->*F)();      // just call the function
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 
@@ -327,10 +338,18 @@ namespace hpx { namespace actions
         static threads::thread_state_enum 
         thread_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "Executing component action("
-                        << detail::get_action_name<Derived>()
-                        << ").";
-            (get_lva<Component>::call(lva)->*F)();      // just call the function
+            try {
+                LTM_(debug) << "Executing component action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
+                (get_lva<Component>::call(lva)->*F)();      // just call the function
+            }
+            catch (hpx::exception const& e) {
+                LTM_(error) 
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << "): " << e.what();
+            }
             return threads::terminated;
         }
 

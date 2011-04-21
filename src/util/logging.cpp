@@ -816,13 +816,11 @@ namespace hpx { namespace util { namespace detail
         init_hpx_logs(ini, isconsole, console_prefix);
         init_app_logs(ini, isconsole, console_prefix);
 
-        // initialize console logs (if appropriate)
-        if (isconsole) {
-            init_agas_console_log(ini);
-            init_timing_console_log(ini);
-            init_hpx_console_log(ini);
-            init_app_console_log(ini);
-        }
+        // initialize console logs 
+        init_agas_console_log(ini);
+        init_timing_console_log(ini);
+        init_hpx_console_log(ini);
+        init_app_console_log(ini);
     }
 
 ///////////////////////////////////////////////////////////////////////////////

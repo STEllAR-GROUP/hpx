@@ -38,10 +38,11 @@ namespace hpx { namespace lcos
             > hook_type;
 
             local_barrier_queue_entry(threads::thread_id_type id)
-              : id_(id)
+              : id_(id), aborted_waiting_(false)
             {}
 
             threads::thread_id_type id_;
+            bool aborted_waiting_;
             hook_type slist_hook_;
         };
 
@@ -63,7 +64,33 @@ namespace hpx { namespace lcos
 
         ~local_barrier()
         {
-            BOOST_ASSERT(queue_.empty());
+            if (!queue_.empty()) {
+                LERR_(fatal) << "~local_barrier: thread_queue is not empty, aborting threads";
+
+                mutex_type::scoped_lock l(this);
+                while (!queue_.empty()) {
+                    threads::thread_id_type id = queue_.front().id_;
+                    queue_.front().id_ = 0;
+                    queue_.front().aborted_waiting_ = true;
+                    queue_.pop_front();
+
+                    // we know that the id is actually the pointer to the thread
+                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    LERR_(fatal) << "~local_barrier: pending thread: " 
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+
+                    // forcefully abort thread, do not throw
+                    error_code ec;
+                    threads::set_thread_state(id, threads::pending, 
+                        threads::wait_abort, threads::thread_priority_normal, ec);
+                    if (ec) {
+                        LERR_(fatal) << "~local_barrier: could not abort thread"
+                            << get_thread_state_name(thrd->get_state()) 
+                            << "(" << id << "): " << thrd->get_description();
+                    }
+                }
+            }
         }
 
         /// The function \a wait will block the number of entering \a threads
@@ -86,11 +113,25 @@ namespace hpx { namespace lcos
 
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    if (statex == threads::wait_abort) {
+                        HPX_OSSTREAM strm;
+                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+                             << ") aborted (yield returned wait_abort)";
+                        HPX_THROW_EXCEPTION(no_success, "local_barrier::wait",
+                            HPX_OSSTREAM_GETSTRING(strm));
+                        return;
+                    }
                 }
 
                 if (e.id_)
                     queue_.erase(last);     // remove entry from queue
+
+                if (e.aborted_waiting_) {
+                    HPX_THROW_EXCEPTION(no_success, "local_barrier::wait",
+                        "aborted wait on counting_semaphore");
+                    return;
+                }
             }
             else {
             // slist::swap has a bug in Boost 1.35.0

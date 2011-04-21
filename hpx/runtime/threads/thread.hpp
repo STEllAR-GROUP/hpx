@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace detail
     class thread : public lcos::base_lco, private boost::noncopyable
     {
         typedef boost::function<thread_function_type> function_type;
-        
+
     public:
         thread(thread_init_data const& init_data, thread_id_type id, 
                thread_state_enum newstate, thread_pool& pool)
