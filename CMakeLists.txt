@@ -128,16 +128,21 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-if(NOT CMAKE_PREFIX)
+# for backwards compatibility
+if(NOT CMAKE_INSTALL_PREFIX AND CMAKE_PREFIX)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
+endif()
+
+if(NOT CMAKE_INSTALL_PREFIX)
   if(UNIX)
     # on POSIX, we do a local system install by default 
-    set(CMAKE_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
   else()
-    set(CMAKE_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
   endif()
 endif()
 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}"
+set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
