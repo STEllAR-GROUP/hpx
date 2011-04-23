@@ -9,50 +9,50 @@ the Gaussian elimination functions here eventually.
 class LUblock
 {
     public:
-	//constructors and destructor
-	LUblock(){}
-	LUblock(unsigned int h, unsigned int w);
-	~LUblock();
+    //constructors and destructor
+    LUblock(){}
+    LUblock(unsigned int h, unsigned int w);
+    ~LUblock();
 
-	//functions for assignment and data access
-	inline int getrows(){return rows;}
-	inline int getcolumns(){return columns;}
-	inline double get(unsigned int row, unsigned int col);
-	inline void set(unsigned int row, unsigned int col, double val);
+    //functions for assignment and data access
+    inline int getrows(){return rows;}
+    inline int getcolumns(){return columns;}
+    inline double get(unsigned int row, unsigned int col);
+    inline void set(unsigned int row, unsigned int col, double val);
 
     private://data members
-	int rows;
-	int columns;
-	double** data;
+    int rows;
+    int columns;
+    double** data;
 };
 //////////////////////////////////////////////////////////////////////////////////////
 
 //the constructor initializes the matrix
 LUblock::LUblock(unsigned int h, unsigned int w){
-	rows = h;
-	columns = w;
+    rows = h;
+    columns = w;
 
-	data = (double**) std::malloc(h*sizeof(double*));
-	for(int i=0;i<h;i++){data[i]=(double*) std::malloc(w*sizeof(double));}
+    data = (double**) std::malloc(h*sizeof(double*));
+    for(int i=0;i<h;i++){data[i]=(double*) std::malloc(w*sizeof(double));}
 }
 
 //the destructor frees the memory
 LUblock::~LUblock(){
-	unsigned int i;
-	for(i=0;i<rows;i++){
-		free(data[i]);
-	}
-	free(data);
+    unsigned int i;
+    for(i=0;i<rows;i++){
+        free(data[i]);
+    }
+    free(data);
 }
 
 //get() gives back an element in the original matrix
 double LUblock::get(unsigned int row, unsigned int col){
-	return data[row][col];
+    return data[row][col];
 }
 
 //set() assigns a value to an element in all matrices
 void LUblock::set(unsigned int row, unsigned int col, double val){
-	data[row][col] = val;
+    data[row][col] = val;
 }
 
 #endif

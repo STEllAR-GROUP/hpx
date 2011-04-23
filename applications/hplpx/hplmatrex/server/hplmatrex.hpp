@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace server
     class HPX_COMPONENT_EXPORT HPLMatreX : public simple_component_base<HPLMatreX>
     {
     public:
-	//enumerate all of the actions that will(or can) be employed
+    //enumerate all of the actions that will(or can) be employed
         enum actions{
                 hpl_construct=0,
                 hpl_destruct=1,
@@ -36,197 +36,197 @@ namespace hpx { namespace components { namespace server
                 hpl_get=3,
                 hpl_set=4,
                 hpl_solve=5,
-		hpl_swap=6,
-		hpl_gmain=7,
-		hpl_bsubst=8,
-		hpl_check=9
+        hpl_swap=6,
+        hpl_gmain=7,
+        hpl_bsubst=8,
+        hpl_check=9
         };
 
-	//constructors and destructor
-	HPLMatreX(){}
-	int construct(naming::id_type gid, int h, int w, int ab, int bs);
-	~HPLMatreX(){destruct();}
-	void destruct();
+    //constructors and destructor
+    HPLMatreX(){}
+    int construct(naming::id_type gid, int h, int w, int ab, int bs);
+    ~HPLMatreX(){destruct();}
+    void destruct();
 
-	//operators for assignment and leftdata access
-	double get(int row, int col);
-	void set(int row, int col, double val);
+    //operators for assignment and leftdata access
+    double get(int row, int col);
+    void set(int row, int col, double val);
 
-	//functions for manipulating the matrix
-	double LUsolve();
+    //functions for manipulating the matrix
+    double LUsolve();
 
     private:
-	void allocate();
-	int assign(int row, int offset, bool complete, int seed);
-	void pivot();
-	int swap(int brow, int bcol);
-	void LUgausscorner(int iter);
-	void LUgausstop(int iter, int bcol);
-	void LUgaussleft(int brow, int iter);
-	void LUgausstrail(int brow, int bcol, int iter);
-	int LUgaussmain(int brow, int bcol, int iter, int type);
-	int LUbacksubst();
-	double checksolve(int row, int offset, bool complete);
-	void print();
-	void print2();
+    void allocate();
+    int assign(int row, int offset, bool complete, int seed);
+    void pivot();
+    int swap(int brow, int bcol);
+    void LUgausscorner(int iter);
+    void LUgausstop(int iter, int bcol);
+    void LUgaussleft(int brow, int iter);
+    void LUgausstrail(int brow, int bcol, int iter);
+    int LUgaussmain(int brow, int bcol, int iter, int type);
+    int LUbacksubst();
+    double checksolve(int row, int offset, bool complete);
+    void print();
+    void print2();
 
-	int rows;			//number of rows in the matrix
-	int brows;			//number of rows of blocks in the matrix
-	int columns;			//number of columns in the matrix
-	int bcolumns;			//number of columns of blocks in the matrix
-	int allocblock;			//reflects amount of allocation done per thread
-	int blocksize;			//reflects amount of computation per thread
-	naming::id_type _gid;		//the instances gid
-	LUblock*** datablock;		//stores the data being operated on
-	double** factordata;		//stores factors for computations
-	double** truedata;		//the original unaltered data
-        double* solution;		//for storing the solution
-	int* pivotarr;			//array for storing pivot elements
-					//(maps original rows to pivoted/reordered rows)
-	lcos::mutex mtex;		//mutex
+    int rows;            //number of rows in the matrix
+    int brows;            //number of rows of blocks in the matrix
+    int columns;            //number of columns in the matrix
+    int bcolumns;            //number of columns of blocks in the matrix
+    int allocblock;            //reflects amount of allocation done per thread
+    int blocksize;            //reflects amount of computation per thread
+    naming::id_type _gid;        //the instances gid
+    LUblock*** datablock;        //stores the data being operated on
+    double** factordata;        //stores factors for computations
+    double** truedata;        //the original unaltered data
+        double* solution;        //for storing the solution
+    int* pivotarr;            //array for storing pivot elements
+                    //(maps original rows to pivoted/reordered rows)
+    lcos::mutex mtex;        //mutex
 
     public:
-	//here we define the actions that will be used
-	//the construct function
-	typedef actions::result_action5<HPLMatreX, int, hpl_construct, naming::id_type,
-		int, int, int, int, &HPLMatreX::construct> construct_action;
-	//the destruct function
-	typedef actions::action0<HPLMatreX, hpl_destruct,
-		&HPLMatreX::destruct> destruct_action;
-	 //the assign function
-	typedef actions::result_action4<HPLMatreX, int, hpl_assign, int,
-		int, bool, int, &HPLMatreX::assign> assign_action;
-	//the get function
-	typedef actions::result_action2<HPLMatreX, double, hpl_get, int,
-        	int, &HPLMatreX::get> get_action;
-	//the set function
-	typedef actions::action3<HPLMatreX, hpl_set, int,
-        	int, double, &HPLMatreX::set> set_action;
-	//the solve function
-	typedef actions::result_action0<HPLMatreX, double, hpl_solve,
-		&HPLMatreX::LUsolve> solve_action;
-	 //the swap function
-	typedef actions::result_action2<HPLMatreX, int, hpl_swap, int,
-		int, &HPLMatreX::swap> swap_action;
-	//the main gaussian function
-	typedef actions::result_action4<HPLMatreX, int, hpl_gmain, int,
-		int, int, int, &HPLMatreX::LUgaussmain> gmain_action;
-	//backsubstitution function
-	typedef actions::result_action0<HPLMatreX, int, hpl_bsubst,
-		&HPLMatreX::LUbacksubst> bsubst_action;
-	//checksolve function
-	typedef actions::result_action3<HPLMatreX, double, hpl_check, int,
-		int, bool, &HPLMatreX::checksolve> check_action;
+    //here we define the actions that will be used
+    //the construct function
+    typedef actions::result_action5<HPLMatreX, int, hpl_construct, naming::id_type,
+        int, int, int, int, &HPLMatreX::construct> construct_action;
+    //the destruct function
+    typedef actions::action0<HPLMatreX, hpl_destruct,
+        &HPLMatreX::destruct> destruct_action;
+     //the assign function
+    typedef actions::result_action4<HPLMatreX, int, hpl_assign, int,
+        int, bool, int, &HPLMatreX::assign> assign_action;
+    //the get function
+    typedef actions::result_action2<HPLMatreX, double, hpl_get, int,
+            int, &HPLMatreX::get> get_action;
+    //the set function
+    typedef actions::action3<HPLMatreX, hpl_set, int,
+            int, double, &HPLMatreX::set> set_action;
+    //the solve function
+    typedef actions::result_action0<HPLMatreX, double, hpl_solve,
+        &HPLMatreX::LUsolve> solve_action;
+     //the swap function
+    typedef actions::result_action2<HPLMatreX, int, hpl_swap, int,
+        int, &HPLMatreX::swap> swap_action;
+    //the main gaussian function
+    typedef actions::result_action4<HPLMatreX, int, hpl_gmain, int,
+        int, int, int, &HPLMatreX::LUgaussmain> gmain_action;
+    //backsubstitution function
+    typedef actions::result_action0<HPLMatreX, int, hpl_bsubst,
+        &HPLMatreX::LUbacksubst> bsubst_action;
+    //checksolve function
+    typedef actions::result_action3<HPLMatreX, double, hpl_check, int,
+        int, bool, &HPLMatreX::checksolve> check_action;
 
-	//here begins the definitions of most of the future types that will be used
-	//the first of which is for assign action
-	typedef lcos::eager_future<server::HPLMatreX::assign_action> assign_future;
+    //here begins the definitions of most of the future types that will be used
+    //the first of which is for assign action
+    typedef lcos::eager_future<server::HPLMatreX::assign_action> assign_future;
 
-	//Here is the swap future, which works the same way as the assign future
-	typedef lcos::eager_future<server::HPLMatreX::swap_action> swap_future;
+    //Here is the swap future, which works the same way as the assign future
+    typedef lcos::eager_future<server::HPLMatreX::swap_action> swap_future;
 
-	//This future corresponds to the Gaussian elimination functions
-	typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
+    //This future corresponds to the Gaussian elimination functions
+    typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
 
-	//the backsubst future is used to make sure all computations are complete before
-	//returning from LUsolve, to avoid killing processes and erasing the leftdata while
-	//it is still being worked on
-	typedef lcos::eager_future<server::HPLMatreX::bsubst_action> bsubst_future;
+    //the backsubst future is used to make sure all computations are complete before
+    //returning from LUsolve, to avoid killing processes and erasing the leftdata while
+    //it is still being worked on
+    typedef lcos::eager_future<server::HPLMatreX::bsubst_action> bsubst_future;
 
-	//the final future type for the class is used for checking the accuracy of
-	//the results of the LU decomposition
-	typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
+    //the final future type for the class is used for checking the accuracy of
+    //the results of the LU decomposition
+    typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
 
 //***//
-	//central_futures is an array of pointers to future which needs to be kept global
-	//to this class and is used to represent LUgausscorner inducing gmain_futures
-	gmain_future** central_futures;
+    //central_futures is an array of pointers to future which needs to be kept global
+    //to this class and is used to represent LUgausscorner inducing gmain_futures
+    gmain_future** central_futures;
 
-	//top_futures and left_futures are 2d arrays of pointers to futures similar to
-	//central_futures
-	gmain_future*** top_futures;
-	gmain_future*** left_futures;
+    //top_futures and left_futures are 2d arrays of pointers to futures similar to
+    //central_futures
+    gmain_future*** top_futures;
+    gmain_future*** left_futures;
     };
 //////////////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
     int HPLMatreX::construct(naming::id_type gid, int h, int w,
-		int ab, int bs){
+        int ab, int bs){
 // / / /initialize class variables/ / / / / / / / / / / /
-	if(ab > std::ceil(((float)h)*.5)){
-		allocblock = (int)std::ceil(((float)h)*.5);
-	}
-	else{ allocblock = ab;}
-	if(bs > h){
-		blocksize = h;
-	}
-	else{ blocksize = bs;}
-	rows = h;
-	brows = (int)std::floor((float)h/blocksize);
-	columns = w;
-	_gid = gid;
+    if(ab > std::ceil(((float)h)*.5)){
+        allocblock = (int)std::ceil(((float)h)*.5);
+    }
+    else{ allocblock = ab;}
+    if(bs > h){
+        blocksize = h;
+    }
+    else{ blocksize = bs;}
+    rows = h;
+    brows = (int)std::floor((float)h/blocksize);
+    columns = w;
+    _gid = gid;
 
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-	int i,j; 		 //just counting variables
-	int offset = 1; //the initial offset used for the memory handling algorithm
-	boost::rand48 gen;	 //random generator used for seeding other generators
-	gen.seed(time(NULL));
+    int i,j;          //just counting variables
+    int offset = 1; //the initial offset used for the memory handling algorithm
+    boost::rand48 gen;     //random generator used for seeding other generators
+    gen.seed(time(NULL));
 
-	/*allocate memory for the various arrays that will be used*/
-	central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
-	left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
-	top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
-	datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
-	factordata = (double**) std::malloc(h*sizeof(double*));
-	truedata = (double**) std::malloc(h*sizeof(double*));
-	pivotarr = (int*) std::malloc(h*sizeof(int));
+    /*allocate memory for the various arrays that will be used*/
+    central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
+    left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
+    top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
+    datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
+    factordata = (double**) std::malloc(h*sizeof(double*));
+    truedata = (double**) std::malloc(h*sizeof(double*));
+    pivotarr = (int*) std::malloc(h*sizeof(int));
 
-	allocate();	//allocate memory for the elements of the array
+    allocate();    //allocate memory for the elements of the array
 
-	//By making offset a power of two, the assign functions
-	//are much simpler than they would be otherwise.
-	//The result of the below computation is that offset will be
-	//the greatest power of two less than or equal to the number
-	//of rows in the matrix
-	h = (int)std::ceil(((float)h)*.5);
-	while(offset < h){
-		offset *= 2;
-	}
+    //By making offset a power of two, the assign functions
+    //are much simpler than they would be otherwise.
+    //The result of the below computation is that offset will be
+    //the greatest power of two less than or equal to the number
+    //of rows in the matrix
+    h = (int)std::ceil(((float)h)*.5);
+    while(offset < h){
+        offset *= 2;
+    }
 
-	//here we initialize the the matrix
-	lcos::eager_future<server::HPLMatreX::assign_action>
-		assign_future(gid,(int)0,offset,false,gen());
+    //here we initialize the the matrix
+    lcos::eager_future<server::HPLMatreX::assign_action>
+        assign_future(gid,(int)0,offset,false,gen());
 
-	//initialize the pivot array
-	for(i=0;i<rows;i++){pivotarr[i]=i;}
+    //initialize the pivot array
+    for(i=0;i<rows;i++){pivotarr[i]=i;}
 
-	//initialize the arrays of futures
-	for(i=0;i<brows;i++){
-		central_futures[i] = NULL;
-		for(j=0;j<i;j++){
-			left_futures[i][j] = NULL;
-		}
-		for(j=0;j<brows-i-1;j++){
-			top_futures[i][j] = NULL;
-	}	}
+    //initialize the arrays of futures
+    for(i=0;i<brows;i++){
+        central_futures[i] = NULL;
+        for(j=0;j<i;j++){
+            left_futures[i][j] = NULL;
+        }
+        for(j=0;j<brows-i-1;j++){
+            top_futures[i][j] = NULL;
+    }    }
 
-	//make sure that everything has been allocated their memory
-	//and initialized
-	return assign_future.get();
+    //make sure that everything has been allocated their memory
+    //and initialized
+    return assign_future.get();
     }
 
     //allocate() allocates memory space for the matrix
     void HPLMatreX::allocate(){
-	for(int i = 0;i < rows;i++){
-	    truedata[i] = (double*) std::malloc(columns*sizeof(double));
-	    factordata[i] = (double*) std::malloc(i*sizeof(double));
-	}
-	for(int i = 0;i < brows;i++){
-	    datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
-	    top_futures[i] = (gmain_future**)std::malloc((brows-i-1)*sizeof(gmain_future*));
-	    left_futures[i] = (gmain_future**)std::malloc(i*sizeof(gmain_future*));
-	}
+    for(int i = 0;i < rows;i++){
+        truedata[i] = (double*) std::malloc(columns*sizeof(double));
+        factordata[i] = (double*) std::malloc(i*sizeof(double));
+    }
+    for(int i = 0;i < brows;i++){
+        datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
+        top_futures[i] = (gmain_future**)std::malloc((brows-i-1)*sizeof(gmain_future*));
+        left_futures[i] = (gmain_future**)std::malloc(i*sizeof(gmain_future*));
+    }
     }
 
     /*assign gives values to the empty elements of the array.
@@ -241,292 +241,292 @@ namespace hpx { namespace components { namespace server
         //while other threads work, and is checked at the end to make certain all
         //threads are completed before returning.
         std::vector<assign_future> futures;
-	boost::rand48 gen;
-	gen.seed(seed);
+    boost::rand48 gen;
+    gen.seed(seed);
 
-	//create multiple futures which in turn create more futures
+    //create multiple futures which in turn create more futures
         while(!complete){
-	    //there is only one more child thread left to produce
+        //there is only one more child thread left to produce
             if(offset <= allocblock){
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,offset,true,gen()));
                 }
                 complete = true;
             }
-	    //there are at least two more child threads to produce
+        //there are at least two more child threads to produce
             else{
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,
-			(int)(offset*.5),false,gen()));
+            (int)(offset*.5),false,gen()));
                 }
                 offset = (int)(offset*.5);
             }
         }
-	//initialize the assigned row
-	int temp = std::min((int)offset, (int)(rows - row));
-	for(int i=0;i<temp;i++){
-	    for(int j=0;j<columns;j++){
-		truedata[row+i][j] = (double) (gen() % 1000);
-	    }
-	}
+    //initialize the assigned row
+    int temp = std::min((int)offset, (int)(rows - row));
+    for(int i=0;i<temp;i++){
+        for(int j=0;j<columns;j++){
+        truedata[row+i][j] = (double) (gen() % 1000);
+        }
+    }
 
-	//once all spun off futures are complete we are done
+    //once all spun off futures are complete we are done
         BOOST_FOREACH(assign_future af, futures){
                 af.get();
         }
-	return 1;
+    return 1;
     }
 
     //the destructor frees the memory
     void HPLMatreX::destruct(){
-	int i;
-	for(i=0;i<rows;i++){
-		free(truedata[i]);
-	}
-	for(i=0;i<brows;i++){
-		for(int j=0;j<brows;j++){
-			delete datablock[i][j];
-		}
-		free(datablock[i]);
-	}
-	free(datablock);
-	free(factordata);
-	free(truedata);
-	free(pivotarr);
-	free(solution);
+    int i;
+    for(i=0;i<rows;i++){
+        free(truedata[i]);
+    }
+    for(i=0;i<brows;i++){
+        for(int j=0;j<brows;j++){
+            delete datablock[i][j];
+        }
+        free(datablock[i]);
+    }
+    free(datablock);
+    free(factordata);
+    free(truedata);
+    free(pivotarr);
+    free(solution);
     }
 
 //DEBUGGING FUNCTIONS/////////////////////////////////////////////////
     //get() gives back an element in the original matrix
     double HPLMatreX::get(int row, int col){
-	return truedata[row][col];
+    return truedata[row][col];
     }
 
     //set() assigns a value to an element in all matrices
     void HPLMatreX::set(int row, int col, double val){
-	truedata[row][col] = val;
+    truedata[row][col] = val;
     }
 
     //print out the matrix
     void HPLMatreX::print(){
-	for(int i = 0; i < brows; i++){
-	    for(int j = 0; j < datablock[i][0]->getrows(); j++){
-		for(int k = 0; k < brows; k++){
-		    for(int l = 0; l < datablock[i][k]->getcolumns(); l++){
-			std::cout<<datablock[i][k]->get(j,l)<<" ";
-		}   }
-		std::cout<<std::endl;
-	}   }
-	std::cout<<std::endl;
+    for(int i = 0; i < brows; i++){
+        for(int j = 0; j < datablock[i][0]->getrows(); j++){
+        for(int k = 0; k < brows; k++){
+            for(int l = 0; l < datablock[i][k]->getcolumns(); l++){
+            std::cout<<datablock[i][k]->get(j,l)<<" ";
+        }   }
+        std::cout<<std::endl;
+    }   }
+    std::cout<<std::endl;
     }
     void HPLMatreX::print2(){
-	for(int i = 0;i < rows; i++){
-	    int temp=0;
-	    while(temp + blocksize <= i){temp+=blocksize;}
-	    for(int j = temp;j < columns; j++){
-		std::cout<<truedata[i][j]<<" ";
-	    }
-	    std::cout<<std::endl;
-	}
-	    std::cout<<std::endl;
+    for(int i = 0;i < rows; i++){
+        int temp=0;
+        while(temp + blocksize <= i){temp+=blocksize;}
+        for(int j = temp;j < columns; j++){
+        std::cout<<truedata[i][j]<<" ";
+        }
+        std::cout<<std::endl;
+    }
+        std::cout<<std::endl;
     }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatreX::LUsolve(){
-	//first perform partial pivoting
-	pivot();
+    //first perform partial pivoting
+    pivot();
 
-	//to initiate the Gaussian elimination, create a future to obtain the final
-	//set of computations we will need
-	gmain_future main_future(_gid,brows-1,brows-1,brows-1,1);
-	main_future.get();
+    //to initiate the Gaussian elimination, create a future to obtain the final
+    //set of computations we will need
+    gmain_future main_future(_gid,brows-1,brows-1,brows-1,1);
+    main_future.get();
 
-	//allocate memory space to store the solution
-	solution = (double*) std::malloc(rows*sizeof(double));
+    //allocate memory space to store the solution
+    solution = (double*) std::malloc(rows*sizeof(double));
 
-	//create a future to perform back substitution
-	bsubst_future bsub(_gid);
+    //create a future to perform back substitution
+    bsubst_future bsub(_gid);
 
-	int h = (int)std::ceil(((float)rows)*.5);
-	int offset = 1;
-	while(offset < h){offset *= 2;}
+    int h = (int)std::ceil(((float)rows)*.5);
+    int offset = 1;
+    while(offset < h){offset *= 2;}
 
-	//confirm back substitution is completed before continuing
-	bsub.get();
+    //confirm back substitution is completed before continuing
+    bsub.get();
 
-	//create a future to check the accuracy of the generated solution
-	check_future chk(_gid,0,offset,false);
-	return chk.get();
-//	return 1;
+    //create a future to check the accuracy of the generated solution
+    check_future chk(_gid,0,offset,false);
+    return chk.get();
+//    return 1;
     }
 
     //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
     void HPLMatreX::pivot(){
-	int max, max_row;
-	int temp_piv;
-	double temp;
-	int h = (int)std::ceil(((float)rows)*.5);
-	int i,j;
+    int max, max_row;
+    int temp_piv;
+    double temp;
+    int h = (int)std::ceil(((float)rows)*.5);
+    int i,j;
 
-	//This first section of the pivot() function finds all of the pivot
-	//values to compute the final pivot array
-	for(i=0;i<rows-1;i++){
-	    max_row = i;
-	    max = (int)fabs(truedata[pivotarr[i]][i]);
-	    temp_piv = pivotarr[i];
-	    for(j=i+1;j<rows;j++){
-		temp = (int)fabs(truedata[pivotarr[j]][i]);
-		if(temp > max){
-		    max = (int)temp;
-		    max_row = j;
-	    }	}
-	    pivotarr[i] = pivotarr[max_row];
-	    pivotarr[max_row] = temp_piv;
-	}
+    //This first section of the pivot() function finds all of the pivot
+    //values to compute the final pivot array
+    for(i=0;i<rows-1;i++){
+        max_row = i;
+        max = (int)fabs(truedata[pivotarr[i]][i]);
+        temp_piv = pivotarr[i];
+        for(j=i+1;j<rows;j++){
+        temp = (int)fabs(truedata[pivotarr[j]][i]);
+        if(temp > max){
+            max = (int)temp;
+            max_row = j;
+        }    }
+        pivotarr[i] = pivotarr[max_row];
+        pivotarr[max_row] = temp_piv;
+    }
 
-	//call the swap function for each datablock in the matrix
-	for(i=0;i<brows;i++){
-		for(j=0;j<brows;j++){
-			swap(i,j);
-	}	}
+    //call the swap function for each datablock in the matrix
+    for(i=0;i<brows;i++){
+        for(j=0;j<brows;j++){
+            swap(i,j);
+    }    }
     }
 
     //swap() creates the datablocks and reorders the original
     //truedata matrix when assigning the initial values to the datablocks
     //according to the pivotarr data.  truedata itself remains unchanged
     int HPLMatreX::swap(int brow, int bcol){
-	int temp = rows/blocksize;
-	int numrows = blocksize, numcols = blocksize;
-	if(brow == brows-1){numrows = rows - (temp-1)*blocksize;}
-	if(bcol == brows-1){numcols = columns - (temp-1)*blocksize;}
+    int temp = rows/blocksize;
+    int numrows = blocksize, numcols = blocksize;
+    if(brow == brows-1){numrows = rows - (temp-1)*blocksize;}
+    if(bcol == brows-1){numcols = columns - (temp-1)*blocksize;}
 
-	datablock[brow][bcol] = new LUblock(numrows,numcols);
-	for(int i=0;i<numrows;i++){
-	    for(int j=0;j<numcols;j++){
-		datablock[brow][bcol]->data[i][j] =
-		    truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j];
-	}   }
+    datablock[brow][bcol] = new LUblock(numrows,numcols);
+    for(int i=0;i<numrows;i++){
+        for(int j=0;j<numcols;j++){
+        datablock[brow][bcol]->data[i][j] =
+            truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j];
+    }   }
     }
 
     //LUgaussmain is a wrapper function which is used so that only one type of action
     //is needed instead of four types of actions
     int HPLMatreX::LUgaussmain(int brow,int bcol,int iter,
-	    int type){
-	//if the following conditional is true, then there is nothing to do
-	if(type == 0 && (brow == 0 || bcol == 0) || iter < 0){return 1;}
+        int type){
+    //if the following conditional is true, then there is nothing to do
+    if(type == 0 && (brow == 0 || bcol == 0) || iter < 0){return 1;}
 
-	//we will need to create a future to perform LUgausstrail regardless
-	//of what this current function instance will compute
-	gmain_future trail_future(_gid,brow,bcol,iter-1,0);
+    //we will need to create a future to perform LUgausstrail regardless
+    //of what this current function instance will compute
+    gmain_future trail_future(_gid,brow,bcol,iter-1,0);
 
-	//below decides what other futures need to be created in order to complete all
-	//necessary computations before we can return
-	if(type == 1){
-		trail_future.get();
-		LUgausscorner(iter);
-	}
-	else if(type == 2){
-		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(central_futures[iter] == NULL){
-			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
-		    }
-		}
-		trail_future.get();
-		central_futures[iter]->get();
-		LUgausstop(iter,bcol);
-	}
-	else if(type == 3){
-		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(central_futures[iter] == NULL){
-			central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
-		    }
-		}
-		trail_future.get();
-		central_futures[iter]->get();
-		LUgaussleft(brow,iter);
-	}
-	else{
-		{
-		    lcos::mutex::scoped_lock l(mtex);
-		    if(top_futures[iter][bcol-iter-1] == NULL){
-			top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
-		    }
-		    if(left_futures[brow][iter] == NULL){
-			left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
-		    }
-		}
-		trail_future.get();
-		top_futures[iter][bcol-iter-1]->get();
-		left_futures[brow][iter]->get();
-		LUgausstrail(brow,bcol,iter);
-	}
-	return 1;
+    //below decides what other futures need to be created in order to complete all
+    //necessary computations before we can return
+    if(type == 1){
+        trail_future.get();
+        LUgausscorner(iter);
+    }
+    else if(type == 2){
+        {
+            lcos::mutex::scoped_lock l(mtex);
+            if(central_futures[iter] == NULL){
+            central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+            }
+        }
+        trail_future.get();
+        central_futures[iter]->get();
+        LUgausstop(iter,bcol);
+    }
+    else if(type == 3){
+        {
+            lcos::mutex::scoped_lock l(mtex);
+            if(central_futures[iter] == NULL){
+            central_futures[iter] = new gmain_future(_gid,iter,iter,iter,1);
+            }
+        }
+        trail_future.get();
+        central_futures[iter]->get();
+        LUgaussleft(brow,iter);
+    }
+    else{
+        {
+            lcos::mutex::scoped_lock l(mtex);
+            if(top_futures[iter][bcol-iter-1] == NULL){
+            top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
+            }
+            if(left_futures[brow][iter] == NULL){
+            left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
+            }
+        }
+        trail_future.get();
+        top_futures[iter][bcol-iter-1]->get();
+        left_futures[brow][iter]->get();
+        LUgausstrail(brow,bcol,iter);
+    }
+    return 1;
     }
 
     //LUgausscorner peforms gaussian elimination on the topleft corner block
     //of data that has not yet completed all of it's gaussian elimination
     //computations. Once complete, this block will need no further computations
     void HPLMatreX::LUgausscorner(int iter){
-	int i, j, k;
-	int offset = iter*blocksize;		//factordata index offset
-	int itercols = datablock[iter][iter]->getcolumns();
-	double f_factor;
-	double factor;
+    int i, j, k;
+    int offset = iter*blocksize;        //factordata index offset
+    int itercols = datablock[iter][iter]->getcolumns();
+    double f_factor;
+    double factor;
 
-	for(i=0;i<datablock[iter][iter]->getrows();i++){
-		if(datablock[iter][iter]->get(i,i) == 0){
-		    std::cerr<<"Warning: divided by zero\n";
-		}
-		f_factor = 1/datablock[iter][iter]->get(i,i);
-		for(j=i+1;j<datablock[iter][iter]->getrows();j++){
-		    factor = f_factor*datablock[iter][iter]->get(j,i);
-		    factordata[j+offset][i+offset] = factor;
-		    for(k=i+1;k<itercols;k++){
-			datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
-	}	}   }
+    for(i=0;i<datablock[iter][iter]->getrows();i++){
+        if(datablock[iter][iter]->get(i,i) == 0){
+            std::cerr<<"Warning: divided by zero\n";
+        }
+        f_factor = 1/datablock[iter][iter]->get(i,i);
+        for(j=i+1;j<datablock[iter][iter]->getrows();j++){
+            factor = f_factor*datablock[iter][iter]->get(j,i);
+            factordata[j+offset][i+offset] = factor;
+            for(k=i+1;k<itercols;k++){
+            datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
+    }    }   }
     }
 
     //LUgausstop performs gaussian elimination on the topmost row of blocks
     //that have not yet finished all gaussian elimination computation.
     //Once complete, these blocks will no longer need further computations
     void HPLMatreX::LUgausstop(int iter, int bcol){
-	int i,j,k;
-	int offset = iter*blocksize;		//factordata index offset
-	int itercols = datablock[iter][bcol]->getcolumns();
-	double factor;
+    int i,j,k;
+    int offset = iter*blocksize;        //factordata index offset
+    int itercols = datablock[iter][bcol]->getcolumns();
+    double factor;
 
-	for(i=0;i<datablock[iter][bcol]->getrows();i++){
-		for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
-		    factor = factordata[j+offset][i+offset];
-		    for(k=0;k<itercols;k++){
-			datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
-	}	}   }
+    for(i=0;i<datablock[iter][bcol]->getrows();i++){
+        for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
+            factor = factordata[j+offset][i+offset];
+            for(k=0;k<itercols;k++){
+            datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
+    }    }   }
     }
 
     //LUgaussleft performs gaussian elimination on the leftmost column of blocks
     //that have not yet finished all gaussian elimination computation.
     //Upon completion, no further computations need be done on these blocks.
     void HPLMatreX::LUgaussleft(int brow, int iter){
-	int i,j,k;
-	int offset = brow*blocksize;
-	int offset_col = iter*blocksize;	//factordata offset
-	int itercols = datablock[brow][iter]->getcolumns();
-	double f_factor;
-	double factor;
+    int i,j,k;
+    int offset = brow*blocksize;
+    int offset_col = iter*blocksize;    //factordata offset
+    int itercols = datablock[brow][iter]->getcolumns();
+    double f_factor;
+    double factor;
 
-	for(i=0;i<datablock[brow][iter]->getcolumns();i++){
-		f_factor = 1/datablock[iter][iter]->get(i,i);
-		for(j=0;j<datablock[brow][iter]->getrows();j++){
-		    factor = f_factor*datablock[brow][iter]->get(j,i);
-		    factordata[j+offset][i+offset_col] = factor;
-		    for(k=i+1;k<itercols;k++){
-			datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
-	}	}   }
+    for(i=0;i<datablock[brow][iter]->getcolumns();i++){
+        f_factor = 1/datablock[iter][iter]->get(i,i);
+        for(j=0;j<datablock[brow][iter]->getrows();j++){
+            factor = f_factor*datablock[brow][iter]->get(j,i);
+            factordata[j+offset][i+offset_col] = factor;
+            for(k=i+1;k<itercols;k++){
+            datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
+    }    }   }
     }
 
     //LUgausstrail performs gaussian elimination on the trailing submatrix of
@@ -534,73 +534,73 @@ namespace hpx { namespace components { namespace server
     //computations. These blocks will still require further computations to be
     //performed in future iterations.
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
-	int i,j,k;
-	int offset = brow*blocksize - 1;	//factordata row offset
-	int offset_col = iter*blocksize;	//factordata column offset
-	int iterrows = datablock[iter][iter]->getrows();
-	int itercols = datablock[brow][bcol]->getcolumns();
-	double factor;
+    int i,j,k;
+    int offset = brow*blocksize - 1;    //factordata row offset
+    int offset_col = iter*blocksize;    //factordata column offset
+    int iterrows = datablock[iter][iter]->getrows();
+    int itercols = datablock[brow][bcol]->getcolumns();
+    double factor;
 
-	//outermost loop: iterates over the f_factors of the most recent corner block
-	//	(f_factors are used indirectly through factordata)
-	//middle loop: iterates over the rows of the current block
-	//inner loop: iterates across the columns of the current block
-	for(j=0;j<datablock[brow][bcol]->getrows();j++){
-		offset++;
-		for(i=0;i<iterrows;i++){
-		    factor = factordata[offset][i+offset_col];
-		    for(k=0;k<itercols;k++){
-			datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
-	}	}   }
+    //outermost loop: iterates over the f_factors of the most recent corner block
+    //    (f_factors are used indirectly through factordata)
+    //middle loop: iterates over the rows of the current block
+    //inner loop: iterates across the columns of the current block
+    for(j=0;j<datablock[brow][bcol]->getrows();j++){
+        offset++;
+        for(i=0;i<iterrows;i++){
+            factor = factordata[offset][i+offset_col];
+            for(k=0;k<itercols;k++){
+            datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
+    }    }   }
     }
 
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
     int HPLMatreX::LUbacksubst(){
-	//i,j,k,l standard loop variables, row and col keep
-	//track of where the loops would be in terms of a single
-	//large data structure; using it allows addition
-	//where multiplication would need to be used without it
+    //i,j,k,l standard loop variables, row and col keep
+    //track of where the loops would be in terms of a single
+    //large data structure; using it allows addition
+    //where multiplication would need to be used without it
         int i,j,k,l,row,col;
-	int temp = datablock[0][bcolumns-1]->getcolumns()-1;
+    int temp = datablock[0][bcolumns-1]->getcolumns()-1;
 
-	for(i=0;i<brows;i++){
-	    for(j=0;j<datablock[i][0]->getrows();j++){
-		solution[i*blocksize+j] = datablock[i][brows-1]->get(j,
-			datablock[i][brows-1]->getcolumns()-1);
-	}   }
+    for(i=0;i<brows;i++){
+        for(j=0;j<datablock[i][0]->getrows();j++){
+        solution[i*blocksize+j] = datablock[i][brows-1]->get(j,
+            datablock[i][brows-1]->getcolumns()-1);
+    }   }
 
         for(i=brows-1;i>=0;i--){
-	    row = i*blocksize;
-	    for(j=brows-1;j>=i;j--){
-		col = j*blocksize;
-		//the block of code following the if statement handles all data blocks
-		//that to not include elements on the diagonal
-		if(i!=j){
-		    for(k=datablock[i][j]->getcolumns()-((j>=brows-1)?(2):(1));k>=0;k--){
-			for(l=datablock[i][j]->getrows()-1;l>=0;l--){
-                	    solution[row+l]-=datablock[i][j]->get(l,k)*solution[col+k];
-			datablock[i][j]->set(l,k,3333);
-            	}   }   }
-		//this block of code following the else statement handles all data blocks
-		//that do include elements on the diagonal
-		else{
-		    for(k=datablock[i][i]->getcolumns()-((i==brows-1)?(2):(1));k>=0;k--){
-			solution[row+k]/=datablock[i][i]->get(k,k);
-			datablock[i][i]->set(k,k,9999);
-//			std::cout<<solution[row+k]<<std::endl;
-			for(l=k-1;l>=0;l--){
-                	    solution[row+l]-=datablock[i][i]->get(l,k)*solution[col+k];
-			datablock[i][i]->set(l,k,3333);
-        }   }	}   }	}
+        row = i*blocksize;
+        for(j=brows-1;j>=i;j--){
+        col = j*blocksize;
+        //the block of code following the if statement handles all data blocks
+        //that to not include elements on the diagonal
+        if(i!=j){
+            for(k=datablock[i][j]->getcolumns()-((j>=brows-1)?(2):(1));k>=0;k--){
+            for(l=datablock[i][j]->getrows()-1;l>=0;l--){
+                        solution[row+l]-=datablock[i][j]->get(l,k)*solution[col+k];
+            datablock[i][j]->set(l,k,3333);
+                }   }   }
+        //this block of code following the else statement handles all data blocks
+        //that do include elements on the diagonal
+        else{
+            for(k=datablock[i][i]->getcolumns()-((i==brows-1)?(2):(1));k>=0;k--){
+            solution[row+k]/=datablock[i][i]->get(k,k);
+            datablock[i][i]->set(k,k,9999);
+//            std::cout<<solution[row+k]<<std::endl;
+            for(l=k-1;l>=0;l--){
+                        solution[row+l]-=datablock[i][i]->get(l,k)*solution[col+k];
+            datablock[i][i]->set(l,k,3333);
+        }   }    }   }    }
 
-	return 1;
+    return 1;
     }
 
     //finally, this function checks the accuracy of the LU computation a few rows at
     //a time
     double HPLMatreX::checksolve(int row, int offset, bool complete){
-	double toterror = 0;	//total error from all checks
+    double toterror = 0;    //total error from all checks
 
         //futures is used to allow this thread to continue spinning off new threads
         //while other threads work, and is checked at the end to make certain all
@@ -617,21 +617,21 @@ namespace hpx { namespace components { namespace server
             }
             else{
                 if(row + offset < rows){
-			futures.push_back(check_future(_gid,row+offset,
-				(int)(offset*.5),false));
+            futures.push_back(check_future(_gid,row+offset,
+                (int)(offset*.5),false));
                 }
                 offset = (int)(offset*.5);
             }
         }
 
-	//accumulate the total error for a subset of the solutions
+    //accumulate the total error for a subset of the solutions
         int temp = std::min((int)offset, (int)(rows - row));
         for(int i=0;i<temp;i++){
-	    double sum = 0;
+        double sum = 0;
             for(int j=0;j<rows;j++){
                 sum += truedata[pivotarr[row+i]][j] * solution[j];
             }
-	    toterror += std::fabs(sum-truedata[pivotarr[row+i]][rows]);
+        toterror += std::fabs(sum-truedata[pivotarr[row+i]][rows]);
         }
 
         //collect the results and add them up

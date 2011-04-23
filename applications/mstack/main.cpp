@@ -59,11 +59,11 @@ hpx_main (hpx::threads::thread_self& s, hpx::applier::applier &app)
     // do something with the gid if it's not the current locality
     if (hpx::naming::get_prefix_from_id(app.get_prefix()) != hpx::naming::get_prefix_from_id(*it))
       {
-	//do_something_with_locality_gid(*it);
-	if (x < 6){
-	  nonlocal_gids[x] = hpx::naming::get_prefix_from_id(*it); 
-	  x++;
-	}
+    //do_something_with_locality_gid(*it);
+    if (x < 6){
+      nonlocal_gids[x] = hpx::naming::get_prefix_from_id(*it); 
+      x++;
+    }
       }
   }
 
@@ -95,9 +95,9 @@ int main(int argc, char* argv[])
     // Check command line arguments.
     if (argc != 5) {
       std::cerr << "Usage: mstack hpx_addr hpx_port dgas_addr "
-	"dgas_port" << std::endl;
+    "dgas_port" << std::endl;
       std::cerr << "Try: mstack <your_ip_addr> 7911 "
-	"<your_ip_addr> 7912" << std::endl;
+    "<your_ip_addr> 7912" << std::endl;
       return -3;
     }
     else {

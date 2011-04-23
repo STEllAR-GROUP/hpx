@@ -17,11 +17,11 @@ int mstack::initialize (int j, int numchn){
   case 4:
     {
       for (m=1; m <= 1000; m++){
-	for (l=1; l <= 1000; l++){
-	  for (k=1; k <= numchn; k++){
-	    mytraces[m][l][k] = 1.0;
-	  };
-	};
+    for (l=1; l <= 1000; l++){
+      for (k=1; k <= numchn; k++){
+        mytraces[m][l][k] = 1.0;
+      };
+    };
       };
       break;
     };
@@ -29,11 +29,11 @@ int mstack::initialize (int j, int numchn){
   case 5:
     {
       for (m=1; m <= 1000; m++){
-	for (l=1; l <= 1000; l++){
-	  for (k=1; k <= numchn; k++){
-	    mytraces[m][l][k] = k;
-	  };
-	};
+    for (l=1; l <= 1000; l++){
+      for (k=1; k <= numchn; k++){
+        mytraces[m][l][k] = k;
+      };
+    };
       }
       break;
     };
@@ -41,11 +41,11 @@ int mstack::initialize (int j, int numchn){
   case 6: 
     {
       for (m=1; m <= 1000; m++){
-	for (l=1; l <= 1000; l++){
-	  for (k=1; k <= numchn; k++){
-	    mytraces[m][l][k] = numchn + 1 - k;
-	  };
-	};
+    for (l=1; l <= 1000; l++){
+      for (k=1; k <= numchn; k++){
+        mytraces[m][l][k] = numchn + 1 - k;
+      };
+    };
       };
       break;
     };
@@ -69,9 +69,9 @@ int mstack::sort_and_store (int numchn, int m, int l){
   for (k1=1; k1 <= numchn; k1++){
     for (k2=1; k2 <= numchn-1; k2++){
       if (scratch[k2] > scratch[k2+1]){
-	temp = scratch[k2];
-	scratch[k2]=scratch[k2+1];
-	scratch[k2+1]=temp;
+    temp = scratch[k2];
+    scratch[k2]=scratch[k2+1];
+    scratch[k2+1]=temp;
       }
     }
   }
