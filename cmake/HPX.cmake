@@ -365,4 +365,9 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
   add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
 endif()
 
-set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
+if(MSVC)
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
+else()
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_asio hpx_ini)
+endif()
+

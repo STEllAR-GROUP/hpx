@@ -127,7 +127,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # for backwards compatibility
-if(NOT CMAKE_INSTALL_PREFIX AND CMAKE_PREFIX)
+if(CMAKE_PREFIX)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
 endif()
 
@@ -391,11 +391,12 @@ endif()
 # target specification 
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
-# default, there may be more for individual modules, but this is the mandatory set
+# default. There may be more for individual modules, but this is the mandatory
+# set.
 if(MSVC)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 else()
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_ini hpx_serialization)
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_asio hpx_ini)
 endif()
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
@@ -408,10 +409,12 @@ add_subdirectory(hpx/components)
 
 # executables that depend on libraries above
 add_hpx_pseudo_target(examples) 
-
 add_subdirectory(examples)
 
 add_subdirectory(runtime)
+
+add_hpx_pseudo_target(tools) 
+add_subdirectory(tools)
 
 ################################################################################
 # test configuration 
