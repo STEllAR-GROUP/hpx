@@ -66,6 +66,7 @@ namespace hpx { namespace threads { namespace detail
     typedef hpx::util::spinlock_pool<tag> thread_mutex_type;
 
     ///////////////////////////////////////////////////////////////////////////
+    // Why do we use std::stack + a lock here?
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {

@@ -6,7 +6,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   introduction_to_agas
-   agas_v1_requests
-   hpx_logs
+   runtime/agas/introduction
+   runtime/agas/v1_requests
+   runtime/logging/log_levels
+   build/linux
+   build/windows
  
