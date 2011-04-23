@@ -6,29 +6,18 @@
 #
 # just recurse into all components subdirectories and execute the scripts there
 
-set(subdirs nqueen)
-    
-foreach (subdir ${subdirs})
-  add_subdirectory(${subdir})
+add_subdirectory(${subdir})
   
-  set(sources
-      ${subdir}_client.cpp)
+set(sources ${subdir}_client.cpp)
       
-  source_group("Source Files" FILES ${sources})
+source_group("Source Files" FILES ${sources})
   
-  # add example executable
-  add_hpx_executable(${subdir}_client
-    MODULE nqueen
-    SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component)
+# add example executable
+add_hpx_executable(${subdir}_client
+  MODULE nqueen
+  SOURCES ${sources}
+  DEPENDENCIES ${subdir}_component)
       
-  # add custom target
-  add_hpx_pseudo_target(examples.nqueen.${subdir})
-  
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.nqueen examples.nqueen.${subdir})
-                   
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.nqueen.${subdir} ${subdir}_client_exe)
-                  
-endforeach()
+# add dependencies to pseudo-target
+add_hpx_pseudo_dependencies(examples.nqueen ${subdir}_client_exe)
+
