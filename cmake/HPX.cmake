@@ -113,7 +113,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # for backwards compatibility
-if(NOT CMAKE_INSTALL_PREFIX AND CMAKE_PREFIX)
+if(CMAKE_PREFIX)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
 endif()
 
@@ -129,7 +129,7 @@ endif()
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
   CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
-hpx_info("install" "Install root is ${CMAKE_PREFIX}")
+hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}")
 
 add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
