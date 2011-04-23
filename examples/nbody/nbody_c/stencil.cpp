@@ -280,10 +280,10 @@ namespace hpx { namespace components { namespace nbody
 //                                 if(global_idx[d] != remote_idx[f] )     
 //                                 {
 // 
-//                                 //	std::vector<unsigned long> vect = par->iList[global_id[d]];
-//                                 	///using algorithms with vectors so as not to iterate through a vector
-//                                 	if (std::binary_search (par->iList[global_idx[d]].begin(),par->iList[global_idx[d]].end(), remote_idx[f]) )
-//                                 	{
+//                                 //    std::vector<unsigned long> vect = par->iList[global_id[d]];
+//                                     ///using algorithms with vectors so as not to iterate through a vector
+//                                     if (std::binary_search (par->iList[global_idx[d]].begin(),par->iList[global_idx[d]].end(), remote_idx[f]) )
+//                                     {
 //                                         register double dx = val[i]->x[f] - val[compute_index]->x[d] ;
 //                                         register double dy = val[i]->y[f] - val[compute_index]->y[d] ;
 //                                         register double dz = val[i]->z[f] - val[compute_index]->z[d] ;
@@ -293,7 +293,7 @@ namespace hpx { namespace components { namespace nbody
 //                                         resultval->ax[d] += dx * acc_factor;
 //                                         resultval->ay[d] += dy * acc_factor;
 //                                         resultval->az[d] += dz * acc_factor;
-//                                 	}
+//                                     }
 // 
 // 
 // //                                    register unsigned long e;
