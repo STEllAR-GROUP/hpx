@@ -15,7 +15,6 @@ namespace hpx { namespace components
         // as the values defined in the component_type enumerator
         char const* const names[] =
         {
-            "component_invalid",
             "component_runtime_support",
             "component_memory",
             "component_memory_block",
@@ -26,6 +25,8 @@ namespace hpx { namespace components
             "component_barrier",
             "component_thread",
             "component_dataflow_variable",
+            "component_thunk",
+            "component_dataflow_block"
         };
     }
 
@@ -33,8 +34,13 @@ namespace hpx { namespace components
     std::string const get_component_type_name(int type)
     {
         std::string result;
-        if (type >= component_invalid && type < component_last)
-            result = components::detail::names[type+1];
+     
+        if (type == component_invalid)
+            result = "component_invalid"; 
+        else if ((type < component_last) && (get_derived_type(type) == 0))
+            result = components::detail::names[type];
+        else if (get_derived_type(type) < component_last && (get_derived_type(type) != 0))
+            result = components::detail::names[get_derived_type(type)];
         else
             result = "component";
 
