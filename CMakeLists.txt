@@ -80,7 +80,6 @@ if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
                       regex
                       serialization
                       system
-                      signals
                       thread)
 else()
   set(BOOST_LIBRARIES date_time
@@ -89,7 +88,6 @@ else()
                       regex
                       serialization
                       system
-                      signals
                       thread)
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
