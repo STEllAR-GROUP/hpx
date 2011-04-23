@@ -6,15 +6,15 @@
     http://www.boost.org/LICENSE_1_0.txt).
 ==============================================================================*/
 
-#include <boost/detail/lightweight_test.hpp>
-#include <boost/utility/thread_specific_singleton.hpp>
+#include <hpx/util/lightweight_test.hpp>
+#include <boost/utility/mutexed_singleton.hpp>
 
 #include <boost/thread/thread.hpp>
 
 #define LOCKS_PER_THREAD 1000
 #define THREADS 10
 
-class X : public boost::thread_specific_singleton<X>
+class X : public boost::mutexed_singleton<X>
 {
     unsigned val_ctor_called;
 public:
@@ -29,10 +29,11 @@ public:
 
     unsigned f() 
     {
-        BOOST_TEST(val_ctor_called == 0xbeef);
+        HPX_TEST(val_ctor_called == 0xbeef);
+        HPX_TEST(X::n_instances == 1);
         unsigned counter_before_yield = ++counter;
         boost::thread::yield();
-        BOOST_TEST(counter == counter_before_yield);
+        HPX_TEST(counter == counter_before_yield);
         return 0xbeef;
     }
 
@@ -44,38 +45,40 @@ unsigned X::n_instances = 0;
 void test1()
 {
     for (int i = 0; i < LOCKS_PER_THREAD; ++i)
-        BOOST_TEST(X::instance->f() == 0xbeef);
-    BOOST_TEST(X::instance->counter == LOCKS_PER_THREAD);
+        HPX_TEST(X::instance->f() == 0xbeef);
 }
 
 void test2()
 {
     X::lease lease;
+    unsigned tmp = lease->counter;
     for (int i = 0; i < LOCKS_PER_THREAD; ++i)
-        BOOST_TEST(lease->f() == 0xbeef);
-    BOOST_TEST(lease->counter == LOCKS_PER_THREAD);
+        HPX_TEST(lease->f() == 0xbeef);
+    HPX_TEST(lease->counter == tmp + LOCKS_PER_THREAD);
 }
 
 int main()
 {
-    BOOST_TEST(! X::n_instances);
+    HPX_TEST(! X::n_instances);
 
     {
         boost::thread_group threads;
         for (int i = 0; i < THREADS; ++i)
             threads.create_thread(&test1);
         threads.join_all();
+        HPX_TEST(X::instance->counter == THREADS * LOCKS_PER_THREAD);
     }
 
-    BOOST_TEST(X::n_instances == THREADS);
+    X::instance->counter = 0;
 
     {
         boost::thread_group threads;
         for (int i = 0; i < THREADS; ++i)
             threads.create_thread(&test2);
         threads.join_all();
+        HPX_TEST(X::instance->counter == THREADS * LOCKS_PER_THREAD);
     }
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 

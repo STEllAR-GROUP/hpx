@@ -3,12 +3,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(group unit.boost.cache) 
+set(group unit.boost.singleton) 
 
 set(testcases
-    local_lru_cache
-    local_mru_cache
-    local_statistics)
+    basic
+    destruction
+    mutexed
+    mutexed_no_threads
+    mutexed_threading
+    no_threads
+    thread_specific
+    thread_specific_no_threads
+    thread_specific_threading)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)

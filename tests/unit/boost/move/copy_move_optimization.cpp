@@ -1,3 +1,4 @@
+// (C) Copyright Bryce Lelbach 2011
 //We need to declare:
 //
 //2 conversions: rv<T> & and const rv<T> &
@@ -9,7 +10,6 @@
 //Since RVO is better than move-construction,
 //avoid copy constructor overloading.
 #include <boost/move/move.hpp>
-#include <iostream>
 
 bool moved = false;
 
