@@ -40,7 +40,7 @@ namespace hpx { namespace naming { namespace detail
     {
         tasks_.push_back(new do_undo_resolve(
             boost::bind(&parcelset::parcel::set_destination_addr, boost::ref(p), _1)));
-    	  return resolver_.resolve(id);
+          return resolver_.resolve(id);
     }
 
     void bulk_resolver_helper::add_credit_to_gid(naming::id_type const& id, 
@@ -62,7 +62,7 @@ namespace hpx { namespace naming { namespace detail
         tasks_.push_back(new do_undo_incref(
             boost::bind(&bulk_resolver_helper::add_credit_to_gid, id, credits),
             boost::bind(&bulk_resolver_helper::set_credit_for_gid, oldid, oldcredits)));
-    	  return resolver_.incref(id.get_gid(), credits);
+          return resolver_.incref(id.get_gid(), credits);
     }
 
     void bulk_resolver_helper::execute(error_code& ec)
