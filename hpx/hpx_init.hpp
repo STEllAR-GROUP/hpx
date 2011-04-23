@@ -82,7 +82,8 @@ namespace hpx
         // parse the command line
         command_line_result parse_commandline(
             boost::program_options::options_description& app_options, 
-            int argc, char *argv[], boost::program_options::variables_map& vm)
+            int argc, char *argv[], boost::program_options::variables_map& vm,
+            bool is_hpx_runtime = false)
         {
             using boost::program_options::options_description;
             using boost::program_options::value;
@@ -97,8 +98,19 @@ namespace hpx
                      "print out program usage (this message)")
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
-                    ("worker,w",
-                     "run this instance in worker mode")
+                ;
+
+                if (!is_hpx_runtime)
+                  hpx_options.add_options()
+                    ("worker,w", "run this instance in worker mode")
+                  ;
+                else
+                  hpx_options.add_options()
+                    ("console", "run this instance in console mode")
+                    ("run-agas-server-only", "run only the AGAS server")
+                  ;
+
+                hpx_options.add_options()
                     ("config", value<std::string>(), 
                      "load the specified file as a configuration file")
                     ("agas,a", value<std::string>(), 
@@ -178,13 +190,14 @@ namespace hpx
         class agas_server_helper
         {
           public:
-            agas_server_helper(std::string host, boost::uint16_t port)
+            agas_server_helper(std::string host, boost::uint16_t port,
+                               bool blocking = false)
               : agas_pool_(), agas_(agas_pool_, host, port)
-            { agas_.run(false); }
+            { agas_.run(blocking); }
 
             ~agas_server_helper()
             { agas_.stop(); }
-    
+ 
           private:
             hpx::util::io_service_pool agas_pool_; 
             hpx::naming::resolver_server agas_;
@@ -193,7 +206,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     int init(boost::program_options::options_description& desc_cmdline, 
-             int argc, char* argv[])
+             int argc, char* argv[], bool is_hpx_runtime = false)
     {
         int result = 0;
 
@@ -204,7 +217,8 @@ namespace hpx
             // Analyze the command line.
             variables_map vm;
 
-            switch (detail::parse_commandline(desc_cmdline, argc, argv, vm))
+            switch (detail::parse_commandline
+                        (desc_cmdline, argc, argv, vm, is_hpx_runtime))
             {
                 case detail::error:
                     return 1;
@@ -220,7 +234,12 @@ namespace hpx
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
             std::string queueing = "local";
-            hpx::runtime::mode mode = hpx::runtime::console;
+            hpx::runtime::mode mode;
+
+            if (!is_hpx_runtime)
+                mode = hpx::runtime::console;
+            else
+                mode = hpx::runtime::worker;
 
             if (vm.count("random-ports")
                 && !vm.count("agas") && !vm.count("hpx"))
@@ -255,17 +274,23 @@ namespace hpx
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
 
-            if (vm.count("worker"))
-            {
+            if (!is_hpx_runtime && vm.count("worker"))
                 mode = hpx::runtime::worker;
-            }
+            else if (is_hpx_runtime && vm.count("console"))
+                mode = hpx::runtime::console;
 
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
 
-            if (vm.count("run_agas_server") || num_localities == 1)  
+            if (vm.count("run-agas-server") || num_localities == 1)  
                 agas_server.reset
                     (new detail::agas_server_helper(agas_host, agas_port));
+            else if (vm.count("run-agas-server-only"))
+            {
+                agas_server.reset
+                    (new detail::agas_server_helper(agas_host, agas_port, true));
+                return 0;
+            }
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
@@ -284,7 +309,7 @@ namespace hpx
                 }
 
                 // Run this runtime instance.
-                if (mode != hpx::runtime::worker)
+                if (!is_hpx_runtime && mode != hpx::runtime::worker)
                     result = rt.run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else 
@@ -309,7 +334,7 @@ namespace hpx
                 }
 
                 // Run this runtime instance.
-                if (mode != hpx::runtime::worker)
+                if (!is_hpx_runtime && mode != hpx::runtime::worker)
                     result = rt.run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else
@@ -332,7 +357,7 @@ namespace hpx
                 }
 
                 // Run this runtime instance
-                if (mode != hpx::runtime::worker) {
+                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
                       result = rt.run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
@@ -357,7 +382,7 @@ namespace hpx
                 }
 
                 // Run this runtime instance
-                if (mode != hpx::runtime::worker) {
+                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
                       result = rt.run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
