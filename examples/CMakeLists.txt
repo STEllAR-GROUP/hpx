@@ -14,7 +14,6 @@ set(subdirs
     accumulator
     cosmo
     generic
-    had_amr
     had_amr3d
     smp_amr3d
     nbody
