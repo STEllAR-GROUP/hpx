@@ -245,6 +245,7 @@ namespace hpx { namespace threads { namespace policies
     public:
         /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
+        // FIXME: seg faults at shutdown on Linux.
         bool cleanup_terminated()
         {
             {
