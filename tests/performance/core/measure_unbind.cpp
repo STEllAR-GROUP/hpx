@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         std::vector<double> timings;
         double total_time = 0;
 
-	// this is our locality
+    // this is our locality
         locality here("localhost", HPX_PORT);
         hpx::util::io_service_pool agas_pool; 
         resolver_client resolver(agas_pool, hpx::naming::locality(host, port));
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
        
         // unbind the address
         // old timer: measure_timer t("Measure Unbind");
-        hpx::util::high_resolution_timer t;		
+        hpx::util::high_resolution_timer t;        
         for (int i=1; i <1000;i++)
         {
             resolver.unbind(gid_type(i));

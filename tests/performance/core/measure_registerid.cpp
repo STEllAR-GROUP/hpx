@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
         // It accepts char const*, to convert string into that we use c_str() function.
                 
         std::string s;
-        hpx::util::high_resolution_timer t;		
+        hpx::util::high_resolution_timer t;        
         for(int a=1;a<1000;a++)
         {
             s="/test/foo/";

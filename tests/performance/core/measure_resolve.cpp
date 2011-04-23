@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
             
         // resolve this address
         address addr;
-        hpx::util::high_resolution_timer t;		
+        hpx::util::high_resolution_timer t;        
         for(int i =1;i<1000;i++)
         {
             resolver.resolve(gid_type(i), addr);
