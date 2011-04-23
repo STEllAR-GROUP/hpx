@@ -11,7 +11,7 @@ hpx_include(ParseArguments)
 
 macro(hpx_compile_object name)
   hpx_parse_arguments(${name}
-    "MODULE;SOURCE;HEADERS;LANGUAGE;FLAGS;OUTPUT" "ESSENTIAL" ${ARGN})
+    "MODULE;SOURCE;LANGUAGE;FLAGS;OUTPUT" "ESSENTIAL" ${ARGN})
 
   get_directory_property(definitions DEFINITIONS)
 
@@ -29,7 +29,7 @@ macro(hpx_compile_object name)
     COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${flags}
             "-c" "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}"
             "-o" "${${name}_OUTPUT}"
-    DEPENDS ${${name}_SOURCE} ${${name}_HEADERS}
+    DEPENDS ${${name}_SOURCE} 
     VERBATIM)
 
   if(${name}_ESSENTIAL)
