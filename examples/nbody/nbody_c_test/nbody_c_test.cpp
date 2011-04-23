@@ -195,7 +195,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(hpx::memory::default_vector< nodedata* >::type const& vecval, stencil_data* result, 
+int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result, 
              int compute_index, Par const& par)
 {
   return 1;

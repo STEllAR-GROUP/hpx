@@ -87,7 +87,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           if ( val.level_ == par->allowedl ) factor = 2;
           int n = par->granularity + 2*factor*par->buffer;
           double datatime;
-          hpx::memory::default_vector<double>::type x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
+          std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               x.push_back(val.x_[i]);

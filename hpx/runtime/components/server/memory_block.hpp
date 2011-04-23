@@ -136,15 +136,14 @@ namespace hpx { namespace components { namespace server { namespace detail
     {
         if (0 == --p->count_) {
             p->~memory_block_header();
-            hpx::memory::default_malloc::free(p);
+            ::free(p);
         }
     }
 
     template <typename T>
     inline T* allocate_block(std::size_t size)
     {
-        return (T*) hpx::memory::default_malloc::void_malloc
-            (size + sizeof(detail::memory_block_header));
+        return (T*) ::malloc(size + sizeof(detail::memory_block_header));
     }
 }}}}
 
@@ -278,7 +277,7 @@ namespace hpx { namespace components
             alloc_type* p = server::detail::allocate_block<alloc_type>(size);
 
             data_.reset(new (p) alloc_type(size, act->get_instance()));
-            hpx::memory::default_malloc::free(act);
+            ::free(act);
 
             ar >> boost::serialization::make_array(data_->get_ptr(), size);
         }
@@ -519,7 +518,7 @@ namespace hpx { namespace components { namespace server
         static void* operator new(std::size_t size)
         {
             if (size > sizeof(memory_block))
-                return hpx::memory::default_malloc::void_malloc(size);
+                return ::malloc(size);
             return get_heap().alloc();
         }
         static void operator delete(void* p, std::size_t size)
@@ -528,7 +527,7 @@ namespace hpx { namespace components { namespace server
                 return;     // do nothing if given a NULL pointer
 
             if (size != sizeof(memory_block)) {
-                hpx::memory::default_malloc::free(p);
+                ::free(p);
                 return;
             }
             get_heap().free(p);

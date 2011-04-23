@@ -69,10 +69,10 @@ struct stencil_data
     size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     had_double_type timestep_;    // current time step
     size_t level_;    // refinement level
-    hpx::memory::default_vector< nodedata >::type value_;            // current value
-    hpx::memory::default_vector< had_double_type >::type x_;      // x coordinate value
-    hpx::memory::default_vector< had_double_type >::type y_;      // x coordinate value
-    hpx::memory::default_vector< had_double_type >::type z_;      // x coordinate value
+    std::vector< nodedata > value_;            // current value
+    std::vector< had_double_type > x_;      // x coordinate value
+    std::vector< had_double_type > y_;      // x coordinate value
+    std::vector< had_double_type > z_;      // x coordinate value
 
 private:
     // serialization support

@@ -15,7 +15,6 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/util/default_malloc.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
@@ -384,11 +383,11 @@ namespace hpx { namespace components { namespace detail
         {
             static void* alloc(std::size_t& size) 
             { 
-                return hpx::memory::default_malloc::void_malloc(size); 
+                return ::malloc(size); 
             }
             static void free(void* p) 
             { 
-                hpx::memory::default_malloc::free(p); 
+                ::free(p); 
             }
             static void* realloc(std::size_t &size, void *p)
             { 

@@ -19,6 +19,4 @@ typedef double had_double_type;
 const int num_eqns = 5;
 const int maxlevels = 20;
 
-#include <hpx/util/default_vector.hpp>
-
 #endif

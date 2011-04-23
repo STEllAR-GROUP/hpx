@@ -1139,7 +1139,7 @@ namespace hpx { namespace components { namespace amr
         }
 
         // get all input and result memory_block_data instances
-        hpx::memory::default_vector<access_memory_block<stencil_data> >::type val;
+        std::vector<access_memory_block<stencil_data> > val;
         access_memory_block<stencil_data> resultval = 
             get_memory_block_async(val, gids, result);
 

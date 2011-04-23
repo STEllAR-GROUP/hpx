@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         naming::gid_type gid = c->get_base_gid();
         if (gid) return gid;
 
-        hpx::memory::default_malloc::free(c);
+        ::free(c);
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "server::detail::create_memory_block", 
             "global id is already bound to a different "
