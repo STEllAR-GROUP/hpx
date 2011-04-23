@@ -23,7 +23,7 @@ struct data
     char const* const value;
 };
 
-data entries[] = 
+data cache_entries[] = 
 {
     data ("white", "255,255,255"),
     data ("yellow", "255,255,0"),
