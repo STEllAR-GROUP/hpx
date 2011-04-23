@@ -30,6 +30,7 @@ if(NOT MSVC)
   add_hpx_library_sources(hpx
     ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 
+  #############################################################################
   # libhpx_serialization
   add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES})
 
@@ -41,7 +42,7 @@ if(NOT MSVC)
     OUTPUT_NAME hpx_serialization)
 
   target_link_libraries(hpx_serialization
-    ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+    ${hpx_MALLOC_LIBRARY} ${BOOST_serialization_LIBRARY})
 
   get_target_property(path hpx_serialization LOCATION)
   get_filename_component(name "${path}" NAME)
@@ -57,6 +58,35 @@ if(NOT MSVC)
       "-Wall -Wno-strict-aliasing -Wsign-promo")
   endif()
   
+  #############################################################################
+  # libhpx_ini
+  add_library(hpx_ini SHARED ${hpx_ini_SOURCES})
+
+  set_target_properties(hpx_ini PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_ini)
+
+  target_link_libraries(hpx_ini
+    ${hpx_MALLOC_LIBRARY} ${BOOST_regex_LIBRARY} hpx_serialization)
+
+  get_target_property(path hpx_ini LOCATION)
+  get_filename_component(name "${path}" NAME)
+
+  set_property(TARGET hpx_ini APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_LIBRARY_NAME=${name}"
+    "HPX_LIBRARY_STRING=\"${name}\"")
+
+  if(NOT HPX_DISABLE_WARNINGS)
+    set_property(TARGET hpx_ini APPEND
+      PROPERTY COMPILE_FLAGS
+      "-Wall -Wno-strict-aliasing -Wsign-promo")
+  endif()
+  
+  #############################################################################
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES})
   set_target_properties(hpx PROPERTIES
@@ -66,7 +96,7 @@ if(NOT MSVC)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx)
 
-  target_link_libraries(hpx hpx_serialization
+  target_link_libraries(hpx hpx_serialization hpx_ini
     ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
  
   get_target_property(path hpx LOCATION)
