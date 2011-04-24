@@ -14,8 +14,7 @@ set(group unit.boost.lockfree.deque)
 set(testcases
     lifo
     fifo
-    deque    
-    bit_manipulation)
+    deque)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)

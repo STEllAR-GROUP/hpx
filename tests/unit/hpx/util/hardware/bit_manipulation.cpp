@@ -6,14 +6,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/cstdint.hpp>
-#include <boost/lockfree/detail/bit_manipulation.hpp>
 
+#include <hpx/util/hardware/bit_manipulation.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 int main()
 {
-    using boost::lockfree::detail::get_bit_range;
-    using boost::lockfree::detail::pack_bits;
+    using hpx::util::hardware::get_bit_range;
+    using hpx::util::hardware::pack_bits;
+    using hpx::util::hardware::has_bit_set;
 
     boost::uint32_t abcd = 0xaabbccdd;
 
@@ -33,6 +34,9 @@ int main()
                             + pack_bits<24, boost::uint32_t>(a);
 
     HPX_TEST_EQ(rebuilt, abcd);
+
+    HPX_TEST(has_bit_set(d, 0));
+    HPX_TEST(!has_bit_set(d, 1));
 
     return hpx::util::report_errors();
 }

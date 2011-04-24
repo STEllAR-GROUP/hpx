@@ -15,10 +15,11 @@
 namespace hpx { namespace util { namespace hardware
 {
 
-inline boost::uint64_t tick() {
-  LARGE_INTEGER now;
-  QueryPerformanceCounter(&now);
-  return (boost::uint64_t)now.QuadPart;
+inline boost::uint64_t timestamp()
+{
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    return static_cast<boost::uint64_t>(now.QuadPart);
 }
 
 }}}

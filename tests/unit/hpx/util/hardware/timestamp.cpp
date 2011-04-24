@@ -7,7 +7,7 @@
 
 #include <boost/cstdint.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/hardware/tick.hpp>
+#include <hpx/util/hardware/timestamp.hpp>
 
 volatile int global = 0;
 
@@ -17,12 +17,12 @@ int main() {
     { // Basic test. 
         boost::uint64_t t0 = 0, t1 = 0;
 
-        t0 = hpx::util::hardware::tick();
+        t0 = hpx::util::hardware::timestamp();
 
         for (unsigned i = 0; i < (1 << 16); ++i)
             ++global;
 
-        t1 = hpx::util::hardware::tick();
+        t1 = hpx::util::hardware::timestamp();
 
         std::cout <<   "Tick 0: " << t0 
                   << "\nTick 1: " << t1 << std::endl;
@@ -32,11 +32,11 @@ int main() {
    
     std::cout << "serializing test" << std::endl;
  
-    { // Make sure that the ticks are serialized.
+    { // Make sure that the timestamps are serialized.
         boost::uint64_t t0 = 0, t1 = 0;
 
-        t0 = hpx::util::hardware::tick();
-        t1 = hpx::util::hardware::tick();
+        t0 = hpx::util::hardware::timestamp();
+        t1 = hpx::util::hardware::timestamp();
 
         std::cout <<   "Tick 0: " << t0 
                   << "\nTick 1: " << t1 << std::endl;

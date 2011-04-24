@@ -12,7 +12,8 @@
 set(group unit.hpx.util.hardware)
 
 set(testcases
-    tick)
+    timestamp
+    bit_manipulation)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)
