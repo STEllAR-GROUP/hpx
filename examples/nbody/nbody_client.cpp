@@ -428,7 +428,7 @@ void IntrTreeNode::interList(const IntrTreeNode * const n, double box_size_2, st
 void TreeLeaf::interactionList(const TreeNode * const n, double box_size_2, std::vector< std::vector<unsigned long> > & iList , const unsigned long idx, double theta )
 {
  //   std::cout << "idx : "  << idx << std::endl;
-    register double distance_r[3], distance_r_2, acceleration_factor, inv_distance_r;
+    register double distance_r[3], distance_r_2/*, acceleration_factor, inv_distance_r*/;
     for (int i=0; i < 3; ++i)
         distance_r[i] = n->p[i] - p[i];
     
@@ -929,7 +929,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
                 {
                     //int old_val = -1;
                     //int new_val = 0;
-                    bool dup_val = false;
+                    //bool dup_val = false;
                     for (unsigned long r = 0; r < par->iList[q].size(); ++r)
                     { 
                        unsigned long bal_conn = par->iList[q][r] / par->granularity;
@@ -1287,7 +1287,9 @@ int main(int argc, char* argv[])
         if (vm.count("granularity"))
             granularity = vm["granularity"].as<unsigned long>();
 
-        std::size_t numvals;
+        // FIXME: this doesn't appear to be set when it's used, the line
+        // that sets it (below) is commented out.
+        std::size_t numvals(0);
 
         components::nbody::Parameter par;
 

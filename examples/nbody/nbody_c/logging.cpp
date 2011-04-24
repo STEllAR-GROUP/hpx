@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace nbody { namespace server
     void logging::logentry(stencil_data const& val, int row, int logcode, Parameter const& par)
     {
         mutex_type::scoped_lock l(mtx_);
-        int i;
+        //int i;
 
         if ( par->output_stdout == 1 ) {
 //              std::cout << " X: " <<  val.x 

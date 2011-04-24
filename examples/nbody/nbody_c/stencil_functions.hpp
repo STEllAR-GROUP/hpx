@@ -14,7 +14,7 @@
 /// The function \a generate_initial_data will be called to initialize the 
 /// given instance of 'stencil_data' 
 HPX_COMPONENT_EXPORT int generate_initial_data(
-    stencil_data* data, int item, int maxitems, int row,
+    stencil_data* data, unsigned long item, int maxitems, int row,
             Par const& par);
 
 /// The function \a evaluate_timestep will be called to compute the result data

@@ -44,7 +44,7 @@ inline int floatcmp(had_double_type const& x1, had_double_type const& x2)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
+int generate_initial_data(stencil_data* val, unsigned long item, int maxitems, int row,
     Par const& par)
 {
 //     // provide initial data for the given data value 

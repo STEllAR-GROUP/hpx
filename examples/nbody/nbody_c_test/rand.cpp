@@ -41,7 +41,7 @@ double normicdf(double p)
 /* P_HIGH = 1 - P_LOW */
 #define P_HIGH  0.97575
 
-    double x, q, r/*, u, e*/;
+    double x(0), q, r/*, u, e*/;
 
     if ((0 < p )  && (p < P_LOW))
     {
