@@ -49,7 +49,7 @@ namespace hpx { namespace parcelset
             acceptor_ = new boost::asio::ip::tcp::acceptor(io_service_pool_.get_io_service());
 
         // initialize network
-        int tried = 0;
+        std::size_t tried = 0;
         exception_list errors;
         naming::locality::iterator_type end = here_.accept_end();
         for (naming::locality::iterator_type it = 

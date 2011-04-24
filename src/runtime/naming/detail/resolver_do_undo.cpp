@@ -72,7 +72,7 @@ namespace hpx { namespace naming { namespace detail
 
         // execute local tasks if successful
         if (!ec) {
-            for (int i = 0; !ec && i < tasks_.size(); ++i)
+            for (std::size_t i = 0; !ec && i < tasks_.size(); ++i)
             {
                 tasks_[i].do_it(resolver_, i, ec);
             }
@@ -80,7 +80,7 @@ namespace hpx { namespace naming { namespace detail
 
         // invoke the undo action and undo all tasks already finished executing
         if (ec) {
-            for (int i = 0; i < tasks_.size(); ++i)
+            for (std::size_t i = 0; i < tasks_.size(); ++i)
             {
                 tasks_[i].undo_it();
             }
@@ -90,7 +90,7 @@ namespace hpx { namespace naming { namespace detail
     // trigger a full undo for all queued items
     void bulk_resolver_helper::undo()
     {
-        for (int i = 0; i < tasks_.size(); ++i)
+        for (std::size_t i = 0; i < tasks_.size(); ++i)
         {
             tasks_[i].undo_it();
         }

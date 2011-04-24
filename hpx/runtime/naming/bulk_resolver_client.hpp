@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -82,7 +83,7 @@ namespace hpx { namespace naming
         ///
         /// \note             This function may be called only after the cached
         ///                   requests have been executed.
-        bool get_prefix(int index, gid_type& prefix, error_code& ec = throws) const;
+        bool get_prefix(std::size_t index, gid_type& prefix, error_code& ec = throws) const;
 
         /// \brief Cache a request for incrementing the global reference count 
         ///        for the given id
@@ -106,7 +107,7 @@ namespace hpx { namespace naming
         ///                   the function will throw on error instead.
         /// 
         /// \returns          The global reference count after the increment. 
-        int incref(int index, error_code& ec = throws) const;
+        int incref(std::size_t index, error_code& ec = throws) const;
 
         /// \brief Cache request to resolve a given global address (id) to its 
         ///        associated local address
@@ -155,7 +156,7 @@ namespace hpx { namespace naming
         ///                   throw but returns the result code using the 
         ///                   parameter \a ec. Otherwise it throws and instance
         ///                   of hpx#exception.
-        bool resolve(int index, address& addr, error_code& ec = throws) const;
+        bool resolve(std::size_t index, address& addr, error_code& ec = throws) const;
 
         /// \brief Execute the accumulated requests
         bool execute(error_code& ec);

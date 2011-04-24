@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,10 +24,10 @@ namespace hpx { namespace naming
         return requests_.size()-1;
     }
 
-    bool bulk_resolver_client::get_prefix(int index, gid_type& prefix, 
+    bool bulk_resolver_client::get_prefix(std::size_t index, gid_type& prefix, 
         error_code& ec) const
     {
-        if (index < 0 || index >= responses_.size()) {
+        if (index >= responses_.size()) {
             HPX_THROWS_IF(ec, bad_parameter, 
                 "bulk_resolver_client::get_prefix", "index is out of bounds");
             return false;
@@ -61,10 +62,10 @@ namespace hpx { namespace naming
         return requests_.size()-1;
     }
 
-    bool bulk_resolver_client::resolve(int index, address& addr, 
+    bool bulk_resolver_client::resolve(std::size_t index, address& addr, 
         error_code& ec) const
     {
-        if (index < 0 || index >= responses_.size()) {
+        if (index >= responses_.size()) {
             HPX_THROWS_IF(ec, bad_parameter, 
                 "bulk_resolver_client::resolve", "index is out of bounds");
             return false;
@@ -97,9 +98,9 @@ namespace hpx { namespace naming
         return requests_.size()-1;
     }
 
-    int bulk_resolver_client::incref(int index, error_code& ec) const
+    int bulk_resolver_client::incref(std::size_t index, error_code& ec) const
     {
-        if (index < 0 || index >= responses_.size()) {
+        if (index >= responses_.size()) {
             HPX_THROWS_IF(ec, bad_parameter, 
                 "bulk_resolver_client::incref", "index is out of bounds");
             return false;
