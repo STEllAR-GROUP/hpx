@@ -8,6 +8,10 @@ add_definitions(-DHPX_COMPONENT_NAME=hpx)
 add_definitions(-DHPX_EXPORTS)
 add_definitions(-DBOOST_COROUTINE_EXPORTS)
 
+foreach(lib ${hpx_LIBRARIES})
+  set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
+endforeach()
+
 add_hpx_library_sources(hpx
   exception.cpp
   exception_list.cpp
