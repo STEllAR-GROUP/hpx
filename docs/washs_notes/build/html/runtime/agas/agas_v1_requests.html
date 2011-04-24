@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AGAS v1 Requests &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="agas-v1-requests">
+<h1>AGAS v1 Requests<a class="headerlink" href="#agas-v1-requests" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">author:</th><td class="field-body">Bryce Lelbach aka &#8220;wash&#8221;</td>
+</tr>
+<tr class="field"><th class="field-name">contact:</th><td class="field-body"><a class="reference external" href="mailto:blelbach&#37;&#52;&#48;cct&#46;lsu&#46;edu">blelbach<span>&#64;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a></td>
+</tr>
+<tr class="field"><th class="field-name">organization:</th><td class="field-body">LSU Center for Computation and Technology, ParalleX group</td>
+</tr>
+<tr class="field"><th class="field-name">copyright:</th><td class="field-body">Copyright (c) 2011</td>
+</tr>
+</tbody>
+</table>
+<p>Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at <a class="reference external" href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><em>Disclaimer: Read my paper on the implementation of RTTI-free dynamic type
+systems in C++ first and my introduction to AGAS.</em></p>
+<p>The backend of AGAS v1 is implemented in the hpx::naming::server::request_handler&lt;&gt;
+class. This class implements all of the services that AGAS provides. Requests
+are sent to the handler in the form of hpx::naming::server::request instances.</p>
+<p>The request data structure holds two pieces of information:</p>
+<blockquote>
+<div><ol class="arabic simple" start="0">
+<li>A punned type (ptype) from the bounded type system defined by
+hpx::naming::server::agas_server_command.</li>
+<li>Request data (note that not all ptypes have request data).</li>
+</ol>
+</div></blockquote>
+<p>In AGAS v1, the C++ identifiers given to these types are a little bit ambiguous.
+Unfortunately, these names are used by AGAS logging, so it is important for HPX
+users to understand how this type system maps to the services provided by AGAS.</p>
+</div>
+<div class="section" id="requests-to-agas-services">
+<h2>Requests to AGAS Services<a class="headerlink" href="#requests-to-agas-services" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="component-factory-namespace-get-component-id-register-factory">
+<h3>Component/Factory Namespace (get_component_id, register_factory)<a class="headerlink" href="#component-factory-namespace-get-component-id-register-factory" title="Permalink to this headline">¶</a></h3>
+<p><em>Note: The component AGAS namespace and the factory AGAS namespace are tightly
+coupled but distinct.</em></p>
+<div class="highlight-python"><pre>command_get_component_id = 4,   ///&lt; return an unique component type
+command_register_factory = 5,   ///&lt; register a factory for a component type</pre>
+</div>
+<div class="section" id="mappings">
+<h4>Mappings<a class="headerlink" href="#mappings" title="Permalink to this headline">¶</a></h4>
+<p>component name (std::string) -&gt; type id (hpx::components::component_type)
+type id (hpx::components::component_type) -&gt; prefixes (boost::uint32_t) <a class="footnote-reference" href="#id4" id="id1">[0]</a></p>
+</div>
+<div class="section" id="interface">
+<h4>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="65%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">AGAS v1 ptype</th>
+<th class="head">Method concept</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>command_get_component_id</td>
+<td>resolve <a class="footnote-reference" href="#id5" id="id2">[1]</a></td>
+</tr>
+<tr><td>command_register_factory</td>
+<td>bind <a class="footnote-reference" href="#id6" id="id3">[2]</a></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[0]</a></td><td>This table currently provides no accessors, and is only used by the
+locality registration service (see command_getprefixes below).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>command_get_component_id resolves a component name to a type id.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>command_register_factory creates bindings in the component name -&gt;
+type id database as well as the type id -&gt; prefixes database. It is
+currently the only bind interface for this service.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="locality-namespace-getprefix-getprefixes-getprefix-for-site-getidrange">
+<h3>Locality Namespace (getprefix, getprefixes, getprefix_for_site, getidrange)<a class="headerlink" href="#locality-namespace-getprefix-getprefixes-getprefix-for-site-getidrange" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_getprefix = 0,      ///&lt; return a unique prefix for the requesting site
+command_getprefixes = 2,    ///&lt; return prefixes for all known localities in the system
+command_getprefix_for_site = 3, ///&lt; return prefix for the given site
+command_getidrange = 6,     ///&lt; return a unique range of ids for the requesting site</pre>
+</div>
+<div class="section" id="id7">
+<h4>Mappings<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>locality (hpx::naming::locality) -&gt; prefix (std::pair&lt;boost::uint32_t, hpx::naming::gid_type&gt;) <a class="footnote-reference" href="#id12" id="id8">[3]</a></p>
+</div>
+<div class="section" id="id9">
+<h4>Interface<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="65%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">AGAS v1 ptype</th>
+<th class="head">Method concept</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>command_getprefix</td>
+<td>bind</td>
+</tr>
+<tr><td>command_getprefixes</td>
+<td>resolve <a class="footnote-reference" href="#id13" id="id10">[4]</a></td>
+</tr>
+<tr><td>command_getprefix_for_site</td>
+<td>resolve <a class="footnote-reference" href="#id14" id="id11">[5]</a></td>
+</tr>
+<tr><td>command_getidrange</td>
+<td>rebind</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[3]</a></td><td>Note that locality registration uses the local address resolution
+service. This means that registering a locality will create bindings
+in both the locality -&gt; prefix database and the gid -&gt; address database.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id10">[4]</a></td><td>A command_getprefixes request is sent with a component type. If the
+component type is hpx::components::component_invalid, then a vector
+of all prefixes is returned with the reply. Otherwise, a vector of
+prefixes with have a factory for the given component type is returned.
+The factory lookup semantics provide the only direct resolution interface
+to the component type -&gt; prefixes database provided by the factory
+registration service.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id14" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id11">[5]</a></td><td>command_get_prefix_for_site actually just calls getprefix_for_site -
+the only different is that it doesn&#8217;t try to verify that there&#8217;s only
+one console locality.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="primary-namespace-resolve-unbind-range-bind-range">
+<h3>Primary Namespace (resolve, unbind_range, bind_range)<a class="headerlink" href="#primary-namespace-resolve-unbind-range-bind-range" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_bind_range = 7,     ///&lt; bind a range of addresses to a range of global ids
+command_unbind_range = 10,  ///&lt; remove binding for a range of global ids
+command_resolve = 11,       ///&lt; resolve a global id to an address</pre>
+</div>
+<div class="section" id="id15">
+<h4>Mappings<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<p>gid (hpx::naming::gid_type) -&gt; local address (hpx::naming::address)</p>
+</div>
+<div class="section" id="id16">
+<h4>Interface<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="59%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">AGAS v1 ptype</th>
+<th class="head">Method concept</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>command_resolve</td>
+<td>resolve</td>
+</tr>
+<tr><td>command_bind_range</td>
+<td>bind</td>
+</tr>
+<tr><td>command_unbind_range</td>
+<td>unbind</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="gid-garbage-collection-namespace-incref-decref">
+<h3>GID Garbage Collection Namespace (incref, decref)<a class="headerlink" href="#gid-garbage-collection-namespace-incref-decref" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_incref = 8,         ///&lt; increment global reference count for the given id
+command_decref = 9,         ///&lt; decrement global reference count for the given id</pre>
+</div>
+</div>
+<div class="section" id="symbol-namespace-queryid-registerid-unregisterid-getconsoleprefix">
+<h3>Symbol Namespace (queryid, registerid, unregisterid, getconsoleprefix)<a class="headerlink" href="#symbol-namespace-queryid-registerid-unregisterid-getconsoleprefix" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_getconsoleprefix = 1, ///&lt; return the prefix of the console locality
+command_queryid = 12,       ///&lt; query for a global id associated with a namespace name (string)
+command_registerid = 13,    ///&lt; associate a namespace name with a global id
+command_unregisterid = 14,  ///&lt; remove association of a namespace name with a global id</pre>
+</div>
+<div class="section" id="id17">
+<h4>Mappings<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<p>string (std::string) -&gt; gid (hpx::naming::gid_type)</p>
+</div>
+<div class="section" id="id18">
+<h4>Interface<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="63%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">AGAS v1 ptype</th>
+<th class="head">Method concept</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>command_getconsoleprefix</td>
+<td>resolve</td>
+</tr>
+<tr><td>command_queryid</td>
+<td>resolve</td>
+</tr>
+<tr><td>command_registerid</td>
+<td>bind</td>
+</tr>
+<tr><td>command_unregisterid</td>
+<td>unbind</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="special-requests">
+<h2>Special Requests<a class="headerlink" href="#special-requests" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="command-unknown">
+<h3>command_unknown<a class="headerlink" href="#command-unknown" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">command_unknown</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>This request is the &#8220;NULL&#8221; request. This is the default value of
+hpx::naming::server::request&#8217;s constructor. A request holding a command value
+of command_unknown is not valid; hpx::naming::server::request_handler&lt;&gt; will
+reply to this command with hpx::bad_request.</p>
+</div>
+<div class="section" id="command-firstcommand">
+<h3>command_firstcommand<a class="headerlink" href="#command-firstcommand" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">command_firstcommand</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Syntactic sugar for the numerically lowest valid request value (which is
+command_getprefix).</p>
+</div>
+<div class="section" id="command-lastcommand">
+<h3>command_lastcommand<a class="headerlink" href="#command-lastcommand" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">command_lastcommand</span>
+</pre></div>
+</div>
+<p>Syntactic sugar for the numerically highest valid request value. Note that
+unlike command_firstcommand, this is not inclusive (aka it&#8217;s one-past-the-end).
+command_lastcommand is therefore an invalid command itself. If it is sent to
+hpx::naming::server::request_handler, AGAS will respond with hpx::bad_request.</p>
+</div>
+<div class="section" id="command-statistics-count-command-statistics-mean">
+<h3>command_statistics_count, command_statistics_mean<a class="headerlink" href="#command-statistics-count-command-statistics-mean" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_statistics_count = 15,   ///&lt; return some usage statistics: execution count
+command_statistics_mean = 16,    ///&lt; return some usage statistics: average server execution time</pre>
+</div>
+<p>Self explanatory, likely uninteresting unless you are Hartmut.</p>
+</div>
+<div class="section" id="command-statistics-moment2">
+<h3>command_statistics_moment2<a class="headerlink" href="#command-statistics-moment2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>command_statistics_moment2 = 17, ///&lt; return some usage statistics: 2nd moment of server execution time</pre>
+</div>
+<p>This is currently unimplemented, although instead of replying with
+hpx::not_implemented, it simply returns 0.0.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AGAS v1 Requests</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#requests-to-agas-services">Requests to AGAS Services</a><ul>
+<li><a class="reference internal" href="#component-factory-namespace-get-component-id-register-factory">Component/Factory Namespace (get_component_id, register_factory)</a><ul>
+<li><a class="reference internal" href="#mappings">Mappings</a></li>
+<li><a class="reference internal" href="#interface">Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#locality-namespace-getprefix-getprefixes-getprefix-for-site-getidrange">Locality Namespace (getprefix, getprefixes, getprefix_for_site, getidrange)</a><ul>
+<li><a class="reference internal" href="#id7">Mappings</a></li>
+<li><a class="reference internal" href="#id9">Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#primary-namespace-resolve-unbind-range-bind-range">Primary Namespace (resolve, unbind_range, bind_range)</a><ul>
+<li><a class="reference internal" href="#id15">Mappings</a></li>
+<li><a class="reference internal" href="#id16">Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gid-garbage-collection-namespace-incref-decref">GID Garbage Collection Namespace (incref, decref)</a></li>
+<li><a class="reference internal" href="#symbol-namespace-queryid-registerid-unregisterid-getconsoleprefix">Symbol Namespace (queryid, registerid, unregisterid, getconsoleprefix)</a><ul>
+<li><a class="reference internal" href="#id17">Mappings</a></li>
+<li><a class="reference internal" href="#id18">Interface</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#special-requests">Special Requests</a><ul>
+<li><a class="reference internal" href="#command-unknown">command_unknown</a></li>
+<li><a class="reference internal" href="#command-firstcommand">command_firstcommand</a></li>
+<li><a class="reference internal" href="#command-lastcommand">command_lastcommand</a></li>
+<li><a class="reference internal" href="#command-statistics-count-command-statistics-mean">command_statistics_count, command_statistics_mean</a></li>
+<li><a class="reference internal" href="#command-statistics-moment2">command_statistics_moment2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/runtime/agas/agas_v1_requests.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Bryce Lelbach aka wash.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,129 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Malloc Allocators &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../../index.html" />
+    <link rel="up" title="Building on Linux" href="index.html" />
+    <link rel="next" title="Building on Windows" href="../windows/index.html" />
+    <link rel="prev" title="ELF Visibility Optimizations" href="elf_visibility.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../windows/index.html" title="Building on Windows"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="elf_visibility.html" title="ELF Visibility Optimizations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="malloc-allocators">
+<span id="id1"></span><h1>Malloc Allocators<a class="headerlink" href="#malloc-allocators" title="Permalink to this headline">¶</a></h1>
+<p>HPX supports the use of alternative malloc implementations. On Linux systems,
+an alternative malloc allocator is used by default if one is available. The
+default is <a class="reference external" href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">tcmalloc</a> (a part of <a class="reference external" href="http://goog-perftools.sourceforge.net">google-perftools</a>, requires <a class="reference external" href="http://www.nongnu.org/libunwind">libunwind</a> on
+x86-64 systems), and the first fallback is <a class="reference external" href="http://www.canonware.com/jemalloc">jemalloc</a>.</p>
+<p>For some HPX applications (ones in which allocations of 64-bit objects or
+smaller are predominant), jemalloc may perform better than tcmalloc. In all
+other cases, tcmalloc will perform better than jemalloc. The system allocator
+is almost always the slowest option available. Benchmarks of all three allocators
+can be found in $HPX_SOURCE/tests/performance/allocator.</p>
+<p>To specify the root of your tcmalloc and/or jemalloc installation, define the
+CMake variables TCMALLOC_ROOT and/or JEMALLOC_ROOT to point the appropriate
+paths.</p>
+<p>To change the malloc allocator, define the HPX_MALLOC CMake variable to the name
+of your preferred allocator. Valid options are &#8220;tcmalloc&#8221;, &#8220;jemalloc&#8221; and
+&#8220;system&#8221;.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="elf_visibility.html"
+                        title="previous chapter">ELF Visibility Optimizations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../windows/index.html"
+                        title="next chapter">Building on Windows</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/build/linux/malloc_allocators.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../windows/index.html" title="Building on Windows"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="elf_visibility.html" title="ELF Visibility Optimizations"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" >Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Bryce Lelbach (wash).
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

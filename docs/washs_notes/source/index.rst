@@ -1,12 +1,13 @@
-Wash's Notes on HPX, C++ and ParalleX
-=====================================
+***************************************
+ Wash's Notes on HPX, C++ and ParalleX
+***************************************
 
-Contents:
+Distributed under the |bsl|, Version 1.0. 
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   runtime/index
-   build/index
-   theory/index
+  runtime/index
+  build/index
+  theory/index
  

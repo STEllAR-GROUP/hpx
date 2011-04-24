@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Building HPX on Linux &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../../index.html" />
+    <link rel="up" title="Building on Linux" href="index.html" />
+    <link rel="next" title="AMR Support Libraries" href="amr_support_libraries.html" />
+    <link rel="prev" title="Building on Linux" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Building on Linux"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="building-hpx-on-linux">
+<span id="linux-prereqs"></span><h1>Building HPX on Linux<a class="headerlink" href="#building-hpx-on-linux" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="compilers">
+<h3>Compilers<a class="headerlink" href="#compilers" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="31%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://www.pathscale.com">EKOPath PathScale</a></td>
+<td>4.0.9</td>
+<td>4.0.0 - 4.0.9</td>
+</tr>
+<tr><td><a class="reference external" href="http://software.intel.com/en-us/articles/intel-compilers">Intel C++ Compiler</a></td>
+<td>12.0 (XE 2011)</td>
+<td>11.1 - 12.0</td>
+</tr>
+<tr><td><a class="reference external" href="http://github.com/lll-project">Clang/LLVM</a></td>
+<td>3.0 (lll)</td>
+<td>2.9 - 3.0 (lll)</td>
+</tr>
+<tr><td><a class="reference external" href="http://gcc.gnu.org">GNU Compiler Collection</a></td>
+<td>4.4.4</td>
+<td>4.4.2 - 4.4.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="build-system">
+<h3>Build System<a class="headerlink" href="#build-system" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="31%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://cmake.org">CMake</a></td>
+<td>2.6.4</td>
+<td>2.6.4 - 2.8.*</td>
+</tr>
+<tr><td><a class="reference external" href="http://www.gnu.org/software/make">GNU Make</a></td>
+<td>3.81</td>
+<td>3.80 - 3.82</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required-libraries">
+<h3>Required Libraries<a class="headerlink" href="#required-libraries" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="30%" />
+<col width="24%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://boost.org">Boost C++ Libraries</a></td>
+<td>1.45.0</td>
+<td>1.43.0 - SVN</td>
+</tr>
+<tr><td><a class="reference external" href="http://eglibc.org/home">Embedded GLIBC</a> (Debian, Ubuntu)</td>
+<td>2.11.*</td>
+<td>2.7.* - 2.13.*</td>
+</tr>
+<tr><td><a class="reference external" href="http://gnu.org/s/libc">GNU C Library</a> (Redhat)</td>
+<td>2.11.*</td>
+<td>2.7.* - 2.13.*</td>
+</tr>
+<tr><td><a class="reference external" href="http://gcc.gnu.org/libstdc++">GNU Standard C++ Library</a></td>
+<td>4.4.4</td>
+<td>4.4.2 - 4.4.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optional-libraries">
+<h3>Optional Libraries<a class="headerlink" href="#optional-libraries" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="30%" />
+<col width="24%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://www.mpfr.org">GNU MPFR Library</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<td>3.0.0</td>
+<td>3.0.0 - SVN</td>
+</tr>
+<tr><td><a class="reference external" href="http://gmplib.org">GNU Multi-Precision Library</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<td>4.2.3</td>
+<td>4.1.0 - 5.0.1</td>
+</tr>
+<tr><td><a class="reference external" href="http://relativity.phys.lsu.edu/postdocs/matt/software.php">RNPL</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+<tr><td><a class="reference external" href="http://www.canonware.com/jemalloc">jemalloc</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<td>2.1.2</td>
+<td>2.1.0 - GIT</td>
+</tr>
+<tr><td><a class="reference external" href="http://goog-perftools.sourceforge.net">google-perftools</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<td>1.7.1</td>
+<td>1.7.1 - SVN</td>
+</tr>
+<tr><td><a class="reference external" href="http://www.nongnu.org/libunwind">libunwind</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<td>0.99</td>
+<td>0.97 - GIT</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="build-instructions">
+<h2>Build Instructions<a class="headerlink" href="#build-instructions" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic" start="0">
+<li><p class="first">Download the latest Subversion release of HPX::</p>
+<div class="highlight-python"><pre>$ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx</pre>
+</div>
+</li>
+<li><p class="first">Create a build directory. HPX requires an out-of-tree build. This means you
+will be unable to run CMake in the HPX source tree.:</p>
+<div class="highlight-python"><pre>$ cd hpx
+$ mkdir my_hpx_build
+$ cd my_hpx_build</pre>
+</div>
+</li>
+<li><p class="first">Invoke CMake from your build directory, pointing the CMake driver to the root
+of your HPX source tree.:</p>
+<div class="highlight-python"><pre>$ cmake [CMake variable definitions] /path/to/source/tree</pre>
+</div>
+</li>
+<li><p class="first">Invoke GNU make. If you are on a box with multiple cores (very likely),
+add the -jN flag to your make invocation, where N is the number of nodes
+on your machine plus one.:</p>
+<div class="highlight-python"><pre>$ gmake -j49</pre>
+</div>
+</li>
+<li><p class="first">To complete the build and install HPX::</p>
+<div class="highlight-python"><pre>$ gmake install</pre>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Building HPX on Linux</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#compilers">Compilers</a></li>
+<li><a class="reference internal" href="#build-system">Build System</a></li>
+<li><a class="reference internal" href="#required-libraries">Required Libraries</a></li>
+<li><a class="reference internal" href="#optional-libraries">Optional Libraries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#build-instructions">Build Instructions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Building on Linux</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="amr_support_libraries.html"
+                        title="next chapter">AMR Support Libraries</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/build/linux/prerequisites.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Building on Linux"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" >Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Bryce Lelbach (wash).
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

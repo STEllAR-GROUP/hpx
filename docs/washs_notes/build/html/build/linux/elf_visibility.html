@@ -1,0 +1,123 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ELF Visibility Optimizations &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../../index.html" />
+    <link rel="up" title="Building on Linux" href="index.html" />
+    <link rel="next" title="Malloc Allocators" href="malloc_allocators.html" />
+    <link rel="prev" title="AMR Support Libraries" href="amr_support_libraries.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="malloc_allocators.html" title="Malloc Allocators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="elf-visibility-optimizations">
+<span id="elf-visibility"></span><h1>ELF Visibility Optimizations<a class="headerlink" href="#elf-visibility-optimizations" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference external" href="http://www.ibm.com/developerworks/power/library/pa-spec12">Executable and Linkable Format (ELF)</a> binary objects, all symbols are exported by default. This substantially
+increases the size of ELF binaries. On compilers which expose a usable interface
+for controlling C++ symbol visibility, HPX will only export the symbols needed to
+use HPX in release builds.</p>
+<p>Currently, only <a class="reference external" href="http://gcc.gnu.org">GNU Compiler Collection</a> properly supports ELF symbol visibility for C++. This
+support is only functional in newer versions of GCC (specifically, version 4.4.*
+and up). If you are attempting to build HPX with an older version of GCC, you
+will have to disable this optimization. This can be done by setting the CMake
+variable HPX_ELF_HIDDEN_VISIBILITY to off.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="amr_support_libraries.html"
+                        title="previous chapter">AMR Support Libraries</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="malloc_allocators.html"
+                        title="next chapter">Malloc Allocators</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/build/linux/elf_visibility.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="malloc_allocators.html" title="Malloc Allocators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >HPX Build Infrastructure</a> &raquo;</li>
+          <li><a href="index.html" >Building on Linux</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Bryce Lelbach (wash).
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

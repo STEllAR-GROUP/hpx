@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Building HPX on Windows &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../index.html" />
+    <link rel="prev" title="Building HPX on Linux" href="linux.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="linux.html" title="Building HPX on Linux"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="building-hpx-on-windows">
+<h1>Building HPX on Windows<a class="headerlink" href="#building-hpx-on-windows" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">authors:</th><td class="field-body">Bryce Lelbach</td>
+</tr>
+<tr class="field"><th class="field-name">organization:</th><td class="field-body">LSU</td>
+</tr>
+</tbody>
+</table>
+<p>Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at <a class="reference external" href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="compilers">
+<h3>Compilers<a class="headerlink" href="#compilers" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="31%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://msdn.microsoft.com/en-us/visualc/default.aspx">Visual C++</a> (Windows)</td>
+<td>2010</td>
+<td>2010</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="build-system">
+<h3>Build System<a class="headerlink" href="#build-system" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="31%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://cmake.org">CMake</a></td>
+<td>2.6.4</td>
+<td>2.6.4 - 2.8.*</td>
+</tr>
+<tr><td><a class="reference external" href="http://msdn.microsoft.com/en-us/library/ms171452(v=vs.90).aspx">MSBuild</a></td>
+<td>4.0.*</td>
+<td>4.0.*</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required-libraries">
+<h3>Required Libraries<a class="headerlink" href="#required-libraries" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="30%" />
+<col width="24%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Name</td>
+<td>Recommended Version</td>
+<td>Min/Max Version</td>
+</tr>
+<tr><td><a class="reference external" href="http://boost.org">Boost</a></td>
+<td>1.45.0</td>
+<td>1.43.0 - SVN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Building HPX on Windows</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#compilers">Compilers</a></li>
+<li><a class="reference internal" href="#build-system">Build System</a></li>
+<li><a class="reference internal" href="#required-libraries">Required Libraries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="linux.html"
+                        title="previous chapter">Building HPX on Linux</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/build/windows.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="linux.html" title="Building HPX on Linux"
+             >previous</a> |</li>
+        <li><a href="../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Bryce Lelbach aka wash.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
