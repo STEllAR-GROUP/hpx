@@ -125,7 +125,7 @@ struct thread_deque
         }
 
         if (added) 
-            LTM_(info) << "add_new: added " << added << " tasks to queues";
+        { LTM_(info) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
@@ -181,14 +181,13 @@ struct thread_deque
         }
 
         if (added) 
-            LTM_(info) << "add_new: added " << added << " tasks to queues";
+        { LTM_(info) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
     
-    long compute_count(thread_deque* addfrom_ = 0)
+    long compute_count()
     {
-        thread_deque* addfrom = addfrom_ ? addfrom_ : this;
 
         // create new threads from pending tasks (if appropriate)
         long add_count = -1; // default is no constraint
@@ -420,7 +419,7 @@ struct thread_deque
 //            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
 //                       << ", threads left: " << thread_map_.size();
 
-            std::size_t addednew = steal_new(compute_count(addfrom), addfrom);
+            std::size_t addednew = steal_new(compute_count(), addfrom);
             added += addednew;
 
             // stop running after all PX threads have been terminated

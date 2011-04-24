@@ -41,7 +41,7 @@ namespace hpx { namespace naming
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
 
-        int tried = 0;
+        std::size_t tried = 0;
         exception_list errors;
         locality::iterator_type end = here_.accept_end();
         for (locality::iterator_type it = 
@@ -87,7 +87,7 @@ namespace hpx { namespace naming
         // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
         using boost::asio::ip::tcp;
 
-        int tried = 0;
+        std::size_t tried = 0;
         exception_list errors;
         locality::iterator_type end = here_.accept_end();
         for (locality::iterator_type it = 
@@ -128,7 +128,7 @@ namespace hpx { namespace naming
     void resolver_server::run(bool blocking)
     {
         if (!io_service_pool_.is_running()) 
-            LAGAS_(info) << "startup: listening at: " << here_;
+        { LAGAS_(info) << "startup: listening at: " << here_; }
         io_service_pool_.run(blocking);
     }
 
