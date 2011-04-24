@@ -24,8 +24,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../index.html" />
     <link rel="up" title="HPX Build Infrastructure" href="index.html" />
-    <link rel="next" title="Theory" href="../theory/index.html" />
-    <link rel="prev" title="Building HPX on Windows" href="windows/prerequisites.html" /> 
+    <link rel="next" title="The HPX Runtime System" href="../runtime/index.html" />
+    <link rel="prev" title="Prerequisites" href="windows/prerequisites.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,10 +35,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../theory/index.html" title="Theory"
+          <a href="../runtime/index.html" title="The HPX Runtime System"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="windows/prerequisites.html" title="Building HPX on Windows"
+          <a href="windows/prerequisites.html" title="Prerequisites"
              accesskey="P">previous</a> |</li>
         <li><a href="../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">HPX Build Infrastructure</a> &raquo;</li> 
@@ -51,7 +51,134 @@
           <div class="body">
             
   <div class="section" id="cmake-variable-reference">
-<h1>CMake Variable Reference<a class="headerlink" href="#cmake-variable-reference" title="Permalink to this headline">¶</a></h1>
+<span id="cmake-variables"></span><h1>CMake Variable Reference<a class="headerlink" href="#cmake-variable-reference" title="Permalink to this headline">¶</a></h1>
+<p>Entries take the following format:</p>
+<dl class="docutils">
+<dt>identifier <span class="classifier-delimiter">:</span> <span class="classifier">type</span> <span class="classifier-delimiter">:</span> <span class="classifier">default value</span> <span class="classifier-delimiter">:</span> <span class="classifier">valid values</span></dt>
+<dd>Description of the variable&#8217;s semantics.</dd>
+</dl>
+<div class="section" id="platform-independent-variables">
+<h2>Platform-Independent Variables<a class="headerlink" href="#platform-independent-variables" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>BOOST_FOUND_LIBRARIES <span class="classifier-delimiter">:</span> <span class="classifier">LIST</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_LIBRARIES <span class="classifier-delimiter">:</span> <span class="classifier">LIST</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_LIBRARY_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_SUFFIX <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_USE_MULTITHREADED <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON</span></dt>
+<dd>Placeholder</dd>
+<dt>BOOST_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>CMAKE_BUILD_TYPE <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">RELEASE</span> <span class="classifier-delimiter">:</span> <span class="classifier">Release RelWithDebInfo MinSizeRel Debug</span></dt>
+<dd>Placeholder</dd>
+<dt>CMAKE_CXX_COMPILER <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>CMAKE_INSTALL_PREFIX <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span> <span class="classifier-delimiter">:</span> <span class="classifier">/usr/local (Linux) C:/Program Files/hpx (Windows)</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_CMAKE_LOGLEVEL <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">WARN</span> <span class="classifier-delimiter">:</span> <span class="classifier">Error Warn Info Debug</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_DISABLE_WARNINGS <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+</dl>
+</div>
+<div class="section" id="linux-specific-variables">
+<h2>Linux-Specific Variables<a class="headerlink" href="#linux-specific-variables" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>GMP_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>GMP_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>GMP_LIBRARY <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>GMP_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>GMP_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_COMPILER_AUTO_TUNE <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_ELF_HIDDEN_VISIBILITY <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_GNU_128BIT_INTEGERS <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_GNU_ALIGNED_16 <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_GNU_MCX16 <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_HW_ACCELERATION <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_INTERNAL_CHRONO <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_MALLOC <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">TCMalloc</span> <span class="classifier-delimiter">:</span> <span class="classifier">TCMalloc Jemalloc System</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_PTHREAD_AFFINITY_NP <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_RDTSC <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_RDTSCP <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>HPX_SSE2 <span class="classifier-delimiter">:</span> <span class="classifier">STRING</span> <span class="classifier-delimiter">:</span> <span class="classifier">DETECT</span> <span class="classifier-delimiter">:</span> <span class="classifier">ON OFF DETECT</span></dt>
+<dd>Placeholder</dd>
+<dt>JEMALLOC_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>JEMALLOC_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>JEMALLOC_LIBRARY <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>JEMALLOC_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>JEMALLOC_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>MPFR_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>MPFR_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>MPFR_LIBRARY <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>MPFR_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>MPFR_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_BINARY_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_LIBRARY_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>PXACCEL_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>RNPL_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>RNPL_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>RNPL_LIBRARY <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>RNPL_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>RNPL_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+<dt>TCMALLOC_FOUND <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span></dt>
+<dd>Placeholder</dd>
+<dt>TCMALLOC_INCLUDE_DIR <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>TCMALLOC_LIBRARY <span class="classifier-delimiter">:</span> <span class="classifier">FILEPATH</span></dt>
+<dd>Placeholder</dd>
+<dt>TCMALLOC_ROOT <span class="classifier-delimiter">:</span> <span class="classifier">PATH</span></dt>
+<dd>Placeholder</dd>
+<dt>TCMALLOC_USE_SYSTEM <span class="classifier-delimiter">:</span> <span class="classifier">BOOL</span> <span class="classifier-delimiter">:</span> <span class="classifier">OFF</span></dt>
+<dd>Placeholder</dd>
+</dl>
+</div>
 </div>
 
 
@@ -60,12 +187,21 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CMake Variable Reference</a><ul>
+<li><a class="reference internal" href="#platform-independent-variables">Platform-Independent Variables</a></li>
+<li><a class="reference internal" href="#linux-specific-variables">Linux-Specific Variables</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="windows/prerequisites.html"
-                        title="previous chapter">Building HPX on Windows</a></p>
+                        title="previous chapter">Prerequisites</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../theory/index.html"
-                        title="next chapter">Theory</a></p>
+  <p class="topless"><a href="../runtime/index.html"
+                        title="next chapter">The HPX Runtime System</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/build/cmake_variables.txt"
@@ -95,17 +231,17 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../theory/index.html" title="Theory"
+          <a href="../runtime/index.html" title="The HPX Runtime System"
              >next</a> |</li>
         <li class="right" >
-          <a href="windows/prerequisites.html" title="Building HPX on Windows"
+          <a href="windows/prerequisites.html" title="Prerequisites"
              >previous</a> |</li>
         <li><a href="../index.html">Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >HPX Build Infrastructure</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Bryce Lelbach (wash).
+        &copy; Copyright 2011, Bryce Lelbach (wash) &lt;blelbach@cct.lsu.edu&gt;.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

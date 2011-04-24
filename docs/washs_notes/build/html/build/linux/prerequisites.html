@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Building HPX on Linux &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
+    <title>Prerequisites &mdash; Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation</title>
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Wash&#39;s Notes on HPX, C++ and ParalleX v0.5.0 documentation" href="../../index.html" />
     <link rel="up" title="Building on Linux" href="index.html" />
-    <link rel="next" title="AMR Support Libraries" href="amr_support_libraries.html" />
+    <link rel="next" title="Instructions" href="instructions.html" />
     <link rel="prev" title="Building on Linux" href="index.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+          <a href="instructions.html" title="Instructions"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Building on Linux"
@@ -51,17 +51,15 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="building-hpx-on-linux">
-<span id="linux-prereqs"></span><h1>Building HPX on Linux<a class="headerlink" href="#building-hpx-on-linux" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="prerequisites">
+<span id="linux-build-prerequisites"></span><h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="compilers">
-<h3>Compilers<a class="headerlink" href="#compilers" title="Permalink to this headline">¶</a></h3>
+<h2>Compilers<a class="headerlink" href="#compilers" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
-<col width="44%" />
-<col width="31%" />
-<col width="25%" />
+<col width="46%" />
+<col width="30%" />
+<col width="24%" />
 </colgroup>
 <tbody valign="top">
 <tr><td>Name</td>
@@ -88,12 +86,12 @@
 </table>
 </div>
 <div class="section" id="build-system">
-<h3>Build System<a class="headerlink" href="#build-system" title="Permalink to this headline">¶</a></h3>
+<h2>Build System<a class="headerlink" href="#build-system" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
-<col width="44%" />
-<col width="31%" />
-<col width="25%" />
+<col width="46%" />
+<col width="30%" />
+<col width="24%" />
 </colgroup>
 <tbody valign="top">
 <tr><td>Name</td>
@@ -112,7 +110,7 @@
 </table>
 </div>
 <div class="section" id="required-libraries">
-<h3>Required Libraries<a class="headerlink" href="#required-libraries" title="Permalink to this headline">¶</a></h3>
+<h2>Required Libraries<a class="headerlink" href="#required-libraries" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="46%" />
@@ -144,7 +142,7 @@
 </table>
 </div>
 <div class="section" id="optional-libraries">
-<h3>Optional Libraries<a class="headerlink" href="#optional-libraries" title="Permalink to this headline">¶</a></h3>
+<h2>Optional Libraries<a class="headerlink" href="#optional-libraries" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="46%" />
@@ -156,64 +154,32 @@
 <td>Recommended Version</td>
 <td>Min/Max Version</td>
 </tr>
-<tr><td><a class="reference external" href="http://www.mpfr.org">GNU MPFR Library</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<tr><td><a class="reference external" href="http://www.mpfr.org">GNU MPFR Library</a> (<a class="reference internal" href="amr_support_libraries.html#linux-amr-support-libraries"><em>AMR only</em></a>)</td>
 <td>3.0.0</td>
 <td>3.0.0 - SVN</td>
 </tr>
-<tr><td><a class="reference external" href="http://gmplib.org">GNU Multi-Precision Library</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<tr><td><a class="reference external" href="http://gmplib.org">GNU Multi-Precision Library</a> (<a class="reference internal" href="amr_support_libraries.html#linux-amr-support-libraries"><em>AMR only</em></a>)</td>
 <td>4.2.3</td>
 <td>4.1.0 - 5.0.1</td>
 </tr>
-<tr><td><a class="reference external" href="http://relativity.phys.lsu.edu/postdocs/matt/software.php">RNPL</a> (<a class="reference internal" href="amr_support_libraries.html#amr-support-libs"><em>AMR only</em></a>)</td>
+<tr><td><a class="reference external" href="http://relativity.phys.lsu.edu/postdocs/matt/software.php">RNPL</a> (<a class="reference internal" href="amr_support_libraries.html#linux-amr-support-libraries"><em>AMR only</em></a>)</td>
 <td>N/A</td>
 <td>N/A</td>
 </tr>
-<tr><td><a class="reference external" href="http://www.canonware.com/jemalloc">jemalloc</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<tr><td><a class="reference external" href="http://www.canonware.com/jemalloc">jemalloc</a> (<a class="reference internal" href="malloc_allocators.html#linux-malloc-allocators"><em>malloc allocator</em></a>)</td>
 <td>2.1.2</td>
 <td>2.1.0 - GIT</td>
 </tr>
-<tr><td><a class="reference external" href="http://goog-perftools.sourceforge.net">google-perftools</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<tr><td><a class="reference external" href="http://goog-perftools.sourceforge.net">google-perftools</a> (<a class="reference internal" href="malloc_allocators.html#linux-malloc-allocators"><em>malloc allocator</em></a>)</td>
 <td>1.7.1</td>
 <td>1.7.1 - SVN</td>
 </tr>
-<tr><td><a class="reference external" href="http://www.nongnu.org/libunwind">libunwind</a> (<a class="reference internal" href="malloc_allocators.html#malloc-allocators"><em>malloc allocator</em></a>)</td>
+<tr><td><a class="reference external" href="http://www.nongnu.org/libunwind">libunwind</a> (<a class="reference internal" href="malloc_allocators.html#linux-malloc-allocators"><em>malloc allocator</em></a>)</td>
 <td>0.99</td>
 <td>0.97 - GIT</td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="build-instructions">
-<h2>Build Instructions<a class="headerlink" href="#build-instructions" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic" start="0">
-<li><p class="first">Download the latest Subversion release of HPX::</p>
-<div class="highlight-python"><pre>$ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx</pre>
-</div>
-</li>
-<li><p class="first">Create a build directory. HPX requires an out-of-tree build. This means you
-will be unable to run CMake in the HPX source tree.:</p>
-<div class="highlight-python"><pre>$ cd hpx
-$ mkdir my_hpx_build
-$ cd my_hpx_build</pre>
-</div>
-</li>
-<li><p class="first">Invoke CMake from your build directory, pointing the CMake driver to the root
-of your HPX source tree.:</p>
-<div class="highlight-python"><pre>$ cmake [CMake variable definitions] /path/to/source/tree</pre>
-</div>
-</li>
-<li><p class="first">Invoke GNU make. If you are on a box with multiple cores (very likely),
-add the -jN flag to your make invocation, where N is the number of nodes
-on your machine plus one.:</p>
-<div class="highlight-python"><pre>$ gmake -j49</pre>
-</div>
-</li>
-<li><p class="first">To complete the build and install HPX::</p>
-<div class="highlight-python"><pre>$ gmake install</pre>
-</div>
-</li>
-</ol>
 </div>
 </div>
 
@@ -225,15 +191,11 @@ on your machine plus one.:</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Building HPX on Linux</a><ul>
-<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#">Prerequisites</a><ul>
 <li><a class="reference internal" href="#compilers">Compilers</a></li>
 <li><a class="reference internal" href="#build-system">Build System</a></li>
 <li><a class="reference internal" href="#required-libraries">Required Libraries</a></li>
 <li><a class="reference internal" href="#optional-libraries">Optional Libraries</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#build-instructions">Build Instructions</a></li>
 </ul>
 </li>
 </ul>
@@ -242,8 +204,8 @@ on your machine plus one.:</p>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Building on Linux</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="amr_support_libraries.html"
-                        title="next chapter">AMR Support Libraries</a></p>
+  <p class="topless"><a href="instructions.html"
+                        title="next chapter">Instructions</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../../_sources/build/linux/prerequisites.txt"
@@ -273,7 +235,7 @@ on your machine plus one.:</p>
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="amr_support_libraries.html" title="AMR Support Libraries"
+          <a href="instructions.html" title="Instructions"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Building on Linux"
@@ -284,7 +246,7 @@ on your machine plus one.:</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Bryce Lelbach (wash).
+        &copy; Copyright 2011, Bryce Lelbach (wash) &lt;blelbach@cct.lsu.edu&gt;.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

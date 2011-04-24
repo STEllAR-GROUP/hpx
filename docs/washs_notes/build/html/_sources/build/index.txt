@@ -1,3 +1,5 @@
+.. _build_index:
+
 **************************
  HPX Build Infrastructure  
 **************************
