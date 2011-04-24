@@ -1,4 +1,6 @@
+//  Copyright (c) 2007-2011 Hartmut Kaiser, Richard D Guidry Jr.
 //  Copyright (c) 2011 Vinay C Amatya
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,7 +51,7 @@ threads::thread_state_enum hpx_main()
         if(cmd == "size"){
             std::string arg;
             std::cin >> arg;
-            unsigned int sz_temp = boost::lexical_cast<unsigned int>(arg);
+            std::size_t sz_temp = boost::lexical_cast<std::size_t>(arg);
             board.initBoard(sz_temp, 0);
             board.solveNqueen(board.accessBoard(), sz_temp, 0);
         }

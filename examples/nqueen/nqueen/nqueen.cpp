@@ -72,12 +72,8 @@ HPX_REGISTER_ACTION_EX(
     set_result_action_list_t);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<unsigned int>::set_result_action,
+    hpx::lcos::base_lco_with_value<std::size_t>::set_result_action,
     set_result_action_uint);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<int>::set_result_action,
-    set_result_action_int);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,12 +85,8 @@ HPX_REGISTER_ACTION_EX(
     get_value_action_list_t);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<unsigned int>::get_value_action,
+    hpx::lcos::base_lco_with_value<std::size_t>::get_value_action,
     get_value_action_uint);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<int>::get_value_action,
-    get_value_action_int);
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -106,11 +98,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::component_base_lco_with_value);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<unsigned int>,
-    hpx::components::component_base_lco_with_value);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<int>,
+    hpx::lcos::base_lco_with_value<std::size_t>,
     hpx::components::component_base_lco_with_value);
 
 ////////////////////////////////////////////////////////////

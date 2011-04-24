@@ -1,7 +1,11 @@
 //  Copyright (c) 2011 Vinay C Amatya
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D)
+#define HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D
 
 #include <iostream>
 
@@ -16,7 +20,7 @@
 
 unsigned int c_soln = 0;
 
-typedef std::vector<int> list_t;
+typedef std::vector<std::size_t> list_t;
 
 namespace hpx { namespace components { namespace server
 {
@@ -26,8 +30,8 @@ namespace hpx { namespace components { namespace server
     {
     private:
         list_t list_;
-        int level_;
-        unsigned int size_;
+        std::size_t level_;
+        std::size_t size_;
 
         // here Board is a component
 
@@ -54,21 +58,22 @@ namespace hpx { namespace components { namespace server
             board_clear = 9
         };
 
-        Board():list_(0), size_(0), level_(0)
+        Board():list_(0), level_(0), size_(0)
         {}
 
-        Board(list_t list, unsigned int size, int level):list_(list), level_(level), size_(size)
+        Board(list_t list, std::size_t size, std::size_t level):list_(list), level_(level), size_(size)
         {}
 
         ~Board(){}
 
-        void initBoard(unsigned int size, int level)
+        void initBoard(std::size_t size, std::size_t level)
                 {//list_ = list;
-                      Board::size_ = size; Board::level_ = level;
-                      unsigned int i = 0;
-                      while(i!=Board::size_)
+                      size_ = size;
+                      level_ = level;
+                      std::size_t i = 0;
+                      while(i!=size_)
                       {
-                          Board::list_.push_back(size_);
+                          list_.push_back(size_);
                           i++;
                      }
                 }
@@ -79,7 +84,7 @@ namespace hpx { namespace components { namespace server
           std::cout << "Size:" << size_ << "   "
             " Level:" << level_ << std::endl;
           std::cout << "List contents " << std::endl;
-          int i = 0;
+          std::size_t i = 0;
           while(i!=size_)
           {
             std::cout << list_.at(i) << std::endl;
@@ -87,40 +92,41 @@ namespace hpx { namespace components { namespace server
           };
         }
 
-        bool checkBoard(list_t list, int level)
+        bool checkBoard(list_t list, std::size_t level)
         {
-            list_t list_ = list;
-            int level_= level;
-                for(int i=0;i<level_;i++){
-                    if((list_.at(i)==list_.at(level_)) || (list_.at(level_)-list_.at(i)==level_-i)
-                            || (list_.at(i)-list_.at(level_)==level_-i))
-                        return 0;
-                }
-                return 1;
+            list_t tmp_list = list;
+            std::size_t tmp_level = level;
+            for(std::size_t i=0;i<tmp_level;i++){
+                if((tmp_list.at(i)==tmp_list.at(tmp_level)) || (tmp_list.at(tmp_level)-tmp_list.at(i)==tmp_level-i)
+                        || (tmp_list.at(i)-tmp_list.at(tmp_level)==tmp_level-i))
+                    return 0;
+            }
+            return 1;
         }
 
-        unsigned int getSize()    {return size_;}
+        std::size_t getSize()    {return size_;}
 
-        int getLevel() {return level_;}
+        std::size_t getLevel() {return level_;}
 
         list_t accessBoard() const { return list_;}
 
-        void updateBoard(int pos, int val){int pos_ = pos, val_= val;list_.at(pos_)=val_;}
+        void updateBoard(std::size_t pos, std::size_t val){std::size_t pos_ = pos, val_= val;list_.at(pos_)=val_;}
 
         void clearBoard(){ Board::list_.clear();}
 
 
-        void solveNqueen(list_t list, unsigned int size, int level){
+        void solveNqueen(list_t list, std::size_t size, std::size_t level){
 
-            list_t list_ = list;
-            unsigned int size_ = size;
-            int level_ = level;
-            Board board_(list_, size_, level_);
+            list_t tmp_list = list;
+            std::size_t tmp_size = size;
+            std::size_t tmp_level = level;
 
-            if(level_== size_){
+            Board board_(tmp_list, tmp_size, tmp_level);
+
+            if(tmp_level== tmp_size){
                 std::cout << std::endl << "Solution "<<(++c_soln)<<":"<< std::endl;
-                for(int i=0; i < size_; i++){
-                    for(int j=0; j < size_; j++){
+                for(std::size_t i=0; i < tmp_size; i++){
+                    for(std::size_t j=0; j < tmp_size; j++){
                         if(board_.accessBoard().at(i)==j)
                             std::cout << "X";
                         else
@@ -130,17 +136,18 @@ namespace hpx { namespace components { namespace server
                 }
             }
             else{
-                for(int i = 0; i < size_; i++){
-                    board_.updateBoard(level_,i);
-                    if(board_.checkBoard(board_.accessBoard(),level_)){
-                        solveNqueen(board_.accessBoard(),size_,level_+1);
+                for(std::size_t i = 0; i < tmp_size; i++){
+                    board_.updateBoard(tmp_level,i);
+                    if(board_.checkBoard(board_.accessBoard(),tmp_level)){
+                        solveNqueen(board_.accessBoard(),tmp_size,tmp_level+1);
                     }
                 }
             }
         }
 
         ////////////////////////////////test function////////////////////////////
-        void testBoard(list_t list, unsigned int size, int level){
+        // FIXME: level is unused
+        void testBoard(list_t list, std::size_t size, std::size_t level){
 
             Board board_(list, size, 0);
             if(board_.accessBoard().at(0) == 5){
@@ -154,7 +161,7 @@ namespace hpx { namespace components { namespace server
         }
 
         typedef hpx::actions::action2<
-                Board, board_init, unsigned int, int, &Board::initBoard
+                Board, board_init, std::size_t, std::size_t, &Board::initBoard
             > init_action;
 
         typedef hpx::actions::action0<
@@ -167,27 +174,27 @@ namespace hpx { namespace components { namespace server
             > access_action;
 
         typedef hpx::actions::result_action0<
-                Board, unsigned int, board_size, &Board::getSize
+                Board, std::size_t, board_size, &Board::getSize
             > size_action;
 
         typedef hpx::actions::result_action0<
-                Board, int, board_level, &Board::getLevel
+                Board, std::size_t, board_level, &Board::getLevel
             > level_action;
 
         typedef hpx::actions::action2<
-                Board, board_update, int, int, &Board::updateBoard
+                Board, board_update, std::size_t, std::size_t, &Board::updateBoard
             >update_action;
 
         typedef hpx::actions::result_action2<
-                Board, bool, board_check, list_t, int, &Board::checkBoard
+                Board, bool, board_check, list_t, std::size_t, &Board::checkBoard
             >check_action;
 
         typedef hpx::actions::action3<
-                Board, board_solve, list_t, unsigned int, int, &Board::solveNqueen
+                Board, board_solve, list_t, std::size_t, std::size_t, &Board::solveNqueen
             >solve_action;
 
         typedef hpx::actions::action3<
-                Board, board_test, list_t, unsigned int, int, &Board::testBoard
+                Board, board_test, list_t, std::size_t, std::size_t, &Board::testBoard
             >test_action;
 
         typedef hpx::actions::action0<
@@ -196,3 +203,6 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+#endif // HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D
+
