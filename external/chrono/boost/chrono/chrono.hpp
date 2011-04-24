@@ -62,6 +62,8 @@ TODO:
 #include <climits>
 #include <limits>
 
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/logical.hpp>
 #include <boost/chrono/config.hpp>
 #include <boost/ratio.hpp>
 #include <boost/type_traits/common_type.hpp>
@@ -397,6 +399,10 @@ struct common_type<chrono::time_point<Clock, Duration1>,
 //----------------------------------------------------------------------------//
 
 namespace chrono {
+  template <class ToDuration, class Rep, class Period>
+  inline
+  typename boost::enable_if <detail::is_duration<ToDuration>, ToDuration>::type
+  duration_cast(const duration<Rep, Period>& fd);
 
   template <class Rep, class Period>
   class duration
@@ -417,34 +423,42 @@ namespace chrono {
       duration() {} // = default;
       template <class Rep2>
           explicit duration(const Rep2& r,
-              typename boost::enable_if_c
-              <
-              boost::is_convertible<Rep2, rep>::value
-                 && (treat_as_floating_point<rep>::value
-                 || (!treat_as_floating_point<rep>::value
-                   && !treat_as_floating_point<Rep2>::value))
+              typename boost::enable_if<
+                mpl::and_<
+                  boost::is_convertible<Rep2, rep>,
+                  mpl::or_<
+                    treat_as_floating_point<rep>,
+                    mpl::and_<
+                      mpl::not_<treat_as_floating_point<rep> >,
+                      mpl::not_<treat_as_floating_point<Rep2> >
+                    >
+                  >
+                >
               >::type* = 0)
                   : rep_(r) {}
 
       // conversions
       template <class Rep2, class Period2>
           duration(const duration<Rep2, Period2>& d,
-              typename boost::enable_if_c
-              <
-                  treat_as_floating_point<rep>::value
-                  || ((ratio_divide<Period2, period>::type::den == 1)
-                    && (!treat_as_floating_point<Rep2>::value))
+              typename boost::enable_if<
+                mpl::or_<
+                  treat_as_floating_point<rep>,
+                  mpl::and_<
+                    mpl::bool_<(ratio_divide<Period2, period>::type::den == 1)>,
+                    mpl::not_<treat_as_floating_point<Rep2> >
+                  >
+                >
               >::type* = 0)
-#ifdef        __GNUC__
+//#ifdef        __GNUC__
               // GCC 4.2.4 refused to accept a definition at this point,
               // yet both VC++ 9.0 SP1 and Intel ia32 11.0 accepted the definition
               // without complaint. VC++ 9.0 SP1 refused to accept a later definition,
               // although that was fine with GCC 4.2.4 and Intel ia32 11.0. Thus we
               // have to support both approaches.
-              ;
-#else
+//              ;
+//#else
               : rep_(duration_cast<duration>(d).count()) {}
-#endif
+//#endif
 
       // observer
 
@@ -948,16 +962,6 @@ template <class Clock, class Duration>
 
 #ifdef __GNUC__
   // see comment above in section 20.9.3 Class template duration [time.duration]
-  template <class Rep, class Period>
-  template <class Rep2, class Period2>
-  duration<Rep, Period>::duration(const duration<Rep2, Period2>& d,
-          typename boost::enable_if_c
-          <
-              treat_as_floating_point<rep>::value
-              || ((ratio_divide<Period2, period>::type::den == 1)
-                && (!treat_as_floating_point<Rep2>::value))
-          >::type*)
-          : rep_(duration_cast<duration>(d).count()) {}
 #endif
 
 } // namespace chrono
