@@ -18,6 +18,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/arithmetic/dec.hpp>
 
@@ -93,6 +94,9 @@ namespace boost
     BOOST_PP_REPEAT_FROM_TO_ ## z(0, m, HPX_ENUM_MUTEX_ARG2, m)               \
     /**/
 
+#define HPX_SET_LOCK_FIRST(n, data) lock_first = (lock_first+n) % data;
+#define HPX_LOCK_EMPTY(n, data) 
+
 #define HPX_LOCK_CASE(z, n, data)                                             \
     case n:                                                                   \
         lock_first = detail::lock_helper(                                     \
@@ -100,7 +104,7 @@ namespace boost
         if (!lock_first)                                                      \
             return;                                                           \
         BOOST_PP_IIF(BOOST_PP_NOT_EQUAL(n, 0),                                \
-            lock_first = (lock_first+n) % data, lock_first);                  \
+            HPX_SET_LOCK_FIRST, HPX_LOCK_EMPTY)(n, data)                      \
         break;                                                                \
 
     template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
