@@ -42,8 +42,8 @@ namespace hpx { namespace naming
             util::runtime_configuration const& ini, bool isconsole) 
       : there_(ini.get_agas_locality()), io_service_pool_(io_service_pool), 
         connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
-        agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
-        local_only_(ini.get_agas_smp_mode()), request_handler_(0)
+        isconsole_(isconsole), local_only_(ini.get_agas_smp_mode()),
+        request_handler_(0), agas_cache_(ini.get_agas_cache_size())
     {
         // initialize the request handler if in SMP mode
         if (local_only_) {
@@ -60,8 +60,8 @@ namespace hpx { namespace naming
             bool isconsole) 
       : there_(ini.get_agas_locality(l)), io_service_pool_(io_service_pool), 
         connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
-        agas_cache_(ini.get_agas_cache_size()), isconsole_(isconsole),
-        local_only_(ini.get_agas_smp_mode()), request_handler_(0)
+        isconsole_(isconsole), local_only_(ini.get_agas_smp_mode()),
+        request_handler_(0), agas_cache_(ini.get_agas_cache_size())
     {
         // initialize the request handler if in SMP mode
         if (local_only_) {

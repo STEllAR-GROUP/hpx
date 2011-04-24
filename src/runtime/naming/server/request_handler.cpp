@@ -34,9 +34,9 @@ namespace hpx { namespace naming { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex>
     request_handler<Mutex>::request_handler()
-      : totals_(command_lastcommand), 
-        console_prefix_(0),
-        component_type_(components::component_first_dynamic)
+      : console_prefix_(0),
+        component_type_(components::component_first_dynamic),
+        totals_(command_lastcommand)
     {
         init_mutex(ns_registry_mtx_);
         init_mutex(registry_mtx_);

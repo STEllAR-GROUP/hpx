@@ -59,7 +59,7 @@ namespace hpx
             std::string const& agas_address, boost::uint16_t agas_port, 
             mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
-        result_(0), mode_(locality_mode), 
+        mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -91,7 +91,7 @@ namespace hpx
             naming::locality address, naming::locality agas_address, 
             mode locality_mode, init_scheduler_type const& init) 
       : runtime(agas_client_),
-        result_(0), mode_(locality_mode), 
+        mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -122,7 +122,7 @@ namespace hpx
             naming::locality address, mode locality_mode, 
             init_scheduler_type const& init) 
       : runtime(agas_client_),
-        result_(0), mode_(locality_mode), 
+        mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
