@@ -1,3 +1,5 @@
+.. _windows_build_index:
+
 *********************
  Building on Windows 
 *********************

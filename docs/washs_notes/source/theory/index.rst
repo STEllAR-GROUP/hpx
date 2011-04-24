@@ -1,3 +1,5 @@
+.. _theory_index:
+
 ********
  Theory 
 ********

@@ -1,8 +1,10 @@
-.. _elf_visibility:
+.. _linux_elf_visibility:
 
 ******************************
  ELF Visibility Optimizations 
 ******************************
+
+.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
 
 In |elf|_ binary objects, all symbols are exported by default. This substantially
 increases the size of ELF binaries. On compilers which expose a usable interface

@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Wash's Notes on HPX, C++ and ParalleX documentation build configuration file, created by
-# sphinx-quickstart on Tue Mar  8 10:57:12 2011.
 
 import sys, os
 
@@ -11,23 +8,23 @@ source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
 project = u'Wash\'s Notes on HPX, C++ and ParalleX'
-copyright = u'2011, Bryce Lelbach (wash)'
+copyright = u'2011, Bryce Lelbach (wash) <blelbach@cct.lsu.edu>'
 version = '0.5'
 release = '0.5.0'
 today_fmt = '%Y.%m.%d_%H.%M.%S'
 add_function_parentheses = True
 pygments_style = 'sphinx'
+show_authors = False
 
 # -- Options for HTML output ---------------------------------------------------
 
 html_theme = 'default'
-htmlhelp_basename = 'WashsNotesonHPXCandParalleXdoc'
 
 # -- Epilog for all global substitution ----------------------------------------
 
 rst_epilog = """
-.. |amr_only|     replace:: :ref:`AMR only <amr_support_libs>`
-.. |malloc|       replace:: :ref:`malloc allocator <malloc_allocators>`
+.. |amr_only|     replace:: :ref:`AMR only <linux_amr_support_libraries>`
+.. |malloc|       replace:: :ref:`malloc allocator <linux_malloc_allocators>`
 
 .. |bsl| replace:: Boost Software License
 .. _bsl: http://www.boost.org/LICENSE_1_0.txt
