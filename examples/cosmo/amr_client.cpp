@@ -484,7 +484,7 @@ int main(int argc, char* argv[])
           }
 
           had_double_type np = 0.0;
-          int left_level,oleft_level; 
+          int left_level(0),oleft_level; 
           oleft_level = 0;
           for (int j=0;j<par->nx[0];j++) {
             for (int k=0;k<par->level_begin.size();k++) {

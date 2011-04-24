@@ -153,7 +153,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     nodedata node;
 
     // find out the step row are dealing with 
-    int ll = par.level_row[row];
+//    int ll = par.level_row[row];
 
     // find out the level we are at
     std::size_t a,b,c;
@@ -313,9 +313,9 @@ int rkupdate(std::vector<nodedata*> const& vecval, stencil_data* result,
 
       // -------------------------------------------------------------------------
       // iter 0
-      for (int k=k_start; k<k_end;k++) {
-      for (int j=j_start; j<j_end;j++) {
-      for (int i=i_start; i<i_end;i++) {
+      for (std::size_t k=k_start; k<k_end;k++) {
+      for (std::size_t j=j_start; j<j_end;j++) {
+      for (std::size_t i=i_start; i<i_end;i++) {
         if ( timestep == par.time_granularity ) {
           calcrhs<0>(&rhs,vecval,dx,boundary,i,j,k,par); 
         } else {
@@ -340,9 +340,9 @@ int rkupdate(std::vector<nodedata*> const& vecval, stencil_data* result,
 
       // -------------------------------------------------------------------------
       // iter 1
-      for (int k=k_start; k<k_end;k++) {
-      for (int j=j_start; j<j_end;j++) {
-      for (int i=i_start; i<i_end;i++) {
+      for (std::size_t k=k_start; k<k_end;k++) {
+      for (std::size_t j=j_start; j<j_end;j++) {
+      for (std::size_t i=i_start; i<i_end;i++) {
         calcrhs<1>(&rhs,work,dx,boundary,i,j,k,par); 
         nodedata& nd = work[i+n*(j+n*k)];
         nodedata& nd2 = work2[i+n*(j+n*k)];
@@ -369,9 +369,9 @@ int rkupdate(std::vector<nodedata*> const& vecval, stencil_data* result,
         i_ef = 2*n2;
       }
 
-      for (int k=k_sf; k<k_ef;k++) {
-      for (int j=j_sf; j<j_ef;j++) {
-      for (int i=i_sf; i<i_ef;i++) {
+      for (std::size_t k=k_sf; k<k_ef;k++) {
+      for (std::size_t j=j_sf; j<j_ef;j++) {
+      for (std::size_t i=i_sf; i<i_ef;i++) {
         calcrhs<1>(&rhs,work2,dx,boundary,i,j,k,par); 
 
         ii = i - n2;

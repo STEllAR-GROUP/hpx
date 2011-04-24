@@ -474,7 +474,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
       int counter;
       int step,dst,dst2;
-      int found;
+      //int found;
       int ghostpoint,ghostpoint_ok;
       int cghostpoint,cghostpoint_LoR;
       int ghostpoint2;
@@ -754,6 +754,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       BOOST_ASSERT(level>=0);
      
       if ( level == par->allowedl ) return level;
+      return -1;
     }
 
 }}}}

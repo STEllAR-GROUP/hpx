@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #if defined(RNPL_FOUND)
           int i;
-          double datatime;
+          double datatime(0.0);
           std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<par->granularity;i++) {
@@ -127,14 +127,19 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
             int shape[3];
             char cnames[80] = { "x|y|z" };
+            char phi_name[] = { "0phi" };
+            char phi1_name[] = { "0d1phi" };
+            char phi2_name[] = { "0d2phi" };
+            char phi3_name[] = { "0d3phi" };
+            char phi4_name[] = { "0d4phi" };
             shape[0] = par->granularity;
             shape[1] = par->granularity;
             shape[2] = par->granularity;
-            gft_out_full("0phi",datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
-            gft_out_full("0d1phi",datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
-            gft_out_full("0d2phi",datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
-            gft_out_full("0d3phi",datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
-            gft_out_full("0d4phi",datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+            gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+            gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+            gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+            gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+            gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
           }
 #endif
         }

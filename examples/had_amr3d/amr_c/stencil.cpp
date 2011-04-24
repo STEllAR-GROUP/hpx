@@ -1157,8 +1157,8 @@ namespace hpx { namespace components { namespace amr
         // END TEST
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
-        bool boundary = false;
-        int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
+//        bool boundary = false;
+//        int bbox[6] = {0,0,0,0,0,0};   // initialize bounding box
 
         if ( val.size() == 0 ) {
           // This should not happen
@@ -1238,12 +1238,12 @@ namespace hpx { namespace components { namespace amr
               // interpolation
               int start = factor*par->buffer;
               int stop = factor*par->buffer + par->granularity;
-              had_double_type xmin = val[compute_index]->x_[start];
-              had_double_type xmax = val[compute_index]->x_[stop-1];
-              had_double_type ymin = val[compute_index]->y_[start];
-              had_double_type ymax = val[compute_index]->y_[stop-1];
-              had_double_type zmin = val[compute_index]->z_[start];
-              had_double_type zmax = val[compute_index]->z_[stop-1];
+              //had_double_type xmin = val[compute_index]->x_[start];
+              //had_double_type xmax = val[compute_index]->x_[stop-1];
+              //had_double_type ymin = val[compute_index]->y_[start];
+              //had_double_type ymax = val[compute_index]->y_[stop-1];
+              //had_double_type zmin = val[compute_index]->z_[start];
+              //had_double_type zmax = val[compute_index]->z_[stop-1];
 
               for (int k=start;k<stop;++k) {
                 had_double_type zt = resultval->z_[k];
@@ -1677,8 +1677,8 @@ namespace hpx { namespace components { namespace amr
               had_double_type dx = par->dx0/pow(2.0,level); 
 
               // call rk update 
-              int adj_index = 0;
-              int gft = rkupdate(val[compute_index].get(),resultval.get_ptr(),
+              //int adj_index = 0;
+              /*int gft =*/ rkupdate(val[compute_index].get(),resultval.get_ptr(),
                                    dt,dx,val[compute_index]->timestep_,
                                    level,*par.p);
 

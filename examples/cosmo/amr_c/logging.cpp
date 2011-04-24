@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // output to file "output.dat"
         FILE *fdata;
         std::vector<double> x,phi,Pi,chi;
-        double datatime;
+        double datatime(0.0);
         if ( logcode == 0 ) {
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
             for (i=0;i<val.granularity;i++) {
@@ -79,49 +79,54 @@ namespace hpx { namespace components { namespace amr { namespace server
               std::string r_str = convert(val.value_[i].phi[0][8]);
               std::string time_str = convert(val.timestep_*par->dx0*par->cfl);
 
+              // FIXME: c stdio is bad
+
               fdata = fopen("phi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),phi_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),phi_str.c_str());
               fclose(fdata);
 
               fdata = fopen("Pi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
               fclose(fdata);
 
               fdata = fopen("chi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
               fclose(fdata);
 
               fdata = fopen("a.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),a_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),a_str.c_str());
               fclose(fdata);
 
               fdata = fopen("f.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),f_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),f_str.c_str());
               fclose(fdata);
 
               fdata = fopen("g.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),g_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),g_str.c_str());
               fclose(fdata);
 
               fdata = fopen("b.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),b_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),b_str.c_str());
               fclose(fdata);
 
               fdata = fopen("q.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),q_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),q_str.c_str());
               fclose(fdata);
 
               fdata = fopen("r.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),r_str.c_str());
+              fprintf(fdata,"%ld %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),r_str.c_str());
               fclose(fdata);
             }
 #if defined(SDF_FOUND)
             int shape[3];
             char cnames[80] = { "r" };
+            char phi_name[] = { "phi" };
+            char pi_name[] = { "Pi" };
+            char chi_name[] = { "chi" };
             shape[0] = x.size(); 
-            gft_out_full("phi",datatime,shape,cnames,1,&*x.begin(),&*phi.begin());
-            gft_out_full("Pi",datatime,shape,cnames,1,&*x.begin(),&*Pi.begin());
-            gft_out_full("chi",datatime,shape,cnames,1,&*x.begin(),&*chi.begin());
+            gft_out_full(phi_name,datatime,shape,cnames,1,&*x.begin(),&*phi.begin());
+            gft_out_full(pi_name,datatime,shape,cnames,1,&*x.begin(),&*Pi.begin());
+            gft_out_full(chi_name,datatime,shape,cnames,1,&*x.begin(),&*chi.begin());
 #endif
           }
         }

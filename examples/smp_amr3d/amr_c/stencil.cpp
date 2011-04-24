@@ -1,4 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Matthew Anderson
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1025,12 +1027,12 @@ namespace hpx { namespace components { namespace amr
             if ( prolongation && restriction ) {
               // prolongation and restriction {{{
               // interpolation
-              double_type xmin = val[compute_index]->x_[0];
-              double_type xmax = val[compute_index]->x_[n-1];
-              double_type ymin = val[compute_index]->y_[0];
-              double_type ymax = val[compute_index]->y_[n-1];
-              double_type zmin = val[compute_index]->z_[0];
-              double_type zmax = val[compute_index]->z_[n-1];
+//              double_type xmin = val[compute_index]->x_[0];
+//              double_type xmax = val[compute_index]->x_[n-1];
+//              double_type ymin = val[compute_index]->y_[0];
+//              double_type ymax = val[compute_index]->y_[n-1];
+//              double_type zmin = val[compute_index]->z_[0];
+//              double_type zmax = val[compute_index]->z_[n-1];
 
               for (int k=0;k<n;++k) {
                 double_type zt = resultval->z_[k];
@@ -1062,7 +1064,9 @@ namespace hpx { namespace components { namespace amr
                     }
                   }
 
-                  int anchor_index[27];
+                  // this is pretty dangerous, given that the anchor_indexs might not be
+                  // initialized when they're used as indices for another array
+                  int anchor_index[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
                   int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
                   if ( !found ) {
                     // find the interpolating the anchors needed  
@@ -1358,12 +1362,12 @@ namespace hpx { namespace components { namespace amr
             } else if ( prolongation && !restriction ) {
               // prolongation {{{
               // interpolation
-              double_type xmin = val[compute_index]->x_[0];
-              double_type xmax = val[compute_index]->x_[n-1];
-              double_type ymin = val[compute_index]->y_[0];
-              double_type ymax = val[compute_index]->y_[n-1];
-              double_type zmin = val[compute_index]->z_[0];
-              double_type zmax = val[compute_index]->z_[n-1];
+//              double_type xmin = val[compute_index]->x_[0];
+//              double_type xmax = val[compute_index]->x_[n-1];
+//              double_type ymin = val[compute_index]->y_[0];
+//              double_type ymax = val[compute_index]->y_[n-1];
+//              double_type zmin = val[compute_index]->z_[0];
+//              double_type zmax = val[compute_index]->z_[n-1];
 
               for (int k=0;k<n;++k) {
                 double_type zt = resultval->z_[k];
@@ -1395,7 +1399,9 @@ namespace hpx { namespace components { namespace amr
                     }
                   }
 
-                  int anchor_index[27];
+                  // this is pretty dangerous, given that the anchor_indexs might not be
+                  // initialized when they're used as indices for another array
+                  int anchor_index[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
                   int has_corner[27] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
                   if ( !found ) {
                     // find the interpolating the anchors needed  
@@ -1775,7 +1781,7 @@ namespace hpx { namespace components { namespace amr
             bbox[3] = 1; bbox[4] = 1; bbox[5] = 1;
           }
           for (int i=0;i<val.size();++i) {
-            int ii,jj,kk;
+            int ii(0),jj(0),kk(0);
             if ( val.size() == 27 ) {
               kk = i/9 - 1;
               jj = count_j - 1;
@@ -1872,7 +1878,7 @@ namespace hpx { namespace components { namespace amr
 
               // call rk update 
               int adj_index = 0;
-              int gft = rkupdate(vecval[row],resultval.get_ptr(),
+              /*int gft =*/rkupdate(vecval[row],resultval.get_ptr(),
                                    boundary,bbox,adj_index,dt,dx,val[compute_index]->timestep_,
                                    level,*par.p);
 

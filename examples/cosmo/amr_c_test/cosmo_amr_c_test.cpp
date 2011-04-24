@@ -77,6 +77,7 @@ inline had_double_type initial_phi(had_double_type const& x1,had_double_type con
   } else {
      BOOST_ASSERT(false);
   }
+  return 0.0;
 }
 
 inline had_double_type initial_dphi(had_double_type const& x1,had_double_type const& r,Par const& par) 
@@ -126,7 +127,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     BOOST_ASSERT(level >= 0);
 
     had_double_type r_start = par.minx0;
-    int left_level,oleft_level;
+    int left_level(0),oleft_level;
     had_double_type left_dx;
     oleft_level = 0;
     for (int i=0;i<item;i++) {
@@ -208,16 +209,16 @@ int rkupdate(std::vector< nodedata* > const& vecval, stencil_data* result,
   static had_double_type const c_1 = 1.;
   static had_double_type const c_2 = 2.;
   static had_double_type const c_0_75 = 0.75;
-  static had_double_type const c_0_5 = 0.5;
+  //static had_double_type const c_0_5 = 0.5;
   static had_double_type const c_0_25 = 0.25;
-  static had_double_type const c_0 = 0.0;
+  //static had_double_type const c_0 = 0.0;
 
-  static had_double_type const c_4_3 = had_double_type(4.)/had_double_type(3.);
+//  static had_double_type const c_4_3 = had_double_type(4.)/had_double_type(3.);
   static had_double_type const c_2_3 = had_double_type(2.)/had_double_type(3.);
   static had_double_type const c_1_3 = had_double_type(1.)/had_double_type(3.);
 
   #ifdef UGLIFY
-  had_double_type tmp,tmp2;
+  had_double_type tmp/*,tmp2*/;
   #endif
 
   // TEST
@@ -318,10 +319,10 @@ void calcrhs(struct nodedata * rhs,
   static had_double_type const c_3 = 3.0;
   static had_double_type const c_m3 = -3.0;
   static had_double_type const c_2 = 2.0;
-  static had_double_type const c_0 = 0.0;
+  //static had_double_type const c_0 = 0.0;
 
   if ( compute_index-2 >= 0 && compute_index+2 < size ) {
-    had_double_type const x = *vecx[compute_index];
+//    had_double_type const x = *vecx[compute_index];
     had_double_type const phi = vecval[compute_index]->phi[flag][0];
     had_double_type const Pi  = vecval[compute_index]->phi[flag][1];
     had_double_type const chi = vecval[compute_index]->phi[flag][2];

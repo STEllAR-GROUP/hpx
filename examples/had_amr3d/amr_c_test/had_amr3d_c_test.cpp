@@ -155,7 +155,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     nodedata node;
 
     // find out the step row are dealing with 
-    int ll = par.level_row[row];
+    //int ll = par.level_row[row];
 
     // find out the level we are at
     int a,b,c;

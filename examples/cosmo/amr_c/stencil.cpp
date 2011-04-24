@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace amr
         scoped_values_lock<lcos::mutex> l(resultval, val);
 
         // Here we give the coordinate value to the result (prior to sending it to the user)
-        int compute_index;
+        int compute_index(0);
 
         if ( val.size() == 3 ) {
           compute_index = (val.size()-1)/2;
@@ -126,7 +126,7 @@ namespace hpx { namespace components { namespace amr
         std::vector< had_double_type* > vecx;
         std::vector< nodedata* > vecval;
  
-        std::size_t adj_index;
+        std::size_t adj_index(0);
         if ( compute_index == 1 ) adj_index = val[0]->granularity;
         else if ( compute_index == 0 ) {
           adj_index = 2;
@@ -179,7 +179,7 @@ namespace hpx { namespace components { namespace amr
             if (val[0]->level_ != val[1]->level_ && val[1]->level_ == val[2]->level_ ) { 
               if ( val[0]->level_ > val[1]->level_ ) {
                 // Case I {{{
-                had_double_type dx = *vecx[1] - *vecx[0];
+//                had_double_type dx = *vecx[1] - *vecx[0];
                 // downsample val[0]
                 int half;
                 if ( val[0]->granularity%2 == 0 ) {
@@ -323,7 +323,7 @@ namespace hpx { namespace components { namespace amr
               } else if ( val[2]->level_ > val[1]->level_ ) {
                 // Case IV {{{
                 // downsample val[2]
-                had_double_type dx = *vecx[vecx.size()-1] - *vecx[vecx.size()-2];
+//                had_double_type dx = *vecx[vecx.size()-1] - *vecx[vecx.size()-2];
 
                 int half;
                 if ( val[2]->granularity%2 == 0 ) {
@@ -394,10 +394,12 @@ namespace hpx { namespace components { namespace amr
             //  }
             //}
 
+            int gft = 0;
+
             // call rk update 
-            int gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
-                                 adj_index,dt,dx,val[compute_index]->timestep_,
-                                 level,*par.p);
+            gft = rkupdate(vecval,resultval.get_ptr(),vecx,vecval.size(),
+                           adj_index,dt,dx,val[compute_index]->timestep_,
+                           level,*par.p);
 
             BOOST_ASSERT(gft);
 
