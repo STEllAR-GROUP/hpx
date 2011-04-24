@@ -530,37 +530,34 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         
         // We need to insert a new reference count entry. We assume that
         // binding has already created a first reference + credits.
-        else 
+        BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
+
+        std::pair<typename refcnt_table_type::map_type::iterator, bool>
+            p = refcnt_table.insert(typename
+                refcnt_table_type::map_type::value_type
+                    (id, HPX_INITIAL_GLOBALCREDIT));
+
+        if (HPX_UNLIKELY(!p.second))
         {
-            BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
-
-            std::pair<typename refcnt_table_type::map_type::iterator, bool>
-                p = refcnt_table.insert(typename
-                    refcnt_table_type::map_type::value_type
-                        (id, HPX_INITIAL_GLOBALCREDIT));
-
-            if (HPX_UNLIKELY(!p.second))
-            {
-                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                    "insertion failed due to memory corruption or a locking "
-                    "error");
-            }
-            
-            it = p.first;
-            
-            if (HPX_UNLIKELY(it->second < credits))
-            {
-                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
-                    "bogus credit encountered while decrement global reference "
-                    "count");
-            }
-            
-            count_type cnt = (it->second -= credits);
-           
-            BOOST_ASSERT(0 != cnt);
+            HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                "insertion failed due to memory corruption or a locking "
+                "error");
+        }
+        
+        it = p.first;
+        
+        if (HPX_UNLIKELY(it->second < credits))
+        {
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                "bogus credit encountered while decrement global reference "
+                "count");
+        }
+        
+        count_type cnt = (it->second -= credits);
+        
+        BOOST_ASSERT(0 != cnt);
  
-            return decrement_result_type(cnt, components::component_invalid);
-        }   
+        return decrement_result_type(cnt, components::component_invalid);
     } // }}}
  
     // {{{ action types
