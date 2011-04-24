@@ -55,12 +55,6 @@ if(NOT MSVC)
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
-
-  if(NOT HPX_DISABLE_WARNINGS)
-    set_property(TARGET hpx_serialization APPEND
-      PROPERTY COMPILE_FLAGS
-      "-Wall -Wno-strict-aliasing -Wsign-promo")
-  endif()
   
   #############################################################################
   # libhpx_asio
@@ -83,12 +77,6 @@ if(NOT MSVC)
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
-
-  if(NOT HPX_DISABLE_WARNINGS)
-    set_property(TARGET hpx_asio APPEND
-      PROPERTY COMPILE_FLAGS
-      "-Wall -Wno-strict-aliasing -Wsign-promo")
-  endif()
   
   #############################################################################
   # libhpx_ini
@@ -111,12 +99,6 @@ if(NOT MSVC)
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
-
-  if(NOT HPX_DISABLE_WARNINGS)
-    set_property(TARGET hpx_ini APPEND
-      PROPERTY COMPILE_FLAGS
-      "-Wall -Wno-strict-aliasing -Wsign-promo")
-  endif()
   
   #############################################################################
   # libhpx
@@ -137,12 +119,6 @@ if(NOT MSVC)
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
-
-  if(NOT HPX_DISABLE_WARNINGS)
-    set_property(TARGET hpx APPEND
-      PROPERTY COMPILE_FLAGS
-      "-Wall -Wno-strict-aliasing -Wsign-promo")
-  endif()
 
   install(TARGETS hpx hpx_serialization hpx_asio hpx_ini
       ARCHIVE DESTINATION lib

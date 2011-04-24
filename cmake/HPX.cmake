@@ -195,6 +195,10 @@ else()
 
   option(HPX_DISABLE_WARNINGS
     "Disable all warnings (default: OFF)" OFF)
+  
+  if(NOT HPX_DISABLE_WARNINGS)
+    add_definitions(-Wall -Wno-strict-aliasing -Wsign-promo)
+  endif()
 
   ##############################################################################
   # GNU specific configuration
