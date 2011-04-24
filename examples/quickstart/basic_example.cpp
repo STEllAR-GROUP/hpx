@@ -129,7 +129,7 @@ int hpx_main(po::variables_map &vm)
 
     /* Get the runtime application configuration information from the runtime created implicitly
        by hpx_init() */
-    runtime& rt = get_runtime();
+    //runtime& rt = get_runtime();
 
     /* 
         In this block of code we are querying all localities that the current runtime knows

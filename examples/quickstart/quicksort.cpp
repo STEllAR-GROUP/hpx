@@ -76,7 +76,7 @@ void quicksort<T>::call(naming::id_type prefix, naming::id_type d,
 {
     if (begin != end) {
         static util::high_resolution_timer t;
-        double elapsed = t.elapsed();
+//        double elapsed = t.elapsed();
 
         components::memory_block mb(d);
         components::access_memory_block<T> data(mb.get());
