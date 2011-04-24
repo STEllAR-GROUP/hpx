@@ -48,8 +48,10 @@ namespace hpx { namespace components
             result += "[" + boost::lexical_cast<std::string>(type) + "]";
         else {
             result += "[" + 
-                boost::lexical_cast<std::string>(get_derived_type(type)) + 
-                "(" + boost::lexical_cast<std::string>(get_base_type(type)) + ")"
+                boost::lexical_cast<std::string>
+                  (static_cast<int>(get_derived_type(type))) + 
+                "(" + boost::lexical_cast<std::string>
+                    (static_cast<int>(get_base_type(type))) + ")"
                 "]";
         }
         return result;
