@@ -131,7 +131,7 @@ namespace hpx { namespace naming { namespace server
             else {
             // do some timings
                 util::high_resolution_timer t;
-                boost::uint8_t command = command_unknown;
+                //boost::uint8_t command = command_unknown;
 
             // Extract the data structure from the data just received.
                 std::vector<request> reqs;
