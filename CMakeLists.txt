@@ -109,6 +109,7 @@ add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 # search path configuration
 ################################################################################
 include_directories(${hpx_SOURCE_DIR})
+include_directories(${hpx_SOURCE_DIR}/external/move)
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
