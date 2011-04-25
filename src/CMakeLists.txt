@@ -32,7 +32,31 @@ endif()
 # POSIX 
 if(NOT MSVC)
   if(NOT HPX_DISABLE_WARNINGS)
-    add_definitions(-Wextra -Wno-unused-parameter -Wno-ignored-qualifiers)
+    add_definitions(-Wextra)
+
+    # these are usually benign and can't be suppressed because of
+    # interface requirements
+    add_definitions(-Wno-unused-parameter)
+
+    # there are ignored qualifiers in Boost, so we have to ignore them
+    add_definitions(-Wno-ignored-qualifiers)
+
+    # be extra strict about format checks
+    # Boost.Logging is built on this, sadly
+    add_definitions(-Wformat=2)
+    add_definitions(-Wno-format-nonliteral) 
+
+    # self initialization is dangerous
+    add_definitions(-Winit-self)
+
+    add_definitions(-Werror=parentheses)
+    add_definitions(-Werror=reorder)
+    add_definitions(-Werror=return-type)
+    add_definitions(-Werror=sequence-point)
+    add_definitions(-Werror=uninitialized)
+    add_definitions(-Werror=format)
+    add_definitions(-Werror=missing-braces)
+    add_definitions(-Werror=sign-compare)
   endif()
 
   add_hpx_library_sources(hpx
