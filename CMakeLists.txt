@@ -62,7 +62,7 @@ endif()
 ################################################################################
 # Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
 
-option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default: ON for Boost < 1.47)" ON)
+option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default: ON)" ON)
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
@@ -98,7 +98,7 @@ endif()
 find_package(HPX_Boost)
 
 include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIB_DIR})
+link_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
@@ -166,10 +166,19 @@ if(HPX_HW_ACCELERATION)
 
   if(PXACCEL_FOUND)
     add_definitions(-DHPX_ACCEL_QUEUING)
-    include_directories(${PXACCEL_INC_DIR})
-    link_directories(${PXACCEL_LIB_DIR})
+    include_directories(${PXACCEL_INCLUDE_DIR})
+    link_directories(${PXACCEL_LIBRARY_DIR})
     set(pxaccel_LIBRARIES pciutil pciaccess)
   endif()
+endif()
+
+################################################################################
+# Warning configuration
+################################################################################
+option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
+
+if(NOT HPX_DISABLE_WARNINGS)
+  add_definitions(-Wall)
 endif()
 
 ################################################################################
@@ -182,7 +191,7 @@ if(MSVC)
 
   set(CMAKE_DEBUG_POSTFIX "d")
 
-  # we auto-link on Windows
+  # we auto-link Boost on Windows, so don't specify boost libraries explicitly
   set(BOOST_FOUND_LIBRARIES "")
 
   add_definitions(-D_WINDOWS)
@@ -195,7 +204,7 @@ if(MSVC)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
 
-  # suppress certain warnings
+  # suppress certain warnings (TODO: Document what warnings these disable)
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
 
   if(CMAKE_CL_64)
@@ -224,18 +233,15 @@ else()
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
-  option(HPX_DISABLE_WARNINGS
-    "Disable all warnings (default: OFF)" OFF)
-
   if(NOT HPX_DISABLE_WARNINGS)
-    add_definitions(-Wall -Wno-strict-aliasing -Wsign-promo)
+    add_definitions(-Wno-strict-aliasing -Wsign-promo)
   endif()
 
   ##############################################################################
-  # GNU specific configuration
+  # GCC specific configuration
   ##############################################################################
   option(HPX_ELF_HIDDEN_VISIBILITY
-    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GNU GCC only, default: ON)" ON)
+    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GCC only, default: ON)" ON)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if(HPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
@@ -270,7 +276,7 @@ else()
   ##############################################################################
   # POSIX configuration tests 
   ##############################################################################
-  # GNU GCC's -march=native will automatically tune generated code for the host
+  # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable. This is why
   # we define the HPX_COMPILER_AUTO_TUNED macro.
@@ -334,25 +340,25 @@ else()
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
-  set(HPX_MALLOC "tcmalloc" CACHE STRING
+  set(HPX_MALLOC "TCMalloc" CACHE STRING
     "HPX malloc allocator (default: tcmalloc)" FORCE)
 
   find_package(HPX_TCMalloc)
   find_package(HPX_Jemalloc)
 
-  if("${HPX_MALLOC}" STREQUAL "tcmalloc" AND NOT TCMALLOC_FOUND)
+  if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" AND NOT TCMALLOC_FOUND)
     hpx_warn("malloc" "tcmalloc allocator not found.")
   endif()
 
-  if("${HPX_MALLOC}" STREQUAL "jemalloc" AND NOT JEMALLOC_FOUND)
+  if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC" AND NOT JEMALLOC_FOUND)
     hpx_warn("malloc" "jemalloc allocator not found.")
   endif()
   
   set(hpx_MALLOC_LIBRARY "")
 
-  if(NOT "${HPX_MALLOC}" STREQUAL "system")
+  if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
     if(TCMALLOC_FOUND OR JEMALLOC_FOUND)
-      if("${HPX_MALLOC}" STREQUAL "tcmalloc" OR NOT JEMALLOC_FOUND)
+      if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" OR NOT JEMALLOC_FOUND)
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
