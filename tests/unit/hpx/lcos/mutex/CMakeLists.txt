@@ -9,16 +9,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.hpx.lcos)
+set(group unit.hpx.lcos.mutex)
 
 set(testcases
-    dataflow_variable
-    full_empty
-    lazy_future
-    local_barrier
-    thunk
-    counting_semaphore
-    barrier)
+    basic)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
@@ -29,14 +23,5 @@ foreach(testcase ${testcases})
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
-endforeach()
-
-set(subdirs 
-    mutex) 
-
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(${group}.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(${group} ${group}.${subdir})
 endforeach()
 
