@@ -39,16 +39,16 @@ namespace hpx { namespace components { namespace server
     public:
     //enumerate all of the actions that will(or can) be employed
         enum actions{
-                hpl_construct=0,
-                hpl_destruct=1,
-                hpl_assign=2,
-                hpl_get=3,
-                hpl_set=4,
-                hpl_solve=5,
-        hpl_swap=6,
-        hpl_gmain=7,
-        hpl_bsubst=8,
-        hpl_check=9
+            hpl_construct=0,
+            hpl_destruct=1,
+            hpl_assign=2,
+            hpl_get=3,
+            hpl_set=4,
+            hpl_solve=5,
+            hpl_swap=6,
+            hpl_gmain=7,
+            hpl_bsubst=8,
+            hpl_check=9
         };
 
     //constructors and destructor
@@ -253,19 +253,20 @@ namespace hpx { namespace components { namespace server
         //while other threads work, and is checked at the end to make certain all
         //threads are completed before returning.
         std::vector<assign_future> futures;
-    boost::rand48 gen;
-    gen.seed(seed);
+        boost::rand48 gen;
+        gen.seed(seed);
 
-    //create multiple futures which in turn create more futures
+        //create multiple futures which in turn create more futures
         while(!complete){
         //there is only one more child thread left to produce
             if(offset <= allocblock){
                 if(row + offset < rows){
-                    futures.push_back(assign_future(_gid,row+offset,offset,true,gen()));
+                    futures.push_back(assign_future(_gid,
+                       row+offset,offset,true,gen()));
                 }
                 complete = true;
             }
-        //there are at least two more child threads to produce
+            //there are at least two more child threads to produce
             else{
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,
@@ -474,7 +475,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         {
             lcos::mutex::scoped_lock l(mtex);
             if(top_futures[iter][bcol-iter-1] == NULL){
-            top_futures[iter][bcol-iter-1] = new gmain_future(_gid,iter,bcol,iter,2);
+            top_futures[iter][bcol-iter-1] = 
+                new gmain_future(_gid,iter,bcol,iter,2);
             }
             if(left_futures[brow][iter] == NULL){
             left_futures[brow][iter] = new gmain_future(_gid,brow,iter,iter,3);
@@ -506,8 +508,9 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             factor = f_factor*datablock[iter][iter]->data[j][i];
             factordata[j+offset][i+offset] = factor;
             for(k=i+1;k<datablock[iter][iter]->columns;k++){
-            datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
-    }    }   }
+            datablock[iter][iter]->data[j][k] -= 
+                factor*datablock[iter][iter]->data[i][k];
+    }   }   }
     }
 
     //LUgausstop performs gaussian elimination on the topmost row of blocks
@@ -523,7 +526,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             factor = factordata[j+offset][i+offset];
             for(k=0;k<datablock[iter][bcol]->columns;k++){
             datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
-    }    }   }
+    }   }   }
     }
 
     //LUgaussleft performs gaussian elimination on the leftmost column of blocks
@@ -566,7 +569,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             factor = factordata[offset][i+offset_col];
             for(k=0;k<datablock[brow][bcol]->columns;k++){
             datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
-    }    }   }
+    }   }   }
     }
 
     //this is an implementation of back substitution modified for use on
@@ -594,8 +597,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         if(i!=j){
             for(k=datablock[i][j]->getcolumns()-((j>=brows-1)?(2):(1));k>=0;k--){
             for(l=datablock[i][j]->getrows()-1;l>=0;l--){
-                        solution[row+l]-=datablock[i][j]->data[l][k]*solution[col+k];
-                }   }   }
+                solution[row+l]-=datablock[i][j]->data[l][k]*solution[col+k];
+        }   }   }
         //this block of code following the else statement handles all data blocks
         //that do include elements on the diagonal
         else{
@@ -603,7 +606,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             solution[row+k]/=datablock[i][i]->data[k][k];
 //            std::cout<<solution[row+k]<<std::endl;
             for(l=k-1;l>=0;l--){
-                        solution[row+l]-=datablock[i][i]->data[l][k]*solution[col+k];
+                 solution[row+l]-=datablock[i][i]->data[l][k]*solution[col+k];
         }   }    }   }    }
 
     return 1;
