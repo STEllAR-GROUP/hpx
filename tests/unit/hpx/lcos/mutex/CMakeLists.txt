@@ -14,7 +14,6 @@ set(group unit.hpx.lcos.mutex)
 set(testcases
     lock
     lock_sanity
-    try_lock
     try_lock_sanity)
 
 foreach(testcase ${testcases})
