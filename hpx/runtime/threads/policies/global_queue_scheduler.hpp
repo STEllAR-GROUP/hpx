@@ -45,7 +45,9 @@ namespace hpx { namespace threads { namespace policies
         typedef std::size_t init_parameter_type;
 
         global_queue_scheduler(init_parameter_type max_count = 0)
-          : queue_((0 == max_count) ? max_thread_count : max_count)
+          : queue_((0 == max_count)
+                  ? static_cast<init_parameter_type>(max_thread_count)
+                  : max_count)
         {}
 
         bool numa_sensitive() const { return false; }

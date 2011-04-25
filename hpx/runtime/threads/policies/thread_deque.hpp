@@ -245,13 +245,19 @@ struct thread_deque
       : work_items_(),
         work_items_count_(0),
         terminated_items_(), 
-        max_count_((0 == max_count) ? max_thread_count : max_count),
+        max_count_((0 == max_count)
+                  ? static_cast<std::size_t>(max_thread_count)
+                  : max_count),
         new_tasks_count_(0),
         add_new_logger_("thread_deque::add_new")
     {}
 
     void set_max_count(std::size_t max_count = max_thread_count)
-    { max_count_ = (0 == max_count) ? max_thread_count : max_count; }
+    {
+        max_count_ = (0 == max_count)
+                   ? static_cast<std::size_t>(max_thread_count)
+                   : max_count;
+    }
 
     // This returns the current length of the queues (work items and new items)
     boost::int64_t get_queue_lengths() const

@@ -271,7 +271,9 @@ namespace hpx { namespace threads { namespace policies
           : work_items_(/*"work_items"*/),
             work_items_count_(0),
             terminated_items_(/*"terminated_items"*/), 
-            max_count_((0 == max_count) ? max_thread_count : max_count),
+            max_count_((0 == max_count)
+                      ? static_cast<std::size_t>(max_thread_count)
+                      : max_count),
             new_tasks_count_(0),
             add_new_logger_("thread_queue::add_new")
         {}

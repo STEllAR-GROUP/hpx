@@ -109,7 +109,9 @@ namespace boost { namespace coroutines {
        */
       template<typename Functor>
       x86_64_linux_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1) 
-        : m_stack_size(stack_size == -1 ? default_stack_size : stack_size),
+        : m_stack_size(stack_size == -1
+                      ? static_cast<std::ptrdiff_t>(default_stack_size)
+                      : stack_size),
           m_stack(posix::alloc_stack(m_stack_size)) 
       {
         BOOST_ASSERT(m_stack);
@@ -127,7 +129,7 @@ namespace boost { namespace coroutines {
 
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = (void*) funp ;// return addr (here: start addr)  NOTE: the unsafe cast is safe on IA64
+        *--m_sp = (void*) funp ;// return addr (here: start addr)  NOTE: the unsafe cast is safe on amd64
         *--m_sp = 0;       // rbp
         *--m_sp = 0;       // rbx
         *--m_sp = 0;       // rsi
