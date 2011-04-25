@@ -56,7 +56,7 @@ void errorsink(boost::uint32_t src, std::string const& msg)
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])

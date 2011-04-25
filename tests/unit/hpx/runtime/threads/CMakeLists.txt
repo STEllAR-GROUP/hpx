@@ -13,8 +13,7 @@ set(group unit.hpx.runtime.threads)
 
 set(testcases
     exception
-    thread_state
-    timed_set_state)
+    thread_state)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}

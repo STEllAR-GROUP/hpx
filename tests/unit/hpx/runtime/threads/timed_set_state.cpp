@@ -75,7 +75,7 @@ int hpx_main()
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the runtime type we use in this application
-typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler> runtime_type;
+typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler> runtime_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])

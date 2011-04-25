@@ -13,12 +13,14 @@ using namespace hpx::threads;
 thread_state_enum my_gcd (int m, int n, int gcd);
 void print_state (thread_state_enum t_s);
 
-typedef hpx::threads::threadmanager_impl<hpx::threads::policies::global_queue_scheduler> threadmanager_type;
+typedef hpx::threads::threadmanager_impl<hpx::threads::policies::local_queue_scheduler> threadmanager_type;
 
 int main(int argc, char* argv[])
 {
     hpx::util::io_service_pool timer_pool;
-    hpx::threads::policies::global_queue_scheduler scheduler;
+    hpx::threads::policies::local_queue_scheduler::init_parameter_type
+      init(1, 1000);
+    hpx::threads::policies::local_queue_scheduler scheduler(init);
     hpx::threads::policies::callback_notifier notifier;
     threadmanager_type my_tm(timer_pool, scheduler, notifier);
 

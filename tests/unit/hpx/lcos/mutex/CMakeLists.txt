@@ -12,7 +12,10 @@
 set(group unit.hpx.lcos.mutex)
 
 set(testcases
-    basic)
+    lock
+    lock_sanity
+    try_lock
+    try_lock_sanity)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
