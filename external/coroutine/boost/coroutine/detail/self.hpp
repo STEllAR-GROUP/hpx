@@ -196,9 +196,9 @@ namespace boost { namespace coroutines { namespace detail {
       (BOOST_DEDUCED_TYPENAME Target::self::call_arg, 
        BOOST_COROUTINE_DEDUCED_TYPENAME_DEFAULT Target::arg)))
     {
-      typedef typename Target::arg_slot_type type;
+      typedef typename Target::arg_slot_type type_;
       return yield_to_impl
-        (target, type
+        (target, type_
          (BOOST_PP_ENUM_PARAMS
           (BOOST_COROUTINE_ARG_MAX, arg)));
     }
@@ -257,13 +257,13 @@ namespace boost { namespace coroutines { namespace detail {
     };
 
     yield_result_type yield_impl(BOOST_DEDUCED_TYPENAME 
-                                 coroutine_type::result_slot_type result) 
+                                 coroutine_type::result_slot_type result_) 
     {
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type slot_type;
 
       BOOST_ASSERT(m_pimpl);
 
-      this->m_pimpl->bind_result(&result);
+      this->m_pimpl->bind_result(&result_);
       {
         reset_self_on_exit on_exit(this);
         this->m_pimpl->yield();

@@ -100,8 +100,8 @@ namespace boost { namespace coroutines {
 template <class X>
 struct const_lvalue
 {
-    explicit const_lvalue(X const* p)
-      : p(p) {}
+    explicit const_lvalue(X const* p_)
+      : p(p_) {}
 
     // It acts like a smart pointer, for syntactic convenience
     X const& operator*() const { return *p; }

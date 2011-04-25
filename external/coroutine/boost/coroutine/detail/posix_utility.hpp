@@ -119,9 +119,9 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   union splitter {
     int int_[2];
     T* ptr;
-    splitter(int first, int second) {
-      int_[0] = first;
-      int_[1] = second;
+    splitter(int first_, int second_) {
+      int_[0] = first_;
+      int_[1] = second_;
     }
 
     int first() {
@@ -132,7 +132,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
       return int_[1];
     }
 
-    splitter(T* ptr) :ptr(ptr) {}
+    splitter(T* ptr_) :ptr(ptr_) {}
 
     void operator()() {
       (*ptr)();

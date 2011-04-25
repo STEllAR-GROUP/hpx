@@ -89,7 +89,7 @@ namespace boost { namespace logging {
     private:
         struct call_do_write {
             const logger & self_;
-            call_do_write(const logger & self_) : self_(self_) {}
+            call_do_write(const logger & s) : self_(s) {}
             void operator()(msg_type & msg) const {
                 self_.do_write(msg);
             }
@@ -270,7 +270,7 @@ namespace boost { namespace logging {
 
         typedef logger<gather_msg, write_msg*> self_type;
 
-        logger(write_msg * writer = 0) : m_writer(writer) {
+        logger(write_msg * writer_ = 0) : m_writer(writer_) {
             logger_base_type::m_base.forward_to(this);
         }
         ~logger() {

@@ -37,7 +37,10 @@ private:
     struct index_info {
         typedef hold_string_type::size_type uint;
         
-        index_info(uint src_idx, int *format_idx, int advance_size = 2, int size = 2) : src_idx(src_idx), format_idx(format_idx), advance_size(advance_size), size(size) {}
+        index_info(uint src_idx_, int *format_idx_, int advance_size_ = 2,
+                   int size_ = 2)
+            : src_idx(src_idx_), format_idx(format_idx_),
+              advance_size(advance_size_), size(size_) {}
         uint src_idx;
         int * format_idx;
         int advance_size;

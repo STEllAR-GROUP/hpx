@@ -215,8 +215,9 @@ and you want to define the logger classes, in a source file
     template<class formatter_array, class destination_array> 
     struct formatter_and_destination_array_holder {
     protected:
-        formatter_and_destination_array_holder (const formatter_array & formats, const destination_array & destinations)
-            : m_formats(formats), m_destinations(destinations) {}
+        formatter_and_destination_array_holder (const formatter_array & formats_,
+            const destination_array & destinations_)
+            : m_formats(formats_), m_destinations(destinations_) {}
 
         const formatter_array & formats() const             { return m_formats; }
         const destination_array & destinations() const      { return m_destinations; }

@@ -80,10 +80,9 @@ namespace locker {
         struct write {
             self_type & self ;
             typename mutex::scoped_lock locker;
-            write(self_type & self) : self(self), locker(self.m_cs) {
-            }
-            ~write() {
-            }
+            write(self_type & self_) : self(self_), locker(self_.m_cs) {}
+
+            ~write() {}
 
             type & use() { return self.m_val ; }
             type* operator->() { return &use(); }
@@ -92,10 +91,9 @@ namespace locker {
         struct read {
             const self_type & self ;
             typename mutex::scoped_lock locker;
-            read(const self_type & self) : self(self), locker(self.m_cs) {
-            }
-            ~read() {
-            }
+            read(const self_type & self_) : self(self_), locker(self_.m_cs) {}
+
+            ~read() {}
 
             const type & use() { return self.m_val ; }
             const type* operator->() { return &use(); }
@@ -120,10 +118,9 @@ namespace locker {
 
         struct write {
             self_type & self ;
-            write(self_type & self) : self(self) {
-            }
-            ~write() {
-            }
+            write(self_type & self_) : self(self_) {}
+
+            ~write() {}
 
             type & use() { return self.m_val ; }
             type* operator->() { return &use(); }
@@ -131,10 +128,9 @@ namespace locker {
 
         struct read {
             const self_type & self ;
-            read(const self_type & self) : self(self) {
-            }
-            ~read() {
-            }
+            read(const self_type & self_) : self(self_) { }
+
+            ~read() {}
 
             const type & use() { return self.m_val ; }
             const type* operator->() { return &use(); }

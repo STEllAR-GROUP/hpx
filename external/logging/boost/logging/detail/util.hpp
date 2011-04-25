@@ -65,7 +65,8 @@ namespace boost { namespace logging {
     struct ansi_unicode_char_holder {
         const char * str;
         const wchar_t * wstr;
-        ansi_unicode_char_holder(const char * str, const wchar_t * wstr) : str(str), wstr(wstr) {}
+        ansi_unicode_char_holder(const char * str_, const wchar_t * wstr_)
+            : str(str_), wstr(wstr_) {}
 
         operator const char*() const { return str; }
         operator const wchar_t*() const { return wstr; }

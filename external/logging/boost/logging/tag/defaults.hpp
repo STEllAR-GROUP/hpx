@@ -33,7 +33,7 @@ namespace boost { namespace logging { namespace tag {
 See @ref boost::logging::tag "how to use tags".
 */
 struct file_line {
-    file_line(const char * val = "") : val(val) {}
+    file_line(const char * val_ = "") : val(val_) {}
     const char * val;
 };
 
@@ -51,7 +51,7 @@ struct function {
 See @ref boost::logging::tag "how to use tags".
 */
 struct level {
-    level(::boost::logging::level::type val = 0) : val(val) {}
+    level(::boost::logging::level::type val_ = 0) : val(val_) {}
     ::boost::logging::level::type val;
 };
 

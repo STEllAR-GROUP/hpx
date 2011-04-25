@@ -57,8 +57,8 @@ namespace optimize {
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(int reserve_prepend, int reserve_append, int grow_size = 10) 
-                : m_reserve_prepend(reserve_prepend), m_reserve_append(reserve_append), m_grow_size(grow_size), m_full_msg_computed(false) {}
+        cache_string_one_str(int reserve_prepend_, int reserve_append_, int grow_size_ = 10) 
+                : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {}
 
         /** 
         @param msg - the message that is originally cached
@@ -67,8 +67,8 @@ namespace optimize {
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(const string_type & msg, int reserve_prepend = 10, int reserve_append = 10, int grow_size = 10) 
-                : m_reserve_prepend(reserve_prepend), m_reserve_append(reserve_append), m_grow_size(grow_size), m_full_msg_computed(false) {
+        cache_string_one_str(const string_type & msg, int reserve_prepend_ = 10, int reserve_append_ = 10, int grow_size_ = 10) 
+                : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {
             set_string(msg);
         }
 
@@ -191,28 +191,28 @@ namespace optimize {
         operator const string_type&() const { return full_string(); }
 
     private:
-        void resize_string(int reserve_prepend, int reserve_append) {
-            BOOST_ASSERT( reserve_prepend >= 0 && reserve_append >= 0);
+        void resize_string(int reserve_prepend_, int reserve_append_) {
+            BOOST_ASSERT( reserve_prepend_ >= 0 && reserve_append_ >= 0);
 
             if ( is_string_set() ) {
-                int to_add = reserve_prepend + reserve_append - m_reserve_prepend - m_reserve_append ;
+                int to_add = reserve_prepend_ + reserve_append_ - m_reserve_prepend - m_reserve_append ;
                 int new_size = (int)m_str.size() + to_add;
                 if ( new_size < 0)
                     new_size = 0;
                 // I'm creating a new string instead of resizing the existing one
                 // this is because the new string could be of lower size
-                string_type new_str(reserve_prepend, 0);
+                string_type new_str(reserve_prepend_, 0);
                 int used_size = (int)m_str.size() - m_reserve_prepend - m_reserve_append;
                 new_str.insert( new_str.end(), m_str.begin() + m_reserve_prepend, m_str.begin() + m_reserve_prepend + used_size);
 
-                BOOST_ASSERT(new_size == reserve_prepend + used_size + reserve_append);
+                BOOST_ASSERT(new_size == reserve_prepend_ + used_size + reserve_append_);
 
                 new_str.resize( new_size, 0);
                 std::swap(new_str, m_str);
             }
 
-            m_reserve_prepend = reserve_prepend;
-            m_reserve_append = reserve_append;
+            m_reserve_prepend = reserve_prepend_;
+            m_reserve_append = reserve_append_;
         }
 
         // if true, string was already set
@@ -254,7 +254,8 @@ namespace optimize {
 
         struct cached_msg {
             cached_msg() : prepended(true), id( ptr_type() ), is_new(true) {}
-            cached_msg(const string_type & str, bool prepended) : msg(new string_type(str)), prepended(prepended), id( ptr_type() ), is_new(true) {}
+            cached_msg(const string_type & str, bool prepended_)
+              : msg(new string_type(str)), prepended(prepended_), id( ptr_type() ), is_new(true) {}
 
             // when within the collection - it can never be null
             // when within the array - if null, use it from the collection

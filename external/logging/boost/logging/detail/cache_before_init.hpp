@@ -71,7 +71,7 @@ private:
     typedef bool (*is_enabled_func)();
 
     struct message {
-        message(is_enabled_func is_enabled, msg_type string) : is_enabled(is_enabled), string(string) {}
+        message(is_enabled_func is_enabled_, msg_type string_) : is_enabled(is_enabled_), string(string_) {}
         // function that sees if the filter is enabled or not
         is_enabled_func is_enabled;
         // the message itself

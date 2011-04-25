@@ -71,10 +71,11 @@ namespace detail {
     }
 
     struct file_info {
-        file_info(const std::string& name, file_settings settings) 
-            : name(name), 
-              out( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) )), 
-              settings(settings) {}
+        file_info(const std::string& name_, file_settings settings_) 
+            : name(name_), 
+              out( new std::basic_ofstream<char_type>
+                  ( name_.c_str(), open_flags(settings_) )), 
+              settings(settings_) {}
 
         void reopen() {
             out = boost::shared_ptr< std::basic_ofstream<char_type> > ( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) ) );

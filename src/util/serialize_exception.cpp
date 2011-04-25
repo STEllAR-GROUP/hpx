@@ -47,9 +47,9 @@ namespace boost { namespace serialization
                 throw_function_ = *func;
             }
             else {
-                std::string const* func(boost::get_error_info<hpx::detail::throw_function>(e));
-                if (func)
-                    throw_function_ = *func;
+                std::string const* s(boost::get_error_info<hpx::detail::throw_function>(e));
+                if (s)
+                    throw_function_ = *s;
             }
 
             std::string const* file(boost::get_error_info<hpx::detail::throw_file>(e));
@@ -66,10 +66,10 @@ namespace boost { namespace serialization
                 throw_function_ = *func;
             }
             else {
-                boost::shared_ptr<std::string const> func(
+                boost::shared_ptr<std::string const> s(
                     boost::get_error_info<hpx::detail::throw_function>(e));
-                if (func)
-                    throw_function_ = *func;
+                if (s)
+                    throw_function_ = *s;
             }
 
             boost::shared_ptr<std::string const> file(

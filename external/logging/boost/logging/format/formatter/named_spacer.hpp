@@ -41,7 +41,8 @@ namespace detail {
         typedef hold_string_type string_type;
 
         struct write_step {
-            write_step(const string_type & prefix, format_base_type * fmt) : prefix(prefix), fmt(fmt) {}
+            write_step(const string_type & prefix_, format_base_type * fmt_)
+                : prefix(prefix_), fmt(fmt_) {}
             string_type prefix;
             // could be null - in case formatter not found by name, or it's the last step
             format_base_type * fmt;
@@ -101,8 +102,8 @@ namespace detail {
         template<class msg_type> void write_with_convert(msg_type & msg, ::boost::logging::formatter::do_convert_format::prepend*) const {
             // prepend
             typename data::read info(m_data);
-            typedef typename write_info::write_step_array array;
-            for ( typename array::const_reverse_iterator b = info->write_steps.rbegin(), e = info->write_steps.rend(); b != e; ++b) {
+            typedef typename write_info::write_step_array array_;
+            for ( typename array_::const_reverse_iterator b = info->write_steps.rbegin(), e = info->write_steps.rend(); b != e; ++b) {
                 if ( b->fmt)
                     (*(b->fmt))(msg);
                 convert_type::write( b->prefix, msg);
@@ -111,8 +112,8 @@ namespace detail {
         template<class msg_type> void write_with_convert(msg_type & msg, ...) const {
             // append
             typename data::read info(m_data);
-            typedef typename write_info::write_step_array array;
-            for ( typename array::const_iterator b = info->write_steps.begin(), e = info->write_steps.end(); b != e; ++b) {
+            typedef typename write_info::write_step_array array_;
+            for ( typename array_::const_iterator b = info->write_steps.begin(), e = info->write_steps.end(); b != e; ++b) {
                 convert_type::write( b->prefix, msg);
                 if ( b->fmt)
                     (*(b->fmt))(msg);
