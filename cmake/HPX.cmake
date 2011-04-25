@@ -212,6 +212,12 @@ else()
   option(HPX_ELF_HIDDEN_VISIBILITY
     "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GCC only, default: ON)" ON)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # Show the flags that toggle each warning
+    add_definitions(-fdiagnostics-show-option)
+
+    # I'm aware that __sync_fetch_and_nand changed semantics
+    add_definitions(-Wno-sync-nand)
+
     if(HPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
       add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
