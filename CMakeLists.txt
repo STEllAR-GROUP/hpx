@@ -173,7 +173,7 @@ if(HPX_HW_ACCELERATION)
 endif()
 
 ################################################################################
-# Warning configuration
+# warning configuration
 ################################################################################
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
 
