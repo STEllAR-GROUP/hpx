@@ -88,8 +88,8 @@ namespace hpx { namespace components { namespace server
                     //(maps original rows to pivoted/reordered rows)
     lcos::mutex mtex;        //mutex
 
-    ptime starttime;	//used for measurements
-    ptime rectime;	//used for measurements
+    ptime starttime;    //used for measurements
+    ptime rectime;    //used for measurements
     public:
     //here we define the actions that will be used
     //the construct function
