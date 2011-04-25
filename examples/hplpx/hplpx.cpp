@@ -12,8 +12,8 @@ using namespace std;
 namespace po=boost::program_options;
 
 //the size of the matrix
-unsigned int SIZE = 1024;
-unsigned int ABSIZE = 256;
+unsigned int SIZE = 2048;
+unsigned int ABSIZE = 1024;
 unsigned int BSIZE = 250;
 double ERROR = 0;
 
@@ -85,17 +85,17 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
                 "and 'local' (default is 'global')")
             ("size,S", po::value<int>(),
                 "the height of the n x n+1 matrix generated, where n is the height "
-        "and the minimum size value is 3(default is 1024)")
+        "and the minimum size value is 3(default is 2048)")
             ("csv,s", "generate statistics of the run in comma separated format")
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
-        "thread during gaussian elimination (default is 256)")
+        "thread during gaussian elimination (default is 250)")
         ("allocblock,A", po::value<int>(),
         "allocblock effects the amount of work each thread performs "
         "during memory allocation, initialization, and during the "
         "final correctness check.  Only powers of 2 are accepted, "
         "all other values will be rounded down to the nearest power of 2"
-        "(default is 256)");
+        "(default is 1024)");
 
         po::store(po::command_line_parser(argc, argv)
             .options(desc_cmdline).run(), vm);

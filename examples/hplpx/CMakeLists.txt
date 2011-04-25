@@ -18,8 +18,8 @@ add_hpx_executable(hplpx2
         SOURCES hplpx2.cpp
         DEPENDENCIES HPLMatreX2_component)
 
-add_custom_target(applications.hplpx.hplmatrex)
-add_dependencies(applications.hplpx hplpx.hplmatrex)
-add_custom_target(applications.hplpx.hplmatrex2)
-add_dependencies(applications.hplpx hplpx2.hplmatrex2)
+add_custom_target(examples.hplpx.hplmatrex)
+add_dependencies(examples.hplpx hplpx.hplmatrex)
+add_custom_target(examples.hplpx.hplmatrex2)
+add_dependencies(examples.hplpx hplpx2.hplmatrex2)
 

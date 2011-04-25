@@ -23,6 +23,9 @@ a destructor, and access operators.
 #include <boost/random/linear_congruential.hpp>
 #include "LUblock.hpp"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+using namespace boost::posix_time;
+
 namespace hpx { namespace components { namespace server
 {
     class HPX_COMPONENT_EXPORT HPLMatreX : public simple_component_base<HPLMatreX>
@@ -85,6 +88,8 @@ namespace hpx { namespace components { namespace server
                     //(maps original rows to pivoted/reordered rows)
     lcos::mutex mtex;        //mutex
 
+    ptime starttime;	//used for measurements
+    ptime rectime;	//used for measurements
     public:
     //here we define the actions that will be used
     //the construct function
@@ -152,6 +157,7 @@ namespace hpx { namespace components { namespace server
     //the constructor initializes the matrix
     int HPLMatreX::construct(naming::id_type gid, int h, int w,
         int ab, int bs){
+    starttime = ptime(microsec_clock::local_time());
 // / / /initialize class variables/ / / / / / / / / / / /
     if(ab > std::ceil(((float)h)*.5)){
         allocblock = (int)std::ceil(((float)h)*.5);
@@ -335,13 +341,20 @@ namespace hpx { namespace components { namespace server
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatreX::LUsolve(){
     //first perform partial pivoting
+ptime temp = ptime(microsec_clock::local_time());
+std::cout<<"alloc time "<<temp-starttime<<std::endl;
     pivot();
+
+ptime temp2 = ptime(microsec_clock::local_time());
+std::cout<<"pivoting over "<<temp2-temp<<std::endl;
 
     //to initiate the Gaussian elimination, create a future to obtain the final
     //set of computations we will need
     gmain_future main_future(_gid,brows-1,brows-1,brows-1,1);
     main_future.get();
 
+ptime temp3 = ptime(microsec_clock::local_time());
+std::cout<<"finished gaussian "<<temp3 - temp2<<std::endl;
     //allocate memory space to store the solution
     solution = (double*) std::malloc(rows*sizeof(double));
 
@@ -354,7 +367,8 @@ namespace hpx { namespace components { namespace server
 
     //confirm back substitution is completed before continuing
     bsub.get();
-
+ptime temp4 = ptime(microsec_clock::local_time());
+std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //create a future to check the accuracy of the generated solution
     check_future chk(_gid,0,offset,false);
     return chk.get();
@@ -474,7 +488,6 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausscorner(int iter){
     int i, j, k;
     int offset = iter*blocksize;        //factordata index offset
-    int itercols = datablock[iter][iter]->getcolumns();
     double f_factor;
     double factor;
 
@@ -483,10 +496,10 @@ namespace hpx { namespace components { namespace server
             std::cerr<<"Warning: divided by zero\n";
         }
         f_factor = 1/datablock[iter][iter]->get(i,i);
-        for(j=i+1;j<datablock[iter][iter]->getrows();j++){
-            factor = f_factor*datablock[iter][iter]->get(j,i);
+        for(j=i+1;j<datablock[iter][iter]->rows;j++){
+            factor = f_factor*datablock[iter][iter]->data[j][i];
             factordata[j+offset][i+offset] = factor;
-            for(k=i+1;k<itercols;k++){
+            for(k=i+1;k<datablock[iter][iter]->columns;k++){
             datablock[iter][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
     }    }   }
     }
@@ -497,13 +510,12 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LUgausstop(int iter, int bcol){
     int i,j,k;
     int offset = iter*blocksize;        //factordata index offset
-    int itercols = datablock[iter][bcol]->getcolumns();
     double factor;
 
     for(i=0;i<datablock[iter][bcol]->getrows();i++){
-        for(j=i+1;j<datablock[iter][bcol]->getrows();j++){
+        for(j=i+1;j<datablock[iter][bcol]->rows;j++){
             factor = factordata[j+offset][i+offset];
-            for(k=0;k<itercols;k++){
+            for(k=0;k<datablock[iter][bcol]->columns;k++){
             datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
     }    }   }
     }
@@ -515,16 +527,15 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     int offset = brow*blocksize;
     int offset_col = iter*blocksize;    //factordata offset
-    int itercols = datablock[brow][iter]->getcolumns();
     double f_factor;
     double factor;
 
     for(i=0;i<datablock[brow][iter]->getcolumns();i++){
         f_factor = 1/datablock[iter][iter]->get(i,i);
-        for(j=0;j<datablock[brow][iter]->getrows();j++){
-            factor = f_factor*datablock[brow][iter]->get(j,i);
+        for(j=0;j<datablock[brow][iter]->rows;j++){
+            factor = f_factor*datablock[brow][iter]->data[j][i];
             factordata[j+offset][i+offset_col] = factor;
-            for(k=i+1;k<itercols;k++){
+            for(k=i+1;k<datablock[brow][iter]->columns;k++){
             datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
     }    }   }
     }
@@ -537,8 +548,6 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     int offset = brow*blocksize - 1;    //factordata row offset
     int offset_col = iter*blocksize;    //factordata column offset
-    int iterrows = datablock[iter][iter]->getrows();
-    int itercols = datablock[brow][bcol]->getcolumns();
     double factor;
 
     //outermost loop: iterates over the f_factors of the most recent corner block
@@ -547,9 +556,9 @@ namespace hpx { namespace components { namespace server
     //inner loop: iterates across the columns of the current block
     for(j=0;j<datablock[brow][bcol]->getrows();j++){
         offset++;
-        for(i=0;i<iterrows;i++){
+        for(i=0;i<datablock[iter][iter]->rows;i++){
             factor = factordata[offset][i+offset_col];
-            for(k=0;k<itercols;k++){
+            for(k=0;k<datablock[brow][bcol]->columns;k++){
             datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
     }    }   }
     }
@@ -561,7 +570,7 @@ namespace hpx { namespace components { namespace server
     //track of where the loops would be in terms of a single
     //large data structure; using it allows addition
     //where multiplication would need to be used without it
-        int i,j,k,l,row,col;
+    int i,j,k,l,row,col;
     int temp = datablock[0][bcolumns-1]->getcolumns()-1;
 
     for(i=0;i<brows;i++){
@@ -570,7 +579,7 @@ namespace hpx { namespace components { namespace server
             datablock[i][brows-1]->getcolumns()-1);
     }   }
 
-        for(i=brows-1;i>=0;i--){
+    for(i=brows-1;i>=0;i--){
         row = i*blocksize;
         for(j=brows-1;j>=i;j--){
         col = j*blocksize;
@@ -579,19 +588,16 @@ namespace hpx { namespace components { namespace server
         if(i!=j){
             for(k=datablock[i][j]->getcolumns()-((j>=brows-1)?(2):(1));k>=0;k--){
             for(l=datablock[i][j]->getrows()-1;l>=0;l--){
-                        solution[row+l]-=datablock[i][j]->get(l,k)*solution[col+k];
-            datablock[i][j]->set(l,k,3333);
+                        solution[row+l]-=datablock[i][j]->data[l][k]*solution[col+k];
                 }   }   }
         //this block of code following the else statement handles all data blocks
         //that do include elements on the diagonal
         else{
             for(k=datablock[i][i]->getcolumns()-((i==brows-1)?(2):(1));k>=0;k--){
-            solution[row+k]/=datablock[i][i]->get(k,k);
-            datablock[i][i]->set(k,k,9999);
+            solution[row+k]/=datablock[i][i]->data[k][k];
 //            std::cout<<solution[row+k]<<std::endl;
             for(l=k-1;l>=0;l--){
-                        solution[row+l]-=datablock[i][i]->get(l,k)*solution[col+k];
-            datablock[i][i]->set(l,k,3333);
+                        solution[row+l]-=datablock[i][i]->data[l][k]*solution[col+k];
         }   }    }   }    }
 
     return 1;

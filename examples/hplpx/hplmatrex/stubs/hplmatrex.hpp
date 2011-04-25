@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include <applications/hplpx/hplmatrex/server/hplmatrex.hpp>
+#include <examples/hplpx/hplmatrex/server/hplmatrex.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
