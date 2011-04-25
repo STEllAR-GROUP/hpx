@@ -29,14 +29,14 @@ macro(get_boost_version)
       endif()
     endif()
   
-    if(NOT BOOST_LIB_DIR)
-      find_path(BOOST_LIB_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
-      set(BOOST_LIB_DIR "${BOOST_LIB_DIR}/lib")
-      if(NOT BOOST_LIB_DIR)
-        find_path(BOOST_LIB_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
-        set(BOOST_LIB_DIR "${BOOST_LIB_DIR}/lib64" )
+    if(NOT BOOST_LIBRARY_DIR)
+      find_path(BOOST_LIBRARY_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+      set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}/lib")
+      if(NOT BOOST_LIBRARY_DIR)
+        find_path(BOOST_LIBRARY_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
+        set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}/lib64" )
       endif()
-      hpx_debug("boost.version" "Using ${BOOST_LIB_DIR} as Boost shared library directory")
+      hpx_debug("boost.version" "Using ${BOOST_LIBRARY_DIR} as Boost shared library directory")
     endif()
     
     if(NOT BOOST_INCLUDE_DIR)
@@ -115,7 +115,7 @@ macro(get_boost_version)
     "Set to true to search for a system install of Boost (default ON)." FORCE)
   set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH
     "The Boost source tree to use (default: BOOST_ROOT or BOOST environmental variable)." FORCE)
-  set(BOOST_LIB_DIR "${BOOST_LIB_DIR}" CACHE PATH
+  set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}" CACHE PATH
     "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib)." FORCE)
   set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" CACHE PATH
     "Include path for Boost (default: \${BOOST_ROOT})." FORCE)
