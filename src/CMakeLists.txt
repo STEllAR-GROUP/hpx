@@ -32,7 +32,7 @@ endif()
 # POSIX 
 if(NOT MSVC)
   if(NOT HPX_DISABLE_WARNINGS)
-    add_definitions(-Wextra)
+    add_definitions(-Wextra -Wno-unused-parameter -Wno-ignored-qualifiers)
   endif()
 
   add_hpx_library_sources(hpx
