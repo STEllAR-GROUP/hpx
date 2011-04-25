@@ -31,6 +31,10 @@ endif()
 ###############################################################################
 # POSIX 
 if(NOT MSVC)
+  if(NOT HPX_DISABLE_WARNINGS)
+    add_definitions(-Wextra)
+  endif()
+
   add_hpx_library_sources(hpx
     ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 
