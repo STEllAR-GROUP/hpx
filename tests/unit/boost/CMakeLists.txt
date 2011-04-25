@@ -9,7 +9,8 @@ set(group unit.boost)
 set(subdirs 
     atomic
     cache
-    lockfree)
+    lockfree
+    move)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})
