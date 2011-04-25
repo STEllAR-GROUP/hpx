@@ -16,6 +16,11 @@ endif()
 
 ################################################################################
 option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
+
+# backwards compatibility
+if(BOOST_LIB_DIR AND NOT BOOST_LIBRARY_DIR)
+  set(BOOST_LIBRARY_DIR "${BOOST_LIB_DIR}")
+endif()
   
 if(NOT BOOST_VERSION_FOUND)
   include(FindHPX_BoostVersion)
@@ -107,7 +112,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
   endif()
 
   set(BOOST_COMPILER_VERSION ${BOOST_COMPILER_VERSION} 
-    CACHE STRING "Boost compiler version (default: guessed).")
+    CACHE INTERNAL "Boost compiler version.")
 
   if(BOOST_SUFFIX)
     # user suffix
@@ -142,10 +147,10 @@ macro(find_boost_library TARGET_LIB)
   if(NOT BOOST_USE_SYSTEM)
     # Locate libraries 
     build_boost_libname(${TARGET_LIB}) 
-    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIB_DIR} for" BOOST_LIBNAMES)
+    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIB_DIR} NO_DEFAULT_PATH)
+      find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIBRARY_DIR} NO_DEFAULT_PATH)
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
         get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
@@ -156,7 +161,7 @@ macro(find_boost_library TARGET_LIB)
     endforeach()
     
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      hpx_warn("boost.${TARGET_LIB}" "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIB_DIR}. Now searching the system path.")
+      hpx_warn("boost.${TARGET_LIB}" "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIBRARY_DIR}. Now searching the system path.")
       unset(BOOST_${TARGET_LIB}_LIBRARY)
    
       build_boost_libname(${TARGET_LIB}) 
@@ -174,7 +179,7 @@ macro(find_boost_library TARGET_LIB)
       endforeach()
     
       if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-        hpx_error("boost.${TARGET_LIB}" "Failed to locate library in ${BOOST_LIB_DIR} or in the system path.")
+        hpx_error("boost.${TARGET_LIB}" "Failed to locate library in ${BOOST_LIBRARY_DIR} or in the system path.")
         unset(BOOST_${TARGET_LIB}_LIBRARY)
       else()
         set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
