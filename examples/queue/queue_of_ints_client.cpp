@@ -57,5 +57,5 @@ int hpx_main(boost::program_options::variables_map &vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    return hpx::init("queue_of_ints");    // Initialize and run HPX
+    return hpx::init("queue_of_ints_client");    // Initialize and run HPX
 }

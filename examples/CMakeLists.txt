@@ -19,8 +19,8 @@ set(subdirs
     nbody
     nqueen
     parcelset
-    quickstart
-    )
+    queue
+    quickstart)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(examples.${subdir})
