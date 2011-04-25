@@ -39,7 +39,7 @@ namespace hpx { namespace threads
         };
     }
 
-    char const* const get_thread_state_name(thread_state_enum state)
+    char const* get_thread_state_name(thread_state_enum state)
     {
         if (state < pending || state > terminated)
             return "unknown";

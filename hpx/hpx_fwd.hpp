@@ -161,7 +161,7 @@ namespace hpx
 
         typedef threads::detail::tagged_thread_state<thread_state_enum> thread_state;
 
-        HPX_API_EXPORT char const* const get_thread_state_name(thread_state_enum state);
+        HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
 
         /**********************************************************************
          * \enum thread_state_ex_enum

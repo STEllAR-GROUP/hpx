@@ -130,7 +130,7 @@ struct deque_anchor
     bool operator!=(volatile pair const& rhs) const 
     { return !(*this == rhs); }
     
-    const bool is_lock_free() const
+    bool is_lock_free() const
     { return pair_.is_lock_free(); }
 };
 
@@ -272,12 +272,12 @@ struct deque: private boost::noncopyable
     // Not thread-safe.
     // Complexity: O(Processes)  
     // FIXME: Should we check both pointers here?
-    const bool empty() const
+    bool empty() const
     { return anchor_.lrs().get_left_ptr() == 0; }
 
     // Thread-safe and non-blocking.
     // Complexity: O(1)
-    const bool is_lock_free() const
+    bool is_lock_free() const
     { return anchor_.is_lock_free(); }
 
     // Thread-safe and non-blocking (may block if node needs to be allocated

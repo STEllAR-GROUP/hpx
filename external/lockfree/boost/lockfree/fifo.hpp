@@ -89,7 +89,7 @@ public:
      *
      * \warning \b Warning: It only checks, if the fifo head node is lockfree. on most platforms, this should be sufficient, though
      * */
-    const bool is_lock_free (void) const
+    bool is_lock_free (void) const
     {
         return head_.is_lock_free();
     }

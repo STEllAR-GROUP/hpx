@@ -47,7 +47,7 @@ namespace hpx { namespace naming { namespace server
             "hpx: agas: more than one console localities";
     }
 
-    char const* const get_error_text(error status)
+    char const* get_error_text(error status)
     {
         switch (status) {
         case hpx::success:               return status_strings::success;

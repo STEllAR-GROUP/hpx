@@ -30,7 +30,7 @@ namespace hpx { namespace naming { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a get_error_text returns the textual representation 
     /// of the passed error code.
-    char const* const get_error_text(error status);
+    char const* get_error_text(error status);
 
     ///////////////////////////////////////////////////////////////////////////
     /// a reply to be sent to a client

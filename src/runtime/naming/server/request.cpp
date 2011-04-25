@@ -44,7 +44,7 @@ namespace hpx { namespace naming { namespace server
         };
     }
 
-    char const* const get_command_name(int cmd)
+    char const* get_command_name(int cmd)
     {
         if (cmd >= command_firstcommand && cmd < command_lastcommand)
             return strings::command_names[cmd];
