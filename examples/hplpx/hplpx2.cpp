@@ -38,7 +38,7 @@ statistical printout.*/
 //this is where the data structure is created and the computation
 //function is called
 int hpx_main(){
-    int i,j,t=0;
+    //int i,j,t=0;
 
     std::vector<naming::id_type> prefixes;
     applier::applier& appl = applier::get_applier();

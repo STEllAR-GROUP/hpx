@@ -15,11 +15,11 @@ set(subdirs
     cosmo
     generic
     had_amr3d
+    hplpx
     smp_amr3d
     nbody
     nqueen
     parcelset
-    queue
     quickstart)
 
 foreach(subdir ${subdirs})

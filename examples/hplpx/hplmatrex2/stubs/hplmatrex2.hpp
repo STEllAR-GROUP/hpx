@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include <applications/hplpx/hplmatrex2/server/hplmatrex2.hpp>
+#include <examples/hplpx/hplmatrex2/server/hplmatrex2.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {

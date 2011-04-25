@@ -12,13 +12,16 @@ add_hpx_executable(hplpx1
         SOURCES hplpx.cpp
         DEPENDENCIES hplmatrex_component)
 
+add_hpx_pseudo_target(examples.hplpx.hplmatrex)
+add_hpx_pseudo_dependencies(examples.hplpx examples.hplpx.hplmatrex)
+add_hpx_pseudo_dependencies(examples.hplpx.hplmatrex hplpx1_exe)
+
 add_hpx_executable(hplpx2
         MODULE hplmatrex2
         SOURCES hplpx2.cpp
         DEPENDENCIES hplmatrex2_component)
 
-add_hpx_pseudo_target(examples.hplpx.hplmatrex)
-add_hpx_pseudo_dependencies(examples.hplpx examples.hplpx.hplmatrex)
 add_hpx_pseudo_target(examples.hplpx.hplmatrex2)
-add_hpx_pseudo_dependencies(examples.hplpx examples.hplpx2.hplmatrex2)
+add_hpx_pseudo_dependencies(examples.hplpx examples.hplpx.hplmatrex2)
+add_hpx_pseudo_dependencies(examples.hplpx.hplmatrex2 hplpx2_exe)
 

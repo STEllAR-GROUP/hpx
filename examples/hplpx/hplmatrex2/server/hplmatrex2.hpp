@@ -390,7 +390,7 @@ namespace hpx { namespace components { namespace server
     unsigned int max, max_row;
     unsigned int temp_piv;
     double temp;
-    unsigned int h = (unsigned int)std::ceil(((float)rows)*.5);
+    //unsigned int h = (unsigned int)std::ceil(((float)rows)*.5);
 
     //This first section of the pivot() function finds all of the pivot
     //values to compute the final pivot array
@@ -591,7 +591,7 @@ namespace hpx { namespace components { namespace server
     //large data structure; using it allows addition
     //where multiplication would need to be used without it
         int i,j,k,l,row,col;
-    unsigned int temp = datablock[0][bcolumns-1]->getcolumns()-1;
+    //unsigned int temp = datablock[0][bcolumns-1]->getcolumns()-1;
 
     for(i=0;i<brows;i++){
         for(j=0;j<datablock[i][0]->getrows();j++){
