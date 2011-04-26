@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace server
             if (!thread_queue_.empty()) {
                 LERR_(fatal) << "~queue: thread_queue is not empty, aborting threads";
 
-                mutex_type::scoped_lock l(this);
+                typename mutex_type::scoped_lock l(this);
                 while (!thread_queue_.empty()) {
                     threads::thread_id_type id = thread_queue_.front().id_;
                     thread_queue_.front().id_ = 0;
@@ -163,7 +163,7 @@ namespace hpx { namespace lcos { namespace server
             std::auto_ptr<queue_value_entry> node(
                 new queue_value_entry(get_result<ValueType, RemoteType>::call(result)));
 
-            mutex_type::scoped_lock l(this);
+            typename mutex_type::scoped_lock l(this);
             value_queue_.push_back(*node);
 
             node.release();
@@ -187,7 +187,7 @@ namespace hpx { namespace lcos { namespace server
         ///               to this LCO instance.
         void set_error(boost::exception_ptr const& e)
         {
-            mutex_type::scoped_lock l(this);
+            typename mutex_type::scoped_lock l(this);
 
             while (!thread_queue_.empty()) {
                 threads::thread_id_type id = thread_queue_.front().id_;
@@ -207,7 +207,7 @@ namespace hpx { namespace lcos { namespace server
         {
             threads::thread_self& self = threads::get_self();
 
-            mutex_type::scoped_lock l(this);
+            typename mutex_type::scoped_lock l(this);
             if (value_queue_.empty()) {
                 // suspend this thread until a new value is placed into the 
                 // value queue
@@ -215,10 +215,10 @@ namespace hpx { namespace lcos { namespace server
 
                 queue_thread_entry e (id);
                 thread_queue_.push_back(e);
-                thread_queue_type::const_iterator last = thread_queue_.last();
+                typename thread_queue_type::const_iterator last = thread_queue_.last();
 
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         HPX_OSSTREAM strm;

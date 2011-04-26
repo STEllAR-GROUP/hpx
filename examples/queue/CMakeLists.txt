@@ -17,7 +17,7 @@ foreach(type ${types})
   add_hpx_executable(queue_of_${type}_client
                      MODULE queue
                      SOURCES queue_of_${type}_client.cpp
-                     DEPENDENCIES queue_of_${type})
+                     DEPENDENCIES queue_of_${type}_component)
 
   add_hpx_pseudo_target(examples.queue.queue_of_${type})
 

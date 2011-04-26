@@ -37,46 +37,46 @@ namespace hpx { namespace lcos
         lcos::future_value<ValueType, RemoteType> 
         get_value_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_value_async(gid_);
+            BOOST_ASSERT(this->gid_);
+            return this->base_type::get_value_async(this->gid_);
         }
 
         lcos::future_value<void> 
         set_value_async(RemoteType const& val)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::set_value_async(gid_, val);
+            BOOST_ASSERT(this->gid_);
+            return this->base_type::set_value_async(this->gid_, val);
         }
 
         lcos::future_value<void, util::unused_type> 
         abort_pending_async(boost::exception_ptr const& e)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::abort_pending_async(gid_, e);
+            BOOST_ASSERT(this->gid_);
+            return this->base_type::abort_pending_async(this->gid_, e);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ValueType get_value_sync()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_value_sync(gid_);
+            BOOST_ASSERT(this->gid_);
+            return this->base_type::get_value_sync(this->gid_);
         }
 
         void set_value_sync(RemoteType const& val)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::set_value_sync(gid_, val);
+            BOOST_ASSERT(this->gid_);
+            this->base_type::set_value_sync(this->gid_, val);
         }
 
         void abort_pending_sync(boost::exception_ptr const& e)
         {
-            this->base_type::abort_pending_sync(gid_, e);
+            this->base_type::abort_pending_sync(this->gid_, e);
         }
 
         ///////////////////////////////////////////////////////////////////////
         void set_value(RemoteType const& val)
         {
-            this->base_type::set_value(gid_, val);
+            this->base_type::set_value(this->gid_, val);
         }
 
         void abort_pending()
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos
                     "interrupt all pending requests");
             }
             catch (...) {
-                this->base_type::abort_pending(gid_, boost::current_exception());
+                this->base_type::abort_pending(this->gid_, boost::current_exception());
             }
         }
     };

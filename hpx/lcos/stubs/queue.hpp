@@ -66,7 +66,9 @@ namespace hpx { namespace lcos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static void set_value(naming::id_type const& gid, RemoteType const& val)
         {
-            typedef lcos::base_lco::set_result_action action_type;
+            typedef typename 
+                lcos::base_lco_with_value<ValueType, RemoteType>::set_result_action 
+            action_type;
             hpx::applier::apply<action_type>(gid, val);
         }
 
