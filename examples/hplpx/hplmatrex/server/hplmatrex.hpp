@@ -1,9 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2011 Dan Kogler
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  Distributed under the Boost Software License, Version 1.0.(See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 #ifndef _HPLMATREX_SERVER_HPP
 #define _HPLMATREX_SERVER_HPP
 
@@ -34,7 +34,8 @@ using namespace boost::posix_time;
 
 namespace hpx { namespace components { namespace server
 {
-    class HPX_COMPONENT_EXPORT HPLMatreX : public simple_component_base<HPLMatreX>
+    class HPX_COMPONENT_EXPORT HPLMatreX : 
+          public simple_component_base<HPLMatreX>
     {
     public:
     //enumerate all of the actions that will(or can) be employed
@@ -99,8 +100,9 @@ namespace hpx { namespace components { namespace server
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef actions::result_action5<HPLMatreX, int, hpl_construct, naming::id_type,
-        int, int, int, int, &HPLMatreX::construct> construct_action;
+    typedef actions::result_action5<HPLMatreX, int, hpl_construct, 
+        naming::id_type, int, int, int, int, &HPLMatreX::construct> 
+        construct_action;
     //the destruct function
     typedef actions::action0<HPLMatreX, hpl_destruct,
         &HPLMatreX::destruct> destruct_action;
@@ -139,9 +141,9 @@ namespace hpx { namespace components { namespace server
     //This future corresponds to the Gaussian elimination functions
     typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
 
-    //the backsubst future is used to make sure all computations are complete before
-    //returning from LUsolve, to avoid killing processes and erasing the leftdata while
-    //it is still being worked on
+    //the backsubst future is used to make sure all computations are complete
+    //before returning from LUsolve, to avoid killing processes and erasing the
+    //leftdata while it is still being worked on
     typedef lcos::eager_future<server::HPLMatreX::bsubst_action> bsubst_future;
 
     //the final future type for the class is used for checking the accuracy of
@@ -149,16 +151,17 @@ namespace hpx { namespace components { namespace server
     typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
 
 //***//
-    //central_futures is an array of pointers to future which needs to be kept global
-    //to this class and is used to represent LUgausscorner inducing gmain_futures
+    //central_futures is an array of pointers to future which needs to be 
+    //kept global to this class and is used to represent LUgausscorner 
+    //inducing gmain_futures
     gmain_future** central_futures;
 
-    //top_futures and left_futures are 2d arrays of pointers to futures similar to
-    //central_futures
+    //top_futures and left_futures are 2d arrays of pointers to futures
+    //similar to central_futures
     gmain_future*** top_futures;
     gmain_future*** left_futures;
     };
-//////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
     int HPLMatreX::construct(naming::id_type gid, int h, int w,
@@ -236,22 +239,25 @@ namespace hpx { namespace components { namespace server
     }
     for(int i = 0;i < brows;i++){
         datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
-        top_futures[i] = (gmain_future**)std::malloc((brows-i-1)*sizeof(gmain_future*));
+        top_futures[i] = (gmain_future**)std::malloc((brows-i-1)
+                            *sizeof(gmain_future*));
         left_futures[i] = (gmain_future**)std::malloc(i*sizeof(gmain_future*));
     }
     }
 
     /*assign gives values to the empty elements of the array.
-    The idea behind this algorithm is that the initial thread produces threads with offsets
-    of each power of 2 less than (or equal to) the number of rows in the matrix.  Each of the
-    generated threads repeats the process using its assigned row as the base and the new set
-    of offsets is each power of two that will not overlap with other threads' assigned rows.
-    After each thread has produced all of its child threads, that thread initializes the data
-    of its assigned row and waits for the child threads to complete before returning.*/
+    The idea behind this algorithm is that the initial thread produces
+    threads with offsets of each power of 2 less than (or equal to) the
+    number of rows in the matrix.  Each of the generated threads repeats
+    the process using its assigned row as the base and the new set of 
+    offsets is each power of two that will not overlap with other threads'
+    assigned rows. After each thread has produced all of its child threads,
+    that thread initializes the data of its assigned row and waits for the
+    child threads to complete before returning.*/
     int HPLMatreX::assign(int row, int offset, bool complete, int seed){
-        //futures is used to allow this thread to continue spinning off new threads
-        //while other threads work, and is checked at the end to make certain all
-        //threads are completed before returning.
+        //futures is used to allow this thread to continue spinning off new
+        //threads while other threads work, and is checked at the end to make
+        //certain all threads are completed before returning.
         std::vector<assign_future> futures;
         boost::rand48 gen;
         gen.seed(seed);
@@ -382,7 +388,56 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
 //    return 1;
     }
 
-    //pivot() finds the pivot element of each column and stores it. All
+    //pivot_main() breaks up the operation of finding the pivot elements,
+    //so that the operation can be performed in parallel. Afterwards,
+    //the swapping takes place
+    void HPLMatreX::pivot_main(){
+    int i,j;
+    std::vector<pivot_future> pivots;
+    for(i=0;i<brows;i+=1){
+        pivots.push_back(pivot_future(_gid,i*blocksize,
+            ((i==brows-1)?columns:(i+1)*blocksize)));
+    }
+
+    //once all spun off futures are complete we are done
+    BOOST_FOREACH(pivot_future pf, pivots){
+        pf.get();
+    }
+
+    //call the swap function for each datablock in the matrix
+    for(i=0;i<brows;i++){
+        for(j=0;j<brows;j++){
+            swap(i,j);
+    }    }
+    }
+
+    //pivot() finds the potential pivot elements of each column and stores
+    //them. All pivot elements are found before any swapping takes place so
+    //that the swapping is simplified
+    bool HPLMatreX::pivot(int start, int end){
+    double max;
+    int max_row;
+    int temp_piv;
+    double temp;
+    int h = (int)std::ceil(((float)rows)*.5);
+    int i,j;
+
+    for(i=start;i<end;i++){
+        max_row = 0;
+        max = (int)fabs(truedata[pivotarr][i]);
+        temp_piv = pivotarr[i];
+        for(j=i+1;j<rows;j++){
+            temp = (int)fabs(truedata[pivotarr[j]][i]);
+            if(temp > max){
+                max = (int)temp;
+                max_row = j;
+        }   }
+        pivotarr[i] = pivotarr[max_row];
+        pivotarr[max_row] = temp_piv;
+    }
+    }
+
+/*    //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
     void HPLMatreX::pivot(){
@@ -414,6 +469,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             swap(i,j);
     }    }
     }
+*/
 
     //swap() creates the datablocks and reorders the original
     //truedata matrix when assigning the initial values to the datablocks
@@ -432,8 +488,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     }   }
     }
 
-    //LUgaussmain is a wrapper function which is used so that only one type of action
-    //is needed instead of four types of actions
+    //LUgaussmain is a wrapper function which is used so that only one type of
+    //action is needed instead of four types of actions
     int HPLMatreX::LUgaussmain(int brow,int bcol,int iter,
         int type){
     //if the following conditional is true, then there is nothing to do
@@ -443,8 +499,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //of what this current function instance will compute
     gmain_future trail_future(_gid,brow,bcol,iter-1,0);
 
-    //below decides what other futures need to be created in order to complete all
-    //necessary computations before we can return
+    //below decides what other futures need to be created in order to complete
+    //all necessary computations before we can return
     if(type == 1){
         trail_future.get();
         LUgausscorner(iter);
@@ -525,12 +581,13 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         for(j=i+1;j<datablock[iter][bcol]->rows;j++){
             factor = factordata[j+offset][i+offset];
             for(k=0;k<datablock[iter][bcol]->columns;k++){
-            datablock[iter][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
+            datablock[iter][bcol]->data[j][k] -= 
+                factor*datablock[iter][bcol]->data[i][k];
     }   }   }
     }
 
-    //LUgaussleft performs gaussian elimination on the leftmost column of blocks
-    //that have not yet finished all gaussian elimination computation.
+    //LUgaussleft performs gaussian elimination on the leftmost column of
+    //blocks that have not yet finished all gaussian elimination computation.
     //Upon completion, no further computations need be done on these blocks.
     void HPLMatreX::LUgaussleft(int brow, int iter){
     int i,j,k;
@@ -545,22 +602,23 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             factor = f_factor*datablock[brow][iter]->data[j][i];
             factordata[j+offset][i+offset_col] = factor;
             for(k=i+1;k<datablock[brow][iter]->columns;k++){
-            datablock[brow][iter]->data[j][k] -= factor*datablock[iter][iter]->data[i][k];
+            datablock[brow][iter]->data[j][k] -= 
+                factor*datablock[iter][iter]->data[i][k];
     }    }   }
     }
 
     //LUgausstrail performs gaussian elimination on the trailing submatrix of
-    //the blocks operated on during the current iteration of the Gaussian elimination
-    //computations. These blocks will still require further computations to be
-    //performed in future iterations.
+    //the blocks operated on during the current iteration of the Gaussian
+    //elimination computations. These blocks will still require further 
+    //computations to be performed in future iterations.
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
     int i,j,k;
     int offset = brow*blocksize - 1;    //factordata row offset
     int offset_col = iter*blocksize;    //factordata column offset
     double factor;
 
-    //outermost loop: iterates over the f_factors of the most recent corner block
-    //    (f_factors are used indirectly through factordata)
+    //outermost loop: iterates over the f_factors of the most recent corner 
+    //block (f_factors are used indirectly through factordata)
     //middle loop: iterates over the rows of the current block
     //inner loop: iterates across the columns of the current block
     for(j=0;j<datablock[brow][bcol]->getrows();j++){
@@ -568,7 +626,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         for(i=0;i<datablock[iter][iter]->rows;i++){
             factor = factordata[offset][i+offset_col];
             for(k=0;k<datablock[brow][bcol]->columns;k++){
-            datablock[brow][bcol]->data[j][k] -= factor*datablock[iter][bcol]->data[i][k];
+            datablock[brow][bcol]->data[j][k] -= 
+                factor*datablock[iter][bcol]->data[i][k];
     }   }   }
     }
 
@@ -595,38 +654,42 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         //the block of code following the if statement handles all data blocks
         //that to not include elements on the diagonal
         if(i!=j){
-            for(k=datablock[i][j]->getcolumns()-((j>=brows-1)?(2):(1));k>=0;k--){
-            for(l=datablock[i][j]->getrows()-1;l>=0;l--){
-                solution[row+l]-=datablock[i][j]->data[l][k]*solution[col+k];
+            for(k=datablock[i][j]->getcolumns()-
+                ((j>=brows-1)?(2):(1));k>=0;k--){
+                for(l=datablock[i][j]->getrows()-1;l>=0;l--){
+                    solution[row+l] -=
+                        datablock[i][j]->data[l][k]*solution[col+k];
         }   }   }
-        //this block of code following the else statement handles all data blocks
-        //that do include elements on the diagonal
+        //this block of code following the else statement handles all data 
+        //blocks that do include elements on the diagonal
         else{
-            for(k=datablock[i][i]->getcolumns()-((i==brows-1)?(2):(1));k>=0;k--){
-            solution[row+k]/=datablock[i][i]->data[k][k];
-//            std::cout<<solution[row+k]<<std::endl;
-            for(l=k-1;l>=0;l--){
-                 solution[row+l]-=datablock[i][i]->data[l][k]*solution[col+k];
+            for(k=datablock[i][i]->getcolumns()-
+                ((i==brows-1)?(2):(1));k>=0;k--){
+                solution[row+k]/=datablock[i][i]->data[k][k];
+                for(l=k-1;l>=0;l--){
+                    solution[row+l] -=
+                        datablock[i][i]->data[l][k]*solution[col+k];
         }   }    }   }    }
 
     return 1;
     }
 
-    //finally, this function checks the accuracy of the LU computation a few rows at
-    //a time
+    //finally, this function checks the accuracy of the LU computation a few
+    //rows at a time
     double HPLMatreX::checksolve(int row, int offset, bool complete){
     double toterror = 0;    //total error from all checks
 
-        //futures is used to allow this thread to continue spinning off new threads
-        //while other threads work, and is checked at the end to make certain all
-        //threads are completed before returning.
+        //futures is used to allow this thread to continue spinning off new 
+        //thread while other threads work, and is checked at the end to make
+        // certain all threads are completed before returning.
         std::vector<check_future> futures;
 
         //start spinning off work to do
         while(!complete){
             if(offset <= allocblock){
                 if(row + offset < rows){
-                    futures.push_back(check_future(_gid,row+offset,offset,true));
+                    futures.push_back(check_future(_gid,
+                        row+offset,offset,true));
                 }
                 complete = true;
             }
