@@ -35,4 +35,4 @@ refine_level_7 = 0.8
 refine_level_8 = 0.8
 refine_level_9 = 0.8
 
-scheduler = 1
+thread_scheduler = 1
