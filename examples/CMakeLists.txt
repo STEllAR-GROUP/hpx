@@ -20,6 +20,7 @@ set(subdirs
     nbody
     nqueen
     parcelset
+    queue
     quickstart)
 
 foreach(subdir ${subdirs})
