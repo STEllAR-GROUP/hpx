@@ -41,6 +41,7 @@ namespace hpx { namespace util
 
         section* root_;
         entry_map entries_;
+        // FIXME: section_env_ is filled, but doesn't appear to be used anywhere
         entry_map section_env_;
         section_map sections_;
         std::string name_;
