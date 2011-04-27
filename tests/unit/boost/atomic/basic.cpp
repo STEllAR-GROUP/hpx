@@ -30,7 +30,7 @@ namespace {
 template <typename T>
 void test_atomic_arithmetic(void)
 {
-    atomic<T> i(41);
+    atomic<T> i(T(41));
     
     T n;
     
@@ -39,48 +39,48 @@ void test_atomic_arithmetic(void)
     bool success;
     
     n=i++;
-    HPX_TEST_EQ(i, 42);
-    HPX_TEST_EQ(n, 41);
+    HPX_TEST_EQ(i, T(42));
+    HPX_TEST_EQ(n, T(41));
     
     n=i--;
-    HPX_TEST_EQ(n, 42);
-    HPX_TEST_EQ(i, 41);
+    HPX_TEST_EQ(n, T(42));
+    HPX_TEST_EQ(i, T(41));
     
     n=++i;
-    HPX_TEST_EQ(i, 42);
-    HPX_TEST_EQ(n, 42);
+    HPX_TEST_EQ(i, T(42));
+    HPX_TEST_EQ(n, T(42));
     
     n=--i;
-    HPX_TEST_EQ(n, 41);
-    HPX_TEST_EQ(i, 41);
+    HPX_TEST_EQ(n, T(41));
+    HPX_TEST_EQ(i, T(41));
     
-    n=i.fetch_and(15);
-    HPX_TEST_EQ(n, 41);
-    HPX_TEST_EQ(i, 9);
+    n=i.fetch_and(T(15));
+    HPX_TEST_EQ(n, T(41));
+    HPX_TEST_EQ(i, T(9));
     
-    n=i.fetch_or(17);
-    HPX_TEST_EQ(n, 9);
-    HPX_TEST_EQ(i, 25);
+    n=i.fetch_or(T(17));
+    HPX_TEST_EQ(n, T(9));
+    HPX_TEST_EQ(i, T(25));
     
-    n=i.fetch_xor(3);
-    HPX_TEST_EQ(n, 25);
-    HPX_TEST_EQ(i, 26);
+    n=i.fetch_xor(T(3));
+    HPX_TEST_EQ(n, T(25));
+    HPX_TEST_EQ(i, T(26));
     
-    n=i.exchange(12);
-    HPX_TEST_EQ(n, 26);
-    HPX_TEST_EQ(i, 12);
+    n=i.exchange(T(12));
+    HPX_TEST_EQ(n, T(26));
+    HPX_TEST_EQ(i, T(12));
     
-    n=12;
-    success=i.compare_exchange_strong(n, 17);
+    n=T(12);
+    success=i.compare_exchange_strong(n, T(17));
     HPX_TEST(success);
-    HPX_TEST_EQ(n, 12);
-    HPX_TEST_EQ(i, 17);
+    HPX_TEST_EQ(n, T(12));
+    HPX_TEST_EQ(i, T(17));
     
-    n=12;
-    success=i.compare_exchange_strong(n, 19);
+    n=T(12);
+    success=i.compare_exchange_strong(n, T(19));
     HPX_TEST(!success);
-    HPX_TEST_EQ(n, 17);
-    HPX_TEST_EQ(i, 17);
+    HPX_TEST_EQ(n, T(17));
+    HPX_TEST_EQ(i, T(17));
 }
 
 template <typename T>
