@@ -125,7 +125,7 @@ namespace hpx { namespace util
 
         // set global config options
 #if HPX_USE_ITT == 1
-        use_ittnotifiy_api = get_itt_notify_mode();
+        use_ittnotify_api = get_itt_notify_mode();
 #endif
     }
 

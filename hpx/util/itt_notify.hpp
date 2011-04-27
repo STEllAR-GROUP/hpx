@@ -15,7 +15,7 @@ struct __itt_frame_t;
 // decide whether to use the ITT notify API if it's available
 
 #if HPX_USE_ITT == 1
-extern bool use_ittnotifiy_api;
+extern bool use_ittnotify_api;
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT void itt_sync_create(void* addr, const char* objtype, const char* objname);
