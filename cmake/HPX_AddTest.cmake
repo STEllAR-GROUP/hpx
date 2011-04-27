@@ -44,7 +44,7 @@ macro(add_hpx_test name)
 
     if(NOT ${name}_DONTRUN)
       add_test(${name}
-        ${CMAKE_CURRENT_BINARY_DIR}/${name}_test
+        ${CMAKE_BINARY_DIR}/bin/${name}_test
         ${${name}_ARGS})
     endif()
   endif()
