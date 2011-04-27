@@ -7,6 +7,7 @@
 set(group unit.hpx.runtime)
 
 set(subdirs 
+    agas
     components
     naming)
 
