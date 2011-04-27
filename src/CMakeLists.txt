@@ -8,7 +8,7 @@ add_definitions(-DHPX_COMPONENT_NAME=hpx)
 add_definitions(-DHPX_EXPORTS)
 add_definitions(-DBOOST_COROUTINE_EXPORTS)
 
-foreach(lib ${hpx_LIBRARIES})
+foreach(lib ${hpx_CORE})
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
 endforeach()
 
@@ -148,13 +148,13 @@ if(NOT MSVC)
     "HPX_LIBRARY_NAME=${name}"
     "HPX_LIBRARY_STRING=\"${name}\"")
 
-  install(TARGETS hpx hpx_serialization hpx_asio hpx_ini
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      COMPONENT core
-      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                  GROUP_READ GROUP_EXECUTE
-                  WORLD_READ WORLD_EXECUTE)
+  foreach(lib ${hpx_CORE})
+    get_target_property(path ${lib} LOCATION)
+    get_filename_component(name "${path}" NAME)
+    hpx_library_install(core ${name})
+    hpx_library_install(core ${name}.${HPX_SOVERSION})
+    hpx_library_install(core ${name}.${HPX_VERSION})
+  endforeach()
 else()
 ###############################################################################
 # MSVC 

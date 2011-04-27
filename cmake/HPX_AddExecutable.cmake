@@ -55,15 +55,10 @@ macro(add_hpx_executable name)
     hpx_debug("add_executable.${name}" "Module was not specified for executable.")
   endif()
 
-  if(${name}_ESSENTIAL) 
-    install(TARGETS ${name}_exe
-      RUNTIME DESTINATION bin
-      COMPONENT ${${name}_MODULE}
-      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                  GROUP_READ GROUP_EXECUTE
-                  WORLD_READ WORLD_EXECUTE)
+  if(${name}_ESSENTIAL)
+    hpx_executable_install(${name}_exe MODULE ${${name}_MODULE} ESSENTIAL)
   else()
-    hpx_install(${${name}_MODULE} ${name})
-  endif()
+    hpx_executable_install(${name}_exe MODULE ${${name}_MODULE})
+  endif() 
 endmacro()
 

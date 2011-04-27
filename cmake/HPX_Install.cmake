@@ -4,25 +4,37 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # Abusive hacks that allow us to have installable targets that are not built
-# by default
+# by default. FIXME: do stuff with MODULE.
 
 set(HPX_INSTALL_LOADED TRUE)
 
-macro(hpx_install module bin)
+hpx_include(ParseArguments)
+
+macro(hpx_executable_install name)
+  hpx_parse_arguments(${name} "MODULE" "ESSENTIAL" ${ARGN})
+
+  set(optional "OPTIONAL")
+
+  if(${name}_ESSENTIAL)
+    set(optional "")
+  endif()
+
+  get_target_property(location ${name} LOCATION)
+
   set(install_code
-      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${bin}
+      "file(INSTALL FILES ${location} 
             DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
             TYPE EXECUTABLE 
-            OPTIONAL
+            ${optional}
             PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                         GROUP_READ GROUP_EXECUTE
                         WORLD_READ WORLD_EXECUTE)")
-  install(CODE "${install_code}" COMPONENT ${module})
+  install(CODE "${install_code}" COMPONENT ${${name}_MODULE})
 endmacro()
 
-macro(hpx_component_install module lib)
+macro(hpx_library_install module lib)
   set(install_code
-      "file(INSTALL FILES ${CMAKE_CURRENT_BINARY_DIR}/${lib}
+      "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/${lib}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
             TYPE SHARED_LIBRARY 
             OPTIONAL
@@ -34,7 +46,7 @@ endmacro()
 
 macro(hpx_ini_install module name ini)
   set(install_code
-      "if(EXISTS "${name}")
+      "if(EXISTS \"${name}\")
           file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
                OPTIONAL

@@ -117,8 +117,6 @@ include_directories(${hpx_SOURCE_DIR}/external/endian)
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/jemalloc)
-include_directories(${hpx_SOURCE_DIR}/external/nedmalloc)
 
 ################################################################################
 # installation configuration
@@ -146,14 +144,18 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
-add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+add_definitions("-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
-# rpath configuration
+# RPATH configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
@@ -411,8 +413,10 @@ endif()
 # default. There may be more for individual modules, but this is the mandatory
 # set.
 if(MSVC)
+  set(hpx_CORE hpx hpx_serialization)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 else()
+  set(hpx_CORE hpx hpx_serialization hpx_asio hpx_ini)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_asio hpx_ini)
 endif()
 

@@ -73,32 +73,12 @@ macro(add_hpx_component name)
     hpx_debug("add_component.${name}" "Module was not specified for component.")
   endif()
 
-  if(${name}_ESSENTIAL) 
-    install(TARGETS ${name}_component
-      RUNTIME DESTINATION lib
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      COMPONENT ${${name}_MODULE}
-      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                  GROUP_READ GROUP_EXECUTE
-                  WORLD_READ WORLD_EXECUTE)
+  foreach(target ${install_targets})
+    hpx_library_install(${${name}_MODULE} ${target})
+  endforeach()
 
-    if(${name}_INI)
-      install(FILES ${${name}_INI}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
-        COMPONENT ${${name}_MODULE}
-        PERMISSIONS OWNER_READ OWNER_WRITE 
-                    GROUP_READ 
-                    WORLD_READ)
-    endif()
-  else()
-    foreach(target ${install_targets})
-      hpx_component_install(${${name}_MODULE} ${target})
-    endforeach()
-
-    foreach(target ${${name}_INI})
-      hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
-    endforeach()
-  endif()
+  foreach(target ${${name}_INI})
+    hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
+  endforeach()
 endmacro()
 
