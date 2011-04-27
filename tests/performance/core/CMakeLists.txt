@@ -7,14 +7,14 @@
 set(group performance.core)
 
 set(benchmarks
-    #measure_bind 
-    #measure_getprefix 
-    #measure_getrange 
-    #measure_queryid
-    #measure_registerid 
-    #measure_resolve 
-    #measure_unbind 
-    #measure_unregister
+    measure_bind 
+    measure_getprefix 
+    measure_getrange 
+    measure_queryid
+    measure_registerid 
+    measure_resolve 
+    measure_unbind 
+    measure_unregister
     measure_thread_execution)
 
 foreach(benchmark ${benchmarks})
