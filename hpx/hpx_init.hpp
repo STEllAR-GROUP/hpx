@@ -111,8 +111,10 @@ namespace hpx
                   ;
 
                 hpx_options.add_options()
-                    ("config", value<std::string>(), 
-                     "load the specified file as a configuration file")
+                    ("app-config", value<std::string>(), 
+                     "load the specified application configuration file")
+                    ("hpx-config", value<std::string>()->default_value(""), 
+                     "load the specified hpx configuration file")
                     ("agas,a", value<std::string>(), 
                      "the IP address the AGAS server is running on, "
                      "expected format: `address:port' (default: "
@@ -132,10 +134,11 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >(),
                      "add an ini definition to the default runtime "
                      "configuration")
-                    ("dump-config", "print the runtime configuration and exit")
+                    ("dump-config", "print the runtime configuration")
+                    ("exit", "exit after configuring the runtime")
                     ("queueing,q", value<std::string>(),
                      "the queue scheduling policy to use, options are `global/g', "
-                     "`local/l', `priority_local/p' and `abp' (default: local/l)")
+                     "`local/l', `priority_local/p' and `abp/a' (default: local/l)")
                 ;
 
                 options_description desc_cmdline;
@@ -297,7 +300,13 @@ namespace hpx
             }
 
             // Initialize and start the HPX runtime.
-            if (0 == std::string("global").find(queueing)) {
+            if (queueing.empty())
+            {
+                throw std::logic_error("bad value for parameter --queueing/-q");
+            }
+            else if ((queueing[0] == 'g') ||
+                     (0 == std::string("global").find(queueing)))
+            {
                 typedef hpx::threads::policies::global_queue_scheduler
                     global_queue_policy;
                 typedef hpx::runtime_impl<global_queue_policy>
@@ -310,25 +319,27 @@ namespace hpx
                     rt.reset(new runtime_type(
                         hpx_host, hpx_port, agas_host, agas_port, mode,
                         global_queue_policy::init_parameter_type(),
+                        vm["hpx-config"].as<std::string>(),
                         vm["ini"].as<std::vector<std::string> >()));
                 else
                     rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode));
+                        hpx_host, hpx_port, agas_host, agas_port, mode,
+                        global_queue_policy::init_parameter_type(),
+                        vm["hpx-config"].as<std::string>()));
                     
-                if (vm.count("config"))
+                if (vm.count("app-config"))
                 {
-                    std::string config(vm["config"].as<std::string>());
+                    std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration
                         (config.c_str());
                 }
 
                 // Dump the configuration.
                 if (vm.count("dump-config"))
-                {
-                    result = 0; 
                     rt->get_config().dump();
-                } 
 
+                if (vm.count("exit"))
+                    result = 0;
                 // Run this runtime instance.
                 else if (!is_hpx_runtime && mode != hpx::runtime::worker)
                     result = rt->run(boost::bind
@@ -336,7 +347,9 @@ namespace hpx
                 else 
                     result = rt->run(num_threads, num_localities);
             }
-            else if (0 == std::string("local").find(queueing)) {
+            else if ((queueing[0] == 'l') ||
+                     (0 == std::string("local").find(queueing)))
+            {
                 typedef hpx::threads::policies::local_queue_scheduler
                     local_queue_policy;
                 typedef hpx::runtime_impl<local_queue_policy> 
@@ -350,25 +363,26 @@ namespace hpx
                 if (vm.count("ini"))
                     rt.reset(new runtime_type(
                         hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>(),
                         vm["ini"].as<std::vector<std::string> >()));
                 else
                     rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>()));
 
-                if (vm.count("config"))
+                if (vm.count("app-config"))
                 {
-                    std::string config(vm["config"].as<std::string>());
+                    std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration
                         (config.c_str());
                 }
 
                 // Dump the configuration.
                 if (vm.count("dump-config"))
-                {
-                    result = 0; 
                     rt->get_config().dump();
-                } 
 
+                if (vm.count("exit"))
+                    result = 0;
                 // Run this runtime instance.
                 else if (!is_hpx_runtime && mode != hpx::runtime::worker)
                     result = rt->run(boost::bind
@@ -376,7 +390,9 @@ namespace hpx
                 else
                     result = rt->run(num_threads, num_localities);
             }
-            else if (0 == std::string("priority_local").find(queueing)) {
+            else if ((queueing[0] == 'p') ||
+                     (0 == std::string("priority_local").find(queueing)))
+            {
                 // local scheduler with priority queue (one queue for ech OS threads
                 // plus one separate queue for high priority PX-threads)
                 typedef hpx::threads::policies::local_priority_queue_scheduler 
@@ -390,34 +406,37 @@ namespace hpx
                 if (vm.count("ini"))
                     rt.reset(new runtime_type(
                         hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>(),
                         vm["ini"].as<std::vector<std::string> >()));
                 else
                     rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>()));
 
-                if (mode != hpx::runtime::worker && vm.count("config"))
+                if (mode != hpx::runtime::worker && vm.count("app-config"))
                 {
-                    std::string config(vm["config"].as<std::string>());
+                    std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration(config.c_str());
                 }
 
                 // Dump the configuration.
                 if (vm.count("dump-config"))
-                {
-                    result = 0;
                     rt->get_config().dump();
-                } 
 
+                if (vm.count("exit"))
+                    result = 0;
                 // Run this runtime instance
                 else if (!is_hpx_runtime && mode != hpx::runtime::worker) {
-                      result = rt->run(boost::bind(hpx_main, vm), 
+                    result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
                 else {
                   result = rt->run(num_threads, num_localities);
                 }
             }
-            else if (0 == std::string("abp").find(queueing)) {
+            else if ((queueing[0] == 'a') ||
+                     (0 == std::string("abp").find(queueing)))
+            {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
                 typedef hpx::threads::policies::abp_queue_scheduler 
@@ -431,26 +450,27 @@ namespace hpx
                 if (vm.count("ini"))
                     rt.reset(new runtime_type(
                         hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>(),
                         vm["ini"].as<std::vector<std::string> >()));
                 else
                     rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["hpx-config"].as<std::string>()));
 
-                if (mode != hpx::runtime::worker && vm.count("config"))
+                if (mode != hpx::runtime::worker && vm.count("app-config"))
                 {
-                    std::string config(vm["config"].as<std::string>());
+                    std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration(config.c_str());
                 }
 
                 // Dump the configuration.
                 if (vm.count("dump-config"))
-                {
-                    result = 0;
                     rt->get_config().dump();
-                } 
 
+                if (vm.count("exit"))
+                    result = 0;
                 // Run this runtime instance
-                else if (!is_hpx_runtime && mode != hpx::runtime::worker) {
+                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
                       result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
@@ -459,7 +479,7 @@ namespace hpx
                 }
             }
             else {
-                throw std::logic_error("bad value for parameter --queuing/-q");
+                throw std::logic_error("bad value for parameter --queueing/-q");
             }
         }
         catch (std::exception& e)
