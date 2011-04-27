@@ -304,8 +304,7 @@ namespace hpx
             {
                 throw std::logic_error("bad value for parameter --queueing/-q");
             }
-            else if ((queueing[0] == 'g') ||
-                     (0 == std::string("global").find(queueing)))
+            else if ((0 == std::string("global").find(queueing)))
             {
                 typedef hpx::threads::policies::global_queue_scheduler
                     global_queue_policy;
@@ -347,8 +346,7 @@ namespace hpx
                 else 
                     result = rt->run(num_threads, num_localities);
             }
-            else if ((queueing[0] == 'l') ||
-                     (0 == std::string("local").find(queueing)))
+            else if ((0 == std::string("local").find(queueing)))
             {
                 typedef hpx::threads::policies::local_queue_scheduler
                     local_queue_policy;
@@ -390,8 +388,7 @@ namespace hpx
                 else
                     result = rt->run(num_threads, num_localities);
             }
-            else if ((queueing[0] == 'p') ||
-                     (0 == std::string("priority_local").find(queueing)))
+            else if ((0 == std::string("priority_local").find(queueing)))
             {
                 // local scheduler with priority queue (one queue for ech OS threads
                 // plus one separate queue for high priority PX-threads)
@@ -434,8 +431,7 @@ namespace hpx
                   result = rt->run(num_threads, num_localities);
                 }
             }
-            else if ((queueing[0] == 'a') ||
-                     (0 == std::string("abp").find(queueing)))
+            else if ((0 == std::string("abp").find(queueing)))
             {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
