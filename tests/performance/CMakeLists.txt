@@ -6,7 +6,8 @@
 set(group performance)
 
 set(subdirs
-    allocator)
+    allocator
+    core)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})
