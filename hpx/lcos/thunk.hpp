@@ -152,10 +152,9 @@ namespace hpx { namespace lcos { namespace detail
     typedef hpx::util::spinlock_pool<tag> mutex_type;
     typedef typename mutex_type::scoped_lock scoped_lock;
 
-    bool was_triggered_;
-
-    naming::id_type gid_;
     boost::function<void()> closure_;
+    naming::id_type gid_;
+    bool was_triggered_;
     util::full_empty<feb_data_type> data_;
   };
 }}} // hpx::lcos::detail
@@ -233,3 +232,4 @@ namespace hpx { namespace lcos
     HPX_DEFINE_GET_COMPONENT_TYPE(thunk_type);                                 \
 
 #endif
+

@@ -28,29 +28,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 #else // defined(BOOST_PP_IS_ITERATING)
 
-#define N BOOST_PP_ITERATION()
+#define HPX_N BOOST_PP_ITERATION()
 
   private:
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void BOOST_PP_CAT(invoke,N)(
+    template <BOOST_PP_ENUM_PARAMS(HPX_N, typename Arg)>
+    void BOOST_PP_CAT(invoke,HPX_N)(
         naming::id_type const& gid, 
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_ENUM_BINARY_PARAMS(HPX_N, Arg, const& arg))
     {
       applier::apply_c<Action>(this->get_gid(), gid,
-          BOOST_PP_ENUM_PARAMS(N, arg));
+          BOOST_PP_ENUM_PARAMS(HPX_N, arg));
     }
 
   public:
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <BOOST_PP_ENUM_PARAMS(HPX_N, typename Arg)>
     thunk(naming::id_type const& target, 
-          BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          BOOST_PP_ENUM_BINARY_PARAMS(HPX_N, Arg, const& arg))
       : closure_(boost::bind(&thunk::template 
-            BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
-            this_(), target, BOOST_PP_ENUM_PARAMS(N, arg))),
+            BOOST_PP_CAT(invoke,HPX_N)<BOOST_PP_ENUM_PARAMS(HPX_N,Arg)>, 
+            this_(), target, BOOST_PP_ENUM_PARAMS(HPX_N, arg))),
         gid_(naming::invalid_id),
         was_triggered_(false)
     { }
 
-#undef N
+#undef HPX_N
 
 #endif
+
