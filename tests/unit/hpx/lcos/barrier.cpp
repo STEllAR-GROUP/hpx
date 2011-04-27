@@ -44,25 +44,33 @@ int hpx_main(variables_map& vm)
     if (vm.count("threads"))
         num_threads = vm["threads"].as<std::size_t>();
 
-    std::size_t pxthreads = num_threads * 2;
+    std::size_t pxthreads = 0;
 
     if (vm.count("pxthreads"))
         pxthreads = vm["pxthreads"].as<std::size_t>();
+    
+    std::size_t iterations = 0;
 
-    id_type prefix = get_applier().get_runtime_support_gid();
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
 
-    // create a barrier waiting on 'count' threads
-    barrier b;
-    b.create_one(prefix, pxthreads + 1);
+    for (std::size_t i = 0; i < iterations; ++i)
+    {
+        id_type prefix = get_applier().get_runtime_support_gid();
 
-    boost::atomic<std::size_t> c(0);
+        // create a barrier waiting on 'count' threads
+        barrier b;
+        b.create_one(prefix, pxthreads + 1);
 
-    for (std::size_t j = 0; j < pxthreads; ++j)
-        register_work(boost::bind 
-            (&barrier_test, b.get_gid(), boost::ref(c), pxthreads));
+        boost::atomic<std::size_t> c(0);
 
-    b.wait(); // wait for all threads to enter the barrier
-    HPX_TEST_EQ(pxthreads, c.load());
+        for (std::size_t j = 0; j < pxthreads; ++j)
+            register_work(boost::bind 
+                (&barrier_test, b.get_gid(), boost::ref(c), pxthreads));
+
+        b.wait(); // wait for all threads to enter the barrier
+        HPX_TEST_EQ(pxthreads, c.load());
+    }
 
     // initiate shutdown of the runtime system
     finalize();
@@ -77,8 +85,10 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>(), 
-            "the number of PX threads to invoke (default: OS threads * 2)")
+        ("pxthreads,T", value<std::size_t>()->default_value(1 << 6), 
+            "the number of PX threads to invoke")
+        ("iterations", value<std::size_t>()->default_value(1 << 6), 
+            "the number of times to repeat the test") 
         ;
 
     // Initialize and run HPX

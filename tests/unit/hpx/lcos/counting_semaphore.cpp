@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -58,7 +56,8 @@ void sem_wait1(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 void sem_signal1(boost::shared_ptr<test_environment> env,
                  int max_semaphore_value)
 {
-    while (--max_semaphore_value >= 0) {
+    while (--max_semaphore_value >= 0)
+    {
         --env->counter1_;
         env->sem_.signal();    // we need to signal all threads
     }
@@ -75,7 +74,8 @@ void sem_signal1_all(boost::shared_ptr<test_environment> env,
 void sem_wait2(boost::shared_ptr<test_environment> env, int max_semaphore_value)
 {
     // we wait for the other threads to signal this semaphore
-    while (--max_semaphore_value >= 0) {
+    while (--max_semaphore_value >= 0)
+    {
         env->sem_.wait();
         --env->counter1_;
     }
@@ -153,7 +153,7 @@ char const* const sem_signal2_desc[] =
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map &vm)
 {
-    std::size_t max_semaphore_value = 3;
+    std::size_t max_semaphore_value = 0;
 
     if (vm.count("semaphores"))
         max_semaphore_value = vm["semaphores"].as<std::size_t>();
@@ -161,115 +161,123 @@ int hpx_main(variables_map &vm)
     if (max_semaphore_value > 80)
         HPX_THROW_EXCEPTION(bad_parameter, 
             "hpx_main", "semaphore count specified is higher than 80");
+    
+    std::size_t iterations = 0;
 
-    // create a semaphore, which which we will use to make several threads 
-    // waiting for another one
-    boost::shared_ptr<test_environment> env1(new test_environment("test1"));
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
 
-    // create the threads which will have to wait on the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+    for (std::size_t i = 0; i < iterations; ++i)
+    {
+        // create a semaphore, which which we will use to make several threads 
+        // waiting for another one
+        boost::shared_ptr<test_environment> env1(new test_environment("test1"));
+    
+        // create the threads which will have to wait on the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind
+                (&sem_wait1, env1, max_semaphore_value), sem_wait1_desc[i]);
+    
+        // now create a thread signaling the semaphore
         register_work(boost::bind
-            (&sem_wait1, env1, max_semaphore_value), sem_wait1_desc[i]);
-
-    // now create a thread signaling the semaphore
-    register_work(boost::bind
-        (&sem_signal1, env1, max_semaphore_value), "sem_signal1");
-
-    // create a semaphore, which which we will use to make several threads 
-    // waiting for another one, use signal_all
-    boost::shared_ptr<test_environment>
-        env1_all(new test_environment("test1_all"));
-
-    // create the  threads which will have to wait on the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            (&sem_signal1, env1, max_semaphore_value), "sem_signal1");
+    
+        // create a semaphore, which which we will use to make several threads 
+        // waiting for another one, use signal_all
+        boost::shared_ptr<test_environment>
+            env1_all(new test_environment("test1_all"));
+    
+        // create the  threads which will have to wait on the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind
+                (&sem_wait1, env1_all, max_semaphore_value), sem_wait1_desc[i]);
+    
+        // now create a thread signaling the semaphore
         register_work(boost::bind
-            (&sem_wait1, env1_all, max_semaphore_value), sem_wait1_desc[i]);
-
-    // now create a thread signaling the semaphore
-    register_work(boost::bind
-        (&sem_signal1_all, env1_all, max_semaphore_value), "sem_signal1_all");
-
-    // create a semaphore, which we will use to make several threads 
-    // waiting for another one, but the semaphore is signaled before being 
-    // waited on
-    boost::shared_ptr<test_environment> env2(new test_environment("test2"));
-
-    // create a thread signaling the semaphore
-    register_work(boost::bind
-        (&sem_signal1, env2, max_semaphore_value), "sem_signal1");
-
-    // create the  threads which will have to wait on the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            (&sem_signal1_all, env1_all, max_semaphore_value), "sem_signal1_all");
+    
+        // create a semaphore, which we will use to make several threads 
+        // waiting for another one, but the semaphore is signaled before being 
+        // waited on
+        boost::shared_ptr<test_environment> env2(new test_environment("test2"));
+    
+        // create a thread signaling the semaphore
         register_work(boost::bind
-            (&sem_wait1, env2, max_semaphore_value), sem_wait1_desc[i]);
-
-    // create a semaphore, which we will use to make several threads 
-    // waiting for another one, but the semaphore is signaled before being 
-    // waited on, use signal_all
-    boost::shared_ptr<test_environment>
-        env2_all(new test_environment("test2_all"));
-
-    // create a thread signaling the semaphore
-    register_work(boost::bind
-        (&sem_signal1_all, env2_all, max_semaphore_value), "sem_signal1_all");
-
-    // create the threads which will have to wait on the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            (&sem_signal1, env2, max_semaphore_value), "sem_signal1");
+    
+        // create the  threads which will have to wait on the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind
+                (&sem_wait1, env2, max_semaphore_value), sem_wait1_desc[i]);
+    
+        // create a semaphore, which we will use to make several threads 
+        // waiting for another one, but the semaphore is signaled before being 
+        // waited on, use signal_all
+        boost::shared_ptr<test_environment>
+            env2_all(new test_environment("test2_all"));
+    
+        // create a thread signaling the semaphore
         register_work(boost::bind
-            (&sem_wait1, env2_all, max_semaphore_value), sem_wait1_desc[i]);
-
-    // the 3rd test does the opposite, it creates a semaphore, which  
-    // will be used to make one thread waiting for several other threads
-    boost::shared_ptr<test_environment> env3(new test_environment("test3"));
-
-    // now create a thread waiting on the semaphore
-    register_work(boost::bind
-        (&sem_wait2, env3, max_semaphore_value), "sem_wait2");
-
-    // create the threads which will have to signal the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        register_work(boost::bind(&sem_signal2, env3), sem_signal2_desc[i]);
-
-    // the 3rd test does the opposite, it creates a semaphore, which  
-    // will be used to make one thread waiting for several other threads,
-    // use wait_all
-    boost::shared_ptr<test_environment>
-        env3_all(new test_environment("test3_all"));
-
-    // now create a thread waiting on the semaphore
-    register_work(boost::bind
-        (&sem_wait2_all, env3_all, max_semaphore_value), "sem_wait2_all");
-
-    // create the threads which will have to signal the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        register_work(boost::bind(&sem_signal2, env3_all), sem_signal2_desc[i]);
-
-    // the 4th test does the opposite, it creates a semaphore, which  
-    // will be used to make one thread waiting for several other threads, but 
-    // the semaphore is signaled before being waited on
-    boost::shared_ptr<test_environment> env4(new test_environment("test4"));
-
-    // create the threads which will have to signal the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        register_work(boost::bind(&sem_signal2, env4), sem_signal2_desc[i]);
-
-    // now create a thread waiting on the semaphore
-    register_work(boost::bind
-        (&sem_wait2, env4, max_semaphore_value), "sem_wait2");
-
-    // the 4th test does the opposite, it creates a semaphore, which  
-    // will be used to make one thread waiting for several other threads, but 
-    // the semaphore is signaled before being waited on, use wait_all
-    boost::shared_ptr<test_environment>
-        env4_all(new test_environment("test4_all"));
-
-    // create the threads which will have to signal the semaphore
-    for (std::size_t i = 0; i < max_semaphore_value; ++i) 
-        register_work(boost::bind(&sem_signal2, env4_all), sem_signal2_desc[i]);
-
-    // now create a thread waiting on the semaphore
-    register_work(boost::bind
-        (&sem_wait2_all, env4_all, max_semaphore_value), "sem_wait2_all");
+            (&sem_signal1_all, env2_all, max_semaphore_value), "sem_signal1_all");
+    
+        // create the threads which will have to wait on the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind
+                (&sem_wait1, env2_all, max_semaphore_value), sem_wait1_desc[i]);
+    
+        // the 3rd test does the opposite, it creates a semaphore, which  
+        // will be used to make one thread waiting for several other threads
+        boost::shared_ptr<test_environment> env3(new test_environment("test3"));
+    
+        // now create a thread waiting on the semaphore
+        register_work(boost::bind
+            (&sem_wait2, env3, max_semaphore_value), "sem_wait2");
+    
+        // create the threads which will have to signal the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind(&sem_signal2, env3), sem_signal2_desc[i]);
+    
+        // the 3rd test does the opposite, it creates a semaphore, which  
+        // will be used to make one thread waiting for several other threads,
+        // use wait_all
+        boost::shared_ptr<test_environment>
+            env3_all(new test_environment("test3_all"));
+    
+        // now create a thread waiting on the semaphore
+        register_work(boost::bind
+            (&sem_wait2_all, env3_all, max_semaphore_value), "sem_wait2_all");
+    
+        // create the threads which will have to signal the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind(&sem_signal2, env3_all), sem_signal2_desc[i]);
+    
+        // the 4th test does the opposite, it creates a semaphore, which  
+        // will be used to make one thread waiting for several other threads, but 
+        // the semaphore is signaled before being waited on
+        boost::shared_ptr<test_environment> env4(new test_environment("test4"));
+    
+        // create the threads which will have to signal the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind(&sem_signal2, env4), sem_signal2_desc[i]);
+    
+        // now create a thread waiting on the semaphore
+        register_work(boost::bind
+            (&sem_wait2, env4, max_semaphore_value), "sem_wait2");
+    
+        // the 4th test does the opposite, it creates a semaphore, which  
+        // will be used to make one thread waiting for several other threads, but 
+        // the semaphore is signaled before being waited on, use wait_all
+        boost::shared_ptr<test_environment>
+            env4_all(new test_environment("test4_all"));
+    
+        // create the threads which will have to signal the semaphore
+        for (std::size_t i = 0; i < max_semaphore_value; ++i) 
+            register_work(boost::bind(&sem_signal2, env4_all), sem_signal2_desc[i]);
+    
+        // now create a thread waiting on the semaphore
+        register_work(boost::bind
+            (&sem_wait2_all, env4_all, max_semaphore_value), "sem_wait2_all");
+    }
 
     // initiate shutdown of the runtime system
     finalize();
@@ -284,8 +292,10 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
         
     desc_commandline.add_options()
-        ("semaphores,s", value<std::size_t>(), 
-            "the number of semaphores (default: 3, max: 80)")
+        ("semaphores,s", value<std::size_t>()->default_value(1 << 3), 
+            "the number of semaphores (max 80)")
+        ("iterations", value<std::size_t>()->default_value(1 << 6), 
+            "the number of times to repeat the test") 
         ;
 
     // Initialize and run HPX

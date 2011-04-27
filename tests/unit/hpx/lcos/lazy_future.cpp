@@ -12,6 +12,7 @@
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
+using boost::program_options::value;
 
 using hpx::actions::plain_result_action0;
 using hpx::actions::plain_result_action1;
@@ -52,25 +53,33 @@ int hpx_main(variables_map& vm)
 {
     id_type here = find_here();
 
-    { // zero
-        zero_lazy_future zero(here);
+    std::size_t iterations = 0;
 
-        HPX_TEST_EQ(zero.get(), 0);
-        HPX_TEST_EQ(zero.get(), 0);
-    }
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
 
-    { // identity
-        identity_lazy_future identity(here, 42);
-
-        HPX_TEST_EQ(identity.get(), 42);
-        HPX_TEST_EQ(identity.get(), 42);
-    }
-
-    { // sum
-        sum_lazy_future sum(here, 42, 42);
-
-        HPX_TEST_EQ(sum.get(), 84);
-        HPX_TEST_EQ(sum.get(), 84);
+    for (std::size_t i = 0; i < iterations; ++i)
+    {
+        { // zero
+            zero_lazy_future zero(here);
+    
+            HPX_TEST_EQ(zero.get(), 0);
+            HPX_TEST_EQ(zero.get(), 0);
+        }
+    
+        { // identity
+            identity_lazy_future identity(here, 42);
+    
+            HPX_TEST_EQ(identity.get(), 42);
+            HPX_TEST_EQ(identity.get(), 42);
+        }
+    
+        { // sum
+            sum_lazy_future sum(here, 42, 42);
+    
+            HPX_TEST_EQ(sum.get(), 84);
+            HPX_TEST_EQ(sum.get(), 84);
+        }
     }
 
     // initiate shutdown of the runtime systems on all localities
@@ -84,6 +93,11 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+    
+    desc_commandline.add_options()
+        ("iterations", value<std::size_t>()->default_value(1 << 6), 
+            "the number of times to repeat the test") 
+        ;
 
     // Initialize and run HPX.
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,

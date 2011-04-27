@@ -10,6 +10,7 @@
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
+using boost::program_options::value;
 
 using hpx::naming::id_type;
 
@@ -26,7 +27,7 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_helper(full_empty<int>& data)
+void full_empty_test_helper(full_empty<int>& data)
 {
     // retrieve gid for this thread
     id_type gid = get_applier().get_thread_manager().
@@ -37,7 +38,7 @@ void test_helper(full_empty<int>& data)
     HPX_TEST(!data.is_empty());
 }
 
-void test(thread_state_ex)
+void full_empty_test(thread_state_ex)
 {
     // retrieve gid for this thread
     id_type gid = get_applier().get_thread_manager().
@@ -49,11 +50,11 @@ void test(thread_state_ex)
     HPX_TEST(data.is_empty());
 
     // schedule the helper thread
-    register_work(boost::bind(&test_helper, boost::ref(data)));
+    register_work(boost::bind(&full_empty_test_helper, boost::ref(data)));
 
     // wait for the other thread to set 'data' to full
     int value = 0;
-    data.read(value); // this blocks for test_helper to set value
+    data.read(value); // this blocks for full_empty_test_helper to set the value
 
     HPX_TEST(!data.is_empty());
     HPX_TEST_EQ(value, 1);
@@ -73,8 +74,14 @@ int hpx_main(variables_map& vm)
         get_thread_gid(get_self().get_thread_id());
     HPX_TEST(gid);
 
-    // schedule test threads: test
-    register_work(test);
+    std::size_t iterations = 0;
+
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
+
+    for (std::size_t i = 0; i < iterations; ++i)
+        // schedule test threads
+        register_work(full_empty_test);
 
     // initiate shutdown of the runtime system
     finalize();
@@ -87,6 +94,11 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+    
+    desc_commandline.add_options()
+        ("iterations", value<std::size_t>()->default_value(1 << 16), 
+            "the number of times to repeat the test") 
+        ;
 
     // Initialize and run HPX.
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
