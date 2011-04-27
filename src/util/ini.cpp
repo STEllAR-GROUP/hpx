@@ -51,11 +51,10 @@ const char pattern_comment[] =  "^([^#]*)(#.*)$";
 const char pattern_section[] = "^\\[([^\\]]+)\\]$";
 
 // example uses ini line: sec.ssec.key = val
-const char pattern_qualified_entry[] = "^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s])\\s*$";
+const char pattern_qualified_entry[] = "^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 // example uses ini line: key = val
-const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s])\\s*$";
-// FIXME: allow empty values, interpret as ""
+const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -173,7 +172,7 @@ void section::read (std::string const& filename)
 
 // parse file
 void section::parse (std::string const& sourcename, 
-    std::vector<std::string> const& lines, bool override)
+    std::vector<std::string> const& lines)
 {
     int linenum = 0;
     section* current = this;
@@ -236,7 +235,7 @@ void section::parse (std::string const& sourcename,
             current = add_section_if_new (current, sec_name.substr(pos));
             
             // add key/val to this section 
-            current->add_entry (what[2], what[3], override);
+            current->add_entry (what[2], what[3]);
 
             // restore the old section
             current = save;
@@ -276,7 +275,7 @@ void section::parse (std::string const& sourcename,
             }
 
             // add key/val to current section
-            current->add_entry (what[1], what[2], override);
+            current->add_entry (what[1], what[2]);
         }
         else {
             // Hmm, is not a section, is not an entry, is not empty - must be an error!
@@ -374,18 +373,8 @@ section const* section::get_section (std::string const& sec_name) const
     return NULL;
 }
 
-void section::add_entry (std::string const& key, std::string val, bool override)
-{
-    if (!val.empty())
-        val = expand_entry(val);
-
-    if (val.empty())
-        entries_.erase(key);
-    else if (override)
-        entries_[key] = val;
-    else if (!entries_.count(key))
-        entries_[key] = val;
-}
+void section::add_entry (std::string const& key, std::string val)
+{ entries_[key] = val; }
 
 bool section::has_entry (std::string const& key) const
 {
@@ -428,7 +417,7 @@ std::string section::get_entry (std::string const& key) const
     {
         entry_map::const_iterator cit = entries_.find(key);
         BOOST_ASSERT(cit != entries_.end());
-        return (*cit).second;
+        return expand_entry((*cit).second);
     }
 
     HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry", 
@@ -453,15 +442,15 @@ section::get_entry (std::string key, std::string const& default_val) const
     {
         section_map::const_iterator next = cur_section->sections_.find(*iter);
         if (cur_section->sections_.end() == next)
-            return default_val;
+            return expand_entry(default_val);
         cur_section = &next->second;
     }
 
     entry_map::const_iterator entry = cur_section->entries_.find(key);
     if (cur_section->entries_.end() == entry)
-        return default_val;
+        return expand_entry(default_val);
 
-    return entry->second;
+    return expand_entry(entry->second);
 }
 
 section section::clone(section* root) const

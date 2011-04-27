@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -58,8 +59,9 @@ namespace hpx
             std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
             mode locality_mode, init_scheduler_type const& init,
-            std::vector<std::string> const& ini_overrides) 
-      : runtime(agas_client_, ini_overrides),
+            std::string const& hpx_ini_file,
+            std::vector<std::string> const& cmdline_ini_defs) 
+      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
@@ -91,8 +93,9 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, naming::locality agas_address, 
             mode locality_mode, init_scheduler_type const& init,
-            std::vector<std::string> const& ini_overrides) 
-      : runtime(agas_client_, ini_overrides),
+            std::string const& hpx_ini_file,
+            std::vector<std::string> const& cmdline_ini_defs) 
+      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
@@ -123,8 +126,9 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, mode locality_mode, 
             init_scheduler_type const& init,
-            std::vector<std::string> const& ini_overrides) 
-      : runtime(agas_client_, ini_overrides),
+            std::string const& hpx_ini_file,
+            std::vector<std::string> const& cmdline_ini_defs) 
+      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 

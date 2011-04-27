@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -141,18 +142,13 @@ namespace hpx
             boost::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(naming::resolver_client& agas_client) 
-          : counters_(agas_client),
-            ini_(util::detail::get_logging_data()),
-            instance_number_(++instance_number_counter_),
-            stopped_(true)
-        {
-        }
-        
         runtime(naming::resolver_client& agas_client,
-                std::vector<std::string> const& ini_overrides)  
+                std::string const& hpx_ini_file = "", 
+                std::vector<std::string> const& cmdline_ini_defs
+                    = std::vector<std::string>())
           : counters_(agas_client),
-            ini_(util::detail::get_logging_data(), ini_overrides),
+            ini_(util::detail::get_logging_data(), hpx_ini_file,
+                 cmdline_ini_defs),
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
@@ -310,7 +306,9 @@ namespace hpx
             std::string const& agas_address = "", 
             boost::uint16_t agas_port = 0, mode locality_mode = console,
             init_scheduler_type const& init = init_scheduler_type(),
-            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
+            std::string const& hpx_ini_file = "",
+            std::vector<std::string> const& cmdline_ini_defs
+                = std::vector<std::string>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -322,7 +320,9 @@ namespace hpx
         explicit runtime_impl(naming::locality address, 
             mode locality_mode = worker,
             init_scheduler_type const& init = init_scheduler_type(),
-            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
+            std::string const& hpx_ini_file = "",
+            std::vector<std::string> const& cmdline_ini_defs
+                = std::vector<std::string>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -334,7 +334,9 @@ namespace hpx
         runtime_impl(naming::locality address, naming::locality agas_address, 
             mode locality_mode = worker,
             init_scheduler_type const& init = init_scheduler_type(),
-            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
+            std::string const& hpx_ini_file = "",
+            std::vector<std::string> const& cmdline_ini_defs
+                = std::vector<std::string>());
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before exiting.

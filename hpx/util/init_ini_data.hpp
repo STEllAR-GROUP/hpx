@@ -1,4 +1,5 @@
 //  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +24,7 @@ namespace hpx { namespace util
     //
     // returns true if at least one alternative location has been read 
     // successfully
-    bool init_ini_data_base (section& ini);
+    bool init_ini_data_base(section& ini, std::string const& hpx_ini_file = "");
 
     ///////////////////////////////////////////////////////////////////////////
     // global function to read component ini information

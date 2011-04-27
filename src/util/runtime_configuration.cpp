@@ -1,4 +1,5 @@
 //  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -69,18 +70,26 @@ namespace hpx { namespace util
              "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
         ;
         // don't overload user overrides
-        ini.parse("static defaults", lines, false);
+        ini.parse("static defaults", lines);
     }
 
-    void post_initialize_ini(section& ini)
+    void post_initialize_ini(section& ini,
+        std::string const& hpx_ini_file = "",
+        std::vector<std::string> const& cmdline_ini_defs
+            = std::vector<std::string>())
     {
+
         // try to build default ini structure from shared libraries in default 
         // installation location, this allows to install simple components
         // without the need to install an ini file
         util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
-
+        
         // add explicit configuration information if its provided
-        util::init_ini_data_base(ini); 
+        util::init_ini_data_base(ini, hpx_ini_file); 
+
+        // let the command line override the config file. 
+        if (!cmdline_ini_defs.empty())
+            ini.parse("command line definitions", cmdline_ini_defs);
 
         // merge all found ini files of all components
         util::merge_component_inis(ini);
@@ -88,6 +97,10 @@ namespace hpx { namespace util
         // read system and user ini files _again_, to allow the user to 
         // overwrite the settings from the default component ini's. 
         util::init_ini_data_base(ini);
+        
+        // let the command line override the config file. 
+        if (!cmdline_ini_defs.empty())
+            ini.parse("command line definitions", cmdline_ini_defs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -99,36 +112,16 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(
-        std::vector<std::string> const& prefill)
+        std::vector<std::string> const& prefill,
+        std::string const& hpx_ini_file,
+        std::vector<std::string> const& cmdline_ini_defs)
     {
         pre_initialize_ini(*this);
 
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this);
-
-        // set global config options
-#if HPX_USE_ITT == 1
-        use_ittnotifiy_api = get_itt_notify_mode();
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(
-        std::vector<std::string> const& prefill,
-        std::vector<std::string> const& overrides)
-    {
-        if (!overrides.empty())
-            this->parse("user overrides", overrides);
-
-        pre_initialize_ini(*this);
-
-        if (!prefill.empty())
-            // don't overwrite user overrides
-            this->parse("static prefill defaults", prefill, false);
-
-        post_initialize_ini(*this);
+        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -257,3 +250,4 @@ namespace hpx { namespace util
     }
 
 }}
+
