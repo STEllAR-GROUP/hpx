@@ -1,5 +1,6 @@
 //  Copyright (c) 2005-2007 Andre Merzky 
 //  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,6 +49,9 @@ const char pattern_comment[] =  "^([^#]*)(#.*)$";
 
 // example uses ini line: [sec.ssec]
 const char pattern_section[] = "^\\[([^\\]]+)\\]$";
+
+// example uses ini line: sec.ssec.key = val
+const char pattern_qualified_entry[] = "^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s])\\s*$";
 
 // example uses ini line: key = val
 const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s])\\s*$";
@@ -169,13 +173,15 @@ void section::read (std::string const& filename)
 
 // parse file
 void section::parse (std::string const& sourcename, 
-    std::vector<std::string> const& lines)
+    std::vector<std::string> const& lines, bool override)
 {
     int linenum = 0;
     section* current = this;
 
     boost::regex regex_comment (pattern_comment, boost::regex::perl | boost::regex::icase);
     boost::regex regex_section (pattern_section, boost::regex::perl | boost::regex::icase);
+    boost::regex regex_qualified_entry
+        (pattern_qualified_entry, boost::regex::perl | boost::regex::icase);
     boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
 
     std::vector<std::string>::const_iterator end = lines.end();
@@ -205,7 +211,38 @@ void section::parse (std::string const& sourcename,
         // no comments anymore: line is either section, key=val,
         // or garbage/empty
         boost::smatch what;
-        if (boost::regex_match(line, what, regex_section))
+        if (boost::regex_match(line, what, regex_qualified_entry))
+        {
+            // found a entry line
+            if (4 != what.size())
+            {
+                line_msg("Cannot parse key/value in ", sourcename, linenum);
+            }
+
+            section* save = current;  // save the section we're in
+            current = this;           // start adding sections at the root
+
+            // got the section name. It might be hierarchical, so split it up, and
+            // for each elem, check if we have it.  If not, create it, and add
+            std::string sec_name (what[1]);
+            std::string::size_type pos = 0;
+            for (std::string::size_type pos1 = sec_name.find_first_of('.');
+                 std::string::npos != pos1;
+                 pos1 = sec_name.find_first_of ('.', pos = pos1 + 1))
+            {
+                current = add_section_if_new(current, sec_name.substr(pos, pos1 - pos));
+            }
+
+            current = add_section_if_new (current, sec_name.substr(pos));
+            
+            // add key/val to this section 
+            current->add_entry (what[2], what[3], override);
+
+            // restore the old section
+            current = save;
+        }
+
+        else if (boost::regex_match(line, what, regex_section))
         {
             // found a section line
             if(2 != what.size())
@@ -239,7 +276,7 @@ void section::parse (std::string const& sourcename,
             }
 
             // add key/val to current section
-            current->add_entry (what[1], what[2]);
+            current->add_entry (what[1], what[2], override);
         }
         else {
             // Hmm, is not a section, is not an entry, is not empty - must be an error!
@@ -337,14 +374,16 @@ section const* section::get_section (std::string const& sec_name) const
     return NULL;
 }
 
-void section::add_entry (std::string const& key, std::string val)
+void section::add_entry (std::string const& key, std::string val, bool override)
 {
     if (!val.empty())
         val = expand_entry(val);
 
     if (val.empty())
         entries_.erase(key);
-    else
+    else if (override)
+        entries_[key] = val;
+    else if (!entries_.count(key))
         entries_[key] = val;
 }
 

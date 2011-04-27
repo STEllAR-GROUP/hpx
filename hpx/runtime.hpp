@@ -148,6 +148,15 @@ namespace hpx
             stopped_(true)
         {
         }
+        
+        runtime(naming::resolver_client& agas_client,
+                std::vector<std::string> const& ini_overrides)  
+          : counters_(agas_client),
+            ini_(util::detail::get_logging_data(), ini_overrides),
+            instance_number_(++instance_number_counter_),
+            stopped_(true)
+        {
+        }
 
         ~runtime()
         {
@@ -300,7 +309,8 @@ namespace hpx
             boost::uint16_t port = HPX_PORT,
             std::string const& agas_address = "", 
             boost::uint16_t agas_port = 0, mode locality_mode = console,
-            init_scheduler_type const& init = init_scheduler_type());
+            init_scheduler_type const& init = init_scheduler_type(),
+            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -311,7 +321,8 @@ namespace hpx
         ///       file (hpx.ini).
         explicit runtime_impl(naming::locality address, 
             mode locality_mode = worker,
-            init_scheduler_type const& init = init_scheduler_type());
+            init_scheduler_type const& init = init_scheduler_type(),
+            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
 
         /// Construct a new HPX runtime instance 
         ///
@@ -322,7 +333,8 @@ namespace hpx
         ///                       running on. 
         runtime_impl(naming::locality address, naming::locality agas_address, 
             mode locality_mode = worker,
-            init_scheduler_type const& init = init_scheduler_type());
+            init_scheduler_type const& init = init_scheduler_type(),
+            std::vector<std::string> const& ini_overrides = std::vector<std::string>());
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before exiting.

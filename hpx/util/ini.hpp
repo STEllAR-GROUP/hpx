@@ -69,7 +69,7 @@ namespace hpx { namespace util
         section& operator=(section const& rhs);
 
         void parse(std::string const& sourcename, 
-            std::vector<std::string> const& lines);
+            std::vector<std::string> const& lines, bool override = true);
         void read(std::string const& filename);
         void merge(std::string const& second);
         void merge(section& second);
@@ -86,7 +86,8 @@ namespace hpx { namespace util
         section_map const& get_sections() const
             { return sections_; }
 
-        void add_entry(std::string const& key, std::string val);
+        void add_entry(std::string const& key, std::string val,
+            bool override = true);
         bool has_entry(std::string const& key) const;
         std::string get_entry(std::string const& key) const;
         std::string get_entry(std::string key, std::string const& dflt) const;

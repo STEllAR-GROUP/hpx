@@ -1,5 +1,5 @@
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
-//  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2011 Bryce Lelbach, Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -129,6 +129,10 @@ namespace hpx
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
+                    ("ini,I", value<std::vector<std::string> >(),
+                     "add an ini definition to the default runtime "
+                     "configuration")
+                    ("dump-config", "print the runtime configuration and exit")
                     ("queueing,q", value<std::string>(),
                      "the queue scheduling policy to use, options are `global/g', "
                      "`local/l', `priority_local/p' and `abp' (default: local/l)")
@@ -299,21 +303,38 @@ namespace hpx
                 typedef hpx::runtime_impl<global_queue_policy>
                     runtime_type;
 
+                boost::shared_ptr<runtime_type> rt;
+
                 // Build and configure this runtime instance.
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+                if (vm.count("ini"))
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode,
+                        global_queue_policy::init_parameter_type(),
+                        vm["ini"].as<std::vector<std::string> >()));
+                else
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode));
+                    
                 if (vm.count("config"))
                 {
                     std::string config(vm["config"].as<std::string>());
-                    rt.get_config().load_application_configuration
+                    rt->get_config().load_application_configuration
                         (config.c_str());
                 }
 
+                // Dump the configuration.
+                if (vm.count("dump-config"))
+                {
+                    result = 0; 
+                    rt->get_config().dump();
+                } 
+
                 // Run this runtime instance.
-                if (!is_hpx_runtime && mode != hpx::runtime::worker)
-                    result = rt.run(boost::bind
+                else if (!is_hpx_runtime && mode != hpx::runtime::worker)
+                    result = rt->run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else 
-                    result = rt.run(num_threads, num_localities);
+                    result = rt->run(num_threads, num_localities);
             }
             else if (0 == std::string("local").find(queueing)) {
                 typedef hpx::threads::policies::local_queue_scheduler
@@ -323,22 +344,37 @@ namespace hpx
 
                 local_queue_policy::init_parameter_type init(num_threads, 1000);
 
+                boost::shared_ptr<runtime_type> rt;
+
                 // Build and configure this runtime instance.
-                runtime_type rt
-                    (hpx_host, hpx_port, agas_host, agas_port, mode, init);
+                if (vm.count("ini"))
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["ini"].as<std::vector<std::string> >()));
+                else
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+
                 if (vm.count("config"))
                 {
                     std::string config(vm["config"].as<std::string>());
-                    rt.get_config().load_application_configuration
+                    rt->get_config().load_application_configuration
                         (config.c_str());
                 }
 
+                // Dump the configuration.
+                if (vm.count("dump-config"))
+                {
+                    result = 0; 
+                    rt->get_config().dump();
+                } 
+
                 // Run this runtime instance.
-                if (!is_hpx_runtime && mode != hpx::runtime::worker)
-                    result = rt.run(boost::bind
+                else if (!is_hpx_runtime && mode != hpx::runtime::worker)
+                    result = rt->run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else
-                    result = rt.run(num_threads, num_localities);
+                    result = rt->run(num_threads, num_localities);
             }
             else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for ech OS threads
@@ -348,21 +384,37 @@ namespace hpx
                 typedef hpx::runtime_impl<local_queue_policy> runtime_type;
                 local_queue_policy::init_parameter_type init(num_threads, 1000);
 
+                boost::shared_ptr<runtime_type> rt;
+
                 // Build and configure this runtime instance
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+                if (vm.count("ini"))
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["ini"].as<std::vector<std::string> >()));
+                else
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+
                 if (mode != hpx::runtime::worker && vm.count("config"))
                 {
                     std::string config(vm["config"].as<std::string>());
-                    rt.get_config().load_application_configuration(config.c_str());
+                    rt->get_config().load_application_configuration(config.c_str());
                 }
 
+                // Dump the configuration.
+                if (vm.count("dump-config"))
+                {
+                    result = 0;
+                    rt->get_config().dump();
+                } 
+
                 // Run this runtime instance
-                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
-                      result = rt.run(boost::bind(hpx_main, vm), 
+                else if (!is_hpx_runtime && mode != hpx::runtime::worker) {
+                      result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
                 else {
-                  result = rt.run(num_threads, num_localities);
+                  result = rt->run(num_threads, num_localities);
                 }
             }
             else if (0 == std::string("abp").find(queueing)) {
@@ -373,21 +425,37 @@ namespace hpx
                 typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
                 abp_queue_policy::init_parameter_type init(num_threads, 1000);
 
+                boost::shared_ptr<runtime_type> rt;
+
                 // Build and configure this runtime instance
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+                if (vm.count("ini"))
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                        vm["ini"].as<std::vector<std::string> >()));
+                else
+                    rt.reset(new runtime_type(
+                        hpx_host, hpx_port, agas_host, agas_port, mode, init));
+
                 if (mode != hpx::runtime::worker && vm.count("config"))
                 {
                     std::string config(vm["config"].as<std::string>());
-                    rt.get_config().load_application_configuration(config.c_str());
+                    rt->get_config().load_application_configuration(config.c_str());
                 }
 
+                // Dump the configuration.
+                if (vm.count("dump-config"))
+                {
+                    result = 0;
+                    rt->get_config().dump();
+                } 
+
                 // Run this runtime instance
-                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
-                      result = rt.run(boost::bind(hpx_main, vm), 
+                else if (!is_hpx_runtime && mode != hpx::runtime::worker) {
+                      result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
                 else {
-                  result = rt.run(num_threads, num_localities);
+                  result = rt->run(num_threads, num_localities);
                 }
             }
             else {

@@ -57,8 +57,9 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
-            mode locality_mode, init_scheduler_type const& init) 
-      : runtime(agas_client_),
+            mode locality_mode, init_scheduler_type const& init,
+            std::vector<std::string> const& ini_overrides) 
+      : runtime(agas_client_, ini_overrides),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
@@ -89,8 +90,9 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, naming::locality agas_address, 
-            mode locality_mode, init_scheduler_type const& init) 
-      : runtime(agas_client_),
+            mode locality_mode, init_scheduler_type const& init,
+            std::vector<std::string> const& ini_overrides) 
+      : runtime(agas_client_, ini_overrides),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
@@ -120,8 +122,9 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, mode locality_mode, 
-            init_scheduler_type const& init) 
-      : runtime(agas_client_),
+            init_scheduler_type const& init,
+            std::vector<std::string> const& ini_overrides) 
+      : runtime(agas_client_, ini_overrides),
         mode_(locality_mode), result_(0), 
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 

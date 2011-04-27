@@ -68,7 +68,8 @@ namespace hpx { namespace util
              "name = hpx",
              "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
         ;
-        ini.parse("static defaults", lines);
+        // don't overload user overrides
+        ini.parse("static defaults", lines, false);
     }
 
     void post_initialize_ini(section& ini)
@@ -104,6 +105,28 @@ namespace hpx { namespace util
 
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
+
+        post_initialize_ini(*this);
+
+        // set global config options
+#if HPX_USE_ITT == 1
+        use_ittnotifiy_api = get_itt_notify_mode();
+#endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime_configuration::runtime_configuration(
+        std::vector<std::string> const& prefill,
+        std::vector<std::string> const& overrides)
+    {
+        if (!overrides.empty())
+            this->parse("user overrides", overrides);
+
+        pre_initialize_ini(*this);
+
+        if (!prefill.empty())
+            // don't overwrite user overrides
+            this->parse("static prefill defaults", prefill, false);
 
         post_initialize_ini(*this);
 

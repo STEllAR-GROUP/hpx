@@ -22,6 +22,8 @@ namespace hpx { namespace util
         // initialize and load configuration information
         runtime_configuration();
         runtime_configuration(std::vector<std::string> const& prefill);
+        runtime_configuration(std::vector<std::string> const& prefill,
+                              std::vector<std::string> const& overrides);
 
         // Get the AGAS locality to use 
         naming::locality get_agas_locality() const;
