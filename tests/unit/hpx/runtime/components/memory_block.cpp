@@ -30,7 +30,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     // read a value from memory
     boost::uint32_t& value0 = data0.get();
-    HPX_TEST_EQ(value0, 17);
+    HPX_TEST_EQ(value0, 17U);
 
     // modify a value and check it in (using an eager future)
     hpx::components::memory_block_data data1 = mb.get();
@@ -43,7 +43,7 @@ int hpx_main(boost::program_options::variables_map&)
     hpx::lcos::eager_future<get_action_type> ef1(mb.get_gid());
     hpx::components::access_memory_block<boost::uint32_t> data2(ef1.get());
     boost::uint32_t& value1 = data2.get_ptr()[0];
-    HPX_TEST_EQ(value1, 42);
+    HPX_TEST_EQ(value1, 42U);
 
     // initiate shutdown of the runtime system
     hpx::finalize();

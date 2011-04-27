@@ -19,7 +19,8 @@ foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
                SOURCES ${testcase}.cpp
                ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
-                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}")
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
+                         "-I\"system.prefix=${CMAKE_BINARY_DIRY}\"")
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)

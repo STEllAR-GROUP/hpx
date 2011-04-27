@@ -19,7 +19,7 @@ int hpx_main(boost::program_options::variables_map&)
     typedef hpx::components::server::memory::store32_action store_action_type;
     hpx::applier::apply<store_action_type>(memid, boost::uint64_t(&value), 1);
 
-    HPX_TEST_EQ(value, 1);
+    HPX_TEST_EQ(value, 1U);
 
     // read the value back from memory (using an eager_future)
     typedef hpx::components::server::memory::load32_action load_action_type;

@@ -8,8 +8,7 @@ set(group unit.hpx.runtime)
 
 set(subdirs 
     components
-    naming
-    threads)
+    naming)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})

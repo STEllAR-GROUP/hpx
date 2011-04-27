@@ -76,7 +76,7 @@ int main()
    
         prefixes.clear(); 
         resolver.get_prefixes(prefixes);
-        HPX_TEST_EQ(2, prefixes.size());
+        HPX_TEST_EQ(2U, prefixes.size());
         HPX_TEST_EQ(prefixes.front(), prefix3);
     
         gid_type prefix4;
