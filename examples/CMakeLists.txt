@@ -12,6 +12,7 @@
 
 set(subdirs 
     accumulator
+    balancing
     cosmo
     generic
     had_amr3d
