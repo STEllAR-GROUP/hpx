@@ -49,7 +49,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         typename gid_table_type::map_type& gid_table = gids_.get();
 
         typename gid_table_type::map_type::iterator
-            it = gid_table.begin(), end = gid_table.end();
+            it = gid_table.find(key), end = gid_table.end();
 
         if (it != end)
             return false;
@@ -66,7 +66,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         typename gid_table_type::map_type& gid_table = gids_.get();
 
         typename gid_table_type::map_type::iterator
-            it = gid_table.begin(), end = gid_table.end();
+            it = gid_table.find(key), end = gid_table.end();
 
         if (it == end)
             return naming::invalid_gid;
