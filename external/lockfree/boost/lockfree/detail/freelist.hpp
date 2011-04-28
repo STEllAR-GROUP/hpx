@@ -21,6 +21,7 @@
 #include <boost/mpl/at.hpp>
 #include <boost/type_traits/is_pod.hpp>
 
+#include <cstring>
 #include <algorithm>            /* for std::min */
 
 namespace boost
