@@ -108,6 +108,7 @@ namespace hpx { namespace threads { namespace detail
             parent_thread_phase_(init_data.parent_phase),
             component_id_(init_data.lva),
             marked_state_(unknown),
+            priority_(init_data.priority),
             pool_(&pool)
         {
             // store the thread id of the parent thread, mainly for debugging 
@@ -132,7 +133,8 @@ namespace hpx { namespace threads { namespace detail
           : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())), 
             description_(""), lco_description_(""),
             parent_locality_prefix_(0), parent_thread_id_(0), 
-            parent_thread_phase_(0), component_id_(0), pool_(0)
+            parent_thread_phase_(0), component_id_(0),
+            priority_(thread_priority_normal), pool_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -292,7 +294,6 @@ namespace hpx { namespace threads { namespace detail
             return pool_ == pool;
         }
 
-    public:
         // action support
 
         // This is the component id. Every component needs to have an embedded
@@ -314,6 +315,9 @@ namespace hpx { namespace threads { namespace detail
             return id_;
         }
 
+        thread_priority get_thread_priority() const
+        { return priority_; }
+
     private:
         friend class threads::thread;
         friend void threads::delete_clone(threads::thread const*);
@@ -331,6 +335,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t parent_thread_phase_;
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
+        thread_priority const priority_;
 
         mutable naming::id_type id_;    // that's our gid
         thread_pool* pool_;
@@ -391,8 +396,11 @@ namespace hpx { namespace threads
 
         ~thread() 
         {
-            LTM_(debug) << "~thread(" << this << "), description(" 
-                        << get()->get_description() << ")";
+            if (get_thread_priority() != thread_priority_low)
+            {
+                LTM_(debug) << "~thread(" << this << "), description(" 
+                            << get()->get_description() << ")";
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -427,6 +435,12 @@ namespace hpx { namespace threads
         static void operator delete(void*, void*) {}
 
         ///////////////////////////////////////////////////////////////////////
+        thread_priority get_thread_priority() const
+        { 
+            detail::thread const* t = get();
+            return t ? t->get_thread_priority() : thread_priority_default;
+        }
+
         thread_id_type get_thread_id() const
         {
             return const_cast<thread*>(this);
@@ -659,8 +673,11 @@ namespace hpx { namespace threads
       : thread::base_type(new (pool) detail::thread(
             init_data, This(), new_state, pool))
     {
-        LTM_(debug) << "thread::thread(" << this << "), description(" 
-                    << init_data.description << ")";
+        if (get_thread_priority() != thread_priority_low)
+        {
+            LTM_(debug) << "thread::thread(" << this << "), description(" 
+                        << init_data.description << ")";
+        }
     }
 }}
 
