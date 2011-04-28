@@ -410,6 +410,15 @@ namespace hpx { namespace actions
             void_cast_register<action, base_argument_action<Arguments> >();
             base_argument_action<Arguments>::register_base();
         }
+        
+        /// Return the thread priority this action has to be executed with
+        threads::thread_priority get_thread_priority() const
+        {
+            if (priority_ == threads::thread_priority_default) 
+                return threads::thread_priority(priority_value);
+            else
+                return priority_;
+        }
 
     private:
         /// retrieve action code
@@ -456,19 +465,11 @@ namespace hpx { namespace actions
             return parent_phase_;
         }
 
-        /// Return the thread priority this action has to be executed with
-        threads::thread_priority get_thread_priority() const
-        {
-          return priority_ == threads::thread_priority_default ? 
-              threads::thread_priority(priority_value) : priority_;
-        }
-
         void enumerate_argument_gids(enum_gid_handler_type f)
         {
             boost::fusion::any(arguments_, enum_gid_handler(f));
         }
 
-    private:
         // serialization support
         friend class boost::serialization::access;
 

@@ -269,7 +269,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
 
@@ -285,7 +285,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
     };
@@ -387,7 +387,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
 
@@ -403,7 +403,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
     };
@@ -632,7 +632,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
 
@@ -648,7 +648,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
     };
@@ -749,7 +749,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
 
@@ -765,7 +765,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
+            data.priority = this->get_thread_priority(); 
             return data;
         }
     };
