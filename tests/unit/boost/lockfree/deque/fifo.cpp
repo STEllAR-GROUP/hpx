@@ -95,7 +95,7 @@ int main(int argc, char** argv)
          "the number of worker threads removing objects into the deque "
          "(default: 4)") 
         ("iterations,i", value<std::size_t>(), 
-         "the number of iterations (default: 1000000)") 
+         "the number of iterations (default: 100000)") 
     ;
 
     store(command_line_parser(argc, argv).options(desc_cmdline).run(), vm);
