@@ -434,8 +434,10 @@ add_subdirectory(examples)
 
 add_subdirectory(runtime)
 
-add_hpx_pseudo_target(tools) 
-add_subdirectory(tools)
+if(NOT MSVC)
+  add_hpx_pseudo_target(tools) 
+  add_subdirectory(tools)
+endif()
 
 ################################################################################
 # test configuration 
