@@ -9,10 +9,6 @@ add_hpx_library_sources(hpx_serialization
   portable_binary_oarchive.cpp
   serialize_exception.cpp)
 
-add_hpx_library_sources(hpx_asio
-  asio_util.cpp
-  io_service_pool.cpp)
-
 add_hpx_library_sources(hpx_ini
   ini.cpp)
 
@@ -21,5 +17,7 @@ add_hpx_library_sources(hpx
   itt_notify.cpp
   logging.cpp
   performance_counters.cpp
-  runtime_configuration.cpp)
+  runtime_configuration.cpp
+  asio_util.cpp
+  io_service_pool.cpp)
 

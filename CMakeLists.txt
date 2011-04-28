@@ -416,8 +416,8 @@ if(MSVC)
   set(hpx_CORE hpx hpx_serialization)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 else()
-  set(hpx_CORE hpx hpx_serialization hpx_asio hpx_ini)
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_asio hpx_ini)
+  set(hpx_CORE hpx hpx_serialization hpx_ini)
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_ini)
 endif()
 
 # Recurse into some subdirectories. This does not actually cause another cmake 

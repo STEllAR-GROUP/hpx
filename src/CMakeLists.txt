@@ -85,28 +85,6 @@ if(NOT MSVC)
     "HPX_LIBRARY_STRING=\"${name}\"")
   
   #############################################################################
-  # libhpx_asio
-  add_library(hpx_asio SHARED ${hpx_asio_SOURCES})
-
-  set_target_properties(hpx_asio PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-    VERSION ${HPX_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME hpx_asio)
-
-  target_link_libraries(hpx_asio
-    ${hpx_MALLOC_LIBRARY} ${BOOST_system_LIBRARY} ${BOOST_thread_LIBRARY})
-
-  get_target_property(path hpx_asio LOCATION)
-  get_filename_component(name "${path}" NAME)
-
-  set_property(TARGET hpx_asio APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
-  
-  #############################################################################
   # libhpx_ini
   add_library(hpx_ini SHARED ${hpx_ini_SOURCES})
 
@@ -138,7 +116,7 @@ if(NOT MSVC)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx)
 
-  target_link_libraries(hpx hpx_serialization hpx_asio hpx_ini
+  target_link_libraries(hpx hpx_serialization hpx_ini
     ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
  
   get_target_property(path hpx LOCATION)
