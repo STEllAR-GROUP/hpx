@@ -3,7 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/unordered_set.hpp>
+#include <map>
+
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 
@@ -43,10 +44,10 @@ typedef hpx::agas::symbol_namespace<
     hpx::agas::tag::database::default_
 > symbol_namespace_type;
 
+typedef std::map<std::string, gid_type> database_type;
 
-void insert_key_value_pair (local_barrier& global, local_barrier& barr,
-                            symbol_namespace_type& sym, std::string const& key,
-                            gid_type const& value)
+void insert_key_value_pair (local_barrier& barr, symbol_namespace_type& sym,
+                            std::string const& key, gid_type const& value)
 {
     // Insert the key and value synchronously. 
     bool r = sym.bind(key, value);
@@ -58,9 +59,6 @@ void insert_key_value_pair (local_barrier& global, local_barrier& barr,
     // thread that will be resolving this key waits on this barrier before it
     // attempts the resolve action (this makes the test thread-safe).
     barr.wait();
-
-    // Suspend until shutdown.
-    global.wait();
 }
 
 void resolve_key_value_pair (local_barrier& global, local_barrier& barr,
@@ -88,64 +86,77 @@ int hpx_main(variables_map& vm)
     if (vm.count("entries"))
         entries = vm["entries"].as<std::size_t>();
 
-    boost::unordered_set<std::string> keys;
+    std::size_t iterations = 0;
 
-    // Alphabet for keys.
-    std::string const chars(
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "1234567890");        
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
 
-    mt19937 rng;
-
-    // Random number distributions.
-    uniform_int<> index_dist(0, chars.size() - 1);
-    uniform_int<std::size_t> length_dist(4, 18);
-    uniform_int<boost::uint64_t> gid_dist;
-
-    // Get this locality's prefix.
-    id_type prefix = get_applier().get_runtime_support_gid();
-
-    // Create the symbol namespace.
-    symbol_namespace_type sym;
-    sym.create(prefix);
-        
-    // Create the global barrier for shutdown.
-    local_barrier global(entries + 1);
-
-    // Allocate the storage for the local barriers
-    boost::scoped_array<local_barrier> barriers
-        (reinterpret_cast<local_barrier*>(::operator new
-            (sizeof(local_barrier) * entries)));
-
-    for (std::size_t i = 0; i < entries; ++i) {
-        std::size_t const len = length_dist(rng);
-
-        // Construct the barrier for this entry
-        new (&barriers[i]) local_barrier(2);
-
-        // Have the key preallocate space to avoid multiple resizes.
-        std::string key;
-
-        // Generate a unique key.
-        do {
-            key.clear();
-            key.reserve(len);
-            for (std::size_t j = 0; j < len; ++j)
-                key.push_back(chars[index_dist(rng)]);
-        } while (keys.count(key));
- 
-        gid_type value(gid_dist(rng), gid_dist(rng));
-
-        register_work(boost::bind(&insert_key_value_pair,
-            ref(global), ref(barriers[i]), ref(sym), cref(key), cref(value)));
-        
-        register_work(boost::bind(&resolve_key_value_pair,
-            ref(global), ref(barriers[i]), ref(sym), cref(key), cref(value)));
+    for (std::size_t i = 0; i < iterations; ++i)
+    {
+        database_type database;
+    
+        // Alphabet for keys.
+        std::string const chars(
+            "abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "1234567890");        
+    
+        mt19937 rng;
+    
+        // Random number distributions.
+        uniform_int<> index_dist(0, chars.size() - 1);
+        uniform_int<std::size_t> length_dist(4, 18);
+        uniform_int<boost::uint64_t> gid_dist;
+    
+        // Get this locality's prefix.
+        id_type prefix = get_applier().get_runtime_support_gid();
+    
+        // Create the symbol namespace.
+        symbol_namespace_type sym;
+        sym.create(prefix);
+            
+        // Create the global barrier for shutdown.
+        local_barrier global(entries + 1);
+    
+        // Allocate the storage for the local barriers
+        local_barrier* barriers
+            (reinterpret_cast<local_barrier*>(::malloc
+                (sizeof(local_barrier) * entries)));
+    
+        for (std::size_t e = 0; e < entries; ++e) {
+            std::size_t const len = length_dist(rng);
+    
+            // Construct the barrier for this entry
+            new (&barriers[e]) local_barrier(2);
+    
+            // Have the key preallocate space to avoid multiple resizes.
+            std::string key;
+    
+            // Generate a unique key.
+            do {
+                key.clear();
+                key.reserve(len);
+                for (std::size_t j = 0; j < len; ++j)
+                    key.push_back(chars[index_dist(rng)]);
+            } while (database.count(key));
+    
+            gid_type value(gid_dist(rng), gid_dist(rng));
+    
+            database_type::iterator it = database.insert
+                (database_type::value_type(key, value)).first;
+    
+            register_work(boost::bind(&insert_key_value_pair, ref(barriers[e]),
+                ref(sym), cref(it->first), cref(it->second)));
+            
+            register_work(boost::bind(&resolve_key_value_pair, ref(global),
+                ref(barriers[e]), ref(sym), cref(it->first), cref(it->second)));
+        }
+    
+        // wait for all threads to enter the barrier
+        global.wait(); 
+    
+        ::free(reinterpret_cast<void*>(barriers));
     }
-
-    // wait for all threads to enter the barrier
-    global.wait(); 
 
     // initiate shutdown of the runtime system
     finalize();
@@ -162,8 +173,8 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("entries", value<std::size_t>()->default_value(1 << 6), 
             "the number of entries used in each iteration") 
-        //("iterations", value<std::size_t>()->default_value(1 << 6), 
-        //    "the number of times to repeat the test") 
+        ("iterations", value<std::size_t>()->default_value(1 << 6), 
+            "the number of times to repeat the test") 
         ;
 
     // Initialize and run HPX
