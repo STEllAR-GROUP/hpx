@@ -19,9 +19,9 @@
 #include <hpx/util/lightweight_test.hpp>
 
 boost::atomic<std::size_t> left_producer_count(0);
-boost::atomic<std::size_t> right_producer_count(0);
-
 boost::atomic<std::size_t> left_consumer_count(0);
+
+boost::atomic<std::size_t> right_producer_count(0);
 boost::atomic<std::size_t> right_consumer_count(0);
 
 boost::lockfree::deque<std::size_t> deque;
@@ -40,16 +40,16 @@ void left_producer()
     }
 }
 
-void right_consumer()
+void left_consumer()
 {
-    std::size_t value(0);
+    std::size_t value;
     while (!done) {
-        while (deque.pop_right(value))
-            ++right_consumer_count;
+        while (deque.pop_left(value))
+            ++left_consumer_count;
     }
 
-    while (deque.pop_right(value))
-        ++right_consumer_count;
+    while (deque.pop_left(value))
+        ++left_consumer_count;
 }
 
 void right_producer()
@@ -60,16 +60,16 @@ void right_producer()
     }
 }
 
-void left_consumer()
+void right_consumer()
 {
-    std::size_t value(0);
+    std::size_t value;
     while (!done) {
-        while (deque.pop_left(value))
-            ++left_consumer_count;
+        while (deque.pop_right(value))
+            ++right_consumer_count;
     }
 
-    while (deque.pop_left(value))
-        ++left_consumer_count;
+    while (deque.pop_right(value))
+        ++right_consumer_count;
 }
 
 int main(int argc, char** argv)
@@ -118,38 +118,18 @@ int main(int argc, char** argv)
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
 
-    { // left in, right out
-        std::cout << "left in, right out" << std::endl;
+    std::cout << "boost::lockfree::deque is ";
+    if (!deque.is_lock_free())
+        std::cout << "not ";
+    std::cout << "lockfree" << std::endl;
+
+    { // left in, left out
+        std::cout << "left in, left out" << std::endl;
 
         boost::thread_group producer_threads, consumer_threads;
 
         for (std::size_t i = 0; i != producer_thread_count; ++i)
             producer_threads.create_thread(left_producer);
-
-        for (std::size_t i = 0; i != consumer_thread_count; ++i)
-            consumer_threads.create_thread(right_consumer);
-
-        producer_threads.join_all();
-        done = true;
-
-        consumer_threads.join_all();
-
-        HPX_TEST_EQ(left_producer_count, right_consumer_count);
-
-        std::cout << "produced " << left_producer_count
-                  << " objects on the left\n"
-                  << "consumed " << right_consumer_count
-                  << " objects on the right"
-                  << std::endl;
-    }
-    
-    { // right in, left out
-        std::cout << "right in, left out" << std::endl;
-
-        boost::thread_group producer_threads, consumer_threads;
-
-        for (std::size_t i = 0; i != producer_thread_count; ++i)
-            producer_threads.create_thread(right_producer);
 
         for (std::size_t i = 0; i != consumer_thread_count; ++i)
             consumer_threads.create_thread(left_consumer);
@@ -159,12 +139,37 @@ int main(int argc, char** argv)
 
         consumer_threads.join_all();
 
-        HPX_TEST_EQ(right_producer_count, left_consumer_count);
+        HPX_TEST_EQ(left_producer_count, left_consumer_count);
+
+        std::cout << "produced " << left_producer_count
+                  << " objects on the left\n"
+                  << "consumed " << left_consumer_count
+                  << " objects on the left"
+                  << std::endl;
+    }
+    
+    { // right in, right out
+        std::cout << "right in, right out" << std::endl;
+
+        boost::thread_group producer_threads, consumer_threads;
+
+        for (std::size_t i = 0; i != producer_thread_count; ++i)
+            producer_threads.create_thread(right_producer);
+
+        for (std::size_t i = 0; i != consumer_thread_count; ++i)
+            consumer_threads.create_thread(right_consumer);
+
+        producer_threads.join_all();
+        done = true;
+
+        consumer_threads.join_all();
+
+        HPX_TEST_EQ(right_producer_count, right_consumer_count);
 
         std::cout << "produced " << right_producer_count
                   << " objects on the right\n"
-                  << "consumed " << left_consumer_count
-                  << " objects on the left"
+                  << "consumed " << right_consumer_count
+                  << " objects on the right"
                   << std::endl;
     }
 
