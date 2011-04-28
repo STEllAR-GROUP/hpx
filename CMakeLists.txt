@@ -104,6 +104,8 @@ link_directories(${BOOST_LIBRARY_DIR})
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+add_definitions(-DBOOST_LOG_NO_TSS)
+add_definitions(-DBOOST_LOG_NO_TS)
 
 ################################################################################
 # search path configuration
