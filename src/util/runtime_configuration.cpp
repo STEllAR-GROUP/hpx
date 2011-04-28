@@ -67,6 +67,10 @@ namespace hpx { namespace util
 
              "[hpx.components.barrier]",
              "name = hpx",
+             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
+
+             "[hpx.components.symbol_namespace]",
+             "name = hpx",
              "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
         ;
         // don't overload user overrides
