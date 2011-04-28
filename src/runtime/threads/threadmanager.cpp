@@ -41,9 +41,29 @@ namespace hpx { namespace threads
 
     char const* get_thread_state_name(thread_state_enum state)
     {
-        if (state < pending || state > terminated)
+        if (state < unknown || state > terminated)
             return "unknown";
         return strings::thread_state_names[state];
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace strings
+    {
+        char const* const thread_priority_names[] = 
+        {
+            "default",
+            "low",
+            "normal",
+            "critical"
+        };
+    }
+
+    char const* get_thread_priority_name(thread_priority priority)
+    {
+        if (priority < thread_priority_default
+         || priority > thread_priority_critical)
+            return "unknown";
+        return strings::thread_priority_names[priority];
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -171,10 +191,16 @@ namespace hpx { namespace threads
         thread_id_type newid = scheduler_.create_thread(
             data, initial_state, run_now, ec, data.num_os_thread);
 
-        LTM_(info) << "register_thread(" << newid << "): initial_state(" 
-                   << get_thread_state_name(initial_state) << "), "
-                   << std::boolalpha << "run_now(" << run_now << "), "
-                   << "description(" << data.description << ")";
+        // Don't log for low priority threads to avoid inverse feedback loops
+        // with logging.
+        if (data.priority != thread_priority_low)
+        {
+            LTM_(info) << "register_thread(" << newid << "): initial_state(" 
+                       << get_thread_state_name(initial_state) << "), thread_priority("
+                       << get_thread_priority_name(data.priority) << "), "
+                       << "run_now(" << (run_now ? "true" : "false") << "), "
+                       << "description(" << data.description << ")";
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -224,9 +250,15 @@ namespace hpx { namespace threads
             return;
         }
 
-        LTM_(info) << "register_work: initial_state(" 
-                   << get_thread_state_name(initial_state) << "), "
-                   << "description(" << data.description << ")";
+        // Don't log for low priority threads to avoid inverse feedback loops
+        // with logging.
+        if (data.priority != thread_priority_low)
+        {
+            LTM_(info) << "register_work: initial_state(" 
+                       << get_thread_state_name(initial_state) << "), thread_priority("
+                       << get_thread_priority_name(data.priority) << "), "
+                       << "description(" << data.description << ")";
+        }
 
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
