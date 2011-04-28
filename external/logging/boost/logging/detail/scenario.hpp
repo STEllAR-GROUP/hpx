@@ -149,7 +149,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifdef BOOST_HAS_THREADS
+#ifndef BOOST_LOG_NO_TS
             typedef often<> default_;
 #else
             typedef single_thread default_;
@@ -204,7 +204,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifdef BOOST_HAS_THREADS
+#ifndef BOOST_LOG_NO_TS
             typedef often<> default_;
 #else
             typedef single_thread default_;
@@ -229,7 +229,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifdef BOOST_HAS_THREADS
+#ifndef BOOST_LOG_NO_TS
             typedef correctness default_;
 #else
             typedef single_thread default_;

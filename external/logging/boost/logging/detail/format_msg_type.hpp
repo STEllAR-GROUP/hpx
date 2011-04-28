@@ -23,7 +23,11 @@
 
 #include <boost/logging/detail/fwd.hpp>
 #include <boost/logging/detail/find_gather.hpp>
-#include <boost/logging/detail/tss/tss_ostringstream.hpp>
+#ifndef BOOST_LOG_NO_TSS
+  #include <boost/logging/detail/tss/tss_ostringstream.hpp>
+#else
+  #include <sstream>
+#endif
 
 namespace boost { namespace logging {
 

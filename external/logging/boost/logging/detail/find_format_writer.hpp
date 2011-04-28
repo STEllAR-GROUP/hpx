@@ -90,7 +90,7 @@ namespace detail {
     ///////////// find_writer_with_thread_safety
     template<class thread_safety, class format_write> struct find_writer_with_thread_safety {
         // for default_
-#ifdef BOOST_HAS_THREADS
+#ifndef BOOST_LOG_NO_TS
         // use ts_write
         typedef writer::ts_write<format_write> type;
 #else
