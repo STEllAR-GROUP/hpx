@@ -5,12 +5,14 @@
 
 set(tools
     cpu_features
-    dump_static_component_types)
+    dump_static_component_types
+    linux_page_stats)
+
+set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
+set(linux_page_stats NOLIBS)
 
 foreach(tool ${tools})
-  add_hpx_executable(${tool} SOURCES ${tool}.cpp)
-
-  # add a dependency to the pseudo-target  
+  add_hpx_executable(${tool} SOURCES ${tool}.cpp ${${tool}})
   add_hpx_pseudo_dependencies(tools ${tool}_exe) 
 endforeach()
 
