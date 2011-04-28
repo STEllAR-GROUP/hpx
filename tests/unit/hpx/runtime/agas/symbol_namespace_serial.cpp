@@ -64,6 +64,8 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("entries"))
         entries = vm["entries"].as<std::size_t>();
+    
+    std::size_t iterations = 0;
 
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
