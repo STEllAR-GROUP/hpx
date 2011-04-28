@@ -89,9 +89,9 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
-                LTM_(debug) << "Executing plain action("
-                            << detail::get_action_name<Derived>()
-                            << ").";
+                //LTM_(debug) << "Executing plain action("
+                //            << detail::get_action_name<Derived>()
+                //            << ").";
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
@@ -458,9 +458,9 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
-                LTM_(debug) << "Executing plain action("
-                            << detail::get_action_name<Derived>()
-                            << ").";
+                //LTM_(debug) << "Executing plain action("
+                //            << detail::get_action_name<Derived>()
+                //            << ").";
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
