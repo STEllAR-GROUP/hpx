@@ -388,56 +388,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
 //    return 1;
     }
 
-    //pivot_main() breaks up the operation of finding the pivot elements,
-    //so that the operation can be performed in parallel. Afterwards,
-    //the swapping takes place
-    void HPLMatreX::pivot_main(){
-    int i,j;
-    std::vector<pivot_future> pivots;
-    for(i=0;i<brows;i+=1){
-        pivots.push_back(pivot_future(_gid,i*blocksize,
-            ((i==brows-1)?columns:(i+1)*blocksize)));
-    }
 
-    //once all spun off futures are complete we are done
-    BOOST_FOREACH(pivot_future pf, pivots){
-        pf.get();
-    }
-
-    //call the swap function for each datablock in the matrix
-    for(i=0;i<brows;i++){
-        for(j=0;j<brows;j++){
-            swap(i,j);
-    }    }
-    }
-
-    //pivot() finds the potential pivot elements of each column and stores
-    //them. All pivot elements are found before any swapping takes place so
-    //that the swapping is simplified
-    bool HPLMatreX::pivot(int start, int end){
-    double max;
-    int max_row;
-    int temp_piv;
-    double temp;
-    int h = (int)std::ceil(((float)rows)*.5);
-    int i,j;
-
-    for(i=start;i<end;i++){
-        max_row = 0;
-        max = (int)fabs(truedata[pivotarr][i]);
-        temp_piv = pivotarr[i];
-        for(j=i+1;j<rows;j++){
-            temp = (int)fabs(truedata[pivotarr[j]][i]);
-            if(temp > max){
-                max = (int)temp;
-                max_row = j;
-        }   }
-        pivotarr[i] = pivotarr[max_row];
-        pivotarr[max_row] = temp_piv;
-    }
-    }
-
-/*    //pivot() finds the pivot element of each column and stores it. All
+    //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
     void HPLMatreX::pivot(){
@@ -469,7 +421,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
             swap(i,j);
     }    }
     }
-*/
+
 
     //swap() creates the datablocks and reorders the original
     //truedata matrix when assigning the initial values to the datablocks
