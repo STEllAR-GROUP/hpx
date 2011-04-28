@@ -6,6 +6,14 @@
 
 set(group unit.hpx.util)
 
+set(testcases
+    spinlock_pool)
+
+foreach(testcase ${testcases})
+  add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)
+  add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
+endforeach()
+
 set(subdirs 
     hardware
     serialization)
