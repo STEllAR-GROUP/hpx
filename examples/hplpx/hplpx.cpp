@@ -66,7 +66,7 @@ int hpx_main(){
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
 {
     try {
-        po::options_description desc_cmdline ("Usage: fibonacci [options]");
+        po::options_description desc_cmdline ("Usage: hplpx [options]");
         desc_cmdline.add_options()
             ("help,h", "print out program usage (this message)")
 
