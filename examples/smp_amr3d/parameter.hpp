@@ -30,13 +30,13 @@ namespace detail {
 struct HPX_COMPONENT_EXPORT parameter
 {
     double_type lambda;
-    int allowedl;
-    int num_rows;
-    int loglevel;
+    std::size_t allowedl;
+    std::size_t num_rows;
+    std::size_t loglevel;
     double_type output;
-    int output_stdout;
-    int nt0;
-    int nx[HPX_SMP_AMR3D_MAX_LEVELS];
+    std::size_t output_stdout;
+    std::size_t nt0;
+    std::size_t nx[HPX_SMP_AMR3D_MAX_LEVELS];
     double refine_level[HPX_SMP_AMR3D_MAX_LEVELS];
     double_type minx0;
     double_type maxx0;
@@ -48,10 +48,10 @@ struct HPX_COMPONENT_EXPORT parameter
     double_type amp;
     double_type amp_dot;
     double_type eps;
-    int output_level;
-    int granularity;
-    int time_granularity;
-    int gw;
+    std::size_t output_level;
+    std::size_t granularity;
+    std::size_t time_granularity;
+    std::size_t gw;
     std::vector<std::size_t> rowsize,level_row;
     std::vector<std::size_t> level_begin, level_end;
     std::vector<double_type> min;

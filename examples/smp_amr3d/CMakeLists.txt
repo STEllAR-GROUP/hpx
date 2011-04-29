@@ -26,7 +26,7 @@ endforeach()
 
 # define build target for this directory
 set(sources
-    amr_client.cpp)
+    smp_amr3d_client.cpp)
 
 # define basic dependencies
 set(dependencies
