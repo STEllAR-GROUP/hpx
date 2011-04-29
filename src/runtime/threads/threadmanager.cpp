@@ -191,16 +191,10 @@ namespace hpx { namespace threads
         thread_id_type newid = scheduler_.create_thread(
             data, initial_state, run_now, ec, data.num_os_thread);
 
-        // Don't log for low priority threads to avoid inverse feedback loops
-        // with logging.
-        if (data.priority != thread_priority_low)
-        {
-            LTM_(info) << "register_thread(" << newid << "): initial_state(" 
-                       << get_thread_state_name(initial_state) << "), thread_priority("
-                       << get_thread_priority_name(data.priority) << "), "
-                       << "run_now(" << (run_now ? "true" : "false") << "), "
-                       << "description(" << data.description << ")";
-        }
+        LTM_(info) << "register_thread(" << newid << "): initial_state(" 
+                   << get_thread_state_name(initial_state) << "), "
+                   << "run_now(" << (run_now ? "true" : "false") << "), "
+                   << "description(" << data.description << ")";
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -250,15 +244,10 @@ namespace hpx { namespace threads
             return;
         }
 
-        // Don't log for low priority threads to avoid inverse feedback loops
-        // with logging.
-        if (data.priority != thread_priority_low)
-        {
-            LTM_(info) << "register_work: initial_state(" 
-                       << get_thread_state_name(initial_state) << "), thread_priority("
-                       << get_thread_priority_name(data.priority) << "), "
-                       << "description(" << data.description << ")";
-        }
+        LTM_(info) << "register_work: initial_state(" 
+                   << get_thread_state_name(initial_state) << "), thread_priority("
+                   << get_thread_priority_name(data.priority) << "), "
+                   << "description(" << data.description << ")";
 
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
@@ -296,7 +285,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The set_state function is part of the thread related API and allows us
+    /// The set_state function is part of the thread related API and allows
     /// to change the state of one of the threads managed by this threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -359,12 +348,9 @@ namespace hpx { namespace threads
         // at some point will ignore this thread by simply skipping it 
         // (if it's not pending anymore). 
 
-        if (thrd->get_thread_priority() != thread_priority_low)
-        {
-            LTM_(info) << "set_state: " << "thread(" << id << "), "
-                       << "description(" << thrd->get_description() << "), "
-                       << "new state(" << get_thread_state_name(new_state) << ")";
-        }
+        LTM_(info) << "set_state: " << "thread(" << id << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(new_state) << ")";
 
         // So all what we do here is to set the new state.
         thrd->set_state(new_state);
@@ -785,39 +771,29 @@ namespace hpx { namespace threads
     inline void write_old_state_log(std::size_t num_thread, thread* thrd, 
         thread_state_enum state)
     {
-        if (thrd->get_thread_priority() != thread_priority_low)
-        {
-            LTM_(debug) << "tfunc(" << num_thread << "): "
-                        << "thread(" << thrd->get_thread_id() << "), " 
-                        << "description(" << thrd->get_description() << "), "
-                        << "old state(" << get_thread_state_name(state) << ")";
-        }
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), " 
+                   << "description(" << thrd->get_description() << "), "
+                   << "old state(" << get_thread_state_name(state) << ")";
     }
 
     inline void write_new_state_log_debug(std::size_t num_thread, thread* thrd, 
         thread_state_enum state, char const* info)
     {
-        if (thrd->get_thread_priority() != thread_priority_low)
-        {
-            LTM_(debug) << "tfunc(" << num_thread << "): "
-                        << "thread(" << thrd->get_thread_id() << "), "
-                        << "description(" << thrd->get_description() << "), "
-                        << "new state(" << get_thread_state_name(state) << "), "
-                        << info;
-        }
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(state) << "), "
+                   << info;
     }
-
     inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd, 
         thread_state_enum state, char const* info)
     {
-        if (thrd->get_thread_priority() != thread_priority_low)
-        {
-            LTM_(debug) << "tfunc(" << num_thread << "): "
-                        << "thread(" << thrd->get_thread_id() << "), "
-                        << "description(" << thrd->get_description() << "), "
-                        << "new state(" << get_thread_state_name(state) << "), "
-                        << info;
-        }
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                   << "thread(" << thrd->get_thread_id() << "), "
+                   << "description(" << thrd->get_description() << "), "
+                   << "new state(" << get_thread_state_name(state) << "), "
+                   << info;
     }
 
 #if HPX_USE_ITT != 0
