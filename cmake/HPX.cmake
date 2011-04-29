@@ -151,7 +151,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
 
 if(NOT HPX_DISABLE_WARNINGS)
-  add_definitions(-Wall)
+  hpx_use_flag_if_available(Wall)
 endif()
 
 ################################################################################
@@ -207,27 +207,33 @@ else()
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
   if(NOT HPX_DISABLE_WARNINGS)
-    add_definitions(-Wno-strict-aliasing -Wsign-promo)
+    hpx_use_flag_if_available(Wno-strict-aliasing)
+    hpx_use_flag_if_available(Wsign-promo)
   endif()
 
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
-  option(HPX_ELF_HIDDEN_VISIBILITY
-    "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (GCC only, default: ON)" ON)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     # Show the flags that toggle each warning
-    add_definitions(-fdiagnostics-show-option)
+    hpx_use_flag_if_available(fdiagnostics-show-option)
 
     # I'm aware that __sync_fetch_and_nand changed semantics
-    add_definitions(-Wno-sync-nand)
+    hpx_use_flag_if_gcc_version(Wno-sync-nand 040400)
 
-    if(HPX_ELF_HIDDEN_VISIBILITY)
-      add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-      add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-      add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-      set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
-      set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
+    if(0404 GREATER ${GCC_VERSION}) 
+      hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
+    else()
+      option(HPX_ELF_HIDDEN_VISIBILITY
+        "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (default: ON)" ON)
+
+      if(HPX_ELF_HIDDEN_VISIBILITY)
+        add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
+        add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+        add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+        set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
+      endif()
     endif()
   ##############################################################################
   # Intel specific configuration

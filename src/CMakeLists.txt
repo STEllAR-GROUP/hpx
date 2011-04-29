@@ -32,31 +32,31 @@ endif()
 # POSIX 
 if(NOT MSVC)
   if(NOT HPX_DISABLE_WARNINGS)
-    add_definitions(-Wextra)
+    hpx_use_flag_if_available(Wextra)
 
     # these are usually benign and can't be suppressed because of
     # interface requirements
-    add_definitions(-Wno-unused-parameter)
+    hpx_use_flag_if_available(Wno-unused-parameter)
 
     # there are ignored qualifiers in Boost, so we have to ignore them
-    add_definitions(-Wno-ignored-qualifiers)
+    hpx_use_flag_if_available(Wno-ignored-qualifiers)
 
     # be extra strict about format checks
     # Boost.Logging is built on this, sadly
-    add_definitions(-Wformat=2)
-    add_definitions(-Wno-format-nonliteral) 
+    hpx_use_flag_if_available(Wformat=2 NAME Wformat_2)
+    hpx_use_flag_if_available(Wno-format-nonliteral) 
 
     # self initialization is dangerous
-    add_definitions(-Winit-self)
+    hpx_use_flag_if_available(Winit-self)
 
-    add_definitions(-Werror=parentheses)
-    add_definitions(-Werror=reorder)
-    add_definitions(-Werror=return-type)
-    add_definitions(-Werror=sequence-point)
-    add_definitions(-Werror=uninitialized)
-    add_definitions(-Werror=format)
-    add_definitions(-Werror=missing-braces)
-    add_definitions(-Werror=sign-compare)
+    hpx_use_flag_if_available(Werror=parentheses NAME Werror_parentheses)
+    hpx_use_flag_if_available(Werror=reorder NAME Werror_reorder)
+    hpx_use_flag_if_available(Werror=return-type NAME Werror_return-type)
+    hpx_use_flag_if_available(Werror=sequence-point NAME Werror_sequence-point)
+    hpx_use_flag_if_available(Werror=uninitialized NAME Werror_uninitialized)
+    hpx_use_flag_if_available(Werror=format NAME Werror_format)
+    hpx_use_flag_if_available(Werror=missing-braces NAME Werror_missing-braces)
+    hpx_use_flag_if_available(Werror=sign-compare NAME Werror_sign-compare)
   endif()
 
   add_hpx_library_sources(hpx
