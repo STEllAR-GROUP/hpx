@@ -75,7 +75,6 @@ namespace hpx { namespace util
         void read(std::string const& filename);
         void merge(std::string const& second);
         void merge(section& second);
-        void expand();
         void dump(int ind = 0, std::ostream& strm = std::cout) const;
 
         void add_section(std::string const& sec_name, section& sec, 

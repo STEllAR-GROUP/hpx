@@ -22,7 +22,7 @@ namespace hpx { namespace util
         std::vector<std::string> lines; 
         lines +=
             // create an empty application section
-            "[application]",
+//            "[application]",
 
             // create system and application instance specific entries
             "[system]",
@@ -32,6 +32,7 @@ namespace hpx { namespace util
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
+            "component_path = $[hpx.location]/lib",
             "ini_path = $[hpx.location]/share/hpx/ini",
 #if HPX_USE_ITT == 1
             "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
@@ -82,12 +83,6 @@ namespace hpx { namespace util
         std::vector<std::string> const& cmdline_ini_defs
             = std::vector<std::string>())
     {
-
-        // try to build default ini structure from shared libraries in default 
-        // installation location, this allows to install simple components
-        // without the need to install an ini file
-        util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
-        
         // add explicit configuration information if its provided
         util::init_ini_data_base(ini, hpx_ini_file); 
 
@@ -95,12 +90,22 @@ namespace hpx { namespace util
         if (!cmdline_ini_defs.empty())
             ini.parse("command line definitions", cmdline_ini_defs);
 
+        // try to build default ini structure from shared libraries in default 
+        // installation location, this allows to install simple components
+        // without the need to install an ini file
+        if (ini.has_section("hpx") &&
+            ini.get_section("hpx")->has_entry("component_path"))
+            util::init_ini_data_default
+                (ini.get_section("hpx")->get_entry("component_path"), ini);
+        else
+            util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
+
         // merge all found ini files of all components
         util::merge_component_inis(ini);
 
         // read system and user ini files _again_, to allow the user to 
         // overwrite the settings from the default component ini's. 
-        util::init_ini_data_base(ini);
+        util::init_ini_data_base(ini, hpx_ini_file);
         
         // let the command line override the config file. 
         if (!cmdline_ini_defs.empty())
