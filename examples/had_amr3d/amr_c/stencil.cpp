@@ -1147,13 +1147,13 @@ namespace hpx { namespace components { namespace amr
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // TEST
-        //resultval.get() = val[0].get();
-        //resultval->timestep_ = val[0]->timestep_ + 1;
-        //if ( resultval->timestep_ >= par->nt0-2 ) {
-          //std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
-        //  return 0;
-        //}
-        //return 1;
+        resultval.get() = val[0].get();
+        resultval->timestep_ = val[0]->timestep_ + 1;
+        if ( resultval->timestep_ >= par->nt0-2 ) {
+          std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
+          return 0;
+        }
+        return 1;
         // END TEST
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
