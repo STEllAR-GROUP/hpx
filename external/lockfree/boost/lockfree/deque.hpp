@@ -260,10 +260,10 @@ struct deque: private boost::noncopyable
     {
         if (!empty())
         {
-            T dummy;
+            T dummy = T();
             while (true)
             {
-                if (!push_left(dummy))
+                if (!pop_left(dummy))
                     break;
             }
         }
