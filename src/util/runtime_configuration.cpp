@@ -22,7 +22,7 @@ namespace hpx { namespace util
         std::vector<std::string> lines; 
         lines +=
             // create an empty application section
-//            "[application]",
+            "[application]",
 
             // create system and application instance specific entries
             "[system]",
@@ -78,10 +78,8 @@ namespace hpx { namespace util
         ini.parse("static defaults", lines);
     }
 
-    void post_initialize_ini(section& ini,
-        std::string const& hpx_ini_file = "",
-        std::vector<std::string> const& cmdline_ini_defs
-            = std::vector<std::string>())
+    void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
+        std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>())
     {
         // add explicit configuration information if its provided
         util::init_ini_data_base(ini, hpx_ini_file); 
@@ -93,12 +91,9 @@ namespace hpx { namespace util
         // try to build default ini structure from shared libraries in default 
         // installation location, this allows to install simple components
         // without the need to install an ini file
-        if (ini.has_section("hpx") &&
-            ini.get_section("hpx")->has_entry("component_path"))
-            util::init_ini_data_default
-                (ini.get_section("hpx")->get_entry("component_path"), ini);
-        else
-            util::init_ini_data_default(HPX_DEFAULT_COMPONENT_PATH, ini);
+        std::string component_path(
+            ini.get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
+        util::init_ini_data_default(component_path, ini);
 
         // merge all found ini files of all components
         util::merge_component_inis(ini);
@@ -106,7 +101,7 @@ namespace hpx { namespace util
         // read system and user ini files _again_, to allow the user to 
         // overwrite the settings from the default component ini's. 
         util::init_ini_data_base(ini, hpx_ini_file);
-        
+
         // let the command line override the config file. 
         if (!cmdline_ini_defs.empty())
             ini.parse("command line definitions", cmdline_ini_defs);
@@ -117,6 +112,11 @@ namespace hpx { namespace util
     {
         pre_initialize_ini(*this);
         post_initialize_ini(*this);
+
+        // set global config options
+#if HPX_USE_ITT == 1
+        use_ittnotify_api = get_itt_notify_mode();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

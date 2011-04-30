@@ -69,7 +69,8 @@ namespace hpx { namespace util
         namespace fs = boost::filesystem;
 
         // fall back: use compile time prefix
-        bool result = handle_ini_file (ini, HPX_DEFAULT_INI_PATH "/hpx.ini");
+        std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
+        bool result = handle_ini_file (ini, ini_path + "/hpx.ini");
 
         // look in the current directory first
         std::string cwd = fs::current_path().string() + "/.hpx.ini";
@@ -82,7 +83,9 @@ namespace hpx { namespace util
 #if !defined(BOOST_WINDOWS)   // /etc/hpx.ini doesn't make sense for Windows
         result = handle_ini_file(ini, "/etc/hpx.ini") || result;
 #endif
-        result = handle_ini_file_env(ini, "HPX_LOCATION", "/share/hpx/hpx.ini") || result;
+//      FIXME: is this really redundant?
+//         result = handle_ini_file_env(ini, "HPX_LOCATION", "/share/hpx/hpx.ini") || result;
+
         result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
         result =  handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
         return handle_ini_file(ini, hpx_ini_file) || result;
