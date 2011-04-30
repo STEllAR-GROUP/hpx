@@ -229,11 +229,6 @@ void test_atomic_struct(void)
     HPX_TEST(i.load()==one);
 }
 
-enum enum_type
-{
-    foo, bar
-};
-
 void test_fence()
 {
     atomic_thread_fence(memory_order_acquire);
@@ -268,7 +263,6 @@ int main()
     test_atomic_base<void *>();
     test_atomic_ptr<int>();
     test_atomic_base<bool>();
-    test_atomic_base<enum_type>();
     
     atomic_thread_fence(memory_order_seq_cst);
     

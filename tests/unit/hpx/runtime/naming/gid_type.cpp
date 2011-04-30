@@ -258,8 +258,8 @@ int main()
       // + 0x00000000000000000000000000000001
       // ------------------------------------
       //   0x00000000000000000000000000000000
-      HPX_TEST_EQ(gid.get_lsb(), 0); 
-      HPX_TEST_EQ(gid.get_msb(), 0); 
+      HPX_TEST_EQ(gid.get_lsb(), 0U); 
+      HPX_TEST_EQ(gid.get_msb(), 0U); 
   
       gid.set_msb(~0x0ULL); gid.set_lsb(~0x0ULL); 
 
