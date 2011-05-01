@@ -18,7 +18,7 @@
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 
 typedef hpx::agas::server::component_namespace<
-    hpx::agas::tag::database::default_
+    hpx::agas::tag::database::stdmap
 > agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(

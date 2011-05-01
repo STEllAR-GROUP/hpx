@@ -12,7 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
-#include <hpx/runtime/agas/database/backend/default.hpp>
+#include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/lcos/local_barrier.hpp>
 
 using boost::program_options::variables_map;
@@ -163,7 +163,7 @@ int hpx_main(variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     for (std::size_t i = 0; i < iterations; ++i)
-        test_symbol_namespace<hpx::agas::tag::database::default_>(entries);
+        test_symbol_namespace<hpx::agas::tag::database::stdmap>(entries);
 
     // initiate shutdown of the runtime system
     finalize(5.0);

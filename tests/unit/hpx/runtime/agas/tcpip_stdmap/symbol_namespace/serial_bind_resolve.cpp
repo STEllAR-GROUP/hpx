@@ -12,7 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
-#include <hpx/runtime/agas/database/backend/default.hpp>
+#include <hpx/runtime/agas/database/backend/stdmap.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -37,7 +37,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 typedef hpx::agas::symbol_namespace<
-    hpx::agas::tag::database::default_
+    hpx::agas::tag::database::stdmap
 > symbol_namespace_type;
 
 void insert_key_value_pair (symbol_namespace_type& sym, std::string const& key,

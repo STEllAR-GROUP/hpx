@@ -15,7 +15,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/hash_asio_basic_endpoint.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
-#include <hpx/runtime/agas/database/backend/default.hpp>
+#include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/lcos/local_barrier.hpp>
 
@@ -53,7 +53,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 typedef primary_namespace<
-    hpx::agas::tag::database::default_, hpx::agas::tag::network::tcpip
+    hpx::agas::tag::database::stdmap, hpx::agas::tag::network::tcpip
 > primary_namespace_type;
 
 void bind_locality (local_barrier& barr, primary_namespace_type& pri,

@@ -68,7 +68,7 @@ namespace hpx { namespace util
 
              "[hpx.components.barrier]",
              "name = hpx",
-             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
+             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING//,
 
 //             "[hpx.components.component_namespace]",
 //             "name = hpx",

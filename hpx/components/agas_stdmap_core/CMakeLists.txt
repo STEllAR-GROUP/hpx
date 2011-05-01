@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT MSVC)
-  add_hpx_component(stdmap_agas_core 
+  add_hpx_component(agas_stdmap_core 
     MODULE core
     SOURCES component_module.cpp
             component_namespace.cpp
