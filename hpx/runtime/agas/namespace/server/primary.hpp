@@ -37,9 +37,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         endpoint_type;
 
     typedef gva<Protocol> gva_type;
-    typedef full_gva<Protocol> full_gva_type;
-    typedef typename full_gva_type::count_type count_type;
-    typedef typename full_gva_type::offset_type offset_type;
+    typedef typename gva_type::count_type count_type;
+    typedef typename gva_type::offset_type offset_type;
     typedef int component_type;
 
     typedef boost::fusion::vector2<count_type, component_type>
@@ -51,7 +50,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
         range_type;
 
-    typedef table<Database, naming::gid_type, full_gva_type>
+    typedef table<Database, naming::gid_type, gva_type>
         gva_table_type; 
 
     typedef table<Database, endpoint_type, partition_type>
@@ -89,6 +88,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             it = partition_table.find(ep),
             end = partition_table.end(); 
 
+        // If the endpoint is in the table, then this is a resize.
         if (it != end)
         {
             // Compute the new allocation.
@@ -120,6 +120,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             return range_type(lower, upper);
         }
 
+        // If the endpoint isn't in the table, then we're registering it.
         else
         {
             // Check for address space exhaustion.
@@ -163,8 +164,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             std::pair<typename gva_table_type::map_type::iterator, bool>
                 git = gva_table.insert(typename
                     gva_table_type::map_type::value_type
-                        (id, full_gva_type
-                            (ep, components::component_runtime_support, 1, 0)));
+                        (id, gva_type
+                            (ep, components::component_runtime_support, count)));
 
             // REVIEW: Should this be an assertion?
             // Check for insertion failure.
@@ -189,8 +190,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         }
     } // }}}
 
-    bool bind_gid(naming::gid_type const& gid, gva_type const& gva,
-                  count_type count, offset_type offset)
+    bool bind_gid(naming::gid_type const& gid, gva_type const& gva)
     { // {{{ bind_gid implementation
         using boost::fusion::at_c;
 
@@ -217,7 +217,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             {
                 // Check for count mismatch (we can't change block sizes of
                 // existing bindings).
-                if (it->second.count != count)
+                if (it->second.count != gva.count)
                 {
                     // REVIEW: Is this the right error code to use?
                     HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
@@ -227,8 +227,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 // Store the new endpoint and offset
                 it->second.endpoint = gva.endpoint;
                 it->second.type = gva.type;
-                it->second.base_lva = gva.lva;
-                it->second.offset = offset;
+                it->second.lva(gva.lva());
+                it->second.offset = gva.offset;
                 return true;
             }
 
@@ -251,7 +251,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 return false;
         }
 
-        naming::gid_type upper_bound(id + (count - 1));
+        naming::gid_type upper_bound(id + (gva.count - 1));
 
         if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
         {
@@ -261,8 +261,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
         std::pair<typename gva_table_type::map_type::iterator, bool>
             p = gva_table.insert(typename gva_table_type::map_type::value_type
-                (id, full_gva_type
-                    (gva.endpoint, gva.type, gva.lva, count, offset)));
+                (id, gva));
         
         // REVIEW: Should this be an assertion?
         // Check for an insertion failure. 
@@ -276,29 +275,80 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return true;
     } // }}}
 
-    // REVIEW: Right return type, yes/no?
-    range_type resolve_locality(endpoint_type const& ep) 
+    gva_type resolve_locality(endpoint_type const& ep) 
     { // {{{ resolve_endpoint implementation
         using boost::fusion::at_c;
 
         typename database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the GVA table 
+        // Load the partition table 
         typename partition_table_type::map_type const&
             partition_table = partitions_.get();
 
         typename partition_table_type::map_type::const_iterator
-            it = partition_table.find(ep),
-            end = partition_table.end(); 
+            pit = partition_table.find(ep),
+            pend = partition_table.end(); 
 
-        if (it != end)
+        if (pit != pend)
         {
-            return range_type(
-                naming::get_gid_from_prefix(at_c<0>(it->second)),
-                at_c<1>(it->second));
+            naming::gid_type id
+                = naming::get_gid_from_prefix(at_c<0>(pit->second));
+                
+            // Load the GVA table 
+            typename gva_table_type::map_type const& gva_table = gvas_.get();
+    
+            typename gva_table_type::map_type::const_iterator
+                git = gva_table.lower_bound(id),
+                gbegin = gva_table.begin(),
+                gend = gva_table.end();
+    
+            if (git != gend)
+            {
+                // Check for exact match
+                if (git->first == id)
+                    return git->second;
+    
+                // We need to decrement the iterator, check that it's safe to do
+                // so.
+                else if (git != gbegin)
+                {
+                    --git;
+    
+                    // Found the GID in a range
+                    if ((git->first + git->second.count) > id)
+                    {
+                        if (HPX_UNLIKELY(id.get_msb() != git->first.get_msb()))
+                        {
+                            HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                                "MSBs of lower and upper range bound do not match");
+                        }
+     
+                        // Calculation of the lva address occurs in gva<>::resolve()
+                        return git->second.resolve(id, git->first);
+                    }
+                }
+            }
+    
+            else if (HPX_LIKELY(!gva_table.empty()))
+            {
+                --git;
+    
+                // Found the GID in a range
+                if ((git->first + git->second.count) > id)
+                {
+                    if (HPX_UNLIKELY(id.get_msb() != git->first.get_msb()))
+                    {
+                        HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                            "MSBs of lower and upper range bound do not match");
+                    }
+     
+                    // Calculation of the local address occurs in gva<>::resolve()
+                    return git->second.resolve(id, git->first);
+                }
+            }
         }
 
-        return range_type();
+        return gva_type();
     } // }}}
 
     gva_type resolve_gid(naming::gid_type const& gid) 
@@ -322,11 +372,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         {
             // Check for exact match
             if (it->first == id)
-            {
-                return gva_type(it->second.endpoint,
-                                it->second.type,
-                                it->second.base_lva);
-            }
+                return it->second;
 
             // We need to decrement the iterator, check that it's safe to do
             // so.
@@ -343,8 +389,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                             "MSBs of lower and upper range bound do not match");
                     }
  
-                    // Calculation of the local address occurs in the gva ctor
-                    return gva_type(it->second, id, it->first);
+                    // Calculation of the lva address occurs in gva<>::resolve()
+                    return it->second.resolve(id, it->first);
                 }
             }
         }
@@ -362,8 +408,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                         "MSBs of lower and upper range bound do not match");
                 }
  
-                // Calculation of the local address occurs in the gva ctor
-                return gva_type(it->second, id, it->first);
+                // Calculation of the local address occurs in gva<>::resolve()
+                return it->second.resolve(id, it->first);
             }
         }
 
@@ -580,18 +626,17 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         &primary_namespace<Database, Protocol>::bind_locality
     > bind_locality_action; 
    
-    typedef hpx::actions::result_action4<
+    typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
         /* return type */ bool,
         /* enum value */  namespace_bind_gid,
-        /* arguments */   naming::gid_type const&, gva_type const&, count_type,
-                          offset_type,
+        /* arguments */   naming::gid_type const&, gva_type const&,
         &primary_namespace<Database, Protocol>::bind_gid
     > bind_gid_action;
     
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
-        /* return type */ range_type,
+        /* return type */ gva_type,
         /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
         &primary_namespace<Database, Protocol>::resolve_locality

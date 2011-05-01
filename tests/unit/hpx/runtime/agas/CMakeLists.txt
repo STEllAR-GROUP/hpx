@@ -13,7 +13,9 @@ set(group unit.hpx.runtime.agas)
 
 set(testcases
     symbol_namespace_concurrent
-    symbol_namespace_serial)
+    symbol_namespace_serial
+    primary_namespace_concurrent
+    primary_namespace_serial)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}

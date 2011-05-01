@@ -26,10 +26,8 @@ struct primary_namespace
 
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;
-    typedef typename server_type::full_gva_type full_gva_type;
     typedef typename server_type::count_type count_type;
     typedef typename server_type::offset_type offset_type;
-    typedef typename server_type::components_type components_type;
     typedef typename server_type::range_type range_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
@@ -52,28 +50,27 @@ struct primary_namespace
     // {{{ bind_gid dispatch
     static lcos::future_value<bool>
     bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
-                   gva_type const& gva, count_type count, offset_type offset)
+                   gva_type const& gva)
     {
         typedef typename server_type::bind_gid_action action_type;
-        return lcos::eager_future<action_type, bool>
-            (gid, id, gva, count, offset);
+        return lcos::eager_future<action_type, bool>(gid, id, gva);
     }
 
     static bool
     bind_gid(naming::id_type const& gid, naming::gid_type const& id,
-             gva_type const& gva, count_type count, offset_type offset)
-    { return bind_gid_async(gid, id, gva, count, offset).get(); } 
+             gva_type const& gva)
+    { return bind_gid_async(gid, id, gva).get(); } 
     // }}}
 
     // {{{ resolve_locality dispatch
-    static lcos::future_value<range_type>
+    static lcos::future_value<gva_type>
     resolve_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
         typedef typename server_type::resolve_locality_action action_type;
-        return lcos::eager_future<action_type, range_type>(gid, ep);
+        return lcos::eager_future<action_type, gva_type>(gid, ep);
     }
     
-    static range_type
+    static gva_type
     resolve_locality(naming::id_type const& gid, endpoint_type const& ep)
     { return resolve_locality_async(gid, ep).get(); } 
     // }}}

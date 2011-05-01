@@ -39,15 +39,6 @@ struct name_hook<tag::network::tcpip>
 }}}}
 
 BOOST_CLASS_VERSION(
-    hpx::agas::full_gva<hpx::agas::tag::network::tcpip>, 
-    hpx::agas::traits::serialization_version<
-        hpx::agas::tag::network::tcpip
-    >::value)
-BOOST_CLASS_TRACKING(
-    hpx::agas::full_gva<hpx::agas::tag::network::tcpip>,
-    boost::serialization::track_never)
-
-BOOST_CLASS_VERSION(
     hpx::agas::gva<hpx::agas::tag::network::tcpip>, 
     hpx::agas::traits::serialization_version<
         hpx::agas::tag::network::tcpip

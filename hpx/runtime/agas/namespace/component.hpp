@@ -16,6 +16,7 @@
 namespace hpx { namespace agas 
 {
 
+// TODO: add error code parameters
 template <typename Database>
 struct component_namespace
   : components::client_base<

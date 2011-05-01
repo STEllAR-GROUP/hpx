@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/integer.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
@@ -19,6 +20,8 @@ using boost::program_options::value;
 
 using boost::mt19937;
 using boost::uniform_int;
+
+using boost::integer_traits;
 
 using hpx::naming::gid_type;
 using hpx::naming::id_type;
@@ -85,7 +88,8 @@ int hpx_main(variables_map& vm)
         // Random number distributions.
         uniform_int<> index_dist(0, chars.size() - 1);
         uniform_int<std::size_t> length_dist(4, 18);
-        uniform_int<boost::uint64_t> gid_dist;
+        uniform_int<boost::uint64_t> gid_dist(1,
+            integer_traits<boost::uint64_t>::const_max);
     
         // Get this locality's prefix.
         id_type prefix = get_applier().get_runtime_support_gid();
@@ -94,7 +98,8 @@ int hpx_main(variables_map& vm)
         symbol_namespace_type sym;
         sym.create(prefix);
             
-        for (std::size_t e = 0; e < entries; ++e) {
+        for (std::size_t e = 0; e < entries; ++e)
+        {
             std::size_t const len = length_dist(rng);
     
             // Have the key preallocate space to avoid multiple resizes.
@@ -107,7 +112,9 @@ int hpx_main(variables_map& vm)
                 for (std::size_t j = 0; j < len; ++j)
                     key.push_back(chars[index_dist(rng)]);
             } while (keys.count(key));
-     
+   
+            keys.insert(key);
+  
             gid_type value(gid_dist(rng), gid_dist(rng));
     
             insert_key_value_pair(sym, key, value);

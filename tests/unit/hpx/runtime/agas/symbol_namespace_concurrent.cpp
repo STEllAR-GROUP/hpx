@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <map>
-
+#include <boost/unordered_map.hpp>
+#include <boost/integer.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 
@@ -21,6 +21,8 @@ using boost::program_options::value;
 
 using boost::mt19937;
 using boost::uniform_int;
+
+using boost::integer_traits;
 
 using boost::ref;
 using boost::cref;
@@ -40,14 +42,11 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-typedef hpx::agas::symbol_namespace<
-    hpx::agas::tag::database::default_
-> symbol_namespace_type;
+typedef boost::unordered_map<std::string, gid_type> entry_table_type;
 
-typedef std::map<std::string, gid_type> database_type;
-
-void insert_key_value_pair (local_barrier& barr, symbol_namespace_type& sym,
-                            std::string const& key, gid_type const& value)
+template <typename Database>
+void bind_symbol (local_barrier& barr, symbol_namespace<Database>& sym,
+                  std::string const& key, gid_type const& value)
 {
     // Insert the key and value synchronously. 
     bool r = sym.bind(key, value);
@@ -61,9 +60,10 @@ void insert_key_value_pair (local_barrier& barr, symbol_namespace_type& sym,
     barr.wait();
 }
 
-void resolve_key_value_pair (local_barrier& global, local_barrier& barr,
-                             symbol_namespace_type& sym, std::string const& key,
-                             gid_type const& value)
+template <typename Database>
+void resolve_symbol (local_barrier& global, local_barrier& barr,
+                     symbol_namespace<Database>& sym, std::string const& key,
+                     gid_type const& value)
 {
     // Wait until the insertion has been completed.
     barr.wait();
@@ -76,6 +76,77 @@ void resolve_key_value_pair (local_barrier& global, local_barrier& barr,
 
     // Suspend until shutdown.
     global.wait();
+}
+
+template <typename Database>
+void test_symbol_namespace(std::size_t entries)
+{
+    entry_table_type entry_table;
+
+    // Alphabet for keys.
+    std::string const chars(
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "1234567890");        
+
+    mt19937 rng;
+
+    // Random number distributions.
+    uniform_int<> index_dist(0, chars.size() - 1);
+    uniform_int<std::size_t> length_dist(4, 18);
+    uniform_int<boost::uint64_t> gid_dist(1,
+        integer_traits<boost::uint64_t>::const_max);
+
+    // Get this locality's prefix.
+    id_type prefix = get_applier().get_runtime_support_gid();
+
+    // Create the symbol namespace.
+    symbol_namespace<Database> sym;
+    sym.create(prefix);
+        
+    // Create the global barrier for shutdown.
+    local_barrier global(entries + 1);
+
+    // Allocate the storage for the local barriers
+    local_barrier* barriers
+        (reinterpret_cast<local_barrier*>(::malloc
+            (sizeof(local_barrier) * entries)));
+
+    for (std::size_t e = 0; e < entries; ++e)
+    {
+        std::size_t const len = length_dist(rng);
+
+        // Construct the barrier for this entry
+        new (&barriers[e]) local_barrier(2);
+
+        // Have the key preallocate space to avoid multiple resizes.
+        std::string key;
+
+        // Generate a unique key.
+        do {
+            key.clear();
+            key.reserve(len);
+            for (std::size_t j = 0; j < len; ++j)
+                key.push_back(chars[index_dist(rng)]);
+        } while (entry_table.count(key));
+
+        gid_type value(gid_dist(rng), gid_dist(rng));
+
+        entry_table_type::iterator it = entry_table.insert
+            (entry_table_type::value_type(key, value)).first;
+
+        register_work(boost::bind(&bind_symbol<Database>,
+            ref(barriers[e]), ref(sym), cref(it->first), cref(it->second)));
+        
+        register_work(boost::bind(&resolve_symbol<Database>,
+            ref(global), ref(barriers[e]), ref(sym), cref(it->first),
+            cref(it->second)));
+    }
+
+    // wait for all threads to enter the barrier
+    global.wait(); 
+
+    ::free(reinterpret_cast<void*>(barriers));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,74 +163,10 @@ int hpx_main(variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     for (std::size_t i = 0; i < iterations; ++i)
-    {
-        database_type database;
-    
-        // Alphabet for keys.
-        std::string const chars(
-            "abcdefghijklmnopqrstuvwxyz"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "1234567890");        
-    
-        mt19937 rng;
-    
-        // Random number distributions.
-        uniform_int<> index_dist(0, chars.size() - 1);
-        uniform_int<std::size_t> length_dist(4, 18);
-        uniform_int<boost::uint64_t> gid_dist;
-    
-        // Get this locality's prefix.
-        id_type prefix = get_applier().get_runtime_support_gid();
-    
-        // Create the symbol namespace.
-        symbol_namespace_type sym;
-        sym.create(prefix);
-            
-        // Create the global barrier for shutdown.
-        local_barrier global(entries + 1);
-    
-        // Allocate the storage for the local barriers
-        local_barrier* barriers
-            (reinterpret_cast<local_barrier*>(::malloc
-                (sizeof(local_barrier) * entries)));
-    
-        for (std::size_t e = 0; e < entries; ++e) {
-            std::size_t const len = length_dist(rng);
-    
-            // Construct the barrier for this entry
-            new (&barriers[e]) local_barrier(2);
-    
-            // Have the key preallocate space to avoid multiple resizes.
-            std::string key;
-    
-            // Generate a unique key.
-            do {
-                key.clear();
-                key.reserve(len);
-                for (std::size_t j = 0; j < len; ++j)
-                    key.push_back(chars[index_dist(rng)]);
-            } while (database.count(key));
-    
-            gid_type value(gid_dist(rng), gid_dist(rng));
-    
-            database_type::iterator it = database.insert
-                (database_type::value_type(key, value)).first;
-    
-            register_work(boost::bind(&insert_key_value_pair, ref(barriers[e]),
-                ref(sym), cref(it->first), cref(it->second)));
-            
-            register_work(boost::bind(&resolve_key_value_pair, ref(global),
-                ref(barriers[e]), ref(sym), cref(it->first), cref(it->second)));
-        }
-    
-        // wait for all threads to enter the barrier
-        global.wait(); 
-    
-        ::free(reinterpret_cast<void*>(barriers));
-    }
+        test_symbol_namespace<hpx::agas::tag::database::default_>(entries);
 
     // initiate shutdown of the runtime system
-    finalize();
+    finalize(5.0);
     return 0;
 }
 
