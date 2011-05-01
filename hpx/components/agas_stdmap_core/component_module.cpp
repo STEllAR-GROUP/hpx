@@ -5,17 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_F9585C9E_A48B_4D3C_9685_7A888B159119)
-#define HPX_F9585C9E_A48B_4D3C_9685_7A888B159119
+#include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/runtime/agas/database/backend/stdmap.hpp>
-
-namespace hpx { namespace agas
-{
-
-namespace tag { namespace database { typedef stdmap default_; }} 
-
-}}
-
-#endif // HPX_F9585C9E_A48B_4D3C_9685_7A888B159119
+HPX_REGISTER_COMPONENT_MODULE();
 

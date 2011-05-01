@@ -15,7 +15,7 @@
 namespace hpx { namespace agas 
 {
 
-namespace tag { namespace database { struct std_map; }} 
+namespace tag { namespace database { struct stdmap; }} 
 
 namespace traits { namespace database
 {
@@ -23,16 +23,16 @@ namespace traits { namespace database
 // REVIEW: Consider using HPX allocator stuff (possibly moot because of malloc
 // overloading that we do).
 template <typename Key, typename Value>
-struct map_type<tag::database::std_map, Key, Value>
+struct map_type<tag::database::stdmap, Key, Value>
 { typedef std::map<Key, Value> type; };
 
 template <>
-struct name_hook<tag::database::std_map>
+struct name_hook<tag::database::stdmap>
 {
     typedef char const* result_type;
 
     static result_type call()
-    { return "std_map"; }
+    { return "stdmap"; }
 };
 
 }}}}

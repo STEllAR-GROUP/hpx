@@ -70,17 +70,17 @@ namespace hpx { namespace util
              "name = hpx",
              "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
 
-             "[hpx.components.component_namespace]",
-             "name = hpx",
-             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
+//             "[hpx.components.component_namespace]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
 
-             "[hpx.components.primary_namespace]",
-             "name = hpx",
-             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
+//             "[hpx.components.primary_namespace]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
 
-             "[hpx.components.symbol_namespace]",
-             "name = hpx",
-             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
+//             "[hpx.components.symbol_namespace]",
+//             "name = hpx",
+//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
         ;
         // don't overload user overrides
         ini.parse("static defaults", lines);
