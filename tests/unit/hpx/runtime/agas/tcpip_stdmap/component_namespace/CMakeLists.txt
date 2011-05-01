@@ -9,14 +9,19 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.hpx.runtime.agas)
+set(group unit.hpx.runtime.agas.tcpip_stdmap.component_namespace)
 
-set(subdirs 
-    tcpip_stdmap)
+set(testcases)
 
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(${group}.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(${group} ${group}.${subdir})
+foreach(testcase ${testcases})
+  add_hpx_test(${group}.${testcase}
+               SOURCES ${testcase}.cpp
+               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
+                         "-t" "${HPX_TEST_NUM_THREADS}"
+                         "-I\"system.prefix=${CMAKE_BINARY_DIR}\"")
+
+  # depend on the executable
+  add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
 endforeach()
 

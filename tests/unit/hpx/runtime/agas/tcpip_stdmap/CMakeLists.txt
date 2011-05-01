@@ -9,10 +9,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.hpx.runtime.agas)
+set(group unit.hpx.runtime.agas.tcpip_stdmap)
 
 set(subdirs 
-    tcpip_stdmap)
+    component_namespace
+    primary_namespace
+    symbol_namespace)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})
