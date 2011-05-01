@@ -12,12 +12,12 @@
 set(group unit.hpx.lcos)
 
 set(testcases
+    counting_semaphore
     dataflow_variable
     full_empty
     lazy_future
     local_barrier
     thunk
-    counting_semaphore
     barrier)
 
 foreach(testcase ${testcases})
