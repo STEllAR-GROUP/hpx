@@ -18,6 +18,7 @@
 namespace hpx { namespace agas 
 {
 
+// TODO: pass error codes once they're implemented in AGAS.
 template <typename Database>
 struct legacy_agent
 {
@@ -84,7 +85,7 @@ struct legacy_agent
         address addr;
         addr.from_string(l.get_address());
 
-        primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
+        typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
 
         if (self)
         {
@@ -156,7 +157,11 @@ struct legacy_agent
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       components::component_type type,
                       error_code& ec = throws) const 
-    { /* IMPLEMENT */ } 
+    {
+        prefixes = component_ns_.resolve_id
+            (typename component_namespace_type::component_id_type(type));
+        return !prefixes.empty();
+    } 
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) const
