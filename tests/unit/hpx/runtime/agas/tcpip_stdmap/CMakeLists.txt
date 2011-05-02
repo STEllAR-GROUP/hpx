@@ -11,6 +11,23 @@
 
 set(group unit.hpx.runtime.agas.tcpip_stdmap)
 
+set(testcases
+    legacy_agent_serial)
+
+foreach(testcase ${testcases})
+  add_hpx_test(${group}.${testcase}
+               SOURCES ${testcase}.cpp
+               DEPENDENCIES agas_stdmap_core_component
+                            agas_tcpip_stdmap_component
+               ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
+                         "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
+                         "-t" "${HPX_TEST_NUM_THREADS}"
+                         "-I\"system.prefix=${CMAKE_BINARY_DIR}\"")
+
+  # depend on the executable
+  add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
+endforeach()
+
 set(subdirs 
     component_namespace
     primary_namespace

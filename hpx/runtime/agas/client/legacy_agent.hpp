@@ -80,7 +80,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
-                    bool self = true, error_code& ec = throws) const
+                    bool self = true, error_code& ec = throws) 
     {
         using boost::asio::ip::address;
         using boost::fusion::at_c;
@@ -124,7 +124,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool get_console_prefix(naming::gid_type& prefix,
-                            error_code& ec = throws) const
+                            error_code& ec = throws) 
     {
         prefix = symbol_ns_.resolve("/console");
         return prefix;
@@ -158,14 +158,27 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      component_id_type type, error_code& ec = throws) const 
+                      component_id_type type, error_code& ec = throws) 
     {
-        prefixes = component_ns_.resolve(type);
-        return !prefixes.empty();
+        typedef typename component_namespace_type::prefixes_type::const_iterator
+            iterator;
+
+        typename component_namespace_type::prefixes_type raw_prefixes
+            = component_ns_.resolve(type);
+
+        if (raw_prefixes.empty())
+            return false;
+
+        iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
+
+        for (; it != end; ++it) 
+            prefixes.push_back(naming::get_gid_from_prefix(*it));
+
+        return true; 
     } 
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      error_code& ec = throws) const
+                      error_code& ec = throws) 
     { return get_prefixes(prefixes, components::component_invalid, ec); }
 
     // {{{ get_component_id specification
@@ -192,7 +205,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     typename component_namespace_type::component_id_type
-    get_component_id(std::string const& name, error_code& ec = throws) const
+    get_component_id(std::string const& name, error_code& ec = throws) 
     { return component_ns_.resolve(name); } 
 
     // {{{ register_factory specification
@@ -225,7 +238,7 @@ struct legacy_agent
     // }}}
     typename component_namespace_type::component_id_type
     register_factory(naming::gid_type const& prefix, std::string const& name, 
-                     error_code& ec = throws) const
+                     error_code& ec = throws) 
     { return component_ns_.bind(name, naming::get_prefix_from_gid(prefix)); } 
 
     // {{{ get_id_range specification
@@ -276,7 +289,7 @@ struct legacy_agent
     bool get_id_range(naming::locality const& l, boost::uint32_t count, 
                       naming::gid_type& lower_bound,
                       naming::gid_type& upper_bound, 
-                      error_code& ec = throws) const
+                      error_code& ec = throws) 
     {
         using boost::asio::ip::address;
         using boost::fusion::at_c;
@@ -330,7 +343,7 @@ struct legacy_agent
     ///                   reference count to one.
     // }}}
     bool bind(naming::gid_type const& id, naming::address const& addr,
-              error_code& ec = throws) const
+              error_code& ec = throws) 
     { return bind_range(id, 1, addr, 0, ec); }
 
     // {{{ bind_range specification
@@ -372,7 +385,7 @@ struct legacy_agent
     // }}}
     bool bind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                     naming::address const& baseaddr, std::ptrdiff_t offset, 
-                    error_code& ec = throws) const
+                    error_code& ec = throws) 
     {
         using boost::asio::ip::address;
         using boost::fusion::at_c;
@@ -406,7 +419,7 @@ struct legacy_agent
     // }}}
     typename primary_namespace_type::count_type
     incref(naming::gid_type const& id, boost::uint32_t credits = 1, 
-           error_code& ec = throws) const
+           error_code& ec = throws) 
     { return primary_ns_.increment(id, credits); } 
 
     // {{{ decref specification
@@ -429,7 +442,7 @@ struct legacy_agent
     // }}}
     typename primary_namespace_type::count_type
     decref(naming::gid_type const& id, component_id_type& t,
-           boost::uint32_t credits = 1, error_code& ec = throws) const
+           boost::uint32_t credits = 1, error_code& ec = throws) 
     {
         using boost::fusion::at_c;
 
@@ -474,7 +487,7 @@ struct legacy_agent
     /// \note             This function will raise an error if the global 
     ///                   reference count of the given gid is not zero!
     // }}}
-    bool unbind(naming::gid_type const& id, error_code& ec = throws) const
+    bool unbind(naming::gid_type const& id, error_code& ec = throws) 
     { // {{{ unbind implementation
         return unbind_range(id, 1, ec);
     } // }}}
@@ -516,7 +529,7 @@ struct legacy_agent
     ///                   reference count of the given gid is not zero!
     // }}}
     bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
-                      error_code& ec = throws) const
+                      error_code& ec = throws) 
     { return primary_ns_.unbind(lower_id, count); } 
 
     // {{{ resolve specification
@@ -551,7 +564,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool resolve(naming::gid_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws) const
+                 bool try_cache = true, error_code& ec = throws) 
     {
         typename primary_namespace_type::gva_type gva = primary_ns_.resolve(id);
 
@@ -563,11 +576,11 @@ struct legacy_agent
     }
 
     bool resolve(naming::id_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws) const
+                 bool try_cache = true, error_code& ec = throws) 
     { return resolve(id.get_gid(), addr, try_cache, ec); }
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
-                        error_code& ec = throws) const
+                        error_code& ec = throws) 
     { return resolve(id, addr, true, ec); /* IMPLEMENT */ }
 
     // {{{ registerid specification
@@ -600,7 +613,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool registerid(std::string const& name, naming::gid_type const& id,
-                    error_code& ec = throws) const
+                    error_code& ec = throws) 
     { return symbol_ns_.bind(name, id); }
 
     // {{{ unregisterid specification
@@ -627,7 +640,7 @@ struct legacy_agent
     ///                   parameter \a ec. Otherwise it throws and instance
     ///                   of hpx#exception.
     // }}}
-    bool unregisterid(std::string const& name, error_code& ec = throws) const
+    bool unregisterid(std::string const& name, error_code& ec = throws) 
     { return symbol_ns_.unbind(name); }
 
     // {{{ queryid specification
@@ -658,7 +671,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool queryid(std::string const& ns_name, naming::gid_type& id,
-                 error_code& ec = throws) const
+                 error_code& ec = throws) 
     {
         id = symbol_ns_.resolve(ns_name);
         return id;         
