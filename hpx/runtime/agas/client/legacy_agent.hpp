@@ -276,7 +276,23 @@ struct legacy_agent
                       naming::gid_type& lower_bound,
                       naming::gid_type& upper_bound, 
                       error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    {
+        using boost::asio::ip::address;
+        using boost::fusion::at_c;
+
+        address addr;
+        addr.from_string(l.get_address());
+
+        typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
+         
+        typename primary_namespace_type::range_type range =
+            primary_ns_.bind(ep, count);
+
+        lower_bound = at_c<0>(range);
+        upper_bound = at_c<1>(range);
+
+        return lower_bound && upper_bound;
+    } 
 
     // {{{ bind specification
     /// \brief Bind a global address to a local address.
