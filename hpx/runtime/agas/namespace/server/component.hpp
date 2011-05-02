@@ -129,9 +129,14 @@ struct HPX_COMPONENT_EXPORT component_namespace
         typename component_id_table_type::map_type::const_iterator
             it = c_id_table.find(key), end = c_id_table.end();
 
-        // If the name is not in the table, return component_invalid
+        // If the name is not in the table, register it (this is only done so
+        // we can implement a backwards compatible get_component_id).
         if (it == end)
-            return components::component_invalid;
+            it = c_id_table.insert(typename
+                component_id_table_type::map_type::value_type
+                    (key, type_counter++)).first;
+
+        BOOST_ASSERT(it != end);
 
         return it->second;
     } // }}} 

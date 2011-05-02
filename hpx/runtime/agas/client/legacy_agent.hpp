@@ -158,7 +158,7 @@ struct legacy_agent
                       components::component_type type,
                       error_code& ec = throws) const 
     {
-        prefixes = component_ns_.resolve_id
+        prefixes = component_ns_.resolve
             (typename component_namespace_type::component_id_type(type));
         return !prefixes.empty();
     } 
@@ -190,9 +190,9 @@ struct legacy_agent
     ///                   parameter \a ec. Otherwise it throws and instance
     ///                   of hpx#exception.
     // }}}
-    components::component_type get_component_id(std::string const& name, 
-                                                error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    typename component_namespace_type::component_id_type
+    get_component_id(std::string const& name, error_code& ec = throws) const
+    { return component_ns_.resolve(name); } 
 
     // {{{ register_factory specification
     /// \brief Register a factory for a specific component type
@@ -222,10 +222,10 @@ struct legacy_agent
     ///                   parameter \a ec. Otherwise it throws and instance
     ///                   of hpx#exception.
     // }}}
-    components::component_type register_factory(naming::gid_type const& prefix,
-                                                std::string const& name, 
-                                                error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    typename component_namespace_type::component_id_type
+    register_factory(naming::gid_type const& prefix, std::string const& name, 
+                     error_code& ec = throws) const
+    { return component_ns_.bind(name, naming::get_prefix_from_gid(prefix)); } 
 
     // {{{ get_id_range specification
     /// \brief Get unique range of freely assignable global ids 
