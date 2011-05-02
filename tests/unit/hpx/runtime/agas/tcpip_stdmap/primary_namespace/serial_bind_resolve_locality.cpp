@@ -63,7 +63,7 @@ void resolve_locality (primary_namespace_type& pri,
                        primary_namespace_type::endpoint_type const& ep,
                        primary_namespace_type::count_type const count)
 {
-    primary_namespace_type::gva_type const gva = pri.resolve(ep);
+    primary_namespace_type::gva_type const gva = at_c<1>(pri.resolve(ep));
     HPX_TEST_EQ(gva.count, count);
 }
 

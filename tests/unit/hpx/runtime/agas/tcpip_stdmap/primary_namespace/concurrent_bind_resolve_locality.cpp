@@ -76,7 +76,7 @@ void resolve_locality (local_barrier& global, local_barrier& barr,
     // Wait until the insertion has been completed.
     barr.wait();
 
-    primary_namespace_type::gva_type const gva = pri.resolve(ep);
+    primary_namespace_type::gva_type const gva = at_c<1>(pri.resolve(ep));
     HPX_TEST_EQ(gva.count, count);
 
     // Let our parent know we're done.
@@ -91,7 +91,7 @@ void test_tcpip_primary_namespace(std::size_t entries)
         primary_namespace_type::count_type
     > entry_table_type;
 
-    entry_table_type entry_table;
+    entry_table_type entry_table(entries);
 
     mt19937 rng;
 
@@ -119,6 +119,9 @@ void test_tcpip_primary_namespace(std::size_t entries)
         
     for (std::size_t e = 0; e < entries; ++e)
     {
+        // Construct the barrier for this entry
+        new (&barriers[e]) local_barrier(2);
+
         primary_namespace_type::endpoint_type ep;
         typename Address::bytes_type addr;
 
@@ -136,10 +139,11 @@ void test_tcpip_primary_namespace(std::size_t entries)
             (entry_table_type::value_type(ep, count)).first;
 
         register_work(boost::bind(&bind_locality,
-            ref(barriers[e]), ref(pri), cref(ep), cref(count)));
+            ref(barriers[e]), ref(pri), cref(it->first), cref(it->second)));
  
         register_work(boost::bind(&resolve_locality,
-            ref(global), ref(barriers[e]), ref(pri), ref(ep), ref(count)));
+            ref(global), ref(barriers[e]), ref(pri), ref(it->first),
+            ref(it->second)));
     }
 
     global.wait();
@@ -167,7 +171,7 @@ int hpx_main(variables_map& vm)
     }
 
     // initiate shutdown of the runtime system
-    finalize();
+    finalize(5.0);
     return 0;
 }
 

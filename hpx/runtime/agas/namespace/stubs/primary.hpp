@@ -29,6 +29,7 @@ struct primary_namespace
     typedef typename server_type::count_type count_type;
     typedef typename server_type::offset_type offset_type;
     typedef typename server_type::range_type range_type;
+    typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
 
@@ -63,14 +64,14 @@ struct primary_namespace
     // }}}
 
     // {{{ resolve_locality dispatch
-    static lcos::future_value<gva_type>
+    static lcos::future_value<locality_type>
     resolve_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
         typedef typename server_type::resolve_locality_action action_type;
-        return lcos::eager_future<action_type, gva_type>(gid, ep);
+        return lcos::eager_future<action_type, locality_type>(gid, ep);
     }
     
-    static gva_type
+    static locality_type
     resolve_locality(naming::id_type const& gid, endpoint_type const& ep)
     { return resolve_locality_async(gid, ep).get(); } 
     // }}}

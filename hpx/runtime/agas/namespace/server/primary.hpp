@@ -50,6 +50,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
         range_type;
 
+    typedef boost::fusion::vector2<naming::gid_type, gva_type>
+        locality_type;
+
     typedef table<Database, naming::gid_type, gva_type>
         gva_table_type; 
 
@@ -80,7 +83,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
         typename database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the GVA table 
+        // Load the partition table 
         typename partition_table_type::map_type&
             partition_table = partitions_.get();
 
@@ -275,7 +278,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return true;
     } // }}}
 
-    gva_type resolve_locality(endpoint_type const& ep) 
+    locality_type resolve_locality(endpoint_type const& ep) 
     { // {{{ resolve_endpoint implementation
         using boost::fusion::at_c;
 
@@ -306,7 +309,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             {
                 // Check for exact match
                 if (git->first == id)
-                    return git->second;
+                    return locality_type(id, git->second);
     
                 // We need to decrement the iterator, check that it's safe to do
                 // so.
@@ -324,7 +327,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                         }
      
                         // Calculation of the lva address occurs in gva<>::resolve()
-                        return git->second.resolve(id, git->first);
+                        return locality_type
+                            (id, git->second.resolve(id, git->first));
                     }
                 }
             }
@@ -343,12 +347,13 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     }
      
                     // Calculation of the local address occurs in gva<>::resolve()
-                    return git->second.resolve(id, git->first);
+                    return locality_type
+                        (id, git->second.resolve(id, git->first));
                 }
             }
         }
 
-        return gva_type();
+        return locality_type();
     } // }}}
 
     gva_type resolve_gid(naming::gid_type const& gid) 
@@ -636,7 +641,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
-        /* return type */ gva_type,
+        /* return type */ locality_type,
         /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
         &primary_namespace<Database, Protocol>::resolve_locality

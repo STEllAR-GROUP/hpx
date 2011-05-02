@@ -106,7 +106,7 @@ struct gva
     {
         return type     == rhs.type
             && count    == rhs.count
-            && lva_ == rhs.lva_ 
+            && lva_     == rhs.lva_ 
             && offset   == rhs.offset
             && endpoint == rhs.endpoint;
     }

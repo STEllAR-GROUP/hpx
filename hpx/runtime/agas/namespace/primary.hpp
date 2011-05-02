@@ -16,7 +16,7 @@
 namespace hpx { namespace agas 
 {
 
-// TODO: change bind_locality's return type to prefix, add error code parameters
+// TODO: add error code parameters
 template <typename Database, typename Protocol>
 struct primary_namespace
   : components::client_base<
@@ -37,6 +37,7 @@ struct primary_namespace
     typedef typename server_type::count_type count_type;
     typedef typename server_type::offset_type offset_type;
     typedef typename server_type::range_type range_type;
+    typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
 
@@ -46,10 +47,10 @@ struct primary_namespace
     ///////////////////////////////////////////////////////////////////////////
     // bind_locality and bind_gid interface 
     lcos::future_value<range_type>
-    bind_async(endpoint_type const& ep, count_type count)
+    bind_async(endpoint_type const& ep, count_type count = 1)
     { return this->base_type::bind_locality_async(this->gid_, ep, count); }
 
-    range_type bind(endpoint_type const& ep, count_type count)
+    range_type bind(endpoint_type const& ep, count_type count = 1)
     { return this->base_type::bind_locality(this->gid_, ep, count); }
     
     lcos::future_value<bool>
@@ -61,11 +62,11 @@ struct primary_namespace
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_endpoint and resolve_gid interface
-    lcos::future_value<gva_type>
+    lcos::future_value<locality_type>
     resolve_async(endpoint_type const& ep)
     { return this->base_type::resolve_locality_async(this->gid_, ep); }
     
-    gva_type resolve(endpoint_type const& ep)
+    locality_type resolve(endpoint_type const& ep)
     { return this->base_type::resolve_locality(this->gid_, ep); }
 
     lcos::future_value<gva_type>

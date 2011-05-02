@@ -19,7 +19,7 @@ namespace hpx { namespace agas
 {
 
 template <typename Database>
-struct legacy_client
+struct legacy_agent
 {
     typedef primary_namespace<Database, tag::network::tcpip>
         primary_namespace_type;
@@ -33,9 +33,9 @@ struct legacy_client
     symbol_namespace_type symbol_ns_;
 
   public:
-     explicit legacy_client(naming::id_type const& primary_ns,
-                            naming::id_type const& component_ns,
-                            naming::id_type const& symbol_ns) :
+     explicit legacy_agent(naming::id_type const& primary_ns,
+                           naming::id_type const& component_ns,
+                           naming::id_type const& symbol_ns) :
         primary_ns_(primary_ns),
         component_ns_(component_ns),
         symbol_ns_(symbol_ns) {} 
@@ -77,7 +77,28 @@ struct legacy_client
     // }}}
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    {
+        using boost::asio::ip::address;
+        using boost::fusion::at_c;
+
+        address addr;
+        addr.from_string(l.get_address());
+
+        primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
+
+        if (self)
+        {
+            prefix = naming::get_gid_from_prefix
+                (naming::get_prefix_from_gid(at_c<0>(symbol_ns_.bind(ep))));
+            return prefix;
+        }
+        
+        else 
+        {
+            prefix = at_c<0>(symbol_ns_.resolve(ep)); 
+            return prefix;
+        }
+    } 
 
     // {{{ get_console_prefix
     /// \brief Get locality prefix of the console locality
