@@ -15,7 +15,7 @@
 #include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT stencil_value_out_adaptor

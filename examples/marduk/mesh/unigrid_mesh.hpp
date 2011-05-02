@@ -12,25 +12,25 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
-#include "stubs/had_mesh.hpp"
+#include "stubs/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class had_mesh
-      : public client_base<had_mesh, mesh::stubs::had_mesh>
+    class unigrid_mesh
+      : public client_base<unigrid_mesh, amr::stubs::unigrid_mesh>
     {
     private:
         typedef 
-            client_base<had_mesh, mesh::stubs::had_mesh>
+            client_base<unigrid_mesh, amr::stubs::unigrid_mesh>
         base_type;
 
     public:
-        had_mesh()
+        unigrid_mesh()
         {}
 
-        had_mesh(naming::id_type gid)
+        unigrid_mesh(naming::id_type gid)
           : base_type(gid)
         {}
 

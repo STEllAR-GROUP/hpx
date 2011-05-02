@@ -25,21 +25,21 @@
 #include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
-    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/mesh/server/dynamic_stencil_value.hpp
+    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/server/dynamic_stencil_value.hpp
     class HPX_COMPONENT_EXPORT dynamic_stencil_value 
       : public components::detail::managed_component_base<dynamic_stencil_value >
     {
     protected:
         // the in_adaptors_type is the concrete dynamic_stencil_value_in_adaptor
         // of the proper type
-        typedef mesh::server::stencil_value_in_adaptor in_adaptor_type;
+        typedef amr::server::stencil_value_in_adaptor in_adaptor_type;
 
         // the out_adaptors_type is the concrete dynamic_stencil_value_out_adaptor
         // of the proper type
         typedef 
-            managed_component<mesh::server::stencil_value_out_adaptor>
+            managed_component<amr::server::stencil_value_out_adaptor>
         out_adaptor_type;
 
     public:

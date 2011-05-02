@@ -14,7 +14,7 @@
 #include "stencil_value_out_adaptor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     class stencil_value_in_adaptor 
       : public lcos::eager_future<

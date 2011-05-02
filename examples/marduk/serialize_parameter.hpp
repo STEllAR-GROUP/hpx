@@ -21,7 +21,7 @@ namespace boost { namespace serialization
 {
 
 template <typename Archive>
-void serialize(Archive &ar, hpx::components::mesh::detail::parameter& par,
+void serialize(Archive &ar, hpx::components::amr::detail::parameter& par,
                const unsigned int) 
 {
     ar & par.lambda;
@@ -56,7 +56,7 @@ void serialize(Archive &ar, hpx::components::mesh::detail::parameter& par,
 }
 
 template <typename Archive>
-void serialize(Archive &ar, hpx::components::mesh::parameter& par,
+void serialize(Archive &ar, hpx::components::amr::parameter& par,
                const unsigned int) 
 { ar & par.p; }
 

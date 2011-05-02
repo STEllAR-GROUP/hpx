@@ -18,7 +18,7 @@
 #include "../functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     struct eval_helper
@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
             for (std::size_t i = 0; i < in.size(); ++i) 
                 input_gids[i] = in[i]->get();
 
-            return components::mesh::stubs::functional_component::eval(
+            return components::amr::stubs::functional_component::eval(
                 gid, value_gid, input_gids, row, column, par);
         }
     };
@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
         parameter const& par)
     {
         util::unlock_the_lock<Lock> ul(l);
-        return components::mesh::stubs::functional_component::alloc_data(
+        return components::amr::stubs::functional_component::alloc_data(
             gid, -1, -1, row, par);
     }
 

@@ -15,15 +15,15 @@
 #include "stubs/functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
     class functional_component
-      : public client_base<functional_component, mesh::stubs::functional_component>
+      : public client_base<functional_component, amr::stubs::functional_component>
     {
     private:
         typedef 
-            client_base<functional_component, mesh::stubs::functional_component>
+            client_base<functional_component, amr::stubs::functional_component>
         base_type;
 
     public:

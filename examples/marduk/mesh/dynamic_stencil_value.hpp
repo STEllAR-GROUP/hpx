@@ -12,15 +12,15 @@
 #include "stubs/dynamic_stencil_value.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
-    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/mesh/dynamic_stencil_value.hpp
+    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/dynamic_stencil_value.hpp
     class dynamic_stencil_value 
-      : public client_base<dynamic_stencil_value, mesh::stubs::dynamic_stencil_value >
+      : public client_base<dynamic_stencil_value, amr::stubs::dynamic_stencil_value >
     {
     private:
         typedef 
-            client_base<dynamic_stencil_value, mesh::stubs::dynamic_stencil_value > 
+            client_base<dynamic_stencil_value, amr::stubs::dynamic_stencil_value > 
         base_type;
 
     public:

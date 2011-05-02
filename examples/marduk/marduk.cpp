@@ -13,7 +13,7 @@
 
 #include <examples/marduk/mesh/dynamic_stencil_value.hpp>
 #include <examples/marduk/mesh/functional_component.hpp>
-#include <examples/marduk/mesh/had_mesh.hpp>
+#include <examples/marduk/mesh/unigrid_mesh.hpp>
 #include <examples/marduk/amr_c/stencil.hpp>
 #include <examples/marduk/amr_c/logging.hpp>
 
@@ -38,10 +38,10 @@ using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
 
-using hpx::components::mesh::parameter;
-using hpx::components::mesh::stencil;
-using hpx::components::mesh::had_mesh;
-using hpx::components::mesh::server::logging;
+using hpx::components::amr::parameter;
+using hpx::components::amr::stencil;
+using hpx::components::amr::unigrid_mesh;
+using hpx::components::amr::server::logging;
 
 void appconfig_option(std::string const& name, section const& pars,
                       std::string& data)
@@ -236,7 +236,8 @@ int hpx_main(variables_map& vm)
 
         high_resolution_timer t;
 
-        had_mesh um;
+        // we are in spherical symmetry, r=0 is the smallest radial domain point
+        unigrid_mesh um;
         um.create(here);
         boost::shared_ptr<std::vector<id_type> > result_data =
             um.init_execute(function_type, par->rowsize[0], par->nt0,
@@ -246,7 +247,7 @@ int hpx_main(variables_map& vm)
 
         for (std::size_t i = 0; i < result_data->size(); ++i)
             hpx::components::stubs::memory_block::free((*result_data)[i]);
-    } // had_mesh needs to go out of scope before shutdown
+    } // unigrid_mesh needs to go out of scope before shutdown
 
     // initiate shutdown of the runtime systems on all localities
     finalize();

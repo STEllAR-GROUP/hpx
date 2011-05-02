@@ -11,7 +11,7 @@
 #include <hpx/config/export_definitions.hpp>
 #include "../parameter.hpp"
 
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 
 ///////////////////////////////////////////////////////////////////////////////

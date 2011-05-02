@@ -15,7 +15,7 @@
 #include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT functional_component
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
-        typedef mesh::server::functional_component wrapping_type;
+        typedef amr::server::functional_component wrapping_type;
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class

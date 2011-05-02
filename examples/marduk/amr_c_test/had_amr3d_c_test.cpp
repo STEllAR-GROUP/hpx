@@ -16,7 +16,7 @@
 #include "../amr_c/stencil_functions.hpp"
 #include <examples/marduk/parameter.hpp>
 
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 
 // This is a pointwise calculation: compute the rhs for point result given input values in array phi

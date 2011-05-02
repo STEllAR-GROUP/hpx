@@ -17,10 +17,10 @@
 #include "stencil_data.hpp"
 #include "stencil_functions.hpp"
 #include "stencil_data_locking.hpp"
-#include "../mesh/had_mesh.hpp"
+#include "../mesh/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
     stencil::stencil()

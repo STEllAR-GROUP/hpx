@@ -13,11 +13,11 @@
 #include "../server/dynamic_stencil_value.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace stubs 
+namespace hpx { namespace components { namespace amr { namespace stubs 
 {
-    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/mesh/stubs/dynamic_stencil_value.hpp
+    /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/stubs/dynamic_stencil_value.hpp
     struct dynamic_stencil_value 
-      : components::stubs::stub_base<mesh::server::dynamic_stencil_value >
+      : components::stubs::stub_base<amr::server::dynamic_stencil_value >
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -33,7 +33,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::dynamic_stencil_value::call_action action_type;
+            typedef amr::server::dynamic_stencil_value::call_action action_type;
             return lcos::eager_future<action_type>(targetgid, initial);
         }
 
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::dynamic_stencil_value::get_output_ports_action 
+            typedef amr::server::dynamic_stencil_value::get_output_ports_action 
             action_type;
             typedef std::vector<naming::id_type> return_type;
             return lcos::eager_future<action_type, return_type>(gid);
@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             std::vector<naming::id_type> const& gids)
         {
             typedef 
-                mesh::server::dynamic_stencil_value::connect_input_ports_action 
+                amr::server::dynamic_stencil_value::connect_input_ports_action 
             action_type;
             return lcos::eager_future<action_type, void>(gid, gids);
         }
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             int instencilsize, int outstencilsize, parameter const& par)
         {
             typedef
-                mesh::server::dynamic_stencil_value::set_functional_component_action 
+                amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
             return lcos::eager_future<action_type, void>(gid, functiongid, row, 
                 column, instencilsize, outstencilsize, par);
@@ -116,7 +116,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
         static lcos::future_value<void> 
         start_async(naming::id_type const& gid)
         {
-            typedef mesh::server::dynamic_stencil_value::start_action 
+            typedef amr::server::dynamic_stencil_value::start_action 
                 action_type;
             return lcos::eager_future<action_type, void>(gid);
         }

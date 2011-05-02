@@ -14,7 +14,7 @@
 
 #include <examples/marduk/parameter.hpp>
 
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 
 struct nodedata

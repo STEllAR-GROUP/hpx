@@ -8,10 +8,10 @@
 
 #include "../mesh/server/functional_component.hpp"
 #include "stencil_data.hpp"
-#include "../mesh/had_mesh.hpp"
+#include "../mesh/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
     /// This class implements the time step evolution functionality. It has to
     /// expose several functions: \a eval, \a alloc_data and \a free_data. 
@@ -21,10 +21,10 @@ namespace hpx { namespace components { namespace mesh
     /// datapoint, while the function \a free_data is used to free the memory
     /// allocated using alloc_data.
     class HPX_COMPONENT_EXPORT stencil 
-      : public mesh::server::functional_component
+      : public amr::server::functional_component
     {
     private:
-        typedef mesh::server::functional_component base_type;
+        typedef amr::server::functional_component base_type;
 
     public:
         typedef stencil wrapped_type;

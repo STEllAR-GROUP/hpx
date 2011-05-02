@@ -13,14 +13,14 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
-#include "../server/had_mesh.hpp"
+#include "../server/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace stubs 
+namespace hpx { namespace components { namespace amr { namespace stubs 
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct had_mesh
-      : components::stubs::stub_base<mesh::server::had_mesh>
+    struct unigrid_mesh
+      : components::stubs::stub_base<amr::server::unigrid_mesh>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::had_mesh::init_execute_action action_type;
+            typedef amr::server::unigrid_mesh::init_execute_action action_type;
             return lcos::eager_future<action_type>(gid, function_type,
                 numvalues, numsteps, logging_type,par);
         }
@@ -61,7 +61,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::had_mesh::execute_action action_type;
+            typedef amr::server::unigrid_mesh::execute_action action_type;
             return lcos::eager_future<action_type>(gid, initial_data, 
                 function_type, numvalues, numsteps, logging_type, par);
         }

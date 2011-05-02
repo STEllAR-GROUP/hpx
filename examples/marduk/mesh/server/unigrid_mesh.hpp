@@ -18,29 +18,29 @@
 #include "../../array3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_COMPONENT_EXPORT had_mesh
-      : public simple_component_base<had_mesh>
+    class HPX_COMPONENT_EXPORT unigrid_mesh
+      : public simple_component_base<unigrid_mesh>
     {
     private:
-        typedef simple_component_base<had_mesh> base_type;
+        typedef simple_component_base<unigrid_mesh> base_type;
 
     public:
-        had_mesh();
+        unigrid_mesh();
 
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this component
-        typedef mesh::server::had_mesh wrapping_type;
+        typedef amr::server::unigrid_mesh wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
         enum actions
         {
-            had_mesh_init_execute = 0,
-            had_mesh_execute = 1
+            unigrid_mesh_init_execute = 0,
+            unigrid_mesh_execute = 1
         };
 
         /// This is the main entry point of this component. 
@@ -61,17 +61,17 @@ namespace hpx { namespace components { namespace mesh { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action5<
-            had_mesh, boost::shared_ptr<std::vector<naming::id_type> >,
-            had_mesh_init_execute, components::component_type,
+            unigrid_mesh, boost::shared_ptr<std::vector<naming::id_type> >,
+            unigrid_mesh_init_execute, components::component_type,
             std::size_t, std::size_t, components::component_type,
-            parameter const&, &had_mesh::init_execute
+            parameter const&, &unigrid_mesh::init_execute
         > init_execute_action;
 
         typedef hpx::actions::result_action6<
-            had_mesh, std::vector<naming::id_type>, had_mesh_execute, 
+            unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_execute, 
             std::vector<naming::id_type> const&,
             components::component_type, std::size_t, std::size_t,
-            components::component_type, parameter const&, &had_mesh::execute
+            components::component_type, parameter const&, &unigrid_mesh::execute
         > execute_action;
 
     protected:

@@ -20,7 +20,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 
 typedef double double_type;

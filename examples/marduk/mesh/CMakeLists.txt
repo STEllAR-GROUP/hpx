@@ -5,27 +5,27 @@
 
 ###############################################################################
 set(client_sources
-    mesh.cpp)
+    amr.cpp)
 
 set(server_sources
-    server/had_mesh.cpp
+    server/unigrid_mesh.cpp
     server/functional_component.cpp
     server/stencil_value_out_adaptor.cpp
     server/dynamic_stencil_value.cpp)
 
 ###############################################################################
 set(client_headers
-    had_mesh.hpp
+    unigrid_mesh.hpp
     functional_component.hpp
     dynamic_stencil_value.hpp)
 
 set(stubs_headers
-    stubs/had_mesh.hpp
+    stubs/unigrid_mesh.hpp
     stubs/functional_component.hpp
     stubs/dynamic_stencil_value.hpp)
 
 set(server_headers
-    server/had_mesh.hpp
+    server/unigrid_mesh.hpp
     server/functional_component.hpp
     server/stencil_value_in_adaptor.hpp
     server/stencil_value_out_adaptor.hpp

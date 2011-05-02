@@ -20,17 +20,17 @@
 #include "../../parameter.hpp"
 #include "../../array3d.hpp"
 
-#include "had_mesh.hpp"
+#include "unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::mesh::server::had_mesh had_mesh_type;
+typedef hpx::components::amr::server::unigrid_mesh had_unigrid_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_mesh_type::init_execute_action, 
-    had_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_mesh_type::execute_action, 
-    had_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, 
+    had_unigrid_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, 
+    had_unigrid_mesh_execute_action);
 
 typedef hpx::lcos::base_lco_with_value<
     boost::shared_ptr<std::vector<hpx::naming::id_type> > > lco_gid_vector_ptr;
@@ -40,16 +40,16 @@ HPX_REGISTER_ACTION_EX(lco_gid_vector_ptr::set_result_action,
 HPX_DEFINE_GET_COMPONENT_TYPE(lco_gid_vector_ptr);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_mesh_type>, had_mesh);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_mesh_type);
+    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh3d);
+HPX_DEFINE_GET_COMPONENT_TYPE(had_unigrid_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server 
 {
-    had_mesh::had_mesh()
+    unigrid_mesh::unigrid_mesh()
     {}
 
-    inline bool had_mesh::floatcmp(double_type const& x1, double_type const& x2) {
+    inline bool unigrid_mesh::floatcmp(double_type const& x1, double_type const& x2) {
       // compare two floating point numbers
       static double_type const epsilon = 1.e-8;
       if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
       }
     }
 
-    inline bool had_mesh::floatcmp_ge(double_type const& x1, double_type const& x2) {
+    inline bool unigrid_mesh::floatcmp_ge(double_type const& x1, double_type const& x2) {
       // compare two floating point numbers
       static double_type const epsilon = 1.e-8;
 
@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
       }
     }
 
-    inline bool had_mesh::floatcmp_le(double_type const& x1, double_type const& x2) {
+    inline bool unigrid_mesh::floatcmp_le(double_type const& x1, double_type const& x2) {
       // compare two floating point numbers
       static double_type const epsilon = 1.e-8;
 
@@ -90,7 +90,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     // Initialize functional components by setting the logging component to use
-    void had_mesh::init(distributed_iterator_range_type const& functions,
+    void unigrid_mesh::init(distributed_iterator_range_type const& functions,
         distributed_iterator_range_type const& logging, std::size_t numsteps)
     {
         components::distributing_factory::iterator_type function = functions.first;
@@ -104,7 +104,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
         for (/**/; function != functions.second; ++function)
         {
-            lazyvals.push_back(components::mesh::stubs::functional_component::
+            lazyvals.push_back(components::amr::stubs::functional_component::
                 init_async(*function, numsteps, log));
         }
 
@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     ///////////////////////////////////////////////////////////////////////////////
     // Create functional components, one for each data point, use those to 
     // initialize the stencil value instances
-    void had_mesh::init_stencils(distributed_iterator_range_type const& stencils,
+    void unigrid_mesh::init_stencils(distributed_iterator_range_type const& stencils,
         distributed_iterator_range_type const& functions, int static_step, 
         array3d &dst_port,array3d &dst_src,array3d &dst_step,
         array3d &dst_size,array3d &src_size, parameter const& par)
@@ -128,7 +128,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
-            namespace stubs = components::mesh::stubs;
+            namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
 #if 0       // DEBUG
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     // Get gids of output ports of all functions
-    void had_mesh::get_output_ports(
+    void unigrid_mesh::get_output_ports(
         distributed_iterator_range_type const& stencils,
         std::vector<std::vector<naming::id_type> >& outputs)
     {
@@ -184,7 +184,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         for (/**/; stencil != stencils.second; ++stencil)
         {
-            lazyvals.push_back(components::mesh::stubs::dynamic_stencil_value::
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                 get_output_ports_async(*stencil));
         }
 
@@ -198,7 +198,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     // Currently we have exactly one stencil_value instance per data point, where 
     // the output ports of a stencil_value are connected to the input ports of the 
     // direct neighbors of itself.
-    void had_mesh::connect_input_ports(
+    void unigrid_mesh::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
         std::vector<std::vector<std::vector<naming::id_type> > > const& outputs,
         array3d &dst_size,array3d &dst_step,array3d &dst_src,array3d &dst_port,
@@ -225,7 +225,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
                         outputs[dst_step(step,i,j)][dst_src(step,i,j)][dst_port(step,i,j)]);
                 }
 
-                lazyvals.push_back(components::mesh::stubs::dynamic_stencil_value::
+                lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                     connect_input_ports_async(*stencil, output_ports));
             }
         }
@@ -234,7 +234,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    void had_mesh::prepare_initial_data(
+    void unigrid_mesh::prepare_initial_data(
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type>& initial_data,
         std::size_t numvalues,
@@ -248,7 +248,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
-            lazyvals.push_back(components::mesh::stubs::functional_component::
+            lazyvals.push_back(components::amr::stubs::functional_component::
                 alloc_data_async(*function, i, numvalues, 0,par));
         }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     // do actual work
-    void had_mesh::execute(
+    void unigrid_mesh::execute(
         components::distributing_factory::iterator_range_type const& stencils, 
         std::vector<naming::id_type> const& initial_data, 
         std::vector<naming::id_type>& result_data)
@@ -270,9 +270,9 @@ namespace hpx { namespace components { namespace mesh { namespace server
         for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
         {
             BOOST_ASSERT(i < initial_data.size());
-            lazyvals.push_back(components::mesh::stubs::dynamic_stencil_value::
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                 call_async(*stencil, initial_data[i]));
-          //  lazyvals.push_back(components::mesh::stubs::stencil_value<3>::
+          //  lazyvals.push_back(components::amr::stubs::stencil_value<3>::
           //      call_async(*stencil, initial_data[i]));
         }
 
@@ -281,7 +281,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     
     ///////////////////////////////////////////////////////////////////////////////
     // 
-    void had_mesh::start_row(
+    void unigrid_mesh::start_row(
         components::distributing_factory::iterator_range_type const& stencils)
     {
         // start the execution of all stencil stencils (data items)
@@ -291,7 +291,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
         components::distributing_factory::iterator_type stencil = stencils.first;
         for (std::size_t i = 0; stencil != stencils.second; ++stencil, ++i)
         {
-            lazyvals.push_back(components::mesh::stubs::dynamic_stencil_value::
+            lazyvals.push_back(components::amr::stubs::dynamic_stencil_value::
                 start_async(*stencil));
         }
 
@@ -300,7 +300,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point of this component. 
-    boost::shared_ptr<std::vector<naming::id_type> > had_mesh::init_execute(
+    boost::shared_ptr<std::vector<naming::id_type> > unigrid_mesh::init_execute(
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
         components::component_type logging_type,
@@ -311,7 +311,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
             (new std::vector<naming::id_type>());
 
         components::component_type stencil_type = 
-            components::get_component_type<components::mesh::server::dynamic_stencil_value>();
+            components::get_component_type<components::amr::server::dynamic_stencil_value>();
 
         typedef components::distributing_factory::result_type result_type;
 
@@ -430,7 +430,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// This the other entry point of this component. 
-    std::vector<naming::id_type> had_mesh::execute(
+    std::vector<naming::id_type> unigrid_mesh::execute(
         std::vector<naming::id_type> const& initial_data,
         components::component_type function_type, std::size_t numvalues, 
         std::size_t numsteps,
@@ -442,7 +442,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
         std::vector<naming::id_type> result_data;
 #if 0
         components::component_type stencil_type = 
-            components::get_component_type<components::mesh::server::dynamic_stencil_value >();
+            components::get_component_type<components::amr::server::dynamic_stencil_value >();
 
         typedef components::distributing_factory::result_type result_type;
 
@@ -508,7 +508,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
 
     }
 
-    void had_mesh::prep_ports(array3d &dst_port,array3d &dst_src,
+    void unigrid_mesh::prep_ports(array3d &dst_port,array3d &dst_src,
                                   array3d &dst_step,array3d &dst_size,array3d &src_size,std::size_t num_rows,
                                   std::vector<std::size_t> &each_row,
                                   parameter const& par)
@@ -794,7 +794,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     }
 
     // This routine finds the level of a specified point given its row (step) and column (point)
-    bool had_mesh::intersection(double_type xmin,double_type xmax, 
+    bool unigrid_mesh::intersection(double_type xmin,double_type xmax, 
                                     double_type ymin,double_type ymax, 
                                     double_type zmin,double_type zmax, 
                                     double_type xmin2,double_type xmax2, 
@@ -836,7 +836,7 @@ namespace hpx { namespace components { namespace mesh { namespace server
     }
 
     // This routine finds the level of a specified point given its row (step) and column (point)
-    std::size_t had_mesh::findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, parameter const& par)
+    std::size_t unigrid_mesh::findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, parameter const& par)
     {
       int ll = par->level_row[step];
       // discover what level to which this point belongs

@@ -13,7 +13,7 @@
 #include "logging.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server
+namespace hpx { namespace components { namespace amr { namespace server
 {
     logging::mutex_type logging::mtx_("logging");
 

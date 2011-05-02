@@ -14,7 +14,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/access.hpp>
 
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 
 struct array3d 

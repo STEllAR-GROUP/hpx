@@ -12,7 +12,7 @@
 #include <hpx/lcos/barrier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace server
+namespace hpx { namespace components { namespace amr { namespace server
 {
     /// This class implements a simple logging sink. It exposes the function
     /// \a logentry which is supposed to record the received values in a 
@@ -58,16 +58,16 @@ namespace hpx { namespace components { namespace mesh { namespace server
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace stubs 
+namespace hpx { namespace components { namespace amr { namespace stubs 
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct logging : public components::stubs::stub_base<mesh::server::logging>
+    struct logging : public components::stubs::stub_base<amr::server::logging>
     {
         ///////////////////////////////////////////////////////////////////////
         static void logentry(naming::id_type const& gid, 
             stencil_data const& val, int row, int logcode, parameter const& par)
         {
-            typedef mesh::server::logging::logentry_action action_type;
+            typedef amr::server::logging::logentry_action action_type;
             applier::apply<action_type>(gid, val, row, logcode,par);
         }
     };
@@ -75,13 +75,13 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class logging : public client_base<logging, mesh::stubs::logging>
+    class logging : public client_base<logging, amr::stubs::logging>
     {
     private:
-        typedef client_base<logging, mesh::stubs::logging> base_type;
+        typedef client_base<logging, amr::stubs::logging> base_type;
 
     public:
         logging() {}

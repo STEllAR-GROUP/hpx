@@ -20,8 +20,8 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::mesh::stencil had_stencil_type;
-typedef hpx::components::mesh::server::logging had_logging_type;
+typedef hpx::components::amr::stencil had_stencil_type;
+typedef hpx::components::amr::server::logging had_logging_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation

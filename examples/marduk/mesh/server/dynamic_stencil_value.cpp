@@ -19,18 +19,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Define types of stencil components exposed by this module
 typedef hpx::components::managed_component<
-    hpx::components::mesh::server::dynamic_stencil_value 
+    hpx::components::amr::server::dynamic_stencil_value 
 > dynamic_stencil_value_double_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
 /// of new stencil instances. The name used as the second macro parameter
 /// must match the component name used in the ini configuration file used
-/// for this component. For instance the configuration file had_mesh.ini may look 
+/// for this component. For instance the configuration file had_amr.ini may look 
 /// like:
 /// 
 /// [hpx.components.dynamic_stencil_double]      # this must match the string below
-/// name = had_mesh                               # this must match the name of the shared library
+/// name = had_amr                               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dynamic_stencil_value_double_type, 

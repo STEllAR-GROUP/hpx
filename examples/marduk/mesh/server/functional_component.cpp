@@ -15,7 +15,7 @@
 #include "functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::mesh::server::functional_component functional_component_type;
+typedef hpx::components::amr::server::functional_component functional_component_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions

@@ -16,11 +16,11 @@
 #include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace mesh { namespace stubs 
+namespace hpx { namespace components { namespace amr { namespace stubs 
 {
     ///////////////////////////////////////////////////////////////////////////
     struct functional_component
-      : components::stubs::stub_base<mesh::server::functional_component>
+      : components::stubs::stub_base<amr::server::functional_component>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::functional_component::eval_action action_type;
+            typedef amr::server::functional_component::eval_action action_type;
             return lcos::eager_future<action_type>(gid, result, gids, row, column,par);
         }
 
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
-            typedef mesh::server::functional_component::alloc_data_action action_type;
+            typedef amr::server::functional_component::alloc_data_action action_type;
             return lcos::eager_future<action_type>(gid, item, maxitems, row, par);
         }
 
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace mesh { namespace stubs
         init_async(naming::id_type const& gid, std::size_t numsteps, 
             naming::id_type const& val)
         {
-            typedef mesh::server::functional_component::init_action action_type;
+            typedef amr::server::functional_component::init_action action_type;
             return lcos::eager_future<action_type, void>(gid, numsteps, val);
         }
 

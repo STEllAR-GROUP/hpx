@@ -18,7 +18,7 @@
 
 #include "stencil_data.hpp"
 
-namespace hpx { namespace components { namespace mesh 
+namespace hpx { namespace components { namespace amr 
 {
 #define HPX_LOCK_MUTEX(z, n, _) BOOST_PP_COMMA_IF(n) mutexes[n].get()
 #define HPX_LOCK_MUTEXES(z, n, _)                                             \
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace mesh
 
             default:
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "hpx::components::mesh::detail::lock", 
+                    "hpx::components::amr::detail::lock", 
                     "invalid number of arguments" + boost::lexical_cast<std::string>(mutexes.size()));
                 break;
             }
