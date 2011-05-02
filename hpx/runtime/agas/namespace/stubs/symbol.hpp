@@ -55,14 +55,14 @@ struct symbol_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<void>
+    static lcos::future_value<bool>
     unbind_async(naming::id_type const& gid, symbol_type const& key)
     {
         typedef typename server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, void>(gid, key);
+        return lcos::eager_future<action_type, bool>(gid, key);
     }
     
-    static void unbind(naming::id_type const& gid, symbol_type const& key)
+    static bool unbind(naming::id_type const& gid, symbol_type const& key)
     { return unbind_async(gid, key).get(); } 
     // }}}
 };            

@@ -78,11 +78,11 @@ struct primary_namespace
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<void>
+    lcos::future_value<bool>
     unbind_async(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind_async(this->gid_, gid, count); }
     
-    void unbind(naming::gid_type const& gid, count_type count)
+    bool unbind(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind(this->gid_, gid, count); }
     
     ///////////////////////////////////////////////////////////////////////////

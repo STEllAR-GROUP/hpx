@@ -90,15 +90,15 @@ struct primary_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<void>
+    static lcos::future_value<bool>
     unbind_async(naming::id_type const& gid, naming::gid_type const& id,
                  count_type count)
     {
         typedef typename server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, void>(gid, id, count);
+        return lcos::eager_future<action_type, bool>(gid, id, count);
     }
     
-    static void unbind(naming::id_type const& gid, naming::gid_type const& id,
+    static bool unbind(naming::id_type const& gid, naming::gid_type const& id,
                        count_type count)
     { return unbind_async(gid, id, count).get(); } 
     // }}}

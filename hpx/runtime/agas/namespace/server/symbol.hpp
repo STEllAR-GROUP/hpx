@@ -74,10 +74,20 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         return it->second;
     } // }}}  
     
-    void unbind(symbol_type const& key)
+    bool unbind(symbol_type const& key)
     { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
-        gids_.get().erase(key);
+        
+        typename gid_table_type::map_type& gid_table = gids_.get();
+
+        typename gid_table_type::map_type::iterator
+            it = gid_table.find(key), end = gid_table.end();
+
+        if (it == end)
+            return false;
+
+        gid_table.erase(key);
+        return true;
     } // }}} 
 
     // {{{ action types
@@ -104,8 +114,9 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         &symbol_namespace<Database>::resolve
     > resolve_action;
     
-    typedef hpx::actions::action1<
+    typedef hpx::actions::result_action1<
         symbol_namespace<Database>,
+        /* retrun type */ bool,
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
         &symbol_namespace<Database>::unbind

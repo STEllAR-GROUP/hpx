@@ -57,10 +57,10 @@ struct symbol_namespace
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<void> unbind_async(symbol_type const& key)
+    lcos::future_value<bool> unbind_async(symbol_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    void unbind(symbol_type const& key)
+    bool unbind(symbol_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
 

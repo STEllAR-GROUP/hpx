@@ -141,7 +141,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
         return it->second;
     } // }}} 
     
-    void unbind(component_name_type const& key)
+    bool unbind(component_name_type const& key)
     { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
@@ -156,12 +156,14 @@ struct HPX_COMPONENT_EXPORT component_namespace
 
         // REVIEW: Should this be an error?
         if (it == end)
-          return;
+          return false;
 
         // REVIEW: If there are no localities with this type, should we throw
         // an exception here?
         factory_table.erase(it->second);
         c_id_table.erase(it);
+
+        return true;
     } // }}} 
 
     // {{{ action types
@@ -197,8 +199,9 @@ struct HPX_COMPONENT_EXPORT component_namespace
         &component_namespace<Database>::resolve_name
     > resolve_name_action;
     
-    typedef hpx::actions::action1<
+    typedef hpx::actions::result_action1<
         component_namespace<Database>,
+        /* return type */ bool,
         /* enum value */  namespace_unbind,
         /* arguments */   component_name_type const&,
         &component_namespace<Database>::unbind

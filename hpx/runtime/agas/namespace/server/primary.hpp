@@ -421,7 +421,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return gva_type();
     } // }}}
 
-    void unbind(naming::gid_type const& gid, count_type count)
+    bool unbind(naming::gid_type const& gid, count_type count)
     { // {{{ unbind implementation
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
@@ -446,7 +446,11 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             }
 
             gva_table.erase(it);
-        }       
+            return true;
+        }
+
+        else
+            return false;       
     } // }}}
 
     count_type increment(naming::gid_type const& gid, count_type credits)
@@ -655,8 +659,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         &primary_namespace<Database, Protocol>::resolve_gid
     > resolve_gid_action;
     
-    typedef hpx::actions::action2<
+    typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
+        /* return type */ bool,
         /* enum value */  namespace_unbind,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::unbind

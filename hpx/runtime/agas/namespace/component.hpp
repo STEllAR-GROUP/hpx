@@ -70,11 +70,11 @@ struct component_namespace
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<void>
+    lcos::future_value<bool>
     unbind_async(component_name_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    void unbind(component_name_type const& key)
+    bool unbind(component_name_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
 

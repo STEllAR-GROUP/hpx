@@ -476,49 +476,8 @@ struct legacy_agent
     // }}}
     bool unbind(naming::gid_type const& id, error_code& ec = throws) const
     { // {{{ unbind implementation
-        naming::address addr; // ignore the return value
-        return unbind_range(id, 1, addr, ec);
+        return unbind_range(id, 1, ec);
     } // }}}
-
-    // {{{ unbind specification
-    /// \brief Unbind a global address
-    ///
-    /// Remove the association of the given global address with any local 
-    /// address, which was bound to this global address. Additionally it 
-    /// returns the local address which was bound at the time of this call.
-    /// 
-    /// \param id         [in] The global address (id) for which the 
-    ///                   association has to be removed.
-    /// \param addr       [out] The local address which was associated with 
-    ///                   the given global address (id).
-    ///                   This is valid only if the return value of this 
-    ///                   function is true.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \returns          The function returns \a true if the association 
-    ///                   has been removed, and it returns \a false if no 
-    ///                   association existed. Any error results in an 
-    ///                   exception thrown from this function.
-    ///
-    /// \note             You can unbind only global ids bound using the 
-    ///                   function \a bind. Do not use this function to 
-    ///                   unbind any of the global ids bound using 
-    ///                   \a bind_range.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    /// 
-    /// \note             This function will raise an error if the global 
-    ///                   reference count of the given gid is not zero!
-    // }}}
-    bool unbind(naming::gid_type const& id, naming::address& addr, 
-                error_code& ec = throws) const
-    { return unbind_range(id, 1, addr, ec); }
 
     // {{{ unbind_range specification
     /// \brief Unbind the given range of global ids
@@ -558,10 +517,7 @@ struct legacy_agent
     // }}}
     bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                       error_code& ec = throws) const
-    { 
-        primary_ns_.unbind(lower_id, count);
-        return true;          
-    } 
+    { return primary_ns_.unbind(lower_id, count); } 
 
     // {{{ resolve specification
     /// \brief Resolve a given global address (id) to its associated local 
@@ -612,7 +568,7 @@ struct legacy_agent
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
                         error_code& ec = throws) const
-    { return false; /* IMPLEMENT */ }
+    { return resolve(id, addr, true, ec); /* IMPLEMENT */ }
 
     // {{{ registerid specification
     /// \brief Register a global name with a global address (id)
@@ -672,10 +628,7 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool unregisterid(std::string const& name, error_code& ec = throws) const
-    {
-        symbol_ns_.unbind(name);
-        return true;
-    }
+    { return symbol_ns_.unbind(name); }
 
     // {{{ queryid specification
     /// Query for the global address associated with a given global name.
