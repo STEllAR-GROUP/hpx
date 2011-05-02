@@ -372,7 +372,23 @@ struct legacy_agent
     bool bind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                     naming::address const& baseaddr, std::ptrdiff_t offset, 
                     error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    {
+        using boost::asio::ip::address;
+        using boost::fusion::at_c;
+
+        address addr;
+        addr.from_string(baseaddr.locality_.get_address());
+
+        typename primary_namespace_type::endpoint_type ep
+            (addr, baseaddr.locality_.get_port()); 
+        
+        // Create a global virtual address from the legacy calling convention
+        // parameters.
+        typename primary_namespace_type::gva_type gva
+            (ep, baseaddr.type_, count, baseaddr.address_, offset);
+
+        return primary_ns_.bind(lower_id, gva); 
+    } 
 
     // {{{ incref specification
     /// \brief Increment the global reference count for the given id
