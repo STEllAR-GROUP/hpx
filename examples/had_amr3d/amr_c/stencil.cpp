@@ -1736,3 +1736,8 @@ namespace hpx { namespace components { namespace amr
 
 }}}
 
+// add serialization support for stencil_data helper object
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::actions::manage_object_action<stencil_data>, 
+    manage_object_action_stencil_data)
+

@@ -54,6 +54,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<memory_data_type>,
     hpx::components::component_base_lco_with_value);
 
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::actions::manage_object_action<boost::uint8_t>, 
+    manage_object_action_uint8_t)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
 {
@@ -72,6 +76,8 @@ namespace hpx { namespace components { namespace server { namespace detail
     /// Write back data
     void memory_block::checkin(components::memory_block_data const& data) 
     {
+        // safety net, making sure we don't write accidentally
+        BOOST_ASSERT(false);
     }
 
     /// Clone this memory_block

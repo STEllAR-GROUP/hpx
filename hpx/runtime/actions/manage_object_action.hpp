@@ -11,6 +11,7 @@
 #include <boost/serialization/serialization.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -58,7 +59,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct manage_object_action : manage_object_action_base        
+    struct manage_object_action : manage_object_action_base
     {
         manage_object_action() {}
         ~manage_object_action() {}
@@ -101,28 +102,50 @@ namespace hpx { namespace actions
             return instance;
         }
 
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<manage_object_action, manage_object_action_base>();
+        }
+
     private:
         // serialization support, just serialize the type
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) {}
+        void serialize(Archive& ar, const unsigned int) 
+        {
+            using namespace boost::serialization;
+            ar & base_object<manage_object_action_base>(*this);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct manage_object_action<boost::uint8_t> : manage_object_action_base        
+    struct manage_object_action<boost::uint8_t> : manage_object_action_base
     {
         manage_object_action() {}
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<manage_object_action, manage_object_action_base>();
+        }
 
     private:
         // serialization support, just serialize the type
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) {}
+        void serialize(Archive& ar, const unsigned int) 
+        {
+            using namespace boost::serialization;
+            ar & base_object<manage_object_action_base>(*this);
+        }
     };
-        
+
     inline manage_object_action_base const& 
     manage_object_action_base::get_instance() const
     {
@@ -131,6 +154,11 @@ namespace hpx { namespace actions
         return instance;
     }
 }}
+
+#define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \
+        BOOST_CLASS_EXPORT(object_action)                                     \
+        HPX_REGISTER_BASE_HELPER(object_action, name)                         \
+    /***/
 
 #include <hpx/config/warnings_suffix.hpp>
 
