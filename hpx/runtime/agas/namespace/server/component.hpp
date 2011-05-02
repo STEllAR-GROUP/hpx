@@ -123,10 +123,10 @@ struct HPX_COMPONENT_EXPORT component_namespace
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Load the table.
-        typename component_id_table_type::map_type const& c_id_table =
+        typename component_id_table_type::map_type& c_id_table =
             component_ids_.get();
         
-        typename component_id_table_type::map_type::const_iterator
+        typename component_id_table_type::map_type::iterator
             it = c_id_table.find(key), end = c_id_table.end();
 
         // If the name is not in the table, register it (this is only done so
