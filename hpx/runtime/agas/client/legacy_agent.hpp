@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
