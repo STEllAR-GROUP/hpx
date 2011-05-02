@@ -89,13 +89,13 @@ struct legacy_agent
         if (self)
         {
             prefix = naming::get_gid_from_prefix
-                (naming::get_prefix_from_gid(at_c<0>(symbol_ns_.bind(ep))));
+                (naming::get_prefix_from_gid(at_c<0>(primary_ns_.bind(ep))));
             return prefix;
         }
         
         else 
         {
-            prefix = at_c<0>(symbol_ns_.resolve(ep)); 
+            prefix = at_c<0>(primary_ns_.resolve(ep)); 
             return prefix;
         }
     } 
@@ -121,7 +121,10 @@ struct legacy_agent
     // }}}
     bool get_console_prefix(naming::gid_type& prefix,
                             error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    {
+        prefix = symbol_ns_.resolve("/console");
+        return prefix;
+    } 
 
     // {{{ get_prefixes specification
     /// \brief Query for the prefixes of all known localities.
