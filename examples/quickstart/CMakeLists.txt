@@ -7,6 +7,8 @@
 # define build targets for this directory
 set(example_programs
     basic_example
+    distributed_test
+    null_thread_test
     factorial
     factorial_get
     fibonacci1
