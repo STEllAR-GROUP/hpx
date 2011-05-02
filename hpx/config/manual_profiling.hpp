@@ -5,20 +5,20 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(SHEOL_8877B5FB_1967_43B9_AF98_1A01F162B725)
-#define SHEOL_8877B5FB_1967_43B9_AF98_1A01F162B725
+#if !defined(HPX_8877B5FB_1967_43B9_AF98_1A01F162B725)
+#define HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
 
 #if defined(__GNUC__)
-  #define SHEOL_SUPER_PURE  __attribute__((const)) 
-  #define SHEOL_PURE        __attribute__((pure)) 
-  #define SHEOL_HOT         __attribute__((hot)) 
-  #define SHEOL_COLD        __attribute__((cold)) 
+  #define HPX_SUPER_PURE  __attribute__((const)) 
+  #define HPX_PURE        __attribute__((pure)) 
+  #define HPX_HOT         __attribute__((hot)) 
+  #define HPX_COLD        __attribute__((cold)) 
 #else
-  #define SHEOL_SUPER_PURE
-  #define SHEOL_PURE
-  #define SHEOL_HOT
-  #define SHEOL_COLD
+  #define HPX_SUPER_PURE
+  #define HPX_PURE
+  #define HPX_HOT
+  #define HPX_COLD
 #endif
 
-#endif // SHEOL_8877B5FB_1967_43B9_AF98_1A01F162B725
+#endif // HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
 
