@@ -557,53 +557,10 @@ struct legacy_agent
     // }}}
     bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
                       error_code& ec = throws) const
-    { // {{{ unbind_range implementation
-        naming::address addr; // ignore the return value
-        return unbind_range(lower_id, count, addr, ec);
-    } // }}}
-
-    // {{{ unbind_range specification
-    /// \brief Unbind the given range of global ids
-    ///
-    /// \param lower_id   [in] The lower bound of the assigned id range.
-    ///                   The value must the first id of the range as 
-    ///                   specified to the corresponding call to 
-    ///                   \a bind_range. 
-    /// \param count      [in] The number of consecutive global ids to unbind
-    ///                   starting at \a lower_id. This number must be 
-    ///                   identical to the number of global ids bound by 
-    ///                   the corresponding call to \a bind_range
-    /// \param addr       [out] The local address which was associated with 
-    ///                   the given global address (id).
-    ///                   This is valid only if the return value of this 
-    ///                   function is true.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \returns          This function returns \a true if a new range has 
-    ///                   been generated (it has been called for the first 
-    ///                   time for the given locality) and returns \a false 
-    ///                   if this locality already got a range assigned in 
-    ///                   an earlier call. 
-    ///
-    /// \note             You can unbind only global ids bound using the 
-    ///                   function \a bind_range. Do not use this function 
-    ///                   to unbind any of the global ids bound using 
-    ///                   \a bind.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    /// 
-    /// \note             This function will raise an error if the global 
-    ///                   reference count of the given gid is not zero!
-    // }}}
-    bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
-                      naming::address& addr, error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    { 
+        primary_ns_.unbind(lower_id, count);
+        return true;          
+    } 
 
     // {{{ resolve specification
     /// \brief Resolve a given global address (id) to its associated local 
@@ -638,7 +595,15 @@ struct legacy_agent
     // }}}
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) const
-    { /* IMPLEMENT */ }
+    {
+        typename primary_namespace_type::gva_type gva = primary_ns_.resolve(id);
+
+        addr.locality_ = gva.endpoint;
+        addr.type_ = gva.type;
+        addr.address_ = gva.lva();
+
+        return true;
+    }
 
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) const
@@ -646,7 +611,7 @@ struct legacy_agent
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
                         error_code& ec = throws) const
-    { /* IMPLEMENT */ }
+    { return false; /* IMPLEMENT */ }
 
     // {{{ registerid specification
     /// \brief Register a global name with a global address (id)
@@ -679,7 +644,7 @@ struct legacy_agent
     // }}}
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) const
-    { /* IMPLEMENT */ }
+    { return symbol_ns_.bind(name, id); }
 
     // {{{ unregisterid specification
     /// \brief Unregister a global name (release any existing association)
@@ -706,7 +671,10 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool unregisterid(std::string const& name, error_code& ec = throws) const
-    { /* IMPLEMENT */ }
+    {
+        symbol_ns_.unbind(name);
+        return true;
+    }
 
     // {{{ queryid specification
     /// Query for the global address associated with a given global name.
@@ -737,92 +705,10 @@ struct legacy_agent
     // }}}
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) const
-    { /* IMPLEMENT */ }
-
-    // {{{ get_statistics_count specification
-    /// \brief Query for the gathered statistics of this AGAS instance 
-    ///        (server execution count)
-    ///
-    /// This function returns the execution counts for each of the 
-    /// commands
-    /// 
-    /// \param counts     [out] The vector will contain the server 
-    ///                   execution counts, one entry for each of the 
-    ///                   possible resolver_client commands (i.e. will be 
-    ///                   of the size 'server::command_lastcommand').
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
-    bool get_statistics_count(std::vector<std::size_t>& counts,
-                              error_code& ec = throws) const
-    { /* IMPLEMENT */ }
-
-    // {{{ get_statistics_mean specification
-    /// \brief Query for the gathered statistics of this AGAS instance 
-    ///        (average server execution time)
-    ///
-    /// This function returns the average timings for each of the commands
-    /// 
-    /// \param timings    [out] The vector will contain the average server 
-    ///                   execution times, one entry for each of the 
-    ///                   possible resolver_client commands (i.e. will be 
-    ///                   of the size 'server::command_lastcommand').
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
-    bool get_statistics_mean(std::vector<double>& timings,
-                             error_code& ec = throws) const
-    { /* IMPLEMENT */ }
-
-    // {{{ get_statistics_moment2 specification
-    /// \brief Query for the gathered statistics of this AGAS instance 
-    ///        (statistical 2nd moment of server execution time)
-    ///
-    /// This function returns the 2nd moment for the timings for each of 
-    /// the commands
-    /// 
-    /// \param moments    [out] The vector will contain the 2nd moment of 
-    ///                   the server execution times, one entry for each of 
-    ///                   the possible resolver_client commands (i.e. will 
-    ///                   be of the size 'server::command_lastcommand').
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
-    bool get_statistics_moment2(std::vector<double>& moments,
-                                error_code& ec = throws) const
-    { /* IMPLEMENT */ }
-
-    /// \brief Return the locality of the resolver server this resolver 
-    ///        client instance is using to serve requests
-    naming::locality const& there() const { /* IMPLEMENT */ }
-
-    /// \brief Returns whether this resolver_client represents the console 
-    ///        locality
-    bool is_console() const { /* IMPLEMENT */ }
-
-    /// \brief Returns whether this resolver_client runs in SMP mode
-    bool is_smp_mode() const { /* IMPLEMENT */ }
+    {
+        id = symbol_ns_.resolve(ns_name);
+        return id;         
+    }
 };
 
 }}
