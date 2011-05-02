@@ -28,6 +28,8 @@ struct legacy_agent
     typedef component_namespace<Database> component_namespace_type;
     typedef symbol_namespace<Database> symbol_namespace_type;
 
+    typedef typename component_namespace_type::component_id_type
+        component_id_type;
   private:
     primary_namespace_type primary_ns_;
     component_namespace_type component_ns_;
@@ -155,11 +157,9 @@ struct legacy_agent
     ///                   of hpx#exception.
     // }}}
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      components::component_type type,
-                      error_code& ec = throws) const 
+                      component_id_type type, error_code& ec = throws) const 
     {
-        prefixes = component_ns_.resolve
-            (typename component_namespace_type::component_id_type(type));
+        prefixes = component_ns_.resolve(type);
         return !prefixes.empty();
     } 
 
@@ -403,10 +403,10 @@ struct legacy_agent
     /// 
     /// \returns          The global reference count after the increment. 
     // }}}
-    boost::uint32_t incref(naming::gid_type const& id,
-                           boost::uint32_t credits = 1, 
-                           error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    typename primary_namespace_type::count_type
+    incref(naming::gid_type const& id, boost::uint32_t credits = 1, 
+           error_code& ec = throws) const
+    { return primary_ns_.increment(id, credits); } 
 
     // {{{ decref specification
     /// \brief Decrement the global reference count for the given id
@@ -426,11 +426,20 @@ struct legacy_agent
     /// 
     /// \returns          The global reference count after the decrement. 
     // }}}
-    boost::uint32_t decref(naming::gid_type const& id, 
-                           components::component_type& t,
-                           boost::uint32_t credits = 1,
-                           error_code& ec = throws) const
-    { /* IMPLEMENT */ } 
+    typename primary_namespace_type::count_type
+    decref(naming::gid_type const& id, component_id_type& t,
+           boost::uint32_t credits = 1, error_code& ec = throws) const
+    {
+        using boost::fusion::at_c;
+
+        typename primary_namespace_type::decrement_result_type r
+            = primary_ns_.increment(id, credits);
+
+        if (at_c<0>(r) == 0)
+            t = at_c<1>(r);
+
+        return at_c<0>(r);
+    }
 
     // {{{ unbind specification
     /// \brief Unbind a global address
