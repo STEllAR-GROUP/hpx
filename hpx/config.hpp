@@ -28,7 +28,7 @@
 #define HPX_RANDOM_PORT_MAX         26132
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DEBUG) && defined(_DEBUG)
+#if !defined(HPX_DEBUG) && defined(DEBUG)
 #  define HPX_DEBUG 1
 #endif
 
@@ -201,7 +201,11 @@
     #if defined(BOOST_WINDOWS)
         #define HPX_DEFAULT_STACK_SIZE 0x4000
     #else
-        #define HPX_DEFAULT_STACK_SIZE 0x4000 
+      #if defined(HPX_DEBUG)
+        #define HPX_DEFAULT_STACK_SIZE 0x10000 
+      #else
+        #define HPX_DEFAULT_STACK_SIZE 0x8000 
+      #endif 
     #endif
 #endif
 
