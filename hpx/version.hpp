@@ -21,4 +21,8 @@
 
 #define HPX_VERSION_DATE         20100929
 
+#if !defined(HPX_AGAS_VERSION)
+    #define HPX_AGAS_VERSION 0x10
+#endif
+
 #endif

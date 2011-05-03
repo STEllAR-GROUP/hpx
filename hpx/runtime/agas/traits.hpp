@@ -10,6 +10,7 @@
 
 #include <boost/mpl/integral_c.hpp>
 
+#include <hpx/version.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/agas/traits_fwd.hpp>
 #include <hpx/runtime/agas/network/traits.hpp>
@@ -21,7 +22,7 @@ namespace hpx { namespace agas { namespace traits
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Enable>
 struct serialization_version
-  : boost::mpl::integral_c<unsigned, 0x10> {};
+  : boost::mpl::integral_c<unsigned, HPX_AGAS_VERSION> {};
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Mutex, typename Enable>

@@ -177,6 +177,17 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
+# AGAS configuration
+################################################################################
+set(HPX_AGAS_VERSION "1" CACHE STRING "AGAS subsystem version")
+
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
+  add_definitions(-DHPX_AGAS_VERSION=0x20)
+else()
+  add_definitions(-DHPX_AGAS_VERSION=0x10)
+endif()
+
+################################################################################
 # hardware support
 ################################################################################
 option(HPX_HW_ACCELERATION "Compile in support for hardware acceleration (default: off)." OFF)
