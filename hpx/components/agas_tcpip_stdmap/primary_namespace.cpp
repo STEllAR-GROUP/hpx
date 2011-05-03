@@ -54,6 +54,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     agas_component::unbind_action,
     tcpip_stdmap_primary_namespace_unbind_action);
+HPX_REGISTER_ACTION_EX(
+    agas_component::localities_action,
+    tcpip_stdmap_primary_namespace_localities_action);
 
 // GID reference count interface
 HPX_REGISTER_ACTION_EX(
