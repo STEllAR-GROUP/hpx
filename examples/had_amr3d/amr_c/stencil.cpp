@@ -5,8 +5,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 
 #include <boost/foreach.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <math.h>
 
