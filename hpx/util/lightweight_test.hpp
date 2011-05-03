@@ -12,6 +12,7 @@
 
 #include <iostream>
 
+#include <boost/io/ios_state.hpp>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
@@ -85,6 +86,7 @@ struct fixture
         if (!t)
         { 
             mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_); 
             stream_ 
                 << file << "(" << line << "): "
                 << msg << " failed in function '"
@@ -102,6 +104,7 @@ struct fixture
         if (!(t == u))
         {
             mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_); 
             stream_ 
                 << file << "(" << line << "): " << msg  
                 << " failed in function '" << function << "': "
@@ -120,6 +123,7 @@ struct fixture
         if (!(t != u))
         {
             mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_); 
             stream_ 
                 << file << "(" << line << "): " << msg  
                 << " failed in function '" << function << "': "
@@ -137,6 +141,7 @@ struct fixture
         if (!(t < u))
         {
             mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_); 
             stream_ 
                 << file << "(" << line << "): " << msg  
                 << " failed in function '" << function << "': "
@@ -155,6 +160,7 @@ struct fixture
         if (!(t <= u))
         {
             mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_); 
             stream_ 
                 << file << "(" << line << "): " << msg  
                 << " failed in function '" << function << "': "
@@ -170,7 +176,7 @@ fixture global_fixture = fixture(std::cerr);
 
 } // hpx::util::detail
 
-inline int report_errors()
+inline int report_errors(std::ostream& stream = std::cerr)
 {
     std::size_t sanity = detail::global_fixture.get(counter_sanity),
                 test   = detail::global_fixture.get(counter_test); 
@@ -179,11 +185,12 @@ inline int report_errors()
 
     else
     {
-        std::cerr << sanity << " sanity check"
-                  << ((sanity == 1) ? " and " : "s and ")
-                  << test << " test"
-                  << ((test == 1) ? " failed." : "s failed.")
-                  << std::endl;
+        boost::io::ios_flags_saver ifs(stream); 
+        stream << sanity << " sanity check"
+               << ((sanity == 1) ? " and " : "s and ")
+               << test << " test"
+               << ((test == 1) ? " failed." : "s failed.")
+               << std::endl;
         return 1;
     }
 }

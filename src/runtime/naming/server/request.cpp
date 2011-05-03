@@ -12,6 +12,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
@@ -55,6 +56,7 @@ namespace hpx { namespace naming { namespace server
     // debug support for a request class
     std::ostream& operator<< (std::ostream& os, request const& req)
     {
+        boost::io::ios_flags_saver ifs(os); 
         os << get_command_name(req.command_) << ": ";
 
         switch (req.command_) {
@@ -65,10 +67,10 @@ namespace hpx { namespace naming { namespace server
         case command_bind_range:
             os << "id" << req.id_ << " ";
             if (req.count_ != 1)
-                os << "count(" << std::dec << req.count_ << ") ";
+                os << "count(" << req.count_ << ") ";
             os << "addr(" << req.addr_ << ") ";
             if (req.offset_ != 0)
-                os << "offset(" << std::dec << req.offset_ << ") ";
+                os << "offset(" << req.offset_ << ") ";
             break;
 
         case command_incref:
@@ -76,7 +78,7 @@ namespace hpx { namespace naming { namespace server
         case command_unbind_range:
             os << "id" << req.id_ << " ";
             if (req.count_ != 1)
-                os << "count(" << std::dec << req.count_ << ") ";
+                os << "count(" << req.count_ << ") ";
             break;
 
         case command_get_component_id:
@@ -102,7 +104,7 @@ namespace hpx { namespace naming { namespace server
 
         case command_getidrange:
             os << "site(" << req.site_ << ") ";
-            os << "count(" << std::dec << req.count_ << ") ";
+            os << "count(" << req.count_ << ") ";
             break;
 
         case command_getprefixes:

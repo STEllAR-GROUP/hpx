@@ -88,6 +88,7 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, full_address const& fa)
     {
+        boost::io::ios_flags_saver ifs(os); 
         os << fa.gid_ << "[" << fa.address_ << "]"; 
         return os;
     }

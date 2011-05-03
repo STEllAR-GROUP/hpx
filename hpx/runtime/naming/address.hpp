@@ -6,6 +6,7 @@
 #if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
 #define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
 
+#include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
@@ -104,9 +105,10 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, address const& addr)
     {
+        boost::io::ios_flags_saver ifs(os); 
         os << "(" << addr.locality_ << ":" 
            << components::get_component_type_name((int)addr.type_) 
-           << ":0x" << std::hex << addr.address_ << ")"; 
+           << ":" << std::showbase << std::hex << addr.address_ << ")"; 
         return os;
     }
 

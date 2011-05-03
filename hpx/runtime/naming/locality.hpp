@@ -13,6 +13,7 @@
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/config.hpp>
+#include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
@@ -174,7 +175,8 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, locality const& l)
     {
-        os << std::dec << l.address_ << ":" << l.port_;
+        boost::io::ios_flags_saver ifs(os); 
+        os << l.address_ << ":" << l.port_;
         return os;
     }
 

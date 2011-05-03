@@ -11,6 +11,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/vector.hpp>
@@ -71,6 +72,7 @@ namespace hpx { namespace naming { namespace server
     // Streaming operator, used by logging
     std::ostream& operator<< (std::ostream& os, reply const& rep)
     {
+        boost::io::ios_flags_saver ifs(os); 
         os << get_command_name(rep.command_) << ": ";
 
         if (rep.status_ != success && rep.status_ != repeated_request) {
