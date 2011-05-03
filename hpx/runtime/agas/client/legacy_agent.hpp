@@ -160,20 +160,39 @@ struct legacy_agent
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       component_id_type type, error_code& ec = throws) 
     {
-        typedef typename component_namespace_type::prefixes_type::const_iterator
-            iterator;
+        if (type != components::component_invalid)
+        {
+            typedef typename component_namespace_type::prefixes_type::
+                const_iterator iterator;
+    
+            typename component_namespace_type::prefixes_type raw_prefixes
+                = component_ns_.resolve(type);
+    
+            if (raw_prefixes.empty())
+                return false;
+    
+            iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
+    
+            for (; it != end; ++it) 
+                prefixes.push_back(naming::get_gid_from_prefix(*it));
+    
+            return true; 
+        }
 
-        typename component_namespace_type::prefixes_type raw_prefixes
-            = component_ns_.resolve(type);
-
+        typedef typename primary_namespace_type::prefixes_type::
+            const_iterator iterator;
+    
+        typename primary_namespace_type::prefixes_type raw_prefixes
+            = primary_ns_.localities();
+    
         if (raw_prefixes.empty())
             return false;
-
+    
         iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
-
+    
         for (; it != end; ++it) 
             prefixes.push_back(naming::get_gid_from_prefix(*it));
-
+    
         return true; 
     } 
 

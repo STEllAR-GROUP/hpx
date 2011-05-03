@@ -40,11 +40,13 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef typename gva_type::count_type count_type;
     typedef typename gva_type::offset_type offset_type;
     typedef int component_type;
+    typedef boost::uint32_t prefix_type;
+    typedef std::vector<prefix_type> prefixes_type;
 
     typedef boost::fusion::vector2<count_type, component_type>
         decrement_result_type;
 
-    typedef boost::fusion::vector2<boost::uint32_t, naming::gid_type>
+    typedef boost::fusion::vector2<prefix_type, naming::gid_type>
         partition_type;
 
     typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
@@ -615,6 +617,31 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return decrement_result_type(cnt, components::component_invalid);
     } // }}}
  
+    prefixes_type 
+    localities()
+    { // {{{ localities implementation
+        using boost::fusion::at_c;
+
+        prefixes_type prefixes;
+
+        typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Load the partition table 
+        typename partition_table_type::map_type const&
+            partition_table = partitions_.get();
+
+        prefixes.reserve(partition_table.size());
+
+        typename partition_table_type::map_type::const_iterator
+            it = partition_table.begin(),
+            end = partition_table.end(); 
+
+        for (; it != end; ++it)
+            prefixes.push_back(at_c<0>(it->second));
+
+        return prefixes;
+    } // }}}
+
     // {{{ action types
     enum actions 
     {
@@ -624,7 +651,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         namespace_resolve_gid,
         namespace_unbind,
         namespace_increment,
-        namespace_decrement
+        namespace_decrement,
+        namespace_localities
     };
 
     typedef hpx::actions::result_action2<
@@ -682,6 +710,13 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::decrement
     > decrement_action;
+    
+    typedef hpx::actions::result_action0<
+        primary_namespace<Database, Protocol>,
+        /* return type */ prefixes_type,
+        /* enum value */  namespace_localities,
+        &primary_namespace<Database, Protocol>::localities
+    > localities_action;
     // }}}
 };
 

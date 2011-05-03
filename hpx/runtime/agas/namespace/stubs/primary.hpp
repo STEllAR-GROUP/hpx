@@ -28,6 +28,8 @@ struct primary_namespace
     typedef typename server_type::gva_type gva_type;
     typedef typename server_type::count_type count_type;
     typedef typename server_type::offset_type offset_type;
+    typedef typename server_type::prefix_type prefix_type;
+    typedef typename server_type::prefixes_type prefixes_type;
     typedef typename server_type::range_type range_type;
     typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
@@ -132,6 +134,19 @@ struct primary_namespace
     decrement(naming::id_type const& gid, naming::gid_type const& key,
               count_type count)
     { return decrement_async(gid, key, count).get(); } 
+    // }}}
+    
+    // {{{ localities dispatch 
+    static lcos::future_value<prefixes_type>
+    localities_async(naming::id_type const& gid)
+    {
+        typedef typename server_type::localities_action action_type;
+        return lcos::eager_future<action_type, prefixes_type>(gid);
+    }
+    
+    static prefixes_type
+    localities(naming::id_type const& gid)
+    { return localities_async(gid).get(); } 
     // }}}
 };            
 
