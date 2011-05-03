@@ -18,6 +18,8 @@
 #include "stencil_functions.hpp"
 #include "stencil_data_locking.hpp"
 #include "../amr/unigrid_mesh.hpp"
+#include <hpx/runtime/actions/manage_object_action.hpp>
+#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -1149,13 +1151,13 @@ namespace hpx { namespace components { namespace amr
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
         // TEST
-        resultval.get() = val[0].get();
-        resultval->timestep_ = val[0]->timestep_ + 1;
-        if ( resultval->timestep_ >= par->nt0-2 ) {
-          std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
-          return 0;
-        }
-        return 1;
+        //resultval.get() = val[0].get();
+        //resultval->timestep_ = val[0]->timestep_ + 1;
+        //if ( resultval->timestep_ >= par->nt0-2 ) {
+        //  std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
+        //  return 0;
+        //}
+        //return 1;
         // END TEST
         // Here we give the coordinate value to the result (prior to sending it to the user)
         int compute_index;
@@ -1697,9 +1699,10 @@ namespace hpx { namespace components { namespace amr
 
           // set return value difference between actual and required number of
           // timesteps (>0: still to go, 0: last step, <0: overdone)
-          if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
-            return 0;
-          }
+          //if ( val[compute_index]->timestep_ >= par->nt0-2 ) {
+          //  std::cout << " TEST row " << row << " timestep " << resultval->timestep_ << std::endl;
+          //  return 0;
+          //}
           return 1;
        }
        BOOST_ASSERT(false);

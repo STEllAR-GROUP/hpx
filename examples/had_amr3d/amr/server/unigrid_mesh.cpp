@@ -580,7 +580,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
-#if 0
+//#if 0
             // exchange overlap information
             int factor = 1;
             if ( level == par->allowedl ) factor = 2;
@@ -620,7 +620,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 }
               }
             } } }
-#endif
+//#endif
 
 #if 0
             if ( level != par->allowedl ) { 

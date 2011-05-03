@@ -89,6 +89,10 @@ namespace hpx { namespace components { namespace amr { namespace server
           double datatime(0.0);
           std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
           if (fmod(val.timestep_,par->output) < 1.e-6 && val.level_ >= par->output_level) {
+            applier::applier& appl = applier::get_applier();
+            naming::id_type this_prefix = appl.get_runtime_support_gid();
+            int locality = get_prefix_from_id( this_prefix );
+
             for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
               x.push_back(val.x_[i]);
             }
@@ -131,11 +135,16 @@ namespace hpx { namespace components { namespace amr { namespace server
             } } }
             int shape[3];
             char cnames[80] = { "x|y|z" };
-            char phi_name[] = { "0phi" };
-            char phi1_name[] = { "0d1phi" };
-            char phi2_name[] = { "0d2phi" };
-            char phi3_name[] = { "0d3phi" };
-            char phi4_name[] = { "0d4phi" };
+            char phi_name[80];
+            sprintf(phi_name,"%dphi",locality);
+            char phi1_name[80];
+            sprintf(phi1_name,"%dd1phi",locality);
+            char phi2_name[80];
+            sprintf(phi2_name,"%dd2phi",locality);
+            char phi3_name[80];
+            sprintf(phi3_name,"%dd3phi",locality);
+            char phi4_name[80];
+            sprintf(phi4_name,"%dd4phi",locality);
             shape[0] = par->granularity;
             shape[1] = par->granularity;
             shape[2] = par->granularity;
