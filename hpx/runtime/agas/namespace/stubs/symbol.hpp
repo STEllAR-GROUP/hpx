@@ -40,6 +40,22 @@ struct symbol_namespace
                      naming::gid_type const& value)
     { return bind_async(gid, key, value).get(); } 
     // }}}
+    
+    // {{{ rebind dispatch
+    static lcos::future_value<naming::gid_type>
+    rebind_async(naming::id_type const& gid, symbol_type const& key,
+                 naming::gid_type const& value)
+    {
+        typedef typename server_type::rebind_action action_type;
+        return lcos::eager_future<action_type, naming::gid_type>  
+            (gid, key, value);
+    }
+
+    static naming::gid_type
+    rebind(naming::id_type const& gid, symbol_type const& key,
+           naming::gid_type const& value)
+    { return rebind_async(gid, key, value).get(); } 
+    // }}}
 
     // {{{ resolve dispatch 
     static lcos::future_value<naming::gid_type>

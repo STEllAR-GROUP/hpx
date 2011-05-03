@@ -83,10 +83,11 @@ int hpx_main(variables_map& vm)
     {
         // Retrieve the id prefix of this site.
         gid_type prefix1;
-        if (agent.get_prefix(here, prefix1))
-            last_lowerid = prefix1;
+        agent.get_prefix(here, prefix1);
+        if (i == 0)
+          last_lowerid = prefix1;
         HPX_TEST(prefix1 != 0);
-    
+ 
         std::vector<gid_type> prefixes;
         agent.get_prefixes(prefixes);
         HPX_TEST((i != 0) ? (2 == prefixes.size()) : (1 == prefixes.size()));
@@ -94,7 +95,7 @@ int hpx_main(variables_map& vm)
     
          // Identical sites should get same prefix.
         gid_type prefix2;
-        HPX_TEST(!agent.get_prefix(here, prefix2));
+        agent.get_prefix(here, prefix2);
         HPX_TEST_EQ(prefix2, prefix1);
     
         // Different sites should get different prefix.
@@ -108,19 +109,20 @@ int hpx_main(variables_map& vm)
         HPX_TEST_EQ(prefixes.front(), prefix3);
     
         gid_type prefix4;
-        HPX_TEST(!agent.get_prefix(locality("1.1.1.1", 1), prefix4));
+        agent.get_prefix(locality("1.1.1.1", 1), prefix4);
         HPX_TEST_EQ(prefix3, prefix4);   
     
         // test get_id_range
         gid_type lower1, upper1;
-        HPX_TEST(!agent.get_id_range(here, 1024, lower1, upper1));
-        HPX_TEST(0 == i || last_lowerid + 1 == lower1);   
-        
+        HPX_TEST(agent.get_id_range(here, 1024, lower1, upper1));
+        if (0 != i)
+            HPX_TEST_EQ(last_lowerid + 1, lower1);   
+ 
         gid_type lower2, upper2;
-        HPX_TEST(!agent.get_id_range(here, 1024, lower2, upper2));
+        HPX_TEST(agent.get_id_range(here, 1024, lower2, upper2));
         HPX_TEST_EQ(upper1 + 1, lower2);   
         last_lowerid = upper2;
-        
+         
         // bind an arbitrary address
         HPX_TEST(agent.bind(gid_type(1), address(here, 1, 2)));
         

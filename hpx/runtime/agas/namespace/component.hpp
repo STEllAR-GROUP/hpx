@@ -45,11 +45,18 @@ struct component_namespace
     // bind interface 
     lcos::future_value<component_id_type>
     bind_async(component_name_type const& key, prefix_type prefix)
-    { return this->base_type::bind_async(this->gid_, key, prefix); }
+    { return this->base_type::bind_prefix_async(this->gid_, key, prefix); }
 
     component_id_type
     bind(component_name_type const& key, prefix_type prefix)
-    { return this->base_type::bind(this->gid_, key, prefix); }
+    { return this->base_type::bind_prefix(this->gid_, key, prefix); }
+    
+    lcos::future_value<component_id_type>
+    bind_async(component_name_type const& key)
+    { return this->base_type::bind_name_async(this->gid_, key); }
+    
+    component_id_type bind(component_name_type const& key)
+    { return this->base_type::bind_name(this->gid_, key); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_id and resolve_name interface - note the clever use of overloads

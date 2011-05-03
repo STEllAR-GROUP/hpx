@@ -79,14 +79,13 @@ struct legacy_agent
     ///                   parameter \a ec. Otherwise it throws and instance
     ///                   of hpx#exception.
     // }}}
-    bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
+    void get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) 
     {
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
-        address addr;
-        addr.from_string(l.get_address());
+        address addr = address::from_string(l.get_address());
 
         typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
 
@@ -94,13 +93,13 @@ struct legacy_agent
         {
             prefix = naming::get_gid_from_prefix
                 (naming::get_prefix_from_gid(at_c<0>(primary_ns_.bind(ep))));
-            return prefix;
+            return;
         }
         
         else 
         {
             prefix = at_c<0>(primary_ns_.resolve(ep)); 
-            return prefix;
+            return;
         }
     } 
 
@@ -225,7 +224,7 @@ struct legacy_agent
     // }}}
     typename component_namespace_type::component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
-    { return component_ns_.resolve(name); } 
+    { return component_ns_.bind(name); } 
 
     // {{{ register_factory specification
     /// \brief Register a factory for a specific component type
@@ -313,8 +312,7 @@ struct legacy_agent
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
-        address addr;
-        addr.from_string(l.get_address());
+        address addr = address::from_string(l.get_address());
 
         typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
          
@@ -409,12 +407,11 @@ struct legacy_agent
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
-        address addr;
-        addr.from_string(baseaddr.locality_.get_address());
+        address addr = address::from_string(baseaddr.locality_.get_address());
 
         typename primary_namespace_type::endpoint_type ep
             (addr, baseaddr.locality_.get_port()); 
-        
+       
         // Create a global virtual address from the legacy calling convention
         // parameters.
         typename primary_namespace_type::gva_type gva
@@ -591,7 +588,10 @@ struct legacy_agent
         addr.type_ = gva.type;
         addr.address_ = gva.lva();
 
-        return true;
+        typedef typename primary_namespace_type::endpoint_type endpoint_type;
+        return (gva.endpoint != endpoint_type())
+            && (gva.type != components::component_invalid)
+            && (gva.lva() != 0);
     }
 
     bool resolve(naming::id_type const& id, naming::address& addr,
@@ -633,7 +633,10 @@ struct legacy_agent
     // }}}
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
-    { return symbol_ns_.bind(name, id); }
+    {
+        naming::gid_type r = symbol_ns_.rebind(name, id);
+        return r == id;
+    }
 
     // {{{ unregisterid specification
     /// \brief Unregister a global name (release any existing association)

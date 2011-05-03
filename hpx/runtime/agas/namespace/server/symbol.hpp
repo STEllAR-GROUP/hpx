@@ -58,6 +58,29 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
             gid_table_type::map_type::value_type(key, gid));
         return true; 
     } // }}}
+    
+    naming::gid_type rebind(symbol_type const& key, naming::gid_type const& gid)
+    { // {{{ bind implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Always load the table once, as this operation might be slow for some
+        // database backends.
+        typename gid_table_type::map_type& gid_table = gids_.get();
+
+        typename gid_table_type::map_type::iterator
+            it = gid_table.find(key), end = gid_table.end();
+
+        if (it != end)
+        {
+            naming::gid_type old = it->second;
+            it->second = gid;
+            return old;
+        }
+
+        gid_table.insert(typename
+            gid_table_type::map_type::value_type(key, gid));
+        return gid; 
+    } // }}}
 
     naming::gid_type resolve(symbol_type const& key)
     { // {{{ resolve implementation
@@ -94,6 +117,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     enum actions
     {
         namespace_bind,
+        namespace_rebind,
         namespace_resolve,
         namespace_unbind,
     };
@@ -105,6 +129,14 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         /* arguments */   symbol_type const&, naming::gid_type const&,
         &symbol_namespace<Database>::bind
     > bind_action;
+    
+    typedef hpx::actions::result_action2<
+        symbol_namespace<Database>,
+        /* return type */ naming::gid_type,
+        /* enum value */  namespace_rebind,
+        /* arguments */   symbol_type const&, naming::gid_type const&,
+        &symbol_namespace<Database>::rebind
+    > rebind_action;
     
     typedef hpx::actions::result_action1<
         symbol_namespace<Database>,

@@ -30,20 +30,33 @@ struct component_namespace
     typedef typename server_type::prefixes_type prefixes_type;
     // }}}
 
-    // {{{ bind dispatch
+    // {{{ bind_prefix dispatch
     static lcos::future_value<component_id_type>
-    bind_async(naming::id_type const& gid, component_name_type const& key,
-               prefix_type prefix)
+    bind_prefix_async(naming::id_type const& gid, component_name_type const& key,
+                      prefix_type prefix)
     {
-        typedef typename server_type::bind_action action_type;
+        typedef typename server_type::bind_prefix_action action_type;
         return lcos::eager_future<action_type, component_id_type>
             (gid, key, prefix);
     }
 
     static component_id_type
-    bind(naming::id_type const& gid, component_name_type const& key,
-         prefix_type prefix)
-    { return bind_async(gid, key, prefix).get(); } 
+    bind_prefix(naming::id_type const& gid, component_name_type const& key,
+                prefix_type prefix)
+    { return bind_prefix_async(gid, key, prefix).get(); } 
+    // }}}
+    
+    // {{{ bind_name dispatch 
+    static lcos::future_value<component_id_type>
+    bind_name_async(naming::id_type const& gid, component_name_type const& key)
+    {
+        typedef typename server_type::bind_name_action action_type;
+        return lcos::eager_future<action_type, component_id_type>(gid, key);
+    }
+    
+    static component_id_type
+    bind_name(naming::id_type const& gid, component_name_type const& key)
+    { return bind_name_async(gid, key).get(); } 
     // }}}
 
     // {{{ resolve_id dispatch

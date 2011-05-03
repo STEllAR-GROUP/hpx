@@ -31,6 +31,9 @@ HPX_REGISTER_ACTION_EX(
     agas_component::bind_action,
     stdmap_symbol_namespace_bind_action);
 HPX_REGISTER_ACTION_EX(
+    agas_component::rebind_action,
+    stdmap_symbol_namespace_rebind_action);
+HPX_REGISTER_ACTION_EX(
     agas_component::resolve_action,
     stdmap_symbol_namespace_resolve_action);
 HPX_REGISTER_ACTION_EX(

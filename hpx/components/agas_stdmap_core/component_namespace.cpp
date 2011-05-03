@@ -28,8 +28,11 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(agas_component);
 
 HPX_REGISTER_ACTION_EX(
-    agas_component::bind_action,
-    stdmap_component_namespace_bind_action);
+    agas_component::bind_prefix_action,
+    stdmap_component_namespace_bind_prefix_action);
+HPX_REGISTER_ACTION_EX(
+    agas_component::bind_name_action,
+    stdmap_component_namespace_bind_name_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::resolve_id_action,
     stdmap_component_namespace_resolve_id_action);

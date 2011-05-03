@@ -46,6 +46,15 @@ struct symbol_namespace
 
     bool bind(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind(this->gid_, key, gid); }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // rebind interface 
+    lcos::future_value<naming::gid_type>
+    rebind_async(symbol_type const& key, naming::gid_type const& gid)
+    { return this->base_type::rebind_async(this->gid_, key, gid); }
+
+    naming::gid_type rebind(symbol_type const& key, naming::gid_type const& gid)
+    { return this->base_type::rebind(this->gid_, key, gid); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve interface 

@@ -57,8 +57,9 @@ struct HPX_COMPONENT_EXPORT component_namespace
         type_counter(components::component_first_dynamic)
     { traits::initialize_mutex(mutex_); }
 
-    component_id_type bind(component_name_type const& key, prefix_type prefix)
-    { // {{{ bind implementation
+    component_id_type
+    bind_prefix(component_name_type const& key, prefix_type prefix)
+    { // {{{ bind_prefix implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Always load the table once, as the operation might be expensive for
@@ -100,6 +101,29 @@ struct HPX_COMPONENT_EXPORT component_namespace
 
         return cit->second;
     } // }}}
+    
+    component_id_type bind_name(component_name_type const& key) 
+    { // {{{ bind_name implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Load the table.
+        typename component_id_table_type::map_type& c_id_table =
+            component_ids_.get();
+        
+        typename component_id_table_type::map_type::iterator
+            it = c_id_table.find(key), end = c_id_table.end();
+
+        // If the name is not in the table, register it (this is only done so
+        // we can implement a backwards compatible get_component_id).
+        if (it == end)
+            it = c_id_table.insert(typename
+                component_id_table_type::map_type::value_type
+                    (key, type_counter++)).first;
+
+        BOOST_ASSERT(it != end);
+
+        return it->second;
+    } // }}} 
 
     prefixes_type resolve_id(component_id_type key) 
     { // {{{ resolve_id implementation 
@@ -132,11 +156,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
         // If the name is not in the table, register it (this is only done so
         // we can implement a backwards compatible get_component_id).
         if (it == end)
-            it = c_id_table.insert(typename
-                component_id_table_type::map_type::value_type
-                    (key, type_counter++)).first;
-
-        BOOST_ASSERT(it != end);
+            return components::component_invalid;
 
         return it->second;
     } // }}} 
@@ -169,19 +189,28 @@ struct HPX_COMPONENT_EXPORT component_namespace
     // {{{ action types
     enum actions
     {
-        namespace_bind,
+        namespace_bind_prefix,
+        namespace_bind_name,
         namespace_resolve_name,
         namespace_resolve_id,
-        namespace_unbind,
+        namespace_unbind
     };
   
     typedef hpx::actions::result_action2<
         component_namespace<Database>,
         /* return type */ component_id_type,
-        /* enum value */  namespace_bind,
+        /* enum value */  namespace_bind_prefix,
         /* arguments */   component_name_type const&, prefix_type,
-        &component_namespace<Database>::bind
-    > bind_action;
+        &component_namespace<Database>::bind_prefix
+    > bind_prefix_action;
+    
+    typedef hpx::actions::result_action1<
+        component_namespace<Database>,
+        /* return type */ component_id_type,
+        /* enum value */  namespace_resolve_name,
+        /* arguments */   component_name_type const&,
+        &component_namespace<Database>::bind_name
+    > bind_name_action;
     
     typedef hpx::actions::result_action1<
         component_namespace<Database>,
