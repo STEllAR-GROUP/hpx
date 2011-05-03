@@ -7,6 +7,7 @@
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/optional.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
@@ -18,6 +19,8 @@
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
+
+using boost::optional;
 
 using hpx::lcos::base_lco_with_value;
 
@@ -38,6 +41,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::locality_type>::set_result_action,
     set_result_action_agas_tcpip_stdmap_locality_type);
+HPX_REGISTER_ACTION_EX(
+    base_lco_with_value<optional<agas_component::gva_type> >::set_result_action,
+    set_result_action_agas_tcpip_stdmap_binding_type);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_locality_action,

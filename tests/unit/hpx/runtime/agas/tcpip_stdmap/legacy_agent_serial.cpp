@@ -143,7 +143,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST_EQ(id, gid_type(1));
         
         // rebind the id above to a new address
-        HPX_TEST(agent.bind(gid_type(1), address(here, 1, 3)));
+        HPX_TEST(!agent.bind(gid_type(1), address(here, 1, 3)));
     
         // re-associate this id with a namespace name
         HPX_TEST(!agent.registerid("/test/foo/1", gid_type(2)));

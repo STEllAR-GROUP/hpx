@@ -31,8 +31,9 @@ struct primary_namespace
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
     typedef typename server_type::binding_type binding_type;
+    typedef typename server_type::unbinding_type unbinding_type;
     typedef typename server_type::locality_type locality_type;
-    typedef typename server_type::decrement_result_type decrement_result_type;
+    typedef typename server_type::decrement_type decrement_type;
     // }}}
 
     // {{{ bind_locality dispatch
@@ -92,16 +93,17 @@ struct primary_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<bool>
+    static lcos::future_value<unbinding_type>
     unbind_async(naming::id_type const& gid, naming::gid_type const& id,
                  count_type count)
     {
         typedef typename server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, bool>(gid, id, count);
+        return lcos::eager_future<action_type, unbinding_type>(gid, id, count);
     }
     
-    static bool unbind(naming::id_type const& gid, naming::gid_type const& id,
-                       count_type count)
+    static unbinding_type
+    unbind(naming::id_type const& gid, naming::gid_type const& id,
+           count_type count)
     { return unbind_async(gid, id, count).get(); } 
     // }}}
     
@@ -121,16 +123,16 @@ struct primary_namespace
     // }}}
     
     // {{{ decrement dispatch 
-    static lcos::future_value<decrement_result_type>
+    static lcos::future_value<decrement_type>
     decrement_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
         typedef typename server_type::decrement_action action_type;
-        return lcos::eager_future<action_type, decrement_result_type>
+        return lcos::eager_future<action_type, decrement_type>
             (gid, key, count);
     }
     
-    static decrement_result_type
+    static decrement_type
     decrement(naming::id_type const& gid, naming::gid_type const& key,
               count_type count)
     { return decrement_async(gid, key, count).get(); } 
