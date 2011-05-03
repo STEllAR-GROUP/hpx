@@ -8,6 +8,10 @@
 #if !defined(HPX_NAMING_NAME_MAR_24_2008_0942AM)
 #define HPX_NAMING_NAME_MAR_24_2008_0942AM
 
+#include <ios>
+#include <iomanip>
+#include <iostream>
+
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
@@ -202,7 +206,11 @@ namespace hpx { namespace naming
     inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
     {
         boost::io::ios_flags_saver ifs(os); 
-        os << "{" << std::hex << id.id_msb_ << ", " << id.id_lsb_ << "}";
+        os << std::hex
+           << "{" << std::right << std::setfill('0') << std::setw(16)
+                  << id.id_msb_ << ", "
+                  << std::right << std::setfill('0') << std::setw(16)
+                  << id.id_lsb_ << "}";
         return os;
     }
 

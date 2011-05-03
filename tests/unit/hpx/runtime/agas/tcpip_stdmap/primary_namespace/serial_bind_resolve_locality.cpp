@@ -54,7 +54,7 @@ void insert_locality (primary_namespace_type& pri,
                       primary_namespace_type::endpoint_type const& ep,
                       primary_namespace_type::count_type const count)
 {
-    primary_namespace_type::range_type const range = pri.bind(ep, count);
+    primary_namespace_type::binding_type const range = pri.bind(ep, count);
     HPX_TEST_EQ(at_c<0>(range).get_msb(), at_c<1>(range).get_msb());
     HPX_TEST_EQ(at_c<1>(range).get_lsb(), count);
 }

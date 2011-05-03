@@ -30,21 +30,21 @@ struct primary_namespace
     typedef typename server_type::offset_type offset_type;
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
-    typedef typename server_type::range_type range_type;
+    typedef typename server_type::binding_type binding_type;
     typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
 
     // {{{ bind_locality dispatch
-    static lcos::future_value<range_type>
+    static lcos::future_value<binding_type>
     bind_locality_async(naming::id_type const& gid, endpoint_type const& ep,
                         count_type count)
     {
         typedef typename server_type::bind_locality_action action_type;
-        return lcos::eager_future<action_type, range_type>(gid, ep, count);
+        return lcos::eager_future<action_type, binding_type>(gid, ep, count);
     }
 
-    static range_type
+    static binding_type
     bind_locality(naming::id_type const& gid, endpoint_type const& ep,
                   count_type count)
     { return bind_locality_async(gid, ep, count).get(); } 

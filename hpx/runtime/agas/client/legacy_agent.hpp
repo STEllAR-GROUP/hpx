@@ -91,8 +91,7 @@ struct legacy_agent
 
         if (self)
         {
-            prefix = naming::get_gid_from_prefix
-                (naming::get_prefix_from_gid(at_c<0>(primary_ns_.bind(ep))));
+            prefix = at_c<2>(primary_ns_.bind(ep, 0));
             return;
         }
         
@@ -316,7 +315,7 @@ struct legacy_agent
 
         typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
          
-        typename primary_namespace_type::range_type range =
+        typename primary_namespace_type::binding_type range =
             primary_ns_.bind(ep, count);
 
         lower_bound = at_c<0>(range);

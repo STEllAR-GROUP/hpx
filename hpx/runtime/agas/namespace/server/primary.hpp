@@ -49,8 +49,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef boost::fusion::vector2<prefix_type, naming::gid_type>
         partition_type;
 
-    typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
-        range_type;
+    typedef boost::fusion::vector3<
+        naming::gid_type, naming::gid_type, naming::gid_type
+    > binding_type;
 
     typedef boost::fusion::vector2<naming::gid_type, gva_type>
         locality_type;
@@ -79,7 +80,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         refcnts_("hpx.agas.primary_namespace.refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    range_type bind_locality(endpoint_type const& ep, count_type count)
+    binding_type bind_locality(endpoint_type const& ep, count_type count)
     { // {{{ bind_locality implementation
         using boost::fusion::at_c;
 
@@ -93,12 +94,19 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             it = partition_table.find(ep),
             end = partition_table.end(); 
 
+        count_type const real_count = (count) ? (count - 1) : (0);
+
         // If the endpoint is in the table, then this is a resize.
         if (it != end)
         {
+            // Just return the prefix
+            if (count == 0)
+              return binding_type(naming::invalid_gid, naming::invalid_gid,
+                  naming::get_gid_from_prefix(at_c<0>(it->second)));
+
             // Compute the new allocation.
             naming::gid_type lower(at_c<1>(it->second) + 1),
-                             upper(lower + (count - 1));
+                             upper(lower + real_count);
 
             // Check for overflow.
             if (upper.get_msb() != lower.get_msb())
@@ -112,7 +120,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
                 // Otherwise, correct
                 lower = naming::gid_type(upper.get_msb(), 0);
-                upper = lower + (count - 1); 
+                upper = lower + real_count; 
             }
             
             // Store the new upper bound.
@@ -122,7 +130,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
-            return range_type(lower, upper);
+            return binding_type(lower, upper,
+                naming::get_gid_from_prefix(at_c<0>(it->second)));
         }
 
         // If the endpoint isn't in the table, then we're registering it.
@@ -140,7 +149,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                 (partition_table.size() + 1);
             naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
-            // Start assigning ids with the seconds block of 64bit numbers only
+            // Start assigning ids with the second block of 64bit numbers only
             naming::gid_type lower_id(id.get_msb() + 1, 0);
 
             std::pair<typename partition_table_type::map_type::iterator, bool>
@@ -183,7 +192,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             }
 
             // Generate the requested GID range
-            naming::gid_type lower(lower_id + 1), upper(lower + (count - 1));
+            naming::gid_type lower = lower_id + 1;
+            naming::gid_type upper = lower + real_count;
 
             at_c<1>((*pit.first).second) = upper;
 
@@ -191,7 +201,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
-            return range_type(lower, upper);
+            return binding_type(lower, upper, id);
         }
     } // }}}
 
@@ -311,7 +321,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             {
                 // Check for exact match
                 if (git->first == id)
-                    return locality_type(id, git->second);
+                    return locality_type(git->first, git->second);
     
                 // We need to decrement the iterator, check that it's safe to do
                 // so.
@@ -330,7 +340,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
      
                         // Calculation of the lva address occurs in gva<>::resolve()
                         return locality_type
-                            (id, git->second.resolve(id, git->first));
+                            (git->first, git->second.resolve(id, git->first));
                     }
                 }
             }
@@ -350,7 +360,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
      
                     // Calculation of the local address occurs in gva<>::resolve()
                     return locality_type
-                        (id, git->second.resolve(id, git->first));
+                        (git->first, git->second.resolve(id, git->first));
                 }
             }
         }
@@ -617,8 +627,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return decrement_result_type(cnt, components::component_invalid);
     } // }}}
  
-    prefixes_type 
-    localities()
+    prefixes_type localities()
     { // {{{ localities implementation
         using boost::fusion::at_c;
 
@@ -657,7 +666,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
 
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ range_type,
+        /* return type */ binding_type,
         /* enum value */  namespace_bind_locality,
         /* arguments */   endpoint_type const&, count_type,
         &primary_namespace<Database, Protocol>::bind_locality

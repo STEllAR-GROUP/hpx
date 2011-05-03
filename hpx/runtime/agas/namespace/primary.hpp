@@ -38,7 +38,7 @@ struct primary_namespace
     typedef typename server_type::offset_type offset_type;
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
-    typedef typename server_type::range_type range_type;
+    typedef typename server_type::binding_type binding_type;
     typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_result_type decrement_result_type;
     // }}}
@@ -48,11 +48,11 @@ struct primary_namespace
 
     ///////////////////////////////////////////////////////////////////////////
     // bind_locality and bind_gid interface 
-    lcos::future_value<range_type>
+    lcos::future_value<binding_type>
     bind_async(endpoint_type const& ep, count_type count = 1)
     { return this->base_type::bind_locality_async(this->gid_, ep, count); }
 
-    range_type bind(endpoint_type const& ep, count_type count = 1)
+    binding_type bind(endpoint_type const& ep, count_type count = 1)
     { return this->base_type::bind_locality(this->gid_, ep, count); }
     
     lcos::future_value<bool>
