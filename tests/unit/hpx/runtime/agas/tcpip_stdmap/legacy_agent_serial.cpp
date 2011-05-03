@@ -77,7 +77,7 @@ int hpx_main(variables_map& vm)
     legacy_agent_type agent(pri.get_gid(), cpt.get_gid(), sym.get_gid());
 
     gid_type last_lowerid;
-    locality here("localhost", 4000);
+    locality here(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
 
     for (std::size_t i = 0; i < iterations; ++i)
     {
