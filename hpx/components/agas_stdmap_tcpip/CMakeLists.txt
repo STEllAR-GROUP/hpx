@@ -4,11 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT MSVC)
-  add_hpx_component(agas_stdmap_core 
+  add_hpx_component(agas_stdmap_tcpip 
     MODULE core
     SOURCES component_module.cpp
-            component_namespace.cpp
-            symbol_namespace.cpp
+            primary_namespace.cpp
     ESSENTIAL)
 endif()
 

@@ -31,44 +31,44 @@ typedef hpx::agas::server::primary_namespace<
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<agas_component>,
-    tcpip_stdmap_primary_namespace);
+    stdmap_tcpip_primary_namespace);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(agas_component);
 
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::gva_type>::set_result_action,
-    set_result_action_agas_tcpip_stdmap_gva_type);
+    set_result_action_agas_stdmap_tcpip_gva_type);
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::locality_type>::set_result_action,
-    set_result_action_agas_tcpip_stdmap_locality_type);
+    set_result_action_agas_stdmap_tcpip_locality_type);
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<optional<agas_component::gva_type> >::set_result_action,
-    set_result_action_agas_tcpip_stdmap_binding_type);
+    set_result_action_agas_stdmap_tcpip_binding_type);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_locality_action,
-    tcpip_stdmap_primary_namespace_bind_locality_action);
+    stdmap_tcpip_primary_namespace_bind_locality_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_gid_action,
-    tcpip_stdmap_primary_namespace_bind_gid_action);
+    stdmap_tcpip_primary_namespace_bind_gid_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::resolve_locality_action,
-    tcpip_stdmap_primary_namespace_resolve_locality_action);
+    stdmap_tcpip_primary_namespace_resolve_locality_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::resolve_gid_action,
-    tcpip_stdmap_primary_namespace_resolve_gid_action);
+    stdmap_tcpip_primary_namespace_resolve_gid_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::unbind_action,
-    tcpip_stdmap_primary_namespace_unbind_action);
+    stdmap_tcpip_primary_namespace_unbind_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::localities_action,
-    tcpip_stdmap_primary_namespace_localities_action);
+    stdmap_tcpip_primary_namespace_localities_action);
 
 // GID reference count interface
 HPX_REGISTER_ACTION_EX(
     agas_component::increment_action,
-    tcpip_stdmap_primary_namespace_increment_action);
+    stdmap_tcpip_primary_namespace_increment_action);
 HPX_REGISTER_ACTION_EX(
     agas_component::decrement_action,
-    tcpip_stdmap_primary_namespace_decrement_action);
+    stdmap_tcpip_primary_namespace_decrement_action);
 

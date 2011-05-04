@@ -6,8 +6,8 @@
 
 set(subdirs 
     distributing_factory
-    agas_stdmap_core
-    agas_tcpip_stdmap)
+    agas_stdmap
+    agas_stdmap_tcpip)
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
