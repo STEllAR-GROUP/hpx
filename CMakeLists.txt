@@ -208,10 +208,6 @@ endif()
 ################################################################################
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
 
-if(NOT HPX_DISABLE_WARNINGS)
-  hpx_use_flag_if_available(Wall)
-endif()
-
 ################################################################################
 # Windows specific configuration 
 ################################################################################
@@ -265,6 +261,7 @@ else()
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
   if(NOT HPX_DISABLE_WARNINGS)
+    hpx_use_flag_if_available(Wall)
     hpx_use_flag_if_available(Wno-strict-aliasing)
     hpx_use_flag_if_available(Wsign-promo)
   endif()
