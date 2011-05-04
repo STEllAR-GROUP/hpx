@@ -22,6 +22,8 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/void_cast.hpp>
 #include <boost/serialization/access.hpp>
@@ -238,8 +240,40 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Figure out what priority the action has to be be associated with
+        // A dynamically specified default priority results in using the static 
+        // Priority.
+        template <threads::thread_priority Priority>
+        struct thread_priority
+        {
+            static threads::thread_priority 
+            call(threads::thread_priority priority)
+            {
+                if (priority == threads::thread_priority_default)
+                    return Priority;
+                return priority;
+            }
+        };
+
+        // If the static Priority is default, a dynamically specified default 
+        // priority results in using the normal priority.
+        template <>
+        struct thread_priority<threads::thread_priority_default>
+        {
+            static threads::thread_priority 
+            call(threads::thread_priority priority)
+            {
+                if (priority == threads::thread_priority_default)
+                    return threads::thread_priority_normal;
+                return priority;
+            }
+        };
+    }
+
     template <typename Component, int Action, typename Arguments, 
-      typename Derived, threads::thread_priority Priority>
+        typename Derived, threads::thread_priority Priority>
     class action : public base_argument_action<Arguments>
     {
     public:
@@ -263,7 +297,7 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         explicit action(threads::thread_priority priority) 
           : arguments_(), parent_locality_(0), parent_id_(0), parent_phase_(0),
-            priority_(priority)
+            priority_(detail::thread_priority<Priority>::call(priority))
         {}
 
         template <typename Arg0>
@@ -272,7 +306,7 @@ namespace hpx { namespace actions
             parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
             parent_phase_(threads::get_parent_phase()),
-            priority_(threads::thread_priority_normal)
+            priority_(detail::thread_priority<Priority>::call(Priority))
         {}
 
         template <typename Arg0>
@@ -281,7 +315,7 @@ namespace hpx { namespace actions
             parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
             parent_phase_(threads::get_parent_phase()),
-            priority_(priority)
+            priority_(detail::thread_priority<Priority>::call(priority))
         {}
 
         // bring in the rest of the constructors
@@ -410,15 +444,6 @@ namespace hpx { namespace actions
             void_cast_register<action, base_argument_action<Arguments> >();
             base_argument_action<Arguments>::register_base();
         }
-        
-        /// Return the thread priority this action has to be executed with
-        threads::thread_priority get_thread_priority() const
-        {
-            if (priority_ == threads::thread_priority_default) 
-                return threads::thread_priority(priority_value);
-            else
-                return priority_;
-        }
 
     private:
         /// retrieve action code
@@ -437,7 +462,7 @@ namespace hpx { namespace actions
         /// (mainly used for debugging and logging purposes).
         char const* get_action_name() const
         {
-            return "<Unknown action type>";
+            return detail::get_action_name<Derived>();
         }
 
         /// The function \a get_action_type returns whether this action needs
@@ -465,15 +490,22 @@ namespace hpx { namespace actions
             return parent_phase_;
         }
 
+        /// Return the thread priority this action has to be executed with
+        threads::thread_priority get_thread_priority() const
+        {
+            return priority_;
+        }
+
         void enumerate_argument_gids(enum_gid_handler_type f)
         {
             boost::fusion::any(arguments_, enum_gid_handler(f));
         }
 
+    private:
         // serialization support
         friend class boost::serialization::access;
 
-        template<class Archive>
+        template <class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
             util::serialize_sequence(ar, arguments_);
@@ -512,6 +544,19 @@ namespace hpx { namespace actions
             Action::register_base();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // simple type allowing to distinguish whether an action is the most 
+        // derived one
+        struct this_type {};
+
+        template <typename Action, typename Derived>
+        struct action_type
+          : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
+        {};
+    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -34,17 +34,17 @@
           parent_locality_(applier::get_prefix_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
           parent_phase_(threads::get_parent_phase()),
-          priority_(threads::thread_priority_default)
+          priority_(detail::thread_priority<Priority>::call(Priority))
     {}
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     action(threads::thread_priority priority, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+              BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)), 
           parent_locality_(applier::get_prefix_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
           parent_phase_(threads::get_parent_phase()),
-          priority_(priority)
+          priority_(detail::thread_priority<Priority>::call(priority))
     {}
 
 #undef N

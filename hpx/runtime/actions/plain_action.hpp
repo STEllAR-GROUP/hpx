@@ -79,18 +79,19 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-    private:
+    protected:
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
+        template <typename State>   // dummy template parameter
         static threads::thread_state_enum 
-        thread_function(threads::thread_state_ex_enum)
+        thread_function(State)
         {
             try {
-                //LTM_(debug) << "Executing plain action("
-                //            << detail::get_action_name<Derived>()
-                //            << ").";
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
                 F();      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
@@ -113,7 +114,11 @@ namespace hpx { namespace actions
         static boost::function<threads::thread_function_type> 
         construct_thread_function(naming::address::address_type lva)
         {
-            return &plain_base_result_action0::thread_function;
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
+                &Derived::template thread_function<threads::thread_state_ex_enum>;
+            return f;
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -184,26 +189,26 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)(),
-        threads::thread_priority Priority = threads::thread_priority_default>
+        threads::thread_priority Priority = threads::thread_priority_default,
+        typename Derived = detail::this_type>
     class plain_result_action0 
       : public plain_base_result_action0<Result, F, 
-            plain_result_action0<Result, F, Priority>, Priority>
+            typename detail::action_type<
+                plain_result_action0<Result, F, Priority>, Derived
+            >::type, Priority>
     {
     private:
-        typedef plain_base_result_action0<Result, F, plain_result_action0, Priority> 
+        typedef typename detail::action_type<
+            plain_result_action0<Result, F, Priority>, Derived
+        >::type derived_type;
+
+        typedef plain_base_result_action0<Result, F, derived_type, Priority> 
             base_type;
 
     public:
         explicit plain_result_action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
-
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* get_action_name() const
-        {
-            return detail::get_action_name<plain_result_action0>();
-        }
 
         /// serialization support
         static void register_base()
@@ -230,11 +235,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<plain_result_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
 
@@ -245,24 +250,30 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<plain_result_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, Result (*F)()>
+    template <typename Result, Result (*F)(),
+        typename Derived = detail::this_type>
     class plain_direct_result_action0 
       : public plain_base_result_action0<Result, F, 
-            plain_direct_result_action0<Result, F> >
+            typename detail::action_type<
+                plain_direct_result_action0<Result, F>, Derived
+            >::type>
     {
     private:
-        typedef plain_base_result_action0<
-            Result, F, plain_direct_result_action0> base_type;
+        typedef typename detail::action_type<
+            plain_direct_result_action0<Result, F>, Derived
+        >::type derived_type;
+
+        typedef plain_base_result_action0<Result, F, derived_type> base_type;
 
     public:
         plain_direct_result_action0()
@@ -277,11 +288,9 @@ namespace hpx { namespace actions
         ///
         static Result execute_function(naming::address::address_type lva)
         {
-            // DTS: removed because it is logging too many 
-            // console_logging_actions
-            //LTM_(debug) << "Executing direct action " 
-            //            << detail::get_action_name<plain_direct_result_action0>()
-            //            << ".";
+            LTM_(debug) << "Executing direct action " 
+                        << detail::get_action_name<derived_type>()
+                        << ".";
             return F();
         }
 
@@ -304,13 +313,6 @@ namespace hpx { namespace actions
         }
 
     private:
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_result_action0>();
-        }
-
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         base_action::action_type get_action_type() const 
@@ -324,11 +326,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<plain_direct_result_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
 
@@ -339,11 +341,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<plain_direct_result_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
     };
@@ -368,18 +370,19 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-    private:
+    protected:
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.
+        template <typename State>   // dummy template parameter
         static threads::thread_state_enum 
-        thread_function(threads::thread_state_ex_enum)
+        thread_function(State)
         {
             try {
-                //LTM_(debug) << "Executing plain action("
-                //            << detail::get_action_name<Derived>()
-                //            << ").";
+                LTM_(debug) << "Executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << ").";
                 F();      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
@@ -402,7 +405,11 @@ namespace hpx { namespace actions
         static boost::function<threads::thread_function_type> 
         construct_thread_function(naming::address::address_type lva)
         {
-            return &plain_base_action0::thread_function;
+            // we need to assign the address of the thread function to a 
+            // variable to  help the compiler to deduce the function type
+            threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
+                &Derived::template thread_function<threads::thread_state_ex_enum>;
+            return f;
         }
 
         /// \brief This static \a construct_thread_function allows to construct 
@@ -465,24 +472,25 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)(),
-        threads::thread_priority Priority = threads::thread_priority_default>
+        threads::thread_priority Priority = threads::thread_priority_default,
+        typename Derived = detail::this_type>
     class plain_action0 
-      : public plain_base_action0<F, plain_action0<F, Priority>, Priority>
+      : public plain_base_action0<F, 
+            typename detail::action_type<
+                plain_action0<F, Priority>, Derived
+            >::type, Priority>
     {
     private:
-        typedef plain_base_action0<F, plain_action0, Priority> base_type;
+        typedef typename detail::action_type<
+            plain_action0<F, Priority>, Derived
+        >::type derived_type;
+
+        typedef plain_base_action0<F, derived_type, Priority> base_type;
 
     public:
         explicit plain_action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
-
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* get_action_name() const
-        {
-            return detail::get_action_name<plain_action0>();
-        }
 
         /// serialization support
         static void register_base()
@@ -509,11 +517,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<plain_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
 
@@ -524,22 +532,29 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<plain_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <void (*F)()>
+    template <void (*F)(), typename Derived = detail::this_type>
     class plain_direct_action0 
-      : public plain_base_action0<F, plain_direct_action0<F> >
+      : public plain_base_action0<F, 
+            typename detail::action_type<
+                plain_direct_action0<F>, Derived
+            >::type>
     {
     private:
-        typedef plain_base_action0<F, plain_direct_action0> base_type;
+        typedef typename detail::action_type<
+            plain_direct_action0<F>, Derived
+        >::type derived_type;
+
+        typedef plain_base_action0<F, derived_type> base_type;
 
     public:
         plain_direct_action0()
@@ -554,11 +569,9 @@ namespace hpx { namespace actions
         ///
         static util::unused_type execute_function(naming::address::address_type lva)
         {
-            // DTS: removed because it is logging too many 
-            // console_logging_actions
-            //LTM_(debug) << "Executing direct action " 
-            //            << detail::get_action_name<plain_direct_action0>()
-            //            << ".";
+            LTM_(debug) << "Executing direct action " 
+                        << detail::get_action_name<derived_type>()
+                        << ".";
             F();
             return util::unused;
         }
@@ -582,13 +595,6 @@ namespace hpx { namespace actions
         }
 
     private:
-        /// The function \a get_action_name returns the name of this action
-        /// (mainly used for debugging and logging purposes).
-        char const* get_action_name() const
-        {
-            return detail::get_action_name<plain_direct_action0>();
-        }
-
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         base_action::action_type get_action_type() const 
@@ -602,11 +608,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<plain_direct_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
 
@@ -617,11 +623,11 @@ namespace hpx { namespace actions
         {
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<plain_direct_action0>();
+            data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->get_thread_priority(); 
+            data.priority = this->priority_; 
             return data;
         }
     };
