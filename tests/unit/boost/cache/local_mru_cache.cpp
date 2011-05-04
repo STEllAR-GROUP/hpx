@@ -89,7 +89,7 @@ void test_mru_insert_with_touch()
         HPX_TEST(3 == c.size());
     }
 
-    // there should be 3 items in the cache, and white should be there as well
+    // there should be 3 items in the cache, and white should not be there anymore
     HPX_TEST(3 == c.size());
     HPX_TEST(!c.holds_key("white"));
 }
