@@ -11,11 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\deque.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\bit_manipulation.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\branch_hints.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\freelist.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\prefix.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_dcas.hpp" />
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_pair.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_ptrcompression.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\fifo.hpp" />
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\ringbuffer.hpp" />

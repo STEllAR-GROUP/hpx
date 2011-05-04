@@ -77,6 +77,21 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "had_amr_3d_clientd", "..\..
 		AttachLaunchAction = No
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Marduck", "Marduck", "{C7189A49-C795-4840-96C5-326BB1FBFEE6}"
+EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "barrier_testsd", "..\..\bin64\Debug\lib\barrier_testsd.exe", "{998B4D6A-3CE2-4507-A31A-6A213832FAB9}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\CVS\hpx\hpx\bin64\Debug\lib\barrier_testsd.exe
+		RemoteMachine = FIFTYTWO
+		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib
+		Arguments = -w -a localhost:2222 -x localhost:2224 -l 2 -t 1
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,7 +198,6 @@ Global
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Debug|Win32.ActiveCfg = Debug|x64
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Debug|x64.ActiveCfg = Debug|x64
-		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Debug|x64.Build.0 = Debug|x64
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Release|Any CPU.ActiveCfg = Release|x64
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{ED02C377-AC27-41C0-9648-275AE59AEDAF}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -252,7 +266,6 @@ Global
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|Win32.ActiveCfg = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|x64.ActiveCfg = Debug|x64
-		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Debug|x64.Build.0 = Debug|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Any CPU.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -287,7 +300,6 @@ Global
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Debug|Win32.ActiveCfg = Debug|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Debug|x64.ActiveCfg = Debug|x64
-		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Debug|x64.Build.0 = Debug|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|Any CPU.ActiveCfg = Release|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -327,6 +339,14 @@ Global
 		{92800C98-A4CF-4F73-8170-2D6A0F0B3DB1}.Release|Mixed Platforms.ActiveCfg = Debug|x64
 		{92800C98-A4CF-4F73-8170-2D6A0F0B3DB1}.Release|Win32.ActiveCfg = Debug|x64
 		{92800C98-A4CF-4F73-8170-2D6A0F0B3DB1}.Release|x64.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Debug|Win32.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Debug|x64.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Release|Any CPU.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Release|Mixed Platforms.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Release|Win32.ActiveCfg = Debug|x64
+		{998B4D6A-3CE2-4507-A31A-6A213832FAB9}.Release|x64.ActiveCfg = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -335,6 +355,7 @@ Global
 		{D8ED4ED0-AF99-4227-BF45-8F8515F1FFB0} = {C24E2A49-8928-4C5E-81F6-CB0918294C0D}
 		{B9B4AB26-8E9F-4BDE-B8C4-29C20FFCE018} = {C24E2A49-8928-4C5E-81F6-CB0918294C0D}
 		{2EE0F985-2F0C-4481-9D10-271ACFE308B1} = {C24E2A49-8928-4C5E-81F6-CB0918294C0D}
+		{C7189A49-C795-4840-96C5-326BB1FBFEE6} = {C24E2A49-8928-4C5E-81F6-CB0918294C0D}
 		{7A1A51F1-6629-41DB-94AD-E7420EE0F894} = {03B1522E-0ACA-4BE6-B935-A7EBD550C896}
 		{5347BCF4-113A-4DF0-BEA0-E748A6B4F42A} = {03B1522E-0ACA-4BE6-B935-A7EBD550C896}
 		{48D1EA21-DF22-416F-BE61-F6D246CE8930} = {03B1522E-0ACA-4BE6-B935-A7EBD550C896}

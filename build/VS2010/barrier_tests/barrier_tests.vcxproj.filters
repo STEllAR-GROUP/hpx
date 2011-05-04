@@ -7,13 +7,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\tests\unit\lcos\barrier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\tests\name_resolver_client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\tests\unit\serialization\hpx_exception.cpp">
+    <ClCompile Include="..\..\..\tests\unit\hpx\lcos\barrier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -141,36 +141,6 @@
     <Filter Include="Source Files\Runtime\Components\Server">
       <UniqueIdentifier>{c1cfc809-0781-465d-808d-06554754c0a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Runtime\AGAS">
-      <UniqueIdentifier>{00dc8798-6ac6-4863-a008-5b29c42b7d18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Client">
-      <UniqueIdentifier>{474d1b6f-0502-40ba-9286-3fa3334fbcf0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Database">
-      <UniqueIdentifier>{a1f945ae-dcb4-4808-b858-0b7274624c60}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Network">
-      <UniqueIdentifier>{8fa8cf71-d004-4527-ba61-13a95e2a0fe7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace">
-      <UniqueIdentifier>{e95803d6-3933-4ba5-a347-554f0737a7ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Database\Backend">
-      <UniqueIdentifier>{f73888ca-92cf-4448-bf3f-bfa5acc67259}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace\Server">
-      <UniqueIdentifier>{b7de2b71-cde6-4a96-be13-26567ec01099}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace\Stubs">
-      <UniqueIdentifier>{87a43861-7f66-423b-ac19-047e0c74d1ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Network\Backend">
-      <UniqueIdentifier>{280fee40-8fe1-4e09-8bb8-0319159f7f21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\AGAS">
-      <UniqueIdentifier>{fe8f0b09-5f30-454d-97e8-74e3198ccbc7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -314,17 +284,8 @@
     <ClCompile Include="..\..\..\src\util\itt_notify.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\nedmalloc\src\nedmalloc.c">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\serialize_exception.cpp">
       <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
-      <Filter>Source Files\Runtime\AGAS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp">
-      <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -844,81 +805,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_queue_scheduler.hpp">
       <Filter>Header Files\Runtime\Threads\Policies</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy_agent.hpp">
-      <Filter>Header Files\Runtime\AGAS\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\std_map.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\gva.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\full_gva.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\tcpip.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\udpip.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\ib.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp">
       <Filter>Header Files\Runtime\Threads\Policies</Filter>
     </ClInclude>
@@ -939,28 +825,7 @@
     <None Include="..\..\..\docs\hpx.doxy">
       <Filter>Auxiliary Files</Filter>
     </None>
-    <None Include="..\..\..\misc\FindBoost.cmake">
-      <Filter>Auxiliary Files</Filter>
-    </None>
-    <None Include="..\..\..\misc\HpxUtils.cmake">
-      <Filter>Auxiliary Files</Filter>
-    </None>
     <None Include="..\..\..\src\CMakeLists.txt" />
-    <None Include="..\..\..\misc\FindGMP.cmake">
-      <Filter>Auxiliary Files</Filter>
-    </None>
-    <None Include="..\..\..\misc\FindMPFR.cmake">
-      <Filter>Auxiliary Files</Filter>
-    </None>
-    <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </None>
-    <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\agas\CMakeLists.txt">
-      <Filter>Source Files\Runtime\AGAS</Filter>
-    </None>
     <None Include="..\..\..\src\runtime\actions\CMakeLists.txt">
       <Filter>Source Files\Runtime\Actions</Filter>
     </None>
@@ -993,6 +858,9 @@
     </None>
     <None Include="..\..\..\src\util\CMakeLists.txt">
       <Filter>Source Files\Util</Filter>
+    </None>
+    <None Include="hpx.def">
+      <Filter>Auxiliary Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -37,5 +37,14 @@
     <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\prefix.hpp">
       <Filter>Header Files\Detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\tagged_ptr_pair.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\detail\bit_manipulation.hpp">
+      <Filter>Header Files\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\lockfree\boost\lockfree\deque.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
