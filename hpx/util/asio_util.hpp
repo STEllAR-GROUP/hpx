@@ -15,13 +15,13 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool get_endpoint(std::string const& addr, boost::uint16_t port,
-        boost::asio::ip::tcp::endpoint& ep) HPX_EXPORT;
+    bool HPX_EXPORT get_endpoint(std::string const& addr, boost::uint16_t port,
+        boost::asio::ip::tcp::endpoint& ep);
 
     boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
-    get_random_ports() HPX_EXPORT;
-    
-    boost::uint16_t get_random_port() HPX_EXPORT;
+    HPX_EXPORT get_random_ports();
+
+    boost::uint16_t HPX_EXPORT get_random_port();
 }}
 
 #endif
