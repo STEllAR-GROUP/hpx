@@ -136,6 +136,7 @@ struct data
     ~data() {}
 
     int val_;
+    std::vector<int> x_;
 
 private:
     // serialization support
@@ -144,7 +145,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & val_;
+        ar & val_ & x_;
     }
 };
 
@@ -229,6 +230,7 @@ int hpx_main(po::variables_map &vm)
         components::access_memory_block<data> val1( components::stubs::memory_block::get(n1.get()) );
         components::access_memory_block<data> val2( components::stubs::memory_block::get(n2.get()) );
         std::cout << " Result " << val1->val_ << " " << val2->val_ << std::endl;
+        std::cout << " Vector Result " << val1->x_[0] << " " << val2->x_[0] << std::endl;
 
         //std::cout << " Result: " << n1.get() << " " << n2.get() << std::endl;
         //result = n1.get()+n2.get();
@@ -273,6 +275,9 @@ naming::id_type getnumber2 ()
                 components::stubs::memory_block::checkout(result));
 
     val->val_ = 6;
+    val->x_.push_back(1);
+    val->x_.push_back(2);
+    val->x_.push_back(3);
 
     return result;
 }
