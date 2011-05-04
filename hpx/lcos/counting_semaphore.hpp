@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -86,7 +87,8 @@ namespace hpx { namespace lcos
         ~counting_semaphore()
         {
             if (!queue_.empty()) {
-                LERR_(fatal) << "~counting_semaphore: queue is not empty, aborting threads";
+                LERR_(fatal) << "lcos::counting_semaphore::~counting_semaphore:"
+                                " queue is not empty, aborting threads";
 
                 mutex_type::scoped_lock l(this);
                 while (!queue_.empty()) {
@@ -97,7 +99,9 @@ namespace hpx { namespace lcos
 
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
-                    LERR_(fatal) << "~counting_semaphore: pending thread: " 
+                    LERR_(fatal)
+                            << "lcos::counting_semaphore::~counting_semaphore:"
+                            << " pending thread: " 
                             << get_thread_state_name(thrd->get_state()) 
                             << "(" << id << "): " << thrd->get_description();
 
@@ -106,7 +110,9 @@ namespace hpx { namespace lcos
                     threads::set_thread_state(id, threads::pending, 
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
-                        LERR_(fatal) << "~barrier: could not abort thread"
+                        LERR_(fatal)
+                            << "lcos::counting_semaphore::~counting_semaphore:"
+                            << " could not abort thread: "
                             << get_thread_state_name(thrd->get_state()) 
                             << "(" << id << "): " << thrd->get_description();
                     }
@@ -143,7 +149,7 @@ namespace hpx { namespace lcos
                         hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, "counting_semaphore::wait",
+                        HPX_THROW_EXCEPTION(no_success, "lcos::counting_semaphore::wait",
                             hpx::util::osstream_get_string(strm));
                         return;
                     }
@@ -153,7 +159,7 @@ namespace hpx { namespace lcos
                     queue_.erase(last);     // remove entry from queue
 
                 if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, "counting_semaphore::wait",
+                    HPX_THROW_EXCEPTION(no_success, "lcos::counting_semaphore::wait",
                         "aborted wait on counting_semaphore");
                     return;
                 }
