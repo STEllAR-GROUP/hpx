@@ -12,20 +12,18 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "stencil_value_out_adaptor.hpp"
+#include "functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Define types of stencil_value_out_adaptor components exposed by this module
-typedef hpx::components::managed_component<
-    hpx::components::amr::server::stencil_value_out_adaptor
-> had_stencil_value_out_adaptor_type;
-
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    had_stencil_value_out_adaptor_type, had_stencil_value_out_adaptor);
+typedef hpx::components::amr::server::functional_component functional_component_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
-    had_stencil_value_out_adaptor_type::wrapped_type::get_value_action,
-    had_stencil_value_out_get_value_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_value_out_adaptor_type::wrapped_type);
+// Serialization support for the actions
+HPX_REGISTER_ACTION_EX(functional_component_type::alloc_data_action, 
+    cosmo_functional_component_alloc_data_action);
+HPX_REGISTER_ACTION_EX(functional_component_type::eval_action, 
+    cosmo_functional_component_eval_action);
+HPX_REGISTER_ACTION_EX(functional_component_type::init_action, 
+    cosmo_functional_component_init_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_type);
 

@@ -21,18 +21,18 @@
 #include "unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::unigrid_mesh had_unigrid_mesh_type;
+typedef hpx::components::amr::server::unigrid_mesh unigrid_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, 
-    had_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, 
-    had_unigrid_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(unigrid_mesh_type::init_execute_action, 
+    cosmo_unigrid_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(unigrid_mesh_type::execute_action, 
+    cosmo_unigrid_mesh_execute_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_unigrid_mesh_type);
+    hpx::components::simple_component<unigrid_mesh_type>, cosmo_unigrid_mesh);
+HPX_DEFINE_GET_COMPONENT_TYPE(unigrid_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 

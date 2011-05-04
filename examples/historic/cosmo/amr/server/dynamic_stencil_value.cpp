@@ -34,22 +34,23 @@ typedef hpx::components::managed_component<
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dynamic_stencil_value_double_type, 
-    dynamic_stencil_double);
+    cosmo_dynamic_stencil_double);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::call_action,
-    dynamic_stencil_value_double_call_action);
+    cosmo_dynamic_stencil_value_double_call_action);
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::get_output_ports_action,
-    dynamic_stencil_value_double_get_output_ports_action);
+    cosmo_dynamic_stencil_value_double_get_output_ports_action);
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::connect_input_ports_action,
-    dynamic_stencil_value_double_connect_input_ports_action);
+    cosmo_dynamic_stencil_value_double_connect_input_ports_action);
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::set_functional_component_action,
-    dynamic_stencil_value_double_set_functional_component_action);
+    cosmo_dynamic_stencil_value_double_set_functional_component_action);
 HPX_REGISTER_ACTION_EX(
     dynamic_stencil_value_double_type::wrapped_type::start_action,
-    dynamic_stencil_value_double_start_action);
+    cosmo_dynamic_stencil_value_double_start_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(dynamic_stencil_value_double_type::wrapped_type);
+

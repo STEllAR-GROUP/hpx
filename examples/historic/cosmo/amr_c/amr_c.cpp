@@ -20,8 +20,8 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::stencil had_stencil_type;
-typedef hpx::components::amr::server::logging had_logging_type;
+typedef hpx::components::amr::stencil stencil_type;
+typedef hpx::components::amr::server::logging logging_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -35,20 +35,20 @@ typedef hpx::components::amr::server::logging had_logging_type;
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_stencil_type>, 
-    had_stencil, "had_functional_component");
+    hpx::components::simple_component<stencil_type>, 
+    cosmo_stencil, "cosmo_functional_component");
 
-HPX_DEFINE_GET_COMPONENT_TYPE(had_stencil_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(stencil_type);
 
 /// [hpx.components.had_logging]  # this must match the string below
 /// name = had_amr_test           # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_logging_type>, had_logging);
+    hpx::components::simple_component<logging_type>, cosmo_logging);
 
-HPX_REGISTER_ACTION_EX(had_logging_type::logentry_action, logentry_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_logging_type);
+HPX_REGISTER_ACTION_EX(logging_type::logentry_action, cosmo_logentry_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(logging_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // windows needs to initialize MPFR in each shared library
