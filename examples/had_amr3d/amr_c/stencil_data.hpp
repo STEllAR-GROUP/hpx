@@ -9,7 +9,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <vector>
 
-#include <hpx/c/types.h>
 #include <hpx/lcos/mutex.hpp>
 
 #include "../had_config.hpp"
