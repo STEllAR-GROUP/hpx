@@ -45,8 +45,8 @@ namespace hpx { namespace components { namespace server { namespace detail
           : count_(0), size_(size), wrapper_(wrapper), 
             managing_object_(act.get_instance())
         {
-            if (act.construct())
-                act.construct()(this->get_ptr(), size);
+            BOOST_ASSERT(act.construct());
+            act.construct()(this->get_ptr(), size);
         }
 
         memory_block_header(server::memory_block* wrapper, 
@@ -55,8 +55,8 @@ namespace hpx { namespace components { namespace server { namespace detail
           : count_(0), size_(size), wrapper_(wrapper), 
             managing_object_(act.get_instance())
         {
-            if (act.clone())
-                act.clone()(this->get_ptr(), rhs->get_ptr(), size);
+            BOOST_ASSERT(act.clone());
+            act.clone()(this->get_ptr(), rhs->get_ptr(), size);
         }
 
         /// This constructor is called whenever a memory_block gets 
@@ -65,13 +65,16 @@ namespace hpx { namespace components { namespace server { namespace detail
                 hpx::actions::manage_object_action_base const& act)
           : count_(0), size_(size), wrapper_(NULL), 
             managing_object_(act.get_instance())
-        {}
+        {
+            BOOST_ASSERT(act.construct());
+            act.construct()(this->get_ptr(), size);
+        }
 
         ~memory_block_header()
         {
             // invoke destructor, if needed
-            if (this->managing_object_.destruct())
-                this->managing_object_.destruct()(this->get_ptr());
+            BOOST_ASSERT(this->managing_object_.destruct());
+            this->managing_object_.destruct()(this->get_ptr());
         }
 
         /// \brief get_ptr returns the address of the first byte allocated for 
@@ -251,7 +254,7 @@ namespace hpx { namespace components
         ///       not considered.
         friend class boost::serialization::access;
 
-        template<class Archive>
+        template <class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
             std::size_t size = data_->get_size();
@@ -261,10 +264,12 @@ namespace hpx { namespace components
 
             ar << size;
             ar << act;
-            ar << boost::serialization::make_array(data_->get_ptr(), data_->get_size());
+
+            BOOST_ASSERT(act->save());
+            act->save()(data_->get_ptr(), data_->get_size(), ar, version);
         }
 
-        template<class Archive>
+        template <class Archive>
         void load(Archive & ar, const unsigned int version)
         {
             std::size_t size = 0;
@@ -277,9 +282,11 @@ namespace hpx { namespace components
             alloc_type* p = server::detail::allocate_block<alloc_type>(size);
 
             data_.reset(new (p) alloc_type(size, act->get_instance()));
-            ::free(act);
 
-            ar >> boost::serialization::make_array(data_->get_ptr(), size);
+            BOOST_ASSERT(act->load());
+            act->load()(data_->get_ptr(), size, ar, version);
+
+            delete act;
         }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -373,7 +380,6 @@ namespace hpx { namespace components { namespace server { namespace detail
             &memory_block::clone
         > clone_action;
     };
-
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////

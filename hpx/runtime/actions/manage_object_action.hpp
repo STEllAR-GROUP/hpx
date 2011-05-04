@@ -22,6 +22,17 @@ namespace hpx { namespace actions
         typedef void (*construct_function)(void*, std::size_t);
         typedef void (*clone_function)(void*, void const*, std::size_t);
         typedef void (*destruct_function)(void*);
+#if HPX_USE_PORTABLE_ARCHIVES != 0
+        typedef util::portable_binary_oarchive oarchive_type;
+        typedef util::portable_binary_iarchive iarchive_type;
+#else
+        typedef boost::archive::binary_oarchive oarchive_type;
+        typedef boost::archive::binary_iarchive iarchive_type;
+#endif
+        typedef void (*serialize_save_function)(boost::uint8_t*, std::size_t, 
+            oarchive_type&, const unsigned int);
+        typedef void (*serialize_load_function)(boost::uint8_t*, std::size_t,
+            iarchive_type&, const unsigned int);
 
     private:
         static void construct_(void*, std::size_t) {}
@@ -32,9 +43,24 @@ namespace hpx { namespace actions
         }
         static void destruct_(void*) {}
 
+        static void save_(boost::uint8_t* data, std::size_t size, 
+            oarchive_type& ar, const unsigned int version)
+        {
+            using boost::serialization::make_array;
+            ar << make_array(data, size);
+        }
+        static void load_(boost::uint8_t* data, std::size_t size, 
+            iarchive_type& ar, const unsigned int version)
+        {
+            using boost::serialization::make_array;
+            ar >> make_array(data, size);
+        }
+
     public:
+        manage_object_action_base() {}
         virtual ~manage_object_action_base() {}
 
+        // support for construction, copying, destruction
         virtual construct_function construct() const 
         { 
             return &manage_object_action_base::construct_; 
@@ -47,7 +73,18 @@ namespace hpx { namespace actions
         { 
             return &manage_object_action_base::destruct_; 
         }
+
         virtual manage_object_action_base const& get_instance() const;
+
+        // serialization support
+        virtual serialize_save_function save() const
+        { 
+            return &manage_object_action_base::save_; 
+        }
+        virtual serialize_load_function load() const
+        { 
+            return &manage_object_action_base::load_; 
+        }
 
     private:
         // serialization support, just serialize the type
@@ -80,7 +117,19 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
+        static void save_(boost::uint8_t* data, std::size_t size, 
+            oarchive_type& ar, const unsigned int version)
+        {
+            ar << *reinterpret_cast<T*>(data);
+        }
+        static void load_(boost::uint8_t* data, std::size_t size, 
+            iarchive_type& ar, const unsigned int version)
+        {
+            ar >> *reinterpret_cast<T*>(data);
+        }
+
     private:
+        // support for construction, copying, destruction
         construct_function construct() const 
         { 
             return &manage_object_action::construct_; 
@@ -92,6 +141,16 @@ namespace hpx { namespace actions
         destruct_function destruct() const
         {
             return &manage_object_action::destruct_; 
+        }
+
+        // serialization support
+        virtual serialize_save_function save() const
+        { 
+            return &manage_object_action::save_; 
+        }
+        virtual serialize_load_function load() const
+        { 
+            return &manage_object_action::load_; 
         }
 
     public:
