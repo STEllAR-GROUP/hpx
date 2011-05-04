@@ -515,6 +515,20 @@ install( # install hpx python scripts
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
+if(UNIX)
+  file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py") 
+  foreach(script ${scripts})
+    get_filename_component(script_name ${script} NAME)
+    get_filename_component(script_name_we ${script} NAME_WE)
+    install(CODE
+      "set(bindir \"${CMAKE_INSTALL_PREFIX}/bin/\")
+       execute_process(
+         COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+                 \"${script_name}\" \"${script_name_we}\"
+         WORKING_DIRECTORY \"\${bindir}\")")
+  endforeach()
+endif()
+
 install( # install hpx python module (TODO: this is a temporary hack) 
   DIRECTORY python/hpx 
   DESTINATION share/hpx/python 
