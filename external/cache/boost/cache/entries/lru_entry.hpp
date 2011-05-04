@@ -73,7 +73,7 @@ namespace boost { namespace cache { namespace entries
         ///        another entry if it has been accessed less recently (LRU).
         friend bool operator< (lru_entry const& lhs, lru_entry const& rhs)
         {
-            return lhs.get_access_time() < rhs.get_access_time();
+            return lhs.get_access_time() > rhs.get_access_time();
         }
 
     private:

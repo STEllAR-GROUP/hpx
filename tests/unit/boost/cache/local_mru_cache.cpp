@@ -91,7 +91,7 @@ void test_mru_insert_with_touch()
 
     // there should be 3 items in the cache, and white should be there as well
     HPX_TEST(3 == c.size());
-    HPX_TEST(c.holds_key("white"));
+    HPX_TEST(!c.holds_key("white"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,13 +151,13 @@ void test_mru_erase_one()
         HPX_TEST(3 >= c.size());
     }
 
-    entry_type blue;
-    HPX_TEST(c.get_entry("blue", blue));
+    entry_type white;
+    HPX_TEST(c.get_entry("white", white));
 
-    c.erase(erase_func("blue"));
+    c.erase(erase_func("white"));
 
     // there should be 2 items in the cache
-    HPX_TEST(!c.get_entry("blue", blue));
+    HPX_TEST(!c.get_entry("white", white));
     HPX_TEST(2 == c.size());
 }
 
