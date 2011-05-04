@@ -35,8 +35,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::solve_action,HPLsolve_action);
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::HPLMatreX::pivot_action,HPLpivot_action);
-HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::swap_action,HPLswap_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::gmain_action,HPLgmain_action);
