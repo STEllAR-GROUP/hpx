@@ -394,6 +394,6 @@ endif()
 if(MSVC)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 else()
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_asio hpx_ini)
+  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_ini)
 endif()
 
