@@ -157,12 +157,12 @@ namespace hpx { namespace threads
 
         default:
             {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "invalid initial state: " 
                      << get_thread_state_name(initial_state);
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threadmanager_impl::register_thread",
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
                 return invalid_thread_id;
             }
         }
@@ -227,12 +227,12 @@ namespace hpx { namespace threads
 
         default:
             {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "invalid initial state: " 
                      << get_thread_state_name(initial_state);
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threadmanager_impl::register_work",
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
                 return;
             }
         }
@@ -297,10 +297,10 @@ namespace hpx { namespace threads
 
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter, 
-                "threadmanager_impl::set_state", HPX_OSSTREAM_GETSTRING(strm));
+                "threadmanager_impl::set_state", hpx::util::osstream_get_string(strm));
             return thread_state(unknown);
         }
 

@@ -16,7 +16,7 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/cstdint.hpp>

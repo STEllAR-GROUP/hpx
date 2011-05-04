@@ -9,7 +9,7 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/container_device.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
@@ -37,11 +37,11 @@ namespace hpx { namespace parcelset
             archive << p;
         }
         catch (std::exception const& e) {
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << "parcelport: parcel serialization failed: " << e.what();
             HPX_THROW_EXCEPTION(no_success, 
                 "parcelport_connection::set_parcel", 
-                HPX_OSSTREAM_GETSTRING(strm));
+                hpx::util::osstream_get_string(strm));
             return;
         }
         out_size_ = out_buffer_.size();

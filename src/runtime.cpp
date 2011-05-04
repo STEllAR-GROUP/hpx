@@ -273,11 +273,11 @@ namespace hpx
 
             if (here_lid == std::size_t(-1))
             {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "failed to find prefix of this locality: " 
                      << tmp_here;
                 HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
             }
 
             // wrap all gid_types into id_types

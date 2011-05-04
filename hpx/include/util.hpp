@@ -7,7 +7,6 @@
 #define HPX_UTIL_MAR_24_2008_1121AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/util.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #endif

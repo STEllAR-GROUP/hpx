@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/asio_util.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -73,10 +73,10 @@ namespace hpx { namespace naming
         }
         
         // report errors
-        HPX_OSSTREAM strm;
+        hpx::util::osstream strm;
         strm << errors.get_message() << " (while trying to resolve: " 
              << address_ << ":" << port_ << ")";
-        throw hpx::exception(network_error, HPX_OSSTREAM_GETSTRING(strm));
+        throw hpx::exception(network_error, hpx::util::osstream_get_string(strm));
         return locality::iterator_type();
     }
 

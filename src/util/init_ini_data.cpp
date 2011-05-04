@@ -7,7 +7,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/util.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>

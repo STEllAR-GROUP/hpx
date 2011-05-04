@@ -79,14 +79,14 @@ namespace hpx { namespace components
                 gid_ = appl.get_parcel_handler().get_next_id();
                 if (!appl.get_agas_client().bind(gid_, addr))
                 {
-                    HPX_OSSTREAM strm;
+                    hpx::util::osstream strm;
                     strm << gid_;
 
                     gid_ = naming::gid_type();   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "simple_component_base<Component>::get_gid", 
-                        HPX_OSSTREAM_GETSTRING(strm));
+                        hpx::util::osstream_get_string(strm));
                 }
             }
             return gid_;

@@ -12,7 +12,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/util.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/assert.hpp>

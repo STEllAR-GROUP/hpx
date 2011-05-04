@@ -221,11 +221,11 @@ namespace hpx { namespace lcos { namespace server
                     util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, "queue::get_value",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                         return ValueType();
                     }
                 }

@@ -19,7 +19,7 @@
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
@@ -198,14 +198,14 @@ namespace hpx { namespace components
         Component* get_checked()
         {
             if (0 == component_) {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "component is NULL (" 
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
             }
             return component_;
         }
@@ -213,14 +213,14 @@ namespace hpx { namespace components
         Component const* get_checked() const
         {
             if (0 == component_) {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "component is NULL (" 
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
             }
             return component_;
         }

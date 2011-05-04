@@ -190,12 +190,12 @@ namespace hpx { namespace parcelset
 //                     boost::asio::socket_base::shutdown_both, ec);
                 client_connection->socket().close();
 
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << error.message() << " (while trying to connect to: " 
                      << addr.locality_ << ")";
                 HPX_THROW_EXCEPTION(network_error, 
                     "parcelport::send_parcel", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
             }
 
         // Start an asynchronous write operation.

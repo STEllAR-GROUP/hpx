@@ -31,7 +31,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/block_profiler.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -716,16 +716,16 @@ namespace hpx { namespace naming
 //                     boost::asio::socket_base::shutdown_both, ec);
                 client_connection->socket().close();
 
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << error.message() << " (while trying to connect to: " 
                      << there_ << ")";
                 if (&ec == &throws) {
                     HPX_THROW_EXCEPTION(network_error, 
                         "resolver_client::get_client_connection", 
-                        HPX_OSSTREAM_GETSTRING(strm));
+                        hpx::util::osstream_get_string(strm));
                     return boost::shared_ptr<resolver_client_connection>();
                 }
-                ec = make_error_code(network_error, HPX_OSSTREAM_GETSTRING(strm));
+                ec = make_error_code(network_error, hpx::util::osstream_get_string(strm));
                 client_connection.reset();
                 return client_connection;
             }

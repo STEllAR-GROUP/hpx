@@ -9,7 +9,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/util.hpp>
 
 #include <examples/marduk/mesh/dynamic_stencil_value.hpp>
 #include <examples/marduk/mesh/functional_component.hpp>

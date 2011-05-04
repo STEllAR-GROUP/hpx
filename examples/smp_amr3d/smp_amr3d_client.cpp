@@ -9,7 +9,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/util.hpp>
 
 #include <examples/smp_amr3d/amr/dynamic_stencil_value.hpp>
 #include <examples/smp_amr3d/amr/functional_component.hpp>

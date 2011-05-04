@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
@@ -34,11 +34,11 @@ namespace hpx { namespace components { namespace server
         }
         catch (boost::exception const& be) {
             // extract error information
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << boost::diagnostic_information(be);
 
             // dispatch this error to registered functions
-            get_error_dispatcher()(src, HPX_OSSTREAM_GETSTRING(strm));
+            get_error_dispatcher()(src, hpx::util::osstream_get_string(strm));
         }
     }
 }}}

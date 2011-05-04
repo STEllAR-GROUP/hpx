@@ -343,9 +343,9 @@ namespace hpx { namespace performance_counters
         {
             naming::gid_type prefix = applier::get_applier().get_runtime_support_raw_gid();
 
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << prefix;
-            p.parentinstancename_ = HPX_OSSTREAM_GETSTRING(strm);
+            p.parentinstancename_ = hpx::util::osstream_get_string(strm);
         }
 
         return get_counter_name(p, info.fullname_, ec);

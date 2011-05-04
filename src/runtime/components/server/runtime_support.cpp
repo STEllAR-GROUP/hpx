@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/util.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
@@ -83,13 +83,13 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << "attempt to query factory properties for components "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::factory_properties",
-                HPX_OSSTREAM_GETSTRING(strm));
+                hpx::util::osstream_get_string(strm));
             return factory_invalid;
         }
 
@@ -106,12 +106,12 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::create_component",
-                HPX_OSSTREAM_GETSTRING(strm));
+                hpx::util::osstream_get_string(strm));
             return naming::invalid_gid;
         }
 
@@ -145,12 +145,12 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::create_component",
-                HPX_OSSTREAM_GETSTRING(strm));
+                hpx::util::osstream_get_string(strm));
             return naming::invalid_gid;
         }
 
@@ -198,12 +198,12 @@ namespace hpx { namespace components { namespace server
             naming::address addr;
             if (!appl.get_agas_client().resolve(gid, addr)) 
             {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "global id " << gid << " is not bound to any "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                     "runtime_support::free_component", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
                 return;
             }
 
@@ -211,12 +211,12 @@ namespace hpx { namespace components { namespace server
             if (appl.here() != addr.locality_) 
             {
                 // FIXME: should the component be re-bound ?
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "global id " << gid << " is not bound to any local "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                     "runtime_support::free_component", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
                 return;
             }
 
@@ -231,7 +231,7 @@ namespace hpx { namespace components { namespace server
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
-            HPX_OSSTREAM strm;
+            hpx::util::osstream strm;
 
             strm << "attempt to destroy component " << gid 
                  << " of invalid/unknown type: " 
@@ -248,7 +248,7 @@ namespace hpx { namespace components { namespace server
 
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::free_component",
-                HPX_OSSTREAM_GETSTRING(strm));
+                hpx::util::osstream_get_string(strm));
             return;
         }
 

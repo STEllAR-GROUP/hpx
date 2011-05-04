@@ -166,12 +166,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_full_full",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 
@@ -211,12 +211,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_full_full",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 
@@ -254,12 +254,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_full_empty",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 
@@ -305,12 +305,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_full_empty",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 
@@ -351,12 +351,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_if_full",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 
@@ -399,12 +399,12 @@ namespace hpx { namespace util { namespace detail
                     util::unlock_the_lock<scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
-                        HPX_OSSTREAM strm;
+                        hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
                         HPX_THROW_EXCEPTION(no_success, 
                             "full_empty_entry::enqueue_if_full",
-                            HPX_OSSTREAM_GETSTRING(strm));
+                            hpx::util::osstream_get_string(strm));
                     }
                 }
                 if (f.id_) 

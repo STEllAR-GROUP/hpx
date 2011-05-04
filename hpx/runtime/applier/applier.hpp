@@ -10,6 +10,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -211,28 +212,28 @@ namespace hpx { namespace applier
         {
             if (id.is_local()) {    // address gets resolved if not already
                 if (!id.get_local_address(addr)) {
-                    HPX_OSSTREAM strm;
+                    hpx::util::osstream strm;
                     strm << "gid" << id.get_gid();
                     HPX_THROW_EXCEPTION(invalid_status, 
                         "applier::address_is_local", 
-                        HPX_OSSTREAM_GETSTRING(strm));
+                        hpx::util::osstream_get_string(strm));
                 }
                 return true;
             }
 
             if (!id.is_resolved()) {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "gid" << id.get_gid();
                 HPX_THROW_EXCEPTION(unknown_component_address, 
-                    "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
+                    "applier::address_is_local", hpx::util::osstream_get_string(strm));
             }
 
             if (!id.get_address_cached(addr)) {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "gid" << id.get_gid();
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "applier::address_is_local", 
-                    HPX_OSSTREAM_GETSTRING(strm));
+                    hpx::util::osstream_get_string(strm));
             }
             return false;   // non-local
         }
@@ -257,10 +258,10 @@ namespace hpx { namespace applier
             // Resolve the address of the gid
             if (!parcel_handler_.get_resolver().resolve(gid, addr))
             {
-                HPX_OSSTREAM strm;
+                hpx::util::osstream strm;
                 strm << "gid" << gid;
                 HPX_THROW_EXCEPTION(unknown_component_address, 
-                    "applier::address_is_local", HPX_OSSTREAM_GETSTRING(strm));
+                    "applier::address_is_local", hpx::util::osstream_get_string(strm));
             }
             return addr.locality_ == parcel_handler_.here();
         }
