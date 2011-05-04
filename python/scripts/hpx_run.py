@@ -109,7 +109,7 @@ class System(dict):
       if len(ip) > 0:
         self[node_name].ip = ip
       else:
-        self[node_name].ip = 'localhost'
+        self[node_name].ip = '127.0.0.1'
         self.is_virtual = True
   
   def load_from_localities_spec(self, localities_spec):
@@ -122,7 +122,7 @@ class System(dict):
 
       self[node_name].is_virtual=True
       self[node_name].num_cores = num_threads
-      self[node_name].ip = 'localhost'
+      self[node_name].ip = '127.0.0.1'
 
 class Node:
   """
