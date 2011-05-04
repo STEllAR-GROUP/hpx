@@ -60,8 +60,7 @@ namespace hpx { namespace threads
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_default
-         || priority > thread_priority_critical)
+        if (priority < thread_priority_low || priority > thread_priority_critical)
             return "unknown";
         return strings::thread_priority_names[priority];
     }
@@ -157,12 +156,12 @@ namespace hpx { namespace threads
 
         default:
             {
-                hpx::util::osstream strm;
+                HPX_OSSTREAM strm;
                 strm << "invalid initial state: " 
                      << get_thread_state_name(initial_state);
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threadmanager_impl::register_thread",
-                    hpx::util::osstream_get_string(strm));
+                    HPX_OSSTREAM_GETSTRING(strm));
                 return invalid_thread_id;
             }
         }
@@ -227,12 +226,12 @@ namespace hpx { namespace threads
 
         default:
             {
-                hpx::util::osstream strm;
+                HPX_OSSTREAM strm;
                 strm << "invalid initial state: " 
                      << get_thread_state_name(initial_state);
                 HPX_THROWS_IF(ec, bad_parameter,
                     "threadmanager_impl::register_work",
-                    hpx::util::osstream_get_string(strm));
+                    HPX_OSSTREAM_GETSTRING(strm));
                 return;
             }
         }
@@ -297,10 +296,10 @@ namespace hpx { namespace threads
 
         // set_state can't be used to force a thread into active state
         if (new_state == active) {
-            hpx::util::osstream strm;
+            HPX_OSSTREAM strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter, 
-                "threadmanager_impl::set_state", hpx::util::osstream_get_string(strm));
+                "threadmanager_impl::set_state", HPX_OSSTREAM_GETSTRING(strm));
             return thread_state(unknown);
         }
 

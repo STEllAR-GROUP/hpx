@@ -18,8 +18,6 @@
 #include "stencil_functions.hpp"
 #include "stencil_data_locking.hpp"
 #include "../amr/unigrid_mesh.hpp"
-#include <hpx/runtime/actions/manage_object_action.hpp>
-#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 

@@ -15,6 +15,7 @@
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 

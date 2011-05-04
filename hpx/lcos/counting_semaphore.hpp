@@ -10,6 +10,7 @@
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/intrusive/slist.hpp>

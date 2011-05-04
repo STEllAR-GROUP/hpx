@@ -8,6 +8,7 @@
 
 #include <boost/detail/atomic_count.hpp>
 #include <boost/lockfree/fifo.hpp>
+#include <hpx/util/stringstream.hpp>
 
 // Description of the condition algorithm is explained here:
 // http://lists.boost.org/Archives/boost/2006/09/110367.php

@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include <boost/version.hpp>
 #include <boost/asio/io_service.hpp>
