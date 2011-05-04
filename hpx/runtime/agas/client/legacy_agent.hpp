@@ -8,6 +8,7 @@
 #if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -15,6 +16,15 @@
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
+
+#if defined(HPX_USE_AGAS_CACHE)
+    #include <map>
+
+    #include <boost/cache/local_cache.hpp>
+    #include <boost/cache/entries/lfu_entry.hpp>
+
+    #include <hpx/lcos/mutex.hpp>
+#endif
 
 namespace hpx { namespace agas 
 {
@@ -31,15 +41,77 @@ struct legacy_agent
 
     typedef typename component_namespace_type::component_id_type
         component_id_type;
+    
+    typedef typename primary_namespace_type::gva_type gva_type;
+    typedef typename primary_namespace_type::count_type count_type;
+    typedef typename primary_namespace_type::offset_type offset_type;
+    typedef typename primary_namespace_type::endpoint_type endpoint_type;
+    typedef typename primary_namespace_type::unbinding_type unbinding_type;
+    typedef typename primary_namespace_type::binding_type binding_type;
+    typedef typename component_namespace_type::prefixes_type prefixes_type;
+    typedef typename component_namespace_type::prefix_type prefix_type;
+    typedef typename primary_namespace_type::decrement_type decrement_type;
   private:
     primary_namespace_type primary_ns_;
     component_namespace_type component_ns_;
     symbol_namespace_type symbol_ns_;
 
+    #if defined(HPX_USE_AGAS_CACHE)
+        struct cache_key
+        {
+            cache_key()
+              : id(), count(0)
+            {}
+
+            explicit cache_key(naming::gid_type const& id_,
+                               count_type count_ = 1)
+              : id(id_), count(count_)
+            {}
+
+            naming::gid_type id;
+            count_type count;
+
+            friend bool operator<(cache_key const& lhs, cache_key const& rhs)
+            { return (lhs.id + (lhs.count - 1)) < rhs.id; }
+
+            friend bool operator==(cache_key const& lhs, cache_key const& rhs)
+            { return (lhs.id == rhs.id) && (lhs.count == rhs.count); }
+        };
+    
+        struct erase_policy
+        {
+            erase_policy(naming::gid_type const& id, count_type count)
+              : entry(id, count)
+            {}
+
+            typedef std::pair<
+                cache_key, boost::cache::entries::lfu_entry<gva_type>
+            > entry_type;
+
+            bool operator()(entry_type const& p) const
+            { return p.first == entry; }
+
+            cache_key entry;
+        };
+
+        typedef boost::cache::entries::lfu_entry<gva_type> entry_type;
+
+        typedef hpx::lcos::mutex mutex_type;
+
+        typedef boost::cache::local_cache<
+            cache_key, entry_type, 
+            std::less<entry_type>, boost::cache::policies::always<entry_type>,
+            std::map<cache_key, entry_type>
+        > cache_type;
+
+        mutex_type cache_mtx_;
+        cache_type gva_cache_;
+    #endif
+
   public:
-     explicit legacy_agent(naming::id_type const& primary_ns,
-                           naming::id_type const& component_ns,
-                           naming::id_type const& symbol_ns) :
+    explicit legacy_agent(naming::id_type const& primary_ns,
+                          naming::id_type const& component_ns,
+                          naming::id_type const& symbol_ns) :
         primary_ns_(primary_ns),
         component_ns_(component_ns),
         symbol_ns_(symbol_ns) {} 
@@ -52,12 +124,11 @@ struct legacy_agent
 
         address addr = address::from_string(l.get_address());
 
-        typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
+        endpoint_type ep(addr, l.get_port()); 
 
         if (self)
         {
-            typename primary_namespace_type::binding_type r
-                = primary_ns_.bind(ep, 0);
+            binding_type r = primary_ns_.bind(ep, 0);
             prefix = at_c<2>(r);
             return at_c<3>(r);
         }
@@ -79,13 +150,11 @@ struct legacy_agent
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       component_id_type type, error_code& ec = throws) 
     {
+        typedef typename prefixes_type::const_iterator iterator;
+
         if (type != components::component_invalid)
         {
-            typedef typename component_namespace_type::prefixes_type::
-                const_iterator iterator;
-    
-            typename component_namespace_type::prefixes_type raw_prefixes
-                = component_ns_.resolve(type);
+            prefixes_type raw_prefixes = component_ns_.resolve(type);
     
             if (raw_prefixes.empty())
                 return false;
@@ -98,11 +167,7 @@ struct legacy_agent
             return true; 
         }
 
-        typedef typename primary_namespace_type::prefixes_type::
-            const_iterator iterator;
-    
-        typename primary_namespace_type::prefixes_type raw_prefixes
-            = primary_ns_.localities();
+        prefixes_type raw_prefixes = primary_ns_.localities();
     
         if (raw_prefixes.empty())
             return false;
@@ -119,16 +184,16 @@ struct legacy_agent
                       error_code& ec = throws) 
     { return get_prefixes(prefixes, components::component_invalid, ec); }
 
-    typename component_namespace_type::component_id_type
+    component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
     { return component_ns_.bind(name); } 
 
-    typename component_namespace_type::component_id_type
+    component_id_type
     register_factory(naming::gid_type const& prefix, std::string const& name, 
                      error_code& ec = throws) 
     { return component_ns_.bind(name, naming::get_prefix_from_gid(prefix)); } 
 
-    bool get_id_range(naming::locality const& l, boost::uint32_t count, 
+    bool get_id_range(naming::locality const& l, count_type count, 
                       naming::gid_type& lower_bound,
                       naming::gid_type& upper_bound, 
                       error_code& ec = throws) 
@@ -138,10 +203,9 @@ struct legacy_agent
 
         address addr = address::from_string(l.get_address());
 
-        typename primary_namespace_type::endpoint_type ep(addr, l.get_port()); 
+        endpoint_type ep(addr, l.get_port()); 
          
-        typename primary_namespace_type::binding_type range =
-            primary_ns_.bind(ep, count);
+        binding_type range = primary_ns_.bind(ep, count);
 
         lower_bound = at_c<0>(range);
         upper_bound = at_c<1>(range);
@@ -153,8 +217,8 @@ struct legacy_agent
               error_code& ec = throws) 
     { return bind_range(id, 1, addr, 0, ec); }
 
-    bool bind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
-                    naming::address const& baseaddr, std::ptrdiff_t offset, 
+    bool bind_range(naming::gid_type const& lower_id, count_type count, 
+                    naming::address const& baseaddr, offset_type offset, 
                     error_code& ec = throws) 
     {
         using boost::asio::ip::address;
@@ -162,30 +226,38 @@ struct legacy_agent
 
         address addr = address::from_string(baseaddr.locality_.get_address());
 
-        typename primary_namespace_type::endpoint_type ep
-            (addr, baseaddr.locality_.get_port()); 
+        endpoint_type ep(addr, baseaddr.locality_.get_port()); 
        
         // Create a global virtual address from the legacy calling convention
         // parameters.
-        typename primary_namespace_type::gva_type gva
-            (ep, baseaddr.type_, count, baseaddr.address_, offset);
+        gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
+        
+        if (primary_ns_.bind(lower_id, gva)) 
+        { 
+            #if defined(HPX_USE_AGAS_CACHE)
+                mutex_type::scoped_lock lock(cache_mtx_);
+                cache_key key(lower_id, count);
+                gva_cache_.insert(key, gva);
+            #endif
 
-        return primary_ns_.bind(lower_id, gva); 
+            return true;
+        }
+
+        return false; 
     } 
 
-    typename primary_namespace_type::count_type
-    incref(naming::gid_type const& id, boost::uint32_t credits = 1, 
+    count_type
+    incref(naming::gid_type const& id, count_type credits = 1, 
            error_code& ec = throws) 
     { return primary_ns_.increment(id, credits); } 
 
-    typename primary_namespace_type::count_type
+    count_type
     decref(naming::gid_type const& id, component_id_type& t,
-           boost::uint32_t credits = 1, error_code& ec = throws) 
+           count_type credits = 1, error_code& ec = throws) 
     {
         using boost::fusion::at_c;
 
-        typename primary_namespace_type::decrement_type r
-            = primary_ns_.increment(id, credits);
+        decrement_type r = primary_ns_.decrement(id, credits);
 
         if (at_c<0>(r) == 0)
             t = at_c<1>(r);
@@ -200,21 +272,25 @@ struct legacy_agent
                 error_code& ec = throws) 
     { return unbind_range(id, 1, addr, ec); }
 
-    bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
+    bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       error_code& ec = throws) 
     {
         naming::address addr; 
         return unbind_range(lower_id, count, addr, ec);
     } 
 
-    bool unbind_range(naming::gid_type const& lower_id, boost::uint32_t count, 
+    bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       naming::address& addr, error_code& ec = throws) 
     {
-        typename primary_namespace_type::unbinding_type r
-            = primary_ns_.unbind(lower_id, count);
+        unbinding_type r = primary_ns_.unbind(lower_id, count);
 
         if (r)
         {
+            #if defined(HPX_USE_AGAS_CACHE)
+                mutex_type::scoped_lock lock(cache_mtx_);
+                erase_policy ep(lower_id, count);
+                gva_cache_.erase(ep);
+            #endif
             addr.locality_ = r->endpoint;
             addr.type_ = r->type;
             addr.address_ = r->lva();
@@ -224,57 +300,73 @@ struct legacy_agent
     }
 
     bool resolve(naming::gid_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws) 
+                 bool try_cache = false, error_code& ec = throws) 
     {
-        typename primary_namespace_type::gva_type gva = primary_ns_.resolve(id);
+        gva_type gva = primary_ns_.resolve(id);
+
+        if (try_cache && resolve_cached(id, addr, ec))
+            return true;
 
         addr.locality_ = gva.endpoint;
         addr.type_ = gva.type;
         addr.address_ = gva.lva();
 
-        typedef typename primary_namespace_type::endpoint_type endpoint_type;
-        return (gva.endpoint != endpoint_type())
-            && (gva.type != components::component_invalid)
-            && (gva.lva() != 0);
+        if (HPX_LIKELY((gva.endpoint != endpoint_type()) &&
+                       (gva.type != components::component_invalid) &&
+                       (gva.lva() != 0)))
+        {     
+            #if defined(HPX_USE_AGAS_CACHE)
+                // We only insert the entry into the cache if it's valid
+                mutex_type::scoped_lock lock(cache_mtx_);
+                cache_key key(id);
+                gva_cache_.insert(key, gva);
+            #endif
+            return true;
+        }
+
+        return false;
     }
 
     bool resolve(naming::id_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws) 
+                 bool try_cache = false, error_code& ec = throws) 
     { return resolve(id.get_gid(), addr, try_cache, ec); }
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
                         error_code& ec = throws) 
-    { return resolve(id, addr, true, ec); /* IMPLEMENT */ }
+    {
+        #if defined(HPX_USE_AGAS_CACHE)
+            // first look up the requested item in the cache
+            cache_key k(id);
+            {
+                mutex_type::scoped_lock lock(cache_mtx_);
+                cache_key idbase;
+                typename cache_type::entry_type e;
 
-    // {{{ registerid specification
-    /// \brief Register a global name with a global address (id)
-    /// 
-    /// This function registers an association between a global name 
-    /// (string) and a global address (id) usable with one of the functions 
-    /// above (bind, unbind, and resolve).
-    ///
-    /// \param name       [in] The global name (string) to be associated
-    ///                   with the global address.
-    /// \param id         [in] The global address (id) to be associated 
-    ///                   with the global address.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    /// 
-    /// \returns          The function returns \a true if the global name 
-    ///                   got an association with a global address for the 
-    ///                   first time, and it returns \a false if this 
-    ///                   function call replaced a previously registered 
-    ///                   global address with the global address (id) 
-    ///                   given as the parameter. Any error results in an 
-    ///                   exception thrown from this function.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
+                // Check if the entry is currently in the cache
+                if (gva_cache_.get_entry(k, idbase, e))
+                {
+                    // FIXME: make this an exception
+                    if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
+                    {
+                        HPX_THROWS_IN_CURRENT_FUNC_IF(ec, bad_parameter, 
+                            "MSBs of GID base and GID do not match");
+                        return false;
+                    }
+
+                    gva_type const& gva = e.get();
+
+                    addr.locality_ = gva.endpoint;
+                    addr.type_ = gva.type;
+                    addr.address_ = gva.lva(id, idbase.id);
+        
+                    return true;
+                }
+            }
+        #endif
+
+        return false;
+    }
+
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
     {
@@ -282,60 +374,9 @@ struct legacy_agent
         return r == id;
     }
 
-    // {{{ unregisterid specification
-    /// \brief Unregister a global name (release any existing association)
-    ///
-    /// This function releases any existing association of the given global 
-    /// name with a global address (id). 
-    /// 
-    /// \param name       [in] The global name (string) for which any 
-    ///                   association with a global address (id) has to be 
-    ///                   released.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    /// 
-    /// \returns          The function returns \a true if an association of 
-    ///                   this global name has been released, and it returns 
-    ///                   \a false, if no association existed. Any error 
-    ///                   results in an exception thrown from this function.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
     bool unregisterid(std::string const& name, error_code& ec = throws) 
     { return symbol_ns_.unbind(name); }
 
-    // {{{ queryid specification
-    /// Query for the global address associated with a given global name.
-    ///
-    /// This function returns the global address associated with the given 
-    /// global name.
-    ///
-    /// string name:      [in] The global name (string) for which the 
-    ///                   currently associated global address has to be 
-    ///                   retrieved.
-    /// id_type& id:      [out] The id currently associated with the given 
-    ///                   global name (valid only if the return value is 
-    ///                   true).
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    /// 
-    /// This function returns true if it returned global address (id), 
-    /// which is currently associated with the given global name, and it 
-    /// returns false, if currently there is no association for this global 
-    /// name. Any error results in an exception thrown from this function.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
-    ///                   of hpx#exception.
-    // }}}
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) 
     {

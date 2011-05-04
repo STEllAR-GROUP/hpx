@@ -345,6 +345,7 @@ namespace boost { namespace system
     }                                                                         \
     /**/
 
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
     HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
     /**/
@@ -352,6 +353,28 @@ namespace boost { namespace system
 #define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                             \
     HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)               \
     /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_THROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                       \
+    {                                                                         \
+        if (&ec == &hpx::throws) {                                            \
+            HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
+    /**/
+
+#define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                     \
+    {                                                                         \
+        if (&ec == &hpx::throws) {                                            \
+            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
+    /**/
+
 
 #include <hpx/config/warnings_suffix.hpp>
 
