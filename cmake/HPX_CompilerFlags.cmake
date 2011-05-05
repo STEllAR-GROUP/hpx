@@ -22,10 +22,24 @@ macro(hpx_use_flag_if_available flag)
   else()
     string(TOUPPER ${flag} uppercase_name)
   endif()
-
-  add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
-    SOURCE cmake/tests/flag.cpp
-    FLAGS "-${flag}" FILE)
+  
+  if(HPX_ROOT)
+    set(source_dir "${HPX_ROOT}")
+    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
+      ROOT ${source_dir}
+      SOURCE cmake/tests/flag.cpp
+      FLAGS "-${flag}" FILE)
+  elseif($ENV{HPX_ROOT})
+    set(source_dir "$ENV{HPX_ROOT}")
+    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
+      ROOT ${source_dir}
+      SOURCE cmake/tests/flag.cpp
+      FLAGS "-${flag}" FILE)
+  else()
+    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
+      SOURCE cmake/tests/flag.cpp
+      FLAGS "-${flag}" FILE)
+  endif()
 
   if(HPX_FLAG_${uppercase_name})
     add_definitions("-${flag}")

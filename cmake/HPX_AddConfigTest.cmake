@@ -36,7 +36,7 @@ macro(add_hpx_config_test name variable)
   
     if(${name}_FILE)
       if(${name}_ROOT)
-        set(test_source "${${name}_ROOT}/share/${${name}_SOURCE}")
+        set(test_source "${${name}_ROOT}/share/hpx/${${name}_SOURCE}")
       else()
         set(test_source "${hpx_SOURCE_DIR}/${${name}_SOURCE}")
       endif()
