@@ -16,6 +16,7 @@ set(subdirs
     generic
     had_amr3d
     hplpx
+    marduk
     smp_amr3d
     nbody
     nqueen

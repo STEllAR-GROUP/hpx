@@ -32,7 +32,7 @@ set(sources
 set(dependencies
     smp_amr3d_component 
     smp_amr3d_c_component 
-    smp_amr3d_c_test_component
+    smp_amr3d_c_test_lib
     distributing_factory_component)
 
 if(RNPL_FOUND)

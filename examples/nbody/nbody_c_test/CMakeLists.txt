@@ -12,7 +12,7 @@ set(sources
 source_group("Source Files" FILES ${sources})
 
 ###############################################################################
-add_hpx_component(nbody_c_test
+add_hpx_library(nbody_c_test
   MODULE nbody
   SOURCES ${sources}) 
 

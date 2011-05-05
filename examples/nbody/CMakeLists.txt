@@ -24,7 +24,7 @@ set(sources
 set(dependencies
     nbody_component 
     nbody_c_component 
-    nbody_c_test_component
+    nbody_c_test_lib
     distributing_factory_component)
 
 source_group("Source Files" FILES ${sources})

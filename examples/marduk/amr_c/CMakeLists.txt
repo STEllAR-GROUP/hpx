@@ -25,5 +25,5 @@ add_hpx_component(ssmp_amr3d_c
   MODULE ssmp_amr3d
   SOURCES ${sources} 
   HEADERS ${headers}
-  DEPENDENCIES ssmp_amr3d_c_test_component)
+  DEPENDENCIES ssmp_amr3d_c_test_lib)
 

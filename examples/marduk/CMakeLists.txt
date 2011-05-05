@@ -29,7 +29,7 @@ set(sources
 set(dependencies
     marduk_mesh_component 
     ssmp_amr3d_c_component 
-    ssmp_amr3d_c_test_component
+    ssmp_amr3d_c_test_lib
     distributing_factory_component)
 
 if(RNPL_FOUND)

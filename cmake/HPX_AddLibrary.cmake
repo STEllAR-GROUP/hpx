@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(HPX_ADDCOMPONENT_LOADED TRUE)
+set(HPX_ADDLIBRARY_LOADED TRUE)
 
 include(HPX_Include)
 
@@ -12,38 +12,38 @@ hpx_include(Message
             ParseArguments
             Install)
 
-macro(add_hpx_component name)
+macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
     "MODULE;SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL" ${ARGN})
 
-  hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
-  hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
-  hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
-  hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
+  hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)
+  hpx_print_list("DEBUG" "add_library.${name}" "Headers for ${name}" ${name}_HEADERS)
+  hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_library.${name}" "Configuration files for ${name}" ${name}_INI)
 
   if(NOT MSVC)
     if(${name}_ESSENTIAL)
-      add_library(${name}_component SHARED 
+      add_library(${name}_lib SHARED 
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
-      add_library(${name}_component SHARED EXCLUDE_FROM_ALL
+      add_library(${name}_lib SHARED EXCLUDE_FROM_ALL
         ${${name}_SOURCES} ${${name}_HEADERS})
     endif() 
   else()
     if(${name}_ESSENTIAL)
-      add_library(${name}_component SHARED ${${name}_SOURCES}) 
+      add_library(${name}_lib SHARED ${${name}_SOURCES}) 
     else()
-      add_library(${name}_component SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES}) 
+      add_library(${name}_lib SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES}) 
     endif() 
   endif()
 
   set(prefix "")
 
   if(NOT MSVC)
-    target_link_libraries(${name}_component
+    target_link_libraries(${name}_lib
       ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
-    set(prefix "hpx_component_")
+    set(prefix "hpx_")
     # main_target is checked by the ini install code, to see if ini files for
     # this component need to be installed
     set(main_target lib${prefix}${name}.so)
@@ -51,18 +51,15 @@ macro(add_hpx_component name)
       lib${prefix}${name}.so
       lib${prefix}${name}.so.${HPX_SOVERSION}
       lib${prefix}${name}.so.${HPX_VERSION})
-    set_target_properties(${name}_component PROPERTIES
-      COMPILE_FLAGS "-fno-use-cxa-atexit"
-      LINK_FLAGS "-fno-use-cxa-atexit")
   else()
-    target_link_libraries(${name}_component
+    target_link_libraries(${name}_lib
       ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
     set(main_target ${name}.dll)
     set(install_targets ${name}.dll)
   endif()
 
   # set properties of generated shared library
-  set_target_properties(${name}_component PROPERTIES
+  set_target_properties(${name}_lib PROPERTIES
     # create *nix style library versions + symbolic links
     VERSION ${HPX_VERSION}      
     SOVERSION ${HPX_SOVERSION}
@@ -70,28 +67,16 @@ macro(add_hpx_component name)
     CLEAN_DIRECT_OUTPUT 1 
     OUTPUT_NAME ${prefix}${name})
   
-  set_property(TARGET ${name}_component APPEND
-               PROPERTY COMPILE_DEFINITIONS
-               "HPX_COMPONENT_NAME=${name}"
-               "HPX_COMPONENT_STRING=\"${name}\""
-               "HPX_COMPONENT_EXPORTS")
-  set_property(TARGET ${name}_component
-               PROPERTY LIBRARY_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY RUNTIME_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET ${name}_lib APPEND
+               PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
-    hpx_debug("add_component.${name}" "Module was not specified for component.")
+    hpx_debug("add_library.${name}" "Module was not specified for component.")
   endif()
 
   foreach(target ${install_targets})
-    hpx_component_install(${${name}_MODULE} ${target})
+    hpx_library_install(${${name}_MODULE} ${target})
   endforeach()
 
   foreach(target ${${name}_INI})

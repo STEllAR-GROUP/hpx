@@ -62,7 +62,7 @@ endif()
 set(dependencies
     had_amr3d_component 
     had_amr3d_c_component 
-    had_amr3d_c_test_component
+    had_amr3d_c_test_lib
     distributing_factory_component)
 
 if(GMP_FOUND)

@@ -25,5 +25,5 @@ add_hpx_component(had_amr3d_c
   MODULE had_amr3d
   SOURCES ${sources} 
   HEADERS ${headers}
-  DEPENDENCIES had_amr3d_c_test_component)
+  DEPENDENCIES had_amr3d_c_test_lib)
 
