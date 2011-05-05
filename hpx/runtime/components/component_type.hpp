@@ -94,7 +94,6 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_MSVC)
     template <typename Component, typename Enable = void>
     struct component_type_database
     {
@@ -103,16 +102,6 @@ namespace hpx { namespace components
         static HPX_ALWAYS_EXPORT component_type get();
         static HPX_ALWAYS_EXPORT void set(component_type);
     }; 
-#else
-    template <typename Component, typename Enable = void>
-    struct HPX_ALWAYS_EXPORT component_type_database
-    {
-        static component_type value;
-
-        static component_type get() { return value; }
-        static void set(component_type t) { value = t; }
-    }; 
-#endif 
 
     template <typename Component, typename Enable>
     component_type component_type_database<Component, Enable>::value = component_invalid;
@@ -145,8 +134,7 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_MSVC)
-  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                            \
+#define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
@@ -157,9 +145,6 @@ namespace hpx { namespace components
             { value = t; }                                                    \
     }}                                                                        \
     /**/
-#else
-  #define HPX_DEFINE_GET_COMPONENT_TYPE(component)
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
