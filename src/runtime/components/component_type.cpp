@@ -26,7 +26,10 @@ namespace hpx { namespace components
             "component_thread",
             "component_dataflow_variable",
             "component_thunk",
-            "component_dataflow_block"
+            "component_dataflow_block",
+            "component_agas_primary_namespace",
+            "component_agas_component_namespace",
+            "component_agas_symbol_namespace"
         };
     }
 

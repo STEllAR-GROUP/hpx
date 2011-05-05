@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #if defined(HPX_USE_AGAS_CACHE)
     #include <map>
@@ -109,6 +110,11 @@ struct legacy_agent
     #endif
 
   public:
+    legacy_agent(util::runtime_configuration const& ini_
+                  = util::runtime_configuration(), 
+                 bool isconsole = false)
+      { /* IMPLEMENT */ }
+
     explicit legacy_agent(naming::id_type const& primary_ns,
                           naming::id_type const& component_ns,
                           naming::id_type const& symbol_ns) :

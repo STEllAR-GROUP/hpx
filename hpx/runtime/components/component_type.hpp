@@ -43,6 +43,10 @@ namespace hpx { namespace components
 
         component_dataflow_block = 11,  ///< a dataflow block
 
+        component_agas_primary_namespace = 12,
+        component_agas_component_namespace = 13,
+        component_agas_symbol_namespace = 14,
+
         component_last,
         component_first_dynamic = component_last
     };

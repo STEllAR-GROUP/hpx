@@ -17,6 +17,8 @@
 #include <hpx/runtime/agas/namespace/symbol.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 
+using hpx::components::component_agas_symbol_namespace;
+
 typedef hpx::agas::server::symbol_namespace<
     hpx::agas::tag::database::stdmap
 > agas_component;
@@ -25,7 +27,8 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<agas_component>,
     stdmap_symbol_namespace);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(agas_component);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    agas_component, component_agas_symbol_namespace);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_action,

@@ -22,6 +22,7 @@
 
 using boost::optional;
 
+using hpx::components::component_agas_symbol_namespace;
 using hpx::components::component_base_lco_with_value;
 using hpx::lcos::base_lco_with_value;
 using hpx::naming::gid_type;
@@ -35,7 +36,8 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<agas_component>,
     stdmap_tcpip_primary_namespace);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(agas_component);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    agas_component, component_agas_primary_namespace);
 
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::gva_type>::set_result_action,
