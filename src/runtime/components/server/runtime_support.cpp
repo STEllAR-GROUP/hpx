@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -143,11 +144,23 @@ namespace hpx { namespace components { namespace server
     {
     // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first) {
+        if (it == components_.end()) {
             // we don't know anything about this component
             hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type);
+                 << components::get_component_type_name(type) 
+                 << " (component not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+        else if (!(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of invalid/unknown type: "
+                 << components::get_component_type_name(type)
+                 << " (map entry is NULL)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type, 
                 "runtime_support::create_component",
                 hpx::util::osstream_get_string(strm));
@@ -466,6 +479,9 @@ namespace hpx { namespace components { namespace server
             else
                 component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
 
+            if (i->second.has_entry("version"))
+                component += i->second.get_entry("version");
+
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::algorithm::to_lower (tmp);
@@ -512,7 +528,10 @@ namespace hpx { namespace components { namespace server
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
+        {
+            LRT_(info) << lib.string() << " is not a shared object: " << instance;
             return false;
+        }
 
         try {
             // get the handle of the library 
@@ -572,17 +591,17 @@ namespace hpx { namespace components { namespace server
                        << components::get_component_type_name(t);
         }
         catch (std::logic_error const& e) {
-            if (!isdefault) {
+            //if (!isdefault) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string() 
                               << ": " << instance << ": " << e.what();
-            }
+            //}
             return false;
         }
         catch (std::exception const& e) {
-            if (!isdefault) {
+            //if (!isdefault) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string() 
                               << ": " << instance << ": " << e.what();
-            }
+            //}
             return false;
         }
         return true;    // component got loaded
