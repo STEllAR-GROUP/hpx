@@ -21,7 +21,7 @@ if(NOT HPX_ROOT)
   set(HPX_ROOT $ENV{HPX_ROOT})
 endif()
 
-set(CMAKE_MODULE_PATH ${HPX_ROOT}/share/cmake)
+set(CMAKE_MODULE_PATH ${HPX_ROOT}/share/hpx/cmake)
 
 # include additional macro definitions
 include(HPX_Utils)
@@ -39,15 +39,17 @@ endif()
 # environment detection 
 ################################################################################
 # FIXME: broken for MSVC
-execute_process(COMMAND "${HPX_ROOT}/bin/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
-                OUTPUT_VARIABLE build_environment
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT MSVC)
+  execute_process(COMMAND "${HPX_ROOT}/bin/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
+                  OUTPUT_VARIABLE build_environment
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(build_environment)
-  set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-  hpx_info("environment" "Build environment is ${BUILDNAME}")
-else()
-  hpx_warn("environment" "Couldn't determine build environment (install python).") 
+  if(build_environment)
+    set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
+    hpx_info("environment" "Build environment is ${BUILDNAME}")
+  else()
+    hpx_warn("environment" "Couldn't determine build environment (install python).") 
+  endif()
 endif()
 
 ################################################################################
@@ -102,8 +104,9 @@ add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 ################################################################################
 # search path configuration
 ################################################################################
-include_directories("${HPX_ROOT}/include")
-link_directories("${HPX_ROOT}/lib")
+include_directories(${HPX_ROOT}/include)
+link_directories(${HPX_ROOT}/lib)
+link_directories(${HPX_ROOT}/lib/hpx)
 
 ################################################################################
 # installation configuration
@@ -119,15 +122,14 @@ endif()
 
 if(NOT CMAKE_INSTALL_PREFIX)
   if(UNIX)
-    # on POSIX, we do a local system install by default 
-    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "/opt/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
   else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
   endif()
 endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
-  CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
+  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx.${HPX_VERSION} for POSIX, C:/Program Files/hpx.${HPX_VERSION} for Windows)." FORCE)
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}")
 
@@ -137,22 +139,34 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/lib)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib)
+
 ################################################################################
 # RPATH configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib:${CMAKE_BINARY_DIR}/lib/hpx")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
 # Warning configuration
 ################################################################################
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
-
-if(NOT HPX_DISABLE_WARNINGS)
-  hpx_use_flag_if_available(Wall)
-endif()
 
 ################################################################################
 # Windows specific configuration 
@@ -207,6 +221,7 @@ else()
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
   if(NOT HPX_DISABLE_WARNINGS)
+    hpx_use_flag_if_available(Wall)
     hpx_use_flag_if_available(Wno-strict-aliasing)
     hpx_use_flag_if_available(Wsign-promo)
   endif()

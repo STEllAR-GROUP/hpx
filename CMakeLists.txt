@@ -119,6 +119,8 @@ include_directories(${hpx_SOURCE_DIR}/external/endian)
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
+link_directories(${CMAKE_BINARY_DIR}/lib)
+link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
 # installation configuration
@@ -134,15 +136,14 @@ endif()
 
 if(NOT CMAKE_INSTALL_PREFIX)
   if(UNIX)
-    # on POSIX, we do a local system install by default 
-    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "/opt/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
   else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
   endif()
 endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
-  CACHE PATH "Where to install ${PROJECT_NAME} (default: /usr/local/ for POSIX, C:/Program Files/hpx for Windows)." FORCE)
+  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx.${HPX_VERSION} for POSIX, C:/Program Files/hpx.${HPX_VERSION} for Windows)." FORCE)
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
@@ -173,7 +174,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib)
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib:${CMAKE_BINARY_DIR}/lib/hpx")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
@@ -499,7 +500,7 @@ install( # install all hpx header files
 
 install( # install all hpx cmake utility files
   DIRECTORY cmake/ 
-  DESTINATION share/cmake 
+  DESTINATION share/hpx/cmake 
   COMPONENT core
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)

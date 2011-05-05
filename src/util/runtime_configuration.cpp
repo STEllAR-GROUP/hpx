@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
@@ -32,55 +33,29 @@ namespace hpx { namespace util
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
-            "component_path = $[hpx.location]/lib",
+            "component_path = $[hpx.location]/lib/hpx",
             "ini_path = $[hpx.location]/share/hpx/ini",
 #if HPX_USE_ITT == 1
             "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
 
+#if HPX_AGAS_VERSION <= 0x10
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADRESS:" 
                 HPX_NAME_RESOLVER_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
+#endif
             "cachesize = ${HPX_AGAS_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
             "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
 
-            // create default ini entries for memory_block component hosted in 
-            // the main hpx shared library
-//             "[hpx.components.memory_block]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" 
-//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
-//                 HPX_SHARED_LIB_EXTENSION,
-
-            // create default ini entries for raw_counter component hosted in 
-            // the main hpx shared library
-//             "[hpx.components.raw_counter]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" 
-//                 BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))
-//                 HPX_SHARED_LIB_EXTENSION,
-
-             "[hpx.components.barrier]",
-             "name = hpx",
-             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING//,
-
-//             "[hpx.components.component_namespace]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
-
-//             "[hpx.components.primary_namespace]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING,
-
-//             "[hpx.components.symbol_namespace]",
-//             "name = hpx",
-//             "path = $[hpx.location]/lib/" HPX_LIBRARY_STRING
+            "[hpx.components.barrier]",
+            "name = hpx",
+            "path = $[hpx.location]/lib/" HPX_LIBRARY 
         ;
         // don't overload user overrides
         ini.parse("static defaults", lines);
@@ -153,6 +128,7 @@ namespace hpx { namespace util
     //    address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
     //    port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
     //
+    // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality() const
     {
         // load all components as described in the configuration information
@@ -170,6 +146,7 @@ namespace hpx { namespace util
         return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
     }
 
+    // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality(
         naming::locality const& l) const
     {

@@ -32,6 +32,18 @@ macro(hpx_executable_install name)
   install(CODE "${install_code}" COMPONENT ${${name}_MODULE})
 endmacro()
 
+macro(hpx_component_install module lib)
+  set(install_code
+      "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/hpx/${lib}
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
+            TYPE SHARED_LIBRARY 
+            OPTIONAL
+            PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
+                        GROUP_READ GROUP_EXECUTE
+                        WORLD_READ WORLD_EXECUTE)")
+  install(CODE "${install_code}" COMPONENT ${module})
+endmacro()
+
 macro(hpx_library_install module lib)
   set(install_code
       "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/${lib}

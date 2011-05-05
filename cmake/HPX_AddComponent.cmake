@@ -67,6 +67,15 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
+  set_property(TARGET ${name}_component
+               PROPERTY LIBRARY_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET ${name}_component
+               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET ${name}_component
+               PROPERTY RUNTIME_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
@@ -74,7 +83,7 @@ macro(add_hpx_component name)
   endif()
 
   foreach(target ${install_targets})
-    hpx_library_install(${${name}_MODULE} ${target})
+    hpx_component_install(${${name}_MODULE} ${target})
   endforeach()
 
   foreach(target ${${name}_INI})

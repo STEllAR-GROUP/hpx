@@ -51,9 +51,12 @@ namespace hpx { namespace components
             using namespace boost::assign;
             fillini += std::string("[hpx.components.") + 
                 unique_component_name<component_registry>::call() + "]";
-            fillini += std::string("name = ") + 
-                BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME);
-            fillini += "path = $[hpx.location]/lib";
+            fillini += "name = " HPX_COMPONENT_STRING;
+            #if defined(HPX_COMPONENT_EXPORTS)
+                fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
+            #else
+                fillini += "path = $[hpx.location]/lib/" HPX_LIBRARY;
+            #endif
             return true;
         }
     };
