@@ -108,7 +108,7 @@ namespace hpx { namespace components { namespace server
 
         std::size_t getLevel() {return level_;}
 
-        list_t accessBoard() const { return list_;}
+        list_t accessBoard() { return list_;}
 
         void updateBoard(std::size_t pos, std::size_t val){std::size_t pos_ = pos, val_= val;list_.at(pos_)=val_;}
 
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace server
                 
 
         typedef hpx::actions::result_action0<
-                Board const, list_t, board_access, &Board::accessBoard
+                Board, list_t, board_access, &Board::accessBoard
             > access_action;
 
         typedef hpx::actions::result_action0<
