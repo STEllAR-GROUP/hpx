@@ -81,8 +81,7 @@ if(NOT MSVC)
 
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\"")
   
   #############################################################################
   # libhpx_ini
@@ -103,8 +102,7 @@ if(NOT MSVC)
 
   set_property(TARGET hpx_ini APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\"")
   
   #############################################################################
   # libhpx
@@ -123,8 +121,7 @@ if(NOT MSVC)
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\"")
 
   foreach(lib ${hpx_CORE})
     get_target_property(path ${lib} LOCATION)
@@ -615,8 +612,7 @@ else()
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\"")
 
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES}
@@ -635,8 +631,7 @@ else()
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY_NAME=${name}"
-    "HPX_LIBRARY_STRING=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\"")
 
   install(TARGETS hpx hpx_serialization
       ARCHIVE DESTINATION lib
