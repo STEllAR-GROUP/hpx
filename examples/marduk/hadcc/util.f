@@ -830,5 +830,435 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       return
       end    ! END: mat_copy3d
 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cc                                                                            cc
+cc  level_clusterDD:                                                          cc
+cc                  Take as input a the set of subgrids to create             cc
+cc                  And output that same set but domain decomposed            cc
+cc                  according to the number of processors.                    cc
+cc                                                                            cc
+cc                  NB: to help ensure that the chopped up grids              cc
+cc                      get placed onto all different processors,             cc
+cc                      the list should be kept in order instead of           cc
+cc                      putting the new blocks at the end of the list.        cc
+cc                      Hence the need for temp storage. Reals are used       cc
+cc                      because such space is readily available in            cc
+cc                      level_refine().                                       cc
+cc                                                                            cc
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine level_clusterdd(tmp_mini, tmp_maxi, tmp_minj, tmp_maxj,
+     *                           tmp_mink, tmp_maxk, b_mini,   b_maxi,
+     *                           b_minj,   b_maxj,   b_mink,   b_maxk,
+     *                           numbox, nump, maxnum,
+     *                           ghostwidth,refine_factor,mindim,
+     *                           bound_width)
+      implicit     none
+      integer      ghostwidth,refine_factor,mindim,bound_width
+      integer      numbox, nump, maxnum
+      real(kind=8) tmp_mini(maxnum), tmp_maxi(maxnum),
+     *             tmp_minj(maxnum), tmp_maxj(maxnum),
+     *             tmp_mink(maxnum), tmp_maxk(maxnum)
+      integer      b_mini(maxnum),   b_maxi(maxnum),
+     *             b_minj(maxnum),   b_maxj(maxnum),
+     *             b_mink(maxnum),   b_maxk(maxnum)
+      integer      ii,   i, j, k, dims(3), gwc
+      integer      lengthi, lengthj, lengthk
+      integer      numx, numy, numz
+      ! Offsets to overlap decomposed grids:
+      integer      minus, plus
+      ! Minimum dimension into which to cut:
+      integer      minsize
+      integer      boxcount, fixcount
+      integer      fixminx, fixminy, fixminz, fixmaxx, fixmaxy, fixmaxz
+      logical      fixshow
+
+      logical      ltrace
+      parameter (  ltrace  = .false. )
+
+      !
+      ! Each cluster which we are trying to split among
+      ! the procs should have at least ghostwidth+mindim
+      ! points in each direction. If we split, then each
+      !
+      minsize = ghostwidth / refine_factor + mindim
+
+      ! The ghostwidth as it appears on the parent level:
+      gwc  = ghostwidth / refine_factor + 1
+
+      if (ltrace) then
+         write(*,*) '********************************'
+         write(*,*) 'level_clusterDD:  numbox     = ',numbox
+         write(*,*) 'level_clusterDD:  mindim     = ',mindim
+         write(*,*) 'level_clusterDD:  ghostwidth = ',ghostwidth
+         write(*,*) 'level_clusterDD:  gwc        = ',gwc
+         write(*,*) 'level_clusterDD:  minsize    = ',minsize
+      end if
+
+      !            
+      ! Copy entries to temp storage:
+      !            
+      do ii = 1, numbox
+         tmp_mini(ii) = b_mini(ii)
+         tmp_maxi(ii) = b_maxi(ii)
+         tmp_minj(ii) = b_minj(ii)
+         tmp_maxj(ii) = b_maxj(ii)
+         tmp_mink(ii) = b_mink(ii)
+         tmp_maxk(ii) = b_maxk(ii)
+      end do
+
+      call my_dims_create( nump, dims)
+      !if (nump .ne. 64) then
+      !   dims(1) = 0      !  x: LEFT   and RIGHT
+      !   dims(2) = 0      !  y: BACK   and FRONT
+      !   dims(3) = 0      !  z: BOTTOM and TOP
+      !   call MPI_DIMS_CREATE( nump, 3, dims, ierr )
+      !else
+      !   ! For some strange reason above function yields 8x4x2
+      !   ! instead of 4x4x4, so bypass
+      !   dims(1) = 4
+      !   dims(2) = 4
+      !   dims(3) = 4
+      !end if
+      if (ltrace) write(*,*) 'level_clusterDD: dims1/2/3:',
+     *                             dims(1),dims(2),dims(3)
 
 
+      !            
+      ! For each box, break up into nump pieces:
+      !            
+      boxcount = 0
+      do ii = 1, numbox
+         ! Keep track if clustering needs to be "fixed":
+         fixminx = 0
+         fixminy = 0
+         fixminz = 0
+         fixmaxx = 0
+         fixmaxy = 0
+         fixmaxz = 0
+         fixcount= boxcount
+         lengthi = NINT( (tmp_maxi(ii) - tmp_mini(ii) ) / dims(1) )
+         lengthj = NINT( (tmp_maxj(ii) - tmp_minj(ii) ) / dims(2) )
+         lengthk = NINT( (tmp_maxk(ii) - tmp_mink(ii) ) / dims(3) )
+         if (ltrace) then
+            write(*,*) 'level_clusterDD:  Splitting box: ',ii
+            write(*,*) 'level_clusterDD:  i: ',tmp_mini(ii),tmp_maxi(ii)
+            write(*,*) 'level_clusterDD:  j: ',tmp_minj(ii),tmp_maxj(ii)
+            write(*,*) 'level_clusterDD:  k: ',tmp_mink(ii),tmp_maxk(ii)
+            write(*,*) 'level_clusterDD:    lengthi/j/k: ',
+     *                  lengthi, lengthj, lengthk
+         end if
+         !
+         ! Decide how we should chop up:
+         !    (1) Chop as per MPI_DIMS_Create() says if possible
+         !        (ie if that would produce sufficient size boxes)
+         !    (2) Else chop into "minsize" pieces
+         !
+         if (lengthi .lt. minsize .and. dims(1).gt.1) then
+         !if (lengthi .lt. mindim .and. dims(1).gt.1) then
+            numx = (tmp_maxi(ii)-tmp_mini(ii)) / minsize
+            if (numx .le. 0) numx = 1
+            lengthi = NINT( (tmp_maxi(ii) - tmp_mini(ii) ) / numx )
+         else
+            numx = dims(1)
+         end if
+         if (lengthj .lt. minsize .and. dims(2).gt.1) then
+            numy = (tmp_maxj(ii)-tmp_minj(ii)) / minsize
+            if (numy .le. 0) numy = 1
+            lengthj = NINT( (tmp_maxj(ii) - tmp_minj(ii) ) / numy )
+         else
+            numy = dims(2)
+         end if
+         if (lengthk .lt. minsize .and. dims(3).gt.1) then
+            numz = (tmp_maxk(ii)-tmp_mink(ii)) / minsize
+            if (numz .le. 0) numz = 1
+            if (numx*numy*numz.gt.nump) numz = nump / numx / numy 
+            lengthk = NINT( (tmp_maxk(ii) - tmp_mink(ii) ) / numz )
+         else
+            numz = dims(3)
+         end if
+         if (ltrace) write(*,*) '   split numbers:',
+     *                       numx,numy,numz,numx*numy*numz,nump
+         !
+         ! If the boxes need splitting and we have enough
+         ! children to accomodate:
+         !
+         if ( (numx.gt.1.or.numy.gt.1.or.numz.gt.1)
+     *                       .and. 
+     *         (maxnum .ge. (boxcount+numx*numy*numz)) ) then
+         !if (numx.gt.1.or.numy.gt.1.or.numz.gt.1) then
+            !
+            ! Split up box "ii":
+            !
+            do k = 1, numz
+            do j = 1, numy
+            do i = 1, numx      
+               boxcount         = boxcount + 1 
+               b_mini(boxcount) = tmp_mini(ii) + (i-1) * lengthi
+               b_maxi(boxcount) = tmp_mini(ii) +   i   * lengthi
+               b_minj(boxcount) = tmp_minj(ii) + (j-1) * lengthj
+               b_maxj(boxcount) = tmp_minj(ii) +   j   * lengthj
+               b_mink(boxcount) = tmp_mink(ii) + (k-1) * lengthk
+               b_maxk(boxcount) = tmp_mink(ii) +   k   * lengthk
+               !
+               ! Force overlap:
+               !    NB: The amount of overlap among the grids
+               !    depends on the stencils used and how
+               !    the parameter bwidth is set in util.f.
+               !    Also, keep in mind that we're working
+               !    in the coarse grid space in which the
+               !    grids are defined but the grids to be
+               !    completed will have greater resolution.
+               !    Assuming a minimum refinement factor of 2,
+               !    then we need to overlap with 4 of these
+               !    coarse points so that the grids themselves
+               !    share 2*bwidth points. 
+               !
+               plus  = bound_width / 2
+               if (mod(bound_width,2) .eq. 0) then
+                  minus = plus
+               else
+                  minus = plus + 1
+               end if
+               b_mini(boxcount) = b_mini(boxcount) - minus
+               b_maxi(boxcount) = b_maxi(boxcount) + plus
+               b_minj(boxcount) = b_minj(boxcount) - minus
+               b_maxj(boxcount) = b_maxj(boxcount) + plus
+               b_mink(boxcount) = b_mink(boxcount) - minus
+               b_maxk(boxcount) = b_maxk(boxcount) + plus
+               !
+               ! In case, dimensions don't divide evenly
+               ! and to overrule the overlap at the bounds,
+               ! make sure we cover the whole box:
+               !
+               if (i.eq. 1    ) b_mini(boxcount) = tmp_mini(ii)
+               if (j.eq. 1    ) b_minj(boxcount) = tmp_minj(ii)
+               if (k.eq. 1    ) b_mink(boxcount) = tmp_mink(ii)
+               if (i.eq. numx ) b_maxi(boxcount) = tmp_maxi(ii)
+               if (j.eq. numy ) b_maxj(boxcount) = tmp_maxj(ii)
+               if (k.eq. numz ) b_maxk(boxcount) = tmp_maxk(ii)
+               !
+               ! Must ensure that grids do not terminate within
+               ! the ghostregion for the level...that is, each
+               ! grid that does not touch the amr boundary on
+               ! one of its faces, should not end *close* to
+               ! the amr boundary. If one does, one gets points
+               ! that are both injected to the parent, and
+               ! those same points on the parent are used to
+               ! reset the boundary.
+               !
+               if(ltrace) then
+                  write(*,*) '---boxcount= ',boxcount
+                  write(*,*) '    i: ',b_mini(boxcount),b_maxi(boxcount)
+                  write(*,*) '    j: ',b_minj(boxcount),b_maxj(boxcount)
+                  write(*,*) '    k: ',b_mink(boxcount),b_maxk(boxcount)
+                  write(*,*) '  . . . '
+               end if
+               if (b_mini(boxcount).ne.tmp_mini(ii) .and.
+     *             b_mini(boxcount).le.tmp_mini(ii)+gwc-1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing small i',
+     *                   b_mini(boxcount),tmp_mini(ii)+gwc
+                  if ((tmp_mini(ii)+gwc-b_mini(boxcount)) .gt. fixminx)
+     *               fixminx = tmp_mini(ii)+gwc-b_mini(boxcount)
+                  b_mini(boxcount) = tmp_mini(ii)+gwc
+               end if
+               if (b_maxi(boxcount).ne.tmp_maxi(ii) .and.
+     *             b_maxi(boxcount).ge.tmp_maxi(ii)-gwc+1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing large i',
+     *                   b_maxi(boxcount),tmp_maxi(ii)-gwc
+                  if ((b_maxi(boxcount)- (tmp_maxi(ii)-gwc).gt.fixmaxx))
+     *               fixmaxx = b_maxi(boxcount)- (tmp_maxi(ii)-gwc)
+                  b_maxi(boxcount) = tmp_maxi(ii)-gwc
+               end if
+               if (b_minj(boxcount).ne.tmp_minj(ii) .and.
+     *             b_minj(boxcount).le.tmp_minj(ii)+gwc-1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing small j',
+     *                   b_minj(boxcount),tmp_minj(ii)+gwc
+                  if ( (tmp_minj(ii)+gwc-b_minj(boxcount)) .gt. fixminy)
+     *               fixminy = tmp_minj(ii)+gwc-b_minj(boxcount)
+                  b_minj(boxcount) = tmp_minj(ii)+gwc
+               end if
+               if (b_maxj(boxcount).ne.tmp_maxj(ii) .and.
+     *             b_maxj(boxcount).ge.tmp_maxj(ii)-gwc+1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing large j',
+     *                   b_maxj(boxcount),tmp_maxj(ii)-gwc
+                  if ((b_maxj(boxcount)- (tmp_maxj(ii)-gwc).gt.fixmaxy))
+     *               fixmaxy = b_maxj(boxcount)- (tmp_maxj(ii)-gwc)
+                  b_maxj(boxcount) = tmp_maxj(ii)-gwc
+               end if
+               if (b_mink(boxcount).ne.tmp_mink(ii) .and.
+     *             b_mink(boxcount).le.tmp_mink(ii)+gwc-1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing small k',
+     *                   b_mink(boxcount),tmp_mink(ii)+gwc
+                  if ( (tmp_mink(ii)+gwc-b_mink(boxcount)) .gt. fixminz)
+     *               fixminz = tmp_mink(ii)+gwc-b_mink(boxcount)
+                  b_mink(boxcount) = tmp_mink(ii)+gwc
+               end if
+               if (b_maxk(boxcount).ne.tmp_maxk(ii) .and.
+     *             b_maxk(boxcount).ge.tmp_maxk(ii)-gwc+1 ) then
+                  if(ltrace)write(*,*)'level_clusterDD: fixing large k',
+     *                   b_maxk(boxcount),tmp_maxk(ii)-gwc
+                  if ((b_maxk(boxcount)- (tmp_maxk(ii)-gwc).gt.fixmaxz))
+     *               fixmaxz = b_maxk(boxcount)- (tmp_maxk(ii)-gwc)
+                  b_maxk(boxcount) = tmp_maxk(ii)-gwc
+               end if
+               !
+               if (ltrace) then
+                  write(*,*) 'bound_width = ',bound_width
+                  write(*,*) 'plus        = ',plus
+                  write(*,*) 'minus       = ',minus
+                  write(*,*) 'gwc         = ',gwc
+                  write(*,*) '   boxcount= ',boxcount
+                  write(*,*) '    i: ',b_mini(boxcount),b_maxi(boxcount)
+                  write(*,*) '    j: ',b_minj(boxcount),b_maxj(boxcount)
+                  write(*,*) '    k: ',b_mink(boxcount),b_maxk(boxcount)
+                  write(*,*) '-----------------------------'
+               end if
+            end do
+            end do
+            end do
+            if (ltrace) then
+            !if (ltrace.or. .true.) then
+               write(*,*)'level_clusterDD:fixminx/y/z:',fixminx,fixminy,
+     *                        fixminz
+               write(*,*)'level_clusterDD:fixmaxx/y/z:',fixmaxx,fixmaxy,
+     *                        fixmaxz
+            end if
+            !
+            ! Fix the boxes on the border:
+            !
+            do k = fixcount+1,boxcount
+               fixshow = .false.
+               if (ltrace) then
+                  write(*,*) 'level_clusterDD: Fixing box: ',k
+                  write(*,*) '    i: ',b_mini(k),b_maxi(k)
+                  write(*,*) '    j: ',b_minj(k),b_maxj(k)
+                  write(*,*) '    k: ',b_mink(k),b_maxk(k)
+               end if
+               if (fixminx.gt.0 .and. b_mini(k).eq.tmp_mini(ii)) then
+                  b_maxi(k) = b_maxi(k) + fixminx
+                  if (b_maxi(k).gt.tmp_maxi(ii)) b_maxi(k)=tmp_maxi(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed minx'
+                  fixshow = .true.
+               end if
+               if (fixmaxx.gt.0 .and. b_maxi(k).eq.tmp_maxi(ii)) then
+                  b_mini(k) = b_mini(k) - fixmaxx
+                  if (b_mini(k).lt.tmp_mini(ii)) b_mini(k)=tmp_mini(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed maxx'
+                  fixshow = .true.
+               end if
+               if (fixminy.gt.0 .and. b_minj(k).eq.tmp_minj(ii)) then
+                  b_maxj(k) = b_maxj(k) + fixminy
+                  if (b_maxj(k).gt.tmp_maxj(ii)) b_maxj(k)=tmp_maxj(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed miny'
+                  fixshow = .true.
+               end if
+               if (fixmaxy.gt.0 .and. b_maxj(k).eq.tmp_maxj(ii)) then
+                  b_minj(k) = b_minj(k) - fixmaxy
+                  if (b_minj(k).lt.tmp_minj(ii)) b_minj(k)=tmp_minj(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed maxy'
+                  fixshow = .true.
+               end if
+               if (fixminz.gt.0 .and. b_mink(k).eq.tmp_mink(ii)) then
+                  b_maxk(k) = b_maxk(k) + fixminz
+                  if (b_maxk(k).gt.tmp_maxk(ii)) b_maxk(k)=tmp_maxk(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed minz'
+                  fixshow = .true.
+               end if
+               if (fixmaxz.gt.0 .and. b_maxk(k).eq.tmp_maxk(ii)) then
+                  b_mink(k) = b_mink(k) - fixmaxz
+                  if (b_mink(k).lt.tmp_mink(ii)) b_mink(k)=tmp_mink(ii)
+                  if(ltrace)write(*,*)'level_clusterDD: fixed maxz'
+                  fixshow = .true.
+               end if
+               if (ltrace .and. fixshow) then
+                  write(*,*) 'level_clusterDD: After FIX box: ',k
+                  write(*,*) '    i: ',b_mini(k),b_maxi(k)
+                  write(*,*) '    j: ',b_minj(k),b_maxj(k)
+                  write(*,*) '    k: ',b_mink(k),b_maxk(k)
+                  write(*,*) ' ---------------------'
+               end if
+            end do
+         else
+            if (ltrace) write(*,*) ' Not cutting box'
+            if ( maxnum .lt. (boxcount+numx*numy*numz)) then
+               write(*,*) ' Not decomposing anymore grids because of '
+               write(*,*) ' hardcoded limit to number of child grids.'
+               write(*,*) ' Current limit: maxnum =',maxnum
+               write(*,*) ' Consider increasing in had/include/glob.inc'
+               write(*,*) '       *  *  *  *  *  *  *'
+            end if
+            boxcount         = boxcount + 1
+            b_mini(boxcount) = tmp_mini(ii)
+            b_mini(boxcount) = tmp_mini(ii)
+            b_maxi(boxcount) = tmp_maxi(ii)
+            b_minj(boxcount) = tmp_minj(ii)
+            b_maxj(boxcount) = tmp_maxj(ii)
+            b_mink(boxcount) = tmp_mink(ii)
+            b_maxk(boxcount) = tmp_maxk(ii)
+         end if
+      end do
+
+      numbox = boxcount
+
+      if (ltrace) then
+         write(*,*) 'level_clusterDD:  numbox = ',numbox
+         write(*,*) 'level_clusterDD: DONE.'
+         write(*,*) '********************************'
+      end if
+
+      return
+      end      ! END: level_clusterDD
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cc                                                                            cc
+cc  my_dims_create                                                            cc
+cc                                                                            cc
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine my_dims_create( nump, dims)
+      implicit   none
+      integer    nump
+      integer    dims(3)
+
+      if ( nump .eq. 1 ) then
+        dims = (/1,1,1/)
+      else if ( nump .eq. 2 ) then
+        dims = (/2,1,1/)
+      else if ( nump .eq. 3 ) then
+        dims = (/3,1,1/)
+      else if ( nump .eq. 4 ) then
+        dims = (/2,2,1/)
+      else if ( nump .eq. 5 ) then
+        dims = (/5,1,1/)
+      else if ( nump .eq. 6 ) then
+        dims = (/3,2,1/)
+      else if ( nump .eq. 7 ) then
+        dims = (/7,1,1/)
+      else if ( nump .eq. 8 ) then
+        dims = (/2,2,2/)
+      else if ( nump .eq. 9 ) then
+        dims = (/3,3,1/)
+      else if ( nump .eq. 10 ) then
+        dims = (/5,2,1/)
+      else if ( nump .eq. 11 ) then
+        dims = (/11,1,1/)
+      else if ( nump .eq. 12 ) then
+        dims = (/3,2,2/)
+      else if ( nump .eq. 13 ) then
+        dims = (/13,1,1/)
+      else if ( nump .eq. 14 ) then
+        dims = (/7,2,1/)
+      else if ( nump .eq. 15 ) then
+        dims = (/5,3,1/)
+      else if ( nump .eq. 16 ) then
+        dims = (/4,4,1/)
+      else if ( nump .eq. 17 ) then
+        dims = (/17,1,1/)
+      else if ( nump .eq. 18 ) then
+        dims = (/3,3,2/)
+      else if ( nump .eq. 19 ) then
+        dims = (/19,1,1/)
+      else if ( nump .eq. 20 ) then
+        dims = (/5,2,2/)
+      end if
+
+      return
+      end    ! END: my_dims_create

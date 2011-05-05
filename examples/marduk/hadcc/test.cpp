@@ -17,7 +17,7 @@ struct Globals
   int ny0;
   int nz0;
   int ghostwidth; 
-  int boundwidth; 
+  int bound_width; 
   int allowedl;
   int shadow;
   double ethreshold;
@@ -56,6 +56,16 @@ extern "C" {void FNAME(level_makeflag)(double *flag,double *error,int *level,
                                        double *h,int *nx,int *ny,int *nz,
                                        double *ethreshold); }
 
+extern "C" {void FNAME(level_clusterdd)(double *tmp_mini,double *tmp_maxi,
+                         double *tmp_minj,double *tmp_maxj,
+                         double *tmp_mink,double *tmp_maxk,
+                         int *b_mini,int *b_maxi,
+                         int *b_minj,int *b_maxj,
+                         int *b_mink,int *b_maxk,
+                         int *numbox,int *numprocs,int *maxbboxsize,
+                         int *ghostwidth,int *refine_factor,int *mindim,
+                         int *bound_width); }
+
 int floatcmp(double const& x1, double const& x2);
 
 const int maxlevels = 25;
@@ -69,7 +79,7 @@ int main(int argc,char* argv[]) {
   int ny0 = 99;
   int nz0 = 99;
   int ghostwidth = 9;
-  int boundwidth = 5;
+  int bound_width = 5;
   int allowedl = 0;
   int nlevels;
   int numprocs = 1;
@@ -120,8 +130,8 @@ int main(int argc,char* argv[]) {
   if ( GetInt(list, "ghostwidth", &ghostwidth) == 0) {
     std::cerr << " Parameter ghostwidth not found, using default " << std::endl;
   } 
-  if ( GetInt(list, "boundwidth", &boundwidth) == 0) {
-    std::cerr << " Parameter boundwidth not found, using default " << std::endl;
+  if ( GetInt(list, "bound_width", &bound_width) == 0) {
+    std::cerr << " Parameter bound_width not found, using default " << std::endl;
   } 
   if ( GetInt(list, "shadow", &shadow) == 0) {
     std::cerr << " Parameter shadow not found, using default " << std::endl;
@@ -177,7 +187,7 @@ int main(int argc,char* argv[]) {
   std::cout << " maxz0        : " <<  maxz0 << std::endl;
   std::cout << " minz0        : " <<  minz0 << std::endl;
   std::cout << " ghostwidth   : " <<  ghostwidth << std::endl;
-  std::cout << " boundwidth   : " <<  boundwidth << std::endl;
+  std::cout << " bound_width   : " <<  bound_width << std::endl;
   for (int i=0;i<allowedl;i++) {
     char tmpname[80];
     std::cout << " refine_level_" << i << " : " << par.refine_level[i] << std::endl;
@@ -189,7 +199,7 @@ int main(int argc,char* argv[]) {
   par.allowedl = allowedl;
   par.ethreshold = ethreshold;
   par.ghostwidth = ghostwidth;
-  par.boundwidth = boundwidth;
+  par.bound_width = bound_width;
   par.maxx0 = maxx0;
   par.minx0 = minx0;
   par.maxy0 = maxy0;
@@ -224,14 +234,21 @@ int main(int argc,char* argv[]) {
   for (int j=0;j<ny0;j++) {
     double y = miny0 + j*h;
   for (int i=0;i<nx0;i++) {
-    double x = minx0 + i*h;
+    error[i+nx0*(j+ny0*k)] = 0.0;
+    double x = minx0 + i*h + 2.25;
     double r = sqrt(x*x+y*y+z*z);
     if ( pow(r-1.0,2) <= 0.5*0.5 && r > 0 ) {
       error[i+nx0*(j+ny0*k)] = pow((r-1.0)*(r-1.0)-0.5*0.5,3)*8.0*(1.0-r)/pow(0.5,8)/r;
       if ( error[i+nx0*(j+ny0*k)] < 0.0 ) error[i+nx0*(j+ny0*k)] = 0.0;
-    } else {
-      error[i+nx0*(j+ny0*k)] = 0.0;
+    } 
+
+    x = minx0 + i*h - 2.25;
+    r = sqrt(x*x+y*y+z*z);
+    if ( pow(r-1.0,2) <= 0.5*0.5 && r > 0 ) {
+      error[i+nx0*(j+ny0*k)] = pow((r-1.0)*(r-1.0)-0.5*0.5,3)*8.0*(1.0-r)/pow(0.5,8)/r;
+      if ( error[i+nx0*(j+ny0*k)] < 0.0 ) error[i+nx0*(j+ny0*k)] = 0.0;
     }
+
   } } }
 
   double scalar = par.refine_level[0];
@@ -263,7 +280,7 @@ int main(int argc,char* argv[]) {
   // level_cluster
   int numbox = 1;
   int clusterstyle = 0;
-  double minefficiency = .2;
+  double minefficiency = .9;
   int mindim = 6;
   int refine_factor = 2;
   double time = 0.0;
@@ -278,7 +295,7 @@ int main(int argc,char* argv[]) {
    lapi.resize(nx0); lapj.resize(ny0); lapk.resize(nz0);
   alapi.resize(nx0);alapj.resize(ny0);alapk.resize(nz0);
  
-  int maxbboxsize = 100;
+  int maxbboxsize = 1000;
   b_minx.resize(maxbboxsize);
   b_maxx.resize(maxbboxsize);
   b_miny.resize(maxbboxsize);
@@ -308,6 +325,32 @@ int main(int argc,char* argv[]) {
     std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
     std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
   }
+
+  // Take the set of subgrids to create and then output the same set but domain decomposed
+  std::vector<double> tmp_mini,tmp_maxi,tmp_minj,tmp_maxj,tmp_mink,tmp_maxk;
+  tmp_mini.resize(maxbboxsize);
+  tmp_maxi.resize(maxbboxsize);
+  tmp_minj.resize(maxbboxsize);
+  tmp_maxj.resize(maxbboxsize);
+  tmp_mink.resize(maxbboxsize);
+  tmp_maxk.resize(maxbboxsize);
+  FNAME(level_clusterdd)(&*tmp_mini.begin(),&*tmp_maxi.begin(),
+                         &*tmp_minj.begin(),&*tmp_maxj.begin(),
+                         &*tmp_mink.begin(),&*tmp_maxk.begin(),
+                         &*b_minx.begin(),&*b_maxx.begin(),
+                         &*b_miny.begin(),&*b_maxy.begin(),
+                         &*b_minz.begin(),&*b_maxz.begin(),
+                         &numbox,&numprocs,&maxbboxsize,
+                         &ghostwidth,&refine_factor,&mindim,
+                         &bound_width);
+
+  std::cout << " numbox post DD " << numbox << std::endl;
+  for (int i=0;i<numbox;i++) {
+    std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
+    std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
+    std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
+  }
+
   return 0;
 }
 
