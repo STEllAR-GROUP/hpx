@@ -479,9 +479,6 @@ namespace hpx { namespace components { namespace server
             else
                 component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
 
-            if (i->second.has_entry("version"))
-                component += i->second.get_entry("version");
-
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::algorithm::to_lower (tmp);
