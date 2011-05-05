@@ -25,5 +25,5 @@ add_hpx_component(nbody_c
   MODULE nbody
   SOURCES ${sources} 
   HEADERS ${headers}
-  DEPENDENCIES nbody_c_test_component)
+  DEPENDENCIES nbody_component nbody_c_test_component)
 
