@@ -12,7 +12,7 @@ set(sources
 source_group("Source Files" FILES ${sources})
 
 ###############################################################################
-add_hpx_component(amr_c_test
+add_hpx_library(amr_c_test
   MODULE amr
   SOURCES ${sources}) 
 
