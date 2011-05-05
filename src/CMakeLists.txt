@@ -130,6 +130,21 @@ if(NOT MSVC)
     hpx_library_install(core ${name}.${HPX_SOVERSION})
     hpx_library_install(core ${name}.${HPX_VERSION})
   endforeach()
+
+  get_target_property(path hpx LOCATION)
+  get_filename_component(name "${path}" NAME)
+
+  add_custom_command(TARGET hpx POST_BUILD
+                     COMMAND "${CMAKE_COMMAND}" -E create_symlink
+                             "${name}" "hpx/${name}"
+                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+ 
+  install(CODE
+    "set(bindir \"${CMAKE_INSTALL_PREFIX}/lib/\")
+     execute_process(
+     COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+             \"${name}\" \"hpx/${name}\"
+     WORKING_DIRECTORY \"\${bindir}\")")
 else()
 ###############################################################################
 # MSVC 
@@ -626,6 +641,16 @@ else()
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx)
+  
+  set_property(TARGET hpx 
+               PROPERTY LIBRARY_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY RUNTIME_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
 
   get_target_property(path hpx LOCATION)
   get_filename_component(name "${path}" NAME)
@@ -633,7 +658,15 @@ else()
     PROPERTY COMPILE_DEFINITIONS
     "HPX_LIBRARY=\"${name}\"")
 
-  install(TARGETS hpx hpx_serialization
+  install(TARGETS hpx
+      ARCHIVE DESTINATION lib/hpx
+      LIBRARY DESTINATION lib/hpx
+      COMPONENT core
+      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                  GROUP_READ GROUP_EXECUTE
+                  WORLD_READ WORLD_EXECUTE)
+
+  install(TARGETS hpx_serialization
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
       COMPONENT core
