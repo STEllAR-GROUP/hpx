@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <boost/program_options.hpp>
@@ -17,6 +18,9 @@
 
 using namespace hpx;
 namespace po = boost::program_options;
+
+typedef hpx::lcos::detail::dataflow_variable<int, int> detail_dataflow_type;
+HPX_DEFINE_GET_COMPONENT_TYPE(detail_dataflow_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // template <typename Iterator>
@@ -162,7 +166,8 @@ int hpx_main(int argument)
     return 0;
 }
 
-HPX_REGISTER_ACTION_EX(quicksort<int>::quicksort_action, quicksort_action);
+typedef quicksort<int>::quicksort_action quicksort_int_action;
+HPX_REGISTER_PLAIN_ACTION(quicksort_int_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
