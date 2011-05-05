@@ -9,11 +9,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.hpx.runtime.agas.tcpip_stdmap.symbol_namespace)
+set(group unit.hpx.runtime.agas.stdmap_tcpip)
 
 set(testcases
-    concurrent_bind_resolve
-    serial_bind_resolve)
+    legacy_agent_serial)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
@@ -27,5 +26,16 @@ foreach(testcase ${testcases})
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
+endforeach()
+
+set(subdirs 
+    component_namespace
+    primary_namespace
+    symbol_namespace)
+
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(${group}.${subdir})
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(${group} ${group}.${subdir})
 endforeach()
 

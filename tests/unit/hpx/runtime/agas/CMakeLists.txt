@@ -12,7 +12,7 @@
 set(group unit.hpx.runtime.agas)
 
 set(subdirs 
-    tcpip_stdmap)
+    stdmap_tcpip)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})

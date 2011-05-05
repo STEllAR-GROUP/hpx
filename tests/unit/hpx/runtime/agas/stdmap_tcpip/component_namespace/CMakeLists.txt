@@ -9,7 +9,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ################################################################################
 
-set(group unit.hpx.runtime.agas.tcpip_stdmap.component_namespace)
+set(group unit.hpx.runtime.agas.stdmap_tcpip.component_namespace)
 
 set(testcases)
 
