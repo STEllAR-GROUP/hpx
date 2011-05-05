@@ -114,10 +114,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 // Barrier
 typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(barrier_type, barrier, 
-    "hpx::lcos::base_lco");
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::server::barrier, hpx::components::component_barrier);
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(barrier_type, barrier, 
+    "hpx::lcos::base_lco");
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
