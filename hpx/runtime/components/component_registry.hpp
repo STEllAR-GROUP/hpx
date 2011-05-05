@@ -52,11 +52,7 @@ namespace hpx { namespace components
             fillini += std::string("[hpx.components.") + 
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
-            #if defined(HPX_COMPONENT_EXPORTS)
-                fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
-            #else
-                fillini += "path = $[hpx.location]/lib/" HPX_LIBRARY;
-            #endif
+            fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
             return true;
         }
     };
