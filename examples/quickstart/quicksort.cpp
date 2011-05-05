@@ -20,9 +20,6 @@
 using namespace hpx;
 namespace po = boost::program_options;
 
-typedef hpx::lcos::detail::dataflow_variable<int, int> detail_dataflow_type;
-HPX_DEFINE_GET_COMPONENT_TYPE(detail_dataflow_type);
-
 ///////////////////////////////////////////////////////////////////////////////
 // template <typename Iterator>
 // void qsort(Iterator begin, Iterator end)
