@@ -45,6 +45,11 @@ HPX_REGISTER_PLAIN_ACTION(dataflow_test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef dataflow_variable<int, int> dataflow_int_type;
+typedef hpx::lcos::detail::dataflow_variable<int, int> detail_dataflow_type;
+HPX_DEFINE_GET_COMPONENT_TYPE(detail_dataflow_type);
+
+typedef hpx::lcos::detail::dataflow_variable<int, int> detail_dataflow_type;
+HPX_DEFINE_GET_COMPONENT_TYPE(detail_dataflow_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
