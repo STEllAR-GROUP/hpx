@@ -741,7 +741,7 @@ int hpx_main(std::size_t numvals, std::size_t numsteps,bool do_logging,
             particles = new TreeLeaf*[par->num_bodies];
             /* cycle through the n array container and allocate memory space for each
             * particle */
-            for (int i = 0; i < par->num_bodies; ++i)
+            for (unsigned i = 0; i < par->num_bodies; ++i)
                 particles[i] = new TreeLeaf();
         }
         
