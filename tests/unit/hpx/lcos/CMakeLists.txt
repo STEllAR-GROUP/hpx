@@ -26,7 +26,8 @@ foreach(testcase ${testcases})
                ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
                          "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
                          "-t" "${HPX_TEST_NUM_THREADS}"
-                         "-I\"system.prefix=${CMAKE_BINARY_DIR}\"")
+                         "-I" "system.prefix=${CMAKE_BINARY_DIR}"
+                         "--dump-config")
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)

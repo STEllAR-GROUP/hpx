@@ -40,10 +40,10 @@ int main()
     std::cout << "Randomized port for AGAS: " << port << std::endl;
 
     // This is our locality.
-    locality here("localhost", port);
+    locality here("127.0.0.1", port);
 
     // Start the AGAS server in the background.
-    agas_server_helper agas_server("localhost", port);
+    agas_server_helper agas_server("127.0.0.1", port);
 
     // Create a client and connect it to the server.
     io_service_pool io_service_pool; 
