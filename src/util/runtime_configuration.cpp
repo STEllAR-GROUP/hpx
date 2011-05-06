@@ -40,13 +40,11 @@ namespace hpx { namespace util
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
 
-#if HPX_AGAS_VERSION <= 0x10
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADRESS:" 
                 HPX_NAME_RESOLVER_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
-#endif
             "cachesize = ${HPX_AGAS_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
