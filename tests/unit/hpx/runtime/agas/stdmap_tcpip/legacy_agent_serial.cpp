@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/agas/client/legacy_agent.hpp>
+#include <hpx/runtime/agas/client/legacy/agent.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -24,7 +24,7 @@ using hpx::naming::id_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::legacy_agent;
+using hpx::agas::legacy::agent;
 using hpx::agas::primary_namespace;
 using hpx::agas::component_namespace;
 using hpx::agas::symbol_namespace;
@@ -34,7 +34,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-typedef legacy_agent<
+typedef agent<
     hpx::agas::tag::database::stdmap
 > legacy_agent_type;
 

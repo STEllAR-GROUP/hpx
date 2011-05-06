@@ -27,13 +27,14 @@
     #include <hpx/lcos/mutex.hpp>
 #endif
 
-namespace hpx { namespace agas 
+namespace hpx { namespace agas { namespace legacy
 {
 
 // TODO: pass error codes once they're implemented in AGAS.
 template <typename Database>
-struct legacy_agent
+struct agent
 {
+    // {{{ types
     typedef primary_namespace<Database, tag::network::tcpip>
         primary_namespace_type;
 
@@ -52,6 +53,8 @@ struct legacy_agent
     typedef typename component_namespace_type::prefixes_type prefixes_type;
     typedef typename component_namespace_type::prefix_type prefix_type;
     typedef typename primary_namespace_type::decrement_type decrement_type;
+    // }}}
+
   private:
     primary_namespace_type primary_ns_;
     component_namespace_type component_ns_;
@@ -59,7 +62,7 @@ struct legacy_agent
 
     #if defined(HPX_USE_AGAS_CACHE)
         struct cache_key
-        {
+        { // {{{ cache_key implementation
             cache_key()
               : id(), count(0)
             {}
@@ -77,10 +80,10 @@ struct legacy_agent
 
             friend bool operator==(cache_key const& lhs, cache_key const& rhs)
             { return (lhs.id == rhs.id) && (lhs.count == rhs.count); }
-        };
+        }; // }}}
     
         struct erase_policy
-        {
+        { // {{{ erase_policy implementation
             erase_policy(naming::gid_type const& id, count_type count)
               : entry(id, count)
             {}
@@ -93,7 +96,7 @@ struct legacy_agent
             { return p.first == entry; }
 
             cache_key entry;
-        };
+        }; // }}}
 
         typedef boost::cache::entries::lfu_entry<gva_type> entry_type;
 
@@ -110,21 +113,33 @@ struct legacy_agent
     #endif
 
   public:
-    legacy_agent(util::runtime_configuration const& ini_
-                  = util::runtime_configuration(), 
-                 bool isconsole = false)
-      { /* IMPLEMENT */ }
+    void bootstrap_worker();
 
-    explicit legacy_agent(naming::id_type const& primary_ns,
-                          naming::id_type const& component_ns,
-                          naming::id_type const& symbol_ns) :
+    void bootstrap_console();
+
+    agent(util::runtime_configuration const& ini_
+                  = util::runtime_configuration(), 
+          runtime_mode mode = runtime_mode_worker)
+        #if defined(HPX_USE_AGAS_CACHE)
+            : gva_cache_(ini_.get_agas_cache_size())
+        #endif
+        {
+            if (mode == runtime_mode_worker)
+                bootstrap_worker();
+            else
+                bootstrap_console();
+        }
+
+    explicit agent(naming::id_type const& primary_ns,
+                   naming::id_type const& component_ns,
+                   naming::id_type const& symbol_ns) :
         primary_ns_(primary_ns),
         component_ns_(component_ns),
         symbol_ns_(symbol_ns) {} 
 
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) 
-    {
+    { // {{{ get_prefix implementation
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
@@ -144,7 +159,7 @@ struct legacy_agent
             prefix = at_c<0>(primary_ns_.resolve(ep)); 
             return false;
         }
-    } 
+    } // }}}
 
     bool get_console_prefix(naming::gid_type& prefix,
                             error_code& ec = throws) 
@@ -155,7 +170,7 @@ struct legacy_agent
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       component_id_type type, error_code& ec = throws) 
-    {
+    { // {{{ get_prefixes implementation
         typedef typename prefixes_type::const_iterator iterator;
 
         if (type != components::component_invalid)
@@ -184,7 +199,7 @@ struct legacy_agent
             prefixes.push_back(naming::get_gid_from_prefix(*it));
     
         return true; 
-    } 
+    } // }}} 
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) 
@@ -203,7 +218,7 @@ struct legacy_agent
                       naming::gid_type& lower_bound,
                       naming::gid_type& upper_bound, 
                       error_code& ec = throws) 
-    {
+    { // {{{ get_id_range implementation
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
@@ -217,7 +232,7 @@ struct legacy_agent
         upper_bound = at_c<1>(range);
 
         return lower_bound && upper_bound;
-    } 
+    } // }}}
 
     bool bind(naming::gid_type const& id, naming::address const& addr,
               error_code& ec = throws) 
@@ -226,7 +241,7 @@ struct legacy_agent
     bool bind_range(naming::gid_type const& lower_id, count_type count, 
                     naming::address const& baseaddr, offset_type offset, 
                     error_code& ec = throws) 
-    {
+    { // {{{ bind_range implementation
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
@@ -250,7 +265,7 @@ struct legacy_agent
         }
 
         return false; 
-    } 
+    } // }}}
 
     count_type
     incref(naming::gid_type const& id, count_type credits = 1, 
@@ -260,7 +275,7 @@ struct legacy_agent
     count_type
     decref(naming::gid_type const& id, component_id_type& t,
            count_type credits = 1, error_code& ec = throws) 
-    {
+    { // {{{ decref implementation
         using boost::fusion::at_c;
 
         decrement_type r = primary_ns_.decrement(id, credits);
@@ -269,10 +284,10 @@ struct legacy_agent
             t = at_c<1>(r);
 
         return at_c<0>(r);
-    }
+    } // }}}
 
     bool unbind(naming::gid_type const& id, error_code& ec = throws) 
-    {  return unbind_range(id, 1, ec); } 
+    { return unbind_range(id, 1, ec); } 
         
     bool unbind(naming::gid_type const& id, naming::address& addr,
                 error_code& ec = throws) 
@@ -287,7 +302,7 @@ struct legacy_agent
 
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       naming::address& addr, error_code& ec = throws) 
-    {
+    { // {{{ unbind_range implementation
         unbinding_type r = primary_ns_.unbind(lower_id, count);
 
         if (r)
@@ -303,11 +318,11 @@ struct legacy_agent
         }
 
         return r; 
-    }
+    } // }}}
 
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = false, error_code& ec = throws) 
-    {
+    { // {{{ resolve implementation
         gva_type gva = primary_ns_.resolve(id);
 
         if (try_cache && resolve_cached(id, addr, ec))
@@ -331,7 +346,7 @@ struct legacy_agent
         }
 
         return false;
-    }
+    } // }}}
 
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = false, error_code& ec = throws) 
@@ -339,7 +354,7 @@ struct legacy_agent
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
                         error_code& ec = throws) 
-    {
+    { // {{{ resolve_cached implementation
         #if defined(HPX_USE_AGAS_CACHE)
             // first look up the requested item in the cache
             cache_key k(id);
@@ -371,7 +386,7 @@ struct legacy_agent
         #endif
 
         return false;
-    }
+    } // }}}
 
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
@@ -391,7 +406,9 @@ struct legacy_agent
     }
 };
 
-}}
+}}}
+
+#include <hpx/runtime/agas/client/legacy/bootstrap.hpp>
 
 #endif // HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
