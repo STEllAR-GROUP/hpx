@@ -171,7 +171,7 @@ int main(int argc, char* argv[]){
         int num_threads = 1;
         int num_localities = 1;
         std::string queueing = "global";
-        hpx::runtime::mode mode = hpx::runtime::console;
+        hpx::runtime_mode mode = hpx::runtime_mode_console;
 
         // extract IP address/port arguments
             if(vm.count("agas"))
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]){
         }
 
             if(vm.count("worker")){
-                mode = hpx::runtime::worker;
+                mode = hpx::runtime_mode_worker;
                 if(vm.count("config")){
                     std::cerr<<"warning: --config option ignored, used for console "
                             "instance only\n";
@@ -240,7 +240,7 @@ int main(int argc, char* argv[]){
             typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler>
                 runtime_type;
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-                    if(mode == hpx::runtime::worker){
+                    if(mode == hpx::runtime_mode_worker){
                         rt.run(num_threads, num_localities);
                     }
                     else{
@@ -262,7 +262,7 @@ int main(int argc, char* argv[]){
                 init(num_threads, 1000);
 
                         runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-                        if(mode == hpx::runtime::worker){
+                        if(mode == hpx::runtime_mode_worker){
                             rt.run(num_threads, num_localities);
                         }
                         else{

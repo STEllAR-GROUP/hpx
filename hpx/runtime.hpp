@@ -125,14 +125,6 @@ namespace hpx
     class HPX_EXPORT runtime
     {
     public:
-        /// A HPX runtime can be executed in two different modes: console mode
-        /// and worker mode.
-        enum mode
-        {
-            console = 0,    ///< The runtime instance represents the application console
-            worker = 1      ///< The runtime instance represents a worker locality
-        };
-
         /// The \a hpx_main_function_type is the default function type usable 
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
@@ -304,7 +296,8 @@ namespace hpx
         explicit runtime_impl(std::string const& address = "localhost", 
             boost::uint16_t port = HPX_PORT,
             std::string const& agas_address = "", 
-            boost::uint16_t agas_port = 0, mode locality_mode = console,
+            boost::uint16_t agas_port = 0, runtime_mode locality_mode
+              = runtime_mode_console,
             init_scheduler_type const& init = init_scheduler_type(),
             std::string const& hpx_ini_file = "",
             std::vector<std::string> const& cmdline_ini_defs
@@ -318,7 +311,7 @@ namespace hpx
         /// \note The AGAS locality to use will be taken from the configuration 
         ///       file (hpx.ini).
         explicit runtime_impl(naming::locality address, 
-            mode locality_mode = worker,
+            runtime_mode locality_mode = runtime_mode_worker,
             init_scheduler_type const& init = init_scheduler_type(),
             std::string const& hpx_ini_file = "",
             std::vector<std::string> const& cmdline_ini_defs
@@ -332,7 +325,7 @@ namespace hpx
         /// \param agas_address   [in] This is the locality the AGAS server is 
         ///                       running on. 
         runtime_impl(naming::locality address, naming::locality agas_address, 
-            mode locality_mode = worker,
+            runtime_mode locality_mode = runtime_mode_worker,
             init_scheduler_type const& init = init_scheduler_type(),
             std::string const& hpx_ini_file = "",
             std::vector<std::string> const& cmdline_ini_defs
@@ -537,7 +530,7 @@ namespace hpx
         void deinit_tss();
 
     private:
-        mode mode_;
+        runtime_mode mode_;
         int result_;
         util::io_service_pool agas_pool_; 
         util::io_service_pool parcel_pool_; 

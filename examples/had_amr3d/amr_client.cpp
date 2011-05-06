@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         int num_localities = 1;
-        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        hpx::runtime_mode mode = hpx::runtime_mode_console;    // default is console mode
         bool do_logging = false;
 
         if (vm.count("random_ports") && !vm.count("agas") && !vm.count("hpx"))
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
             num_localities = vm["localities"].as<int>();
 
         if (vm.count("worker"))
-            mode = hpx::runtime::worker;
+            mode = hpx::runtime_mode_worker;
 
         if (vm.count("verbose"))
             do_logging = true;
@@ -482,7 +482,7 @@ int main(int argc, char* argv[])
 
         if (scheduler == 0) {
           global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-          if (mode == hpx::runtime::worker) 
+          if (mode == hpx::runtime_mode_worker) 
               rt.run(num_threads,num_localities);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads,num_localities);
@@ -492,7 +492,7 @@ int main(int argc, char* argv[])
         else if (scheduler == 1) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-          if (mode == hpx::runtime::worker) 
+          if (mode == hpx::runtime_mode_worker) 
               rt.run(num_threads,num_localities);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads,num_localities);
@@ -502,7 +502,7 @@ int main(int argc, char* argv[])
         else if (scheduler == 2) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_priority_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-          if (mode == hpx::runtime::worker) 
+          if (mode == hpx::runtime_mode_worker) 
               rt.run(num_threads,num_localities);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads,num_localities);

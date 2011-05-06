@@ -179,7 +179,7 @@ BOOL CMandelbrotApp::InitInstance()
         agas_server.reset(new agas_server_helper(agas_host, agas_port));
 
     // initialize and start the HPX runtime
-    runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
+    runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime_mode_console);
 
     // show dialog
     CMandelbrotDlg dlg (rt);

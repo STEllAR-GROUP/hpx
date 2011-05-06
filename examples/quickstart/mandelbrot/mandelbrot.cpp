@@ -196,11 +196,11 @@ int main(int argc, char* argv[])
 
         // initialize and start the HPX runtime
         if (vm.count("worker")) {
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::worker);
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime_mode_worker);
             rt.run(num_threads);
         }
         else {
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime::console);
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, hpx::runtime_mode_console);
             rt.run(boost::bind(hpx_main, size_x, size_y, iterations), num_threads);
         }
     }

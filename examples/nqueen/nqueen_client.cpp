@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
 
         int num_threads = 1;
-        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        hpx::runtime_mode mode = hpx::runtime_mode_console;    // default is console mode
         int num_localities = 1;
 
         // extract IP address/port arguments
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
             num_threads = vm["threads"].as<int>();
 
         if (vm.count("worker"))
-            mode = hpx::runtime::worker;
+            mode = hpx::runtime_mode_worker;
 
         if (vm.count("localities"))
             num_localities = vm["localities"].as<int>();

@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         hpx::naming::resolver_server agas(agas_pool);
 
         // start the HPX runtime
-        runtime_type rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime::console);
+        runtime_type rt("localhost", HPX_PORT, "localhost", 0, hpx::runtime_mode_console);
 
         boost::signals2::scoped_connection errorsink_connection;
         rt.register_error_sink(errorsink, errorsink_connection);

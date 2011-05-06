@@ -241,12 +241,12 @@ namespace hpx
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
             std::string queueing = "local";
-            hpx::runtime::mode mode;
+            hpx::runtime_mode mode;
 
             if (!is_hpx_runtime)
-                mode = hpx::runtime::console;
+                mode = hpx::runtime_mode_console;
             else
-                mode = hpx::runtime::worker;
+                mode = hpx::runtime_mode_worker;
 
             if (vm.count("random-ports")
                 && !vm.count("agas") && !vm.count("hpx"))
@@ -282,9 +282,9 @@ namespace hpx
                 queueing = vm["queueing"].as<std::string>();
 
             if (!is_hpx_runtime && vm.count("worker"))
-                mode = hpx::runtime::worker;
+                mode = hpx::runtime_mode_worker;
             else if (is_hpx_runtime && vm.count("console"))
-                mode = hpx::runtime::console;
+                mode = hpx::runtime_mode_console;
 
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
@@ -340,7 +340,7 @@ namespace hpx
                 if (vm.count("exit"))
                     result = 0;
                 // Run this runtime instance.
-                else if (!is_hpx_runtime && mode != hpx::runtime::worker)
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
                     result = rt->run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else 
@@ -382,7 +382,7 @@ namespace hpx
                 if (vm.count("exit"))
                     result = 0;
                 // Run this runtime instance.
-                else if (!is_hpx_runtime && mode != hpx::runtime::worker)
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
                     result = rt->run(boost::bind
                         (hpx_main, vm), num_threads, num_localities);
                 else
@@ -410,7 +410,7 @@ namespace hpx
                         hpx_host, hpx_port, agas_host, agas_port, mode, init,
                         vm["hpx-config"].as<std::string>()));
 
-                if (mode != hpx::runtime::worker && vm.count("app-config"))
+                if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
                 {
                     std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration(config.c_str());
@@ -423,7 +423,7 @@ namespace hpx
                 if (vm.count("exit"))
                     result = 0;
                 // Run this runtime instance
-                else if (!is_hpx_runtime && mode != hpx::runtime::worker) {
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
                     result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }
@@ -453,7 +453,7 @@ namespace hpx
                         hpx_host, hpx_port, agas_host, agas_port, mode, init,
                         vm["hpx-config"].as<std::string>()));
 
-                if (mode != hpx::runtime::worker && vm.count("app-config"))
+                if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
                 {
                     std::string config(vm["app-config"].as<std::string>());
                     rt->get_config().load_application_configuration(config.c_str());
@@ -466,7 +466,7 @@ namespace hpx
                 if (vm.count("exit"))
                     result = 0;
                 // Run this runtime instance
-                if (!is_hpx_runtime && mode != hpx::runtime::worker) {
+                if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
                       result = rt->run(boost::bind(hpx_main, vm), 
                           num_threads, num_localities);
                 }

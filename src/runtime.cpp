@@ -52,6 +52,24 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 namespace hpx 
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace strings
+    {
+        char const* const runtime_mode_names[] = 
+        {
+            "invalid",
+            "console",
+            "worker",
+        };
+    }
+
+    char const* get_runtime_mode_name(runtime_mode state)
+    {
+        if (state < runtime_mode_invalid || state > runtime_mode_worker)
+            return "invalid";
+        return strings::runtime_mode_names[state];
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -59,7 +77,7 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             std::string const& address, boost::uint16_t port,
             std::string const& agas_address, boost::uint16_t agas_port, 
-            mode locality_mode, init_scheduler_type const& init,
+            runtime_mode locality_mode, init_scheduler_type const& init,
             std::string const& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs) 
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
@@ -71,10 +89,10 @@ namespace hpx
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         agas_client_(agas_pool_, naming::locality(agas_address, agas_port), 
-            ini_, mode_ == console),
+            ini_, mode_ == runtime_mode_console),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_),
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
@@ -93,7 +111,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             naming::locality address, naming::locality agas_address, 
-            mode locality_mode, init_scheduler_type const& init,
+            runtime_mode locality_mode, init_scheduler_type const& init,
             std::string const& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs) 
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
@@ -104,10 +122,10 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        agas_client_(agas_pool_, agas_address, ini_, mode_ == console),
+        agas_client_(agas_pool_, agas_address, ini_, mode_ == runtime_mode_console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_),
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
@@ -125,7 +143,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            naming::locality address, mode locality_mode, 
+            naming::locality address, runtime_mode locality_mode, 
             init_scheduler_type const& init,
             std::string const& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs) 
@@ -137,10 +155,10 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        agas_client_(agas_pool_, ini_, mode_ == console),
+        agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
         parcel_port_(parcel_pool_, address),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
-        init_logging_(ini_, mode_ == console, agas_client_),
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),

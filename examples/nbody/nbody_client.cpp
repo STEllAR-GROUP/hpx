@@ -1255,7 +1255,7 @@ int main(int argc, char* argv[])
         std::string hpx_host("localhost"), agas_host;
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
-        hpx::runtime::mode mode = hpx::runtime::console;    // default is console mode
+        hpx::runtime_mode mode = hpx::runtime_mode_console;    // default is console mode
         bool do_logging = false;
 
         // extract IP address/port arguments
@@ -1269,7 +1269,7 @@ int main(int argc, char* argv[])
             num_threads = vm["threads"].as<int>();
 
         if (vm.count("worker"))
-            mode = hpx::runtime::worker;
+            mode = hpx::runtime_mode_worker;
 
         if (vm.count("verbose"))
             do_logging = true;
@@ -1362,7 +1362,7 @@ int main(int argc, char* argv[])
 
         if (scheduler == 0) {
           global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-          if (mode == hpx::runtime::worker) 
+          if (mode == hpx::runtime_mode_worker) 
               rt.run(num_threads);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
@@ -1372,7 +1372,7 @@ int main(int argc, char* argv[])
         else if (scheduler == 1) {
           std::pair<std::size_t, std::size_t> init(/*vm["local"].as<int>()*/num_threads, 0);
           local_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-          if (mode == hpx::runtime::worker) 
+          if (mode == hpx::runtime_mode_worker) 
               rt.run(num_threads);
           else 
               rt.run(boost::bind(hpx_main, numvals, numsteps, do_logging, par), num_threads);
