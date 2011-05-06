@@ -593,6 +593,11 @@ else()
     ${hpxlib_parcelset_SOURCES}
     ${hpxlib_threadmanager_SOURCES}
     ${hpxlib_util_SOURCES})
+  
+  if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
+    set(hpxlib_SOURCES ${hpxlib_SOURCES} 
+      ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+  endif()
 
   set(hpxserializationlib_HEADERS
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
