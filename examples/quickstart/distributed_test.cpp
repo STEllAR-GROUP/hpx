@@ -137,6 +137,7 @@ struct data
 
     int val_;
     std::vector<int> x_;
+    bool proceed_;
 
 private:
     // serialization support
@@ -145,7 +146,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & val_ & x_;
+        ar & val_ & x_ & proceed_;
     }
 };
 
@@ -231,6 +232,7 @@ int hpx_main(po::variables_map &vm)
         components::access_memory_block<data> val2( components::stubs::memory_block::get(n2.get()) );
         std::cout << " Result " << val1->val_ << " " << val2->val_ << std::endl;
         std::cout << " Vector Result " << val1->x_[0] << " " << val2->x_[0] << std::endl;
+        std::cout << " Proceed Result " << val1->proceed_ << " " << val2->proceed_ << std::endl;
 
         //std::cout << " Result: " << n1.get() << " " << n2.get() << std::endl;
         //result = n1.get()+n2.get();
@@ -274,10 +276,22 @@ naming::id_type getnumber2 ()
     components::access_memory_block<data> val(
                 components::stubs::memory_block::checkout(result));
 
-    val->val_ = 6;
-    val->x_.push_back(1);
-    val->x_.push_back(2);
-    val->x_.push_back(3);
+    int locality = get_prefix_from_id( here );
+    
+
+    if ( locality == 1 ) {
+      val->val_ = 6;
+      val->x_.push_back(1);
+      val->x_.push_back(2);
+      val->x_.push_back(3);
+      val->proceed_ = true;
+    } else {
+      val->val_ = 3;
+      val->x_.push_back(4);
+      val->x_.push_back(5);
+      val->x_.push_back(6);
+      val->proceed_ = false;
+    }
 
     return result;
 }
