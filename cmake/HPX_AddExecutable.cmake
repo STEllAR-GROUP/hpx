@@ -38,12 +38,17 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
+  set(libs "")
+  if(NOT MSVC)
+    set(libs ${BOOST_FOUND_LIBRARIES})
+  endif()
+
   # linker instructions
   if(NOT ${name}_NOLIBS)
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES} 
       ${hpx_LIBRARIES}
-      ${BOOST_FOUND_LIBRARIES}
+      ${libs}
       ${pxaccel_LIBRARIES})
   else()
     target_link_libraries(${name}_exe

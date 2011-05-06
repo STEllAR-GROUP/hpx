@@ -8,29 +8,29 @@ add_definitions(-DHPX_COMPONENT_NAME=hpx)
 add_definitions(-DHPX_EXPORTS)
 add_definitions(-DBOOST_COROUTINE_EXPORTS)
 
-foreach(lib ${hpx_CORE})
-  set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
-endforeach()
-
-add_hpx_library_sources(hpx
-  exception.cpp
-  exception_list.cpp
-  runtime.cpp)
-
-add_subdirectory(lcos)
-add_subdirectory(performance_counters)
-add_subdirectory(runtime)
-add_subdirectory(util)
-
-# Boost Chrono sources (as long as this library is not in Boost)
-if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-  add_hpx_library_sources(hpx
-    ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
-endif()
-
 ###############################################################################
 # POSIX 
-if(NOT MSVC)
+if(UNIX)
+  foreach(lib ${hpx_CORE})
+    set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
+  endforeach()
+
+  add_hpx_library_sources(hpx
+    exception.cpp
+    exception_list.cpp
+    runtime.cpp)
+
+  add_subdirectory(lcos)
+  add_subdirectory(performance_counters)
+  add_subdirectory(runtime)
+  add_subdirectory(util)
+
+  # Boost Chrono sources (as long as this library is not in Boost)
+  if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
+    add_hpx_library_sources(hpx
+      ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+  endif()
+
   if(NOT HPX_DISABLE_WARNINGS)
     hpx_use_flag_if_available(Wextra)
 
@@ -579,6 +579,20 @@ else()
   source_group("Source Files\\Util" 
       FILES ${hpxlib_util_SOURCES})
 
+  set(hpxlib_SOURCES
+    ${hpxlib_global_SOURCES}
+    ${hpxlib_lcos_SOURCES}
+    ${hpxlib_performance_counters_SOURCES}
+    ${hpxlib_performance_counters_stubs_SOURCES}
+    ${hpxlib_performance_counters_server_SOURCES}
+    ${hpxlib_actions_SOURCES}
+    ${hpxlib_applier_SOURCES}
+    ${hpxlib_components_SOURCES}
+    ${hpxlib_components_server_SOURCES}
+    ${hpxlib_naming_SOURCES}
+    ${hpxlib_parcelset_SOURCES}
+    ${hpxlib_threadmanager_SOURCES}
+    ${hpxlib_util_SOURCES})
 
   set(hpxserializationlib_HEADERS
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
@@ -598,7 +612,7 @@ else()
       FILES ${hpxserializationlib_SOURCES})
 
   # libhpx_serialization
-  add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES}
+  add_library(hpx_serialization SHARED ${hpxserializationlib_SOURCES}
                                        ${hpxserializationlib_HEADERS})
 
   set_target_properties(hpx_serialization PROPERTIES
@@ -615,7 +629,7 @@ else()
     "HPX_LIBRARY=\"${name}\"")
 
   # libhpx
-  add_library(hpx SHARED ${hpx_SOURCES}
+  add_library(hpx SHARED ${hpxlib_SOURCES}
                          ${hpxlib_HEADERS})
 
   target_link_libraries(hpx hpx_serialization)

@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "MODULE;SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL" ${ARGN})
+    "MODULE;SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -39,10 +39,15 @@ macro(add_hpx_component name)
   endif()
 
   set(prefix "")
+  set(libs "")
+
+  if(NOT ${name}_NOLIBS)
+    set(libs ${hpx_LIBRARIES}) 
+  endif()
 
   if(NOT MSVC)
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+      ${${name}_DEPENDENCIES} ${libs} ${BOOST_FOUND_LIBRARIES})
     set(prefix "hpx_component_")
     # main_target is checked by the ini install code, to see if ini files for
     # this component need to be installed
@@ -56,7 +61,7 @@ macro(add_hpx_component name)
       LINK_FLAGS "-fno-use-cxa-atexit")
   else()
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+      ${${name}_DEPENDENCIES} ${libs})
     set(main_target ${name}.dll)
     set(install_targets ${name}.dll)
   endif()
