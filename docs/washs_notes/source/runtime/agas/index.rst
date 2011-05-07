@@ -7,4 +7,5 @@
 
   introduction
   v1_requests
+  v2_boot_protocol
 

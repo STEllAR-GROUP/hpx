@@ -12,6 +12,7 @@
 
 set(subdirs 
     accumulator
+    agas
     balancing
     generic
     had_amr3d

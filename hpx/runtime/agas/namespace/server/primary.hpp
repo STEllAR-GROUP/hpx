@@ -194,17 +194,23 @@ struct HPX_COMPONENT_EXPORT primary_namespace
                     "error");
             }
 
-            // Generate the requested GID range
-            naming::gid_type lower = lower_id + 1;
-            naming::gid_type upper = lower + real_count;
+            if (count != 0)
+            {
+                // Generate the requested GID range
+                naming::gid_type lower = lower_id + 1;
+                naming::gid_type upper = lower + real_count;
 
-            at_c<1>((*pit.first).second) = upper;
+                at_c<1>((*pit.first).second) = upper;
 
-            // Set the initial credit count.
-            naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-            naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
+                // Set the initial credit count.
+                naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+                naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
-            return binding_type(lower, upper, id, true);
+                return binding_type(lower, upper, id, true);
+            }
+
+            return binding_type
+                (naming::invalid_gid, naming::invalid_gid, id, true);
         }
     } // }}}
 
