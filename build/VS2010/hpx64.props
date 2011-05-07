@@ -30,12 +30,13 @@
       <Command>if not exist "$(HPX_ROOT)\bin64" mkdir "$(HPX_ROOT)\bin64"
 if not exist "$(HPX_ROOT)\bin64\$(Configuration)" mkdir "$(HPX_ROOT)\bin64\$(Configuration)"
 if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
 if not exist "$(HPX_ROOT)\bin64\$(Configuration)\libs" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\libs"
-xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
-xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
+xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
 xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\$(Configuration)\libs"
 </Command>
-      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\$(TargetName).pdb;%(Outputs)</Outputs>
+      <Outputs>%(Outputs)</Outputs>
       <Inputs>$(TargetPath)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>

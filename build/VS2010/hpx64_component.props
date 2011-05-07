@@ -18,6 +18,10 @@
     </ClCompile>
     <CustomBuildStep />
     <Link />
+    <CustomBuildStep />
+    <CustomBuildStep>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="BOOST_ROOT">

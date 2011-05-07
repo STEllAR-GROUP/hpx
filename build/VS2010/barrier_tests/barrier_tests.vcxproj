@@ -160,7 +160,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\tests\unit\hpx\lcos\barrier.cpp" />
+    <ClCompile Include="..\..\..\examples\quickstart\distributed_test.cpp" />
+    <ClCompile Include="..\..\..\tests\unit\hpx\lcos\barrier.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -74,6 +74,9 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <CustomBuildStep>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
