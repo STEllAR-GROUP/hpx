@@ -25,6 +25,12 @@
 // definitions related to console logging
 
 ///////////////////////////////////////////////////////////////////////////////
+// This must be in global namespace
+HPX_REGISTER_PLAIN_ACTION_EX(
+    hpx::components::server::console_logging_action<>,
+    console_logging_action);
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -54,10 +60,4 @@ namespace hpx { namespace components { namespace server
         }
     }
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-// This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION_EX(
-    hpx::components::server::console_logging_action,
-    console_logging_action);
 

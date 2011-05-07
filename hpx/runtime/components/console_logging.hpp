@@ -29,7 +29,7 @@ namespace hpx { namespace components
     {
         try {
             if (system_is_running()) 
-                applier::apply_p<server::console_logging_action>
+                applier::apply_p<server::console_logging_action<> >
                     (prefix, threads::thread_priority_low, dest, level, msg);
         }
         catch(hpx::exception const& e) {
