@@ -262,6 +262,8 @@ namespace hpx { namespace components
                 const_cast<actions::manage_object_action_base*>(
                     &data_->get_managing_object().get_instance());
 
+            BOOST_ASSERT(act);
+
             ar << size;
             ar << act;
 

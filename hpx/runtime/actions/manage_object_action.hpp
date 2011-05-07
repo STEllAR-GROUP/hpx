@@ -144,11 +144,11 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        virtual serialize_save_function save() const
+        serialize_save_function save() const
         { 
             return &manage_object_action::save_; 
         }
-        virtual serialize_load_function load() const
+        serialize_load_function load() const
         { 
             return &manage_object_action::load_; 
         }

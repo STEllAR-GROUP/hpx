@@ -16,7 +16,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
 #if defined(_DEBUG) && !defined(DEBUG)
-#define DEBUG
+#  define DEBUG
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_DEBUG) && defined(DEBUG)
+#  define HPX_DEBUG 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,11 +31,6 @@
 #define HPX_NAME_RESOLVER_PORT      7911
 #define HPX_RANDOM_PORT_MIN         26001
 #define HPX_RANDOM_PORT_MAX         26132
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DEBUG) && defined(DEBUG)
-#  define HPX_DEBUG 1
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines if the Intel Thread Building Blocks library will be used
@@ -110,11 +110,11 @@
 // This defines the maximum number of connect retries to the AGAS service 
 // allowing for some leeway during startup of the localities 
 #if !defined(HPX_MAX_NETWORK_RETRIES)
-#define HPX_MAX_NETWORK_RETRIES 100
+#  define HPX_MAX_NETWORK_RETRIES 100
 #endif
 
 #if !defined(HPX_NETWORK_RETRIES_SLEEP)
-#define HPX_NETWORK_RETRIES_SLEEP 100
+#  define HPX_NETWORK_RETRIES_SLEEP 100
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,65 +159,65 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_LIBRARY)
-    #if defined(HPX_COMPONENT_EXPORTS)
-        #define HPX_LIBRARY                                                   \
-            BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME)) \
-            HPX_SHARED_LIB_EXTENSION                                          \
-        /**/
-    #else
-        #define HPX_LIBRARY                                                   \
-            BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))           \
-            HPX_SHARED_LIB_EXTENSION                                          \
-        /**/
-    #endif
+  #if defined(HPX_COMPONENT_EXPORTS)
+    #define HPX_LIBRARY                                                       \
+        BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME))     \
+        HPX_SHARED_LIB_EXTENSION                                              \
+    /**/
+  #else
+    #define HPX_LIBRARY                                                       \
+        BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))               \
+        HPX_SHARED_LIB_EXTENSION                                              \
+    /**/
+  #endif
 #endif
 
 #if !defined(HPX_COMPONENT_STRING)
-#define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
+#  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
 #if !defined(HPX_APPLICATION_NAME)
-#define HPX_APPLICATION_NAME "unknown HPX application"
+#  define HPX_APPLICATION_NAME "unknown HPX application"
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
-#define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
+#  define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
-#define snprintf _snprintf
-#if !defined(HPX_EMULATE_SWAP_CONTEXT)
-#define HPX_EMULATE_SWAP_CONTEXT 0
-#endif
+#  define snprintf _snprintf
+#  if !defined(HPX_EMULATE_SWAP_CONTEXT)
+#    define HPX_EMULATE_SWAP_CONTEXT 0
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_USE_ITT)
-#define HPX_USE_ITT 0
+#  define HPX_USE_ITT 0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
-#define HPX_IDLE_LOOP_COUNT_MAX 20000
+#  define HPX_IDLE_LOOP_COUNT_MAX 20000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_LOCK_LIMIT)
-#define HPX_LOCK_LIMIT 28
+#  define HPX_LOCK_LIMIT 28
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEFAULT_STACK_SIZE)
-    #if defined(BOOST_WINDOWS)
-        #define HPX_DEFAULT_STACK_SIZE 0x4000
+  #if defined(BOOST_WINDOWS)
+      #define HPX_DEFAULT_STACK_SIZE 0x4000
+  #else
+    #if defined(HPX_DEBUG)
+      #define HPX_DEFAULT_STACK_SIZE 0x10000 
     #else
-      #if defined(HPX_DEBUG)
-        #define HPX_DEFAULT_STACK_SIZE 0x10000 
-      #else
-        #define HPX_DEFAULT_STACK_SIZE 0x8000 
-      #endif 
-    #endif
+      #define HPX_DEFAULT_STACK_SIZE 0x8000 
+    #endif 
+  #endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
