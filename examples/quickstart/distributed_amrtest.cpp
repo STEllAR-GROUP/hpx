@@ -107,7 +107,7 @@ naming::id_type getnumber(int hello);
     hpx/runtime/actions/plain_action.hpp and related files for the form of these variants.
     */
 typedef 
-    actions::result_action1<naming::id_type, getnumber,int> 
+    actions::plain_result_action1<naming::id_type, int, getnumber> 
 getnumber_action;
 
     /*
@@ -116,7 +116,7 @@ getnumber_action;
     this example code, then when a block of code queries the runtime to see who is available
     to provide computations on behalf of getnumber_action all localities will report back.
     */
-HPX_REGISTER_ACTION_EX(getnumber_action,getnumber_action);
+HPX_REGISTER_PLAIN_ACTION(getnumber_action);
 
 /* 
     hpx_main must exist with this name in any hpx program. In this example it is called
