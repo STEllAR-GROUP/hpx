@@ -131,11 +131,11 @@ int hpx_main(variables_map& vm)
         
         // resolve this address
         address addr;
-        HPX_TEST(agent.resolve(gid_type(1), addr));
+        HPX_TEST(agent.resolve(gid_type(1), addr, false));
         HPX_TEST_EQ(addr, address(here, 1, 2));
     
         // try to resolve a non-existing address
-        HPX_TEST(!agent.resolve(gid_type(2), addr));
+        HPX_TEST(!agent.resolve(gid_type(2), addr, false));
     
         // check association of the namespace name
         gid_type id;
@@ -149,7 +149,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST(!agent.registerid("/test/foo/1", gid_type(2)));
     
         // resolve it again
-        HPX_TEST(agent.resolve(gid_type(1), addr));
+        HPX_TEST(agent.resolve(gid_type(1), addr, false));
         HPX_TEST_EQ(addr, address(here, 1, 3));
     
         // re-check association of the namespace name
@@ -163,7 +163,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST(agent.unregisterid("/test/foo/1"));
         
         // resolve should fail now
-        HPX_TEST(!agent.resolve(gid_type(1), addr));
+        HPX_TEST(!agent.resolve(gid_type(1), addr, false));
     
         // association of the namespace name should fail now
         HPX_TEST(!agent.queryid("/test/foo/1", id));
@@ -177,16 +177,16 @@ int hpx_main(variables_map& vm)
         // test bind_range/unbind_range API
         HPX_TEST(agent.bind_range(gid_type(3), 20, address(here, 1, 2), 10));
     
-        HPX_TEST(agent.resolve(gid_type(3), addr));
+        HPX_TEST(agent.resolve(gid_type(3), addr, false));
         HPX_TEST_EQ(addr, address(here, 1, 2));
         
-        HPX_TEST(agent.resolve(gid_type(6), addr));
+        HPX_TEST(agent.resolve(gid_type(6), addr, false));
         HPX_TEST_EQ(addr, address(here, 1, 32));
     
-        HPX_TEST(agent.resolve(gid_type(22), addr));
+        HPX_TEST(agent.resolve(gid_type(22), addr, false));
         HPX_TEST_EQ(addr, address(here, 1, 192));
         
-        HPX_TEST(!agent.resolve(gid_type(23), addr));
+        HPX_TEST(!agent.resolve(gid_type(23), addr, false));
     
         HPX_TEST(agent.unbind_range(gid_type(3), 20));
     }
