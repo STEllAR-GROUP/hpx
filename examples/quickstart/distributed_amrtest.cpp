@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     follows it.
     */
 naming::id_type get_initialdata();
-naming::id_type compute(naming::id_type in1,naming::id_type in2);
+naming::id_type compute(naming::id_type in1,naming::id_type in2,naming::id_type out);
 
     /*
     This typedef takes the work routine in this example, get_initialdata(), and uses it to create a 
@@ -112,7 +112,7 @@ typedef
 get_initialdata_action;
 
 typedef 
-    actions::plain_result_action2<naming::id_type,naming::id_type,naming::id_type, compute> 
+    actions::plain_result_action3<naming::id_type,naming::id_type,naming::id_type,naming::id_type, compute> 
 compute_action;
 
     /*
@@ -218,20 +218,24 @@ int hpx_main(po::variables_map &vm)
         */
         lcos::eager_future<get_initialdata_action> n1(that_prefix);
         lcos::eager_future<get_initialdata_action> n2(this_prefix);
+        lcos::eager_future<get_initialdata_action> ni1(that_prefix);
+        lcos::eager_future<get_initialdata_action> ni2(this_prefix);
 
         naming::id_type id1 = n1.get();
         naming::id_type id2 = n2.get();
+        naming::id_type result_that = ni1.get();
+        naming::id_type result_this = ni2.get();
 
         // compute
-        lcos::eager_future<compute_action> n3(that_prefix,id1,id2);
-        lcos::eager_future<compute_action> n4(this_prefix,id1,id2);
+        lcos::eager_future<compute_action> n3(that_prefix,id1,id2,result_that);
+        lcos::eager_future<compute_action> n4(this_prefix,id1,id2,result_this);
 
         naming::id_type id3 = n3.get();
         naming::id_type id4 = n4.get();
 
         // compute
-        lcos::eager_future<compute_action> n5(that_prefix,id3,id4);
-        lcos::eager_future<compute_action> n6(this_prefix,id3,id4);
+        lcos::eager_future<compute_action> n5(that_prefix,id3,id4,id1);
+        lcos::eager_future<compute_action> n6(this_prefix,id3,id4,id2);
 
         naming::id_type id5 = n5.get();
         naming::id_type id6 = n6.get();
@@ -302,7 +306,7 @@ naming::id_type get_initialdata ()
 }
 
 // the "work" 
-naming::id_type compute (naming::id_type id1, naming::id_type id2)
+naming::id_type compute (naming::id_type id1, naming::id_type id2,naming::id_type out)
 {  
 
     components::access_memory_block<data> val1(
@@ -311,23 +315,26 @@ naming::id_type compute (naming::id_type id1, naming::id_type id2)
     components::access_memory_block<data> val2(
                 components::stubs::memory_block::checkout(id2));
 
+    components::access_memory_block<data> result(
+                components::stubs::memory_block::checkout(out));
+
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
     int locality = get_prefix_from_id( here );
 
     if ( locality == 1 ) {
-      val1->val_ += 1.0 + val1->val_ + val2->val_;
-      val1->x_[0] = 2 + val1->x_[0] + val2->x_[0];
-      val1->x_[1] = 3 + val1->x_[1] + val2->x_[1];
-      val1->x_[2] = 4 + val1->x_[2] + val2->x_[2];
-      val1->proceed_ = true;
-      return id1;
+      result->val_ += 1.0 + val1->val_ + val2->val_;
+      result->x_[0] = 2 + val1->x_[0] + val2->x_[0];
+      result->x_[1] = 3 + val1->x_[1] + val2->x_[1];
+      result->x_[2] = 4 + val1->x_[2] + val2->x_[2];
+      result->proceed_ = true;
+      return out;
     } else {
-      val2->val_ -= 3.0 + val1->val_ + val2->val_;
-      val2->x_[0] = 20 + val1->x_[0] + val2->x_[0];
-      val2->x_[1] = 30 + val1->x_[1] + val2->x_[1];
-      val2->x_[2] = 40 + val1->x_[2] + val2->x_[2];
-      val2->proceed_ = false;
-      return id2;
+      result->val_ -= 3.0 + val1->val_ + val2->val_;
+      result->x_[0] = 20 + val1->x_[0] + val2->x_[0];
+      result->x_[1] = 30 + val1->x_[1] + val2->x_[1];
+      result->x_[2] = 40 + val1->x_[2] + val2->x_[2];
+      result->proceed_ = false;
+      return out;
     }
 }
 
