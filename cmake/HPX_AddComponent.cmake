@@ -80,27 +80,40 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
-  set_property(TARGET ${name}_component
-               PROPERTY LIBRARY_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY RUNTIME_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  
+  if(NOT MSVC)
+    set_property(TARGET ${name}_component
+                 PROPERTY LIBRARY_OUTPUT_DIRECTORY
+                 "${CMAKE_BINARY_DIR}/lib/hpx")
+    set_property(TARGET ${name}_component
+                 PROPERTY ARCHIVE_OUTPUT_DIRECTORY
+                 "${CMAKE_BINARY_DIR}/lib/hpx")
+    set_property(TARGET ${name}_component
+                 PROPERTY RUNTIME_OUTPUT_DIRECTORY
+                 "${CMAKE_BINARY_DIR}/lib/hpx")
+  endif()
+   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
     hpx_debug("add_component.${name}" "Module was not specified for component.")
   endif()
 
   foreach(target ${install_targets})
-    hpx_component_install(${${name}_MODULE} ${target})
+    if(NOT MSVC)
+      hpx_component_install(${${name}_MODULE} ${target})
+    else()
+      install(TARGETS ${name}_component
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                  GROUP_READ GROUP_EXECUTE
+                  WORLD_READ WORLD_EXECUTE)
+    endif()
   endforeach()
 
   foreach(target ${${name}_INI})
-    hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
+    if(NOT MSVC)
+      hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
+    endif()
   endforeach()
 endmacro()
 

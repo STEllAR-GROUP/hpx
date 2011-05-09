@@ -22,15 +22,22 @@ macro(add_hpx_executable name)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
 
   # add the executable build target
-  if(${name}_ESSENTIAL)
-    add_executable(${name}_exe 
-      ${${name}_SOURCES} ${${name}_HEADERS})
+  if(NOT MSVC)
+    if(${name}_ESSENTIAL)
+      add_executable(${name}_exe 
+        ${${name}_SOURCES} ${${name}_HEADERS})
+    else()
+      add_executable(${name}_exe EXCLUDE_FROM_ALL
+        ${${name}_SOURCES})
+    endif()
   else()
-    add_executable(${name}_exe EXCLUDE_FROM_ALL
+    add_executable(${name}_exe 
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
-  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
+  if(NOT MSVC)
+    set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
+  endif()
 
   set_property(TARGET ${name}_exe APPEND
                PROPERTY COMPILE_DEFINITIONS
@@ -60,10 +67,18 @@ macro(add_hpx_executable name)
     hpx_debug("add_executable.${name}" "Module was not specified for executable.")
   endif()
 
-  if(${name}_ESSENTIAL)
-    hpx_executable_install(${name}_exe MODULE ${${name}_MODULE} ESSENTIAL)
+  if(NOT MSVC)
+    if(${name}_ESSENTIAL)
+      hpx_executable_install(${name}_exe MODULE ${${name}_MODULE} ESSENTIAL)
+    else()
+      hpx_executable_install(${name}_exe MODULE ${${name}_MODULE})
+    endif() 
   else()
-    hpx_executable_install(${name}_exe MODULE ${${name}_MODULE})
-  endif() 
+    install(TARGETS ${name}_exe
+      RUNTIME DESTINATION bin
+      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                  GROUP_READ GROUP_EXECUTE
+                  WORLD_READ WORLD_EXECUTE)
+  endif()
 endmacro()
 

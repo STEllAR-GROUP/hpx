@@ -10,20 +10,27 @@
 # It is important that all of these examples remain linked into the CMake
 # dependency tree for testing purposes.
 
-set(subdirs 
-    accumulator
-    agas
-    balancing
-    generic
-    had_amr3d
-    hplpx
-    marduk
-    smp_amr3d
-    nbody
-    nqueen
-    parcelset
-    queue
-    quickstart)
+if(NOT MSVC)
+  set(subdirs
+      accumulator
+      agas
+      balancing
+      generic
+      had_amr3d
+      hplpx
+      marduk
+      smp_amr3d
+      nbody
+      nqueen
+      parcelset
+      queue
+      quickstart)
+else()
+  set(subdirs
+      accumulator
+      quickstart
+      nqueen)
+endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(examples.${subdir})
