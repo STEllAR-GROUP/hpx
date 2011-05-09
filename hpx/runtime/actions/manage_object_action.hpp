@@ -29,10 +29,10 @@ namespace hpx { namespace actions
         typedef boost::archive::binary_oarchive oarchive_type;
         typedef boost::archive::binary_iarchive iarchive_type;
 #endif
-        typedef void (*serialize_save_function)(boost::uint8_t*, std::size_t, 
-            oarchive_type&, const unsigned int);
-        typedef void (*serialize_load_function)(boost::uint8_t*, std::size_t,
-            iarchive_type&, const unsigned int);
+        typedef void (*serialize_save_function)(boost::uint8_t const*, 
+            std::size_t, oarchive_type&, const unsigned int);
+        typedef void (*serialize_load_function)(boost::uint8_t*, 
+            std::size_t, iarchive_type&, const unsigned int);
 
     private:
         static void construct_(void*, std::size_t) {}
@@ -43,7 +43,7 @@ namespace hpx { namespace actions
         }
         static void destruct_(void*) {}
 
-        static void save_(boost::uint8_t* data, std::size_t size, 
+        static void save_(boost::uint8_t const* data, std::size_t size, 
             oarchive_type& ar, const unsigned int version)
         {
             using boost::serialization::make_array;
@@ -117,10 +117,10 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
-        static void save_(boost::uint8_t* data, std::size_t size, 
+        static void save_(boost::uint8_t const* data, std::size_t size, 
             oarchive_type& ar, const unsigned int version)
         {
-            ar << *reinterpret_cast<T*>(data);
+            ar << *reinterpret_cast<T const*>(data);
         }
         static void load_(boost::uint8_t* data, std::size_t size, 
             iarchive_type& ar, const unsigned int version)
