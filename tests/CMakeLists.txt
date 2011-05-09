@@ -6,8 +6,7 @@
 
 set(subdirs 
     unit
-    performance
-    function)
+    performance)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${subdir})
