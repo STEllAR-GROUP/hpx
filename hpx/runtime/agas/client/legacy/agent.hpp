@@ -321,7 +321,7 @@ struct agent
     } // }}}
 
     bool resolve(naming::gid_type const& id, naming::address& addr,
-                 bool try_cache = false, error_code& ec = throws) 
+                 bool try_cache = true, error_code& ec = throws) 
     { // {{{ resolve implementation
         gva_type gva = primary_ns_.resolve(id);
 
@@ -349,7 +349,7 @@ struct agent
     } // }}}
 
     bool resolve(naming::id_type const& id, naming::address& addr,
-                 bool try_cache = false, error_code& ec = throws) 
+                 bool try_cache = true, error_code& ec = throws) 
     { return resolve(id.get_gid(), addr, try_cache, ec); }
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
