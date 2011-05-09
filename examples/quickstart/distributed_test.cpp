@@ -216,7 +216,7 @@ int hpx_main(po::variables_map &vm)
             required parameters, they would appear in the list after "that_prefix".
         */
         lcos::eager_future<getnumber_action> n1(that_prefix);
-        lcos::eager_future<getnumber_action> n2(that_prefix);
+        lcos::eager_future<getnumber_action> n2(this_prefix);
 
         //insert busy work
         
@@ -277,7 +277,6 @@ naming::id_type getnumber2 ()
                 components::stubs::memory_block::checkout(result));
 
     int locality = get_prefix_from_id( here );
-    
 
     if ( locality == 1 ) {
       val->val_ = 6;
