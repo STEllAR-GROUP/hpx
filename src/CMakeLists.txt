@@ -653,8 +653,8 @@ else()
     "HPX_LIBRARY=\"${name}\"")
 
   install(TARGETS hpx
-      ARCHIVE DESTINATION lib/hpx
-      LIBRARY DESTINATION lib/hpx
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
       COMPONENT core
       PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                   GROUP_READ GROUP_EXECUTE
