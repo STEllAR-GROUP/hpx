@@ -242,11 +242,10 @@ namespace hpx { namespace threads { namespace policies
             return addednew != 0;
         }
 
-    public:
         /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
         // FIXME: seg faults at shutdown on Linux.
-        bool cleanup_terminated()
+        bool cleanup_terminated_locked()
         {
             {
                 long delete_count = max_delete_count;   // delete only this many threads
@@ -258,6 +257,13 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
             return thread_map_.empty();
+        }
+
+    public:
+        bool cleanup_terminated()
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            return cleanup_terminated_locked();
         }
 
         // The maximum number of active threads this thread manager should
@@ -368,12 +374,14 @@ namespace hpx { namespace threads { namespace policies
         /// Return the number of existing threads, regardless of their state
         boost::uint64_t get_thread_count() const
         {
+            mutex_type::scoped_lock lk(mtx_);
             return thread_map_.size();
         }
 
         // return the number of existing threads with given state
         boost::uint64_t get_thread_count(thread_state_enum state) const
         {
+            mutex_type::scoped_lock lk(mtx_);
             if (state == unknown)
                 return thread_map_.size();
 
@@ -391,6 +399,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads(std::size_t num_thread)
         {
+            mutex_type::scoped_lock lk(mtx_);
             thread_map_type::iterator end =  thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
@@ -443,8 +452,6 @@ namespace hpx { namespace threads { namespace policies
         void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
     private:
-        friend class local_queue_scheduler;
-
         mutable mutex_type mtx_;            ///< mutex protecting the members
         boost::condition cond_;             ///< used to trigger some action
 
@@ -481,7 +488,7 @@ namespace hpx { namespace threads { namespace policies
             if (lk) {
                 // no point in having a thread waiting on the lock 
                 // while another thread is doing the maintenance
-                cleanup_terminated();
+                cleanup_terminated_locked();
 
                 // now, add new threads from the queue of task descriptions
                 add_new_if_possible(added, addfrom, num_thread);    // calls notify_all
@@ -515,7 +522,7 @@ namespace hpx { namespace threads { namespace policies
             if (!added_new && !running) {
                 // Before exiting each of the OS threads deletes the 
                 // remaining terminated PX threads 
-                if (cleanup_terminated()) {
+                if (cleanup_terminated_locked()) {
                     // we don't have any registered work items anymore
                     do_some_work();       // notify possibly waiting threads
                     terminate = true;
@@ -526,7 +533,7 @@ namespace hpx { namespace threads { namespace policies
                            << "): threadmap not empty";
             }
             else {
-                cleanup_terminated();
+                cleanup_terminated_locked();
             }
 
             if (!Global)
@@ -573,3 +580,4 @@ namespace hpx { namespace threads { namespace policies
 }}}
 
 #endif
+

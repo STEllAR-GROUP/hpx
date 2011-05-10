@@ -216,10 +216,9 @@ struct thread_deque
         return add_count;
     }
 
-  public:
     // This function makes sure all threads which are marked for deletion
     // (state is terminated) are properly destroyed
-    bool cleanup_terminated()
+    bool cleanup_terminated_locked()
     {
         {
             // delete only this many threads
@@ -232,6 +231,12 @@ struct thread_deque
             }
         }
         return thread_map_.empty();
+    }
+  public:
+    bool cleanup_terminated()
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        return cleanup_terminated_locked();
     }
 
     // The maximum number of active threads this thread manager should
@@ -342,11 +347,15 @@ struct thread_deque
 
     // Return the number of existing threads, regardless of their state
     boost::uint64_t get_thread_count() const
-    { return thread_map_.size(); }
+    {
+        mutex_type::scoped_lock lk(mtx_);
+        return thread_map_.size();
+    }
 
     // return the number of existing threads with given state
     boost::uint64_t get_thread_count(thread_state_enum state) const
     {
+        mutex_type::scoped_lock lk(mtx_);
         if (state == unknown)
             return thread_map_.size();
 
@@ -364,6 +373,7 @@ struct thread_deque
     ///////////////////////////////////////////////////////////////////////////
     void abort_all_suspended_threads(std::size_t /*num_thread*/)
     {
+        mutex_type::scoped_lock lk(mtx_);
         thread_map_type::iterator end =  thread_map_.end();
         for (thread_map_type::iterator it = thread_map_.begin();
               it != end; ++it)
@@ -386,8 +396,8 @@ struct thread_deque
 
             // this thread acquired the lock, do maintenance and finally
             // call wait() if no work is available
-//            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-//                       << ", threads left: " << thread_map_.size();
+            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
+                       << ", threads left: " << thread_map_.size();
 
             std::size_t addednew = add_new(compute_count());
             added += addednew;
@@ -396,7 +406,7 @@ struct thread_deque
             if (!(added != 0) && !running) {
                 // Before exiting each of the OS threads deletes the 
                 // remaining terminated PX threads 
-                if (cleanup_terminated())
+                if (cleanup_terminated_locked())
                     return true; 
 
                 LTM_(info) << "tfunc(" << num_thread 
@@ -404,7 +414,7 @@ struct thread_deque
             }
 
             else {
-                cleanup_terminated();
+                cleanup_terminated_locked();
                 return false;
             }
         }
@@ -422,8 +432,8 @@ struct thread_deque
 
             // this thread acquired the lock, do maintenance and finally
             // call wait() if no work is available
-//            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-//                       << ", threads left: " << thread_map_.size();
+            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
+                       << ", threads left: " << thread_map_.size();
 
             std::size_t addednew = steal_new(compute_count(), addfrom);
             added += addednew;
@@ -432,7 +442,7 @@ struct thread_deque
             if (!(added != 0) && !running) {
                 // Before exiting each of the OS threads deletes the 
                 // remaining terminated PX threads 
-                if (cleanup_terminated())
+                if (cleanup_terminated_locked())
                     return true; 
 
                 LTM_(info) << "tfunc(" << num_thread 
@@ -440,7 +450,7 @@ struct thread_deque
             }
 
             else {
-                cleanup_terminated();
+                cleanup_terminated_locked();
                 return false;
             }
         }
@@ -474,8 +484,6 @@ struct thread_deque
     void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
 private:
-    friend class local_queue_scheduler;
-
     mutable mutex_type mtx_;            ///< mutex protecting the members
     boost::condition cond_;             ///< used to trigger some action
 
