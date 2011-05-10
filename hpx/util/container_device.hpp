@@ -80,7 +80,7 @@ namespace hpx { namespace util
             boost::iostreams::stream_offset off, std::ios_base::seekdir way)
         {
             // Determine new value of pos_
-            boost::iostreams::stream_offset next;
+            boost::iostreams::stream_offset next(0);
             if (way == std::ios_base::beg) {
                 next = off;
             } 
