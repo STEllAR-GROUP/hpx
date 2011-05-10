@@ -239,13 +239,13 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG"
+  set(CMAKE_CXX_FLAGS_DEBUG "-O2 -g -DDEBUG"
     CACHE STRING "Debug flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
     CACHE STRING "MinSizeRel flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
   if(NOT HPX_DISABLE_WARNINGS)
