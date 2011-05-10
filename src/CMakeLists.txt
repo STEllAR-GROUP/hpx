@@ -561,6 +561,7 @@ else()
   # threadmanager
   set(hpxlib_threadmanager_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/threads/thread.cpp
+      ${hpx_SOURCE_DIR}/src/runtime/threads/thread_helpers.cpp
       ${hpx_SOURCE_DIR}/src/runtime/threads/threadmanager.cpp)
   source_group("Source Files\\Runtime\\Threads" 
       FILES ${hpxlib_threadmanager_SOURCES})

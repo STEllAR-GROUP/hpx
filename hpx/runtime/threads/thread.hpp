@@ -1,4 +1,5 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -392,7 +393,8 @@ namespace hpx { namespace threads
         ~thread() 
         {
             LTM_(debug) << "~thread(" << this << "), description(" 
-                        << get()->get_description() << ")";
+                        << get()->get_description() << "), phase("
+                        << get()->get_thread_phase() << ")";
         }
 
         ///////////////////////////////////////////////////////////////////////

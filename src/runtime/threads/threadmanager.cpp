@@ -1,4 +1,5 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -364,8 +365,8 @@ namespace hpx { namespace threads
         return previous_state;
     }
 
-    /// The get_state function is part of the thread related API and allows
-    /// to query the state of one of the threads known to the threadmanager_impl
+    /// The get_state function is part of the thread related API. It
+    /// queries the state of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_state(thread_id_type id) 
@@ -373,6 +374,17 @@ namespace hpx { namespace threads
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         return thrd->get() ? thrd->get_state() : thread_state(terminated);
+    }
+    
+    /// The get_phase function is part of the thread related API. It
+    /// queries the phase of one of the threads known to the threadmanager_impl
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_phase(thread_id_type id) 
+    {
+        // we know that the id is actually the pointer to the thread
+        thread* thrd = reinterpret_cast<thread*>(id);
+        return thrd->get() ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
     /// The get_description function is part of the thread related API and 

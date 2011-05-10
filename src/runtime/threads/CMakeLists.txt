@@ -5,5 +5,6 @@
 
 add_hpx_library_sources(hpx
   thread.cpp
+  thread_helpers.cpp
   threadmanager.cpp)
 

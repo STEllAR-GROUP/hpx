@@ -1,4 +1,5 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -147,9 +148,8 @@ namespace hpx { namespace threads
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The function get_thread_state is part of the thread related API 
-    /// allows to query the state of one of the threads known to the 
-    /// threadmanager.
+    /// The function get_thread_state is part of the thread related API. It
+    /// queries the state of one of the threads known to the threadmanager.
     ///
     /// \param id         [in] The thread id of the thread the state should 
     ///                   be modified for.
@@ -162,6 +162,23 @@ namespace hpx { namespace threads
     ///                   thread is not known to the threadmanager the return 
     ///                   value will be \a terminated.
     HPX_API_EXPORT thread_state get_thread_state(thread_id_type id,
+        error_code& ec = throws);
+    
+    ///////////////////////////////////////////////////////////////////////////
+    /// The function get_thread_phase is part of the thread related API. 
+    /// It queries the phase of one of the threads known to the threadmanager.
+    ///
+    /// \param id         [in] The thread id of the thread the phase should 
+    ///                   be modified for.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \returns          This function returns the thread phase of the 
+    ///                   thread referenced by the \a id parameter. If the 
+    ///                   thread is not known to the threadmanager the return 
+    ///                   value will be ~0.
+    HPX_API_EXPORT std::size_t get_thread_phase(thread_id_type id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -69,9 +70,21 @@ namespace hpx { namespace threads
         //        of terminated threads. Some schedulers might not do anything
         //        here.
         virtual bool cleanup_terminated() = 0;
+        
+        /// The get_phase function is part of the thread related API. It 
+        /// queries the phase of one of the threads known to the threadmanager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should 
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current phase of the 
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be ~0. 
+        virtual std::size_t get_phase(thread_id_type id) = 0;
 
-        /// The get_state function is part of the thread related API and allows
-        /// to query the state of one of the threads known to the threadmanager
+        /// The get_state function is part of the thread related API. It
+        /// queries the state of one of the threads known to the threadmanager
         ///
         /// \param id       [in] The thread id of the thread the state should 
         ///                 be returned for.
@@ -439,8 +452,8 @@ namespace hpx { namespace threads
             thread_priority priority = thread_priority_normal,
             error_code& ec = throws);
 
-        /// The get_state function is part of the thread related API and allows
-        /// to query the state of one of the threads known to the threadmanager
+        /// The get_state function is part of the thread related API. It
+        /// queries the state of one of the threads known to the threadmanager
         ///
         /// \param id       [in] The thread id of the thread the state should 
         ///                 be returned for.
@@ -452,6 +465,18 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return 
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(thread_id_type id);
+        
+        /// The get_phase function is part of the thread related API. It 
+        /// queries the phase of one of the threads known to the threadmanager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should 
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current phase of the 
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the threadmanager the return 
+        ///                 value will be ~0. 
+        std::size_t get_phase(thread_id_type id);
 
         /// The function get_thread_gid is part of the thread related API 
         /// allows to query the GID of one of the threads known to the 

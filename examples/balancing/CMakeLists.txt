@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    os_thread_num)
+    os_thread_num
+    px_thread_phase)
 
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)
