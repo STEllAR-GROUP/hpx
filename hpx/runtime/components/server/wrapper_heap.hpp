@@ -148,7 +148,6 @@ namespace hpx { namespace components { namespace detail
             // init memory blocks
             debug::fill_bytes(p, initial_value, count*sizeof(storage_type));
 #endif
-            BOOST_ASSERT(free_size_ >= 0);
 
             *result = p;
             return true;
