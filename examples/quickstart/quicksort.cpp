@@ -50,10 +50,43 @@ inline std::size_t partition(T* data, std::size_t begin, std::size_t end)
 
     return middle - data;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct quicksort_serial
+{
+    static std::size_t sort_count;
+
+    static void call(T* data, std::size_t begin, std::size_t end)
+    {
+        if (begin != end)
+        {
+            std::size_t middle_idx = partition(data, begin, end);
+    
+            ++sort_count;
+    
+            // always spawn the larger part in a new thread
+            if (2 * middle_idx < end - begin)
+            {
+                call(data, std::max(begin + 1, middle_idx), end);
+                call(data, begin, middle_idx);
+            }
+    
+            else
+            {
+                call(data, begin, middle_idx);
+                call(data, std::max(begin + 1, middle_idx), end);
+            }
+        }
+    }
+};
+
+template <typename T>
+std::size_t quicksort_serial<T>::sort_count(0); 
  
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-struct quicksort
+struct quicksort_parallel
 {
     static std::size_t sort_count;
 
@@ -61,18 +94,19 @@ struct quicksort
                      std::size_t end);
 
     typedef plain_action4<
-        id_type, id_type, std::size_t, std::size_t, &quicksort::call
+        id_type, id_type, std::size_t, std::size_t, &quicksort_parallel::call
     > action_type;
 };
 
 template <typename T>
-std::size_t quicksort<T>::sort_count(0); 
+std::size_t quicksort_parallel<T>::sort_count(0); 
 
 template <typename T>
-void quicksort<T>::call(id_type prefix, id_type d, std::size_t begin,
-                        std::size_t end)
+void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
+                                 std::size_t end)
 {
-    if (begin != end) {
+    if (begin != end)
+    {
         memory_block mb(d);
         access_memory_block<T> data(mb.get());
 
@@ -81,7 +115,8 @@ void quicksort<T>::call(id_type prefix, id_type d, std::size_t begin,
         ++sort_count;
 
         // always spawn the larger part in a new thread
-        if (2 * middle_idx < end - begin) {
+        if (2 * middle_idx < end - begin)
+        {
             eager_future<action_type> n(prefix, prefix, d, 
                 (std::max)(begin + 1, middle_idx), end);
 
@@ -89,7 +124,8 @@ void quicksort<T>::call(id_type prefix, id_type d, std::size_t begin,
             ::hpx::components::wait(n);
         }
 
-        else {
+        else
+        {
             eager_future<action_type> n(prefix, prefix, d, 
                 begin, middle_idx);
 
@@ -99,7 +135,7 @@ void quicksort<T>::call(id_type prefix, id_type d, std::size_t begin,
     }
 }
 
-typedef quicksort<int>::action_type quicksort_int_action;
+typedef quicksort_parallel<int>::action_type quicksort_int_action;
 HPX_REGISTER_PLAIN_ACTION(quicksort_int_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,22 +172,39 @@ int hpx_main(variables_map& vm)
         // randomly fill the vector
         std::generate(data.get_ptr(), data.get_ptr() + elements, std::rand);
 
-        high_resolution_timer t;
-        std::sort(data.get_ptr(), data.get_ptr() + elements);
+        std::cout << "serial quicksort" << std::endl;
 
+        high_resolution_timer t;
+        quicksort_serial<int>::call(data.get_ptr(), 0, elements);
         double elapsed = t.elapsed();
-        std::cout << "elapsed: " << elapsed << std::endl;
+
+        std::cout << "  elapsed=" << elapsed << "\n" 
+                  << "  count=" << quicksort_serial<int>::sort_count << "\n";
+
+//        int* it = data.get_ptr();
+//        int* end = data.get_ptr() + elements;
+
+//        for (; it < end; ++it)
+//            std::cout << *it << "\n";
 
         std::generate(data.get_ptr(), data.get_ptr() + elements, std::rand);
-        t.restart();
 
-        eager_future<quicksort<int>::action_type> n(
+        std::cout << "parallel quicksort" << std::endl;
+
+        t.restart();
+        eager_future<quicksort_parallel<int>::action_type> n(
             prefix, prefix, mb.get_gid(), 0, elements);
         ::hpx::components::wait(n);
-
         elapsed = t.elapsed();
-        std::cout << "elapsed: " << elapsed << std::endl;
-        std::cout << "count: " << quicksort<int>::sort_count << std::endl;
+
+        std::cout << "  elapsed=" << elapsed << "\n"
+                  << "  count=" << quicksort_parallel<int>::sort_count << "\n";
+        
+//        it = data.get_ptr();
+//        end = data.get_ptr() + elements;
+
+//        for (; it < end; ++it)
+//            std::cout << *it << "\n";
 
         mb.free();
     }
