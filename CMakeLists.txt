@@ -239,14 +239,35 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fno-omit-frame-pointer -fno-inline -fno-optimize-sibling-calls -g -DDEBUG"
-    CACHE STRING "Debug flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
-    CACHE STRING "MinSizeRel flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
-    CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -fno-omit-frame-pointer -fno-inline -fno-optimize-sibling-calls -fno-web -fno-rename-registers -g -DDEBUG"
-    CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+  # clear CMake defaults
+  set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Release flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    hpx_use_flag_if_available(g)
+    hpx_use_flag_if_available(fno-omit-frame-pointer)
+    hpx_use_flag_if_available(fno-inline)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    add_definitions(-DDEBUG)
+    hpx_use_flag_if_available(g)
+    hpx_use_flag_if_available(O3)
+    hpx_use_flag_if_available(fno-omit-frame-pointer)
+    hpx_use_flag_if_available(fno-inline)
+    hpx_use_flag_if_available(fno-optimize-sibling-calls)
+    hpx_use_flag_if_available(fno-web)
+    hpx_use_flag_if_available(fno-rename-registers)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    add_definitions(-DNDEBUG)
+    hpx_use_flag_if_available(Os)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    add_definitions(-DNDEBUG)
+    hpx_use_flag_if_available(O3)
+  else()
+    hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+  endif()
 
   if(NOT HPX_DISABLE_WARNINGS)
     hpx_use_flag_if_available(Wall)
@@ -258,24 +279,28 @@ else()
   # GNU specific configuration
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
+
     # Show the flags that toggle each warning
     hpx_use_flag_if_available(fdiagnostics-show-option)
 
     # I'm aware that __sync_fetch_and_nand changed semantics
     hpx_use_flag_if_gcc_version(Wno-sync-nand 040400)
 
-    if(0404 GREATER ${GCC_VERSION}) 
+    if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
       hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
     else()
       option(HPX_ELF_HIDDEN_VISIBILITY
-        "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (default: ON)" ON)
+        "Use -fvisibility=hidden for Release, MinSizeRel builds (default: ON)" ON)
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
-        add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-        add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-        add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-        set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
+        if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+           "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+          add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
+          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+          add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+          hpx_append_flag(-fvisibility=hidden)
+        endif()
       endif()
     endif()
   ##############################################################################
@@ -297,8 +322,7 @@ else()
     # warning #1125: virtual function override intended 
     add_definitions(-diag-disable 1125) 
 
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
+    hpx_use_flag_if_available(ipo)
   endif()
 
   ##############################################################################
@@ -312,7 +336,7 @@ else()
      DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
   
   if(HPX_COMPILER_AUTO_TUNE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    hpx_append_flag("-march=native")
   endif() 
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
@@ -324,7 +348,7 @@ else()
                 BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
 
   if(HPX_GNU_MCX16)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
+    hpx_append_flag("-mcx16")
   endif() 
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
@@ -349,7 +373,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
   
   if(HPX_SSE2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+    hpx_append_flag("-msse2")
   endif() 
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -364,7 +388,7 @@ else()
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
   add_definitions(-D_GNU_SOURCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  hpx_append_flag(-pthread)
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
@@ -390,25 +414,23 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
         add_definitions(-DHPX_JEMALLOC)
       endif()
  
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
+      hpx_use_flag_if_available(fno-builtin-cfree)
+      hpx_use_flag_if_available(fno-builtin-pvalloc)
+      hpx_use_flag_if_available(fno-builtin-malloc)
+      hpx_use_flag_if_available(fno-builtin-free)
+      hpx_use_flag_if_available(fno-builtin-calloc)
+      hpx_use_flag_if_available(fno-builtin-realloc)
+      hpx_use_flag_if_available(fno-builtin-valloc)
+      hpx_use_flag_if_available(fno-builtin-memalign)
+      hpx_use_flag_if_available(fno-builtin-posix_memalign)
     else()
       hpx_info("malloc" "Using system allocator.")
       hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
@@ -423,6 +445,7 @@ endif()
 # Mac OS X specific configuration 
 ################################################################################
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+  hpx_warn("darwin_config" "HPX will perform poorly on Darwin.")
   add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
 endif()
 

@@ -12,6 +12,10 @@ hpx_include(Message
             AddConfigTest
             ParseArguments)
 
+macro(hpx_append_flag flag)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+endmacro()
+
 macro(hpx_use_flag_if_available flag)
   hpx_parse_arguments(FLAG "NAME" "" ${ARGN})
 
@@ -42,7 +46,7 @@ macro(hpx_use_flag_if_available flag)
   endif()
 
   if(HPX_FLAG_${uppercase_name})
-    add_definitions("-${flag}")
+    hpx_append_flag("-${flag}")
   else()
     hpx_warn("use_flag_if_available" "${flag} is unavailable") 
   endif()
@@ -52,7 +56,7 @@ macro(hpx_use_flag_if_gcc_version flag version)
   if(${version} GREATER ${GCC_VERSION})
     hpx_warn("use_flag_if_gcc_version" "${flag} is unavailable") 
   else()
-    add_definitions("-${flag}")
+    hpx_append_flag("-${flag}")
   endif()
 endmacro()
 
@@ -60,7 +64,7 @@ macro(hpx_use_flag_if_msvc_version flag version)
   if(${version} GREATER ${MSVC_VERSION})
     hpx_warn("use_flag_if_msvc_version" "${flag} is unavailable") 
   else()
-    add_definitions("-${flag}")
+    hpx_append_flag("-${flag}")
   endif()
 endmacro()
 
