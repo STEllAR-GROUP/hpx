@@ -82,6 +82,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
 #if defined(RNPL_FOUND)
+#if 0
           int i,j,k;
           int factor = 1;
           if ( val.level_ == par->allowedl ) factor = 2;
@@ -154,6 +155,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
             gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
           }
+#endif
 #endif
         }
     }

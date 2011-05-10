@@ -19,6 +19,10 @@
 #include "stencil_data_locking.hpp"
 #include "../amr/unigrid_mesh.hpp"
 
+#if defined(RNPL_FOUND)
+#include <sdf.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
@@ -1140,6 +1144,15 @@ namespace hpx { namespace components { namespace amr
                 return -1;
         }
 
+        // TEST
+        {
+          applier::applier& appl = applier::get_applier();
+          naming::id_type this_prefix = appl.get_runtime_support_gid();
+          int locality = get_prefix_from_id( this_prefix );
+          std::cout << " TEST locality " << locality << " row " << row << " column " <<  column << std::endl;
+        }
+        // END TEST
+
         // get all input and result memory_block_data instances
         std::vector<access_memory_block<stencil_data> > val;
         access_memory_block<stencil_data> resultval = 
@@ -1685,6 +1698,60 @@ namespace hpx { namespace components { namespace amr
                                    level,*par.p);
 
               if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+#if defined(RNPL_FOUND)
+                int i,j,k;
+                int factor = 1;
+                if ( resultval->level_ == par->allowedl ) factor = 2;
+                int n = par->granularity + 2*factor*par->buffer;
+                double datatime(0.0);
+                std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
+                if (fmod(resultval->timestep_,par->output) < 1.e-6 && resultval->level_ >= par->output_level) {
+                  applier::applier& appl = applier::get_applier();
+                  naming::id_type this_prefix = appl.get_runtime_support_gid();
+                  int locality = get_prefix_from_id( this_prefix );
+      
+                  for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
+                    x.push_back(resultval->x_[i]);
+                  }
+                  for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
+                    x.push_back(resultval->y_[i]);
+                  }
+                  for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
+                    x.push_back(resultval->z_[i]);
+                  }
+      
+                  for (k=factor*par->buffer;k<factor*par->buffer+par->granularity;k++) {
+                  for (j=factor*par->buffer;j<factor*par->buffer+par->granularity;j++) {
+                  for (i=factor*par->buffer;i<factor*par->buffer+par->granularity;i++) {
+                    phi.push_back(resultval->value_[i+n*(j+n*k)].phi[0][0]);
+                    d1phi.push_back(resultval->value_[i+n*(j+n*k)].phi[0][1]);
+                    d2phi.push_back(resultval->value_[i+n*(j+n*k)].phi[0][2]);
+                    d3phi.push_back(resultval->value_[i+n*(j+n*k)].phi[0][3]);
+                    d4phi.push_back(resultval->value_[i+n*(j+n*k)].phi[0][4]);
+                    datatime = resultval->timestep_*par->dx0*par->lambda;
+                  } } }
+                  int shape[3];
+                  char cnames[80] = { "x|y|z" };
+                  char phi_name[80];
+                  sprintf(phi_name,"%dphi",locality);
+                  char phi1_name[80];
+                  sprintf(phi1_name,"%dd1phi",locality);
+                  char phi2_name[80];
+                  sprintf(phi2_name,"%dd2phi",locality);
+                  char phi3_name[80];
+                  sprintf(phi3_name,"%dd3phi",locality);
+                  char phi4_name[80];
+                  sprintf(phi4_name,"%dd4phi",locality);
+                  shape[0] = par->granularity;
+                  shape[1] = par->granularity;
+                  shape[2] = par->granularity;
+                  gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+                  gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+                  gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+                  gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+                  gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+                }
+#endif
                   stencil_data data (resultval.get());
                   unlock_scoped_values_lock<lcos::mutex> ul(l);
                   stubs::logging::logentry(log_, data, row, 0, par);
