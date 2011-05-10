@@ -239,13 +239,13 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fno-omit-frame-pointer -g -DDEBUG"
+  set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fno-omit-frame-pointer -fno-inline -fno-optimize-sibling-calls -g -DDEBUG"
     CACHE STRING "Debug flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
     CACHE STRING "MinSizeRel flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
     CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -fno-omit-frame-pointer -g -DDEBUG"
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -fno-omit-frame-pointer -fno-inline -fno-optimize-sibling-calls -fno-web -fno-rename-registers -g -DDEBUG"
     CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
   if(NOT HPX_DISABLE_WARNINGS)
