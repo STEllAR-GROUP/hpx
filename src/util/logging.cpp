@@ -13,6 +13,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
@@ -107,6 +108,27 @@ namespace hpx { namespace util
         //return "<" + boost::lexical_cast<std::string>(level) + ">";
         return     " <unknown>";
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // custom formatter: shepherd 
+    struct shepherd_thread_id 
+      : boost::logging::formatter::class_<
+            shepherd_thread_id, 
+            boost::logging::formatter::implement_op_equal::no_context
+        > 
+    {
+        shepherd_thread_id() 
+        {}
+
+        void operator()(param str) const 
+        {
+            std::stringstream out;
+            out << std::hex << std::setw(sizeof(std::size_t)*2)
+                << std::setfill('0')
+                << threads::threadmanager_base::get_thread_num();
+            str.prepend_string(out.str());
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix 
@@ -343,6 +365,7 @@ namespace hpx { namespace util
             agas_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_agas));
             agas_logger()->writer().write(logformat, logdest);
+            agas_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             agas_logger()->writer().replace_formatter("locality", locality_prefix());
             agas_logger()->writer().replace_formatter("pxthread", thread_id());
             agas_logger()->writer().replace_formatter("pxphase", thread_phase());
@@ -391,6 +414,7 @@ namespace hpx { namespace util
             timing_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_timing));
             timing_logger()->writer().write(logformat, logdest);
+            timing_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             timing_logger()->writer().replace_formatter("locality", locality_prefix());
             timing_logger()->writer().replace_formatter("pxthread", thread_id());
             timing_logger()->writer().replace_formatter("pxphase", thread_phase());
@@ -441,6 +465,7 @@ namespace hpx { namespace util
             hpx_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_hpx));
             hpx_logger()->writer().write(logformat, logdest);
+            hpx_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             hpx_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_logger()->writer().replace_formatter("pxphase", thread_phase());
@@ -455,6 +480,7 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_hpx));
             hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+            hpx_error_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("pxphase", thread_phase());
@@ -475,6 +501,7 @@ namespace hpx { namespace util
             else {
                 hpx_error_logger()->writer().write(logformat, "cerr");
             }
+            hpx_error_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("pxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("pxphase", thread_phase());
@@ -525,6 +552,7 @@ namespace hpx { namespace util
             app_logger()->writer().add_destination("console",
                 console(console_prefix, lvl, components::server::destination_app));
             app_logger()->writer().write(logformat, logdest);
+            app_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             app_logger()->writer().replace_formatter("locality", locality_prefix());
             app_logger()->writer().replace_formatter("pxthread", thread_id());
             app_logger()->writer().replace_formatter("pxphase", thread_phase());
