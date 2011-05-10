@@ -173,7 +173,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (added) {
-                LTM_(info) << "add_new: added " << added << " tasks to queues";
+                LTM_(debug) << "add_new: added " << added << " tasks to queues";
             }
             return added;
         }
@@ -514,8 +514,8 @@ namespace hpx { namespace threads { namespace policies
 
             // this thread acquired the lock, do maintenance and finally
             // call wait() if no work is available
-            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-                       << ", threads left: " << thread_map_.size();
+//            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
+//                        << ", threads left: " << thread_map_.size();
 
             // stop running after all PX threads have been terminated
             bool added_new = add_new_always(added, addfrom, num_thread);
@@ -529,8 +529,8 @@ namespace hpx { namespace threads { namespace policies
                     break;                // terminate scheduling loop
                 }
 
-                LTM_(info) << "tfunc(" << num_thread 
-                           << "): threadmap not empty";
+                LTM_(debug) << "tfunc(" << num_thread 
+                            << "): threadmap not empty";
             }
             else {
                 cleanup_terminated_locked();
@@ -553,7 +553,7 @@ namespace hpx { namespace threads { namespace policies
             // Ask again if queues are empty to avoid race conditions (we 
             // needed to lock anyways...), this way no notify_all() gets lost
             if (0 == work_items_count_) {
-                LTM_(info) << "tfunc(" << num_thread 
+                LTM_(debug) << "tfunc(" << num_thread 
                            << "): queues empty, entering wait";
 
                 // dump list of suspended threads once a second
@@ -565,7 +565,7 @@ namespace hpx { namespace threads { namespace policies
                 namespace bpt = boost::posix_time;
                 bool timed_out = !cond_.timed_wait(lk, bpt::microseconds(10*idle_loop_count));
                     
-                LTM_(info) << "tfunc(" << num_thread << "): exiting wait";
+                LTM_(debug) << "tfunc(" << num_thread << "): exiting wait";
 
                 // make sure all pending new threads are properly queued
                 // but do that only if the lock has been acquired while 

@@ -125,7 +125,7 @@ struct thread_deque
         }
 
         if (added) 
-        { LTM_(info) << "add_new: added " << added << " tasks to queues"; }
+        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
@@ -181,7 +181,7 @@ struct thread_deque
         }
 
         if (added) 
-        { LTM_(info) << "add_new: added " << added << " tasks to queues"; }
+        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
@@ -396,8 +396,8 @@ struct thread_deque
 
             // this thread acquired the lock, do maintenance and finally
             // call wait() if no work is available
-            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-                       << ", threads left: " << thread_map_.size();
+//            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
+//                       << ", threads left: " << thread_map_.size();
 
             std::size_t addednew = add_new(compute_count());
             added += addednew;
@@ -409,8 +409,8 @@ struct thread_deque
                 if (cleanup_terminated_locked())
                     return true; 
 
-                LTM_(info) << "tfunc(" << num_thread 
-                           << "): threadmap not empty";
+                LTM_(debug) << "tfunc(" << num_thread 
+                            << "): threadmap not empty";
             }
 
             else {
@@ -432,8 +432,8 @@ struct thread_deque
 
             // this thread acquired the lock, do maintenance and finally
             // call wait() if no work is available
-            LTM_(info) << "tfunc(" << num_thread << "): queues empty"
-                       << ", threads left: " << thread_map_.size();
+//            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
+//                        << ", threads left: " << thread_map_.size();
 
             std::size_t addednew = steal_new(compute_count(), addfrom);
             added += addednew;
@@ -445,7 +445,7 @@ struct thread_deque
                 if (cleanup_terminated_locked())
                     return true; 
 
-                LTM_(info) << "tfunc(" << num_thread 
+                LTM_(debug) << "tfunc(" << num_thread 
                            << "): threadmap not empty";
             }
 
