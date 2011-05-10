@@ -12,6 +12,7 @@
 #include <algorithm>                       // copy, min
 #include <iosfwd>                          // streamsize
 
+#include <boost/assert.hpp>
 #include <boost/iostreams/categories.hpp>  // source_tag
 #include <boost/iostreams/positioning.hpp> // stream_offset
 
@@ -49,7 +50,7 @@ namespace hpx { namespace util
                 return -1;  // EOF
             }
         }
-        
+
         /// Write up to n characters to the underlying data sink into the 
         /// buffer s, returning the number of characters written
         std::streamsize write(const char_type* s, std::streamsize n)
@@ -89,6 +90,9 @@ namespace hpx { namespace util
             } 
             else if (way == std::ios_base::end) {
                 next = container_.size() + off - 1;
+            }
+            else {
+                BOOST_ASSERT(false);
             }
 
             // Check for errors

@@ -142,6 +142,8 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(p != NULL);
 
             first_free_ += count;
+
+            BOOST_ASSERT(free_size_ >= count);
             free_size_ -= count;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
