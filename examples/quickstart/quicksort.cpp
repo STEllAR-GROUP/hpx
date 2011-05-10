@@ -157,7 +157,7 @@ int hpx_main(variables_map& vm)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    finalize(5.0);
+    finalize(1.0);
 
     return 0;
 }
