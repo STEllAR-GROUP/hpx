@@ -354,10 +354,10 @@ private:
             .add( BOOST_LOG_STR("thread_id"), formatter::thread_id_t<formatter::do_convert_format::append>() );
 
         m_destination
-            .add( BOOST_LOG_STR("file"), destination::file("out.txt") )
-            .add( BOOST_LOG_STR("file2"), destination::file("out.txt") )
-            .add( BOOST_LOG_STR("rol_file"), destination::rolling_file("out.txt") )
-            .add( BOOST_LOG_STR("rol_file2"), destination::rolling_file("out.txt") )
+            .add( BOOST_LOG_STR("file"), destination::file("") )
+//            .add( BOOST_LOG_STR("file2"), destination::file("out.txt") )
+//            .add( BOOST_LOG_STR("rol_file"), destination::rolling_file("out.txt") )
+//            .add( BOOST_LOG_STR("rol_file2"), destination::rolling_file("out.txt") )
             .add( BOOST_LOG_STR("cout"), destination::cout() )
             .add( BOOST_LOG_STR("cerr"), destination::cerr() )
             .add( BOOST_LOG_STR("debug"), destination::dbg_window() );
