@@ -1,20 +1,34 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
+# Copyright (c) 2011      Vinay C Amatya
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # define build targets for this directory
-set(example_programs
-    basic_example
-    distributed_test
-    factorial
-    factorial_get
-    fibonacci1
-    fibonacci2
-    fibonacci4
-    fibonacci4_phased
-    quicksort)
+
+if(NOT MSVC)
+  set(example_programs
+      basic_example
+      distributed_test
+      factorial
+      factorial_get
+      fibonacci1
+      fibonacci2
+      fibonacci4
+      fibonacci4_phased
+      quicksort)
+else()
+  set(example_programs
+      basic_example
+      distributed_test
+      factorial
+      factorial_get
+      fibonacci1
+      fibonacci2
+      fibonacci4
+      fibonacci4_phased)
+endif()
 
 foreach(example_program ${example_programs})
   set(sources
