@@ -30,6 +30,19 @@ struct Globals
   double h;
   int numprocs;
   std::vector<double> refine_level;
+  std::vector<int> gr_sibling;
+  std::vector<double> gr_t;
+  std::vector<double> gr_minx;
+  std::vector<double> gr_miny;
+  std::vector<double> gr_minz;
+  std::vector<double> gr_maxx;
+  std::vector<double> gr_maxy;
+  std::vector<double> gr_maxz;
+  std::vector<int> gr_proc;
+  std::vector<double> gr_h;
+  std::vector<int> gr_alive;
+  std::vector<int> levelp;
+
 };
 
 extern "C" {void FNAME(level_cluster)(double *flag,
@@ -67,6 +80,15 @@ extern "C" {void FNAME(level_clusterdd)(double *tmp_mini,double *tmp_maxi,
                          int *bound_width); }
 
 int floatcmp(double const& x1, double const& x2);
+int level_refine(int level,Globals & par);
+int level_find_bounds(int level, double &minx, double &maxx,
+                                 double &miny, double &maxy,
+                                 double &minz, double &maxz, Globals &par);
+int grid_return_existence(int gridnum,struct Globals &par);
+int level_return_start(int level,Globals &par);
+int grid_find_bounds(int gi,double &minx,double &maxx,
+                            double &miny,double &maxy,
+                            double &minz,double &maxz,Globals &par);
 
 const int maxlevels = 25;
 
@@ -224,6 +246,62 @@ int main(int argc,char* argv[]) {
   }
   par.h = h;
 
+  int rc = level_refine(-1,par);
+
+  return 0;
+}
+
+int level_refine(int level,Globals & par) 
+{
+
+  int rc;
+  int numprocs = par.numprocs;
+  int ghostwidth = par.ghostwidth;
+  int bound_width = par.bound_width;
+  int nx0 = par.nx0;
+  int ny0 = par.ny0;
+  int nz0 = par.nz0;
+  double ethreshold = par.ethreshold;
+  double minx0 = par.minx0;
+  double miny0 = par.miny0;
+  double minz0 = par.minz0;
+  double maxx0 = par.maxx0;
+  double maxy0 = par.maxy0;
+  double maxz0 = par.maxz0;
+  double h = par.h;
+
+  if ( level == par.allowedl ) { 
+    return 0;
+  }
+
+  double minx,miny,minz,maxx,maxy,maxz;
+  double hl,time;
+  int gi;
+  if ( level == -1 ) {
+    // we're creating the coarse grid
+    minx = minx0; 
+    miny = miny0; 
+    minz = minz0; 
+    maxx = maxx0; 
+    maxy = maxy0; 
+    maxz = maxz0; 
+    gi = -1;
+    hl = h;
+    time = 0.0;
+  } else {
+    // find the bounds of the level
+    rc = level_find_bounds(level,minx,maxx,miny,maxy,minz,maxz,par);
+        
+    // find the grid index of the beginning of the level
+    gi = level_return_start(level,par);
+
+    // grid spacing for the level
+    hl = par.gr_h[gi];
+
+    // find the time on the level
+    time = par.gr_t[gi];
+  }
+
   std::vector<double> error,flag; 
   error.resize(nx0*ny0*nz0);
   flag.resize(nx0*ny0*nz0);
@@ -252,7 +330,6 @@ int main(int argc,char* argv[]) {
   } } }
 
   double scalar = par.refine_level[0];
-  int level = 0;
   FNAME(load_scal_mult3d)(&*error.begin(),&*error.begin(),&scalar,&nx0,&ny0,&nz0);
   FNAME(level_makeflag)(&*flag.begin(),&*error.begin(),&level,
                                                  &minx0,&miny0,&minz0,&h,
@@ -283,7 +360,6 @@ int main(int argc,char* argv[]) {
   double minefficiency = .9;
   int mindim = 6;
   int refine_factor = 2;
-  double time = 0.0;
   std::vector<double> sigi,sigj,sigk;
   std::vector<double> asigi,asigj,asigk;
   std::vector<double> lapi,lapj,lapk;
@@ -364,4 +440,76 @@ int floatcmp(double const& x1, double const& x2) {
     return false;
   }
 }
+
+int level_find_bounds(int level, double &minx, double &maxx,
+                                 double &miny, double &maxy,
+                                 double &minz, double &maxz, Globals &par)
+{
+  int rc;
+  minx = 0.0;
+  miny = 0.0;
+  minz = 0.0;
+  maxx = 0.0;
+  maxy = 0.0;
+  maxz = 0.0;
+
+  double tminx,tmaxx,tminy,tmaxy,tminz,tmaxz;
+
+  int gi = level_return_start(level,par);
+
+  if ( !grid_return_existence(gi,par) ) {
+    std::cerr << " level_find_bounds PROBLEM: level doesn't exist " << level << std::endl;
+    exit(0);
+  }
+
+  rc = grid_find_bounds(gi,minx,maxx,miny,maxy,minz,maxz,par);
+
+  gi = par.gr_sibling[gi];
+  while ( grid_return_existence(gi,par) ) {
+    rc = grid_find_bounds(gi,tminx,tmaxx,tminy,tmaxy,tminz,tmaxz,par);
+    if ( tminx < minx ) minx = tminx;
+    if ( tminy < miny ) miny = tminy;
+    if ( tminz < minz ) minz = tminz;
+    if ( tmaxx > maxx ) maxx = tmaxx;
+    if ( tmaxy > maxy ) maxy = tmaxy;
+    if ( tmaxz > maxz ) maxz = tmaxz;
+    gi = par.gr_sibling[gi];
+  }
+
+  return 0;
+}
+
+int grid_return_existence(int gridnum,Globals &par)
+{
+  if ( (gridnum > 0 ) && (gridnum < par.gr_minx.size()) ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int grid_find_bounds(int gi,double &minx,double &maxx,
+                            double &miny,double &maxy,
+                            double &minz,double &maxz,Globals &par)
+{
+  minx = par.gr_minx[gi];
+  miny = par.gr_miny[gi];
+  minz = par.gr_minz[gi];
+
+  maxx = par.gr_maxx[gi];
+  maxy = par.gr_maxy[gi];
+  maxz = par.gr_maxz[gi];
+
+  return 0;
+}
+
+int level_return_start(int level,Globals &par)
+{
+  if ( level >= maxlevels  || level < 0 ) {
+    return -1;
+  } else {
+    return par.levelp[level];
+  }
+}
+
 
