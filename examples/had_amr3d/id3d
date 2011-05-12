@@ -1,7 +1,7 @@
 [had_amr]
 nx0         = 100
-nt0         = 10
-granularity = 10
+nt0         = 20
+granularity = 50
 ghostwidth  = 5
 buffer      = 3
 
