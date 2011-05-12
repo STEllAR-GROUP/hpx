@@ -21,6 +21,7 @@ namespace po=boost::program_options;
 unsigned int SIZE = 2048;
 unsigned int ABSIZE = 1024;
 unsigned int BSIZE = 250;
+unsigned int MSIZE = 250;
 double ERROR = 0;
 
 /*This small program is used to perform LU decomposition on a randomly
@@ -53,7 +54,7 @@ int hpx_main(){
     HPLMatreX dat;
 
     dat.create(prefix);
-    dat.construct(SIZE,SIZE+1,ABSIZE,BSIZE);
+    dat.construct(SIZE,MSIZE,ABSIZE,BSIZE);
 
     ERROR = dat.LUsolve();
     dat.destruct();
@@ -96,6 +97,7 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
         "thread during gaussian elimination (default is 250)")
+        ("mini-block,m", po::value<int>(), "affects cache behavior for GE")
         ("allocblock,A", po::value<int>(),
         "allocblock effects the amount of work each thread performs "
         "during memory allocation, initialization, and during the "
@@ -170,7 +172,7 @@ int main(int argc, char* argv[]){
         boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
         int num_threads = 1;
         int num_localities = 1;
-        std::string queueing = "global";
+        std::string queueing = "local";
         hpx::runtime_mode mode = hpx::runtime_mode_console;
 
         // extract IP address/port arguments
@@ -227,6 +229,7 @@ int main(int argc, char* argv[]){
                     }
                 }
 
+        if(vm.count("mini-block")){MSIZE = vm["mini-block"].as<int>();}
         //now that the parameters have been set, we get a start time for the timing
         //of the application
         ptime start(microsec_clock::local_time());

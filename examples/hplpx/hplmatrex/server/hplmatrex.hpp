@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace server
 
     //constructors and destructor
     HPLMatreX(){}
-    int construct(naming::id_type gid, int h, int w, int ab, int bs);
+    int construct(naming::id_type gid, int h, int l, int ab, int bs);
     ~HPLMatreX(){destruct();}
     void destruct();
 
@@ -80,23 +80,25 @@ namespace hpx { namespace components { namespace server
     void print();
     void print2();
 
-    int rows;            //number of rows in the matrix
+    int rows;             //number of rows in the matrix
     int brows;            //number of rows of blocks in the matrix
-    int columns;            //number of columns in the matrix
-    int bcolumns;            //number of columns of blocks in the matrix
-    int allocblock;            //reflects amount of allocation done per thread
-    int blocksize;            //reflects amount of computation per thread
-    naming::id_type _gid;        //the instances gid
-    LUblock*** datablock;        //stores the data being operated on
-    double** factordata;        //stores factors for computations
-    double** truedata;        //the original unaltered data
-        double* solution;        //for storing the solution
-    int* pivotarr;            //array for storing pivot elements
-                    //(maps original rows to pivoted/reordered rows)
-    lcos::mutex mtex;        //mutex
+    int columns;          //number of columns in the matrix
+    int bcolumns;         //number of columns of blocks in the matrix
+    int allocblock;       //reflects amount of allocation done per thread
+    int blocksize;        //reflects amount of computation per thread
+    int lit_block;        //size of inner loop blocks
+    naming::id_type _gid; //the instances gid
+    LUblock*** datablock; //stores the data being operated on
+    double** factordata;  //stores factors for computations
+    double** truedata;    //the original unaltered data
+    double** transdata;   //transpose of the original data(speeds up pivoting)
+    double* solution;     //for storing the solution
+    int* pivotarr;        //array for storing pivot elements
+                          //(maps original rows to pivoted/reordered rows)
+    lcos::mutex mtex;     //mutex
 
-    ptime starttime;    //used for measurements
-    ptime rectime;    //used for measurements
+    ptime starttime;      //used for measurements
+    ptime rectime;        //used for measurements
     public:
     //here we define the actions that will be used
     //the construct function
@@ -164,7 +166,7 @@ namespace hpx { namespace components { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
-    int HPLMatreX::construct(naming::id_type gid, int h, int w,
+    int HPLMatreX::construct(naming::id_type gid, int h, int l,
         int ab, int bs){
     starttime = ptime(microsec_clock::local_time());
 // / / /initialize class variables/ / / / / / / / / / / /
@@ -176,9 +178,13 @@ namespace hpx { namespace components { namespace server
         blocksize = h;
     }
     else{ blocksize = bs;}
+    if(l > blocksize){
+        lit_block = blocksize;
+    }
+    else{ lit_block = l;}
     rows = h;
     brows = (int)std::floor((float)h/blocksize);
-    columns = w;
+    columns = h+1;
     _gid = gid;
 
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
@@ -189,14 +195,6 @@ namespace hpx { namespace components { namespace server
     gen.seed(time(NULL));
 
     /*allocate memory for the various arrays that will be used*/
-    central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
-    left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
-    top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
-    datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
-    factordata = (double**) std::malloc(h*sizeof(double*));
-    truedata = (double**) std::malloc(h*sizeof(double*));
-    pivotarr = (int*) std::malloc(h*sizeof(int));
-
     allocate();    //allocate memory for the elements of the array
 
     //By making offset a power of two, the assign functions
@@ -212,7 +210,7 @@ namespace hpx { namespace components { namespace server
     //here we initialize the the matrix
     lcos::eager_future<server::HPLMatreX::assign_action>
         assign_future(gid,(int)0,offset,false,gen());
-
+    
     //initialize the pivot array
     for(i=0;i<rows;i++){pivotarr[i]=i;}
 
@@ -233,10 +231,19 @@ namespace hpx { namespace components { namespace server
 
     //allocate() allocates memory space for the matrix
     void HPLMatreX::allocate(){
+    central_futures = (gmain_future**) std::malloc(brows*sizeof(gmain_future*));
+    left_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
+    top_futures = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
+    datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
+    factordata = (double**) std::malloc(rows*sizeof(double*));
+    transdata = (double**) std::malloc(columns*sizeof(double*));
+    truedata = (double**) std::malloc(rows*sizeof(double*));
+    pivotarr = (int*) std::malloc(rows*sizeof(int));
     for(int i = 0;i < rows;i++){
         truedata[i] = (double*) std::malloc(columns*sizeof(double));
-        factordata[i] = (double*) std::malloc(i*sizeof(double));
+        transdata[i] = (double*) std::malloc(rows*sizeof(double));
     }
+    transdata[rows] = (double*) std::malloc(rows*sizeof(double));
     for(int i = 0;i < brows;i++){
         datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
         top_futures[i] = (gmain_future**)std::malloc((brows-i-1)
@@ -285,14 +292,14 @@ namespace hpx { namespace components { namespace server
     int temp = std::min((int)offset, (int)(rows - row));
     for(int i=0;i<temp;i++){
         for(int j=0;j<columns;j++){
-        truedata[row+i][j] = (double) (gen() % 1000);
+        transdata[j][row+i] = truedata[row+i][j] = (double) (gen() % 1000);
         }
     }
 
     //once all spun off futures are complete we are done
-        BOOST_FOREACH(assign_future af, futures){
-                af.get();
-        }
+    BOOST_FOREACH(assign_future af, futures){
+        af.get();
+    }
     return 1;
     }
 
@@ -340,48 +347,51 @@ namespace hpx { namespace components { namespace server
     }
     void HPLMatreX::print2(){
     for(int i = 0;i < rows; i++){
-        int temp=0;
-        while(temp + blocksize <= i){temp+=blocksize;}
-        for(int j = temp;j < columns; j++){
+        for(int j = 0;j < columns; j++){
         std::cout<<truedata[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
+    std::cout<<std::endl;
+    for(int i = 0;i < columns; i++){
+        for(int j = 0;j < rows; j++){
+        std::cout<<transdata[i][j]<<" ";
+        }
         std::cout<<std::endl;
+    }
+    std::cout<<std::endl;
     }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatreX::LUsolve(){
     //first perform partial pivoting
-ptime temp = ptime(microsec_clock::local_time());
-std::cout<<"alloc time "<<temp-starttime<<std::endl;
+    ptime temp = ptime(microsec_clock::local_time());
+    std::cout<<"alloc time "<<temp-starttime<<std::endl;
     pivot();
 
-ptime temp2 = ptime(microsec_clock::local_time());
-std::cout<<"pivoting over "<<temp2-temp<<std::endl;
+    ptime temp2 = ptime(microsec_clock::local_time());
+    std::cout<<"pivoting over "<<temp2-temp<<std::endl;
 
     //to initiate the Gaussian elimination, create a future to obtain the final
     //set of computations we will need
     gmain_future main_future(_gid,brows-1,brows-1,brows-1,1);
     main_future.get();
 
-ptime temp3 = ptime(microsec_clock::local_time());
-std::cout<<"finished gaussian "<<temp3 - temp2<<std::endl;
+    ptime temp3 = ptime(microsec_clock::local_time());
+    std::cout<<"finished gaussian "<<temp3 - temp2<<std::endl;
     //allocate memory space to store the solution
     solution = (double*) std::malloc(rows*sizeof(double));
 
-    //create a future to perform back substitution
-    bsubst_future bsub(_gid);
+    //perform back substitution
+    LUbacksubst();
 
     int h = (int)std::ceil(((float)rows)*.5);
     int offset = 1;
     while(offset < h){offset *= 2;}
 
-    //confirm back substitution is completed before continuing
-    bsub.get();
-ptime temp4 = ptime(microsec_clock::local_time());
-std::cout<<"bsub done "<<temp4-temp3<<std::endl;
+    ptime temp4 = ptime(microsec_clock::local_time());
+    std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //create a future to check the accuracy of the generated solution
     check_future chk(_gid,0,offset,false);
     return chk.get();
@@ -393,27 +403,36 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
     void HPLMatreX::pivot(){
-    int max, max_row;
+    double max;
+    int max_row;
     int temp_piv;
     double temp;
-    int h = (int)std::ceil(((float)rows)*.5);
     int i,j;
 
     //This first section of the pivot() function finds all of the pivot
     //values to compute the final pivot array
     for(i=0;i<rows-1;i++){
         max_row = i;
-        max = (int)fabs(truedata[pivotarr[i]][i]);
+        max = fabs(transdata[i][pivotarr[i]]);
         temp_piv = pivotarr[i];
         for(j=i+1;j<rows;j++){
-        temp = (int)fabs(truedata[pivotarr[j]][i]);
+        temp = fabs(transdata[i][pivotarr[j]]);
         if(temp > max){
-            max = (int)temp;
+            max = temp;
             max_row = j;
-        }    }
+        }   }
         pivotarr[i] = pivotarr[max_row];
         pivotarr[max_row] = temp_piv;
     }
+
+    //transdata is no longer needed so free the memory and allocate
+    //space for factordata
+    for(i=0;i<rows;i++){
+        free(transdata[i]);
+        factordata[i] = (double*) std::malloc(i*sizeof(double));
+    }
+    free(transdata[rows]);
+    free(transdata);
 
     //call the swap function for each datablock in the matrix
     for(i=0;i<brows;i++){
@@ -438,6 +457,7 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
         datablock[brow][bcol]->data[i][j] =
             truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j];
     }   }
+    return 1;
     }
 
     //LUgaussmain is a wrapper function which is used so that only one type of
@@ -564,8 +584,8 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //elimination computations. These blocks will still require further 
     //computations to be performed in future iterations.
     void HPLMatreX::LUgausstrail(int brow, int bcol, int iter){
-    int i,j,k;
-    int offset = brow*blocksize - 1;    //factordata row offset
+    int i,j,k,ii,jj,kk;
+    int offset = brow*blocksize;    //factordata row offset
     int offset_col = iter*blocksize;    //factordata column offset
     double factor;
 
@@ -573,15 +593,23 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //block (f_factors are used indirectly through factordata)
     //middle loop: iterates over the rows of the current block
     //inner loop: iterates across the columns of the current block
-    for(j=0;j<datablock[brow][bcol]->getrows();j++){
-        offset++;
-        for(i=0;i<datablock[iter][iter]->rows;i++){
-            factor = factordata[offset][i+offset_col];
+    for(jj = 0;jj<datablock[brow][bcol]->rows;jj+=lit_block){
+    for(ii = 0;ii<datablock[iter][iter]->rows;ii+=lit_block){
+//    for(kk = 0;kk<datablock[brow][bcol]->columns;kk+=.5*blocksize){
+//    for(j=0;j<datablock[brow][bcol]->rows;j++){
+    for(j=jj;j<std::min(jj+lit_block,datablock[brow][bcol]->rows);j++){
+//        for(i=0;i<datablock[iter][iter]->rows;i++){
+        for(i=ii;i<std::min(ii+lit_block,datablock[iter][iter]->rows);i++){
+            factor = factordata[j+offset][i+offset_col];
             for(k=0;k<datablock[brow][bcol]->columns;k++){
+//            for(k=kk;k<std::min(kk+(int)(.5*blocksize),datablock[brow][bcol]->columns);k++){
             datablock[brow][bcol]->data[j][k] -= 
                 factor*datablock[iter][bcol]->data[i][k];
     }   }   }
     }
+    }
+    }
+//    }
 
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
@@ -591,7 +619,6 @@ std::cout<<"bsub done "<<temp4-temp3<<std::endl;
     //large data structure; using it allows addition
     //where multiplication would need to be used without it
     int i,j,k,l,row,col;
-    int temp = datablock[0][bcolumns-1]->getcolumns()-1;
 
     for(i=0;i<brows;i++){
         for(j=0;j<datablock[i][0]->getrows();j++){

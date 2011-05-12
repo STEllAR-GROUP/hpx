@@ -39,12 +39,12 @@ LUblock::LUblock(unsigned int h, unsigned int w){
     columns = w;
 
     data = (double**) std::malloc(h*sizeof(double*));
-    for(int i=0;i<h;i++){data[i]=(double*) std::malloc(w*sizeof(double));}
+    for(int i=0;i<rows;i++){data[i]=(double*) std::malloc(w*sizeof(double));}
 }
 
 //the destructor frees the memory
 LUblock::~LUblock(){
-    unsigned int i;
+    int i;
     for(i=0;i<rows;i++){
         free(data[i]);
     }
