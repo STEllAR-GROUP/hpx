@@ -891,7 +891,7 @@ namespace hpx { namespace naming
 
     bool resolver_client::execute_remote(
         std::vector<server::request> const &req, 
-        std::vector<server::reply>& rep, error_code& ec) const
+        std::vector<server::reply>& reps, error_code& ec) const
     {
         typedef util::container_device<std::vector<char> > io_device_type;
 
@@ -908,7 +908,8 @@ namespace hpx { namespace naming
 #endif
                 std::size_t count = req.size();
                 archive << count;
-                archive << req;
+                for (std::size_t i = 0; i < count; ++i)
+                    archive << req[i];
                 io.strict_sync();
             }
 
@@ -991,7 +992,12 @@ namespace hpx { namespace naming
                 std::size_t count;
                 archive >> count;
                 BOOST_ASSERT(count == req.size());
-                archive >> rep;
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    server::reply rep;
+                    archive >> rep;
+                    reps.push_back(rep);
+                }
             }
         }
         catch (boost::system::system_error const& e) {
