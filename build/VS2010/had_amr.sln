@@ -70,8 +70,8 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "had_amr_3d_clientd", "..\..
 		Executable = C:\CVS\hpx\hpx\bin64\Debug\bin\had_amr_3d_clientd.exe
 		RemoteMachine = FIFTYTWO
 		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib\hpx
-		Arguments = -w  -l 2 -x localhost:5321
-		Environment = hpx_loglevel=4	
+		Arguments = -w  -l 2 -x localhost:5321 -p id3d
+		Environment = hpx_loglevel1=4	
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		LaunchSQLEngine = No
 		AttachLaunchAction = No

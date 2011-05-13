@@ -100,6 +100,7 @@
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
