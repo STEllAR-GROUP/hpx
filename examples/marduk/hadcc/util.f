@@ -610,7 +610,7 @@ cc                     (5) Add a buffer region of flagged points              cc
 cc                     (6) Disallow ghostregion of level                      cc
 cc                                                                            cc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine level_makeflag( flag, error, level,
+      subroutine level_makeflag_simple( flag, error, level,
      *                           minx,miny,minz, h,nx,ny,nz,
      *                           ethreshold)
       implicit none
@@ -721,6 +721,424 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       return
       end        ! END: level_makeflag
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cc                                                                            cc
+cc  level_makeflag:                                                           cc
+cc                 Make flag array for level:                                 cc
+cc                     (1) Initialize flag array to DISALLOW                  cc
+cc                     (2) If error exceeds threshold, flag                   cc
+cc                     (3) Everywhere a refined grid exists, flag             cc
+cc                     (4) If any points are flagged, flag where masked       cc
+cc                     (5) Add a buffer region of flagged points              cc
+cc                     (6) Disallow ghostregion of level                      cc
+cc                                                                            cc
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine level_makeflag( flag, error, level,
+     *                           minx,miny,minz, h,nx,ny,nz,
+     *                           ethreshold,num_masks,max_num_masks,
+     *                           mask_coords,ghostwidth,
+     *                           levelp,allowedl,numboxes,
+     *                           gr_minx,gr_maxx,
+     *                           gr_miny,gr_maxy,
+     *                           gr_minz,gr_maxz,
+     *                           gr_sibling,bh_true,
+     *                           assume_symmetry,buffer)
+      implicit none
+      integer       nx,ny,nz, level,ghostwidth
+      integer       num_masks,max_num_masks
+      integer       allowedl
+      integer       levelp(allowedl)
+      integer       numboxes,buffer
+      integer       assume_symmetry
+      logical       bh_true(max_num_masks) 
+      integer       gr_sibling(numboxes)
+      real(kind=8)  gr_minx(numboxes),gr_maxx(numboxes)
+      real(kind=8)  gr_miny(numboxes),gr_maxy(numboxes)
+      real(kind=8)  gr_minz(numboxes),gr_maxz(numboxes)
+      real(kind=8)  mask_coords(6,max_num_masks)
+      real(kind=8)  minx,miny,minz, h, ethreshold
+      real(kind=8)  flag(nx,ny,nz), error(nx,ny,nz)
+      include       'largesmall.inc'
+      integer       gi, numpoints
+      integer       i, j, k, l
+      integer       mini,maxi, minj,maxj, mink,maxk
+      integer       bi,ei, bj,ej, bk,ek
+      integer       resolution, izero,jzero, kzero
+      logical       inmaskedregion, unresolved, cancellevel
+      logical       childlevelexists
+      real(kind=8)  r1_2, x,y,z
+      logical       double_equal
+      external      double_equal
+
+      !
+      ! Minimum number of grid points in any direction for a masked region:
+      !    (in units of number of grid points)
+      !    (set to 0 to turn off this "feature")
+      !
+      integer       MINRESOLUTION
+      parameter (   MINRESOLUTION = 13 )
+      !parameter (   MINRESOLUTION = 8 )
+      !
+      ! Width of buffer region around a masked region to refine:
+      !    (in units of number of grid points)
+      !
+      integer       MASKBUFFER
+      parameter (   MASKBUFFER = 5 )
+
+      real(kind=8)   FLAG_REFINE
+      parameter    ( FLAG_REFINE   =  1.d0 )
+      !     ...points NOT to be refined
+      real(kind=8)   FLAG_NOREFINE
+      parameter    ( FLAG_NOREFINE =  0.d0 )
+      !     ...points which do not exist on the level
+      real(kind=8)   FLAG_DISALLOW
+      parameter    ( FLAG_DISALLOW = -1.d0 )
+
+      logical      ltrace
+      parameter (  ltrace  = .false.)
+      logical      ltrace2
+      parameter (  ltrace2 = .false.)
+
+
+      if (ltrace) write(*,*) 'level_makeflag: Initializing flag: ',level
+
+      call load_scal3d(flag, FLAG_DISALLOW, nx,ny,nz )
+
+      !
+      ! Keep track of bounding box for FLAG_REFINE points:
+      !
+      numpoints = 0
+
+      !
+      ! If certain bad conditions, then we will not
+      ! create this level
+      !
+      cancellevel      = .false.
+      childlevelexists = .false.
+
+      mini = nx
+      minj = ny
+      mink = nz
+      maxi = 1
+      maxj = 1
+      maxk = 1
+
+      if (ltrace) write(*,*) 'level_makeflag: Flagging where high error'
+      do k = 1, nz
+         do j = 1, ny
+            do i = 1, nx
+               if (error(i,j,k) .ge. ethreshold-SMALLNUMBER) then
+                  flag(i,j,k) = FLAG_REFINE
+                  numpoints   = numpoints + 1
+                  if(.false.)write(*,*)'level_makeflag: Flagged: ',
+     *                                                i,j,k,error(i,j,k)
+                  if (i.lt.mini) mini = i
+                  if (j.lt.minj) minj = j
+                  if (k.lt.mink) mink = k
+                  if (i.gt.maxi) maxi = i
+                  if (j.gt.maxj) maxj = j
+                  if (k.gt.maxk) maxk = k
+               else if (error(i,j,k) .ge. 0-SMALLNUMBER) then
+                  flag(i,j,k) = FLAG_NOREFINE
+               else if (ltrace2) then
+                  if (NINT(error(i,j,k)).ne.-1) then
+                     write(*,*) 'level_makeflag: Disallowed pt: ',
+     *                                         error(i,j,k),i,j,k
+                  end if
+               end if
+            end do
+         end do
+      end do
+      bi = mini
+      ei = maxi
+      bj = minj
+      ej = maxj
+      bk = mink
+      ek = maxk
+
+      if (ltrace) write(*,*) 'level_makeflag: Flagging where refined'
+      gi = levelp(level+2)
+      if (ltrace2)write(*,*) 'level_makeflag: Starting w/ gi: ',gi
+      !
+ 10   if ( gi .ne. -1) then
+         childlevelexists = .true.
+         if (ltrace) write(*,*) 'level_makeflag:   ...grid ',gi
+         !
+         mini = 1 + NINT( (gr_minx(gi)-minx)/h )
+         minj = 1 + NINT( (gr_miny(gi)-miny)/h )
+         mink = 1 + NINT( (gr_minz(gi)-minz)/h )
+         ! Because resolutions are different, need to make sure
+         ! that the full grid is "covered":
+         if (minx+(mini-1)*h .gt. gr_minx(gi).and.mini.gt.1) mini=mini-1
+         if (miny+(minj-1)*h .gt. gr_miny(gi).and.minj.gt.1) minj=minj-1
+         if (minz+(mink-1)*h .gt. gr_minz(gi).and.mink.gt.1) mink=mink-1
+         !
+         maxi = 1 + NINT( (gr_maxx(gi)-minx)/h )
+         maxj = 1 + NINT( (gr_maxy(gi)-miny)/h )
+         maxk = 1 + NINT( (gr_maxz(gi)-minz)/h )
+         if (minx+(maxi-1)*h .lt. gr_maxx(gi).and.maxi.lt.nx)maxi=maxi+1
+         if (miny+(maxj-1)*h .lt. gr_maxy(gi).and.maxj.lt.ny)maxj=maxj+1
+         if (minz+(maxk-1)*h .lt. gr_maxz(gi).and.maxk.lt.nz)maxk=maxk+1
+         !
+         if (ltrace) then
+             write(*,*) 'level_makeflag:   ...looping'
+             write(*,*) 'level_makeflag:   mini/j/k:',mini,minj,mink
+             write(*,*) 'level_makeflag:   maxi/j/k:',maxi,maxj,maxk
+             write(*,*) 'level_makeflag: h: ',h
+             write(*,*) 'level_makeflag:    minx/y/z:',minx,
+     *                  miny,minz
+             write(*,*) 'level_makeflag: gr_minx/y/z:',gr_minx(gi),
+     *                  gr_miny(gi),gr_minz(gi)
+             write(*,*) 'level_makeflag: gr_maxx/y/z:',gr_maxx(gi),
+     *                  gr_maxy(gi),gr_maxz(gi)
+             write(*,*) 'level_makeflag:  lower x:',minx+(mini-1)*h
+             write(*,*) 'level_makeflag:  upper x:',minx+(maxi-1)*h
+          end if
+         do k = mink, maxk
+            do j = minj, maxj
+               do i = mini, maxi
+                  if( NINT(flag(i,j,k)).ne.FLAG_REFINE)
+     *                       numpoints   = numpoints + 1
+                  flag(i,j,k) = FLAG_REFINE
+                  if (i.lt.bi) bi = i
+                  if (i.gt.ei) ei = i
+                  if (j.lt.bj) bj = j
+                  if (j.gt.ej) ej = j
+                  if (k.lt.bk) bk = k
+                  if (k.gt.ek) ek = k
+               end do
+            end do
+         end do
+         !
+         gi = gr_sibling(gi)
+         goto 10
+      end if
+
+      !
+      ! Force refinement in masked region(s) if:
+      !     ---any points have already been flagged
+      !     ---if resolution of masked region too poor
+      !
+      if (ltrace)write(*,*) 'level_makeflag: Are there masked regions?'
+      if (ltrace)write(*,*) 'level_makeflag: num_masks = ',num_masks
+      if (num_masks.gt.0) then
+         if (ltrace)write(*,*) 'level_makeflag: Masked region(s) exist'
+         ! Only flag the masked region if the level has flagged points:
+         !
+         unresolved = .false.
+         do l = 1, max_num_masks
+            if (bh_true(l)) then
+               resolution = min(
+     *                     NINT(mask_coords(2,l)-mask_coords(1,l))/h,
+     *                     NINT(mask_coords(4,l)-mask_coords(3,l))/h,
+     *                     NINT(mask_coords(6,l)-mask_coords(5,l))/h
+     *                          )
+               unresolved = unresolved .or. resolution.lt.MINRESOLUTION
+               if (numpoints.eq.0.and.unresolved) then
+               !if (ltrace.or. (numpoints.eq.0.and.unresolved)) then
+               write(*,*) 'level_makeflag: Forcing new level to resolve'
+               write(*,*) 'level_makeflag: Hole #:       ',l
+               !write(*,*) 'level_makeflag: numpoints:    ',numpoints
+               write(*,*) 'level_makeflag: resolution:   ',resolution
+               !write(*,*) 'level_makeflag: unresolved:   ',unresolved
+               write(*,*) 'level_makeflag: MINRESOLUTION:',MINRESOLUTION
+               end if
+            end if
+         end do
+         !
+         if ( numpoints .gt. 0 .or. unresolved) then
+            if(ltrace)write(*,*)'level_makeFlagged pnts exist',numpoints
+            do k = 1, nz
+               z = minz + h * (k-1)
+            do j = 1, ny
+               y = miny + h * (j-1)
+            do i = 1, nx
+               x = minx + h * (i-1)
+               inmaskedregion = .false.
+               do l = 1, max_num_masks
+                  if (bh_true(l)) then
+                     !
+                     ! Add buffer region around mask:
+                     !
+                     inmaskedregion = inmaskedregion .or.
+     *          (      ( x .ge. (mask_coords(1,l)-MASKBUFFER*h) ) .and.
+     *                 ( x .le. (mask_coords(2,l)+MASKBUFFER*h) ) .and.
+     *                 ( y .ge. (mask_coords(3,l)-MASKBUFFER*h) ) .and.
+     *                 ( y .le. (mask_coords(4,l)+MASKBUFFER*h) ) .and.
+     *                 ( z .ge. (mask_coords(5,l)-MASKBUFFER*h) ) .and.
+     *                 ( z .le. (mask_coords(6,l)+MASKBUFFER*h) ) )
+                     !
+                  end if
+               end do
+               if (inmaskedregion) then
+                  ! This point should       be refined:
+                  if( NINT(flag(i,j,k)).ne.FLAG_REFINE)
+     *                       numpoints   = numpoints + 1
+                  flag(i,j,k) = 1.d0 * FLAG_REFINE
+                  !
+                  ! If the masked region would occur too close
+                  ! to the boundary of a new level then 
+                  ! let us not even create the level:
+                  !
+                  if ( i.le.ghostwidth .or. i.gt.nx-ghostwidth .or.
+     *                 j.le.ghostwidth .or. j.gt.ny-ghostwidth .or.
+     *                 k.le.ghostwidth .or. k.gt.nz-ghostwidth ) then
+                     cancellevel = .true.
+                  end if
+               end if
+            end do
+            end do
+            end do
+            if (ltrace)
+     *      write(*,*)'level_makeflag: Total num flagged pts ',numpoints
+         end if
+      else
+         if (ltrace)write(*,*) 'level_makeflag: No masked regions'
+      end if
+
+      if (ltrace) write(*,*) 'level_makeflag: Buffering flag array'
+      if (ltrace2)write(*,*) 'level_makeflag:     buffer = ',buffer
+      !
+      ! Use "error" array as temporary storage for this routine:
+      !
+      call mat_buffer( flag, error,  buffer, nx,ny,nz)
+
+      !
+      ! Disallow clusters at the boundaries of the level
+      !  NB:  this is where the level gets boundary data from its parent
+      !  NB2: 
+      !
+      if (ltrace) write(*,*) 'level_makeflag: NOrefining boundaries'
+
+      ! x-boundaries
+      if(  minz.gt.0  .or.
+     *     (assume_symmetry.ne.1.and.assume_symmetry.ne.6) )then
+         do k = 1, nz
+            do j = 1, ny
+               do i = 1, ghostwidth
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      else
+         if (ltrace) then
+         write(*,*)'level_makeflag: Allowing min z boundary'
+         write(*,*)'level_makeflag: assume_symmetry=',assume_symmetry
+         end if
+         ! Allow flagging only two coarse grid points less than zero
+         !        (NB: 4 fine grid points for extended boundary)
+         izero   = -NINT(minx/h) + 1
+         do k = 1, nz
+            do j = 1, ny
+               do i = 1,izero-3
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      end if
+      do k = 1, nz
+         do j = 1, ny
+            do i = nx-ghostwidth+1, nx
+               flag(i,j,k) = FLAG_DISALLOW
+            end do
+         end do
+      end do
+      ! y-boundaries
+      if(  minz.gt.0  .or.
+     *     (assume_symmetry.ne.2.and.assume_symmetry.ne.6) )then
+         do k = 1, nz
+            do i = 1, nx
+               do j = 1, ghostwidth
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      else
+         if (ltrace) then
+         write(*,*)'level_makeflag: Allowing min z boundary'
+         write(*,*)'level_makeflag: assume_symmetry=',assume_symmetry
+         end if
+         ! Allow flagging only two coarse grid points less than zero
+         !        (NB: 4 fine grid points for extended boundary)
+         jzero   = -NINT(miny/h) + 1
+         do k = 1, nz
+            do i = 1, nx
+               do j = 1,jzero-3
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      end if
+      do k = 1, nz
+         do i = 1, nx
+            do j = ny-ghostwidth+1, ny
+               flag(i,j,k) = FLAG_DISALLOW
+            end do
+         end do
+      end do
+
+      !
+      ! z-boundaries
+      !
+      !    NB: If using reflection symmetry about z
+      !        we do not want to disallow:
+      !if (.not.(assume_symmetry.eq.3.and.minz .le. 0.d0) )then
+      if(  minz.gt.0  .or.
+     *     (assume_symmetry.ne.3.and.assume_symmetry.ne.6) )then
+         if (ltrace) write(*,*)'level_makeflag: Disallowing min z bndry'
+         do j = 1, ny
+            do i = 1, nx
+               do k = 1, ghostwidth
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      else
+         if (ltrace) then
+         write(*,*)'level_makeflag: Allowing min z boundary'
+         write(*,*)'level_makeflag: assume_symmetry=',assume_symmetry
+         write(*,*)'level_makeflag: minz           =',minz
+         end if
+         ! Allow flagging only two coarse grid points less than zero
+         !        (NB: 4 fine grid points for extended boundary)
+         kzero   = -NINT(minz/h) + 1
+         do j = 1, ny
+            do i = 1, nx
+               do k = 1,kzero-3
+                  flag(i,j,k) = FLAG_DISALLOW
+               end do
+            end do
+         end do
+      end if
+
+      do j = 1, ny
+        do i = 1, nx
+          do k = nz-ghostwidth+1, nz
+            flag(i,j,k) = FLAG_DISALLOW
+          end do
+        end do
+      end do
+
+      if (cancellevel) then
+         if (childlevelexists) then
+            write(*,*)'level_makeflag: --------------------------'
+            write(*,*)'level_makeflag: level = ',level
+            write(*,*)'level_makeflag: Cannot cancel level because'
+            write(*,*)'level_makeflag: child level exists, but a masked'
+            write(*,*)'level_makeflag: region is too close to boundary'
+            write(*,*)'level_makeflag: --------------------------'
+         else
+            write(*,*) 'level_makeflag: Cancelling, level: ',level
+            call load_scal1D(flag,1.d0*FLAG_NOREFINE,nx*ny*nz)
+         end if
+      end if
+
+      if (ltrace) write(*,*) 'level_makeflag: Done on level ',level
+
+      return
+      end        ! END: level_makeflag
+
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cc                                                                            cc
@@ -1258,6 +1676,46 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         dims = (/19,1,1/)
       else if ( nump .eq. 20 ) then
         dims = (/5,2,2/)
+      else if ( nump .eq. 21 ) then
+        dims = (/7,3,1/)
+      else if ( nump .eq. 22 ) then
+        dims = (/11,2,1/)
+      else if ( nump .eq. 23 ) then
+        dims = (/23,1,1/)
+      else if ( nump .eq. 24 ) then
+        dims = (/4,3,2/)
+      else if ( nump .eq. 25 ) then
+        dims = (/5,5,1/)
+      else if ( nump .eq. 26 ) then
+        dims = (/13,2,1/)
+      else if ( nump .eq. 27 ) then
+        dims = (/3,3,3/)
+      else if ( nump .eq. 28 ) then
+        dims = (/7,2,2/)
+      else if ( nump .eq. 29 ) then
+        dims = (/29,1,1/)
+      else if ( nump .eq. 30 ) then
+        dims = (/5,3,2/)
+      else if ( nump .eq. 31 ) then
+        dims = (/31,1,1/)
+      else if ( nump .eq. 32 ) then
+        dims = (/4,4,2/)
+      else if ( nump .eq. 33 ) then
+        dims = (/11,3,1/)
+      else if ( nump .eq. 34 ) then
+        dims = (/17,2,1/)
+      else if ( nump .eq. 35 ) then
+        dims = (/7,5,1/)
+      else if ( nump .eq. 36 ) then
+        dims = (/4,3,3/)
+      else if ( nump .eq. 37 ) then
+        dims = (/37,1,1/)
+      else if ( nump .eq. 38 ) then
+        dims = (/39,2,1/)
+      else if ( nump .eq. 39 ) then
+        dims = (/13,3,1/)
+      else if ( nump .eq. 40 ) then
+        dims = (/5,4,2/)
       end if
 
       return

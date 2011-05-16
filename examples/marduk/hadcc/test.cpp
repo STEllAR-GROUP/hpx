@@ -71,7 +71,7 @@ extern "C" {void FNAME(level_cluster)(double *flag,
 
 extern "C" {void FNAME(load_scal_mult3d)(double *,double *,
                                          double *,int *,int *,int *); }
-extern "C" {void FNAME(level_makeflag)(double *flag,double *error,int *level,
+extern "C" {void FNAME(level_makeflag_simple)(double *flag,double *error,int *level,
                                        double *minx,double *miny,double *minz,
                                        double *h,int *nx,int *ny,int *nz,
                                        double *ethreshold); }
@@ -536,7 +536,7 @@ int level_refine(int level,Globals & par)
 
   double scalar = par.refine_level[level];
   FNAME(load_scal_mult3d)(&*error.begin(),&*error.begin(),&scalar,&nxl,&nyl,&nzl);
-  FNAME(level_makeflag)(&*flag.begin(),&*error.begin(),&level,
+  FNAME(level_makeflag_simple)(&*flag.begin(),&*error.begin(),&level,
                                                  &minx,&miny,&minz,&h,
                                                  &nxl,&nyl,&nzl,&ethreshold);
 #if 0
