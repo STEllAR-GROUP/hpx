@@ -256,7 +256,7 @@ int main(int argc,char* argv[]) {
   par.nz0 = nz0;
   par.allowedl = allowedl;
   par.ethreshold = ethreshold;
-  par.ghostwidth = ghostwidth;
+  par.ghostwidth = 2*ghostwidth;
   par.bound_width = bound_width;
   par.maxx0 = maxx0;
   par.minx0 = minx0;
@@ -287,13 +287,14 @@ int main(int argc,char* argv[]) {
   par.h = h;
 
   // memory allocation
-  int maxgids = 1000;
   par.levelp.resize(par.allowedl);
   par.levelp[0] = 0; 
 
   int rc = level_refine(-1,par);
 
-  rc = level_refine(0,par);
+  for (int i=0;i<par.allowedl;i++) {
+    rc = level_refine(i,par);
+  }
 
   return 0;
 }
@@ -326,7 +327,7 @@ int level_refine(int level,Globals & par)
   int numbox;
 
   // hard coded parameters -- eventually to be made into full parameters
-  int maxbboxsize = 1000;
+  int maxbboxsize = 1000000;
 
   if ( level == par.allowedl ) { 
     return 0;
@@ -344,7 +345,7 @@ int level_refine(int level,Globals & par)
     maxy = maxy0; 
     maxz = maxz0; 
     gi = -1;
-    hl = h;
+    hl = h * refine_factor;
     time = 0.0;
   } else {
     // find the bounds of the level
@@ -416,9 +417,9 @@ int level_refine(int level,Globals & par)
         par.gr_sibling.push_back(i+1);
       }
 
-      int nx = b_maxx[i] - b_minx[i]+1;
-      int ny = b_maxy[i] - b_miny[i]+1;
-      int nz = b_maxz[i] - b_minz[i]+1;
+      int nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
+      int ny = (b_maxy[i] - b_miny[i])*refine_factor+1;
+      int nz = (b_maxz[i] - b_minz[i])*refine_factor+1;
 
       double lminx = minx + (b_minx[i]-1)*hl;
       double lminy = miny + (b_miny[i]-1)*hl;
@@ -435,21 +436,48 @@ int level_refine(int level,Globals & par)
       par.gr_maxy.push_back(lmaxy);
       par.gr_maxz.push_back(lmaxz);
       par.gr_proc.push_back(i);
-      par.gr_h.push_back(hl);
+      par.gr_h.push_back(hl/refine_factor);
       par.gr_alive.push_back(0);
       par.gr_nx.push_back(nx);
       par.gr_ny.push_back(ny);
       par.gr_nz.push_back(nz);
-    //  std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
-    //  std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
-    //  std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
+      //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
+      //std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
+      //std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
 
-    //  std::cout << " minx " << lminx << " maxx " << lmaxx << std::endl;
-    //  std::cout << " miny " << lminy << " maxy " << lmaxy << std::endl;
-    //  std::cout << " minz " << lminz << " maxz " << lmaxz << std::endl;
-    //  std::cout << " nx " << nx << " test " << lminx + (nx-1)*hl << std::endl;
-    //  std::cout << " ny " << nx << "      " << lminy + (ny-1)*hl << std::endl;
-    //  std::cout << " nz " << nx << "      " << lminz + (nz-1)*hl << std::endl;
+      //std::cout << " minx " << lminx << " maxx " << lmaxx << std::endl;
+      //std::cout << " miny " << lminy << " maxy " << lmaxy << std::endl;
+      //std::cout << " minz " << lminz << " maxz " << lmaxz << std::endl;
+      //std::cout << " nx " << nx << " test " << lminx + (nx-1)*hl/refine_factor << std::endl;
+      //std::cout << " ny " << nx << "      " << lminy + (ny-1)*hl/refine_factor << std::endl;
+      //std::cout << " nz " << nx << "      " << lminz + (nz-1)*hl/refine_factor << std::endl;
+
+      // output
+      {
+        std::vector<double> localerror;
+        localerror.resize(nx*ny*nz);
+        double h = hl/refine_factor;
+        int rc = compute_error(localerror,nx,ny,nz,
+                         lminx,lminy,lminz,h);
+        int shape[3];
+        std::vector<double> coord;
+        coord.resize(nx+ny+nz);
+        double hh = hl/refine_factor;
+        for (int i=0;i<nx;i++) {
+          coord[i] = lminx + i*hh; 
+        }
+        for (int i=0;i<ny;i++) {
+          coord[i+nx] = lminy + i*hh; 
+        }
+        for (int i=0;i<nz;i++) {
+          coord[i+nx+ny] = lminz + i*hh; 
+        }
+    
+        shape[0] = nx;
+        shape[1] = ny;
+        shape[2] = nz;
+        gft_out_full("error",0.0,shape,"x|y|z", 3,&*coord.begin(),&*localerror.begin());
+      }
     }
    
     return 0;
@@ -482,8 +510,8 @@ int level_refine(int level,Globals & par)
       if ( floatcmp(lminx-(minx + mini*hl),0.0) == 0 ||
            floatcmp(lminy-(miny + minj*hl),0.0) == 0 ||
            floatcmp(lminz-(minz + mink*hl),0.0) == 0 ||
-           floatcmp(lmaxx-(minz + (mini+nx-1)*hl),0.0) == 0 ||
-           floatcmp(lmaxy-(minz + (minj+ny-1)*hl),0.0) == 0 ||
+           floatcmp(lmaxx-(minx + (mini+nx-1)*hl),0.0) == 0 ||
+           floatcmp(lmaxy-(miny + (minj+ny-1)*hl),0.0) == 0 ||
            floatcmp(lmaxz-(minz + (mink+nz-1)*hl),0.0) == 0 ) {
         std::cerr << " Index problem " << std::endl;
         std::cerr << " lminx " << lminx << " " << minx + mini*hl << std::endl;
@@ -507,10 +535,11 @@ int level_refine(int level,Globals & par)
   rc = level_mkall_dead(level+1,par);
 
   double scalar = par.refine_level[level];
-  FNAME(load_scal_mult3d)(&*error.begin(),&*error.begin(),&scalar,&nx0,&ny0,&nz0);
+  FNAME(load_scal_mult3d)(&*error.begin(),&*error.begin(),&scalar,&nxl,&nyl,&nzl);
   FNAME(level_makeflag)(&*flag.begin(),&*error.begin(),&level,
                                                  &minx,&miny,&minz,&h,
                                                  &nxl,&nyl,&nzl,&ethreshold);
+#if 0
   {
     int shape[3];
     std::vector<double> coord;
@@ -530,6 +559,7 @@ int level_refine(int level,Globals & par)
     shape[2] = nzl;
     gft_out_full("flag",0.0,shape,"x|y|z", 3,&*coord.begin(),&*flag.begin());
   }
+#endif
 
   // level_cluster
   std::vector<double> sigi,sigj,sigk;
@@ -537,10 +567,10 @@ int level_refine(int level,Globals & par)
   std::vector<double> lapi,lapj,lapk;
   std::vector<double> alapi,alapj,alapk;
 
-   sigi.resize(nx0); sigj.resize(ny0); sigk.resize(nz0);
-  asigi.resize(nx0);asigj.resize(ny0);asigk.resize(nz0);
-   lapi.resize(nx0); lapj.resize(ny0); lapk.resize(nz0);
-  alapi.resize(nx0);alapj.resize(ny0);alapk.resize(nz0);
+   sigi.resize(nxl); sigj.resize(nyl); sigk.resize(nzl);
+  asigi.resize(nxl);asigj.resize(nyl);asigk.resize(nzl);
+   lapi.resize(nxl); lapj.resize(nyl); lapk.resize(nzl);
+  alapi.resize(nxl);alapj.resize(nyl);alapk.resize(nzl);
  
   b_minx.resize(maxbboxsize);
   b_maxx.resize(maxbboxsize);
@@ -557,20 +587,20 @@ int level_refine(int level,Globals & par)
                        &*b_minx.begin(),&*b_maxx.begin(),
                        &*b_miny.begin(),&*b_maxy.begin(),
                        &*b_minz.begin(),&*b_maxz.begin(),
-                       &minx0,&maxx0,
-                       &miny0,&maxy0,
-                       &minz0,&maxz0,
-                       &numbox,&nx0,&ny0,&nz0,
+                       &minx,&maxx,
+                       &miny,&maxy,
+                       &minz,&maxz,
+                       &numbox,&nxl,&nyl,&nzl,
                        &clusterstyle,&minefficiency,&mindim,
                        &ghostwidth,&refine_factor, 
                        &minx0,&miny0,&minz0, 
                        &maxx0,&maxy0,&maxz0);
 
-  for (int i=0;i<numbox;i++) {
-    std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
-    std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
-    std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
-  }
+  //for (int i=0;i<numbox;i++) {
+  //  std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
+  //  std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
+  //  std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
+  //}
 
   // Take the set of subgrids to create and then output the same set but domain decomposed
   tmp_mini.resize(maxbboxsize);
@@ -591,9 +621,72 @@ int level_refine(int level,Globals & par)
 
   std::cout << " numbox post DD " << numbox << std::endl;
   for (int i=0;i<numbox;i++) {
-    std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
-    std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
-    std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
+    //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
+    //std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
+    //std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
+
+    int start;
+    if ( i == 0 ) {
+      start = par.gr_sibling.size();
+      par.levelp[level+1] = start;
+    }
+
+    if (i == numbox-1 ) {
+      par.gr_sibling.push_back(-1);
+    } else {
+      par.gr_sibling.push_back(start+1+i);
+    }
+
+    int nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
+    int ny = (b_maxy[i] - b_miny[i])*refine_factor+1;
+    int nz = (b_maxz[i] - b_minz[i])*refine_factor+1;
+
+    double lminx = minx + (b_minx[i]-1)*hl;
+    double lminy = miny + (b_miny[i]-1)*hl;
+    double lminz = minz + (b_minz[i]-1)*hl;
+    double lmaxx = minx + (b_maxx[i]-1)*hl;
+    double lmaxy = miny + (b_maxy[i]-1)*hl;
+    double lmaxz = minz + (b_maxz[i]-1)*hl;
+    par.gr_t.push_back(time);
+    par.gr_minx.push_back(lminx);
+    par.gr_miny.push_back(lminy);
+    par.gr_minz.push_back(lminz);
+    par.gr_maxx.push_back(lmaxx);
+    par.gr_maxy.push_back(lmaxy);
+    par.gr_maxz.push_back(lmaxz);
+    par.gr_proc.push_back(i);
+    par.gr_h.push_back(hl/refine_factor);
+    par.gr_alive.push_back(0);
+    par.gr_nx.push_back(nx);
+    par.gr_ny.push_back(ny);
+    par.gr_nz.push_back(nz);
+
+    // output
+    {
+      std::vector<double> localerror;
+      localerror.resize(nx*ny*nz);
+      double h = hl/refine_factor;
+      int rc = compute_error(localerror,nx,ny,nz,
+                       lminx,lminy,lminz,h);
+      int shape[3];
+      std::vector<double> coord;
+      coord.resize(nx+ny+nz);
+      double hh = hl/refine_factor;
+      for (int i=0;i<nx;i++) {
+        coord[i] = lminx + i*hh; 
+      }
+      for (int i=0;i<ny;i++) {
+        coord[i+nx] = lminy + i*hh; 
+      }
+      for (int i=0;i<nz;i++) {
+        coord[i+nx+ny] = lminz + i*hh; 
+      }
+ 
+      shape[0] = nx;
+      shape[1] = ny;
+      shape[2] = nz;
+      gft_out_full("error",0.0,shape,"x|y|z", 3,&*coord.begin(),&*localerror.begin());
+    }
   }
 
   return 0;
