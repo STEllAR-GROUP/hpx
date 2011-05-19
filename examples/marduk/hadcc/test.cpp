@@ -104,7 +104,17 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
                   int nxl,int nyl,int nzl,
                   int nx,int ny,int nz);
 
+bool intersection(double xmin,double xmax, 
+                  double ymin,double ymax, 
+                  double zmin,double zmax, 
+                  double xmin2,double xmax2, 
+                  double ymin2,double ymax2, 
+                  double zmin2,double zmax2);
+
+bool floatcmp_le(double const& x1, double const& x2);
+
 const int maxlevels = 25;
+const int maxgids = 1000;
 const int ALIVE = 1;
 const int DEAD = 0;
 const int PENDING = -1;
@@ -295,6 +305,46 @@ int main(int argc,char* argv[]) {
   for (int i=0;i<par.allowedl;i++) {
     rc = level_refine(i,par);
   }
+
+  std::vector<int> comm_list[maxgids];
+  // determine the communication pattern
+  for (int i=0;i<=par.allowedl;i++) {
+    std::vector<int> level_gids;
+    int gi = level_return_start(i,par);
+    level_gids.push_back(gi);
+    gi = par.gr_sibling[gi];
+    while ( grid_return_existence(gi,par) ) {
+      level_gids.push_back(gi);
+      gi = par.gr_sibling[gi];
+    }
+
+    // figure out the interaction list
+    for (int j=0;j<level_gids.size();j++) {
+      gi = level_gids[j];
+      for (int k=j;k<level_gids.size();k++) {
+        int gi2 = level_gids[k];
+
+        if ( intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                                 par.gr_miny[gi],par.gr_maxy[gi], 
+                                 par.gr_minz[gi],par.gr_maxz[gi], 
+                                 par.gr_minx[gi2],par.gr_maxx[gi2],
+                                 par.gr_miny[gi2],par.gr_maxy[gi2],
+                                 par.gr_minz[gi2],par.gr_maxz[gi2]) ) {
+          comm_list[gi].push_back(gi2);
+          if ( gi != gi2 ) comm_list[gi2].push_back(gi); 
+        }
+      }
+    }
+  }
+
+  // prolongation pattern
+
+  // restriction pattern
+
+  // TEST
+  //for (int i=0;i<par.gr_minx.size();i++) {
+  //  std::cout << " gi " << i << " has " << comm_list[i].size() << " interactions " << std::endl; 
+  //}
 
   return 0;
 }
@@ -835,4 +885,60 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
   
   return 0;
 }
+
+bool intersection(double xmin,double xmax, 
+                  double ymin,double ymax, 
+                  double zmin,double zmax, 
+                  double xmin2,double xmax2, 
+                  double ymin2,double ymax2, 
+                  double zmin2,double zmax2) 
+{
+  double pa[3],ea[3];
+  static double const half = 0.5;
+  pa[0] = half*(xmax + xmin);
+  pa[1] = half*(ymax + ymin);
+  pa[2] = half*(zmax + zmin);
+
+  ea[0] = xmax - pa[0]; 
+  ea[1] = ymax - pa[1]; 
+  ea[2] = zmax - pa[2]; 
+
+  double pb[3],eb[3];
+  pb[0] = half*(xmax2 + xmin2);
+  pb[1] = half*(ymax2 + ymin2);
+  pb[2] = half*(zmax2 + zmin2);
+
+  eb[0] = xmax2 - pb[0]; 
+  eb[1] = ymax2 - pb[1]; 
+  eb[2] = zmax2 - pb[2]; 
+
+  double T[3];
+  T[0] = pb[0] - pa[0];
+  T[1] = pb[1] - pa[1];
+  T[2] = pb[2] - pa[2];
+
+  if ( floatcmp_le(fabs(T[0]),ea[0] + eb[0]) &&
+       floatcmp_le(fabs(T[1]),ea[1] + eb[1]) &&
+       floatcmp_le(fabs(T[2]),ea[2] + eb[2]) ) {
+    return true;
+  } else {
+    return false;
+  }
+
+}
+
+bool floatcmp_le(double const& x1, double const& x2) {
+  // compare two floating point numbers
+  static double const epsilon = 1.e-8;
+
+  if ( x1 < x2 ) return true;
+
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
