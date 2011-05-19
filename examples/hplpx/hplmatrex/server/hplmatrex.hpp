@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace server
             hpl_construct=0,
             hpl_destruct=1,
             hpl_assign=2,
-            hpl_get=3,
+            hpl_trans=3,
             hpl_set=4,
             hpl_solve=5,
             hpl_swap=6,
@@ -68,6 +68,7 @@ namespace hpx { namespace components { namespace server
     private:
     void allocate();
     int assign(int row, int offset, bool complete, int seed);
+    int transpose(int offset_row, int offset_col);
     void pivot();
     int swap(int brow, int bcol);
     void LUgausscorner(int iter);
@@ -111,9 +112,9 @@ namespace hpx { namespace components { namespace server
      //the assign function
     typedef actions::result_action4<HPLMatreX, int, hpl_assign, int,
         int, bool, int, &HPLMatreX::assign> assign_action;
-    //the get function
-    typedef actions::result_action2<HPLMatreX, double, hpl_get, int,
-            int, &HPLMatreX::get> get_action;
+    //the transpose function
+    typedef actions::result_action2<HPLMatreX, int, hpl_trans, int,
+            int, &HPLMatreX::transpose> transpose_action;
     //the set function
     typedef actions::action3<HPLMatreX, hpl_set, int,
             int, double, &HPLMatreX::set> set_action;
@@ -136,6 +137,9 @@ namespace hpx { namespace components { namespace server
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
     typedef lcos::eager_future<server::HPLMatreX::assign_action> assign_future;
+
+    //This is the future for the transpose function
+    typedef lcos::eager_future<server::HPLMatreX::transpose_action> transpose_future;
 
     //Here is the swap future, which works the same way as the assign future
     typedef lcos::eager_future<server::HPLMatreX::swap_action> swap_future;
@@ -191,6 +195,7 @@ namespace hpx { namespace components { namespace server
 
     int i,j;          //just counting variables
     int offset = 1; //the initial offset used for the memory handling algorithm
+    std::vector<transpose_future> futures; //used for transposing the matrix
     boost::rand48 gen;     //random generator used for seeding other generators
     gen.seed(time(NULL));
 
@@ -209,8 +214,8 @@ namespace hpx { namespace components { namespace server
 
     //here we initialize the the matrix
     lcos::eager_future<server::HPLMatreX::assign_action>
-        assign_future(gid,(int)0,offset,false,gen());
-    
+        assign_future(gid,(int)0,offset,false,gen()); 
+
     //initialize the pivot array
     for(i=0;i<rows;i++){pivotarr[i]=i;}
 
@@ -226,7 +231,9 @@ namespace hpx { namespace components { namespace server
 
     //make sure that everything has been allocated their memory
     //and initialized
-    return assign_future.get();
+    assign_future.get();
+
+    return 1;
     }
 
     //allocate() allocates memory space for the matrix
@@ -292,7 +299,7 @@ namespace hpx { namespace components { namespace server
     int temp = std::min((int)offset, (int)(rows - row));
     for(int i=0;i<temp;i++){
         for(int j=0;j<columns;j++){
-        transdata[j][row+i] = truedata[row+i][j] = (double) (gen() % 1000);
+            transdata[j][row+i] = truedata[row+i][j] = (double) (gen() % 1000);
         }
     }
 
@@ -300,6 +307,28 @@ namespace hpx { namespace components { namespace server
     BOOST_FOREACH(assign_future af, futures){
         af.get();
     }
+    return 1;
+    }
+
+    //transpose transposes a block of the truedata array into the
+    //transdata array. we do this because even with the additional
+    //initialization work the speedup of the partial_pivoting more
+    //than compensates
+    int HPLMatreX::transpose(int offset_row,int offset_col){
+    int i,j,ii,jj;
+    int bsize = 64;
+    int endrow = std::min(offset_row+blocksize,rows);
+    int endcolumn = std::min(offset_col+blocksize,columns);
+
+    if(offset_row/blocksize == brows-1){endrow = rows;}
+    if(offset_col/blocksize == brows-1){endcolumn = columns;}
+    //initialize the transdata matrix
+    for(ii = offset_row; ii < endrow; ii+=bsize){
+    for(jj = offset_col; jj < endcolumn; jj+=bsize){
+    for(i = ii; i < std::min(endrow,ii+bsize); i++){
+    for(j = jj; j < std::min(endcolumn,jj+bsize); j++){
+        transdata[j][i] = truedata[i][j];
+    }}}}
     return 1;
     }
 
@@ -407,24 +436,34 @@ namespace hpx { namespace components { namespace server
     int max_row;
     int temp_piv;
     double temp;
-    int i,j;
+    int outer;
+    int i=0,j;
+    std::vector<swap_future> futures;
 
-    //This first section of the pivot() function finds all of the pivot
-    //values to compute the final pivot array
-    for(i=0;i<rows-1;i++){
-        max_row = i;
-        max = fabs(transdata[i][pivotarr[i]]);
-        temp_piv = pivotarr[i];
-        for(j=i+1;j<rows;j++){
-        temp = fabs(transdata[i][pivotarr[j]]);
-        if(temp > max){
-            max = temp;
-            max_row = j;
-        }   }
-        pivotarr[i] = pivotarr[max_row];
-        pivotarr[max_row] = temp_piv;
+    for(outer=0;outer<=brows;outer++){
+        //This first section of the pivot() function finds all of the pivot
+        //values to compute the final pivot array
+        for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
+            max_row = i;
+            max = fabs(transdata[i][pivotarr[i]]);
+            temp_piv = pivotarr[i];
+            for(j=i+1;j<rows;j++){
+            temp = fabs(transdata[i][pivotarr[j]]);
+            if(temp > max){
+                max = temp;
+                max_row = j;
+            }   }
+            pivotarr[i] = pivotarr[max_row];
+            pivotarr[max_row] = temp_piv;
+        }
+        //here we begin swapping portions of the matrix we have finished
+        //finding the pivot values for
+        if(outer<brows){
+            for(j=0;j<brows;j++){
+                futures.push_back(swap_future(_gid,outer,j));
+            }
+        }
     }
-
     //transdata is no longer needed so free the memory and allocate
     //space for factordata
     for(i=0;i<rows;i++){
@@ -434,11 +473,11 @@ namespace hpx { namespace components { namespace server
     free(transdata[rows]);
     free(transdata);
 
-    //call the swap function for each datablock in the matrix
-    for(i=0;i<brows;i++){
-        for(j=0;j<brows;j++){
-            swap(i,j);
-    }    }
+    //ensure that all pivoting is complete
+    BOOST_FOREACH(swap_future sf, futures){
+        sf.get();
+    }
+
     }
 
 
@@ -470,7 +509,7 @@ namespace hpx { namespace components { namespace server
     //we will need to create a future to perform LUgausstrail regardless
     //of what this current function instance will compute
     gmain_future trail_future(_gid,brow,bcol,iter-1,0);
-
+    for(int i = 0; i<2000000;i++){i++;}
     //below decides what other futures need to be created in order to complete
     //all necessary computations before we can return
     if(type == 1){
