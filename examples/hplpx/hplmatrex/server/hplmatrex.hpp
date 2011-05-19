@@ -459,9 +459,7 @@ namespace hpx { namespace components { namespace server
         //here we begin swapping portions of the matrix we have finished
         //finding the pivot values for
         if(outer<brows){
-            for(j=0;j<brows;j++){
-                futures.push_back(swap_future(_gid,outer,j));
-            }
+            futures.push_back(swap_future(_gid,outer,0));
         }
     }
     //transdata is no longer needed so free the memory and allocate
@@ -487,15 +485,17 @@ namespace hpx { namespace components { namespace server
     int HPLMatreX::swap(int brow, int bcol){
     int temp = rows/blocksize;
     int numrows = blocksize, numcols = blocksize;
-    if(brow == brows-1){numrows = rows - (temp-1)*blocksize;}
-    if(bcol == brows-1){numcols = columns - (temp-1)*blocksize;}
 
-    datablock[brow][bcol] = new LUblock(numrows,numcols);
+    for(int k=0;k<brows;k++){
+    if(brow == brows-1){numrows = rows - (temp-1)*blocksize;}
+    if(k == brows-1){numcols = columns - (temp-1)*blocksize;}
+    datablock[brow][k] = new LUblock(numrows,numcols);
     for(int i=0;i<numrows;i++){
         for(int j=0;j<numcols;j++){
-        datablock[brow][bcol]->data[i][j] =
-            truedata[pivotarr[brow*blocksize+i]][bcol*blocksize+j];
+        datablock[brow][k]->data[i][j] =
+            truedata[pivotarr[brow*blocksize+i]][k*blocksize+j];
     }   }
+    }
     return 1;
     }
 
