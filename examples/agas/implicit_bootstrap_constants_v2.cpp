@@ -63,29 +63,64 @@ typedef primary_namespace_type::binding_type binding_type;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    // Get this locality's prefix.
-    id_type prefix = get_applier().get_runtime_support_gid();
-
-    // Create the primary namespace.
-    primary_namespace_type pri;
-    pri.create(prefix);
-
-    endpoint_type here(address::from_string("127.0.0.1"), 50000);
-
-    // We need to register this locality + 3 GIDs. The return type is (lower
-    // upper prefix is_first_bind).
-    binding_type b = pri.bind(here, 3); 
+    { 
+       // Get this locality's prefix.
+        id_type prefix = get_applier().get_runtime_support_gid();
     
-    // This should be the first binding of this site.
-    HPX_SANITY(at_c<3>(b));
+        // Create the primary namespace.
+        primary_namespace_type pri;
+        pri.create(prefix);
+    
+        endpoint_type here(address::from_string("127.0.0.1"), 50000);
+    
+        // We need to register this locality + 3 GIDs. The return type is (lower
+        // upper prefix is_first_bind).
+        binding_type b = pri.bind(here, 3); 
         
-    strip_credit_from_gid(at_c<0>(b));
-    strip_credit_from_gid(at_c<1>(b));
+        // This should be the first binding of this site.
+        HPX_SANITY(at_c<3>(b));
+            
+        strip_credit_from_gid(at_c<0>(b));
+        strip_credit_from_gid(at_c<1>(b));
 
-    std::cout << "console prefix = " << get_prefix_from_gid(at_c<2>(b)) << "\n"
-              << "lower id       = " << at_c<0>(b) << "\n"
-              << "upper id       = " << at_c<1>(b) << std::endl;
+        std::cout << "console prefix = " << get_prefix_from_gid(at_c<2>(b))
+                << "\nlower id       = " << at_c<0>(b)
+                << "\nupper id       = " << at_c<1>(b) << std::endl;
+    }   
+    
+    { 
+       // Get this locality's prefix.
+        id_type prefix = get_applier().get_runtime_support_gid();
+    
+        // Create the primary namespace.
+        primary_namespace_type pri;
+        pri.create(prefix);
+    
+        endpoint_type there(address::from_string("127.0.0.1"), 50000);
+        endpoint_type here(address::from_string("127.0.0.1"), 50001);
 
+        // Register the console    
+        binding_type there_bindings = pri.bind(there, 0); 
+
+        // We need to register this locality + 3 GIDs. The return type is (lower
+        // upper prefix is_first_bind).
+        binding_type here_bindings = pri.bind(here, 3); 
+        
+        // This should be the first binding of the console and agas sites.
+        HPX_SANITY(at_c<3>(there_bindings));
+        HPX_SANITY(at_c<3>(here_bindings));
+            
+        strip_credit_from_gid(at_c<0>(here_bindings));
+        strip_credit_from_gid(at_c<1>(here_bindings));
+
+        std::cout << "console prefix = "
+                  << get_prefix_from_gid(at_c<2>(there_bindings))
+                << "\nagas prefix    = "
+                  << get_prefix_from_gid(at_c<2>(here_bindings))
+                << "\nlower id       = " << at_c<0>(here_bindings)
+                << "\nupper id       = " << at_c<1>(here_bindings) << std::endl;
+    }   
+ 
     // initiate shutdown of the runtime system
     finalize(1.0);
     return 0;

@@ -28,31 +28,68 @@ int hpx_main(boost::program_options::variables_map &vm) { return 0; }
 
 int main()
 {
-    // This is our locality.
-    locality here("127.0.0.1", 50000);
-
-    // Start the AGAS server in the background.
-    agas_server_helper agas_server("127.0.0.1", 50000);
-
-    // Create a client and connect it to the server.
-    io_service_pool io_service_pool; 
-    resolver_client resolver(io_service_pool, here); 
+    {
+        // This is our locality.
+        locality here("127.0.0.1", 50000);
     
-    // Retrieve the id prefix of this site.
-    gid_type prefix;
-    resolver.get_prefix(here, prefix);
+        // Start the AGAS server in the background.
+        agas_server_helper agas_server("127.0.0.1", 50000);
     
-    std::cout << "console prefix = " << get_prefix_from_gid(prefix) << "\n";
-
-    gid_type lower, upper;
-    HPX_TEST(!resolver.get_id_range(here, 3, lower, upper));
+        // Create a client and connect it to the server.
+        io_service_pool io_service_pool; 
+        resolver_client resolver(io_service_pool, here); 
+        
+        // Retrieve the id prefix of this site.
+        gid_type prefix;
+        resolver.get_prefix(here, prefix);
+        
+        std::cout << "console prefix = " << get_prefix_from_gid(prefix) << "\n";
     
-    // Strip the credits from the range.
-    strip_credit_from_gid(lower);
-    strip_credit_from_gid(upper);
+        gid_type lower, upper;
+        HPX_TEST(!resolver.get_id_range(here, 3, lower, upper));
+        
+        // Strip the credits from the range.
+        strip_credit_from_gid(lower);
+        strip_credit_from_gid(upper);
+        
+        std::cout << "lower id       = " << lower << "\n"
+                  << "upper id       = " << upper << std::endl;
+    }
     
-    std::cout << "lower id       = " << lower << "\n"
-              << "upper id       = " << upper << std::endl;
+    {
+        // This is our locality.
+        locality there("127.0.0.1", 50000);
+        locality here("127.0.0.1", 50001);
+    
+        // Start the AGAS server in the background.
+        agas_server_helper agas_server("127.0.0.1", 50000);
+    
+        // Create a client and connect it to the server.
+        io_service_pool io_service_pool; 
+        resolver_client resolver(io_service_pool, there); 
+        
+        // Retrieve the id prefix of the console site.
+        gid_type there_prefix;
+        resolver.get_prefix(there, there_prefix);
+        
+        gid_type here_prefix;
+        resolver.get_prefix(here, here_prefix);
+        
+        std::cout << "console prefix = "
+                  << get_prefix_from_gid(there_prefix) << "\n";
+        std::cout << "agas prefix    = "
+                  << get_prefix_from_gid(here_prefix) << "\n";
+    
+        gid_type lower, upper;
+        HPX_TEST(!resolver.get_id_range(here, 3, lower, upper));
+        
+        // Strip the credits from the range.
+        strip_credit_from_gid(lower);
+        strip_credit_from_gid(upper);
+        
+        std::cout << "lower id       = " << lower << "\n"
+                  << "upper id       = " << upper << std::endl;
+    }
 
     return report_errors();
 }
