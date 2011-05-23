@@ -77,7 +77,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     refcnt_table_type refcnts_;
   
   public:
-    primary_namespace_base()
+    primary_namespace_base(std::string const& name)
       : mutex_(),
         gvas_(std::string("hpx.agas.") + name + ".gva"),
         partitions_(std::string("hpx.agas.") + name + ".partition"),
