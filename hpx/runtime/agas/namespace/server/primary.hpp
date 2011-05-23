@@ -28,8 +28,8 @@
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database, typename Protocol>
-struct HPX_COMPONENT_EXPORT primary_namespace
+template <typename Base, typename Database, typename Protocol>
+struct HPX_COMPONENT_EXPORT primary_namespace_base : Base
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -681,7 +681,71 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         namespace_decrement,
         namespace_localities
     }; // }}}
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ binding_type,
+        /* enum value */  namespace_bind_locality,
+        /* arguments */   endpoint_type const&, count_type,
+        &primary_namespace_base<Base, Database, Protocol>::bind_locality
+    > bind_locality_action; 
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ bool,
+        /* enum value */  namespace_bind_gid,
+        /* arguments */   naming::gid_type const&, gva_type const&,
+        &primary_namespace_base<Base, Database, Protocol>::bind_gid
+    > bind_gid_action;
+    
+    typedef hpx::actions::result_action1<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ locality_type,
+        /* enum value */  namespace_resolve_locality,
+        /* arguments */   endpoint_type const&,
+        &primary_namespace_base<Base, Database, Protocol>::resolve_locality
+    > resolve_locality_action;
+    
+    typedef hpx::actions::result_action1<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ gva_type,
+        /* enum value */  namespace_resolve_gid,
+        /* arguments */   naming::gid_type const&,
+        &primary_namespace_base<Base, Database, Protocol>::resolve_gid
+    > resolve_gid_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ unbinding_type,
+        /* enum value */  namespace_unbind,
+        /* arguments */   naming::gid_type const&, count_type,
+        &primary_namespace_base<Base, Database, Protocol>::unbind
+    > unbind_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ count_type,  
+        /* enum value */  namespace_increment,
+        /* arguments */   naming::gid_type const&, count_type,
+        &primary_namespace_base<Base, Database, Protocol>::increment
+    > increment_action;
+    
+    typedef hpx::actions::result_action2<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ decrement_type,
+        /* enum value */  namespace_decrement,
+        /* arguments */   naming::gid_type const&, count_type,
+        &primary_namespace_base<Base, Database, Protocol>::decrement
+    > decrement_action;
+    
+    typedef hpx::actions::result_action0<
+        primary_namespace_base<Base, Database, Protocol>,
+        /* return type */ prefixes_type,
+        /* enum value */  namespace_localities,
+        &primary_namespace_base<Base, Database, Protocol>::localities
+    > localities_action;
 
+    #if 0
     template <typename Derived> 
     struct action_types
     { // {{{ action rebinder
@@ -748,17 +812,25 @@ struct HPX_COMPONENT_EXPORT primary_namespace
             &Derived::localities
         > localities;
     }; // }}}
+    #endif
 };
 
 template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT bootstrap_primary_namespace
-  : components::fixed_component_base<
-      0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
-      primary_namespace<Database, Protocol> >,
-    primary_namespace_base<Database, Protocol>
+  : primary_namespace_base<
+       components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
+            bootstrap_primary_namespace<Database, Protocol> >,
+        Database, Protocol>
 {
-    typedef primary_namespace_base<Database, Protocol> base_type;
+    typedef primary_namespace_base<
+       components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
+            bootstrap_primary_namespace<Database, Protocol> >,
+        Database, Protocol
+    > base_type;
 
+    #if 0
     typedef typename base_type::template
       action_types<bootstrap_primary_namespace> bound_action_types;
 
@@ -770,6 +842,7 @@ struct HPX_COMPONENT_EXPORT bootstrap_primary_namespace
     typedef typename bound_action_types::increment increment_action;
     typedef typename bound_action_types::decrement decrement_action;
     typedef typename bound_action_types::localities localities_action;
+    #endif
 
     bootstrap_primary_namespace():
       base_type("bootstrap_primary_namespace") {} 
@@ -777,11 +850,18 @@ struct HPX_COMPONENT_EXPORT bootstrap_primary_namespace
 
 template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT primary_namespace
-  : components::simple_component_base<primary_namespace<Database, Protocol> >,
-    primary_namespace_base<Database, Protocol>
+  : primary_namespace_base<
+        components::simple_component_base<
+            primary_namespace<Database, Protocol> >,
+        Database, Protocol>
 {
-    typedef primary_namespace_base<Database, Protocol> base_type;
+    typedef primary_namespace_base<
+        components::simple_component_base<
+            primary_namespace<Database, Protocol> >,
+        Database, Protocol
+    > base_type;
 
+    #if 0
     typedef typename base_type::template
       action_types<primary_namespace> bound_action_types;
     
@@ -793,6 +873,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     typedef typename bound_action_types::increment increment_action;
     typedef typename bound_action_types::decrement decrement_action;
     typedef typename bound_action_types::localities localities_action;
+    #endif
 
     primary_namespace(): base_type("primary_namespace") {} 
 };

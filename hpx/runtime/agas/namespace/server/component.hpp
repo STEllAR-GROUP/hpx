@@ -21,8 +21,8 @@
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database>
-struct HPX_COMPONENT_EXPORT component_namespace_base
+template <typename Base, typename Database>
+struct HPX_COMPONENT_EXPORT component_namespace_base : Base
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -194,7 +194,48 @@ struct HPX_COMPONENT_EXPORT component_namespace_base
         namespace_resolve_id,
         namespace_unbind
     }; // }}}
+    
+    typedef hpx::actions::result_action2<
+        component_namespace_base<Base, Database>,
+        /* return type */ component_id_type,
+        /* enum value */  namespace_bind_prefix,
+        /* arguments */   component_name_type const&, prefix_type,
+        &component_namespace_base<Base, Database>::bind_prefix
+    > bind_prefix_action;
+    
+    typedef hpx::actions::result_action1<
+        component_namespace_base<Base, Database>,
+        /* return type */ component_id_type,
+        /* enum value */  namespace_resolve_name,
+        /* arguments */   component_name_type const&,
+        &component_namespace_base<Base, Database>::bind_name
+    > bind_name_action;
+    
+    typedef hpx::actions::result_action1<
+        component_namespace_base<Base, Database>,
+        /* return type */ prefixes_type,
+        /* enum value */  namespace_resolve_id,
+        /* arguments */   component_id_type,
+        &component_namespace_base<Base, Database>::resolve_id
+    > resolve_id_action;
+    
+    typedef hpx::actions::result_action1<
+        component_namespace_base<Base, Database>,
+        /* return type */ component_id_type,
+        /* enum value */  namespace_resolve_name,
+        /* arguments */   component_name_type const&,
+        &component_namespace_base<Base, Database>::resolve_name
+    > resolve_name_action;
+    
+    typedef hpx::actions::result_action1<
+        component_namespace_base<Base, Database>,
+        /* return type */ bool,
+        /* enum value */  namespace_unbind,
+        /* arguments */   component_name_type const&,
+        &component_namespace_base<Base, Database>::unbind
+    > unbind_action;
 
+    #if 0
     template <typename Derived> 
     struct action_types
     { // {{{ action rebinder
@@ -238,17 +279,25 @@ struct HPX_COMPONENT_EXPORT component_namespace_base
             &Derived::unbind
         > unbind;
     }; // }}}
+    #endif
 };
 
 template <typename Database>
 struct HPX_COMPONENT_EXPORT bootstrap_component_namespace
-  : components::fixed_component_base<
-      0x0000000100000001ULL, 0x0000000000000002ULL, // constant GID
-      component_namespace<Database> >,
-    component_namespace_base<Database>
+  : component_namespace_base<
+        components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000002ULL, // constant GID
+            bootstrap_component_namespace<Database> >,
+        Database>
 {
-    typedef component_namespace_base<Database> base_type;
-
+    typedef component_namespace_base<
+        components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000002ULL, // constant GID
+            bootstrap_component_namespace<Database> >,
+        Database
+    > base_type;
+ 
+    #if 0
     typedef typename base_type::template
       action_types<bootstrap_component_namespace> bound_action_types;
 
@@ -257,6 +306,7 @@ struct HPX_COMPONENT_EXPORT bootstrap_component_namespace
     typedef typename bound_action_types::resolve_name resolve_name_action;
     typedef typename bound_action_types::resolve_id resolve_id_action;
     typedef typename bound_action_types::unbind unbind_action;
+    #endif
 
     bootstrap_component_namespace():
       base_type("bootstrap_component_namespace") {} 
@@ -264,11 +314,16 @@ struct HPX_COMPONENT_EXPORT bootstrap_component_namespace
 
 template <typename Database>
 struct HPX_COMPONENT_EXPORT component_namespace
-  : components::simple_component_base<component_namespace<Database> >,
-    component_namespace_base<Database>
+  : component_namespace_base<
+        components::simple_component_base<component_namespace<Database> >,
+        Database>
 {
-    typedef component_namespace_base<Database> base_type;
+    typedef component_namespace_base<
+        components::simple_component_base<component_namespace<Database> >,
+        Database
+    > base_type;
 
+    #if 0
     typedef typename base_type::template
       action_types<component_namespace> bound_action_types;
 
@@ -277,6 +332,7 @@ struct HPX_COMPONENT_EXPORT component_namespace
     typedef typename bound_action_types::resolve_name resolve_name_action;
     typedef typename bound_action_types::resolve_id resolve_id_action;
     typedef typename bound_action_types::unbind unbind_action;
+    #endif
 
     component_namespace(): base_type("component_namespace") {} 
 };

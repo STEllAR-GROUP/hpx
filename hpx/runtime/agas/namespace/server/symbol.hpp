@@ -17,8 +17,8 @@
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database>
-struct HPX_COMPONENT_EXPORT symbol_namespace
+template <typename Base, typename Database>
+struct HPX_COMPONENT_EXPORT symbol_namespace_base : Base 
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -120,7 +120,40 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
         namespace_resolve,
         namespace_unbind,
     }; // }}}
+    
+    typedef hpx::actions::result_action2<
+        symbol_namespace_base<Base, Database>,
+        /* return type */ bool,
+        /* enum value */  namespace_bind,
+        /* arguments */   symbol_type const&, naming::gid_type const&,
+        &symbol_namespace_base<Base, Database>::bind
+    > bind_action;
+    
+    typedef hpx::actions::result_action2<
+        symbol_namespace_base<Base, Database>,
+        /* return type */ naming::gid_type,
+        /* enum value */  namespace_rebind,
+        /* arguments */   symbol_type const&, naming::gid_type const&,
+        &symbol_namespace_base<Base, Database>::rebind
+    > rebind_action;
+    
+    typedef hpx::actions::result_action1<
+        symbol_namespace_base<Base, Database>,
+        /* return type */ naming::gid_type,
+        /* enum value */  namespace_resolve,
+        /* arguments */   symbol_type const&,
+        &symbol_namespace_base<Base, Database>::resolve
+    > resolve_action;
+    
+    typedef hpx::actions::result_action1<
+        symbol_namespace_base<Base, Database>,
+        /* retrun type */ bool,
+        /* enum value */  namespace_unbind,
+        /* arguments */   symbol_type const&,
+        &symbol_namespace_base<Base, Database>::unbind
+    > unbind_action;
 
+    #if 0
     template <typename Derived>
     struct action_types
     { // {{{ action rebinder
@@ -156,17 +189,25 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
             &Derived::unbind
         > unbind;
     }; // }}}
+    #endif
 };
 
 template <typename Database>
 struct HPX_COMPONENT_EXPORT bootstrap_symbol_namespace
-  : components::fixed_component_base<
-      0x0000000100000001ULL, 0x0000000000000003ULL, // constant GID
-      symbol_namespace<Database> >,
-    symbol_namespace_base<Database>
+  : symbol_namespace_base<
+        components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000003ULL, // constant GID
+            bootstrap_symbol_namespace<Database> >,
+        Database>
 {
-    typedef symbol_namespace_base<Database> base_type;
+    typedef symbol_namespace_base<
+        components::fixed_component_base<
+            0x0000000100000001ULL, 0x0000000000000003ULL, // constant GID
+            bootstrap_symbol_namespace<Database> >,
+        Database
+    > base_type;
 
+    #if 0
     typedef typename base_type::template
       action_types<bootstrap_symbol_namespace> bound_action_types;
 
@@ -174,6 +215,7 @@ struct HPX_COMPONENT_EXPORT bootstrap_symbol_namespace
     typedef typename bound_action_types::rebind rebind_action;
     typedef typename bound_action_types::resolve resolve_action;
     typedef typename bound_action_types::unbind unbind_action;
+    #endif
 
     bootstrap_symbol_namespace():
       base_type("bootstrap_symbol_namespace") {} 
@@ -181,11 +223,16 @@ struct HPX_COMPONENT_EXPORT bootstrap_symbol_namespace
 
 template <typename Database>
 struct HPX_COMPONENT_EXPORT symbol_namespace
-  : components::simple_component_base<symbol_namespace<Database> >,
-    symbol_namespace_base<Database>
+  : symbol_namespace_base<
+        components::simple_component_base<symbol_namespace<Database> >,
+        Database>
 {
-    typedef symbol_namespace_base<Database> base_type;
+    typedef symbol_namespace_base<
+        components::simple_component_base<symbol_namespace<Database> >,
+        Database
+    > base_type;
 
+    #if 0
     typedef typename base_type::template
       action_types<symbol_namespace> bound_action_types;
 
@@ -193,6 +240,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace
     typedef typename bound_action_types::rebind rebind_action;
     typedef typename bound_action_types::resolve resolve_action;
     typedef typename bound_action_types::unbind unbind_action;
+    #endif
 
     symbol_namespace(): base_type("symbol_namespace") {} 
 };
