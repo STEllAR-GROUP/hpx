@@ -14,6 +14,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/preprocessor/repeat.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
