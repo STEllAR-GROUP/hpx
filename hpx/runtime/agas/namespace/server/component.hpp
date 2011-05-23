@@ -13,6 +13,7 @@
 #include <boost/assert.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
@@ -21,8 +22,7 @@ namespace hpx { namespace agas { namespace server
 {
 
 template <typename Database>
-struct HPX_COMPONENT_EXPORT component_namespace
-  : components::simple_component_base<component_namespace<Database> >
+struct HPX_COMPONENT_EXPORT component_namespace_base
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -50,10 +50,10 @@ struct HPX_COMPONENT_EXPORT component_namespace
     component_id_type type_counter; 
  
   public:
-    component_namespace()
+    component_namespace_base(std::string const& name)
       : mutex_(),
-        component_ids_("hpx.agas.component_namespace.id"),
-        factories_("hpx.agas.component_namespace.factory"),
+        component_ids_(std::string("hpx.agas.") + name + ".id"),
+        factories_(std::string("hpx.agas.") + name + ".factory"),
         type_counter(components::component_first_dynamic)
     { traits::initialize_mutex(mutex_); }
 
@@ -186,56 +186,99 @@ struct HPX_COMPONENT_EXPORT component_namespace
         return true;
     } // }}} 
 
-    // {{{ action types
     enum actions
-    {
+    { // {{{ action enum
         namespace_bind_prefix,
         namespace_bind_name,
         namespace_resolve_name,
         namespace_resolve_id,
         namespace_unbind
-    };
-  
-    typedef hpx::actions::result_action2<
-        component_namespace<Database>,
-        /* return type */ component_id_type,
-        /* enum value */  namespace_bind_prefix,
-        /* arguments */   component_name_type const&, prefix_type,
-        &component_namespace<Database>::bind_prefix
-    > bind_prefix_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace<Database>,
-        /* return type */ component_id_type,
-        /* enum value */  namespace_resolve_name,
-        /* arguments */   component_name_type const&,
-        &component_namespace<Database>::bind_name
-    > bind_name_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace<Database>,
-        /* return type */ prefixes_type,
-        /* enum value */  namespace_resolve_id,
-        /* arguments */   component_id_type,
-        &component_namespace<Database>::resolve_id
-    > resolve_id_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace<Database>,
-        /* return type */ component_id_type,
-        /* enum value */  namespace_resolve_name,
-        /* arguments */   component_name_type const&,
-        &component_namespace<Database>::resolve_name
-    > resolve_name_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace<Database>,
-        /* return type */ bool,
-        /* enum value */  namespace_unbind,
-        /* arguments */   component_name_type const&,
-        &component_namespace<Database>::unbind
-    > unbind_action;
-    // }}}
+    }; // }}}
+
+    template <typename Derived> 
+    struct action_types
+    { // {{{ action rebinder
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ component_id_type,
+            /* enum value */  namespace_bind_prefix,
+            /* arguments */   component_name_type const&, prefix_type,
+            &Derived::bind_prefix
+        > bind_prefix;
+        
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ component_id_type,
+            /* enum value */  namespace_resolve_name,
+            /* arguments */   component_name_type const&,
+            &Derived::bind_name
+        > bind_name;
+        
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ prefixes_type,
+            /* enum value */  namespace_resolve_id,
+            /* arguments */   component_id_type,
+            &Derived::resolve_id
+        > resolve_id;
+        
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ component_id_type,
+            /* enum value */  namespace_resolve_name,
+            /* arguments */   component_name_type const&,
+            &Derived::resolve_name
+        > resolve_name;
+        
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ bool,
+            /* enum value */  namespace_unbind,
+            /* arguments */   component_name_type const&,
+            &Derived::unbind
+        > unbind;
+    }; // }}}
+};
+
+template <typename Database>
+struct HPX_COMPONENT_EXPORT bootstrap_component_namespace
+  : components::fixed_component_base<
+      0x0000000100000001ULL, 0x0000000000000002ULL, // constant GID
+      component_namespace<Database> >,
+    component_namespace_base<Database>
+{
+    typedef component_namespace_base<Database> base_type;
+
+    typedef typename base_type::template
+      action_types<bootstrap_component_namespace> bound_action_types;
+
+    typedef typename bound_action_types::bind_prefix bind_prefix_action;
+    typedef typename bound_action_types::bind_name bind_name_action;
+    typedef typename bound_action_types::resolve_name resolve_name_action;
+    typedef typename bound_action_types::resolve_id resolve_id_action;
+    typedef typename bound_action_types::unbind unbind_action;
+
+    bootstrap_component_namespace():
+      base_type("bootstrap_component_namespace") {} 
+};
+
+template <typename Database>
+struct HPX_COMPONENT_EXPORT component_namespace
+  : components::simple_component_base<component_namespace<Database> >,
+    component_namespace_base<Database>
+{
+    typedef component_namespace_base<Database> base_type;
+
+    typedef typename base_type::template
+      action_types<component_namespace> bound_action_types;
+
+    typedef typename bound_action_types::bind_prefix bind_prefix_action;
+    typedef typename bound_action_types::bind_name bind_name_action;
+    typedef typename bound_action_types::resolve_name resolve_name_action;
+    typedef typename bound_action_types::resolve_id resolve_id_action;
+    typedef typename bound_action_types::unbind unbind_action;
+
+    component_namespace(): base_type("component_namespace") {} 
 };
 
 }}}

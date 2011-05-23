@@ -18,6 +18,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
@@ -28,7 +30,6 @@ namespace hpx { namespace agas { namespace server
 
 template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT primary_namespace
-  : components::simple_component_base<primary_namespace<Database, Protocol> >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -76,11 +77,11 @@ struct HPX_COMPONENT_EXPORT primary_namespace
     refcnt_table_type refcnts_;
   
   public:
-    primary_namespace()
+    primary_namespace_base()
       : mutex_(),
-        gvas_("hpx.agas.primary_namespace.gva"),
-        partitions_("hpx.agas.primary_namespace.partition"),
-        refcnts_("hpx.agas.primary_namespace.refcnt")
+        gvas_(std::string("hpx.agas.") + name + ".gva"),
+        partitions_(std::string("hpx.agas.") + name + ".partition"),
+        refcnts_(std::string("hpx.agas.") + name +".refcnt")
     { traits::initialize_mutex(mutex_); }
 
     binding_type bind_locality(endpoint_type const& ep, count_type count)
@@ -669,9 +670,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         return prefixes;
     } // }}}
 
-    // {{{ action types
     enum actions 
-    {
+    { // {{{ action enum
         namespace_bind_locality,
         namespace_bind_gid,
         namespace_resolve_locality,
@@ -680,71 +680,121 @@ struct HPX_COMPONENT_EXPORT primary_namespace
         namespace_increment,
         namespace_decrement,
         namespace_localities
-    };
+    }; // }}}
 
-    typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
-        /* return type */ binding_type,
-        /* enum value */  namespace_bind_locality,
-        /* arguments */   endpoint_type const&, count_type,
-        &primary_namespace<Database, Protocol>::bind_locality
-    > bind_locality_action; 
-   
-    typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
-        /* return type */ bool,
-        /* enum value */  namespace_bind_gid,
-        /* arguments */   naming::gid_type const&, gva_type const&,
-        &primary_namespace<Database, Protocol>::bind_gid
-    > bind_gid_action;
+    template <typename Derived> 
+    struct action_types
+    { // {{{ action rebinder
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ binding_type,
+            /* enum value */  namespace_bind_locality,
+            /* arguments */   endpoint_type const&, count_type,
+            &Derived::bind_locality
+        > bind_locality; 
+       
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ bool,
+            /* enum value */  namespace_bind_gid,
+            /* arguments */   naming::gid_type const&, gva_type const&,
+            &Derived::bind_gid
+        > bind_gid;
+        
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ locality_type,
+            /* enum value */  namespace_resolve_locality,
+            /* arguments */   endpoint_type const&,
+            &Derived::resolve_locality
+        > resolve_locality;
     
-    typedef hpx::actions::result_action1<
-        primary_namespace<Database, Protocol>,
-        /* return type */ locality_type,
-        /* enum value */  namespace_resolve_locality,
-        /* arguments */   endpoint_type const&,
-        &primary_namespace<Database, Protocol>::resolve_locality
-    > resolve_locality_action;
+        typedef hpx::actions::result_action1<
+            Derived,
+            /* return type */ gva_type,
+            /* enum value */  namespace_resolve_gid,
+            /* arguments */   naming::gid_type const&,
+            &Derived::resolve_gid
+        > resolve_gid;
+        
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ unbinding_type,
+            /* enum value */  namespace_unbind,
+            /* arguments */   naming::gid_type const&, count_type,
+            &Derived::unbind
+        > unbind;
+        
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ count_type,  
+            /* enum value */  namespace_increment,
+            /* arguments */   naming::gid_type const&, count_type,
+            &Derived::increment
+        > increment;
+        
+        typedef hpx::actions::result_action2<
+            Derived,
+            /* return type */ decrement_type,
+            /* enum value */  namespace_decrement,
+            /* arguments */   naming::gid_type const&, count_type,
+            &Derived::decrement
+        > decrement;
+        
+        typedef hpx::actions::result_action0<
+            Derived,
+            /* return type */ prefixes_type,
+            /* enum value */  namespace_localities,
+            &Derived::localities
+        > localities;
+    }; // }}}
+};
 
-    typedef hpx::actions::result_action1<
-        primary_namespace<Database, Protocol>,
-        /* return type */ gva_type,
-        /* enum value */  namespace_resolve_gid,
-        /* arguments */   naming::gid_type const&,
-        &primary_namespace<Database, Protocol>::resolve_gid
-    > resolve_gid_action;
+template <typename Database, typename Protocol>
+struct HPX_COMPONENT_EXPORT bootstrap_primary_namespace
+  : components::fixed_component_base<
+      0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
+      primary_namespace<Database, Protocol> >,
+    primary_namespace_base<Database, Protocol>
+{
+    typedef primary_namespace_base<Database, Protocol> base_type;
+
+    typedef typename base_type::template
+      action_types<bootstrap_primary_namespace> bound_action_types;
+
+    typedef typename bound_action_types::bind_locality bind_locality_action;
+    typedef typename bound_action_types::bind_gid bind_gid_action;
+    typedef typename bound_action_types::resolve_locality resolve_locality_action;
+    typedef typename bound_action_types::resolve_gid resolve_gid_action;
+    typedef typename bound_action_types::unbind unbind_action;
+    typedef typename bound_action_types::increment increment_action;
+    typedef typename bound_action_types::decrement decrement_action;
+    typedef typename bound_action_types::localities localities_action;
+
+    bootstrap_primary_namespace():
+      base_type("bootstrap_primary_namespace") {} 
+};
+
+template <typename Database, typename Protocol>
+struct HPX_COMPONENT_EXPORT primary_namespace
+  : components::simple_component_base<primary_namespace<Database, Protocol> >,
+    primary_namespace_base<Database, Protocol>
+{
+    typedef primary_namespace_base<Database, Protocol> base_type;
+
+    typedef typename base_type::template
+      action_types<primary_namespace> bound_action_types;
     
-    typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
-        /* return type */ unbinding_type,
-        /* enum value */  namespace_unbind,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::unbind
-    > unbind_action;
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
-        /* return type */ count_type,  
-        /* enum value */  namespace_increment,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::increment
-    > increment_action;
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
-        /* return type */ decrement_type,
-        /* enum value */  namespace_decrement,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::decrement
-    > decrement_action;
-    
-    typedef hpx::actions::result_action0<
-        primary_namespace<Database, Protocol>,
-        /* return type */ prefixes_type,
-        /* enum value */  namespace_localities,
-        &primary_namespace<Database, Protocol>::localities
-    > localities_action;
-    // }}}
+    typedef typename bound_action_types::bind_locality bind_locality_action;
+    typedef typename bound_action_types::bind_gid bind_gid_action;
+    typedef typename bound_action_types::resolve_locality resolve_locality_action;
+    typedef typename bound_action_types::resolve_gid resolve_gid_action;
+    typedef typename bound_action_types::unbind unbind_action;
+    typedef typename bound_action_types::increment increment_action;
+    typedef typename bound_action_types::decrement decrement_action;
+    typedef typename bound_action_types::localities localities_action;
+
+    primary_namespace(): base_type("primary_namespace") {} 
 };
 
 }}}
