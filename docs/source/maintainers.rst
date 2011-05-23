@@ -51,28 +51,12 @@ Alternative Visual Studio Build System
   build/VS2010/*
   build/VS.NET/*
 
-Deprecated Documentation
-------------------------
-
-  :maintainer: unmaintained
-
-  docs/hpx.doxy
-  docs/index.html
-  docs/tutorial/*
-
-Wash's Notes
-------------
+Documentation
+-------------
 
   :maintainer: Bryce Lelbach (wash) <blelbach -at- cct.lsu.edu>
   
-  docs/washs_notes/*
-
-Maintainer List
----------------
-
-  :maintainer: Bryce Lelbach (wash) <blelbach -at- cct.lsu.edu>
-
-  docs/maintainers.rst
+  docs/*
 
 Accumulator Examples
 --------------------

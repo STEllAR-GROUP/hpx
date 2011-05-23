@@ -1,8 +1,10 @@
 .. _root_index:
 
-***************************************
- Wash's Notes on HPX, C++ and ParalleX
-***************************************
+*******************
+ HPX Documentation 
+*******************
+
+.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
 
 Distributed under the |bsl|_, Version 1.0. 
 
@@ -11,5 +13,4 @@ Distributed under the |bsl|_, Version 1.0.
 
   build/index
   runtime/index
-  theory/index
  
