@@ -26,7 +26,7 @@
 namespace hpx { namespace components 
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper = detail::this_type>
+    template <typename Component, typename Wrapper>
     class managed_component_base 
       : public detail::managed_component_tag, boost::noncopyable
     {

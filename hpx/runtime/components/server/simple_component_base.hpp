@@ -18,7 +18,7 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
     ///
-    template <typename Component = detail::this_type>
+    template <typename Component>
     class simple_component_base : public detail::simple_component_tag
     {
     private:

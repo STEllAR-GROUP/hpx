@@ -267,12 +267,26 @@ namespace hpx
         namespace detail 
         { 
             struct this_type {};
+            struct fixed_component_tag {};
             struct simple_component_tag {};
             struct managed_component_tag {};
         }
 
+        template <boost::uint64_t MSB, boost::uint64_t LSB,
+                  typename Component = detail::this_type>
+        struct fixed_component_base;
+ 
         template <typename Component> 
-        class simple_component_base;
+        struct fixed_component;
+   
+        template <typename Component = detail::this_type>
+        class simple_component_base; 
+
+        template <typename Component> 
+        class simple_component;
+
+        template <typename Component, typename Wrapper = detail::this_type>
+        class managed_component_base;
 
         template <typename Component, typename Derived = detail::this_type>
         class managed_component;
