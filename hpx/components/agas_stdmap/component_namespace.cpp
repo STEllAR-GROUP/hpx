@@ -30,6 +30,9 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     agas_component, component_agas_component_namespace);
 
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    agas_component::base_type, component_agas_component_namespace);
+
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_prefix_action,
     stdmap_component_namespace_bind_prefix_action);
