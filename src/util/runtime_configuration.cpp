@@ -50,6 +50,14 @@ namespace hpx { namespace util
             "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
             "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
+#if HPX_AGAS_VERSION > 0x10
+            "path = $[hpx.location]/lib/hpx/"
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(agas_stdmap))
+                HPX_SHARED_LIB_EXTENSION
+                HPX_INI_PATH_DELIMITER "$[hpx.location]/lib/hpx/" 
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(agas_stdmap_tcpip))
+                HPX_SHARED_LIB_EXTENSION,
+#endif
 
             "[hpx.components.barrier]",
             "name = hpx",
