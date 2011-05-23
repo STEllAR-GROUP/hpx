@@ -3,8 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <vector>
+#include <map>
+
+#include <ios>
+#include <iomanip>
 #include <iostream>
 
+#include <boost/foreach.hpp>
 #include <boost/lockfree/fifo.hpp>
 
 #include <hpx/hpx.hpp>
@@ -36,6 +42,12 @@ void get_os_thread_num(local_barrier& barr, fifo<std::size_t>& shepherds)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
+    typedef std::map<std::size_t, std::size_t>
+        result_map;
+
+    typedef std::multimap<std::size_t, std::size_t, std::greater<std::size_t> >
+        sorter;
+
     std::size_t pxthreads = 0;
 
     if (vm.count("pxthreads"))
@@ -46,10 +58,10 @@ int hpx_main(variables_map& vm)
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
 
+    result_map results;
+
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        std::cout << "iteration: " << i << "\n";
-
         // Have the fifo preallocate the nodes.
         fifo<std::size_t> shepherds(pxthreads); 
 
@@ -64,11 +76,22 @@ int hpx_main(variables_map& vm)
         std::size_t shepherd = 0;
 
         while (shepherds.dequeue(&shepherd))
-            std::cout << "  " << shepherd << "\n"; 
+            ++results[shepherd];
+    }
+
+    sorter sort;
+
+    BOOST_FOREACH(result_map::value_type const& result, results)
+    { sort.insert(sorter::value_type(result.second, result.first)); }  
+    
+    BOOST_FOREACH(sorter::value_type const& result, sort) {
+        std::cout << std::setfill('0') << std::setw(4)
+                  << result.second << " -> "
+                  << result.first << "\n";
     }
 
     // initiate shutdown of the runtime system
-    finalize();
+    finalize(0.5);
     return 0;
 }
 
