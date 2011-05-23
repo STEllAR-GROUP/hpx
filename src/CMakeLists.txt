@@ -237,67 +237,69 @@ else()
   source_group("Header Files\\Runtime\\Actions" 
       FILES ${hpxlib_actions_HEADERS})
 
-  # AGAS
-  set(hpxlib_agas_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits.hpp.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits_fwd.hpp)
-  source_group("Header Files\\Runtime\\AGAS" 
-      FILES ${hpxlib_agas_HEADERS})
-
-  set(hpxlib_agas_client_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/client/legacy_agent.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Client" 
-      FILES ${hpxlib_agas_client_HEADERS})
-
-  set(hpxlib_agas_database_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/table.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits_fwd.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Database" 
-      FILES ${hpxlib_agas_database_HEADERS})
-
-  set(hpxlib_agas_database_backend_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/std_map.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/default.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Database\\Backend" 
-      FILES ${hpxlib_agas_database_backend_HEADERS})
-
-  set(hpxlib_agas_network_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/full_gva.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/table.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits_fwd.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Network" 
-      FILES ${hpxlib_agas_network_HEADERS})
-
-  set(hpxlib_agas_network_backend_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/default.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/ib.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/tcpip.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/udpip.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Network\\Backend" 
-      FILES ${hpxlib_agas_network_backend_HEADERS})
-
-  set(hpxlib_agas_namespace_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/component.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/primary.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/symbol.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Namespace" 
-      FILES ${hpxlib_agas_namespace_HEADERS})
-
-  set(hpxlib_agas_namespace_server_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/component.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/primary.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/symbol.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Namespace\\Server" 
-      FILES ${hpxlib_agas_namespace_server_HEADERS})
-
-  set(hpxlib_agas_namespace_stubs_HEADERS
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/component.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/primary.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/symbol.hpp)
-  source_group("Header Files\\Runtime\\AGAS\\Namespace\\Stubs" 
-      FILES ${hpxlib_agas_namespace_stubs_HEADERS})
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    # AGAS
+    set(hpxlib_agas_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits.hpp.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits_fwd.hpp)
+    source_group("Header Files\\Runtime\\AGAS" 
+        FILES ${hpxlib_agas_HEADERS})
+  
+    set(hpxlib_agas_client_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/client/legacy_agent.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Client" 
+        FILES ${hpxlib_agas_client_HEADERS})
+  
+    set(hpxlib_agas_database_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/table.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/traits_fwd.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Database" 
+        FILES ${hpxlib_agas_database_HEADERS})
+  
+    set(hpxlib_agas_database_backend_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/std_map.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/database/backend/default.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Database\\Backend" 
+        FILES ${hpxlib_agas_database_backend_HEADERS})
+  
+    set(hpxlib_agas_network_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/full_gva.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/table.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/traits_fwd.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Network" 
+        FILES ${hpxlib_agas_network_HEADERS})
+  
+    set(hpxlib_agas_network_backend_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/default.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/ib.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/tcpip.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/network/backend/udpip.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Network\\Backend" 
+        FILES ${hpxlib_agas_network_backend_HEADERS})
+  
+    set(hpxlib_agas_namespace_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/component.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/primary.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/symbol.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Namespace" 
+        FILES ${hpxlib_agas_namespace_HEADERS})
+  
+    set(hpxlib_agas_namespace_server_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/component.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/primary.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/server/symbol.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Namespace\\Server" 
+        FILES ${hpxlib_agas_namespace_server_HEADERS})
+  
+    set(hpxlib_agas_namespace_stubs_HEADERS
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/component.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/primary.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/namespace/stubs/symbol.hpp)
+    source_group("Header Files\\Runtime\\AGAS\\Namespace\\Stubs" 
+        FILES ${hpxlib_agas_namespace_stubs_HEADERS})
+  endif()
 
   # applier
   set(hpxlib_applier_HEADERS
@@ -505,11 +507,13 @@ else()
       FILES ${hpxlib_actions_SOURCES})
 
   # AGAS 
-  set(hpxlib_agas_SOURCES
-      ${hpx_SOURCE_DIR}/src/runtime/agas/common_actions.cpp
-      ${hpx_SOURCE_DIR}/src/runtime/agas/symbol_namespace.cpp)
-  source_group("Source Files\\Runtime\\AGAS" 
-      FILES ${hpxlib_agas_SOURCES})
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    set(hpxlib_agas_SOURCES
+        ${hpx_SOURCE_DIR}/src/runtime/agas/common_actions.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/symbol_namespace.cpp)
+    source_group("Source Files\\Runtime\\AGAS" 
+        FILES ${hpxlib_agas_SOURCES})
+  endif()
 
   # applier
   set(hpxlib_applier_SOURCES

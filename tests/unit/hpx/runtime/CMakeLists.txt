@@ -7,9 +7,12 @@
 set(group unit.hpx.runtime)
 
 set(subdirs 
-    agas
     components
     naming)
+
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
+  set(subdirs ${subdirs} agas)
+endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(${group}.${subdir})

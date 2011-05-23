@@ -7,7 +7,7 @@ add_subdirectory(actions)
 
 # AGAS v2 is still young, and I don't want to worry about Windows compatibility
 # at this point.
-if(NOT MSVC)
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
   add_subdirectory(agas)
 endif()
 

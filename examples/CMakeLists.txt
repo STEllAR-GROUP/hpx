@@ -13,7 +13,6 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      agas
       balancing
       generic
       had_amr3d
@@ -25,6 +24,9 @@ if(NOT MSVC)
       parcelset
       queue
       quickstart)
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    set(subdirs ${subdirs} agas)
+  endif()
 else()
   set(subdirs
       accumulator
