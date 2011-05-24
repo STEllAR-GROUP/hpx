@@ -18,11 +18,13 @@ add_hpx_executable(${subdir}_client
   MODULE nqueen
   SOURCES ${sources}
   DEPENDENCIES ${subdir}_component)
-  
-set_property(TARGET ${subdir}_component APPEND
-  PROPERTY COMPILE_FLAGS
-  "-bigobj")
-    
+
+if(MSVC)  
+  set_property(TARGET ${subdir}_component APPEND
+    PROPERTY COMPILE_FLAGS
+    "-bigobj")
+endif()
+   
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.nqueen ${subdir}_client_exe)
 
