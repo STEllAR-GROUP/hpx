@@ -65,10 +65,10 @@ HPX_REGISTER_ACTION_EX(
     get_value_action_int);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<bool>::set_result_action,
-    set_result_action_int);
+    set_result_action_bool);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<bool>::get_value_action,
-    get_value_action_int);
+    get_value_action_bool);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<hpx::util::section>::set_result_action,
     set_result_action_section);
