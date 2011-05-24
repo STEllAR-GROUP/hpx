@@ -10,6 +10,18 @@
 
 #include <boost/asio/ip/address.hpp>
 
+// add serialization support for std::array
+#if defined(BOOST_ASIO_HAS_STD_ARRAY)
+namespace boost { namespace serialization
+{
+    template <class Archive, class T, std::size_t N>
+    void serialize(Archive& ar, std::array<T, N>& a, const unsigned int /* version */)
+    {
+        ar & boost::serialization::make_array(a.data(), N);
+    }
+}}
+#endif
+
 #include <hpx/util/serialize_asio_address_v4.hpp>
 #include <hpx/util/serialize_asio_address_v6.hpp>
 
@@ -43,7 +55,7 @@ void load(Archive& ar, asio::ip::address& v, unsigned int)
     ar & proto;
 
     // ipv6
-    if (proto == 1)
+    if (proto)
     {
         asio::ip::address_v6 addr;
         ar & addr;
