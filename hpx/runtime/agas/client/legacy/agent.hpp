@@ -8,15 +8,7 @@
 #if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/naming/locality.hpp>
-#include <hpx/runtime/agas/network/backend/tcpip.hpp>
-#include <hpx/runtime/agas/namespace/component.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
-#include <hpx/runtime/agas/namespace/symbol.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime/agas/client/legacy/user.hpp>
 
 #if defined(HPX_USE_AGAS_CACHE)
     #include <map>
@@ -31,35 +23,34 @@ namespace hpx { namespace agas { namespace legacy
 {
 
 // TODO: pass error codes once they're implemented in AGAS.
-template <typename Database>
-struct agent
+template <typename Base>
+struct agent_base : Base
 {
-    // {{{ types
-    typedef primary_namespace<Database, tag::network::tcpip>
+    typedef Base base_type;
+
+    // {{{ convenience types 
+    typedef typename base_type::primary_namespace_type
         primary_namespace_type;
 
-    typedef component_namespace<Database> component_namespace_type;
-    typedef symbol_namespace<Database> symbol_namespace_type;
+    typedef typename base_type::component_namespace_type
+        component_namespace_type;
 
-    typedef typename component_namespace_type::component_id_type
-        component_id_type;
-    
-    typedef typename primary_namespace_type::gva_type gva_type;
-    typedef typename primary_namespace_type::count_type count_type;
-    typedef typename primary_namespace_type::offset_type offset_type;
-    typedef typename primary_namespace_type::endpoint_type endpoint_type;
-    typedef typename primary_namespace_type::unbinding_type unbinding_type;
-    typedef typename primary_namespace_type::binding_type binding_type;
-    typedef typename component_namespace_type::prefixes_type prefixes_type;
-    typedef typename component_namespace_type::prefix_type prefix_type;
-    typedef typename primary_namespace_type::decrement_type decrement_type;
+    typedef typename base_type::symbol_namespace_type
+        symbol_namespace_type;
+
+    typedef typename base_type::component_id_type component_id_type;
+    typedef typename base_type::gva_type gva_type;
+    typedef typename base_type::count_type count_type;
+    typedef typename base_type::offset_type offset_type;
+    typedef typename base_type::endpoint_type endpoint_type;
+    typedef typename base_type::unbinding_type unbinding_type;
+    typedef typename base_type::binding_type binding_type;
+    typedef typename base_type::prefixes_type prefixes_type;
+    typedef typename base_type::prefix_type prefix_type;
+    typedef typename base_type::decrement_type decrement_type;
     // }}}
 
   private:
-    primary_namespace_type primary_ns_;
-    component_namespace_type component_ns_;
-    symbol_namespace_type symbol_ns_;
-
     #if defined(HPX_USE_AGAS_CACHE)
         struct cache_key
         { // {{{ cache_key implementation
@@ -113,29 +104,12 @@ struct agent
     #endif
 
   public:
-    void bootstrap_worker();
-
-    void bootstrap_console();
-
-    agent(util::runtime_configuration const& ini_
-                  = util::runtime_configuration(), 
-          runtime_mode mode = runtime_mode_worker)
+    agent_base(util::runtime_configuration const& ini_, runtime_mode mode)
+        : base_type(ini_, mode) 
         #if defined(HPX_USE_AGAS_CACHE)
-            : gva_cache_(ini_.get_agas_cache_size())
+            , gva_cache_(ini_.get_agas_cache_size())
         #endif
-        {
-            if (mode == runtime_mode_worker)
-                bootstrap_worker();
-            else
-                bootstrap_console();
-        }
-
-    explicit agent(naming::id_type const& primary_ns,
-                   naming::id_type const& component_ns,
-                   naming::id_type const& symbol_ns) :
-        primary_ns_(primary_ns),
-        component_ns_(component_ns),
-        symbol_ns_(symbol_ns) {} 
+        { }
 
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) 
@@ -149,14 +123,14 @@ struct agent
 
         if (self)
         {
-            binding_type r = primary_ns_.bind(ep, 0);
+            binding_type r = this->primary_ns_.bind(ep, 0);
             prefix = at_c<2>(r);
             return at_c<3>(r);
         }
         
         else 
         {
-            prefix = at_c<0>(primary_ns_.resolve(ep)); 
+            prefix = at_c<0>(this->primary_ns_.resolve(ep)); 
             return false;
         }
     } // }}}
@@ -164,7 +138,7 @@ struct agent
     bool get_console_prefix(naming::gid_type& prefix,
                             error_code& ec = throws) 
     {
-        prefix = symbol_ns_.resolve("/console");
+        prefix = this->symbol_ns_.resolve("/console");
         return prefix;
     } 
 
@@ -175,7 +149,7 @@ struct agent
 
         if (type != components::component_invalid)
         {
-            prefixes_type raw_prefixes = component_ns_.resolve(type);
+            prefixes_type raw_prefixes = this->component_ns_.resolve(type);
     
             if (raw_prefixes.empty())
                 return false;
@@ -188,7 +162,7 @@ struct agent
             return true; 
         }
 
-        prefixes_type raw_prefixes = primary_ns_.localities();
+        prefixes_type raw_prefixes = this->primary_ns_.localities();
     
         if (raw_prefixes.empty())
             return false;
@@ -207,12 +181,15 @@ struct agent
 
     component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
-    { return component_ns_.bind(name); } 
+    { return this->component_ns_.bind(name); } 
 
     component_id_type
     register_factory(naming::gid_type const& prefix, std::string const& name, 
                      error_code& ec = throws) 
-    { return component_ns_.bind(name, naming::get_prefix_from_gid(prefix)); } 
+    {
+        return this->component_ns_.bind
+            (name, naming::get_prefix_from_gid(prefix));
+    } 
 
     bool get_id_range(naming::locality const& l, count_type count, 
                       naming::gid_type& lower_bound,
@@ -226,7 +203,7 @@ struct agent
 
         endpoint_type ep(addr, l.get_port()); 
          
-        binding_type range = primary_ns_.bind(ep, count);
+        binding_type range = this->primary_ns_.bind(ep, count);
 
         lower_bound = at_c<0>(range);
         upper_bound = at_c<1>(range);
@@ -253,7 +230,7 @@ struct agent
         // parameters.
         gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
         
-        if (primary_ns_.bind(lower_id, gva)) 
+        if (this->primary_ns_.bind(lower_id, gva)) 
         { 
             #if defined(HPX_USE_AGAS_CACHE)
                 mutex_type::scoped_lock lock(cache_mtx_);
@@ -270,7 +247,7 @@ struct agent
     count_type
     incref(naming::gid_type const& id, count_type credits = 1, 
            error_code& ec = throws) 
-    { return primary_ns_.increment(id, credits); } 
+    { return this->primary_ns_.increment(id, credits); } 
 
     count_type
     decref(naming::gid_type const& id, component_id_type& t,
@@ -278,7 +255,7 @@ struct agent
     { // {{{ decref implementation
         using boost::fusion::at_c;
 
-        decrement_type r = primary_ns_.decrement(id, credits);
+        decrement_type r = this->primary_ns_.decrement(id, credits);
 
         if (at_c<0>(r) == 0)
             t = at_c<1>(r);
@@ -303,7 +280,7 @@ struct agent
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       naming::address& addr, error_code& ec = throws) 
     { // {{{ unbind_range implementation
-        unbinding_type r = primary_ns_.unbind(lower_id, count);
+        unbinding_type r = this->primary_ns_.unbind(lower_id, count);
 
         if (r)
         {
@@ -323,7 +300,7 @@ struct agent
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
     { // {{{ resolve implementation
-        gva_type gva = primary_ns_.resolve(id);
+        gva_type gva = this->primary_ns_.resolve(id);
 
         if (try_cache && resolve_cached(id, addr, ec))
             return true;
@@ -391,24 +368,44 @@ struct agent
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
     {
-        naming::gid_type r = symbol_ns_.rebind(name, id);
+        naming::gid_type r = this->symbol_ns_.rebind(name, id);
         return r == id;
     }
 
     bool unregisterid(std::string const& name, error_code& ec = throws) 
-    { return symbol_ns_.unbind(name); }
+    { return this->symbol_ns_.unbind(name); }
 
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) 
     {
-        id = symbol_ns_.resolve(ns_name);
+        id = this->symbol_ns_.resolve(ns_name);
         return id;         
     }
 };
 
-}}}
+template <typename Database>
+struct user_agent : agent_base<user_agent_base<Database> >
+{
+    typedef agent_base<user_agent_base<Database> > base_type;
 
-#include <hpx/runtime/agas/client/legacy/bootstrap.hpp>
+    user_agent(util::runtime_configuration const& ini_
+                  = util::runtime_configuration(), 
+               runtime_mode mode = runtime_mode_worker)
+        : base_type(ini_, mode) {} 
+};
+
+template <typename Database>
+struct bootstrap_agent : agent_base<bootstrap_agent_base<Database> >
+{
+    typedef agent_base<bootstrap_agent_base<Database> > base_type;
+
+    bootstrap_agent(util::runtime_configuration const& ini_
+                      = util::runtime_configuration(), 
+                    runtime_mode mode = runtime_mode_worker)
+        : base_type(ini_, mode) {} 
+};
+
+}}}
 
 #endif // HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
