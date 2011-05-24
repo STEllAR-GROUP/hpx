@@ -25,13 +25,6 @@ using hpx::naming::gid_type;
 using boost::fusion::vector2;
 using boost::fusion::vector4;
 
-HPX_REGISTER_ACTION_EX(
-    base_lco_with_value<bool>::set_result_action,
-    set_result_action_bool);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    base_lco_with_value<bool>,
-    component_base_lco_with_value);
-
 // component_ and primary_namespace's prefixes_type
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<std::vector<boost::uint32_t> >::set_result_action,
