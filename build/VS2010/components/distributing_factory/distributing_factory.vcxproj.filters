@@ -20,14 +20,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\hpx\components\distributing_factory\distributing_factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\hpx\components\distributing_factory\server\distributing_factory.cpp">
-      <Filter>Source Files\Server</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\..\hpx\components\distributing_factory\distributing_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,5 +32,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\hpx\components\distributing_factory\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\components\distributing_factory\distributing_factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\components\distributing_factory\server\distributing_factory.cpp">
+      <Filter>Source Files\Server</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

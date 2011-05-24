@@ -36,8 +36,8 @@ xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
 xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
 xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\$(Configuration)\libs"
 </Command>
-      <Outputs>%(Outputs)</Outputs>
       <Inputs>$(TargetPath)</Inputs>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>

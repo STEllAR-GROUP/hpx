@@ -95,15 +95,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\hpx\components\distributing_factory\distributing_factory.cpp" />
-    <ClCompile Include="..\..\..\..\hpx\components\distributing_factory\server\distributing_factory.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(FileName)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(FileName)1.xdc</XMLDocumentationFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(FileName)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(FileName)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\..\hpx\components\distributing_factory\distributing_factory.hpp" />
     <ClInclude Include="..\..\..\..\hpx\components\distributing_factory\server\distributing_factory.hpp" />
     <ClInclude Include="..\..\..\..\hpx\components\distributing_factory\stubs\distributing_factory.hpp" />
@@ -120,6 +111,13 @@
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\components\distributing_factory\distributing_factory.cpp" />
+    <ClCompile Include="..\..\..\..\src\components\distributing_factory\server\distributing_factory.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\distributing_factory1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\distributing_factory1.obj</ObjectFileName>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

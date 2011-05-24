@@ -98,6 +98,7 @@
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
@@ -193,6 +194,10 @@
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
     <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />

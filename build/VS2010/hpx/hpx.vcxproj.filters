@@ -141,6 +141,18 @@
     <Filter Include="Source Files\Runtime\Components\Server">
       <UniqueIdentifier>{c1cfc809-0781-465d-808d-06554754c0a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Runtime\AGAS">
+      <UniqueIdentifier>{329c9ff4-3d83-407a-90cb-a28c843d8a39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS">
+      <UniqueIdentifier>{229da103-f219-4fee-bdc6-8c247ac79483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Client">
+      <UniqueIdentifier>{96743ce1-e084-441a-9857-cfdb716c6919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Database">
+      <UniqueIdentifier>{a33113d6-635c-44f9-84d3-d2fca0fba6b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -289,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp">
       <Filter>Source Files\Runtime\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -819,6 +834,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp">
       <Filter>Header Files\Runtime\Threads\Policies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
