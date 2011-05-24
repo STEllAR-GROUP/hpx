@@ -27,20 +27,45 @@ using hpx::components::component_base_lco_with_value;
 using hpx::lcos::base_lco_with_value;
 using hpx::naming::gid_type;
 
-typedef hpx::agas::server::primary_namespace<
-    hpx::agas::tag::database::stdmap,
-    hpx::agas::tag::network::tcpip
-> agas_component;
+#if !defined(HPX_AGAS_SYSTEM)
+    typedef hpx::agas::server::primary_namespace<
+        hpx::agas::tag::database::stdmap,
+        hpx::agas::tag::network::tcpip
+    > agas_component;
+    
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+        hpx::components::simple_component<agas_component>,
+        stdmap_tcpip_primary_namespace);
+    
+    HPX_DEFINE_GET_COMPONENT_TYPE(agas_component::base_type);
+    
+    namespace hpx { namespace components
+    {
+    
+    template <> HPX_ALWAYS_EXPORT
+    component_type component_type_database<agas_component>::get()
+    { return component_type_database<agas_component::base_type>::get(); }
+    
+    template <> HPX_ALWAYS_EXPORT
+    void component_type_database<agas_component>::set(component_type t)
+    { component_type_database<agas_component::base_type>::set(t); }
+    
+    }}
+#else
+    typedef hpx::agas::server::bootstrap_primary_namespace<
+        hpx::agas::tag::database::stdmap,
+        hpx::agas::tag::network::tcpip
+    > agas_component;
+    
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+        hpx::components::fixed_component<agas_component>,
+        stdmap_tcpip_bootstrap_primary_namespace);
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<agas_component>,
-    stdmap_tcpip_primary_namespace);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component, component_agas_primary_namespace);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component::base_type, component_agas_primary_namespace);
+    HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+        agas_component, component_agas_primary_namespace);
+    HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+        agas_component::base_type, component_agas_primary_namespace);
+#endif
 
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::gva_type>::set_result_action,

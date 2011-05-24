@@ -3,9 +3,21 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_hpx_component(agas_stdmap_tcpip 
+# user version
+add_hpx_component(agas_stdmap_tcpip_u
   MODULE core
   SOURCES component_module.cpp
           primary_namespace.cpp
   ESSENTIAL)
+
+# system version
+add_hpx_library(agas_stdmap_tcpip_s
+  MODULE core
+  SOURCES component_module.cpp
+          primary_namespace.cpp
+  ESSENTIAL)
+
+set_property(TARGET agas_stdmap_tcpip_s_lib APPEND
+  PROPERTY COMPILE_DEFINITIONS
+  "HPX_AGAS_SYSTEM")
 
