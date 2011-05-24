@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +10,6 @@
 #include <hpx/runtime/components/derived_component_factory_one.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/server/barrier.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
@@ -64,6 +64,12 @@ HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<int>::get_value_action,
     get_value_action_int);
 HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<bool>::set_result_action,
+    set_result_action_int);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<bool>::get_value_action,
+    get_value_action_int);
+HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<hpx::util::section>::set_result_action,
     set_result_action_section);
 HPX_REGISTER_ACTION_EX(
@@ -112,15 +118,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<hpx::util::unused_type>,
     hpx::components::component_base_lco_with_value);
-
-///////////////////////////////////////////////////////////////////////////////
-// Barrier
-typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_type;
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::server::barrier, hpx::components::component_barrier);
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(barrier_type, barrier, 
-    "hpx::lcos::base_lco");
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
