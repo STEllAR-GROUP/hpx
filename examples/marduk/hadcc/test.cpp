@@ -338,13 +338,101 @@ int main(int argc,char* argv[]) {
   }
 
   // prolongation pattern
+  std::vector<int> prolong_list[maxgids];
+  // determine the communication pattern
+  for (int i=0;i<par.allowedl;i++) {
+    int gi = level_return_start(i,par);
+    while ( grid_return_existence(gi,par) ) {
+      int gi2 = level_return_start(i+1,par);
+      //std::cout << " TEST " << gi2 << std::endl;
+      while ( grid_return_existence(gi2,par) ) {
+       // std::cout << " TEST " << gi2 << std::endl;
+       // std::cout << "  " << par.gr_minx[gi] << " " << par.gr_maxx[gi] << std::endl;
+       // std::cout << "  " << par.gr_miny[gi] << " " << par.gr_maxy[gi] << std::endl;
+       // std::cout << "  " << par.gr_minz[gi] << " " << par.gr_maxz[gi] << std::endl;
+       // std::cout << "  " << par.gr_minx[gi2] << " " << par.gr_maxx[gi2] << std::endl;
+       // std::cout << "  " << par.gr_miny[gi2] << " " << par.gr_maxy[gi2] << std::endl;
+       // std::cout << "  " << par.gr_minz[gi2] << " " << par.gr_maxz[gi2] << std::endl;
+       // std::cout << "  " << std::endl;
+        double h = par.gr_h[gi2];
+      //  if ( intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+      //                    par.gr_miny[gi],par.gr_maxy[gi], 
+      //                    par.gr_minz[gi],par.gr_maxz[gi], 
+      //                    par.gr_minx[gi2],par.gr_maxx[gi2],
+      //                    par.gr_miny[gi2],par.gr_maxy[gi2],
+      //                    par.gr_minz[gi2],par.gr_maxz[gi2]) ) 
+        if ( intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_minx[gi2],par.gr_minx[gi2]+h,
+                          par.gr_miny[gi2],par.gr_maxy[gi2],
+                          par.gr_minz[gi2],par.gr_maxz[gi2]) ||
+             intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_maxx[gi2]-h,par.gr_maxx[gi2],
+                          par.gr_miny[gi2],par.gr_maxy[gi2],
+                          par.gr_minz[gi2],par.gr_maxz[gi2]) ||
+             intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_minx[gi2],par.gr_maxx[gi2],
+                          par.gr_miny[gi2],par.gr_miny[gi2]+h,
+                          par.gr_minz[gi2],par.gr_maxz[gi2]) ||
+             intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_minx[gi2],par.gr_maxx[gi2],
+                          par.gr_maxy[gi2]-h,par.gr_maxy[gi2],
+                          par.gr_minz[gi2],par.gr_maxz[gi2]) ||
+             intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_minx[gi2],par.gr_maxx[gi2],
+                          par.gr_miny[gi2],par.gr_maxy[gi2],
+                          par.gr_minz[gi2],par.gr_minz[gi2]+h) ||
+             intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                          par.gr_miny[gi],par.gr_maxy[gi], 
+                          par.gr_minz[gi],par.gr_maxz[gi], 
+                          par.gr_minx[gi2],par.gr_maxx[gi2],
+                          par.gr_miny[gi2],par.gr_maxy[gi2],
+                          par.gr_maxz[gi2]-h,par.gr_maxz[gi2]) ) { 
+          prolong_list[gi].push_back(gi2);
+        }
+        gi2 = par.gr_sibling[gi2];
+      }
+      gi = par.gr_sibling[gi];
+    }
+  }
 
   // restriction pattern
+  std::vector<int> restrict_list[maxgids];
+  // determine the communication pattern
+  for (int i=par.allowedl;i>0;i--) {
+    int gi = level_return_start(i,par);
+    while ( grid_return_existence(gi,par) ) {
+      int gi2 = level_return_start(i-1,par);
+      while ( grid_return_existence(gi2,par) ) {
+        gi2 = par.gr_sibling[gi2];
+        if ( intersection(par.gr_minx[gi],par.gr_maxx[gi], 
+                                 par.gr_miny[gi],par.gr_maxy[gi], 
+                                 par.gr_minz[gi],par.gr_maxz[gi], 
+                                 par.gr_minx[gi2],par.gr_maxx[gi2],
+                                 par.gr_miny[gi2],par.gr_maxy[gi2],
+                                 par.gr_minz[gi2],par.gr_maxz[gi2]) ) {
+          restrict_list[gi].push_back(gi2);
+        }
+      }
+      gi = par.gr_sibling[gi];
+    }
+  }
 
   // TEST
-  //for (int i=0;i<par.gr_minx.size();i++) {
-  //  std::cout << " gi " << i << " has " << comm_list[i].size() << " interactions " << std::endl; 
-  //}
+  for (int i=0;i<par.gr_minx.size();i++) {
+    std::cout << " gi " << i << " has " << comm_list[i].size() << " interactions " << std::endl; 
+    std::cout << "                    " << restrict_list[i].size() << " restrict " << std::endl; 
+    std::cout << "                    " << prolong_list[i].size() << " prolong " << std::endl; 
+  }
 
   return 0;
 }
