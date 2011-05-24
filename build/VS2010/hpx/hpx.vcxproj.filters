@@ -153,6 +153,27 @@
     <Filter Include="Header Files\Runtime\AGAS\Database">
       <UniqueIdentifier>{a33113d6-635c-44f9-84d3-d2fca0fba6b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Namespace">
+      <UniqueIdentifier>{eb3a0579-668f-4c0d-8e79-b5a5b6fe9ffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Network">
+      <UniqueIdentifier>{2a44ba57-9834-43ee-a87b-8f90fe69cfd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Client\Legacy">
+      <UniqueIdentifier>{e5860a74-c6cd-4df7-ae64-def3fec69ba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Database\Backend">
+      <UniqueIdentifier>{d6052bdc-2a2d-4289-b1e9-13f02c22ef30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Namespace\Server">
+      <UniqueIdentifier>{f9b32c7e-2a5b-4eb8-9118-cc556dbc61c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Namespace\Stubs">
+      <UniqueIdentifier>{fbdc0ec4-7330-49e9-bfff-cf202a20ab17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Network\Backend">
+      <UniqueIdentifier>{b41a173e-5972-460c-b048-15220561b694}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -847,6 +868,84 @@
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\bootstrap.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\user.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\agent.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp">
+      <Filter>Header Files\Runtime\AGAS\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp">
+      <Filter>Header Files\Runtime\AGAS\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp">
+      <Filter>Header Files\Runtime\AGAS\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp">
+      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\stdmap.hpp">
+      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\gva.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\ib.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\tcpip.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\udpip.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp">
+      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -891,6 +990,12 @@
     </None>
     <None Include="hpx.def">
       <Filter>Auxiliary Files</Filter>
+    </None>
+    <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept">
+      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
+    </None>
+    <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept">
+      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
