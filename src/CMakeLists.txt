@@ -389,7 +389,6 @@ else()
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/thread_init_data.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/threads/threadmanager_impl.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/threads/detail/tagged_thread_state.hpp)
   source_group("Header Files\\Runtime\\Threads" 
       FILES ${hpxlib_threadmanager_HEADERS})
