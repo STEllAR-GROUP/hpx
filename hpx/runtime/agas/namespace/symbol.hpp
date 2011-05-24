@@ -17,25 +17,17 @@ namespace hpx { namespace agas
 {
 
 // TODO: add error code parameters
-template <typename Database>
-struct symbol_namespace
-  : components::client_base<
-      symbol_namespace<Database>,
-      stubs::symbol_namespace<Database>
-    >
+template <typename Base, typename Server>
+struct symbol_namespace_base : Base
 {
     // {{{ nested types 
-    typedef components::client_base<
-        symbol_namespace<Database>,
-        stubs::symbol_namespace<Database>
-    > base_type;
-
-    typedef server::symbol_namespace<Database> server_type;
+    typedef Base base_type; 
+    typedef Server server_type;
 
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
-    explicit symbol_namespace(naming::id_type const& id = naming::invalid_id)
+    explicit symbol_namespace_base(naming::id_type const& id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -72,6 +64,47 @@ struct symbol_namespace
     bool unbind(symbol_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
+
+template <typename Database>
+struct symbol_namespace : symbol_namespace_base<
+    components::client_base<
+        symbol_namespace<Database>,
+        stubs::symbol_namespace<Database>
+    >,
+    server::symbol_namespace<Database>
+> {
+    typedef symbol_namespace_base< 
+        components::client_base<
+            symbol_namespace<Database>,
+            stubs::symbol_namespace<Database>
+        >,
+        server::symbol_namespace<Database>
+    > base_type;
+
+    explicit symbol_namespace(naming::id_type const& id = naming::invalid_id)
+        : base_type(id) {}
+};
+
+template <typename Database>
+struct bootstrap_symbol_namespace : symbol_namespace_base<
+    components::client_base<
+        bootstrap_symbol_namespace<Database>,
+        stubs::bootstrap_symbol_namespace<Database>
+    >,
+    server::bootstrap_symbol_namespace<Database>
+> {
+    typedef symbol_namespace_base< 
+        components::client_base<
+            bootstrap_symbol_namespace<Database>,
+            stubs::bootstrap_symbol_namespace<Database>
+        >,
+        server::bootstrap_symbol_namespace<Database>
+    > base_type;
+
+    explicit bootstrap_symbol_namespace(naming::id_type const& id
+                                             = naming::invalid_id)
+        : base_type(id) {}
+};
 
 }}
 

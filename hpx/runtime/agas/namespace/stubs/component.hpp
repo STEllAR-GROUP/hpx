@@ -17,12 +17,12 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database>
-struct component_namespace
-  : components::stubs::stub_base<server::component_namespace<Database> >
+template <typename Server>
+struct component_namespace_base : components::stubs::stub_base<Server>
 {
     // {{{ nested types
-    typedef server::component_namespace<Database> server_type;
+    typedef components::stubs::stub_base<Server> base_type;
+    typedef Server server_type; 
 
     typedef typename server_type::component_name_type component_name_type;
     typedef typename server_type::component_id_type component_id_type;
@@ -99,6 +99,16 @@ struct component_namespace
     { return unbind_async(gid, key).get(); } 
     // }}}
 };            
+
+template <typename Database> 
+struct component_namespace : component_namespace_base<
+    server::component_namespace<Database>
+> { };
+
+template <typename Database> 
+struct bootstrap_component_namespace : component_namespace_base<
+    server::bootstrap_component_namespace<Database>
+> { };
 
 }}}
 

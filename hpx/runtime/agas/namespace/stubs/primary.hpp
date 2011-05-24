@@ -17,12 +17,12 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database, typename Protocol>
-struct primary_namespace
-  : components::stubs::stub_base<server::primary_namespace<Database, Protocol> >
+template <typename Server>
+struct primary_namespace_base : components::stubs::stub_base<Server>
 {
     // {{{ nested types
-    typedef server::primary_namespace<Database, Protocol> server_type;
+    typedef components::stubs::stub_base<Server> base_type;
+    typedef Server server_type; 
 
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;
@@ -151,6 +151,16 @@ struct primary_namespace
     { return localities_async(gid).get(); } 
     // }}}
 };            
+
+template <typename Database, typename Protocol> 
+struct primary_namespace : primary_namespace_base<
+    server::primary_namespace<Database, Protocol>
+> { };
+
+template <typename Database, typename Protocol> 
+struct bootstrap_primary_namespace : primary_namespace_base<
+    server::bootstrap_primary_namespace<Database, Protocol>
+> { };
 
 }}}
 

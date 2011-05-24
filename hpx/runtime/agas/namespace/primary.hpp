@@ -17,20 +17,12 @@ namespace hpx { namespace agas
 {
 
 // TODO: add error code parameters
-template <typename Database, typename Protocol>
-struct primary_namespace
-  : components::client_base<
-      primary_namespace<Database, Protocol>,
-      stubs::primary_namespace<Database, Protocol>
-    >
+template <typename Base, typename Server>
+struct primary_namespace_base : Base
 {
     // {{{ nested types 
-    typedef components::client_base<
-        primary_namespace<Database, Protocol>,
-        stubs::primary_namespace<Database, Protocol>
-    > base_type;
-
-    typedef server::primary_namespace<Database, Protocol> server_type;
+    typedef Base base_type; 
+    typedef Server server_type;
 
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;
@@ -44,7 +36,7 @@ struct primary_namespace
     typedef typename server_type::decrement_type decrement_type;
     // }}}
 
-    explicit primary_namespace(naming::id_type const& id = naming::invalid_id)
+    explicit primary_namespace_base(naming::id_type const& id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -115,6 +107,47 @@ struct primary_namespace
     prefixes_type localities()
     { return this->base_type::localities(this->gid_); }
 }; 
+
+template <typename Database, typename Protocol>
+struct primary_namespace : primary_namespace_base<
+    components::client_base<
+        primary_namespace<Database, Protocol>,
+        stubs::primary_namespace<Database, Protocol>
+    >,
+    server::primary_namespace<Database, Protocol>
+> {        
+    typedef primary_namespace_base<
+        components::client_base<
+            primary_namespace<Database, Protocol>,
+            stubs::primary_namespace<Database, Protocol>
+        >,
+        server::primary_namespace<Database, Protocol>
+    > base_type;
+
+    explicit primary_namespace(naming::id_type const& id = naming::invalid_id)
+        : base_type(id) {}
+};
+
+template <typename Database, typename Protocol>
+struct bootstrap_primary_namespace : primary_namespace_base<
+    components::client_base<
+        bootstrap_primary_namespace<Database, Protocol>,
+        stubs::bootstrap_primary_namespace<Database, Protocol>
+    >,
+    server::bootstrap_primary_namespace<Database, Protocol>
+> {        
+    typedef primary_namespace_base<
+        components::client_base<
+            bootstrap_primary_namespace<Database, Protocol>,
+            stubs::bootstrap_primary_namespace<Database, Protocol>
+        >,
+        server::bootstrap_primary_namespace<Database, Protocol>
+    > base_type;
+
+    explicit bootstrap_primary_namespace(naming::id_type const& id
+                                            = naming::invalid_id)
+      : base_type(id) {}
+};
 
 }}
 

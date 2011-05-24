@@ -17,28 +17,20 @@ namespace hpx { namespace agas
 {
 
 // TODO: add error code parameters
-template <typename Database>
-struct component_namespace
-  : components::client_base<
-      component_namespace<Database>,
-      stubs::component_namespace<Database>
-    >
+template <typename Base, typename Server>
+struct component_namespace_base : Base
 {
     // {{{ nested types 
-    typedef components::client_base<
-        component_namespace<Database>,
-        stubs::component_namespace<Database>
-    > base_type;
-
-    typedef server::component_namespace<Database> server_type;
-
+    typedef Base base_type; 
+    typedef Server server_type;
+    
     typedef typename server_type::component_name_type component_name_type;
     typedef typename server_type::component_id_type component_id_type;
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
     // }}}
 
-    explicit component_namespace(naming::id_type const& id = naming::invalid_id)
+    explicit component_namespace_base(naming::id_type const& id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -84,6 +76,47 @@ struct component_namespace
     bool unbind(component_name_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
+
+template <typename Database>
+struct component_namespace : component_namespace_base<
+    components::client_base<
+        component_namespace<Database>,
+        stubs::component_namespace<Database>
+    >,
+    server::component_namespace<Database>
+> {
+    typedef component_namespace_base< 
+        components::client_base<
+            component_namespace<Database>,
+            stubs::component_namespace<Database>
+        >,
+        server::component_namespace<Database>
+    > base_type;
+
+    explicit component_namespace(naming::id_type const& id = naming::invalid_id)
+        : base_type(id) {}
+};
+
+template <typename Database>
+struct bootstrap_component_namespace : component_namespace_base<
+    components::client_base<
+        bootstrap_component_namespace<Database>,
+        stubs::bootstrap_component_namespace<Database>
+    >,
+    server::bootstrap_component_namespace<Database>
+> {
+    typedef component_namespace_base< 
+        components::client_base<
+            bootstrap_component_namespace<Database>,
+            stubs::bootstrap_component_namespace<Database>
+        >,
+        server::bootstrap_component_namespace<Database>
+    > base_type;
+
+    explicit bootstrap_component_namespace(naming::id_type const& id
+                                             = naming::invalid_id)
+        : base_type(id) {}
+};
 
 }}
 
