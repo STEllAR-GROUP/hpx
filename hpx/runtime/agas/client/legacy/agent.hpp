@@ -9,6 +9,7 @@
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
 #include <hpx/runtime/agas/client/legacy/user.hpp>
+#include <hpx/runtime/agas/client/legacy/bootstrap.hpp>
 
 #if defined(HPX_USE_AGAS_CACHE)
     #include <map>

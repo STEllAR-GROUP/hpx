@@ -22,6 +22,7 @@ set(testcases
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
                SOURCES ${testcase}.cpp
+               DEPENDENCIES barrier_component
                ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
                          "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
                          "-t" "${HPX_TEST_NUM_THREADS}"

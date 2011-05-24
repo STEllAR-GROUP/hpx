@@ -1,17 +1,17 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(client_headers
-    distributing_factory.hpp)
+set(root ${hpx_SOURCE_DIR}/hpx/components/distributing_factory)
 
-set(stubs_headers
-    stubs/distributing_factory.hpp)
+set(client_headers ${root}/distributing_factory.hpp)
 
-set(server_headers
-    server/distributing_factory.hpp)
+set(stubs_headers ${root}/stubs/distributing_factory.hpp)
+
+set(server_headers ${root}/server/distributing_factory.hpp)
 
 ###############################################################################
 set(client_sources

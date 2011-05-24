@@ -25,7 +25,7 @@ namespace hpx { namespace agas { namespace legacy
 
 // TODO: pass error codes once they're implemented in AGAS.
 template <typename Database>
-struct bootstrap_agent
+struct bootstrap_agent_base
 {
     // {{{ types
     typedef bootstrap_primary_namespace<Database, tag::network::tcpip>

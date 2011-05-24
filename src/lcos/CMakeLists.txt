@@ -6,3 +6,5 @@
 add_hpx_library_sources(hpx
   base_lco.cpp)
 
+add_subdirectory(barrier)
+

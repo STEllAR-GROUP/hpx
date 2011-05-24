@@ -3,10 +3,8 @@
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-add_definitions(-DHPX_COMPONENT_NAME=hpx)
-add_definitions(-DHPX_EXPORTS)
-add_definitions(-DBOOST_COROUTINE_EXPORTS)
+  
+add_subdirectory(components)
 
 ###############################################################################
 # POSIX 
@@ -81,7 +79,11 @@ if(UNIX)
 
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\""
+    "HPX_COMPONENT_NAME=hpx"
+    "HPX_EXPORTS"
+    "BOOST_COROUTINE_EXPORTS")
+
   
   #############################################################################
   # libhpx_ini
@@ -102,7 +104,10 @@ if(UNIX)
 
   set_property(TARGET hpx_ini APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\""
+    "HPX_COMPONENT_NAME=hpx"
+    "HPX_EXPORTS"
+    "BOOST_COROUTINE_EXPORTS")
   
   #############################################################################
   # libhpx
@@ -121,7 +126,10 @@ if(UNIX)
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\""
+    "HPX_COMPONENT_NAME=hpx"
+    "HPX_EXPORTS"
+    "BOOST_COROUTINE_EXPORTS")
 
   foreach(lib ${hpx_CORE})
     get_target_property(path ${lib} LOCATION)
@@ -635,7 +643,10 @@ else()
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx_serialization APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\""
+    "HPX_COMPONENT_NAME=hpx"
+    "HPX_EXPORTS"
+    "BOOST_COROUTINE_EXPORTS")
 
   # libhpx
   add_library(hpx SHARED ${hpxlib_SOURCES}
@@ -654,7 +665,10 @@ else()
   get_filename_component(name "${path}" NAME)
   set_property(TARGET hpx APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\"")
+    "HPX_LIBRARY=\"${name}\""
+    "HPX_COMPONENT_NAME=hpx"
+    "HPX_EXPORTS"
+    "BOOST_COROUTINE_EXPORTS")
 
   install(TARGETS hpx
       ARCHIVE DESTINATION lib
