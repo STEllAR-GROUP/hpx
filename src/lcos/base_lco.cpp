@@ -104,6 +104,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<int>,
     hpx::components::component_base_lco_with_value);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<bool>,
+    hpx::components::component_base_lco_with_value);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<hpx::util::section>,
     hpx::components::component_base_lco_with_value);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
