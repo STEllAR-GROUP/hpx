@@ -15,8 +15,8 @@ foreach(example_program ${example_programs})
   # add example executable
   add_hpx_executable(${example_program}
                      MODULE agas
-                     DEPENDENCIES agas_stdmap_u_component
-                                  agas_stdmap_tcpip_u_component
+                     DEPENDENCIES agas_stdmap_component
+                                  agas_stdmap_tcpip_component
                      SOURCES ${sources})
 
   # add a custom target for this example 

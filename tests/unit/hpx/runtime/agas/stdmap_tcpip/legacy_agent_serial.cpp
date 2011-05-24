@@ -24,7 +24,7 @@ using hpx::naming::id_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::legacy::agent;
+using hpx::agas::legacy::user_agent;
 using hpx::agas::primary_namespace;
 using hpx::agas::component_namespace;
 using hpx::agas::symbol_namespace;
@@ -34,7 +34,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-typedef agent<
+typedef user_agent<
     hpx::agas::tag::database::stdmap
 > legacy_agent_type;
 
@@ -57,7 +57,8 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
-    
+   
+#if 0 
     // Get this locality's prefix.
     id_type prefix = get_applier().get_runtime_support_gid();
 
@@ -75,6 +76,8 @@ int hpx_main(variables_map& vm)
 
     // Create the legacy agent.
     legacy_agent_type agent(pri.get_gid(), cpt.get_gid(), sym.get_gid());
+#endif
+    legacy_agent_type agent;
 
     gid_type last_lowerid;
     locality here(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
