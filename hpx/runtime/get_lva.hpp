@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,6 +7,7 @@
 #if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
+#include <boost/mpl/or.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 
@@ -35,9 +37,14 @@ namespace hpx
     template <typename Component>
     struct get_lva
     {
-        struct is_simple_component
-          : boost::is_base_and_derived<
-                components::detail::simple_component_tag, Component
+        struct is_simple_or_fixed_component
+          : boost::mpl::or_<
+                boost::is_base_and_derived<
+                    components::detail::simple_component_tag, Component
+                >,
+                boost::is_base_and_derived<
+                    components::detail::fixed_component_tag, Component
+                >
             >
         {};
 
@@ -57,7 +64,7 @@ namespace hpx
         static Component* 
         call(naming::address::address_type lva)
         {
-            return call(lva, is_simple_component());
+            return call(lva, is_simple_or_fixed_component());
         }
     };
 
