@@ -90,7 +90,7 @@ namespace hpx
             using boost::program_options::store;
             using boost::program_options::command_line_parser;
 
-//            try {
+            try {
                 options_description hpx_options("HPX Options");
 
                 hpx_options.add_options()
@@ -153,15 +153,13 @@ namespace hpx
                     std::cout << desc_cmdline;
                     return help;
                 }
-//            }
+            }
 
-#if 0
             catch (std::exception const& e) {
                 std::cerr << "hpx::init: exception caught: "
                           << e.what() << std::endl;
                 return error;
             }
-#endif
             
             return success;
         }
@@ -219,8 +217,8 @@ namespace hpx
     {
         int result = 0;
 
-//        try
-//        {
+        try
+        {
             using boost::program_options::variables_map; 
 
             // Analyze the command line.
@@ -479,8 +477,7 @@ namespace hpx
             else {
                 throw std::logic_error("bad value for parameter --queueing/-q");
             }
-//        }
-#if 0
+        }
         catch (std::exception& e)
         {
             std::cerr << "hpx::init: std::exception caught: " << e.what()
@@ -495,7 +492,6 @@ namespace hpx
         }
 
         return result;
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
