@@ -119,8 +119,14 @@ if(UNIX)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx)
 
-  target_link_libraries(hpx hpx_serialization hpx_ini
-    ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    target_link_libraries(hpx hpx_serialization hpx_ini
+      agas_stdmap_bs_lib agas_stdmap_tcpip_bs_lib
+      ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+  else()
+    target_link_libraries(hpx hpx_serialization hpx_ini
+      ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
+  endif()
  
   get_target_property(path hpx LOCATION)
   get_filename_component(name "${path}" NAME)
