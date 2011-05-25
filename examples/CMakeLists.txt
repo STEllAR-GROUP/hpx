@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
+# Copyright (c) 2011      Dylan Stark
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,12 +19,13 @@ if(NOT MSVC)
       had_amr3d
       hplpx
       marduk
-      smp_amr3d
       nbody
       nqueen
       parcelset
+      pxgl
       queue
-      quickstart)
+      quickstart
+      smp_amr3d)
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} agas)
   endif()
@@ -41,9 +43,11 @@ foreach(subdir ${subdirs})
 endforeach()
 
 add_hpx_pseudo_target(chirag)
+add_hpx_pseudo_target(dylan)
 add_hpx_pseudo_target(matt)
 add_hpx_pseudo_target(wash)
 add_hpx_pseudo_dependencies(chirag examples.nbody)
+add_hpx_pseudo_dependencies(dylan examples.pxgl examples.quickstart.fibonacci1)
 add_hpx_pseudo_dependencies(matt examples.had_amr3d)
 add_hpx_pseudo_dependencies(wash examples.smp_amr3d)
 
