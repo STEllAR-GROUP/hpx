@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +8,7 @@
 #define HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
