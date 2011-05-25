@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
@@ -96,11 +97,11 @@ namespace hpx { namespace components
                 if (component_invalid == base_type) 
                 {
                 // first call to get_component_type, ask AGAS for a unique id
-                    base_type = agas_client.get_component_id(
+                    base_type = (component_type) agas_client.get_component_id(
                         unique_component_name<derived_component_factory, base_name>::call());
                 }
 
-                component_type this_type = agas_client.register_factory(
+                component_type this_type = (component_type) agas_client.register_factory(
                     prefix, unique_component_name<derived_component_factory>::call());
 
                 components::set_component_type<type_holder>(

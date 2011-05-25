@@ -1,4 +1,5 @@
 //  Copyright (c) 1998-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #if !defined(DEBUG)
@@ -52,6 +54,14 @@ namespace hpx { namespace components { namespace detail
 
     } // namespace debug
 #endif
+                
+    void store_agas_client(naming::resolver_client*&, hpx::applier::applier&);
+
+    bool bind_range(naming::resolver_client*, naming::gid_type const&,
+                    std::size_t, naming::address const&, std::size_t);
+    
+    void unbind_range(naming::resolver_client*, naming::gid_type const&,
+                      std::size_t);
 
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator>
@@ -212,15 +222,15 @@ namespace hpx { namespace components { namespace detail
 
                 // store a pointer to the AGAS client
                 hpx::applier::applier& appl = hpx::applier::get_applier();
-                get_agas_client_ = &appl.get_agas_client();
+                store_agas_client(get_agas_client_, appl);
 
                 // this is the first call to get_gid() for this heap - allocate 
                 // a sufficiently large range of global ids
-                base_gid_ = ids.get_id(appl.here(), *get_agas_client_, step_);
+                base_gid_ = ids.get_id(appl.here(), get_agas_client_, step_);
 
                 // register the global ids and the base address of this heap
                 // with the AGAS
-                if (!get_agas_client_->bind_range(base_gid_, step_, 
+                if (!bind_range(get_agas_client_, base_gid_, step_, 
                       naming::address(appl.here(),
                           components::get_component_type<typename value_type::type_holder>(), 
                           addr),
@@ -285,7 +295,7 @@ namespace hpx { namespace components { namespace detail
             // unbind in AGAS service 
             if (base_gid_) {
                 BOOST_ASSERT(NULL != get_agas_client_);
-                get_agas_client_->unbind_range(base_gid_, step_);
+                unbind_range(get_agas_client_, base_gid_, step_);
                 base_gid_ = naming::invalid_gid;
             }
 
@@ -357,7 +367,7 @@ namespace hpx { namespace components { namespace detail
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
         naming::gid_type base_gid_;
-        naming::resolver_client const* get_agas_client_;
+        naming::resolver_client* get_agas_client_;
 
 #if defined(DEBUG)
         mutable mutex_type mtx_;

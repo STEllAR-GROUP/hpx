@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -95,11 +96,11 @@ namespace hpx { namespace components
                 if (component_invalid == base_type) 
                 {
                 // first call to get_component_type, ask AGAS for a unique id
-                    base_type = agas_client.get_component_id(
+                    base_type = (component_type) agas_client.get_component_id(
                         unique_component_name<derived_component_factory_one, base_name>::call());
                 }
 
-                component_type this_type = agas_client.register_factory(
+                component_type this_type = (component_type) agas_client.register_factory(
                     prefix, unique_component_name<derived_component_factory_one>::call());
 
                 components::set_component_type<type_holder>(

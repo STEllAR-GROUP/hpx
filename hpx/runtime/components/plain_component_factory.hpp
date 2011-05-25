@@ -75,7 +75,7 @@ namespace hpx { namespace components
             {
                 // first call to get_component_type, ask AGAS for a unique id
                 components::set_component_type<type_holder>(
-                    agas_client.register_factory(prefix,
+                    (component_type) agas_client.register_factory(prefix,
                         unique_component_name<plain_component_factory>::call()));
             }
             return components::get_component_type<type_holder>();

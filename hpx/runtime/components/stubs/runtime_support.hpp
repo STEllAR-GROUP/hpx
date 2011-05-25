@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -247,7 +248,7 @@ namespace hpx { namespace components { namespace stubs
             // remote
             naming::address addr;
             applier::applier& appl = hpx::applier::get_applier();
-            naming::resolver_client const& agas = appl.get_agas_client();
+            naming::resolver_client& agas = appl.get_agas_client();
             if (agas.is_smp_mode() || appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<

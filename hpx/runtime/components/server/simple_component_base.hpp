@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp> 
@@ -15,6 +17,9 @@
 
 namespace hpx { namespace components 
 {
+    bool bind_gid (naming::gid_type const&, naming::address const&);
+    void unbind_gid (naming::gid_type const&);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
     ///
@@ -37,10 +42,7 @@ namespace hpx { namespace components
 
         /// \brief Destruct a simple_component
         ~simple_component_base()
-        {
-            if (gid_)
-                hpx::applier::get_applier().get_agas_client().unbind(gid_);
-        }
+        { unbind_gid(gid_); }
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
@@ -79,7 +81,7 @@ namespace hpx { namespace components
                     components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
                 gid_ = appl.get_parcel_handler().get_next_id();
-                if (!appl.get_agas_client().bind(gid_, addr))
+                if (!bind_gid(gid_, addr))
                 {
                     hpx::util::osstream strm;
                     strm << gid_;
