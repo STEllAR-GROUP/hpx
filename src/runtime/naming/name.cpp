@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,10 +38,15 @@ namespace hpx { namespace naming
                 applier::applier* app = applier::get_applier_ptr();
 
                 error_code ec;
+
+#if HPX_AGAS_VERSION <= 0x10
                 components::component_type t = components::component_invalid;
+#else
+                naming::resolver_client::component_id_type t = components::component_invalid;
+#endif
                 if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
                 {
-                    components::stubs::runtime_support::free_component_sync(t, *p);
+                    components::stubs::runtime_support::free_component_sync((components::component_type)t, *p);
                 }
             }
             catch (hpx::exception const& e) {

@@ -5,6 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/server/request.hpp>
+#include <hpx/runtime/naming/server/reply.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/bulk_resolver_client.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

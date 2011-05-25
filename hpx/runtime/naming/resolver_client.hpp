@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +7,7 @@
 #if !defined(HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM)
 #define HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM
 
-//#if HPX_AGAS_VERSION = 0x10
+#if HPX_AGAS_VERSION <= 0x10
 
 #define HPX_USE_AGAS_CACHE 1
 
@@ -830,20 +831,31 @@ namespace hpx { namespace naming
 
 #include <hpx/config/warnings_suffix.hpp>
 
-//#else
+#else
 
-//#include <hpx/runtime/agas/client/legacy/agent.hpp>
-//#include <hpx/runtime/agas/database/backend/default.hpp>
+#include <hpx/runtime/agas/client/legacy/agent.hpp>
+#include <hpx/runtime/agas/database/backend/default.hpp>
 
-//namespace hpx { namespace naming
-//{
+namespace hpx { namespace naming
+{
 
-//typedef hpx::agas::legacy::bootstrap_agent<
-//    hpx::agas::tag::database::default_
-//> resolver_client;
+struct resolver_client
+    : hpx::agas::legacy::bootstrap_agent<
+        hpx::agas::tag::database::default_
+    >
+{
+    typedef hpx::agas::legacy::bootstrap_agent<
+        hpx::agas::tag::database::default_
+    > base_type;
 
-//}}  // namespace hpx::naming
+    resolver_client(util::runtime_configuration const& ini_
+                      = util::runtime_configuration(), 
+                    runtime_mode mode = runtime_mode_worker)
+        : base_type(ini_, mode) {} 
+};
 
-//#endif
+}}  // namespace hpx::naming
+
+#endif
 
 #endif

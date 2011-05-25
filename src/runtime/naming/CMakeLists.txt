@@ -5,13 +5,18 @@
 
 add_hpx_library_sources(hpx
   address.cpp
-  bulk_resolver_client.cpp
   full_address.cpp
   locality.cpp
   name.cpp
-  resolver_client.cpp
   resolver_server.cpp)
 
-add_subdirectory(detail)
+if("${HPX_AGAS_VERSION}" STREQUAL "1")
+  add_hpx_library_sources(hpx
+    resolver_client.cpp
+    bulk_resolver_client.cpp)
+
+  add_subdirectory(detail)
+endif()
+
 add_subdirectory(server)
 
