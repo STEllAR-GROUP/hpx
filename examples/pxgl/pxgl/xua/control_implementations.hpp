@@ -15,7 +15,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                            \
-    (3, (1, 6, "pxgl/xua/control_implementations.hpp"))                        \
+    (3, (1, 6, "examples/pxgl/pxgl/xua/control_implementations.hpp"))          \
     /**/
     
 #include BOOST_PP_ITERATE()

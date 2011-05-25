@@ -10,16 +10,16 @@
 #include <boost/unordered_map.hpp>
 
 // Bring in PXGL headers
-#include <pxgl/pxgl.hpp>
+#include "../../pxgl/pxgl.hpp"
 
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../pxgl/xua/range.hpp"
+#include "../../pxgl/xua/arbitrary_distribution.hpp"
 
-#include <pxgl/graphs/signal_value.hpp>
-#include <pxgl/graphs/extension_info.hpp>
-#include <pxgl/graphs/edge_tuple.hpp>
+#include "../../pxgl/graphs/signal_value.hpp"
+#include "../../pxgl/graphs/extension_info.hpp"
+#include "../../pxgl/graphs/edge_tuple.hpp"
 
-#include <pxgl/util/component.hpp>
+#include "../../pxgl/util/component.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace pxgl {

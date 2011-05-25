@@ -15,13 +15,13 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in graph and aux. definition
-#include <pxgl/util/futures.hpp>
-#include "pxgl/graphs/csr_graph.hpp"
-#include "pxgl/xua/range.hpp"
-#include "pxgl/xua/arbitrary_distribution.hpp"
-#include "pxgl/xua/vector.hpp"
+#include "../../../pxgl/util/futures.hpp"
+#include "../../../pxgl/graphs/csr_graph.hpp"
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/arbitrary_distribution.hpp"
+#include "../../../pxgl/xua/vector.hpp"
 
-#include "pxgl/graphs/edge_tuple.hpp"
+#include "../../../pxgl/graphs/edge_tuple.hpp"
 
 typedef unsigned long size_type;
 typedef std::vector<size_type> sizes_type;

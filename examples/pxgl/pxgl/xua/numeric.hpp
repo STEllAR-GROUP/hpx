@@ -8,9 +8,9 @@
 
 #include <hpx/hpx.hpp>
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/scoped_use.hpp>
-#include <pxgl/util/component.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/scoped_use.hpp"
+#include "../../pxgl/util/component.hpp"
 
 // Define logging helper
 #define LNUMR_LOG_fatal 1

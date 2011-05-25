@@ -305,7 +305,7 @@ namespace pxgl { namespace xua {
   }
 
 // Pull in remaining implementations
-#include <pxgl/xua/control_implementations.hpp>
+#include "../../pxgl/xua/control_implementations.hpp"
 
   ///
   /// \brief Invoke the component action once on each sub-container

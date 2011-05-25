@@ -8,7 +8,7 @@
 
 #include <boost/unordered_map.hpp>
 
-#include <pxgl/xua/control.hpp>
+#include "../../pxgl/xua/control.hpp"
 
 #define LGENRMAT_info(str)
 #define LGENRMAT_timer(str,timer)

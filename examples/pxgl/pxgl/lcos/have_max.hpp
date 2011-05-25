@@ -6,9 +6,9 @@
 #if !defined(PXGL_LOCS_HAVE_MAX_20110120T1436)
 #define PXGL_LOCS_HAVE_MAX_20110120T1436
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/component.hpp>
-#include <pxgl/util/scoped_use.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/component.hpp"
+#include "../../pxgl/util/scoped_use.hpp"
 
 #define LLHM_info(str) 
 #define LLHM_debug(str) 

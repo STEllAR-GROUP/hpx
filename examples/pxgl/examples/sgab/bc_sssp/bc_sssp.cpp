@@ -16,17 +16,17 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in graph and aux. definition
-#include <pxgl/pxgl.hpp>
+#include "../../../pxgl/pxgl.hpp"
 
-#include <examples/sgab/bc_sssp/bc_sssp_client.hpp>
+#include "../../../examples/sgab/bc_sssp/bc_sssp_client.hpp"
 
-#include <pxgl/util/scoped_use.hpp>
-#include <pxgl/util/futures.hpp>
+#include "../../../pxgl/util/scoped_use.hpp"
+#include "../../../pxgl/util/futures.hpp"
 
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/arbitrary_distribution.hpp"
 
-#include <pxgl/xua/control.hpp>
+#include "../../../pxgl/xua/control.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 #define PXGL_DEBUG_ALIGN

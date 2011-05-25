@@ -6,16 +6,16 @@
 #if !defined(PXGL_XUA_VMAP_CLIENT_20110217T0826)
 #define PXGL_XUA_VMAP_CLIENT_20110217T0826
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/component.hpp>
-#include <pxgl/util/hpx.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/component.hpp"
+#include "../../pxgl/util/hpx.hpp"
 
-#include <pxgl/xua/vmap.hpp>
+#include "../../pxgl/xua/vmap.hpp"
 
-#include <pxgl/graphs/extension_info.hpp>
+#include "../../pxgl/graphs/extension_info.hpp"
 
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../pxgl/xua/range.hpp"
+#include "../../pxgl/xua/arbitrary_distribution.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 typedef unsigned long size_type;

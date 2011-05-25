@@ -12,18 +12,18 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/apply.hpp>
-#include <pxgl/util/futures.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/apply.hpp"
+#include "../../pxgl/util/futures.hpp"
 
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/constant_distribution.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../pxgl/xua/range.hpp"
+#include "../../pxgl/xua/constant_distribution.hpp"
+#include "../../pxgl/xua/arbitrary_distribution.hpp"
 
-#include <pxgl/xua/vector.hpp>
-#include <pxgl/xua/control.hpp>
+#include "../../pxgl/xua/vector.hpp"
+#include "../../pxgl/xua/control.hpp"
 
-#include <pxgl/graphs/edge_tuple.hpp>
+#include "../../pxgl/graphs/edge_tuple.hpp"
 
 // Define logging helper
 #define LRMAT_info(str)
@@ -51,8 +51,8 @@ typedef pxgl::xua::vector<
 
 // FIXME: remove dependency between the above typedefs and the below processes
 // This must go below the container typedef
-#include <pxgl/procs/generate_rmat_graph.hpp>
-#include <pxgl/procs/write_matrix_market.hpp>
+#include "../../pxgl/procs/generate_rmat_graph.hpp"
+#include "../../pxgl/procs/write_matrix_market.hpp"
 
 HPX_REGISTER_FUTURE(size_type, size);
 HPX_REGISTER_FUTURE(sizes_type, sizes);

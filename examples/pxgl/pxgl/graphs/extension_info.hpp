@@ -9,9 +9,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/hpx.hpp>
-#include <pxgl/util/component.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/hpx.hpp"
+#include "../../pxgl/util/component.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace pxgl { namespace graphs { namespace server {

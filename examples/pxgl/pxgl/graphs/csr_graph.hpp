@@ -20,12 +20,12 @@
 
 #include <hpx/runtime/components/client_base.hpp>
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/hpx.hpp>
-#include <pxgl/util/component.hpp>
-#include <pxgl/util/scoped_use.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/util/hpx.hpp"
+#include "../../pxgl/util/component.hpp"
+#include "../../pxgl/util/scoped_use.hpp"
 
-#include <pxgl/graphs/signal_value.hpp>
+#include "../../pxgl/graphs/signal_value.hpp"
 
 // Define logging helper
 #define LCSR_LOG_fatal 1

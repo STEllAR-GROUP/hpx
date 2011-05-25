@@ -15,9 +15,8 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in PXGL headers
-#include <pxgl/util/futures.hpp>
-
-#include "pxgl/lcos/have_max.hpp"
+#include "../../../pxgl/util/futures.hpp"
+#include "../../../pxgl/lcos/have_max.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

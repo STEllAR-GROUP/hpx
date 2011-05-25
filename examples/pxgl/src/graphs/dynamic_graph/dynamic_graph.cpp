@@ -16,19 +16,19 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in graph and aux. definition
-#include <pxgl/pxgl.hpp>
+#include "../../../pxgl/pxgl.hpp"
 
-#include <pxgl/graphs/dynamic_graph_client.hpp>
-#include <pxgl/graphs/extension_info.hpp>
-#include <pxgl/graphs/edge_tuple.hpp>
+#include "../../../pxgl/graphs/dynamic_graph_client.hpp"
+#include "../../../pxgl/graphs/extension_info.hpp"
+#include "../../../pxgl/graphs/edge_tuple.hpp"
 
-#include <pxgl/util/scoped_use.hpp>
-#include <pxgl/util/futures.hpp>
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../../pxgl/util/scoped_use.hpp"
+#include "../../../pxgl/util/futures.hpp"
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/arbitrary_distribution.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-#define PXGL_DEBUG_ALIGN
+//#define PXGL_DEBUG_ALIGN
 
 ////////////////////////////////////////////////////////////////////////////////
 // Define logging helper

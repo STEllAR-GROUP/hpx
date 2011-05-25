@@ -16,7 +16,7 @@
 #include <sstream>
 #endif
 
-#include <pxgl/xua/control.hpp>
+#include "../../pxgl/xua/control.hpp"
 
 #define LREADMM_info(str)
 #define LREADMM_timer(str,timer)

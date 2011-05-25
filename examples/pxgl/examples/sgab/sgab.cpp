@@ -18,20 +18,20 @@
 
 #include <boost/random/linear_congruential.hpp>
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/xua/control.hpp>
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
-#include <pxgl/xua/vector.hpp>
-#include <pxgl/xua/numeric.hpp>
-#include <pxgl/xua/vmap_client.hpp>
-#include <pxgl/graphs/csr_graph.hpp>
-#include <pxgl/graphs/dynamic_graph_client.hpp>
-#include <pxgl/graphs/edge_tuple.hpp>
+#include "../../pxgl/pxgl.hpp"
+#include "../../pxgl/xua/control.hpp"
+#include "../../pxgl/xua/range.hpp"
+#include "../../pxgl/xua/arbitrary_distribution.hpp"
+#include "../../pxgl/xua/vector.hpp"
+#include "../../pxgl/xua/numeric.hpp"
+#include "../../pxgl/xua/vmap_client.hpp"
+#include "../../pxgl/graphs/csr_graph.hpp"
+#include "../../pxgl/graphs/dynamic_graph_client.hpp"
+#include "../../pxgl/graphs/edge_tuple.hpp"
 
-#include <pxgl/lcos/have_max.hpp>
+#include "../../pxgl/lcos/have_max.hpp"
 
-#include <pxgl/util/apply.hpp>
+#include "../../pxgl/util/apply.hpp"
 
 #include "bc_sssp/bc_sssp_client.hpp"
 
@@ -119,7 +119,7 @@ typedef pxgl::graphs::csr_graph<
 
 typedef edge_container_client_type container_type;
 typedef edge_container_server_type container_member_type;
-#include <pxgl/procs/read_matrix_market.hpp>
+#include "../../pxgl/procs/read_matrix_market.hpp"
 
 typedef int result_type;
 typedef boost::exception_ptr error_type;

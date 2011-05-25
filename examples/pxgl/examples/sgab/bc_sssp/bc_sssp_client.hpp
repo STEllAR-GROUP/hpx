@@ -6,14 +6,14 @@
 #if !defined(EXAMPLES_SGAB_BC_SSSP_CLIENT_20110217T0826)
 #define EXAMPLES_SGAB_BC_SSSP_CLIENT_20110217T0826
 
-#include <pxgl/pxgl.hpp>
-#include <pxgl/util/component.hpp>
-#include <pxgl/util/hpx.hpp>
+#include "../../../pxgl/pxgl.hpp"
+#include "../../../pxgl/util/component.hpp"
+#include "../../../pxgl/util/hpx.hpp"
 
 #include "bc_sssp.hpp"
 
-#include <pxgl/xua/range.hpp>
-#include <pxgl/xua/arbitrary_distribution.hpp>
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/arbitrary_distribution.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 typedef unsigned long size_type;

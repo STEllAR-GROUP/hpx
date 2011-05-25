@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <pxgl/xua/control.hpp>
+#include "../../pxgl/xua/control.hpp"
 
 #define LWRITERMAT_info(str)
 #define LWRITERMAT_timer(str,timer)

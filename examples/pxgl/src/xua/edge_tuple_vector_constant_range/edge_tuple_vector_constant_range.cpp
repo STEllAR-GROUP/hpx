@@ -15,14 +15,14 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in PXGL headers
-#include <pxgl/util/futures.hpp>
+#include "../../../pxgl/util/futures.hpp"
 
-#include "pxgl/xua/vector.hpp"
-#include "pxgl/xua/range.hpp"
-#include "pxgl/xua/constant_distribution.hpp"
+#include "../../../pxgl/xua/vector.hpp"
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/constant_distribution.hpp"
 
 // Bring in extra definitions
-#include <pxgl/graphs/edge_tuple.hpp>
+#include "../../../pxgl/graphs/edge_tuple.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

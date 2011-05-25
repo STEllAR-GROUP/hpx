@@ -15,11 +15,10 @@
 #include <boost/serialization/export.hpp>
 
 // Bring in PXGL headers
-#include <pxgl/util/futures.hpp>
-
-#include "pxgl/xua/vector.hpp"
-#include "pxgl/xua/range.hpp"
-#include "pxgl/xua/arbitrary_distribution.hpp"
+#include "../../../pxgl/util/futures.hpp"
+#include "../../../pxgl/xua/vector.hpp"
+#include "../../../pxgl/xua/range.hpp"
+#include "../../../pxgl/xua/arbitrary_distribution.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality

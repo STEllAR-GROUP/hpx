@@ -27,3 +27,4 @@ add_hpx_executable(generate_rmat_data
   ESSENTIAL
 )
 
+add_hpx_pseudo_dependencies(examples.pxgl generate_rmat_data_exe)
