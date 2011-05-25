@@ -16,6 +16,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/pool/object_pool.hpp>
+#include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
