@@ -468,9 +468,6 @@ endif()
 # directory structure.
 add_subdirectory(src)
 
-# components are to be built separately
-add_subdirectory(hpx/components)
-
 if(MSVC)
   option(HPX_EXAMPLES "Build examples (default: OFF)" OFF)
 else()
