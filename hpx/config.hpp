@@ -220,6 +220,13 @@
   #endif
 #endif
 
+#define HPX_AGAS_PRIMARY_NS_MSB 0x0000000100000001
+#define HPX_AGAS_PRIMARY_NS_LSB 0x0000000000000001
+#define HPX_AGAS_COMPONENT_NS_MSB 0x0000000100000001
+#define HPX_AGAS_COMPONENT_NS_LSB 0x0000000000000002
+#define HPX_AGAS_SYMBOL_NS_MSB 0x0000000100000001
+#define HPX_AGAS_SYMBOL_NS_LSB 0x0000000000000003
+
 ///////////////////////////////////////////////////////////////////////////////
 #include <hpx/config/defaults.hpp>
 
