@@ -293,7 +293,7 @@ namespace hpx
         ///                       taken from the configuration file (hpx.ini).
         /// \param locality_mode  [in] This is the mode the given runtime 
         ///                       instance should be executed in.
-        explicit runtime_impl(std::string const& address = "localhost", 
+        explicit runtime_impl(std::string const& address = "127.0.0.1", 
             boost::uint16_t port = HPX_PORT,
             std::string const& agas_address = "", 
             boost::uint16_t agas_port = 0, runtime_mode locality_mode

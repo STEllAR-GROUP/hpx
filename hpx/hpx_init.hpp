@@ -90,7 +90,7 @@ namespace hpx
             using boost::program_options::store;
             using boost::program_options::command_line_parser;
 
-            try {
+//            try {
                 options_description hpx_options("HPX Options");
 
                 hpx_options.add_options()
@@ -122,7 +122,7 @@ namespace hpx
                     ("hpx,x", value<std::string>(), 
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
-                     "localhost:7910)")
+                     "127.0.0.1:7910)")
                     ("random-ports",
                      "use random ports for AGAS and parcels")
                     ("localities,l", value<std::size_t>(), 
@@ -153,13 +153,15 @@ namespace hpx
                     std::cout << desc_cmdline;
                     return help;
                 }
-            }
+//            }
 
+#if 0
             catch (std::exception const& e) {
                 std::cerr << "hpx::init: exception caught: "
                           << e.what() << std::endl;
                 return error;
             }
+#endif
             
             return success;
         }
@@ -217,8 +219,8 @@ namespace hpx
     {
         int result = 0;
 
-        try
-        {
+//        try
+//        {
             using boost::program_options::variables_map; 
 
             // Analyze the command line.
@@ -236,7 +238,7 @@ namespace hpx
             }
 
             // Check command line arguments.
-            std::string hpx_host("localhost"), agas_host;
+            std::string hpx_host("127.0.0.1"), agas_host;
             boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
@@ -477,7 +479,8 @@ namespace hpx
             else {
                 throw std::logic_error("bad value for parameter --queueing/-q");
             }
-        }
+//        }
+#if 0
         catch (std::exception& e)
         {
             std::cerr << "hpx::init: std::exception caught: " << e.what()
@@ -492,6 +495,7 @@ namespace hpx
         }
 
         return result;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
