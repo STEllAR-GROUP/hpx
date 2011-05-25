@@ -1,0 +1,14 @@
+# Copyright (c) 2010-2011 Dylan Stark
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+Out-of-source build:
+$ cd ~/sw/pxgl_foo
+$ export PXGL_SOURCE=$HOME/projects/pxgl_svn
+$ export PXGL_INSTALL=$HOME/usr/local/pxgl_svn_relwithdebinfo
+$ export BOOST_INSTALL=$HOME/usr/local/boost_1_43_0
+$ export HPX_INSTALL=$HOME/usr/local/hpx_svn_relwithdebinfo
+$ cmake $PXGL_SOURCE -DCMAKE_INSTALL_PREFIX=$PXGL_INSTALL -DBOOST_ROOT=$BOOST_INSTALL -DHPX_ROOT=$HPX_INSTALL
+# Update $PXGL_BUILD/.hpx.ini to reflect the correct installation directory.
+# Update PATH and LD_LIBRARY_PATH appropriately.
