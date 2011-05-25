@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +16,11 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+
+#if HPX_AGAS_VERSION <= 0x10
+  #include <hpx/runtime/naming/resolver_client.hpp>
+#endif
+
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/server/parcelhandler_queue.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
@@ -76,17 +81,22 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related 
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp,
-                threads::threadmanager_base* tm = NULL) 
+                threads::threadmanager_base* tm = NULL)
+#if HPX_AGAS_VERSION <= 0x10
           : resolver_(resolver), pp_(pp), tm_(tm), parcels_(This()),
             startup_time_(util::high_resolution_timer::now()), timer_()
         {
             // retrieve the prefix to be used for this site
             resolver_.get_prefix(pp.here(), prefix_);    // throws on error
-
+    
             // register our callback function with the parcelport
             pp_.register_event_handler(
                 boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
         }
+#else
+        ;
+#endif
+
         ~parcelhandler() 
         {
         }
@@ -97,10 +107,14 @@ namespace hpx { namespace parcelset
         /// object the parcelhandler has been initialized with (see 
         /// parcelhandler constructors). This is the same resolver instance 
         /// this parcelhandler has been initialized with.
+#if HPX_AGAS_VERSION <= 0x10
         naming::resolver_client& get_resolver()
         {
             return resolver_;
         }
+#else
+        naming::resolver_client& get_resolver();
+#endif
 
         /// Allow access to parcelport instance. 
         ///
@@ -140,7 +154,7 @@ namespace hpx { namespace parcelset
         ///                 on the returned localities.
         ///
         /// \returns The function returns \a true if there is at least one 
-        ///          remote locality known to the AGASservice 
+        ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes, 
             components::component_type type = components::component_invalid) const;
@@ -154,7 +168,7 @@ namespace hpx { namespace parcelset
         ///                 on the returned localities.
         ///
         /// \returns The function returns \a true if there is at least one 
-        ///          locality known to the AGASservice 
+        ///          locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes, 
             components::component_type type = components::component_invalid) const;

@@ -5,9 +5,14 @@
 
 add_hpx_library_sources(hpx
   parcel.cpp
-  parcelhandler.cpp
   parcelport.cpp
   parcelport_connection.cpp)
+
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
+  add_hpx_library_sources(hpx parcelhandler_v2.cpp)
+else()
+  add_hpx_library_sources(hpx parcelhandler_v1.cpp)
+endif()
 
 add_subdirectory(server)
 
