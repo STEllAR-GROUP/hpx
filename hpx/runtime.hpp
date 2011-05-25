@@ -471,7 +471,7 @@ namespace hpx
 
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client const& get_agas_client() const
+        naming::resolver_client& get_agas_client()
         {
             return agas_client_;
         }
