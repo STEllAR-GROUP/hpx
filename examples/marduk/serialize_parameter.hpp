@@ -26,33 +26,54 @@ void serialize(Archive &ar, hpx::components::amr::detail::parameter& par,
 {
     ar & par.lambda;
     ar & par.allowedl;
+    ar & par.num_rows;
+
     ar & par.loglevel;
     ar & par.output;
     ar & par.output_stdout;
+    ar & par.output_level;
+
     ar & par.nt0;
-    ar & par.nx;
+    ar & par.nx0;
+    ar & par.ny0;
+    ar & par.nz0;
+    ar & par.shadow;
     ar & par.refine_level;
     ar & par.minx0;
     ar & par.maxx0;
-    ar & par.dx0;
-    ar & par.dt0;
+    ar & par.miny0;
+    ar & par.maxy0;
+    ar & par.minz0;
+    ar & par.maxz0;
+    ar & par.h;
     ar & par.ethreshold;
-    ar & par.R0;
-    ar & par.delta;
-    ar & par.amp;
-    ar & par.amp_dot;
-    ar & par.eps;
-    ar & par.output_level;
-    ar & par.granularity;
-    ar & par.time_granularity;
+    ar & par.minefficiency;
+    ar & par.num_px_threads;
+    ar & par.refine_every;
+    ar & par.ghostwidth;
+    ar & par.bound_width;
+    ar & par.clusterstyle;
+    ar & par.mindim;
+    ar & par.refine_factor;
+
+    ar & par.gr_sibling;
+    ar & par.gr_t;
+    ar & par.gr_minx;
+    ar & par.gr_miny;
+    ar & par.gr_minz;
+    ar & par.gr_maxx;
+    ar & par.gr_maxy;
+    ar & par.gr_maxz;
+    ar & par.gr_nx;
+    ar & par.gr_ny;
+    ar & par.gr_nz;
+    ar & par.gr_proc;
+    ar & par.gr_h;
+    ar & par.gr_alive;
+    ar & par.levelp;
+
     ar & par.rowsize;
     ar & par.level_row;
-    ar & par.level_begin;
-    ar & par.level_end;
-    ar & par.min;
-    ar & par.max;
-    ar & par.gw;
-    ar & par.num_rows;
 }
 
 template <typename Archive>

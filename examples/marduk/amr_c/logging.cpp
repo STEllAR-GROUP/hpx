@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             if ( count == 1000 ) {
                 count = 0;
                 std::cout << " PX Timestep: " <<  val.timestep_ 
-                          << " PX Time: " << val.timestep_*par->dx0*par->lambda  
+                          << " PX Time: " << val.timestep_  
                           << " PX Level: " << val.level_  << std::endl;
             } 
 #if 0
@@ -76,6 +76,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 #endif
 
 #if defined(RNPL_FOUND)
+#if 0
           int i;
           double datatime(0.0);
           std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;
@@ -97,26 +98,24 @@ namespace hpx { namespace components { namespace amr { namespace server
               d3phi.push_back(val.value_[i].phi[0][3]);
               d4phi.push_back(val.value_[i].phi[0][4]);
               datatime = val.timestep_*par->dx0*par->lambda;
-#if 0
-              std::string x_str = convert(val.x_[i]);
-              std::string chi_str = convert(val.value_[i].phi[0][0]);
-              std::string Phi_str = convert(val.value_[i].phi[0][1]);
-              std::string Pi_str = convert(val.value_[i].phi[0][2]);
-              std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
 
-              FILE* fdata = fopen("chi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
-              fclose(fdata);
-
-              fdata = fopen("Phi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Phi_str.c_str());
-              fclose(fdata);
-
-              fdata = fopen("Pi.dat","a");
-              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
-              fclose(fdata);
-
-#endif
+//              std::string x_str = convert(val.x_[i]);
+//              std::string chi_str = convert(val.value_[i].phi[0][0]);
+//              std::string Phi_str = convert(val.value_[i].phi[0][1]);
+//              std::string Pi_str = convert(val.value_[i].phi[0][2]);
+//              std::string time_str = convert(val.timestep_*par->dx0*par->lambda);
+//
+//              FILE* fdata = fopen("chi.dat","a");
+//              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),chi_str.c_str());
+//              fclose(fdata);
+//
+//              fdata = fopen("Phi.dat","a");
+//              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Phi_str.c_str());
+//              fclose(fdata);
+//
+//              fdata = fopen("Pi.dat","a");
+//              fprintf(fdata,"%d %s %s %s\n",val.level_,time_str.c_str(),x_str.c_str(),Pi_str.c_str());
+//              fclose(fdata);
             }
             int shape[3];
             char cnames[80] = { "x|y|z" };
@@ -134,6 +133,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
             gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
           }
+#endif
 #endif
         }
     }

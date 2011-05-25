@@ -364,39 +364,39 @@ int main(int argc,char* argv[]) {
         if ( intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
-                          par.gr_minx[gi2],par.gr_minx[gi2]+h,
+                          par.gr_minx[gi2],par.gr_minx[gi2]+h*par.ghostwidth/2,
                           par.gr_miny[gi2],par.gr_maxy[gi2],
                           par.gr_minz[gi2],par.gr_maxz[gi2]) ||
              intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
-                          par.gr_maxx[gi2]-h,par.gr_maxx[gi2],
+                          par.gr_maxx[gi2]-h*par.ghostwidth/2,par.gr_maxx[gi2],
                           par.gr_miny[gi2],par.gr_maxy[gi2],
                           par.gr_minz[gi2],par.gr_maxz[gi2]) ||
              intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
                           par.gr_minx[gi2],par.gr_maxx[gi2],
-                          par.gr_miny[gi2],par.gr_miny[gi2]+h,
+                          par.gr_miny[gi2],par.gr_miny[gi2]+h*par.ghostwidth/2,
                           par.gr_minz[gi2],par.gr_maxz[gi2]) ||
              intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
                           par.gr_minx[gi2],par.gr_maxx[gi2],
-                          par.gr_maxy[gi2]-h,par.gr_maxy[gi2],
+                          par.gr_maxy[gi2]-h*par.ghostwidth/2,par.gr_maxy[gi2],
                           par.gr_minz[gi2],par.gr_maxz[gi2]) ||
              intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
                           par.gr_minx[gi2],par.gr_maxx[gi2],
                           par.gr_miny[gi2],par.gr_maxy[gi2],
-                          par.gr_minz[gi2],par.gr_minz[gi2]+h) ||
+                          par.gr_minz[gi2],par.gr_minz[gi2]+h*par.ghostwidth/2) ||
              intersection(par.gr_minx[gi],par.gr_maxx[gi], 
                           par.gr_miny[gi],par.gr_maxy[gi], 
                           par.gr_minz[gi],par.gr_maxz[gi], 
                           par.gr_minx[gi2],par.gr_maxx[gi2],
                           par.gr_miny[gi2],par.gr_maxy[gi2],
-                          par.gr_maxz[gi2]-h,par.gr_maxz[gi2]) ) { 
+                          par.gr_maxz[gi2]-h*par.ghostwidth/2,par.gr_maxz[gi2]) ) { 
           prolong_list[gi].push_back(gi2);
         }
         gi2 = par.gr_sibling[gi2];
