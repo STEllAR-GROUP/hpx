@@ -17,7 +17,8 @@ add_hpx_library(agas_stdmap_bs
   SOURCES component_module.cpp
           component_namespace.cpp
           symbol_namespace.cpp
-  ESSENTIAL)
+  ESSENTIAL
+  NOLIBS)
 
 set_property(TARGET agas_stdmap_bs_lib APPEND
   PROPERTY COMPILE_DEFINITIONS

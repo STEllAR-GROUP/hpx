@@ -819,13 +819,13 @@ template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT bootstrap_primary_namespace
   : primary_namespace_base<
        components::fixed_component_base<
-            0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
+            HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
             bootstrap_primary_namespace<Database, Protocol> >,
         Database, Protocol>
 {
     typedef primary_namespace_base<
        components::fixed_component_base<
-            0x0000000100000001ULL, 0x0000000000000001ULL, // constant GID
+            HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
             bootstrap_primary_namespace<Database, Protocol> >,
         Database, Protocol
     > base_type;

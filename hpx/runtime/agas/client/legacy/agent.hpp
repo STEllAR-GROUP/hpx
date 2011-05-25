@@ -8,17 +8,10 @@
 #if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
+#include <boost/noncopyable.hpp>
+
 #include <hpx/runtime/agas/client/legacy/user.hpp>
 #include <hpx/runtime/agas/client/legacy/bootstrap.hpp>
-
-#if defined(HPX_USE_AGAS_CACHE)
-    #include <map>
-
-    #include <boost/cache/local_cache.hpp>
-    #include <boost/cache/entries/lfu_entry.hpp>
-
-    #include <hpx/lcos/mutex.hpp>
-#endif
 
 namespace hpx { namespace agas { namespace legacy
 {
@@ -27,9 +20,9 @@ namespace hpx { namespace agas { namespace legacy
 template <typename Base>
 struct agent_base : Base
 {
+    // {{{ types 
     typedef Base base_type;
 
-    // {{{ convenience types 
     typedef typename base_type::primary_namespace_type
         primary_namespace_type;
 
@@ -39,78 +32,35 @@ struct agent_base : Base
     typedef typename base_type::symbol_namespace_type
         symbol_namespace_type;
 
-    typedef typename base_type::component_id_type component_id_type;
-    typedef typename base_type::gva_type gva_type;
-    typedef typename base_type::count_type count_type;
-    typedef typename base_type::offset_type offset_type;
-    typedef typename base_type::endpoint_type endpoint_type;
-    typedef typename base_type::unbinding_type unbinding_type;
-    typedef typename base_type::binding_type binding_type;
-    typedef typename base_type::prefixes_type prefixes_type;
-    typedef typename base_type::prefix_type prefix_type;
-    typedef typename base_type::decrement_type decrement_type;
+    typedef typename component_namespace_type::component_id_type
+        component_id_type;
+
+    typedef typename primary_namespace_type::gva_type gva_type;
+    typedef typename primary_namespace_type::count_type count_type;
+    typedef typename primary_namespace_type::offset_type offset_type;
+    typedef typename primary_namespace_type::endpoint_type endpoint_type;
+    typedef typename primary_namespace_type::unbinding_type unbinding_type;
+    typedef typename primary_namespace_type::binding_type binding_type;
+    typedef typename component_namespace_type::prefixes_type prefixes_type;
+    typedef typename component_namespace_type::prefix_type prefix_type;
+    typedef typename primary_namespace_type::decrement_type decrement_type;
+    
+    typedef typename base_type::cache_mutex_type cache_mutex_type;
+    typedef typename base_type::erase_policy erase_policy;
+    typedef typename base_type::cache_key cache_key;
+    typedef typename base_type::cache_type cache_type;
     // }}}
 
-  private:
-    #if defined(HPX_USE_AGAS_CACHE)
-        struct cache_key
-        { // {{{ cache_key implementation
-            cache_key()
-              : id(), count(0)
-            {}
+    const runtime_mode mode;
 
-            explicit cache_key(naming::gid_type const& id_,
-                               count_type count_ = 1)
-              : id(id_), count(count_)
-            {}
+    agent_base(util::runtime_configuration const& ini_, runtime_mode mode_)
+        : base_type(ini_, mode_), mode(mode_) {}
 
-            naming::gid_type id;
-            count_type count;
-
-            friend bool operator<(cache_key const& lhs, cache_key const& rhs)
-            { return (lhs.id + (lhs.count - 1)) < rhs.id; }
-
-            friend bool operator==(cache_key const& lhs, cache_key const& rhs)
-            { return (lhs.id == rhs.id) && (lhs.count == rhs.count); }
-        }; // }}}
+    bool is_console() const
+    { return mode == runtime_mode_console; }
     
-        struct erase_policy
-        { // {{{ erase_policy implementation
-            erase_policy(naming::gid_type const& id, count_type count)
-              : entry(id, count)
-            {}
-
-            typedef std::pair<
-                cache_key, boost::cache::entries::lfu_entry<gva_type>
-            > entry_type;
-
-            bool operator()(entry_type const& p) const
-            { return p.first == entry; }
-
-            cache_key entry;
-        }; // }}}
-
-        typedef boost::cache::entries::lfu_entry<gva_type> entry_type;
-
-        typedef hpx::lcos::mutex mutex_type;
-
-        typedef boost::cache::local_cache<
-            cache_key, entry_type, 
-            std::less<entry_type>, boost::cache::policies::always<entry_type>,
-            std::map<cache_key, entry_type>
-        > cache_type;
-
-        mutex_type cache_mtx_;
-        cache_type gva_cache_;
-    #endif
-
-  public:
-    agent_base(util::runtime_configuration const& ini_, runtime_mode mode)
-        : base_type(ini_, mode) 
-        #if defined(HPX_USE_AGAS_CACHE)
-            , gva_cache_(ini_.get_agas_cache_size())
-        #endif
-        { }
+    bool is_smp_mode() const
+    { return false; } 
 
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, error_code& ec = throws) 
@@ -136,10 +86,9 @@ struct agent_base : Base
         }
     } // }}}
 
-    bool get_console_prefix(naming::gid_type& prefix,
-                            error_code& ec = throws) 
+    bool get_console_prefix(naming::gid_type& prefix, error_code& ec = throws) 
     {
-        prefix = this->symbol_ns_.resolve("/console");
+        prefix = this->symbol_ns_.resolve("/locality(console)");
         return prefix;
     } 
 
@@ -178,14 +127,14 @@ struct agent_base : Base
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) 
-    { return get_prefixes(prefixes, components::component_invalid, ec); }
+    { return get_prefixes(prefixes, components::component_invalid); }
 
     component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
     { return this->component_ns_.bind(name); } 
 
     component_id_type
-    register_factory(naming::gid_type const& prefix, std::string const& name, 
+    register_factory(naming::gid_type const& prefix, std::string const& name,
                      error_code& ec = throws) 
     {
         return this->component_ns_.bind
@@ -194,8 +143,7 @@ struct agent_base : Base
 
     bool get_id_range(naming::locality const& l, count_type count, 
                       naming::gid_type& lower_bound,
-                      naming::gid_type& upper_bound, 
-                      error_code& ec = throws) 
+                      naming::gid_type& upper_bound, error_code& ec = throws) 
     { // {{{ get_id_range implementation
         using boost::asio::ip::address;
         using boost::fusion::at_c;
@@ -214,10 +162,10 @@ struct agent_base : Base
 
     bool bind(naming::gid_type const& id, naming::address const& addr,
               error_code& ec = throws) 
-    { return bind_range(id, 1, addr, 0, ec); }
+    { return bind_range(id, 1, addr, 0); }
 
     bool bind_range(naming::gid_type const& lower_id, count_type count, 
-                    naming::address const& baseaddr, offset_type offset, 
+                    naming::address const& baseaddr, offset_type offset,
                     error_code& ec = throws) 
     { // {{{ bind_range implementation
         using boost::asio::ip::address;
@@ -233,11 +181,9 @@ struct agent_base : Base
         
         if (this->primary_ns_.bind(lower_id, gva)) 
         { 
-            #if defined(HPX_USE_AGAS_CACHE)
-                mutex_type::scoped_lock lock(cache_mtx_);
-                cache_key key(lower_id, count);
-                gva_cache_.insert(key, gva);
-            #endif
+            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
+            cache_key key(lower_id, count);
+            this->gva_cache_.insert(key, gva);
 
             return true;
         }
@@ -246,7 +192,7 @@ struct agent_base : Base
     } // }}}
 
     count_type
-    incref(naming::gid_type const& id, count_type credits = 1, 
+    incref(naming::gid_type const& id, count_type credits = 1,
            error_code& ec = throws) 
     { return this->primary_ns_.increment(id, credits); } 
 
@@ -265,17 +211,17 @@ struct agent_base : Base
     } // }}}
 
     bool unbind(naming::gid_type const& id, error_code& ec = throws) 
-    { return unbind_range(id, 1, ec); } 
+    { return unbind_range(id, 1); } 
         
     bool unbind(naming::gid_type const& id, naming::address& addr,
                 error_code& ec = throws) 
-    { return unbind_range(id, 1, addr, ec); }
+    { return unbind_range(id, 1, addr); }
 
-    bool unbind_range(naming::gid_type const& lower_id, count_type count, 
+    bool unbind_range(naming::gid_type const& lower_id, count_type count,
                       error_code& ec = throws) 
     {
         naming::address addr; 
-        return unbind_range(lower_id, count, addr, ec);
+        return unbind_range(lower_id, count, addr);
     } 
 
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
@@ -285,11 +231,9 @@ struct agent_base : Base
 
         if (r)
         {
-            #if defined(HPX_USE_AGAS_CACHE)
-                mutex_type::scoped_lock lock(cache_mtx_);
-                erase_policy ep(lower_id, count);
-                gva_cache_.erase(ep);
-            #endif
+            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
+            erase_policy ep(lower_id, count);
+            this->gva_cache_.erase(ep);
             addr.locality_ = r->endpoint;
             addr.type_ = r->type;
             addr.address_ = r->lva();
@@ -301,10 +245,10 @@ struct agent_base : Base
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
     { // {{{ resolve implementation
-        gva_type gva = this->primary_ns_.resolve(id);
-
-        if (try_cache && resolve_cached(id, addr, ec))
+        if (try_cache && resolve_cached(id, addr))
             return true;
+        
+        gva_type gva = this->primary_ns_.resolve(id);
 
         addr.locality_ = gva.endpoint;
         addr.type_ = gva.type;
@@ -314,12 +258,10 @@ struct agent_base : Base
                        (gva.type != components::component_invalid) &&
                        (gva.lva() != 0)))
         {     
-            #if defined(HPX_USE_AGAS_CACHE)
-                // We only insert the entry into the cache if it's valid
-                mutex_type::scoped_lock lock(cache_mtx_);
-                cache_key key(id);
-                gva_cache_.insert(key, gva);
-            #endif
+            // We only insert the entry into the cache if it's valid
+            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
+            cache_key key(id);
+            this->gva_cache_.insert(key, gva);
             return true;
         }
 
@@ -328,40 +270,35 @@ struct agent_base : Base
 
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
-    { return resolve(id.get_gid(), addr, try_cache, ec); }
+    { return resolve(id.get_gid(), addr, try_cache); }
 
-    bool resolve_cached(naming::gid_type const& id, naming::address& addr, 
+    bool resolve_cached(naming::gid_type const& id, naming::address& addr,
                         error_code& ec = throws) 
     { // {{{ resolve_cached implementation
-        #if defined(HPX_USE_AGAS_CACHE)
-            // first look up the requested item in the cache
-            cache_key k(id);
+        // first look up the requested item in the cache
+        cache_key k(id);
+        typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
+        cache_key idbase;
+        typename cache_type::entry_type e;
+
+        // Check if the entry is currently in the cache
+        if (this->gva_cache_.get_entry(k, idbase, e))
+        {
+            if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
             {
-                mutex_type::scoped_lock lock(cache_mtx_);
-                cache_key idbase;
-                typename cache_type::entry_type e;
-
-                // Check if the entry is currently in the cache
-                if (gva_cache_.get_entry(k, idbase, e))
-                {
-                    // FIXME: make this an exception
-                    if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
-                    {
-                        HPX_THROWS_IN_CURRENT_FUNC_IF(ec, bad_parameter, 
-                            "MSBs of GID base and GID do not match");
-                        return false;
-                    }
-
-                    gva_type const& gva = e.get();
-
-                    addr.locality_ = gva.endpoint;
-                    addr.type_ = gva.type;
-                    addr.address_ = gva.lva(id, idbase.id);
-        
-                    return true;
-                }
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "MSBs of GID base and GID do not match");
+                return false;
             }
-        #endif
+
+            gva_type const& gva = e.get();
+
+            addr.locality_ = gva.endpoint;
+            addr.type_ = gva.type;
+            addr.address_ = gva.lva(id, idbase.id);
+        
+            return true;
+        }
 
         return false;
     } // }}}
@@ -385,9 +322,9 @@ struct agent_base : Base
 };
 
 template <typename Database>
-struct user_agent : agent_base<user_agent_base<Database> >
+struct user_agent : agent_base<user<Database> >, boost::noncopyable
 {
-    typedef agent_base<user_agent_base<Database> > base_type;
+    typedef agent_base<user<Database> > base_type;
 
     user_agent(util::runtime_configuration const& ini_
                   = util::runtime_configuration(), 
@@ -396,9 +333,9 @@ struct user_agent : agent_base<user_agent_base<Database> >
 };
 
 template <typename Database>
-struct bootstrap_agent : agent_base<bootstrap_agent_base<Database> >
+struct bootstrap_agent : agent_base<bootstrap<Database> >, boost::noncopyable
 {
-    typedef agent_base<bootstrap_agent_base<Database> > base_type;
+    typedef agent_base<bootstrap<Database> > base_type;
 
     bootstrap_agent(util::runtime_configuration const& ini_
                       = util::runtime_configuration(), 

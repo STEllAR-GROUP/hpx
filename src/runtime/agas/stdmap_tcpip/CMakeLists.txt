@@ -15,7 +15,8 @@ add_hpx_library(agas_stdmap_tcpip_bs
   MODULE core
   SOURCES component_module.cpp
           primary_namespace.cpp
-  ESSENTIAL)
+  ESSENTIAL
+  NOLIBS)
 
 set_property(TARGET agas_stdmap_tcpip_bs_lib APPEND
   PROPERTY COMPILE_DEFINITIONS

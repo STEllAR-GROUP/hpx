@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
+//#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/namespace/server/symbol.hpp>
 
@@ -18,10 +18,10 @@ namespace hpx { namespace agas { namespace stubs
 {
 
 template <typename Server>
-struct symbol_namespace_base : components::stubs::stub_base<Server>
+struct symbol_namespace_base //: components::stubs::stub_base<Server>
 {
     // {{{ nested types
-    typedef components::stubs::stub_base<Server> base_type;
+//    typedef components::stubs::stub_base<Server> base_type;
     typedef Server server_type; 
 
     typedef typename server_type::symbol_type symbol_type;

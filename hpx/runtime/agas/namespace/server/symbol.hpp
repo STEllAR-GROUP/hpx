@@ -196,13 +196,13 @@ template <typename Database>
 struct HPX_COMPONENT_EXPORT bootstrap_symbol_namespace
   : symbol_namespace_base<
         components::fixed_component_base<
-            0x0000000100000001ULL, 0x0000000000000003ULL, // constant GID
+            HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
             bootstrap_symbol_namespace<Database> >,
         Database>
 {
     typedef symbol_namespace_base<
         components::fixed_component_base<
-            0x0000000100000001ULL, 0x0000000000000003ULL, // constant GID
+            HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
             bootstrap_symbol_namespace<Database> >,
         Database
     > base_type;
