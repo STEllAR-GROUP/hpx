@@ -15,6 +15,7 @@ add_hpx_library_sources(hpx_ini
 add_hpx_library_sources(hpx
   init_ini_data.cpp
   itt_notify.cpp
+  generate_unique_ids.cpp
   logging.cpp
   performance_counters.cpp
   runtime_configuration.cpp
