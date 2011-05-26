@@ -17,7 +17,7 @@ namespace hpx { namespace util
 {
     /// The unique_ids class is a type responsible for generating 
     /// unique ids for components, parcels, threads etc.
-    class unique_ids 
+    class HPX_EXPORT unique_ids 
     {
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
