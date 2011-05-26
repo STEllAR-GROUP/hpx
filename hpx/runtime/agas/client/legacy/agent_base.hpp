@@ -8,11 +8,13 @@
 #if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
-#include <boost/assert.hpp>
-#include <boost/noncopyable.hpp>
+#include <vector>
 
-#include <hpx/runtime/agas/client/legacy/user.hpp>
-#include <hpx/runtime/agas/client/legacy/bootstrap.hpp>
+#include <boost/assert.hpp>
+
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace agas { namespace legacy
 {
@@ -398,35 +400,6 @@ struct agent_base : Base
         id = this->symbol_ns_.resolve(ns_name);
         return id;         
     }
-};
-
-template <typename Database>
-struct user_agent : agent_base<user<Database> >, boost::noncopyable
-{
-    typedef agent_base<user<Database> > base_type;
-
-    user_agent(util::runtime_configuration const& ini_
-                  = util::runtime_configuration(), 
-               runtime_mode mode = runtime_mode_worker,
-               agent_state as_state = agent_state_active)
-        : base_type(ini_, mode, as_state)
-    {
-        BOOST_ASSERT(as_state != agent_state_bootstrapping);
-        BOOST_ASSERT(as_state != agent_state_invalid);
-    } 
-};
-
-template <typename Database>
-struct bootstrap_agent : agent_base<bootstrap<Database> >, boost::noncopyable
-{
-    typedef agent_base<bootstrap<Database> > base_type;
-
-    bootstrap_agent(util::runtime_configuration const& ini_
-                      = util::runtime_configuration(), 
-                    runtime_mode mode = runtime_mode_worker,
-                    agent_state as_state = agent_state_bootstrapping)
-        : base_type(ini_, mode, as_state)
-    { BOOST_ASSERT(as_state != agent_state_invalid); }
 };
 
 }}}

@@ -14,7 +14,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/hash_asio_basic_endpoint.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
+#include <hpx/runtime/agas/namespace/user_primary.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
 
@@ -39,14 +39,14 @@ using hpx::naming::id_type;
 using hpx::applier::get_applier;
 using hpx::applier::register_work;
 
-using hpx::agas::primary_namespace;
+using hpx::agas::user_primary_namespace;
 
 using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
 
-typedef hpx::agas::primary_namespace<
+typedef hpx::agas::user_primary_namespace<
     hpx::agas::tag::database::stdmap, hpx::agas::tag::network::tcpip
 > primary_namespace_type;
 

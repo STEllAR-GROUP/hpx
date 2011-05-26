@@ -5,13 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_E425A0E2_3462_4C0F_ADB2_854881DBE6F1)
-#define HPX_E425A0E2_3462_4C0F_ADB2_854881DBE6F1
+#if !defined(HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6)
+#define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/future_value.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/namespace/stubs/component.hpp>
 
 namespace hpx { namespace agas 
 {
@@ -77,48 +77,7 @@ struct component_namespace_base : Base
     { return this->base_type::unbind(this->gid_, key); }
 };            
 
-template <typename Database>
-struct component_namespace : component_namespace_base<
-    components::client_base<
-        component_namespace<Database>,
-        stubs::component_namespace<Database>
-    >,
-    server::component_namespace<Database>
-> {
-    typedef component_namespace_base< 
-        components::client_base<
-            component_namespace<Database>,
-            stubs::component_namespace<Database>
-        >,
-        server::component_namespace<Database>
-    > base_type;
-
-    explicit component_namespace(naming::id_type const& id = naming::invalid_id)
-        : base_type(id) {}
-};
-
-template <typename Database>
-struct bootstrap_component_namespace : component_namespace_base<
-    components::client_base<
-        bootstrap_component_namespace<Database>,
-        stubs::bootstrap_component_namespace<Database>
-    >,
-    server::bootstrap_component_namespace<Database>
-> {
-    typedef component_namespace_base< 
-        components::client_base<
-            bootstrap_component_namespace<Database>,
-            stubs::bootstrap_component_namespace<Database>
-        >,
-        server::bootstrap_component_namespace<Database>
-    > base_type;
-
-    explicit bootstrap_component_namespace(naming::id_type const& id
-                                             = naming::invalid_id)
-        : base_type(id) {}
-};
-
 }}
 
-#endif // HPX_E425A0E2_3462_4C0F_ADB2_854881DBE6F1
+#endif // HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 

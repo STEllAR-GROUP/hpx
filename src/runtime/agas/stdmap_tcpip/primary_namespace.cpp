@@ -16,7 +16,6 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-#include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
 
@@ -28,7 +27,9 @@ using hpx::lcos::base_lco_with_value;
 using hpx::naming::gid_type;
 
 #if !defined(HPX_AGAS_SYSTEM)
-    typedef hpx::agas::server::primary_namespace<
+    #include <hpx/runtime/agas/namespace/user_primary.hpp>
+
+    typedef hpx::agas::server::user_primary_namespace<
         hpx::agas::tag::database::stdmap,
         hpx::agas::tag::network::tcpip
     > agas_component;
@@ -52,6 +53,8 @@ using hpx::naming::gid_type;
     
     }}
 #else
+    #include <hpx/runtime/agas/namespace/bootstrap_primary.hpp>
+
     typedef hpx::agas::server::bootstrap_primary_namespace<
         hpx::agas::tag::database::stdmap,
         hpx::agas::tag::network::tcpip

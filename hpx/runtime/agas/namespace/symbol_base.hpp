@@ -9,9 +9,9 @@
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/future_value.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/namespace/stubs/symbol.hpp>
 
 namespace hpx { namespace agas 
 {
@@ -64,47 +64,6 @@ struct symbol_namespace_base : Base
     bool unbind(symbol_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
-
-template <typename Database>
-struct symbol_namespace : symbol_namespace_base<
-    components::client_base<
-        symbol_namespace<Database>,
-        stubs::symbol_namespace<Database>
-    >,
-    server::symbol_namespace<Database>
-> {
-    typedef symbol_namespace_base< 
-        components::client_base<
-            symbol_namespace<Database>,
-            stubs::symbol_namespace<Database>
-        >,
-        server::symbol_namespace<Database>
-    > base_type;
-
-    explicit symbol_namespace(naming::id_type const& id = naming::invalid_id)
-        : base_type(id) {}
-};
-
-template <typename Database>
-struct bootstrap_symbol_namespace : symbol_namespace_base<
-    components::client_base<
-        bootstrap_symbol_namespace<Database>,
-        stubs::bootstrap_symbol_namespace<Database>
-    >,
-    server::bootstrap_symbol_namespace<Database>
-> {
-    typedef symbol_namespace_base< 
-        components::client_base<
-            bootstrap_symbol_namespace<Database>,
-            stubs::bootstrap_symbol_namespace<Database>
-        >,
-        server::bootstrap_symbol_namespace<Database>
-    > base_type;
-
-    explicit bootstrap_symbol_namespace(naming::id_type const& id
-                                             = naming::invalid_id)
-        : base_type(id) {}
-};
 
 }}
 

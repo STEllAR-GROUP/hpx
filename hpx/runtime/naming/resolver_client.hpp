@@ -833,7 +833,7 @@ namespace hpx { namespace naming
 
 #else
 
-#include <hpx/runtime/agas/client/legacy/agent.hpp>
+#include <hpx/runtime/agas/client/legacy/bootstrap_agent.hpp>
 #include <hpx/runtime/agas/database/backend/default.hpp>
 
 namespace hpx { namespace naming

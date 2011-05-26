@@ -9,9 +9,9 @@
 #define HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/future_value.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/namespace/stubs/primary.hpp>
 
 namespace hpx { namespace agas 
 {
@@ -107,47 +107,6 @@ struct primary_namespace_base : Base
     prefixes_type localities()
     { return this->base_type::localities(this->gid_); }
 }; 
-
-template <typename Database, typename Protocol>
-struct primary_namespace : primary_namespace_base<
-    components::client_base<
-        primary_namespace<Database, Protocol>,
-        stubs::primary_namespace<Database, Protocol>
-    >,
-    server::primary_namespace<Database, Protocol>
-> {        
-    typedef primary_namespace_base<
-        components::client_base<
-            primary_namespace<Database, Protocol>,
-            stubs::primary_namespace<Database, Protocol>
-        >,
-        server::primary_namespace<Database, Protocol>
-    > base_type;
-
-    explicit primary_namespace(naming::id_type const& id = naming::invalid_id)
-        : base_type(id) {}
-};
-
-template <typename Database, typename Protocol>
-struct bootstrap_primary_namespace : primary_namespace_base<
-    components::client_base<
-        bootstrap_primary_namespace<Database, Protocol>,
-        stubs::bootstrap_primary_namespace<Database, Protocol>
-    >,
-    server::bootstrap_primary_namespace<Database, Protocol>
-> {        
-    typedef primary_namespace_base<
-        components::client_base<
-            bootstrap_primary_namespace<Database, Protocol>,
-            stubs::bootstrap_primary_namespace<Database, Protocol>
-        >,
-        server::bootstrap_primary_namespace<Database, Protocol>
-    > base_type;
-
-    explicit bootstrap_primary_namespace(naming::id_type const& id
-                                            = naming::invalid_id)
-      : base_type(id) {}
-};
 
 }}
 

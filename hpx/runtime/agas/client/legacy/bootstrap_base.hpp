@@ -15,9 +15,9 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
-#include <hpx/runtime/agas/namespace/component.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
-#include <hpx/runtime/agas/namespace/symbol.hpp>
+#include <hpx/runtime/agas/namespace/bootstrap_component.hpp>
+#include <hpx/runtime/agas/namespace/bootstrap_primary.hpp>
+#include <hpx/runtime/agas/namespace/bootstrap_symbol.hpp>
 #include <hpx/runtime/agas/client/legacy/resolver_cache.hpp>
 
 namespace hpx { namespace agas { namespace legacy
@@ -25,7 +25,7 @@ namespace hpx { namespace agas { namespace legacy
 
 // TODO: pass error codes once they're implemented in AGAS.
 template <typename Database>
-struct bootstrap : resolver_cache<tag::network::tcpip>
+struct bootstrap_base : resolver_cache<tag::network::tcpip>
 {
   protected:
     // {{{ types
@@ -54,7 +54,7 @@ struct bootstrap : resolver_cache<tag::network::tcpip>
     component_namespace_type component_ns_;
     symbol_namespace_type symbol_ns_;
 
-    bootstrap(util::runtime_configuration const& ini_, runtime_mode mode)
+    bootstrap_base(util::runtime_configuration const& ini_, runtime_mode mode)
         : base_type(ini_),
           primary_ns_server(new primary_namespace_server_type),
           component_ns_server(new component_namespace_server_type), 

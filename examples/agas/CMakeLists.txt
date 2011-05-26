@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    implicit_bootstrap_constants_v1
+    #implicit_bootstrap_constants_v1
     implicit_bootstrap_constants_v2)
 
 foreach(example_program ${example_programs})

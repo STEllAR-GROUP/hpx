@@ -12,8 +12,8 @@
 set(group unit.hpx.runtime.naming)
 
 set(testcases
-    gid_type
-    resolver_client)
+    #resolver_client
+    gid_type)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)

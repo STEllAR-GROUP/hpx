@@ -14,7 +14,6 @@
 #include <boost/cache/entries/lfu_entry.hpp>
 
 #include <hpx/lcos/mutex.hpp>
-#include <hpx/lcos/mutex.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>

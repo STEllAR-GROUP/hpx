@@ -10,15 +10,13 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
-//#include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/namespace/server/component.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Server>
-struct component_namespace_base /*: components::stubs::stub_base<Server>*/
+template <typename Base, typename Server>
+struct component_namespace_base : Base 
 {
     // {{{ nested types
 /*    typedef components::stubs::stub_base<Server> base_type; */
@@ -99,16 +97,6 @@ struct component_namespace_base /*: components::stubs::stub_base<Server>*/
     { return unbind_async(gid, key).get(); } 
     // }}}
 };            
-
-template <typename Database> 
-struct component_namespace : component_namespace_base<
-    server::component_namespace<Database>
-> { };
-
-template <typename Database> 
-struct bootstrap_component_namespace : component_namespace_base<
-    server::bootstrap_component_namespace<Database>
-> { };
 
 }}}
 

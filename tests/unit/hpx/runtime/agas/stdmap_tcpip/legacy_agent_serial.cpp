@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/agas/client/legacy/agent.hpp>
+#include <hpx/runtime/agas/client/legacy/user_agent.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -25,9 +25,9 @@ using hpx::naming::id_type;
 using hpx::applier::get_applier;
 
 using hpx::agas::legacy::user_agent;
-using hpx::agas::primary_namespace;
-using hpx::agas::component_namespace;
-using hpx::agas::symbol_namespace;
+using hpx::agas::user_primary_namespace;
+using hpx::agas::user_component_namespace;
+using hpx::agas::user_symbol_namespace;
 
 using hpx::init;
 using hpx::finalize;
@@ -38,15 +38,15 @@ typedef user_agent<
     hpx::agas::tag::database::stdmap
 > legacy_agent_type;
 
-typedef primary_namespace<
+typedef user_primary_namespace<
     hpx::agas::tag::database::stdmap, hpx::agas::tag::network::tcpip
 > primary_namespace_type;
 
-typedef component_namespace<
+typedef user_component_namespace<
     hpx::agas::tag::database::stdmap
 > component_namespace_type;
 
-typedef symbol_namespace<
+typedef user_symbol_namespace<
     hpx::agas::tag::database::stdmap
 > symbol_namespace_type;
 
@@ -58,25 +58,6 @@ int hpx_main(variables_map& vm)
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
    
-#if 0 
-    // Get this locality's prefix.
-    id_type prefix = get_applier().get_runtime_support_gid();
-
-    // Create the primary namespace.
-    primary_namespace_type pri;
-    pri.create(prefix);
-    
-    // Create the component namespace.
-    component_namespace_type cpt;
-    cpt.create(prefix);
-    
-    // Create the symbol namespace.
-    symbol_namespace_type sym;
-    sym.create(prefix);
-
-    // Create the legacy agent.
-    legacy_agent_type agent(pri.get_gid(), cpt.get_gid(), sym.get_gid());
-#endif
     legacy_agent_type agent;
 
     gid_type last_lowerid;

@@ -14,13 +14,14 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 
 using hpx::components::component_agas_component_namespace;
 
 #if !defined(HPX_AGAS_SYSTEM)
-    typedef hpx::agas::server::component_namespace<
+    #include <hpx/runtime/agas/namespace/user_component.hpp>
+
+    typedef hpx::agas::server::user_component_namespace<
         hpx::agas::tag::database::stdmap
     > agas_component;
     
@@ -43,6 +44,8 @@ using hpx::components::component_agas_component_namespace;
     
     }}
 #else    
+    #include <hpx/runtime/agas/namespace/bootstrap_component.hpp>
+
     typedef hpx::agas::server::bootstrap_component_namespace<
         hpx::agas::tag::database::stdmap
     > agas_component;

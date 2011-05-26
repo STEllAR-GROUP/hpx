@@ -14,9 +14,9 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
-#include <hpx/runtime/agas/namespace/component.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
-#include <hpx/runtime/agas/namespace/symbol.hpp>
+#include <hpx/runtime/agas/namespace/user_component.hpp>
+#include <hpx/runtime/agas/namespace/user_primary.hpp>
+#include <hpx/runtime/agas/namespace/user_symbol.hpp>
 #include <hpx/runtime/agas/client/legacy/resolver_cache.hpp>
 
 namespace hpx { namespace agas { namespace legacy
@@ -24,24 +24,24 @@ namespace hpx { namespace agas { namespace legacy
 
 // TODO: pass error codes once they're implemented in AGAS.
 template <typename Database>
-struct user : resolver_cache<tag::network::tcpip>
+struct user_base : resolver_cache<tag::network::tcpip>
 {
   protected:
     // {{{ types
     typedef resolver_cache<tag::network::tcpip> base_type;
 
-    typedef primary_namespace<Database, tag::network::tcpip>
+    typedef user_primary_namespace<Database, tag::network::tcpip>
         primary_namespace_type;
 
-    typedef component_namespace<Database> component_namespace_type;
-    typedef symbol_namespace<Database> symbol_namespace_type;
+    typedef user_component_namespace<Database> component_namespace_type;
+    typedef user_symbol_namespace<Database> symbol_namespace_type;
     // }}}
 
     primary_namespace_type primary_ns_;
     component_namespace_type component_ns_;
     symbol_namespace_type symbol_ns_;
 
-    user(util::runtime_configuration const& ini_, runtime_mode)
+    user_base(util::runtime_configuration const& ini_, runtime_mode)
         : base_type(ini_)
     {
         naming::id_type prefix

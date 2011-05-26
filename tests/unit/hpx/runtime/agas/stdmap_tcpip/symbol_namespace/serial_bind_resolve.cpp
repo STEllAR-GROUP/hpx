@@ -11,7 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/runtime/agas/namespace/symbol.hpp>
+#include <hpx/runtime/agas/namespace/user_symbol.hpp>
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
 
 using boost::program_options::variables_map;
@@ -29,14 +29,14 @@ using hpx::naming::id_type;
 using hpx::applier::get_applier;
 using hpx::applier::register_work;
 
-using hpx::agas::symbol_namespace;
+using hpx::agas::user_symbol_namespace;
 
 using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
 
-typedef hpx::agas::symbol_namespace<
+typedef user_symbol_namespace<
     hpx::agas::tag::database::stdmap
 > symbol_namespace_type;
 

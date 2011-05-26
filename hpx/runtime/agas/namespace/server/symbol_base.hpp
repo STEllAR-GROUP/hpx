@@ -9,8 +9,6 @@
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 
@@ -152,97 +150,6 @@ struct HPX_COMPONENT_EXPORT symbol_namespace_base : Base
         /* arguments */   symbol_type const&,
         &symbol_namespace_base<Base, Database>::unbind
     > unbind_action;
-
-    #if 0
-    template <typename Derived>
-    struct action_types
-    { // {{{ action rebinder
-        typedef hpx::actions::result_action2<
-            Derived,
-            /* return type */ bool,
-            /* enum value */  namespace_bind,
-            /* arguments */   symbol_type const&, naming::gid_type const&,
-            &Derived::bind
-        > bind;
-        
-        typedef hpx::actions::result_action2<
-            Derived,
-            /* return type */ naming::gid_type,
-            /* enum value */  namespace_rebind,
-            /* arguments */   symbol_type const&, naming::gid_type const&,
-            &Derived::rebind
-        > rebind;
-        
-        typedef hpx::actions::result_action1<
-            Derived,
-            /* return type */ naming::gid_type,
-            /* enum value */  namespace_resolve,
-            /* arguments */   symbol_type const&,
-            &Derived::resolve
-        > resolve;
-        
-        typedef hpx::actions::result_action1<
-            Derived,
-            /* retrun type */ bool,
-            /* enum value */  namespace_unbind,
-            /* arguments */   symbol_type const&,
-            &Derived::unbind
-        > unbind;
-    }; // }}}
-    #endif
-};
-
-template <typename Database>
-struct HPX_COMPONENT_EXPORT bootstrap_symbol_namespace
-  : symbol_namespace_base<
-        components::fixed_component_base<
-            HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-            bootstrap_symbol_namespace<Database> >,
-        Database>
-{
-    typedef symbol_namespace_base<
-        components::fixed_component_base<
-            HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-            bootstrap_symbol_namespace<Database> >,
-        Database
-    > base_type;
-
-    #if 0
-    typedef typename base_type::template
-      action_types<bootstrap_symbol_namespace> bound_action_types;
-
-    typedef typename bound_action_types::bind bind_action;
-    typedef typename bound_action_types::rebind rebind_action;
-    typedef typename bound_action_types::resolve resolve_action;
-    typedef typename bound_action_types::unbind unbind_action;
-    #endif
-
-    bootstrap_symbol_namespace():
-      base_type("bootstrap_symbol_namespace") {} 
-};
-
-template <typename Database>
-struct HPX_COMPONENT_EXPORT symbol_namespace
-  : symbol_namespace_base<
-        components::simple_component_base<symbol_namespace<Database> >,
-        Database>
-{
-    typedef symbol_namespace_base<
-        components::simple_component_base<symbol_namespace<Database> >,
-        Database
-    > base_type;
-
-    #if 0
-    typedef typename base_type::template
-      action_types<symbol_namespace> bound_action_types;
-
-    typedef typename bound_action_types::bind bind_action;
-    typedef typename bound_action_types::rebind rebind_action;
-    typedef typename bound_action_types::resolve resolve_action;
-    typedef typename bound_action_types::unbind unbind_action;
-    #endif
-
-    symbol_namespace(): base_type("symbol_namespace") {} 
 };
 
 }}}

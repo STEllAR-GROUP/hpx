@@ -16,8 +16,11 @@
 #include <hpx/runtime/agas/network/traits.hpp>
 #include <hpx/runtime/agas/database/traits.hpp>
 
-namespace hpx { namespace agas { namespace traits
-{
+namespace hpx { namespace agas {
+
+struct empty { };
+
+namespace traits {
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Enable>
