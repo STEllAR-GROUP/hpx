@@ -379,6 +379,7 @@ protected:
         return tmp;
     }
 };
+
 #elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
 
 #define BOOST_ATOMIC_HAVE_128BIT_SUPPORT
@@ -397,7 +398,7 @@ public:
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -432,15 +433,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline __m128i to_integral(T &t)
@@ -456,6 +457,7 @@ protected:
         return tmp;
     }
 };
+
 #endif
 
 } } }

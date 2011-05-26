@@ -199,6 +199,10 @@ typedef atomic<boost::long_long_type> atomic_llong;
 typedef atomic<__uint128_t> atomic_uint128_t;
 typedef atomic<__int128_t> atomic_int128_t;
 #endif
+#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
+typedef atomic<__m128i> atomic_uint128_t;
+typedef atomic<__m128i> atomic_int128_t;
+#endif
 typedef atomic<void*> atomic_address;
 typedef atomic<bool> atomic_bool;
 
