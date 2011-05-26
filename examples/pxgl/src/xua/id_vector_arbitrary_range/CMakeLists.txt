@@ -24,7 +24,5 @@ set(vector_INI
 add_hpx_component(id_vector_arbitrary_range
   SOURCES ${vector_SOURCES}
   HEADERS ${vector_HEADERS}
-  INI ${vector_INI}
-  ESSENTIAL
 )
 

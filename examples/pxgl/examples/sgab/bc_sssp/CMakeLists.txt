@@ -26,7 +26,5 @@ set(bc_sssp_INI
 add_hpx_component(bc_sssp
   SOURCES ${bc_sssp_SOURCES}
   HEADERS ${bc_sssp_HEADERS}
-  INI ${bc_sssp_INI}
-  ESSENTIAL
 )
 

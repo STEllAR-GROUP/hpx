@@ -24,7 +24,5 @@ set(numeric_INI
 add_hpx_component(double_numeric_arbitrary_range
   SOURCES ${numeric_SOURCES}
   HEADERS ${numeric_HEADERS}
-  INI ${numeric_INI}
-  ESSENTIAL
 )
 

@@ -22,7 +22,5 @@ set(dynamic_graph_INI
 add_hpx_component(dynamic_graph
   SOURCES ${dynamic_graph_SOURCES}
   HEADERS ${dynamic_graph_HEADERS}
-  INI ${dynamic_graph_INI}
-  ESSENTIAL
 )
 

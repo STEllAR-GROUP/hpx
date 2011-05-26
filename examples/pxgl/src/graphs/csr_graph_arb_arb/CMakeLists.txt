@@ -22,7 +22,5 @@ set(csr_graph_arb_arb_INI
 add_hpx_component(csr_graph_arb_arb
   SOURCES ${csr_graph_arb_arb_SOURCES}
   HEADERS ${csr_graph_arb_arb_HEADERS}
-  INI ${csr_graph_arb_arb_INI}
-  ESSENTIAL
 )
 

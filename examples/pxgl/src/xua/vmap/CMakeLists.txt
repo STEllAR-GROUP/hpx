@@ -21,7 +21,5 @@ set(vmap_INI
 add_hpx_component(vmap
   SOURCES ${vmap_SOURCES}
   HEADERS ${vmap_HEADERS}
-  INI ${vmap_INI}
-  ESSENTIAL
 )
 

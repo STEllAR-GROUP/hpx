@@ -19,7 +19,5 @@ set(have_max_INI
 add_hpx_component(double_have_max
   SOURCES ${have_max_SOURCES}
   HEADERS ${have_max_HEADERS}
-  INI ${have_max_INI}
-  ESSENTIAL
 )
 

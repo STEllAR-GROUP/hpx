@@ -48,6 +48,5 @@ add_hpx_executable(sgab_run
   DEPENDENCIES ${sgab_DEPENDENCIES}
   HEADERS ${sgab_HEADERS}
   SOURCES ${sgab_SOURCES}
-  ESSENTIAL
 )
 

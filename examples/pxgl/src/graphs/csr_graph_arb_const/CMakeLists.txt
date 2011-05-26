@@ -23,7 +23,5 @@ add_hpx_component(csr_graph_arb_const
   MODULE csr_graph_arb_const
   SOURCES ${csr_graph_arb_const_SOURCES}
   HEADERS ${csr_graph_arb_const_HEADERS}
-  INI ${csr_graph_arb_const_INI}
-  ESSENTIAL
 )
 

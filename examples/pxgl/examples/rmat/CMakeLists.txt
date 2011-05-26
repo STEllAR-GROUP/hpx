@@ -24,7 +24,7 @@ add_hpx_executable(generate_rmat_data
   DEPENDENCIES ${rmat_DEPENDENCIES}
   HEADERS ${rmat_HEADERS}
   SOURCES ${rmat_SOURCES}
-  ESSENTIAL
 )
 
 add_hpx_pseudo_dependencies(examples.pxgl generate_rmat_data_exe)
+
