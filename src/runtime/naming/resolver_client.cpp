@@ -43,7 +43,7 @@ namespace hpx { namespace naming
       : there_(ini.get_agas_locality()), io_service_pool_(io_service_pool), 
         connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
         isconsole_(isconsole), local_only_(ini.get_agas_smp_mode()),
-        request_handler_(0), agas_cache_(ini.get_agas_cache_size())
+        request_handler_(0), agas_cache_(ini.get_agas_gva_cache_size())
     {
         // initialize the request handler if in SMP mode
         if (local_only_) {
@@ -61,7 +61,7 @@ namespace hpx { namespace naming
       : there_(ini.get_agas_locality(l)), io_service_pool_(io_service_pool), 
         connection_cache_(ini.get_agas_connection_cache_size(), "[AGAS] "),
         isconsole_(isconsole), local_only_(ini.get_agas_smp_mode()),
-        request_handler_(0), agas_cache_(ini.get_agas_cache_size())
+        request_handler_(0), agas_cache_(ini.get_agas_gva_cache_size())
     {
         // initialize the request handler if in SMP mode
         if (local_only_) {
