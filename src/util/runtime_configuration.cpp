@@ -41,14 +41,21 @@ namespace hpx { namespace util
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
 
             "[hpx.agas]",
-            "address = ${HPX_AGAS_SERVER_ADRESS:" 
-                HPX_NAME_RESOLVER_ADDRESS "}",
+#if HPX_AGAS_VERSION <= 0x10
+            "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_NAME_RESOLVER_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
-            "cachesize = ${HPX_AGAS_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CACHE_SIZE) "}",
-            "connectioncachesize = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE) "}",
+#else
+            "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
+            "port = ${HPX_AGAS_SERVER_PORT:" 
+                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+#endif
+            "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
+            "locality_cache_size = ${HPX_AGAS_LOCALITY_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE) "}",
+            "connection_cache_size = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE) "}",
             "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
         ;
         // don't overload user overrides
@@ -130,14 +137,28 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 std::string cfg_port(
-                    sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
+#if HPX_AGAS_VERSION <= 0x10
+                    sec->get_entry("port", HPX_NAME_RESOLVER_PORT)
+#else
+                    sec->get_entry("port", HPX_INITIAL_IP_PORT)
+#endif
+                );
 
                 return naming::locality(
+#if HPX_AGAS_VERSION <= 0x10
                     sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS),
+#else
+                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
+#endif
                     boost::lexical_cast<boost::uint16_t>(cfg_port));
             }
         }
-        return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+        return naming::locality
+#if HPX_AGAS_VERSION <= 0x10
+            (HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+#else
+            (HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
+#endif
     }
 
     // TODO: implement for AGAS v2
@@ -154,28 +175,51 @@ namespace hpx { namespace util
 
                 if (default_address.empty()) {
                     default_address = 
+#if HPX_AGAS_VERSION <= 0x10
                         sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS);
+#else
+                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
+#endif
                 }
                 if (0 == default_port) {
                     default_port = boost::lexical_cast<boost::uint16_t>(
-                        sec->get_entry("port", HPX_NAME_RESOLVER_PORT));
+#if HPX_AGAS_VERSION <= 0x10
+                        sec->get_entry("port", HPX_NAME_RESOLVER_PORT)
+#else
+                        sec->get_entry("port", HPX_INITIAL_IP_PORT)
+#endif
+                    );
                 }
                 return naming::locality(default_address, default_port);
             }
         }
-        return naming::locality(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+        return l;
     }
 
-    std::size_t runtime_configuration::get_agas_cache_size() const
+    std::size_t runtime_configuration::get_agas_gva_cache_size() const
     {
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("cachesize", HPX_INITIAL_AGAS_CACHE_SIZE));
+                    sec->get_entry("gva_cache_size",
+                        HPX_INITIAL_AGAS_GVA_CACHE_SIZE));
             }
         }
-        return HPX_INITIAL_AGAS_CACHE_SIZE;
+        return HPX_INITIAL_AGAS_GVA_CACHE_SIZE;
+    }
+    
+    std::size_t runtime_configuration::get_agas_locality_cache_size() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("locality_cache_size",
+                        HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE));
+            }
+        }
+        return HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE;
     }
 
     std::size_t runtime_configuration::get_agas_connection_cache_size() const
@@ -184,11 +228,11 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("connectioncachesize", 
-                        HPX_MAX_AGAS_CONNECTION_CACHE_SIZE));
+                    sec->get_entry("connection_cache_size", 
+                        HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE));
             }
         }
-        return HPX_MAX_AGAS_CONNECTION_CACHE_SIZE;
+        return HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE;
     }
 
     bool runtime_configuration::get_agas_smp_mode() const
