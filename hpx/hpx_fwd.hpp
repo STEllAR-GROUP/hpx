@@ -227,7 +227,7 @@ namespace hpx
     }
 
     class HPX_API_EXPORT runtime;
-    
+ 
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
     enum runtime_mode
@@ -236,7 +236,18 @@ namespace hpx
         runtime_mode_console = 0, ///< The runtime is the console locality
         runtime_mode_worker = 1   ///< The runtime is a worker locality
     };
-        
+
+    namespace agas
+    {
+        enum agent_state
+        {
+            agent_state_invalid = -1,
+            agent_state_bootstrapping = 0,
+            agent_state_active = 1,
+            agent_state_terminated = 2
+        };
+    }
+ 
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
 
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
