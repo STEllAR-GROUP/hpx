@@ -194,6 +194,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // helper class for AGAS server initialization
+#if HPX_AGAS_VERSION <= 0x10
         class agas_server_helper
         {
           public:
@@ -209,6 +210,7 @@ namespace hpx
             hpx::util::io_service_pool agas_pool_; 
             hpx::naming::resolver_server agas_;
         };
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -236,8 +238,8 @@ namespace hpx
             }
 
             // Check command line arguments.
-            std::string hpx_host("127.0.0.1"), agas_host;
-            boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
+            std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
+            boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
             std::string queueing = "local";
@@ -286,18 +288,20 @@ namespace hpx
             else if (is_hpx_runtime && vm.count("console"))
                 mode = hpx::runtime_mode_console;
 
-            // Initialize and run the AGAS service, if appropriate.
-            boost::shared_ptr<detail::agas_server_helper> agas_server;
+            #if HPX_AGAS_VERSION <= 0x10
+                // Initialize and run the AGAS service, if appropriate.
+                boost::shared_ptr<detail::agas_server_helper> agas_server;
 
-            if (vm.count("run-agas-server") || num_localities == 1)  
-                agas_server.reset
-                    (new detail::agas_server_helper(agas_host, agas_port));
-            else if (vm.count("run-agas-server-only"))
-            {
-                agas_server.reset
-                    (new detail::agas_server_helper(agas_host, agas_port, true));
-                return 0;
-            }
+                if (vm.count("run-agas-server") || num_localities == 1)  
+                    agas_server.reset
+                        (new detail::agas_server_helper(agas_host, agas_port));
+                else if (vm.count("run-agas-server-only"))
+                {
+                    agas_server.reset
+                        (new detail::agas_server_helper(agas_host, agas_port, true));
+                    return 0;
+                }
+            #endif
 
             // Initialize and start the HPX runtime.
             if (queueing.empty())
