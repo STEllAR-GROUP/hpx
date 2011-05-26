@@ -35,8 +35,11 @@ namespace hpx { namespace util
         // configuration info can be found).
         naming::locality get_agas_locality(naming::locality const& l) const;
 
-        // Get AGAS client side cache size
-        std::size_t get_agas_cache_size() const;
+        // Get AGAS client-side GVA cache size
+        std::size_t get_agas_gva_cache_size() const;
+        
+        // Get AGAS client-side locality cache size
+        std::size_t get_agas_locality_cache_size() const;
 
         // Get AGAS connection cache size
         std::size_t get_agas_connection_cache_size() const;
