@@ -241,27 +241,71 @@ namespace hpx
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
 #endif
+        // {{{ early startup code - still in bootstrap mode
         // init TSS for the main thread, this enables logging, time logging, etc.
         init_tss();
         
         LRT_(info) << "runtime_impl: beginning startup sequence";
 
+        LRT_(info) << "runtime_impl: starting services";
         // start services (service threads)
         runtime_support_.run();
+        LRT_(info) << "runtime_impl: started runtime_support component";
+
+        // we don't get logs until the parcel port is up, at a minimum
         parcel_port_.run(false);            // starts parcel_pool_ as well
+        LRT_(info) << "runtime_impl: started parcelport";
+        
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
+        LRT_(info) << "runtime_impl: started threadmanager";
+        // }}}
 
+        // {{{ exiting bootstrap mode 
+        LRT_(info) << "runtime_impl: registering runtime_support and memory components";
         // register the runtime_support and memory instances with the AGAS 
-        agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
-            naming::address(parcel_port_.here(), 
-                components::get_component_type<components::server::runtime_support>(), 
-                &runtime_support_));
+        #if HPX_AGAS_VERSION <= 0x10
+            agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
+                naming::address(parcel_port_.here(), 
+                    components::get_component_type<components::server::runtime_support>(), 
+                    &runtime_support_));
 
-        agas_client_.bind(applier_.get_memory_raw_gid(), 
-            naming::address(parcel_port_.here(), 
-                components::get_component_type<components::server::memory>(), 
-                &memory_));
+            agas_client_.bind(applier_.get_memory_raw_gid(), 
+                naming::address(parcel_port_.here(), 
+                    components::get_component_type<components::server::memory>(), 
+                    &memory_));
+        #else
+            typedef naming::resolver_client::endpoint_type endpoint_type;
+            typedef naming::resolver_client::gva_type gva_type;
 
+            using boost::asio::ip::address;
+
+            address addr = address::from_string(parcel_port_.here().get_address());
+                
+            endpoint_type ep(addr, parcel_port_.here().get_port());
+           
+            gva_type runtime_gva(ep,  
+                components::get_component_type<
+                    components::server::runtime_support
+                >(), 1, reinterpret_cast<void*>(&runtime_support_));
+            
+            gva_type memory_gva(ep,  
+                components::get_component_type<
+                    components::server::memory
+                >(), 1, reinterpret_cast<void*>(&memory_));
+
+            // TODO: add a method to the client to handle this instead of making
+            // runtime_impl a friend class.
+            agas_client_.primary_ns_server->bind_gid
+                (applier_.get_runtime_support_raw_gid(), runtime_gva);
+            agas_client_.primary_ns_server->bind_gid
+                (applier_.get_memory_raw_gid(), memory_gva);
+
+            // finish the bootstrap
+            agas_client_.state(agas::agent_state_active);
+        #endif
+        // }}}
+
+        // {{{ late startup - distributed
         // if there are more than one localities involved, wait for all
         // to get registered
         if (num_localities > 1) {
@@ -285,6 +329,7 @@ namespace hpx
             }
         }
 
+        LRT_(info) << "runtime_impl: setting initial locality prefixes";
         // Set localities prefixes once per runtime instance. This should
         // work fine until we support adding and removing localities.
         {
@@ -320,7 +365,9 @@ namespace hpx
             this->process_.set_num_os_threads(num_threads);
             this->process_.set_localities(here_lid, prefixes);
         }
+        // }}}
 
+        // {{{ launch main 
         // register the given main function with the thread manager
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func, boost::ref(result_)), 
@@ -329,6 +376,7 @@ namespace hpx
         this->runtime::start();
 
         LRT_(info) << "runtime_impl: started using "  << num_threads << " OS threads";
+        // }}}
 
         // block if required
         if (blocking) 
