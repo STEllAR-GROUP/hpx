@@ -515,7 +515,7 @@ public:
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        T expected=i, desired;;
+        T expected=i, desired;
         do {
             desired=expected+c;
         } while(!compare_exchange_strong(expected, desired, order, memory_order_relaxed));
