@@ -202,8 +202,8 @@ int main(int argc, char* argv[])
             return -1;
 
         // Check command line arguments.
-        std::string hpx_host("localhost"), agas_host;
-        boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
+        std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
+        boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
         int num_threads = 1;
         int num_localities = 1;
         hpx::runtime_mode mode = hpx::runtime_mode_console;    // default is console mode

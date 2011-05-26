@@ -168,8 +168,8 @@ int main(int argc, char* argv[]){
         }
 
         //initialize information
-        std::string hpx_host("localhost"), agas_host;
-        boost::uint16_t hpx_port = HPX_PORT, agas_port = 0;
+        std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
+        boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
         int num_threads = 1;
         int num_localities = 1;
         std::string queueing = "local";
