@@ -7,14 +7,11 @@
 #if !defined(HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM)
 #define HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/thread.hpp>
 #include <boost/assert.hpp>
 #include <boost/cstdint.hpp>
-
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config.hpp>
-#include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/unlock_lock.hpp>
 
 namespace hpx { namespace util
 {
@@ -35,18 +32,14 @@ namespace hpx { namespace util
         {}
 
         /// Generate next unique component id
-        naming::gid_type get_id(naming::locality const& here,
+        HPX_EXPORT naming::gid_type get_id(naming::locality const& here,
             naming::resolver_client& resolver, std::size_t count = 1);
-        
-        naming::gid_type get_id(naming::locality const& here,
-            naming::resolver_client* resolver, std::size_t count = 1);
 
     private:
         /// The range of available ids for components
         naming::gid_type lower_;
         naming::gid_type upper_;
     };
-    
 }}
 
 #endif

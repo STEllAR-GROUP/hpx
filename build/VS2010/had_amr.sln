@@ -93,6 +93,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "agas_stdmap", "components\a
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "agas_stdmap_tcpip", "components\agas_stdmap_tcpip\agas_stdmap_tcpip.vcxproj", "{A5DB6B39-FC92-4652-8305-17BA5814D2EB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_client", "marduk\marduk_client\marduk_client.vcxproj", "{22D5671B-21AB-4590-B366-0312D52C058D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_amr_c", "marduk\marduk_amr_c\marduk_amr_c.vcxproj", "{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_amr_c_test", "marduk\marduk_amr_c_test\marduk_amr_c_test.vcxproj", "{4D4F8721-24CC-4A18-9D8A-BA019682EF59}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_mesh", "marduk\marduk_mesh\marduk_mesh.vcxproj", "{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -370,6 +378,50 @@ Global
 		{A5DB6B39-FC92-4652-8305-17BA5814D2EB}.Release|Win32.ActiveCfg = Release|x64
 		{A5DB6B39-FC92-4652-8305-17BA5814D2EB}.Release|x64.ActiveCfg = Release|x64
 		{A5DB6B39-FC92-4652-8305-17BA5814D2EB}.Release|x64.Build.0 = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Win32.ActiveCfg = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|x64.ActiveCfg = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Any CPU.ActiveCfg = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Mixed Platforms.Build.0 = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Win32.ActiveCfg = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|x64.ActiveCfg = Release|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|x64.Build.0 = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Win32.ActiveCfg = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|x64.ActiveCfg = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Any CPU.ActiveCfg = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Mixed Platforms.Build.0 = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Win32.ActiveCfg = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|x64.ActiveCfg = Release|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|x64.Build.0 = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Win32.ActiveCfg = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|x64.ActiveCfg = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Any CPU.ActiveCfg = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Mixed Platforms.Build.0 = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Win32.ActiveCfg = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|x64.ActiveCfg = Release|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|x64.Build.0 = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Win32.ActiveCfg = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|x64.ActiveCfg = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Any CPU.ActiveCfg = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Mixed Platforms.Build.0 = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Win32.ActiveCfg = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|x64.ActiveCfg = Release|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -400,6 +452,10 @@ Global
 		{C5F2D82D-098E-43A6-A259-355E05DA456F} = {D8ED4ED0-AF99-4227-BF45-8F8515F1FFB0}
 		{EB1252E7-B89A-4E34-B378-C653A556053D} = {D8ED4ED0-AF99-4227-BF45-8F8515F1FFB0}
 		{75C335CF-27B4-4A34-A7A2-6682B601033F} = {D8ED4ED0-AF99-4227-BF45-8F8515F1FFB0}
+		{22D5671B-21AB-4590-B366-0312D52C058D} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		AMDCaProjectFile = C:\CVS\hpx\build\VS2010\CodeAnalyst\had_amr.caw

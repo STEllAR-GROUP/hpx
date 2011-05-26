@@ -99,10 +99,14 @@
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
@@ -121,7 +125,6 @@
     <ClCompile Include="..\..\..\src\runtime\naming\server\request.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\server\request_handler.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport_connection.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\server\parcelhandler_queue.cpp" />
@@ -194,6 +197,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />

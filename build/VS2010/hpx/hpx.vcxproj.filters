@@ -272,9 +272,6 @@
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler.cpp">
-      <Filter>Source Files\Runtime\Parcelset</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
@@ -324,6 +321,18 @@
       <Filter>Source Files\Runtime\Threads</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp">
+      <Filter>Source Files\Runtime\Parcelset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp">
+      <Filter>Source Files\Runtime\Parcelset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
       <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
   </ItemGroup>
@@ -945,6 +954,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp">
       <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp">
+      <Filter>Header Files\Runtime\Applier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

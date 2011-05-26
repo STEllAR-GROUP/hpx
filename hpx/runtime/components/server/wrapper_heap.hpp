@@ -18,6 +18,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #if !defined(DEBUG)
@@ -54,14 +55,6 @@ namespace hpx { namespace components { namespace detail
 
     } // namespace debug
 #endif
-                
-    void store_agas_client(naming::resolver_client*&, hpx::applier::applier&);
-
-    bool bind_range(naming::resolver_client*, naming::gid_type const&,
-                    std::size_t, naming::address const&, std::size_t);
-    
-    void unbind_range(naming::resolver_client*, naming::gid_type const&,
-                      std::size_t);
 
     ///////////////////////////////////////////////////////////////////////////////
     template<typename T, typename Allocator>
@@ -99,7 +92,7 @@ namespace hpx { namespace components { namespace detail
         explicit wrapper_heap(char const* class_name, bool, bool, 
                 std::size_t count, std::size_t step = static_cast<std::size_t>(-1))
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_gid), get_agas_client_(NULL),
+            base_gid_(naming::invalid_gid), 
             class_name_(class_name), alloc_count_(0), free_count_(0),
             heap_count_(count)
         {
@@ -118,7 +111,7 @@ namespace hpx { namespace components { namespace detail
         wrapper_heap()
           : pool_(NULL), first_free_(NULL), 
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_gid), get_agas_client_(NULL),
+            base_gid_(naming::invalid_gid), 
             alloc_count_(0), free_count_(0), heap_count_(0)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
@@ -222,15 +215,14 @@ namespace hpx { namespace components { namespace detail
 
                 // store a pointer to the AGAS client
                 hpx::applier::applier& appl = hpx::applier::get_applier();
-                store_agas_client(get_agas_client_, appl);
 
                 // this is the first call to get_gid() for this heap - allocate 
                 // a sufficiently large range of global ids
-                base_gid_ = ids.get_id(appl.here(), get_agas_client_, step_);
+                base_gid_ = ids.get_id(appl.here(), appl.get_agas_client(), step_);
 
                 // register the global ids and the base address of this heap
                 // with the AGAS
-                if (!bind_range(get_agas_client_, base_gid_, step_, 
+                if (!applier::bind_range(base_gid_, step_, 
                       naming::address(appl.here(),
                           components::get_component_type<typename value_type::type_holder>(), 
                           addr),
@@ -294,8 +286,7 @@ namespace hpx { namespace components { namespace detail
 
             // unbind in AGAS service 
             if (base_gid_) {
-                BOOST_ASSERT(NULL != get_agas_client_);
-                unbind_range(get_agas_client_, base_gid_, step_);
+                applier::unbind_range(base_gid_, step_);
                 base_gid_ = naming::invalid_gid;
             }
 
@@ -367,7 +358,6 @@ namespace hpx { namespace components { namespace detail
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
         naming::gid_type base_gid_;
-        naming::resolver_client* get_agas_client_;
 
 #if defined(DEBUG)
         mutable mutex_type mtx_;

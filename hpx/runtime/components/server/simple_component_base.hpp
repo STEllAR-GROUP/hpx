@@ -13,13 +13,11 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp> 
+#include <hpx/runtime/applier/bind_naming_wrappers.hpp> 
 #include <hpx/util/stringstream.hpp>
 
 namespace hpx { namespace components 
 {
-    bool bind_gid (naming::gid_type const&, naming::address const&);
-    void unbind_gid (naming::gid_type const&);
-
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
     ///
@@ -42,7 +40,9 @@ namespace hpx { namespace components
 
         /// \brief Destruct a simple_component
         ~simple_component_base()
-        { unbind_gid(gid_); }
+        { 
+            applier::unbind_gid(gid_); 
+        }
 
         /// \brief finalize() will be called just before the instance gets 
         ///        destructed
@@ -81,7 +81,7 @@ namespace hpx { namespace components
                     components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
                 gid_ = appl.get_parcel_handler().get_next_id();
-                if (!bind_gid(gid_, addr))
+                if (!applier::bind_gid(gid_, addr))
                 {
                     hpx::util::osstream strm;
                     strm << gid_;

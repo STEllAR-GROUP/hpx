@@ -5,16 +5,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <string>
-#include <algorithm>
-
 #include <hpx/hpx_fwd.hpp>
+
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/runtime/naming/detail/resolver_do_undo.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+
+#include <string>
+#include <algorithm>
 
 #include <boost/version.hpp>
 #include <boost/asio/io_service.hpp>
@@ -280,3 +283,5 @@ namespace hpx { namespace parcelset
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+
+#endif // HPX_AGAS_VERSION

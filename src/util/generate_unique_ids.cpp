@@ -8,45 +8,38 @@
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 namespace hpx { namespace util
 {
-
-naming::gid_type unique_ids::get_id(naming::locality const& here,
-    naming::resolver_client& resolver, std::size_t count)
-{
-    // create a new id
-    mutex_type::scoped_lock l(this);
-
-    // ensure next_id doesn't overflow
-    if (lower_ + count > upper_) 
+    naming::gid_type unique_ids::get_id(naming::locality const& here,
+        naming::resolver_client& resolver, std::size_t count)
     {
-        naming::gid_type lower;
-        naming::gid_type upper;
+        // create a new id
+        mutex_type::scoped_lock l(this);
 
+        // ensure next_id doesn't overflow
+        if (lower_ + count > upper_) 
         {
-            unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            resolver.get_id_range(here, 
-                (std::max)(std::size_t(range_delta), count), 
-                lower, upper);
+            naming::gid_type lower;
+            naming::gid_type upper;
+
+            {
+                unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                resolver.get_id_range(here, 
+                    (std::max)(std::size_t(range_delta), count), 
+                    lower, upper);
+            }
+
+            lower_ = lower;
+            upper_ = upper;
         }
 
-        lower_ = lower;
-        upper_ = upper;
+        naming::gid_type result = lower_;
+        lower_ += count;
+        return result;
     }
-
-    naming::gid_type result = lower_;
-    lower_ += count;
-    return result;
-}
-
-naming::gid_type unique_ids::get_id(naming::locality const& here,
-    naming::resolver_client* resolver, std::size_t count)
-{
-    BOOST_ASSERT(resolver);
-    return get_id(here, *resolver, count);
-}
-
 }}
 
 

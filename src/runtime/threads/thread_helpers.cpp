@@ -92,7 +92,7 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_state(id);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_phase(thread_id_type id, error_code& ec)
     {
