@@ -80,7 +80,7 @@ int hpx_main(variables_map& vm)
     legacy_agent_type agent;
 
     gid_type last_lowerid;
-    locality here(HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
+    locality here("127.0.0.1", 40000);
 
     for (std::size_t i = 0; i < iterations; ++i)
     {
