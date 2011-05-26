@@ -8,7 +8,7 @@
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
 #include <boost/config.hpp>
-#include <string>
+#include <hpx/version.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
@@ -25,12 +25,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is the default ip/port number used by the global address resolver
-#define HPX_PORT                    7910
-#define HPX_NAME_RESOLVER_ADDRESS   "127.0.0.1"
-#define HPX_NAME_RESOLVER_PORT      7911
+/// This is the default ip/port number used by the parcel subsystem
+#define HPX_INITIAL_IP_PORT         7910
+#define HPX_INITIAL_IP_ADDRESS      "127.0.0.1"
 #define HPX_RANDOM_PORT_MIN         26001
 #define HPX_RANDOM_PORT_MAX         26132
+
+#if HPX_AGAS_VERSION <= 0x10
+    #define HPX_NAME_RESOLVER_ADDRESS   "127.0.0.1"
+    #define HPX_NAME_RESOLVER_PORT      7911
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines if the Intel Thread Building Blocks library will be used
@@ -74,16 +78,26 @@
 /// This defines the number of outgoing (agas-) connections kept alive 
 /// This generally shouldn't be much larger than the number of OS threads used
 /// in the runtime system.
-#if !defined(HPX_MAX_AGAS_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_AGAS_CONNECTION_CACHE_SIZE 8
+#if !defined(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE 8
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local 
-/// cache. This is just the initial siye which maz be adjusted depending on the 
-/// load of the system, etc.
-#if !defined(HPX_INITIAL_AGAS_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_CACHE_SIZE 128
+/// cache. This is just the initial size which may be adjusted depending on the 
+/// load of the system, etc. It must be a minimum of 3 for AGAS v3
+/// bootstrapping.
+#if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 128
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the number of AGAS locality translations kept in the local 
+/// cache. This is just the initial size which may be adjusted depending on the 
+/// load of the system, etc. It must be a minimum of 1 for AGAS v3
+/// bootstrapping.
+#if !defined(HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE 32
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,12 +234,13 @@
   #endif
 #endif
 
-#define HPX_AGAS_PRIMARY_NS_MSB 0x0000000100000001
-#define HPX_AGAS_PRIMARY_NS_LSB 0x0000000000000001
-#define HPX_AGAS_COMPONENT_NS_MSB 0x0000000100000001
-#define HPX_AGAS_COMPONENT_NS_LSB 0x0000000000000002
-#define HPX_AGAS_SYMBOL_NS_MSB 0x0000000100000001
-#define HPX_AGAS_SYMBOL_NS_LSB 0x0000000000000003
+#define HPX_AGAS_BOOTSTRAP_PREFIX 1U 
+#define HPX_AGAS_PRIMARY_NS_MSB 0x0000000100000001ULL
+#define HPX_AGAS_PRIMARY_NS_LSB 0x0000000000000001ULL
+#define HPX_AGAS_COMPONENT_NS_MSB 0x0000000100000001ULL
+#define HPX_AGAS_COMPONENT_NS_LSB 0x0000000000000002ULL
+#define HPX_AGAS_SYMBOL_NS_MSB 0x0000000100000001ULL
+#define HPX_AGAS_SYMBOL_NS_LSB 0x0000000000000003ULL
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <hpx/config/defaults.hpp>
