@@ -8,6 +8,7 @@
 #if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
 #define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 
+#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <hpx/runtime/agas/client/legacy/user.hpp>
@@ -46,15 +47,34 @@ struct agent_base : Base
     typedef typename primary_namespace_type::decrement_type decrement_type;
     
     typedef typename base_type::cache_mutex_type cache_mutex_type;
-    typedef typename base_type::erase_policy erase_policy;
-    typedef typename base_type::cache_key cache_key;
-    typedef typename base_type::cache_type cache_type;
+    typedef typename base_type::locality_entry_type locality_entry_type;
+    typedef typename base_type::gva_erase_policy gva_erase_policy;
+    typedef typename base_type::gva_cache_key gva_cache_key;
+    typedef typename base_type::gva_cache_type gva_cache_type;
     // }}}
 
     const runtime_mode mode;
 
-    agent_base(util::runtime_configuration const& ini_, runtime_mode mode_)
-        : base_type(ini_, mode_), mode(mode_) {}
+  protected:
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    friend class runtime_impl;
+
+    boost::atomic<agent_state> state_; 
+
+  public:
+    agent_base(util::runtime_configuration const& ini_, runtime_mode mode_,
+               agent_state as_state)
+        : base_type(ini_, mode_), mode(mode_), state_(as_state) {}
+
+    agent_state state() const
+    { return state_.load(); }
+
+    void state(agent_state new_state) 
+    {
+        BOOST_ASSERT(new_state != agent_state_bootstrapping);
+        BOOST_ASSERT(new_state != agent_state_invalid);
+        this->state_.store(new_state);
+    }
 
     bool is_console() const
     { return mode == runtime_mode_console; }
@@ -63,10 +83,14 @@ struct agent_base : Base
     { return false; } 
 
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
-                    bool self = true, error_code& ec = throws) 
+                    bool self = true, bool try_cache = true,
+                    error_code& ec = throws) 
     { // {{{ get_prefix implementation
         using boost::asio::ip::address;
         using boost::fusion::at_c;
+
+        if (try_cache && get_prefix_cached(l, prefix, self, ec))
+            return false;
 
         address addr = address::from_string(l.get_address());
 
@@ -76,19 +100,74 @@ struct agent_base : Base
         {
             binding_type r = this->primary_ns_.bind(ep, 0);
             prefix = at_c<2>(r);
+
+            if (prefix != naming::invalid_gid)
+            {
+                typename cache_mutex_type::scoped_lock
+                    lock(this->locality_cache_mtx_);
+                this->locality_cache_.insert(l, prefix);
+            }
+
+            if (at_c<3>(r) && is_console())
+            {
+                if (!registerid("/locality(console)", at_c<2>(r), ec))
+                {
+                    HPX_THROWS_IN_CURRENT_FUNC_IF(ec, duplicate_console, 
+                        "a console locality is already registered");
+                }
+            } 
+
             return at_c<3>(r);
         }
         
         else 
         {
             prefix = at_c<0>(this->primary_ns_.resolve(ep)); 
+
+            if (prefix != naming::invalid_gid)
+            {
+                typename cache_mutex_type::scoped_lock
+                    lock(this->locality_cache_mtx_);
+                this->locality_cache_.insert(l, prefix);
+            }
+
             return false;
         }
     } // }}}
-
-    bool get_console_prefix(naming::gid_type& prefix, error_code& ec = throws) 
+    
+    bool get_prefix_cached(naming::locality const& l, naming::gid_type& prefix,
+                           bool self = true, error_code& ec = throws) 
     {
+        locality_entry_type e;
+
+        typename cache_mutex_type::scoped_lock lock(this->locality_cache_mtx_);
+
+        if (this->locality_cache_.get_entry(l, e))
+        {
+            prefix = e.get();
+            return true;
+        }
+
+        return false; 
+    }
+
+    bool get_console_prefix(naming::gid_type& prefix,
+                            bool try_cache = true, error_code& ec = throws) 
+    {
+        if (try_cache)
+        {
+            if (this->console_cache_)
+            {
+                prefix = naming::get_gid_from_prefix(this->console_cache_);
+                return true;
+            }
+        }
+
         prefix = this->symbol_ns_.resolve("/locality(console)");
+
+        if (prefix != naming::invalid_gid)
+            this->console_cache_.store(naming::get_prefix_from_gid(prefix));
+
         return prefix;
     } 
 
@@ -127,7 +206,7 @@ struct agent_base : Base
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) 
-    { return get_prefixes(prefixes, components::component_invalid); }
+    { return get_prefixes(prefixes, components::component_invalid, ec); }
 
     component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
@@ -162,7 +241,7 @@ struct agent_base : Base
 
     bool bind(naming::gid_type const& id, naming::address const& addr,
               error_code& ec = throws) 
-    { return bind_range(id, 1, addr, 0); }
+    { return bind_range(id, 1, addr, 0, ec); }
 
     bool bind_range(naming::gid_type const& lower_id, count_type count, 
                     naming::address const& baseaddr, offset_type offset,
@@ -181,8 +260,8 @@ struct agent_base : Base
         
         if (this->primary_ns_.bind(lower_id, gva)) 
         { 
-            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
-            cache_key key(lower_id, count);
+            typename cache_mutex_type::scoped_lock lock(this->gva_cache_mtx_);
+            gva_cache_key key(lower_id, count);
             this->gva_cache_.insert(key, gva);
 
             return true;
@@ -211,17 +290,17 @@ struct agent_base : Base
     } // }}}
 
     bool unbind(naming::gid_type const& id, error_code& ec = throws) 
-    { return unbind_range(id, 1); } 
+    { return unbind_range(id, 1, ec); } 
         
     bool unbind(naming::gid_type const& id, naming::address& addr,
                 error_code& ec = throws) 
-    { return unbind_range(id, 1, addr); }
+    { return unbind_range(id, 1, addr, ec); }
 
     bool unbind_range(naming::gid_type const& lower_id, count_type count,
                       error_code& ec = throws) 
     {
         naming::address addr; 
-        return unbind_range(lower_id, count, addr);
+        return unbind_range(lower_id, count, addr, ec);
     } 
 
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
@@ -231,8 +310,8 @@ struct agent_base : Base
 
         if (r)
         {
-            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
-            erase_policy ep(lower_id, count);
+            typename cache_mutex_type::scoped_lock lock(this->gva_cache_mtx_);
+            gva_erase_policy ep(lower_id, count);
             this->gva_cache_.erase(ep);
             addr.locality_ = r->endpoint;
             addr.type_ = r->type;
@@ -245,7 +324,7 @@ struct agent_base : Base
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
     { // {{{ resolve implementation
-        if (try_cache && resolve_cached(id, addr))
+        if (try_cache && resolve_cached(id, addr, ec))
             return true;
         
         gva_type gva = this->primary_ns_.resolve(id);
@@ -259,8 +338,8 @@ struct agent_base : Base
                        (gva.lva() != 0)))
         {     
             // We only insert the entry into the cache if it's valid
-            typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
-            cache_key key(id);
+            typename cache_mutex_type::scoped_lock lock(this->gva_cache_mtx_);
+            gva_cache_key key(id);
             this->gva_cache_.insert(key, gva);
             return true;
         }
@@ -270,23 +349,23 @@ struct agent_base : Base
 
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
-    { return resolve(id.get_gid(), addr, try_cache); }
+    { return resolve(id.get_gid(), addr, try_cache, ec); }
 
     bool resolve_cached(naming::gid_type const& id, naming::address& addr,
                         error_code& ec = throws) 
     { // {{{ resolve_cached implementation
         // first look up the requested item in the cache
-        cache_key k(id);
-        typename cache_mutex_type::scoped_lock lock(this->cache_mtx_);
-        cache_key idbase;
-        typename cache_type::entry_type e;
+        gva_cache_key k(id);
+        typename cache_mutex_type::scoped_lock lock(this->gva_cache_mtx_);
+        gva_cache_key idbase;
+        typename gva_cache_type::entry_type e;
 
         // Check if the entry is currently in the cache
         if (this->gva_cache_.get_entry(k, idbase, e))
         {
             if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
             {
-                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                HPX_THROWS_IN_CURRENT_FUNC_IF(ec, bad_parameter, 
                     "MSBs of GID base and GID do not match");
                 return false;
             }
@@ -328,8 +407,13 @@ struct user_agent : agent_base<user<Database> >, boost::noncopyable
 
     user_agent(util::runtime_configuration const& ini_
                   = util::runtime_configuration(), 
-               runtime_mode mode = runtime_mode_worker)
-        : base_type(ini_, mode) {} 
+               runtime_mode mode = runtime_mode_worker,
+               agent_state as_state = agent_state_active)
+        : base_type(ini_, mode, as_state)
+    {
+        BOOST_ASSERT(as_state != agent_state_bootstrapping);
+        BOOST_ASSERT(as_state != agent_state_invalid);
+    } 
 };
 
 template <typename Database>
@@ -339,8 +423,10 @@ struct bootstrap_agent : agent_base<bootstrap<Database> >, boost::noncopyable
 
     bootstrap_agent(util::runtime_configuration const& ini_
                       = util::runtime_configuration(), 
-                    runtime_mode mode = runtime_mode_worker)
-        : base_type(ini_, mode) {} 
+                    runtime_mode mode = runtime_mode_worker,
+                    agent_state as_state = agent_state_bootstrapping)
+        : base_type(ini_, mode, as_state)
+    { BOOST_ASSERT(as_state != agent_state_invalid); }
 };
 
 }}}

@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
@@ -45,7 +46,7 @@ struct bootstrap : resolver_cache<tag::network::tcpip>
     typedef typename symbol_namespace_type::server_type
         symbol_namespace_server_type; 
 
-    typedef base_type::cache_key cache_key;
+    typedef base_type::gva_cache_key gva_cache_key;
     typedef base_type::gva_type::endpoint_type endpoint_type;
     // }}}
 
@@ -76,16 +77,38 @@ struct bootstrap : resolver_cache<tag::network::tcpip>
             symbol_namespace_server_type::get_component_type(), 1U,
                 static_cast<void*>(symbol_ns_server.get()));
 
-        cache_key primary_key(primary_ns_server->get_base_gid(), 1U);
-        cache_key component_key(component_ns_server->get_base_gid(), 1U);
-        cache_key symbol_key(symbol_ns_server->get_base_gid(), 1U);
+        gva_cache_key primary_key(primary_ns_server->get_base_gid(), 1U);
+        gva_cache_key component_key(component_ns_server->get_base_gid(), 1U);
+        gva_cache_key symbol_key(symbol_ns_server->get_base_gid(), 1U);
+
+        this->locality_cache_.insert(l, 
+            naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
+        this->symbol_ns_server->bind("/locality(agas#0)",
+            naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
+        this->primary_ns_server->bind_locality(ep, 3);
 
         this->gva_cache_.insert(primary_key, primary_gva);
         this->gva_cache_.insert(component_key, component_gva); 
         this->gva_cache_.insert(symbol_key, symbol_gva);
+        this->primary_ns_server->bind_gid
+            (primary_ns_server->get_base_gid(), primary_gva);
+        this->primary_ns_server->bind_gid
+            (component_ns_server->get_base_gid(), component_gva);
+        this->primary_ns_server->bind_gid
+            (symbol_ns_server->get_base_gid(), symbol_gva);
+
+        if (mode == runtime_mode_console)
+        { 
+            this->console_cache_.store(HPX_AGAS_BOOTSTRAP_PREFIX);
+            this->symbol_ns_server->bind("/locality(console)",
+                naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
+        }
     }
 
   private:
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    friend class runtime_impl;
+
     boost::shared_ptr<primary_namespace_server_type> primary_ns_server;
     boost::shared_ptr<component_namespace_server_type> component_ns_server;
     boost::shared_ptr<symbol_namespace_server_type> symbol_ns_server;
