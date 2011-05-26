@@ -9,6 +9,5 @@ add_hpx_library_sources(hpx
   console_logging.cpp
   memory.cpp
   memory_block.cpp
-  runtime_support.cpp
-  wrapper_heap.cpp)
+  runtime_support.cpp)
 
