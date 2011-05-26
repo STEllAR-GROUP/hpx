@@ -824,6 +824,10 @@ namespace hpx { namespace util { namespace detail
         naming::gid_type console_prefix;
         for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
+            #if HPX_AGAS_VERSION > 0x10
+                if ((agas_client.mode == runtime_mode_console) ||  
+                    (agas_client.state() != agas::agent_state_bootstrapping))
+            #endif 
             if (agas_client.get_console_prefix(console_prefix))
                 break;
 
