@@ -1,3 +1,4 @@
+//  Copyright (c) 2011 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
@@ -14,19 +15,20 @@ namespace hpx { namespace applier
 {
     // helper functions allowing to bind and unbind a GID to a given address
     // without having to directly refer to the resolver_client
-    bool bind_gid (naming::gid_type const& gid_, naming::address const& addr,
+    bool bind_gid(naming::gid_type const& gid_, naming::address const& addr,
         error_code& ec)
     {
         return get_applier().get_agas_client().bind(gid_, addr, ec);
     }
 
-    void unbind_gid (naming::gid_type const& gid_, error_code& ec)
+    void unbind_gid(naming::gid_type const& gid_, error_code& ec)
     {
         if (gid_) {
             get_applier().get_agas_client().unbind(gid_, ec);
         }
         else {
-            // FIXME: what happens here?
+            HPX_THROWS_IF(ec, bad_parameter, "applier::unbind_gid",
+                "cannot dereference invalid GID");
         }
     }
 
