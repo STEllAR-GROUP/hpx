@@ -1,34 +1,28 @@
-////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Hartmut Kaiser
-//  Copyright (c) 2011 Bryce Lelbach
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  Copyright (c) 2011 Bryce Lelbach 
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_A21C8E6C_F75C_4F4D_AD85_8847E40E78AB)
-#define HPX_A21C8E6C_F75C_4F4D_AD85_8847E40E78AB
+#if !defined(HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM)
+#define HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace applier
 {
     // helper functions allowing to bind and unbind a GID to a given address
     // without having to directly refer to the resolver_client
-    bool HPX_EXPORT bind_gid(naming::gid_type const& gid_,
-        naming::address const& addr, error_code& ec = throws);
-
-    void HPX_EXPORT unbind_gid(naming::gid_type const& gid_,
+    HPX_EXPORT bool bind_gid (naming::gid_type const&, naming::address const&,
+        error_code& ec = throws);
+    HPX_EXPORT void unbind_gid (naming::gid_type const&,
         error_code& ec = throws);
 
-    bool HPX_EXPORT bind_range(naming::gid_type const& gid, std::size_t count, 
-        naming::address const& addr, std::size_t offset, error_code& ec = throws);
-
-    void HPX_EXPORT unbind_range(naming::gid_type const& gid, std::size_t count, 
+    HPX_EXPORT bool bind_range(naming::gid_type const&, std::size_t, 
+        naming::address const&, std::size_t, error_code& ec = throws);
+    HPX_EXPORT void unbind_range(naming::gid_type const&, std::size_t, 
         error_code& ec = throws);
 }}
 
-
-#endif // HPX_A21C8E6C_F75C_4F4D_AD85_8847E40E78AB
-
+#endif
