@@ -379,6 +379,83 @@ protected:
         return tmp;
     }
 };
+#elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
+
+#define BOOST_ATOMIC_HAVE_128BIT_SUPPORT
+
+#include <emmintrin.h>
+
+template<typename T>
+class platform_atomic<T, 16> : private platform_atomic_integral<__m128i> {
+public:
+    typedef platform_atomic_integral<__m128i> super;
+#if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
+    typedef union { T e; __m128i i;} conv;
+#endif
+
+    platform_atomic() {}
+    explicit platform_atomic(T t) : super(to_integral(t))
+    {
+    }
+    
+    void store(T t, memory_order order=memory_order_seq_cst) volatile
+    {
+        super::store(to_integral(t), order);
+    }
+    T load(memory_order order=memory_order_seq_cst) volatile const
+    {
+        return from_integral(super::load(order));
+    }
+    bool compare_exchange_strong(
+        T &expected,
+        T desired,
+        memory_order success_order,
+        memory_order failure_order) volatile
+    {
+        __m128i _expected, _desired;
+        _expected=to_integral(expected);
+        _desired=to_integral(desired);
+        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        expected=from_integral(_expected);
+        return success;
+    }
+    bool compare_exchange_weak(
+        T &expected,
+        T desired,
+        memory_order success_order,
+        memory_order failure_order) volatile
+    {
+        __m128i _expected, _desired;
+        _expected=to_integral(expected);
+        _desired=to_integral(desired);
+        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        expected=from_integral(_expected);
+        return success;
+    }
+    
+    T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
+    {
+        return from_integral(super::exchange(to_integral(replacement), order));
+    }
+    
+    operator T(void) const volatile {return load();}
+    T operator=(T v) volatile {store(v); return v;}    
+    
+    using super::is_lock_free;
+protected:
+    static inline __m128i to_integral(T &t)
+    {
+        __m128i tmp;
+        memcpy(&tmp, &t, sizeof(t));
+        return tmp;
+    }
+    static inline T from_integral(__m128i t)
+    {
+        T tmp;
+        memcpy(&tmp, &t, sizeof(t));
+        return tmp;
+    }
+};
 #endif
 
 } } }

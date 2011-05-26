@@ -125,7 +125,7 @@ extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t v
 #endif
 
 template<typename T>
-class atomic_interlocked_64 {
+__declspec(align(64)) class atomic_interlocked_64 {
 public:
     explicit atomic_interlocked_64(T v) : i(v) {}
     atomic_interlocked_64() {}
@@ -176,6 +176,113 @@ public:
     typedef T integral_type;
 private:
     T i;
+};
+#endif
+
+#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
+
+#if defined( BOOST_USE_WINDOWS_H )
+
+# include <windows.h>
+
+# define BOOST_INTERLOCKED_COMPARE_EXCHANGE128 InterlockedCompareExchange128
+
+#else
+
+extern "C" unsigned char __cdecl
+_InterlockedCompareExchange128(boost::int64_t volatile*, boost::int64_t, boost::int64_t, boost::int64_t*);
+
+# pragma intrinsic( _InterlockedCompareExchange128 )
+
+# define BOOST_INTERLOCKED_COMPARE_EXCHANGE128 _InterlockedCompareExchange128
+
+#endif
+
+#include <emmintrin.h>
+
+template<typename T>
+__declspec(align(128)) class atomic_interlocked_128 {
+public:
+    explicit atomic_interlocked_128(T v) : i(v) {}
+    atomic_interlocked_128() {}
+    T load(memory_order order=memory_order_seq_cst) const volatile
+    {
+        T v;
+        if (order!=memory_order_seq_cst) {
+          v = _mm_load_si128((__m128i)(&i));
+        } else {
+          v = *reinterpret_cast<volatile const T *>(&i);
+        }
+        fence_after_load(order);
+        return v;
+    }
+
+    void store(T v, memory_order order=memory_order_seq_cst) volatile
+    {
+        if (order!=memory_order_seq_cst) {
+            *reinterpret_cast<volatile T *>(&i)=v;
+        } else {
+            _mm_storeu_si128((__m128i)(&i), v);
+        }
+    }
+
+    bool compare_exchange_strong(
+        T &expected,
+        T desired,
+        memory_order success_order,
+        memory_order failure_order) volatile
+    {
+        boost::int64_t* expected_raw = &expected;
+        boost::int64_t* desired_raw = &desired;
+        volatile boost::int64_t* i_raw = &i;
+        T prev = i;
+        bool success=BOOST_INTERLOCKED_COMPARE_EXCHANGE128
+            (i_raw, desired_raw[1], desired_raw[0], expected_raw);
+        expected = prev;
+        return success;
+    }
+    bool compare_exchange_weak(
+        T &expected,
+        T desired,
+        memory_order success_order,
+        memory_order failure_order) volatile
+    {
+        return compare_exchange_strong(expected, desired, success_order, failure_order);
+    }
+    T exchange(T r, memory_order order=memory_order_seq_cst) volatile
+    {
+        boost::int64_t* desired = &r;
+
+        while (!BOOST_INTERLOCKED_COMPARE_EXCHANGE128
+            ((volatile boost::int64_t*)(&i), desired[1], desired[0],
+             (boost::int64_t*)&i))
+        {};
+
+        return r;
+    }
+    T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
+    {
+        T expected = i, desired;
+
+        do {
+            desired = expected + c;
+        } while(!compare_exchange_strong(expected, desired, order, memory_order_relaxed));
+        return expected;
+    }
+    
+    bool is_lock_free(void) const volatile {return true;}
+    
+    typedef T integral_type;
+private:
+    T i;
+};
+
+template<typename T>
+class platform_atomic_integral<T, 16> : public build_atomic_from_add<atomic_interlocked_128<T> >{
+public:
+    typedef build_atomic_from_add<atomic_interlocked_128<T> > super;
+    explicit platform_atomic_integral(T v) : super(v) {}
+    platform_atomic_integral(void) {}
 };
 #endif
 
