@@ -528,7 +528,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       int step,dst;
 //      int found;
 
-      std::size_t a,b,c;
+//       std::size_t a,b,c;
       for (step=0;step<num_rows;step = step + 1) {
         for (i=0;i<each_row[step];i++) {
           dst = step + 1;

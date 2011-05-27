@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/format.hpp>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
@@ -16,7 +14,11 @@
 #include <examples/marduk/amr_c/stencil.hpp>
 #include <examples/marduk/amr_c/logging.hpp>
 #include "fname.h"
+#if defined(RNPL_FOUND)
 #include <sdf.h>
+#endif
+
+#include <boost/format.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -602,6 +604,7 @@ int level_refine(int level,parameter &par)
       par->gr_ny.push_back(ny);
       par->gr_nz.push_back(nz);
 
+#if defined(RNPL_FOUND)
       // output
       {
         std::vector<double> localerror;
@@ -632,6 +635,7 @@ int level_refine(int level,parameter &par)
         sprintf(crdnme,"x|y|z");
         gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
       }
+#endif
     }
 
     return 0;
@@ -787,6 +791,7 @@ int level_refine(int level,parameter &par)
     par->gr_ny.push_back(ny);
     par->gr_nz.push_back(nz);
 
+#if defined(RNPL_FOUND)
     // output
     {
       std::vector<double> localerror;
@@ -817,6 +822,7 @@ int level_refine(int level,parameter &par)
       sprintf(crdnme,"x|y|z");
       gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
     }
+#endif
   }
 
   return 0;
