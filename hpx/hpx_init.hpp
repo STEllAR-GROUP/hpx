@@ -66,6 +66,9 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
+        if (shutdown_timeout == -1.0)
+            get_option(shutdown_timeout, "hpx.shutdown_timeout");
+
         components::stubs::runtime_support::shutdown_all(shutdown_timeout);
     }
 

@@ -39,6 +39,7 @@ namespace hpx { namespace util
             "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
+            "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 
             "[hpx.agas]",
 #if HPX_AGAS_VERSION <= 0x10
