@@ -9,6 +9,9 @@
 # We require at least CMake V2.6.4
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
+################################################################################
+# C++ overrides 
+################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
     "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
@@ -38,6 +41,18 @@ hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. 
 # be pedantic and annoying by default
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+################################################################################
+# F90 detection
+################################################################################
+include(CMakeDetermineFortranCompiler)
+
+if(CMAKE_Fortran_COMPILER)
+  hpx_info("f90" "Found a F90 compiler")
+  enable_language(Fortran)
+else()
+  hpx_warn("f90" "Couldn't find a F90 compiler")
 endif()
 
 ################################################################################
