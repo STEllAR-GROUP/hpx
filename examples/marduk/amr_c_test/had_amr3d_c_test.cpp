@@ -52,7 +52,7 @@ int rkupdate(std::vector<nodedata*> const& vecval, stencil_data* result,
   int level, detail::parameter const& par)
 {
     // allocate some temporary arrays for calculating the rhs
-    nodedata rhs;
+//     nodedata rhs;
     boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
     boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
     boost::scoped_array<nodedata> work3(new nodedata[vecval.size()]);

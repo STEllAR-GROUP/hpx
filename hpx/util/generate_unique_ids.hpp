@@ -32,7 +32,7 @@ namespace hpx { namespace util
         {}
 
         /// Generate next unique component id
-        HPX_EXPORT naming::gid_type get_id(naming::locality const& here,
+        naming::gid_type get_id(naming::locality const& here,
             naming::resolver_client& resolver, std::size_t count = 1);
 
     private:
