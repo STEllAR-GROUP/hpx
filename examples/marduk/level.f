@@ -77,8 +77,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical     backcutout
       logical     double_equal
       external    double_equal
-      real(kind=8)getabsmax
-      external    getabsmax
       !
       ! To store the original bbox before a cut:
       !
@@ -675,24 +673,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           !      ( This can cause problems when clusters
           !        are checked for negative values. )
           !
-          if (.false.) then
-          tmpdp1 = getabsmax(sigi,nx)/numbox
-          tmpdp2 = getabsmax(lapi,nx)/numbox
-          do k = 1, nz
-          do i = 1, nx
-             flag(i,1, k) = sigi(i)/tmpdp1
-             flag(i,ny,k) = lapi(i)/tmpdp2
-          end do
-          end do
-          tmpdp1 = getabsmax(sigj,ny)/numbox
-          tmpdp2 = getabsmax(lapj,ny)/numbox
-          do k = 1, nz
-          do j = 1, ny
-             flag(1, j,k) = sigj(j)/tmpdp1
-             flag(nx,j,k) = lapj(j)/tmpdp2
-          end do
-          end do
-          end if
       end if
 
       !
