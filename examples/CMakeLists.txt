@@ -18,7 +18,6 @@ if(NOT MSVC)
       generic
       had_amr3d
       hplpx
-      marduk
       nbody
       nqueen
       parcelset
@@ -28,6 +27,9 @@ if(NOT MSVC)
       smp_amr3d)
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} agas)
+  endif()
+  if(CMAKE_Fortran_COMPILER)
+    set(subdirs ${subdirs} marduk)
   endif()
 else()
   set(subdirs
