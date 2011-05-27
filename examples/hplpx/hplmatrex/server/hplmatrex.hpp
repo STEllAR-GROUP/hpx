@@ -44,7 +44,6 @@ namespace hpx { namespace components { namespace server
             hpl_destruct=1,
             hpl_assign=2,
             hpl_mini=3,
-            hpl_set=4,
             hpl_solve=5,
             hpl_swap=6,
             hpl_gmain=7,
@@ -58,11 +57,6 @@ namespace hpx { namespace components { namespace server
     ~HPLMatreX(){destruct();}
     void destruct();
 
-    //operators for assignment and leftdata access
-    double get(int row, int col);
-    void set(int row, int col, double val);
-
-    //functions for manipulating the matrix
     double LUsolve();
 
     private:
@@ -92,7 +86,7 @@ namespace hpx { namespace components { namespace server
     LUblock*** datablock; //stores the data being operated on
     double** factorData;  //stores factors for computations
     double** trueData;    //the original unaltered data
-    double** transdata;   //transpose of the original data(speeds up pivoting)
+    double** transData;   //transpose of the original data(speeds up pivoting)
     double* solution;     //for storing the solution
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
@@ -112,9 +106,6 @@ namespace hpx { namespace components { namespace server
     //the assign function
     typedef actions::result_action4<HPLMatreX, int, hpl_assign, int,
         int, bool, int, &HPLMatreX::assign> assign_action;
-    //the set function
-    typedef actions::action3<HPLMatreX, hpl_set, int,
-            int, double, &HPLMatreX::set> set_action;
     //the solve function
     typedef actions::result_action0<HPLMatreX, double, hpl_solve,
         &HPLMatreX::LUsolve> solve_action;
@@ -169,15 +160,12 @@ namespace hpx { namespace components { namespace server
     brows = (int)std::floor((float)h/blocksize);
     columns = h+1;
     _gid = gid;
-
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
     int i;          //just counting variables
     int offset = 1; //the initial offset used for the memory handling algorithm
     boost::rand48 gen;     //random generator used for seeding other generators
     gen.seed(time(NULL));
-
-    /*allocate memory for the various arrays that will be used*/
     allocate();    //allocate memory for the elements of the array
 
     //By making offset a power of two, the assign functions
@@ -189,7 +177,6 @@ namespace hpx { namespace components { namespace server
     while(offset < h){
         offset *= 2;
     }
-
     //here we initialize the the matrix
     assign_future future(gid,(int)0,offset,false,gen());
 
@@ -203,14 +190,14 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::allocate(){
     datablock = (LUblock***) std::malloc(brows*sizeof(LUblock**));
     factorData = (double**) std::malloc(rows*sizeof(double*));
-    transdata = (double**) std::malloc(columns*sizeof(double*));
+    transData = (double**) std::malloc(columns*sizeof(double*));
     trueData = (double**) std::malloc(rows*sizeof(double*));
     pivotarr = (int*) std::malloc(rows*sizeof(int));
     for(int i = 0;i < rows;i++){
         trueData[i] = (double*) std::malloc(columns*sizeof(double));
-        transdata[i] = (double*) std::malloc(rows*sizeof(double));
+        transData[i] = (double*) std::malloc(rows*sizeof(double));
     }
-    transdata[rows] = (double*) std::malloc(rows*sizeof(double));
+    transData[rows] = (double*) std::malloc(rows*sizeof(double));
     for(int i = 0;i < brows;i++){
         datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
     }
@@ -258,23 +245,14 @@ namespace hpx { namespace components { namespace server
     for(int i=0;i<temp;i++){
         location = row+i;
         for(int j=0;j<columns;j++){
-            transdata[j][location] = trueData[location][j] = (double) (gen() % 1000);
+            transData[j][location] = trueData[location][j] = (double) (gen() % 1000);
         }
     }
-
     //once all spun off futures are complete we are done
     BOOST_FOREACH(assign_future af, futures){
         af.get();
     }
-
-/*    boost::rand48 gen;
-    gen.seed(seed);
-    int temp = std::min(offset,rows-row);
-    for(int i=0;i<temp;i++){
-        for(int j=0;j<columns;j++){
-            transdata[j][row+i] = trueData[row+i][j] = (double) (gen() % 1000);
-    }   }
-*/    return 1;
+    return 1;
     }
 
     //the destructor frees the memory
@@ -297,16 +275,6 @@ namespace hpx { namespace components { namespace server
     }
 
 //DEBUGGING FUNCTIONS/////////////////////////////////////////////////
-    //get() gives back an element in the original matrix
-    double HPLMatreX::get(int row, int col){
-    return trueData[row][col];
-    }
-
-    //set() assigns a value to an element in all matrices
-    void HPLMatreX::set(int row, int col, double val){
-    trueData[row][col] = val;
-    }
-
     //print out the matrix
     void HPLMatreX::print(){
     for(int i = 0; i < brows; i++){
@@ -329,7 +297,7 @@ namespace hpx { namespace components { namespace server
     std::cout<<std::endl;
     for(int i = 0;i < columns; i++){
         for(int j = 0;j < rows; j++){
-        std::cout<<transdata[i][j]<<" ";
+        std::cout<<transData[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
@@ -342,18 +310,16 @@ namespace hpx { namespace components { namespace server
     //first perform partial pivoting
     starttime = ptime(microsec_clock::local_time());
     pivot();
-
     ptime temp = ptime(microsec_clock::local_time());
     std::cout<<"pivoting over "<<temp-starttime<<std::endl;
 
     //to initiate the Gaussian elimination
     LU_gauss_manager();
-
     ptime temp2 = ptime(microsec_clock::local_time());
     std::cout<<"finished gaussian "<<temp2 - temp<<std::endl;
+
     //allocate memory space to store the solution
     solution = (double*) std::malloc(rows*sizeof(double));
-
     //perform back substitution
     LUbacksubst();
     ptime endtime = ptime(microsec_clock::local_time());
@@ -363,11 +329,9 @@ namespace hpx { namespace components { namespace server
     int h = (int)std::ceil(((float)rows)*.5);
     int offset = 1;
     while(offset < h){offset *= 2;}
-
     //create a future to check the accuracy of the generated solution
     check_future chk(_gid,0,offset,false);
     return chk.get();
-//    return 1;
     }
 
 
@@ -388,10 +352,10 @@ namespace hpx { namespace components { namespace server
         //values to compute the final pivot array
         for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
             max_row = i;
-            max = fabs(transdata[i][pivotarr[i]]);
+            max = fabs(transData[i][pivotarr[i]]);
             temp_piv = pivotarr[i];
             for(j=i+1;j<rows;j++){
-            temp = fabs(transdata[i][pivotarr[j]]);
+            temp = fabs(transData[i][pivotarr[j]]);
             if(temp > max){
                 max = temp;
                 max_row = j;
@@ -405,22 +369,20 @@ namespace hpx { namespace components { namespace server
             futures.push_back(swap_future(_gid,outer,0));
         }
     }
-    //transdata is no longer needed so free the memory and allocate
+    //transData is no longer needed so free the memory and allocate
     //space for factorData
     for(i=0;i<rows;i++){
-        free(transdata[i]);
+        free(transData[i]);
         factorData[i] = (double*) std::malloc(i*sizeof(double));
     }
-    free(transdata[rows]);
-    free(transdata);
+    free(transData[rows]);
+    free(transData);
 
     //ensure that all pivoting is complete
     BOOST_FOREACH(swap_future sf, futures){
         sf.get();
     }
-
     }
-
 
     //swap() creates the datablocks and reorders the original
     //trueData matrix when assigning the initial values to the datablocks
@@ -428,13 +390,13 @@ namespace hpx { namespace components { namespace server
     int HPLMatreX::swap(int brow, int bcol){
     int temp = rows/blocksize;
     int numrows = blocksize, numcols = blocksize;
-
-    for(int k=0;k<brows;k++){
+    int i,j,k;
+    for(k=0;k<brows;k++){
     if(brow == brows-1){numrows = rows - (temp-1)*blocksize;}
     if(k == brows-1){numcols = columns - (temp-1)*blocksize;}
     datablock[brow][k] = new LUblock(numrows,numcols);
-    for(int i=0;i<numrows;i++){
-        for(int j=0;j<numcols;j++){
+    for(i=0;i<numrows;i++){
+        for(j=0;j<numcols;j++){
         datablock[brow][k]->data[i][j] =
             trueData[pivotarr[brow*blocksize+i]][k*blocksize+j];
     }   }
@@ -581,7 +543,7 @@ namespace hpx { namespace components { namespace server
     int i,j,k,jj;
     const int offset = brow*blocksize;    //factorData row offset
     const int offsetCol = iter*blocksize;    //factorData column offset
-    double factor;
+    double factor,temp;
 
     //outermost loop: iterates over the fFactors of the most recent corner 
     //block (fFactors are used indirectly through factorData)
@@ -592,8 +554,8 @@ namespace hpx { namespace components { namespace server
         for(i=0;i<datablock[iter][iter]->rows;i++){
             factor = factorData[j+offset][i+offsetCol];
             for(k=0;k<datablock[brow][bcol]->columns;k++){
-            datablock[brow][bcol]->data[j][k] -= 
-                factor*datablock[iter][bcol]->data[i][k];
+            temp = factor*datablock[iter][bcol]->data[i][k];
+            datablock[brow][bcol]->data[j][k] -= temp;
     }   }   }
     }}
 
