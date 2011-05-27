@@ -29,10 +29,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::assign_action,HPLassign_action);
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::HPLMatreX::set_action,HPLset_action);
-HPX_REGISTER_ACTION_EX(
-    hpx::components::server::HPLMatreX::get_action,HPLget_action);
-HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::solve_action,HPLsolve_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::swap_action,HPLswap_action);

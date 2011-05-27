@@ -19,9 +19,9 @@ namespace po=boost::program_options;
 
 //the size of the matrix
 unsigned int SIZE = 2048;
-unsigned int ABSIZE = 1024;
+unsigned int ABSIZE = 512;
 unsigned int BSIZE = 250;
-unsigned int MSIZE = 250;
+unsigned int MSIZE = 125;
 double ERROR = 0;
 
 /*This small program is used to perform LU decomposition on a randomly
@@ -38,7 +38,7 @@ statistical printout.*/
 //this is where the data structure is created and the computation
 //function is called
 int hpx_main(){
-    int i,j,t=0;
+//    int i,j,t=0;
 
     std::vector<naming::id_type> prefixes;
     applier::applier& appl = applier::get_applier();
@@ -97,13 +97,15 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
             ("blocksize,b", po::value<int>(),
                 "blocksize correlates to the amount of work performed by each "
         "thread during gaussian elimination (default is 250)")
-        ("mini-block,m", po::value<int>(), "affects cache behavior for GE")
+        ("mini-block,m", po::value<int>(), "affects cache behavior for GE"
+        "through blocking. Changing this parameter usually has little effect"
+        "except when running on a single core")
         ("allocblock,A", po::value<int>(),
         "allocblock effects the amount of work each thread performs "
         "during memory allocation, initialization, and during the "
         "final correctness check.  Only powers of 2 are accepted, "
         "all other values will be rounded down to the nearest power of 2"
-        "(default is 1024)");
+        "(default is 512)");
 
         po::store(po::command_line_parser(argc, argv)
             .options(desc_cmdline).run(), vm);
@@ -285,13 +287,11 @@ int main(int argc, char* argv[]){
         //output the results
                 if(vm.count("csv")){
                     std::cout<<num_threads<<","<<SIZE<<","<<BSIZE<<","<<ERROR<<","
-            <<ERROR/SIZE<<","<<ptime(microsec_clock::local_time())-start
-            <<std::endl;
+            <<ERROR/SIZE<<std::endl;
             }
                 else{
                     std::cout<<"total error: "
             <<ERROR<<std::endl<<"average error: "<<ERROR/SIZE<<std::endl
-            <<"time elapsed: "<<ptime(microsec_clock::local_time())-start
             <<std::endl;
                 }
     }

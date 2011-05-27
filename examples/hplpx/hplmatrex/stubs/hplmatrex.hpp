@@ -33,17 +33,6 @@ namespace hpx { namespace components { namespace stubs
         applier::apply<server::HPLMatreX::destruct_action>(gid);
     }
 
-    //operators for assignment and data access
-    static void set(naming::id_type gid,
-        unsigned int row, unsigned int col, double val){
-        applier::apply<server::HPLMatreX::set_action>(gid,row,col,val);
-    }
-    static double get(naming::id_type gid,
-        unsigned int row, unsigned int col){
-        return lcos::eager_future<server::HPLMatreX::get_action,
-            double>(gid,row,col).get();
-    }
-
     //functions for manipulating the matrix
     static double LUsolve(naming::id_type gid){
         return lcos::eager_future<server::HPLMatreX::solve_action,
