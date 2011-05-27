@@ -147,14 +147,14 @@ namespace pxgl { namespace xua { namespace server {
 
         // Collect ids for siblings
         // Note: we include this actor in the collection of siblings
-        ids_type sibling_ids(distribution.size());
-        for (size_type i =0; i < extent; i++)
+        ids_type sibling_ids(extent);
+        for (size_type i = 0; i < extent; i++)
         {
           sibling_ids[i] = siblings_[i].get_gid();
         }
 
         // Construct siblings
-        for (size_type i =0; i < extent; i++)
+        for (size_type i = 0; i < extent; i++)
         {
           if (locales[i] != here_)
           {

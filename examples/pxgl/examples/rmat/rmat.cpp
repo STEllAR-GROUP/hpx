@@ -65,15 +65,14 @@ int hpx_main(boost::program_options::variables_map &vm)
   hpx::util::high_resolution_timer hpx_main_timer;
 
   int scale = 4;
-  double a = 0.57, b = 0.19, c = 0.19, d = 0.05;
+  hpx::get_option(vm, "scale", scale, "rmat.scale");
   int edge_factor = 8;
+  hpx::get_option(vm, "edge_factor", edge_factor, "rmat.edge_factor");
 
-  // Process application-specific command-line options
+  double a = 0.57, b = 0.19, c = 0.19, d = 0.05;
   {
     std::string parameters;
-    hpx::get_option(vm, "scale", scale, "rmat.scale");
     hpx::get_option(vm, "parameters", parameters, "rmat.parameters");
-    hpx::get_option(vm, "edge_factor", edge_factor, "rmat.edge_factor");
 
     if (parameters.size() > 0)
       assert(std::istringstream(parameters) >> a >> b >> c >> d);
@@ -101,7 +100,9 @@ int hpx_main(boost::program_options::variables_map &vm)
     params[2] = c;
     params[3] = d;
 
-    pxgl::px::apply<generate_rmat_graph_action> (
+    //pxgl::px::apply<generate_rmat_graph_action> (
+    //    here, scale, params, edge_factor, edge_tuples.get_gid());
+    hpx::applier::apply<generate_rmat_graph_action> (
         here, scale, params, edge_factor, edge_tuples.get_gid());
 
     LRMAT_timer("hpx_main.rmat", rmat_timer)
@@ -125,7 +126,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
   LRMAT_timer("hpx_main", hpx_main_timer)
 
-  hpx::finalize(5.0);
+  hpx::finalize();
 
   return 0;
 }
@@ -133,6 +134,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+  // Configure application-specific options
   boost::program_options::options_description
       desc_commandline("Usage: gen_rmat_graph --params \"A B C D\" "
                        "[--edge_factor E] "
@@ -147,7 +149,7 @@ int main(int argc, char* argv[])
           "the edge-factor; default: 8")
       ;
 
-  int retcode = hpx::init(desc_commandline, argc, argv);
-  return retcode;
+  // Spawn main task
+  return hpx::init(desc_commandline, argc, argv);
 }
 
