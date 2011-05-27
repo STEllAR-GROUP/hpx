@@ -94,12 +94,17 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "agas_stdmap_tcpip", "components\agas_stdmap_tcpip\agas_stdmap_tcpip.vcxproj", "{A5DB6B39-FC92-4652-8305-17BA5814D2EB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_client", "marduk\marduk_client\marduk_client.vcxproj", "{22D5671B-21AB-4590-B366-0312D52C058D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F6480A2A-698A-4700-B876-C8B9150964CC} = {F6480A2A-698A-4700-B876-C8B9150964CC}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_amr_c", "marduk\marduk_amr_c\marduk_amr_c.vcxproj", "{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_amr_c_test", "marduk\marduk_amr_c_test\marduk_amr_c_test.vcxproj", "{4D4F8721-24CC-4A18-9D8A-BA019682EF59}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_mesh", "marduk\marduk_mesh\marduk_mesh.vcxproj", "{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}"
+EndProject
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "marduk_client_lib", "marduk\marduk_client_lib\marduk_client_lib.vfproj", "{F6480A2A-698A-4700-B876-C8B9150964CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -383,6 +388,7 @@ Global
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|Win32.ActiveCfg = Debug|x64
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|x64.ActiveCfg = Debug|x64
+		{22D5671B-21AB-4590-B366-0312D52C058D}.Debug|x64.Build.0 = Debug|x64
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Any CPU.ActiveCfg = Release|x64
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{22D5671B-21AB-4590-B366-0312D52C058D}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -394,6 +400,7 @@ Global
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|Win32.ActiveCfg = Debug|x64
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|x64.ActiveCfg = Debug|x64
+		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Debug|x64.Build.0 = Debug|x64
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Any CPU.ActiveCfg = Release|x64
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -405,6 +412,7 @@ Global
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|Win32.ActiveCfg = Debug|x64
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|x64.ActiveCfg = Debug|x64
+		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Debug|x64.Build.0 = Debug|x64
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Any CPU.ActiveCfg = Release|x64
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59}.Release|Mixed Platforms.Build.0 = Release|x64
@@ -416,12 +424,25 @@ Global
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|Win32.ActiveCfg = Debug|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|x64.ActiveCfg = Debug|x64
+		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Debug|x64.Build.0 = Debug|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Any CPU.ActiveCfg = Release|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Mixed Platforms.Build.0 = Release|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|Win32.ActiveCfg = Release|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|x64.ActiveCfg = Release|x64
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8}.Release|x64.Build.0 = Release|x64
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|Win32.Build.0 = Debug|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Debug|x64.ActiveCfg = Debug|x64
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|Win32.ActiveCfg = Release|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|Win32.Build.0 = Release|Win32
+		{F6480A2A-698A-4700-B876-C8B9150964CC}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -456,6 +477,7 @@ Global
 		{5CE1E950-69CD-4D83-A62B-0FA47ED7AE3E} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
 		{4D4F8721-24CC-4A18-9D8A-BA019682EF59} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
 		{33BE687A-28FA-4929-A5C9-3E0FD7A1DFF8} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
+		{F6480A2A-698A-4700-B876-C8B9150964CC} = {C7189A49-C795-4840-96C5-326BB1FBFEE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		AMDCaProjectFile = C:\CVS\hpx\build\VS2010\CodeAnalyst\had_amr.caw

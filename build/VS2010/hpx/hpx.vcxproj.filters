@@ -883,15 +883,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp">
       <Filter>Header Files\Runtime\AGAS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\bootstrap.hpp">
-      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\user.hpp">
-      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\agent.hpp">
-      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp">
       <Filter>Header Files\Runtime\AGAS\Database</Filter>
     </ClInclude>
@@ -906,33 +897,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\stdmap.hpp">
       <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp">
       <Filter>Header Files\Runtime\AGAS\Network</Filter>
@@ -957,6 +921,105 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp">
       <Filter>Header Files\Runtime\Applier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\bootstrap_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\resolver_cache.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\user_agent.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\user_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\agent_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\client\legacy\bootstrap_agent.hpp">
+      <Filter>Header Files\Runtime\AGAS\Client\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\user_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\user_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\user_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\bootstrap_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\bootstrap_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\bootstrap_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\user_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\user_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\user_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\bootstrap_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\bootstrap_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\bootstrap_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol_base.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\user_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\user_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\user_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\bootstrap_component.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\bootstrap_primary.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\bootstrap_symbol.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
