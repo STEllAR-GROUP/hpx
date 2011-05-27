@@ -23,7 +23,7 @@ endforeach()
 
 # define build target for this directory
 set(sources
-    marduk.cpp)
+    marduk.cpp level.f util.f)
 
 # define basic dependencies
 set(dependencies

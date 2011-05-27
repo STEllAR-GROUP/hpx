@@ -65,6 +65,11 @@ void appconfig_option(std::string const& name, section const& pars, T& data)
     }
 }
 
+const int maxgids = 1000;
+const int ALIVE = 1;
+const int DEAD = 0;
+const int PENDING = -1;
+
 extern "C" {void FNAME(level_cluster)(double *flag,
                           double *sigi,double *sigj,double *sigk,
                           double *lapi, double *lapj, double *lapk,
@@ -99,10 +104,14 @@ extern "C" {void FNAME(level_clusterdd)(double *tmp_mini,double *tmp_maxi,
                          int *ghostwidth,int *refine_factor,int *mindim,
                          int *bound_width); }
 
-int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
-             std::vector<int> &restrict_list,parameter &par);
+int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[maxgids],
+             std::vector<int> restrict_list[maxgids],parameter &par);
 int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
                                 double minx0,double miny0,double minz0,double h);
+int level_find_bounds(int level, double &minx, double &maxx,
+                                 double &miny, double &maxy,
+                                 double &minz, double &maxz, parameter &par);
+
 bool intersection(double xmin,double xmax,
                   double ymin,double ymax,
                   double zmin,double zmax,
@@ -110,6 +119,7 @@ bool intersection(double xmin,double xmax,
                   double ymin2,double ymax2,
                   double zmin2,double zmax2);
 bool floatcmp_le(double const& x1, double const& x2);
+int floatcmp(double const& x1, double const& x2);
 int level_refine(int level,parameter &par);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
@@ -121,10 +131,6 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
 int grid_find_bounds(int gi,double &minx,double &maxx,
                      double &miny,double &maxy,
                      double &minz,double &maxz,parameter &par);
-
-const int ALIVE = 1;
-const int DEAD = 0;
-const int PENDING = -1;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
@@ -274,15 +280,14 @@ int hpx_main(variables_map& vm)
     // Compute the grid sizes
     // query error tolerance
     int rc = level_refine(-1,par);
-    for (int i=0;i<par->allowedl;i++) {
+    for (std::size_t i=0;i<par->allowedl;i++) {
       rc = level_refine(i,par);
     }  
 
-    const int maxgids = 1000;
-    std::vector<int> comm_list[maxgids];
-    std::vector<int> prolong_list[maxgids];
-    std::vector<int> restrict_list[maxgids];
-    rc = dataflow(comm_list,prolong_list,restrict_list,par);
+    //std::vector<int> comm_list[maxgids];
+    //std::vector<int> prolong_list[maxgids];
+    //std::vector<int> restrict_list[maxgids];
+    //rc = dataflow(comm_list,prolong_list,restrict_list,par);
 
 #if 0
     // for each row, record what the lowest level on the row is
@@ -342,11 +347,11 @@ int hpx_main(variables_map& vm)
 }
 
 // dataflow {{{
-int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
-             std::vector<int> &restrict_list,parameter &par) 
+int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[maxgids],
+             std::vector<int> restrict_list[maxgids],parameter &par) 
 {
     // determine the communication pattern
-  for (int i=0;i<=par->allowedl;i++) {
+  for (std::size_t i=0;i<=par->allowedl;i++) {
     std::vector<int> level_gids;
     int gi = level_return_start(i,par);
     level_gids.push_back(gi);
@@ -357,9 +362,9 @@ int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
     }
 
     // figure out the interaction list
-    for (int j=0;j<level_gids.size();j++) {
+    for (std::size_t j=0;j<level_gids.size();j++) {
       gi = level_gids[j];
-      for (int k=j;k<level_gids.size();k++) {
+      for (std::size_t k=j;k<level_gids.size();k++) {
         int gi2 = level_gids[k];
 
         if ( intersection(par->gr_minx[gi],par->gr_maxx[gi],
@@ -377,7 +382,7 @@ int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
 
   // prolongation pattern
   // determine the communication pattern
-  for (int i=0;i<par->allowedl;i++) {
+  for (std::size_t i=0;i<par->allowedl;i++) {
     int gi = level_return_start(i,par);
     while ( grid_return_existence(gi,par) ) {
       int gi2 = level_return_start(i+1,par);
@@ -441,7 +446,7 @@ int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
                           par->gr_minx[gi2],par->gr_maxx[gi2],
                           par->gr_miny[gi2],par->gr_maxy[gi2],
                           par->gr_minz[gi2],par->gr_maxz[gi2]) ) {
-          restrict_list[gi]->push_back(gi2);
+          restrict_list[gi].push_back(gi2);
         }
       }
       gi = par->gr_sibling[gi];
@@ -449,7 +454,7 @@ int dataflow(std::vector<int> &comm_list,std::vector<int> &prolong_list,
   }
 
   // TEST
-  for (int i=0;i<par->gr_minx.size();i++) {
+  for (std::size_t i=0;i<par->gr_minx.size();i++) {
     std::cout << " gi " << i << " has " << comm_list[i].size() << " interactions " << std::endl;
     std::cout << "                    " << restrict_list[i].size() << " restrict " << std::endl;
     std::cout << "                    " << prolong_list[i].size() << " prolong " << std::endl;
@@ -467,9 +472,6 @@ int level_refine(int level,parameter &par)
   int numprocs = par->num_px_threads;
   int ghostwidth = par->ghostwidth;
   int bound_width = par->bound_width;
-  int nx0 = par->nx0;
-  int ny0 = par->ny0;
-  int nz0 = par->nz0;
   double ethreshold = par->ethreshold;
   double minx0 = par->minx0;
   double miny0 = par->miny0;
@@ -491,7 +493,8 @@ int level_refine(int level,parameter &par)
   // hard coded parameters -- eventually to be made into full parameters
   int maxbboxsize = 1000000;
 
-  if ( level == par->allowedl ) {
+  int maxlevel = par->allowedl;
+  if ( level == maxlevel ) {
     return 0;
   }
  
@@ -569,9 +572,9 @@ int level_refine(int level,parameter &par)
     std::cout << " numbox post DD " << numbox << std::endl;
     for (int i=0;i<numbox;i++) {
       if (i == numbox-1 ) {
-        par.gr_sibling.push_back(-1);
+        par->gr_sibling.push_back(-1);
       } else {
-        par.gr_sibling.push_back(i+1);
+        par->gr_sibling.push_back(i+1);
       }
 
       int nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
@@ -604,7 +607,7 @@ int level_refine(int level,parameter &par)
         std::vector<double> localerror;
         localerror.resize(nx*ny*nz);
         double h = hl/refine_factor;
-        int rc = compute_error(localerror,nx,ny,nz,
+        rc = compute_error(localerror,nx,ny,nz,
                          lminx,lminy,lminz,h);
         int shape[3];
         std::vector<double> coord;
@@ -623,7 +626,11 @@ int level_refine(int level,parameter &par)
         shape[0] = nx;
         shape[1] = ny;
         shape[2] = nz;
-        gft_out_full("error",0.0,shape,"x|y|z", 3,&*coord.begin(),&*localerror.begin());
+        char nme[80];
+        char crdnme[80];
+        sprintf(nme,"error");
+        sprintf(crdnme,"x|y|z");
+        gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
       }
     }
 
@@ -633,21 +640,21 @@ int level_refine(int level,parameter &par)
     gi = level_return_start(level,par);
 
     while ( grid_return_existence(gi,par) ) {
-      int nx = par.gr_nx[gi];
-      int ny = par.gr_ny[gi];
-      int nz = par.gr_nz[gi];
+      int nx = par->gr_nx[gi];
+      int ny = par->gr_ny[gi];
+      int nz = par->gr_nz[gi];
 
       localerror.resize(nx*ny*nz);
 
-      double lminx = par.gr_minx[gi];
-      double lminy = par.gr_miny[gi];
-      double lminz = par.gr_minz[gi];
-      double lmaxx = par.gr_maxx[gi];
-      double lmaxy = par.gr_maxy[gi];
-      double lmaxz = par.gr_maxz[gi];
+      double lminx = par->gr_minx[gi];
+      double lminy = par->gr_miny[gi];
+      double lminz = par->gr_minz[gi];
+      double lmaxx = par->gr_maxx[gi];
+      double lmaxy = par->gr_maxy[gi];
+      double lmaxz = par->gr_maxz[gi];
 
       rc = compute_error(localerror,nx,ny,nz,
-                         lminx,lminy,lminz,par.gr_h[gi]);
+                         lminx,lminy,lminz,par->gr_h[gi]);
 
       int mini = (int) ((lminx - minx)/hl+0.5);
       int minj = (int) ((lminy - miny)/hl+0.5);
@@ -740,14 +747,13 @@ int level_refine(int level,parameter &par)
                          &bound_width);
 
   std::cout << " numbox post DD " << numbox << std::endl;
+  int start = par->gr_sibling.size();
   for (int i=0;i<numbox;i++) {
     //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
     //std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
     //std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
 
-    int start;
     if ( i == 0 ) {
-      start = par->gr_sibling.size();
       par->levelp[level+1] = start;
     }
 
@@ -786,7 +792,7 @@ int level_refine(int level,parameter &par)
       std::vector<double> localerror;
       localerror.resize(nx*ny*nz);
       double h = hl/refine_factor;
-      int rc = compute_error(localerror,nx,ny,nz,
+      rc = compute_error(localerror,nx,ny,nz,
                        lminx,lminy,lminz,h);
       int shape[3];
       std::vector<double> coord;
@@ -805,7 +811,11 @@ int level_refine(int level,parameter &par)
       shape[0] = nx;
       shape[1] = ny;
       shape[2] = nz;
-      gft_out_full("error",0.0,shape,"x|y|z", 3,&*coord.begin(),&*localerror.begin());
+      char nme[80];
+      char crdnme[80];
+      sprintf(nme,"error");
+      sprintf(crdnme,"x|y|z");
+      gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
     }
   }
 
@@ -839,6 +849,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
       }
 
     } } }
+    return 0;
 }
 // }}}
 
@@ -923,10 +934,22 @@ bool floatcmp_le(double const& x1, double const& x2) {
   }
 }
 // }}}
+ 
+// floatcmp {{{
+int floatcmp(double const& x1, double const& x2) {
+  // compare two floating point numbers
+  static double const epsilon = 1.e-8;
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return true;
+  } else {
+    return false;
+  }
+}
+// }}}
 
 int level_mkall_dead(int level,parameter &par)
 {
-  int rc;
   // Find the beginning of level
   int gi = level_return_start(level,par);
 
@@ -940,7 +963,8 @@ int level_mkall_dead(int level,parameter &par)
 
 int grid_return_existence(int gridnum,parameter &par)
 {
-  if ( (gridnum >= 0 ) && (gridnum < par->gr_minx.size()) ) {
+  int maxsize = par->gr_minx.size();
+  if ( (gridnum >= 0 ) && (gridnum < maxsize) ) {
     return 1;
   } else {
     return 0;
@@ -964,13 +988,51 @@ int grid_find_bounds(int gi,double &minx,double &maxx,
 
 int level_return_start(int level,parameter &par)
 {
-  if ( level >= par->levelp.size() || level < 0 ) {
+  int maxsize = par->levelp.size();
+  if ( level >= maxsize || level < 0 ) {
     return -1;
   } else {
     return par->levelp[level];
   }
 }
 
+int level_find_bounds(int level, double &minx, double &maxx,
+                                 double &miny, double &maxy,
+                                 double &minz, double &maxz, parameter &par)
+{
+  int rc;
+  minx = 0.0;
+  miny = 0.0;
+  minz = 0.0;
+  maxx = 0.0;
+  maxy = 0.0;
+  maxz = 0.0;
+
+  double tminx,tmaxx,tminy,tmaxy,tminz,tmaxz;
+
+  int gi = level_return_start(level,par);
+
+  if ( !grid_return_existence(gi,par) ) {
+    std::cerr << " level_find_bounds PROBLEM: level doesn't exist " << level << std::endl;
+    exit(0);
+  }
+
+  rc = grid_find_bounds(gi,minx,maxx,miny,maxy,minz,maxz,par);
+
+  gi = par->gr_sibling[gi];
+  while ( grid_return_existence(gi,par) ) {
+    rc = grid_find_bounds(gi,tminx,tmaxx,tminy,tmaxy,tminz,tmaxz,par);
+    if ( tminx < minx ) minx = tminx;
+    if ( tminy < miny ) miny = tminy;
+    if ( tminz < minz ) minz = tminz;
+    if ( tmaxx > maxx ) maxx = tmaxx;
+    if ( tmaxy > maxy ) maxy = tmaxy;
+    if ( tmaxz > maxz ) maxz = tmaxz;
+    gi = par->gr_sibling[gi];
+  }
+
+  return 0;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
