@@ -125,7 +125,7 @@ extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t v
 #endif
 
 template<typename T>
-class __declspec(align(64)) atomic_interlocked_64 {
+class __declspec(align(8)) atomic_interlocked_64 {
 public:
     explicit atomic_interlocked_64(T v) : i(v) {}
     atomic_interlocked_64() {}
@@ -211,7 +211,7 @@ extern "C" void _mm_store_si128(__m128i *_P, __m128i _B);
 #endif
 
 template<typename T>
-class __declspec(align(128)) atomic_interlocked_128 {
+class __declspec(align(16)) atomic_interlocked_128 {
 public:
     explicit atomic_interlocked_128(T v) : i(v) {}
     atomic_interlocked_128() {}
