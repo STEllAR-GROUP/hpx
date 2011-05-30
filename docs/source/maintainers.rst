@@ -116,6 +116,13 @@ HPLPX
 
   examples/hplpx/*
 
+PXGL
+----
+
+  :maintainer: Dylan Stark <dylan.stark -at- gmail.com>
+
+  examples/pxgl/*
+
 N-body Implementation 
 ---------------------
 
@@ -159,6 +166,8 @@ Quickstart Examples (Distributed Tests)
 
   examples/quickstart/distributed_amrtest.cpp
   examples/quickstart/distributed_test.cpp
+  examples/quickstart/basic_example_mpi.cpp
+  exampels/quickstart/hpxcontact.cpp
 
 Legacy 3D AMR Implementation
 ----------------------------
