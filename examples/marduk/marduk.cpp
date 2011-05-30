@@ -276,7 +276,7 @@ int hpx_main(variables_map& vm)
     par->h = h;
 
     // memory allocation
-    par->levelp.resize(par->allowedl);
+    par->levelp.resize(par->allowedl+1);
     par->levelp[0] = 0; 
 
     // Compute the grid sizes
@@ -291,7 +291,6 @@ int hpx_main(variables_map& vm)
     //std::vector<int> restrict_list[maxgids];
     //rc = dataflow(comm_list,prolong_list,restrict_list,par);
 
-#if 0
     // for each row, record what the lowest level on the row is
     std::size_t num_rows = 1 << par->allowedl;
 
@@ -319,8 +318,27 @@ int hpx_main(variables_map& vm)
             }
         }
     }
-#endif
-#if 0
+ 
+    // discover each rowsize
+    std::size_t count;
+    par->rowsize.resize(par->allowedl+1);
+    for (std::size_t i=0;i<=par->allowedl;i++) {
+      count = 0; 
+      int gi = level_return_start(i,par);
+      count++;
+      gi = par->gr_sibling[gi];
+      while ( grid_return_existence(gi,par) ) {
+        count++;
+        gi = par->gr_sibling[gi];
+      }
+      par->rowsize[i] = count;
+    } 
+    for (std::size_t i=0;i<=par->allowedl;i++) {
+      for (std::size_t j=i+1;j<=par->allowedl;j++) {
+        par->rowsize[i] += par->rowsize[j];
+      }
+    }
+
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
     component_type logging_type = get_component_type<logging>();
@@ -341,9 +359,8 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < result_data->size(); ++i)
             hpx::components::stubs::memory_block::free((*result_data)[i]);
     } // mesh needs to go out of scope before shutdown
-
     // initiate shutdown of the runtime systems on all localities
-#endif
+
     finalize();
     return 0;
 }
@@ -954,6 +971,7 @@ int floatcmp(double const& x1, double const& x2) {
 }
 // }}}
 
+// level_mkall_dead {{{
 int level_mkall_dead(int level,parameter &par)
 {
   // Find the beginning of level
@@ -966,7 +984,9 @@ int level_mkall_dead(int level,parameter &par)
 
   return 0;
 }
+// }}}
 
+// grid_return_existence {{{
 int grid_return_existence(int gridnum,parameter &par)
 {
   int maxsize = par->gr_minx.size();
@@ -976,7 +996,9 @@ int grid_return_existence(int gridnum,parameter &par)
     return 0;
   }
 }
+// }}}
 
+// grid_find_bounds {{{
 int grid_find_bounds(int gi,double &minx,double &maxx,
                             double &miny,double &maxy,
                             double &minz,double &maxz,parameter &par)
@@ -991,7 +1013,9 @@ int grid_find_bounds(int gi,double &minx,double &maxx,
 
   return 0;
 }
+// }}}
 
+// level_return_start {{{
 int level_return_start(int level,parameter &par)
 {
   int maxsize = par->levelp.size();
@@ -1001,7 +1025,9 @@ int level_return_start(int level,parameter &par)
     return par->levelp[level];
   }
 }
+// }}}
 
+// level_find_bounds {{{
 int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
                                  double &minz, double &maxz, parameter &par)
@@ -1039,6 +1065,7 @@ int level_find_bounds(int level, double &minx, double &maxx,
 
   return 0;
 }
+// }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])

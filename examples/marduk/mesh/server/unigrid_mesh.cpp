@@ -133,14 +133,6 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 #if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-
-            // Follow up TEST
-            if ( dst_size(static_step,column,0) == 0 ) {
-              // figure out the index and level of this point
-              std::size_t a,b,c;
-              int level = findlevel3D(static_step,column,a,b,c,par);
-              std::cout << "                 PROBLEM: level " << level << " index " << a << " " << b << " " << c << std::endl;
-            } 
 #endif
 #if 0
             if ( dst_size(static_step,column,0) > 0 ) {
@@ -513,7 +505,8 @@ namespace hpx { namespace components { namespace amr { namespace server
                                   std::vector<std::size_t> &each_row,
                                   parameter const& par)
     {
-      int i,j,k;
+      std::size_t i,j;
+      int k;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -525,19 +518,66 @@ namespace hpx { namespace components { namespace amr { namespace server
       //using namespace boost::assign;
 
       int counter;
-      int step,dst;
-//      int found;
+      std::size_t step,dst;
+      bool prolongation;
 
-//       std::size_t a,b,c;
       for (step=0;step<num_rows;step = step + 1) {
         for (i=0;i<each_row[step];i++) {
-          dst = step + 1;
-          if ( dst == num_rows ) dst = 0;
           counter = 0;
 
-          j = i;
-          vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-          counter++;
+          // find the level of this point
+          int level = par->level_row[step];
+          bool found = false;
+          for (int ii=par->allowedl;ii>=0;ii--) {
+            if ( i < par->rowsize[ii]) {
+              level = ii;
+              found = true;
+              break;
+            }
+          }
+          if ( !found ) {
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "Problem in prep_ports"); 
+          }
+
+          dst = step;
+
+          // Special case for allowedl==0
+          if ( par->allowedl == 0 ) {            
+            dst += 1;
+            if ( step == 0 || step == 1 ) {              
+              prolongation = false;
+            } else {
+              prolongation = true;
+            }
+          } else {
+            if ( (step+3)%3 != 0 ) {
+               // anytime there is a difference of more than one level between src and dst rows,
+              // you need to account for the prolongation/restriction rows going on inbetween them.
+              // That is given by 2^{L-l-1}-1
+              int intermediate = (int) pow(2.,par->allowedl-level) ;
+              if ( par->allowedl-level > 1 ) {
+                dst += intermediate + intermediate/2 - 1;
+              } else {
+                dst += intermediate;
+              }
+              prolongation = false;
+            } else {
+              dst += 1; // this is a prolongation/restriction step
+              prolongation = true;
+            }
+          }
+          if ( dst >= num_rows ) dst = 0;
+
+          if ( prolongation == false ) {
+            j = i;
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          } else {
+            j = i;
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+            counter++;
+          }
+
         }
       }
 
@@ -556,7 +596,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
       // sort the src step (or row) in descending order
       int t1,kk;
-      int column;
+      std::size_t column;
       for (j=0;j<vsrc_step.size();j++) {
         step = vstep[j];
         column = vcolumn[j];
