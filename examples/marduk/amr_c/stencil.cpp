@@ -19,6 +19,10 @@
 #include "stencil_data_locking.hpp"
 #include "../mesh/unigrid_mesh.hpp"
 
+#if defined(RNPL_FOUND)
+#include <sdf.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
@@ -101,14 +105,70 @@ namespace hpx { namespace components { namespace amr
         // lock all user defined data elements, will be unlocked at function exit
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
-        // TEST
         resultval.get() = val[0].get();
-        resultval->timestep_ = val[0]->timestep_ + 1;
+        resultval->level_ = val[0]->level_;
+        resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,val[0]->level_);
+
+#if defined(RNPL_FOUND)
+        // Output
+        if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+          std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;   
+          applier::applier& appl = applier::get_applier();
+          naming::id_type this_prefix = appl.get_runtime_support_gid();
+          int locality = get_prefix_from_id( this_prefix );
+          double datatime;
+
+          int gi = par->item2gi[column];
+          int nx = par->gr_nx[gi];
+          int ny = par->gr_ny[gi];
+          int nz = par->gr_nz[gi];
+          for (int i=0;i<nx;i++) {
+            x.push_back(par->gr_minx[gi] + par->gr_h[gi]*i);
+          }
+          for (int i=0;i<ny;i++) {
+            x.push_back(par->gr_miny[gi] + par->gr_h[gi]*i);
+          }
+          for (int i=0;i<nz;i++) {
+            x.push_back(par->gr_minz[gi] + par->gr_h[gi]*i);
+          }
+
+          datatime = resultval->timestep_*par->gr_h[gi]*par->lambda;
+          for (int k=0;k<nz;k++) {
+          for (int j=0;j<ny;j++) {
+          for (int i=0;i<nx;i++) {
+            phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][0]);
+            d1phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][1]);
+            d2phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][2]);
+            d3phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][3]);
+            d4phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][4]);
+          } } }
+          int shape[3];
+          char cnames[80] = { "x|y|z" };
+          char phi_name[80];
+          sprintf(phi_name,"%dphi",locality);
+          char phi1_name[80];
+          sprintf(phi1_name,"%dd1phi",locality);
+          char phi2_name[80];
+          sprintf(phi2_name,"%dd2phi",locality);
+          char phi3_name[80];
+          sprintf(phi3_name,"%dd3phi",locality);
+          char phi4_name[80];
+          sprintf(phi4_name,"%dd4phi",locality);
+          shape[0] = nx;
+          shape[1] = ny;
+          shape[2] = nz;
+          gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+          gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+          gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+          gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+          gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+        }
+#endif
+
         if ( resultval->timestep_ >= par->nt0-2 ) {
           return 0;
         }
         return 1;
-        // END TEST
     }
 
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
