@@ -83,7 +83,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type definitions
-//typedef int size_type;
 typedef unsigned long size_type;
 typedef std::vector<size_type> sizes_type;
 
@@ -188,10 +187,6 @@ void filter_edges_part(
     graph_type::edge_tuples_type * local_edges,
     sizes_type * max_weights)
 {
-TSGAB_begin(filter_edges_part_timer)
-  //LSGAB_fatal("\tPartition: range [%u,%u)\n",
-  //    start, stop);
-
   graph_type::edge_tuples_type part_edges;
   size_type part_max = 0;
   for (size_type i = start; i < stop; i++)
@@ -211,10 +206,6 @@ TSGAB_begin(filter_edges_part_timer)
     }
   }
 
-  //LCSR_fatal("\tPartition: part_max %u |part_edges| %u\n",
-  //    part_max, part_edges.size());
-
-TSGAB_begin(merge_local_info)
   // Merge local info
   {
     pxgl::util::scoped_use l(use_feb);
@@ -236,8 +227,6 @@ TSGAB_begin(merge_local_info)
           local_edges->end(), part_edges.begin(), part_edges.end());
     }
   }
-TSGAB_end(merge_local_info)
-TSGAB_end(filter_edges_part_timer)
 }
 
 typedef hpx::actions::plain_action5<
@@ -255,13 +244,10 @@ int filter_edges(
     id_type const & large_set_id, 
     id_type const & is_max_id)
 {
-TSGAB_begin(filter_edges_timer)
   YAP_now("K2", "Starting filter edges");
   LSGAB_ping("Filter edges", "Start");
 
-TSGAB_begin(use_feb_timer)
   use_feb.set(feb_data_type(1));
-TSGAB_end(use_feb_timer)
 
   // Create client-side views of each FCO
   graph_type graph(graph_id);
@@ -273,12 +259,8 @@ TSGAB_end(use_feb_timer)
 
   graph_type::edge_tuples_type local_edges;
   {
-TSGAB_nb_begin(setup_partition_info_timer);
-
     // Get edges info
-TSGAB_nb_begin(filter_edges_get_graph_edges)
     graph_type::edge_tuples_type const * edges_ptr = graph.edges();
-TSGAB_nb_end(filter_edges_get_graph_edges)
     size_type const num_edges = edges_ptr->size();
 
     // Calculate partitions
@@ -288,15 +270,10 @@ TSGAB_nb_end(filter_edges_get_graph_edges)
     size_type chunk_size = num_edges / num_partitions;
     size_type extra_size = num_edges % num_partitions;
 
-    //LSGAB_fatal("Partitioning %u edges into %u %u/%u sized chunks, %u\n",
-    //    num_edges, num_partitions, chunk_size, chunk_size+1, extra_size);
-
     id_type const here(hpx::get_runtime().get_process().here());
 
     sizes_type max_weights(1,0);
-TSGAB_nb_end(setup_partition_info_timer)
 
-TSGAB_nb_begin(spawn_parts)
     // Spawn and sync. on partitions 
     future_voids_type outstanding_actions;
     for (size_type i = 0; i < extra_size; i++)
@@ -304,11 +281,9 @@ TSGAB_nb_begin(spawn_parts)
       size_type const start = i * (chunk_size + 1);
       size_type const stop = start + (chunk_size + 1);
 
-TSGAB_begin(outstanding_filter_edges_part_spawn)
       outstanding_actions.push_back(
           hpx::lcos::eager_future<filter_edges_part_action>(
               here, edges_ptr, start, stop, &local_edges, &max_weights));
-TSGAB_end(outstanding_filter_edges_part_spawn)
     }
 
     size_type const prev_size = extra_size * (chunk_size + 1);
@@ -317,21 +292,16 @@ TSGAB_end(outstanding_filter_edges_part_spawn)
       size_type const start = prev_size + (i * chunk_size);
       size_type const stop = start + chunk_size;
 
-TSGAB_begin(outstanding_filter_edges_part_spawn)
       outstanding_actions.push_back(
           hpx::lcos::eager_future<filter_edges_part_action>(
               here, edges_ptr, start, stop, &local_edges, &max_weights));
-TSGAB_end(outstanding_filter_edges_part_spawn)
     }
-TSGAB_nb_end(spawn_parts)
 
-TSGAB_begin(waiting_filter_edges_part)
     while (outstanding_actions.size() > 0)
     {
       outstanding_actions.back().get();
       outstanding_actions.pop_back();
     }
-TSGAB_end(waiting_filter_edges_part)
 
     max_weight = max_weights[0];
   }
@@ -341,21 +311,15 @@ TSGAB_end(waiting_filter_edges_part)
   //   If local max. is global max, then add collection to large-set
   //   Else, add an empty collection to large-set
   bool mine_is_max;
-TSGAB_begin(is_max_signal_timer)
   mine_is_max = is_max.signal(max_weight);
-TSGAB_end(is_max_signal_timer)
   if (!mine_is_max)
   {
     local_edges.clear();
   }
   LSGAB_ping("Filter edges", "Received max weight");
 
-TSGAB_begin(ls_init)
   large_set.init(local_edges);
-TSGAB_end(ls_init)
 
-  //LSGAB_fatal("Filter edges timer: %f\n", filter_edges_timer.elapsed());
-TSGAB_end(filter_edges_timer)
   LSGAB_ping("Filter edges", "Stop");
   return 0;
 }
@@ -635,7 +599,6 @@ void score_bc_vertices(
   size_type const num_vertices = vertices.size();
   std::vector<bc_sssp_type> bc_sssps(num_vertices);
   for (size_type i = 0; i < num_vertices; i++)
-  //BOOST_FOREACH(bc_vertices_type::item_type const & v, vertices)
   {
     bc_sssps[i].create(here);
     bc_sssps[i].async_instantiate(graph, bc_scores);
@@ -666,18 +629,6 @@ inline void async_score_bc_vertices(
   // Parallelized
   pxgl::xua::blocking_for_each_aligned_client<score_bc_vertices_action>(
       graph, bc_vertices, bc_scores);
-
-  // Serialized
-  //size_type const extent = graph.get_distribution().size();
-
-  //for (size_type i=0; i < extent; i++)
-  //{
-  //  hpx::lcos::eager_future<score_bc_vertices_action>(
-  //      graph.local_to(i), 
-  //      graph.local_to(i), 
-  //      bc_vertices.local_to(i), 
-  //      bc_scores.local_to(i)).get();
-  //}
 
   // Set bc_scores as initialized
   {
@@ -889,50 +840,36 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::util::high_resolution_timer timer;
 
         // Construct the large set (edge list)
-TSGAB_begin(ls_create)
         large_set.create(here);
-TSGAB_end(ls_create)
         pxgl::xua::arbitrary_distribution<id_type, pxgl::xua::range>
             ls_dist(localities);
-TSGAB_begin(ls_construct)
         large_set.construct(large_set.get_gid(), ls_dist);
-TSGAB_end(ls_construct)
 
         // Setup have-max LCO
         have_max_type is_max;
-TSGAB_begin(is_max_create)
         is_max.create(here);
-TSGAB_end(is_max_create)
-TSGAB_begin(is_max_construct)
         is_max.construct(ls_dist.size());
-TSGAB_end(is_max_construct)
 
         // Generate large set
         YAP_now("K2", "Spawning filter edges");
-TSGAB_begin(spawn_filter_edges)
         pxgl::xua::for_each_aligned_client1<
             filter_edges_action,
             graph_type, large_set_type
         >(graph, large_set, is_max.get_gid());
-TSGAB_end(spawn_filter_edges)
 
         // Provide phasing required by SGAB spec.
         LSGAB_fatal("Checking large_set.ready() after %f sec\n", 
             timer.elapsed());
-TSGAB_begin(ls_ready)
         large_set.ready();
-TSGAB_end(ls_ready)
 
         measurements << timer.elapsed() << " ";
         LSGAB_fatal("Completed Kernel2 in %f sec\n", timer.elapsed());
 
         // Provide full phasing for HPX shutdown
-TSGAB_begin(ls_ready_all)
         pxgl::xua::blocking_for_each_comp<
             large_set_type, 
             large_set_member_type::ready_action
         >(large_set.get_gid());
-TSGAB_end(ls_ready_all)
       }
       LSGAB_ping("Kernel 2", "Stop");
       
@@ -1056,7 +993,7 @@ TSGAB_end(ls_ready_all)
 
   LSGAB_ping("Main", "Stop");
 
-  hpx::finalize(5.0);
+  hpx::finalize();
 
   return 0;
 }

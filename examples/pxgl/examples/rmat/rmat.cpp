@@ -100,8 +100,6 @@ int hpx_main(boost::program_options::variables_map &vm)
     params[2] = c;
     params[3] = d;
 
-    //pxgl::px::apply<generate_rmat_graph_action> (
-    //    here, scale, params, edge_factor, edge_tuples.get_gid());
     hpx::applier::apply<generate_rmat_graph_action> (
         here, scale, params, edge_factor, edge_tuples.get_gid());
 

@@ -122,7 +122,6 @@ namespace examples { namespace sgab { namespace server  {
     LBCSSSP_debug("Local size: %u\n", local_size);
 
     BC_ptr_ = bc_scores_.sync_init_items(local_size);
-    //BC_ptr_->resize(local_size);
 
     P_ = predecessors_type(local_size);
 
@@ -328,10 +327,6 @@ namespace examples { namespace sgab { namespace server  {
     sigma_[start_id] = 1;
     d_[start_id] = 0;
         
-    // TODO: remove after debugging
-    size_type depth = 0;
-    pxgl::rts::get_ini_option(depth, "sgab.k4.debug.bfs_depth");
-
     Q_.push(start);
     while (!Q_.empty())
     {
@@ -345,21 +340,7 @@ namespace examples { namespace sgab { namespace server  {
 
       BOOST_FOREACH(size_type const & target, new_vertices)
       {
-      //  LBCSSSP_info("\t(%u, %u)\n", source, target);
-
         Q_.push(target);
-      }
-      //if (new_vertices.size() == 0)
-      //{
-      //  LBCSSSP_info("\t(%u, x)\n", source);
-      //}
-
-      depth--;
-      if (0 >= depth)
-      {
-        LBCSSSP_info("bc_sssp out: Q: %u | %u\n", 
-            Q_.size(), new_vertices.size());
-        break;
       }
     }
 
@@ -481,17 +462,8 @@ namespace examples { namespace sgab { namespace server  {
 
     if (target != start)
     {
-      //LBCSSSP_info("\tBC[%u] += %f\n", 
-      //    target, delta_[index(target)]);
-
       pxgl::util::scoped_use l(use_feb_);
 
-      //double const new_score = 
-      //    (*bc_scores_.sync_items())[index(target)] + delta_[index(target)];
-      //bc_scores_.insert(index(target), new_score); 
-
-      //(*BC_ptr_)[index(target)] = 
-      //    (*BC_ptr_)[index(target)] + delta_[index(target)];
       bc_scores_.sync_init_incr(index(target), delta_[index(target)]);
     }
   }
