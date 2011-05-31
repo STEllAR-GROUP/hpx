@@ -223,6 +223,13 @@ int hpx_main(variables_map& vm)
             ) % par->nx0 % par->ny0 % par->nz0);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     }
+    if ( (par->nt0 % 2) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "nt0 needs to be even: (%1%) "
+            ) % par->nt0);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    } 
 
     std::cout << " Parameters    : " << std::endl;
     std::cout << " lambda        : " << par->lambda << std::endl;
@@ -366,8 +373,9 @@ int hpx_main(variables_map& vm)
 
         unigrid_mesh um;
         um.create(here);
+        int numsteps = par->nt0/2;
         boost::shared_ptr<std::vector<id_type> > result_data =
-            um.init_execute(function_type, par->rowsize[0], par->nt0,
+            um.init_execute(function_type, par->rowsize[0], numsteps,
                 par->loglevel ? logging_type : component_invalid, par);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

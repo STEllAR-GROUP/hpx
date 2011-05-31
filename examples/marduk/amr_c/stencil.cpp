@@ -107,7 +107,14 @@ namespace hpx { namespace components { namespace amr
 
         resultval.get() = val[0].get();
         resultval->level_ = val[0]->level_;
-        resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,val[0]->level_);
+
+        // Check if this is a prolongation/restriction step
+        if ( (row+5)%3 == 0 || ( par->allowedl == 0 && row == 0 ) ) {
+          // This is a prolongation/restriction step
+          resultval->timestep_ = val[0]->timestep_;
+        } else {
+          resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,val[0]->level_);
+        }
 
 #if defined(RNPL_FOUND)
         // Output
@@ -132,7 +139,8 @@ namespace hpx { namespace components { namespace amr
             x.push_back(par->gr_minz[gi] + par->gr_h[gi]*i);
           }
 
-          datatime = resultval->timestep_*par->gr_h[gi]*par->lambda;
+          //datatime = resultval->timestep_*par->gr_h[gi]*par->lambda;
+          datatime = resultval->timestep_;
           for (int k=0;k<nz;k++) {
           for (int j=0;j<ny;j++) {
           for (int i=0;i<nx;i++) {
@@ -165,7 +173,8 @@ namespace hpx { namespace components { namespace amr
         }
 #endif
 
-        if ( resultval->timestep_ >= par->nt0-2 ) {
+        //std::cout << " TEST row " << row << " column " << column << " timestep " << resultval->timestep_ << std::endl;
+        if ( val[0]->timestep_ >= par->nt0-2 ) {
           return 0;
         }
         return 1;
