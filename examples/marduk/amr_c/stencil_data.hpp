@@ -45,7 +45,7 @@ struct stencil_data
       : max_index_(rhs.max_index_), index_(rhs.index_), 
         timestep_(rhs.timestep_),
         level_(rhs.level_), 
-        value_(rhs.value_), x_(rhs.x_), y_(rhs.y_), z_(rhs.z_)
+        value_(rhs.value_)
     {
         // intentionally do not copy mutex, new copy will have it's own mutex
     }
@@ -58,9 +58,6 @@ struct stencil_data
             timestep_ = rhs.timestep_;
             level_ = rhs.level_;
             value_ = rhs.value_;
-            x_ = rhs.x_; 
-            y_ = rhs.y_; 
-            z_ = rhs.z_; 
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
         return *this;

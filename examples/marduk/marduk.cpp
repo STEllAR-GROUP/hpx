@@ -339,6 +339,22 @@ int hpx_main(variables_map& vm)
       }
     }
 
+    // here we create a correspondence getween the gi number used in 'had' 
+    // and the index number used in hpx
+    par->item2gi.resize(par->rowsize[0]);
+    count = 0;
+    for (int i=par->allowedl;i>=0;i--) {
+      int gi = level_return_start(i,par);
+      par->item2gi[count] = gi; 
+      count++;
+      gi = par->gr_sibling[gi];
+      while ( grid_return_existence(gi,par) ) {
+        par->item2gi[count] = gi; 
+        count++;
+        gi = par->gr_sibling[gi];
+      }
+    } 
+
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
     component_type logging_type = get_component_type<logging>();
