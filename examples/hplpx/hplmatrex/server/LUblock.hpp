@@ -29,25 +29,27 @@ class LUblock
 //    private://data members
     int rows;
     int columns;
+    double* workSpace;
     double** data;
 };
 //////////////////////////////////////////////////////////////////////////////////////
 
 //the constructor initializes the matrix
 LUblock::LUblock(unsigned int h, unsigned int w){
+    workSpace = (double*) std::malloc((8+h*w)*sizeof(double));
+    data = (double**) std::malloc(h*sizeof(double*));
+//    rows = (int*) workSpace;
+//    columns = ((int*) workSpace) + 1;
     rows = h;
     columns = w;
-
-    data = (double**) std::malloc(h*sizeof(double*));
-    for(int i=0;i<rows;i++){data[i]=(double*) std::malloc(w*sizeof(double));}
+    for(int i = 0;i < h; i++){
+        data[i] = workSpace + 8 + i*w;
+    }
 }
 
 //the destructor frees the memory
 LUblock::~LUblock(){
-    int i;
-    for(i=0;i<rows;i++){
-        free(data[i]);
-    }
+    free(workSpace);
     free(data);
 }
 
