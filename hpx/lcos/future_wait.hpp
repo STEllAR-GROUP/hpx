@@ -60,6 +60,15 @@ namespace hpx { namespace components
             r[i++] = f.get();
     }
 
+    template <typename T, typename TR>
+    inline void
+    wait (std::vector<lcos::future_value<T, TR> > const& v)
+    {
+        typedef lcos::future_value<T, TR> value_type;
+        BOOST_FOREACH(value_type const& f, v)
+            f.get();
+    }
+
     inline void
     wait (std::vector<lcos::future_value<void> > const& v)
     {
@@ -67,7 +76,6 @@ namespace hpx { namespace components
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
-
 }}
 
 #endif

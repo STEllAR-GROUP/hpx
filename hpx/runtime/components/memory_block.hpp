@@ -22,6 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
 {
+    template <typename T>
+    class access_memory_block;
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a runtime_support class is the client side representation of a 
     /// \a server#memory_block component
@@ -81,12 +84,26 @@ namespace hpx { namespace components
         {
             return this->base_type::clone_async(gid_);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Write the given \a memory_block_data back to it's original source
+        template <typename T>
+        void checkin(components::access_memory_block<T> const& data) 
+        {
+            this->base_type::checkin(gid_, data);
+        }
+
+        /// Asynchronously clone the \a memory_block_data maintained by this 
+        /// memory_block
+        template <typename T>
+        lcos::future_value<void> checkin_async(
+            components::access_memory_block<T> const& data) 
+        {
+            return this->base_type::checkin_async(gid_, data);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    class access_memory_block;
-
     template <typename T>
     class access_memory_block_proxy
     {
@@ -184,6 +201,8 @@ namespace hpx { namespace components
             BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return *reinterpret_cast<target_type const*>(mb_.get_ptr());
         }
+
+        memory_block_data const& get_memory_block() const { return mb_; }
 
     private:
         memory_block_data mb_;

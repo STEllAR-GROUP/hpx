@@ -77,6 +77,13 @@ namespace hpx { namespace components { namespace server { namespace detail
             this->managing_object_.destruct()(this->get_ptr());
         }
 
+        memory_block_header& operator= (memory_block_header const& rhs)
+        {
+            if (this != &rhs) {
+            }
+            return *this;
+        }
+
         /// \brief get_ptr returns the address of the first byte allocated for 
         ///        this memory_block. 
         boost::uint8_t* get_ptr() 

@@ -113,7 +113,7 @@ namespace hpx { namespace components { namespace amr
           // This is a prolongation/restriction step
           resultval->timestep_ = val[0]->timestep_;
         } else {
-          resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,val[0]->level_);
+          resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,int(val[0]->level_));
         }
 
 #if defined(RNPL_FOUND)

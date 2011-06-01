@@ -13,9 +13,16 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components 
+{
+    template <typename T>
+    class access_memory_block;
+}}
+
 namespace hpx { namespace components { namespace stubs
 {
-    ///////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // The \a runtime_support class is the client side representation of a 
     // \a server#memory_block component
     struct memory_block : stub_base<server::memory_block>
@@ -106,6 +113,28 @@ namespace hpx { namespace components { namespace stubs
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
             return clone_async(targetgid).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        static lcos::future_value<void> 
+        checkin_async(naming::id_type const& targetgid, 
+            components::access_memory_block<T> const& data) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::detail::memory_block::checkin_action action_type;
+            return lcos::eager_future<action_type, void>(targetgid, data.get_memory_block());
+        }
+
+        template <typename T>
+        static void checkin(naming::id_type const& targetgid,
+            components::access_memory_block<T> const& data) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            checkin_async(targetgid, data).get();
         }
     };
 }}}

@@ -24,6 +24,7 @@ namespace hpx { namespace actions
     {
         typedef void (*construct_function)(void*, std::size_t);
         typedef void (*clone_function)(void*, void const*, std::size_t);
+        typedef void (*assign_function)(void*, void const*, std::size_t);
         typedef void (*destruct_function)(void*);
 #if HPX_USE_PORTABLE_ARCHIVES != 0
         typedef util::portable_binary_oarchive oarchive_type;
@@ -40,6 +41,11 @@ namespace hpx { namespace actions
     private:
         static void construct_(void*, std::size_t) {}
         static void clone_(void* dest, void const* src, std::size_t size)
+        {
+            using namespace std;    // some systems have memcpy in std
+            memcpy(dest, src, size);
+        }
+        static void assign_(void* dest, void const* src, std::size_t size)
         {
             using namespace std;    // some systems have memcpy in std
             memcpy(dest, src, size);
@@ -71,6 +77,10 @@ namespace hpx { namespace actions
         virtual clone_function clone() const 
         { 
             return &manage_object_action_base::clone_; 
+        }
+        virtual assign_function assign() const 
+        { 
+            return &manage_object_action_base::assign_; 
         }
         virtual destruct_function destruct() const 
         { 
@@ -115,6 +125,11 @@ namespace hpx { namespace actions
             BOOST_ASSERT(size == sizeof(T));
             new (dest) T (*reinterpret_cast<T const*>(src));
         }
+        static void assign_(void* dest, void const* src, std::size_t size)
+        {
+            BOOST_ASSERT(size == sizeof(T));
+            *reinterpret_cast<T*>(dest) = *reinterpret_cast<T const*>(src);
+        }
         static void destruct_(void* memory)
         {
             reinterpret_cast<T*>(memory)->~T();
@@ -140,6 +155,10 @@ namespace hpx { namespace actions
         clone_function clone() const
         {
             return &manage_object_action::clone_; 
+        }
+        assign_function assign() const
+        {
+            return &manage_object_action::assign_; 
         }
         destruct_function destruct() const
         {

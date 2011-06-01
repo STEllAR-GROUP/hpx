@@ -336,6 +336,9 @@ namespace hpx
         template <typename Result>
         struct future_value_remote_result;
 
+        template <typename Result>
+        struct future_value_local_result;
+
         template <typename Result, 
             typename RemoteResult = 
                 typename future_value_remote_result<Result>::type, 
@@ -343,17 +346,20 @@ namespace hpx
         class future_value;
 
         template <typename Action, 
-            typename Result = typename Action::result_type,
+            typename Result = typename future_value_local_result<
+                typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class eager_future;
 
         template <typename Action, 
-            typename Result = typename Action::result_type,
+            typename Result = typename future_value_local_result<
+                typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class lazy_future;
 
         template <typename Action, 
-            typename Result = typename Action::result_type,
+            typename Result = typename future_value_local_result<
+                typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class contin;
 

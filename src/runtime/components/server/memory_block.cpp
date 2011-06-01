@@ -7,6 +7,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/get_lva.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -76,8 +77,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     /// Write back data
     void memory_block::checkin(components::memory_block_data const& data) 
     {
-        // safety net, making sure we don't write accidentally
-        BOOST_ASSERT(false);
+        // we currently just write back to the memory block
+        hpx::actions::manage_object_action_base const& obj = 
+            wrapper_->component_->get_managing_object();
+        obj.assign()(this->get_ptr(), &data, data.get_size());
     }
 
     /// Clone this memory_block

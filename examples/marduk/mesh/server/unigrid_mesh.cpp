@@ -554,7 +554,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                // anytime there is a difference of more than one level between src and dst rows,
               // you need to account for the prolongation/restriction rows going on inbetween them.
               // That is given by 2^{L-l-1}-1
-              int intermediate = (int) pow(2.,par->allowedl-level) ;
+              int intermediate = (int) pow(2.,int(par->allowedl-level)) ;
               if ( par->allowedl-level > 1 ) {
                 dst += intermediate + intermediate/2 - 1;
               } else {

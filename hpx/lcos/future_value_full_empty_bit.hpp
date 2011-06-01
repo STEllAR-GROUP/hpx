@@ -370,6 +370,12 @@ namespace hpx { namespace lcos
       : boost::mpl::identity<Result>
     {};
 
+    template <typename Result>
+    struct future_value_local_result 
+      : boost::mpl::identity<Result> 
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult, int N>
     class future_value 
     {
@@ -447,6 +453,11 @@ namespace hpx { namespace lcos
     template <>
     struct future_value_remote_result<void>
       : boost::mpl::identity<util::unused_type>
+    {};
+
+    template <>
+    struct future_value_local_result<util::unused_type> 
+        : boost::mpl::identity<void> 
     {};
 
     template <int N>
