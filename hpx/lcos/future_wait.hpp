@@ -32,6 +32,12 @@ namespace hpx { namespace components
         return f1.get();
     }
 
+    inline void
+    wait (lcos::future_value<void> const& f1)
+    {
+        f1.get();
+    }
+
     template <typename T1, typename T2, typename TR1, typename TR2>
     inline boost::tuple<T1, T2>
     wait (lcos::future_value<T1, TR1> const& f1, 
