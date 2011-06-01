@@ -1,0 +1,51 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Copyright (c) 2011 Bryce Lelbach
+;   Based on Kent Dybvig's fibonacci routines
+;
+;   Distributed under the Boost Software License, Version 1.0. (See accompanying
+;   file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(link hpx as px)
+
+(import * from ports)
+(import (cmdline) from platform)
+(import (eager-future call/cc) from px)
+
+(variable addc
+  (lambda (x y k)
+    (if (zero? y)
+      (k x)
+      (addc (+ x 1) (- y 1) k))))
+
+(variable fibonacci
+  (lambda (x c)
+    (if (zero? x)
+      (c 0)
+      (if (zero? (- x 1))
+        (c 1)
+        (addc
+          ; HPX-backed call-with-current-continuation
+          (call/cc (lambda (c) (fibonacci (- x 1) c)))
+          (call/cc (lambda (c) (fibonacci (- (- x 1) 1) c)))
+          c)))))
+
+(variable test-fibonacci
+  (lambda (n)
+    ; note that I invoke the future (a nullary procedure) in the binding
+    ; expression - this causes the pxthread to wait for the result before
+    ; executing the I/O code in the body of the let
+    (let ((r ((eager-future fibonacci n))))
+      (display "fibonacci(")
+      (display n)
+      (display ") ==> ")
+      (display r)
+      (newline))))
+
+; 'hpx_main' - module level code, which is executed when this file is evaluated
+(assert (number? cmdline))
+
+(test-fibonacci cmdline)
+
+0 ; return 0 to the driver
+
