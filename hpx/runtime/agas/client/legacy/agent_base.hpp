@@ -101,6 +101,12 @@ struct agent_base : Base
         if (self)
         {
             binding_type r = this->primary_ns_.bind(ep, 0);
+
+            if (state() == agent_state_bootstrapping)
+                r = this->primary_ns_server->bind_locality(ep, 0);
+            else
+                r = this->primary_ns_.bind(ep, 0);
+
             prefix = at_c<2>(r);
 
             if (prefix != naming::invalid_gid)
@@ -165,7 +171,10 @@ struct agent_base : Base
             }
         }
 
-        prefix = this->symbol_ns_.resolve("/locality(console)");
+        if (state() == agent_state_bootstrapping)
+            prefix = this->symbol_ns_server->resolve("/locality(console)");
+        else
+            prefix = this->symbol_ns_.resolve("/locality(console)");
 
         if (prefix != naming::invalid_gid)
             this->console_cache_.store(naming::get_prefix_from_gid(prefix));
@@ -180,7 +189,12 @@ struct agent_base : Base
 
         if (type != components::component_invalid)
         {
-            prefixes_type raw_prefixes = this->component_ns_.resolve(type);
+            prefixes_type raw_prefixes;
+
+            if (state() == agent_state_bootstrapping)
+                raw_prefixes = this->component_ns_server->resolve_id(type);
+            else
+                raw_prefixes = this->component_ns_.resolve(type);
     
             if (raw_prefixes.empty())
                 return false;
@@ -193,7 +207,12 @@ struct agent_base : Base
             return true; 
         }
 
-        prefixes_type raw_prefixes = this->primary_ns_.localities();
+        prefixes_type raw_prefixes;
+
+        if (state() == agent_state_bootstrapping)
+            raw_prefixes = this->primary_ns_server->localities();
+        else
+            raw_prefixes = this->primary_ns_.localities();
     
         if (raw_prefixes.empty())
             return false;
@@ -212,14 +231,23 @@ struct agent_base : Base
 
     component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
-    { return this->component_ns_.bind(name); } 
+    {
+        if (state() == agent_state_bootstrapping)
+            return this->component_ns_server->bind_name(name);
+        else
+            return this->component_ns_.bind(name);
+    } 
 
     component_id_type
     register_factory(naming::gid_type const& prefix, std::string const& name,
                      error_code& ec = throws) 
     {
-        return this->component_ns_.bind
-            (name, naming::get_prefix_from_gid(prefix));
+        if (state() == agent_state_bootstrapping)
+            return this->component_ns_server->bind_prefix
+                (name, naming::get_prefix_from_gid(prefix));
+        else
+            return this->component_ns_.bind
+                (name, naming::get_prefix_from_gid(prefix));
     } 
 
     bool get_id_range(naming::locality const& l, count_type count, 
@@ -233,7 +261,12 @@ struct agent_base : Base
 
         endpoint_type ep(addr, l.get_port()); 
          
-        binding_type range = this->primary_ns_.bind(ep, count);
+        binding_type range;
+
+        if (state() == agent_state_bootstrapping)
+            range = this->primary_ns_server->bind_locality(ep, count);
+        else
+            range = this->primary_ns_.bind(ep, count);
 
         lower_bound = at_c<0>(range);
         upper_bound = at_c<1>(range);
@@ -357,7 +390,12 @@ struct agent_base : Base
         if (try_cache && resolve_cached(id, addr, ec))
             return true;
         
-        gva_type gva = this->primary_ns_.resolve(id);
+        gva_type gva; 
+
+        if (state() == agent_state_bootstrapping)
+            gva = this->primary_ns_server->resolve_gid(id);
+        else
+            gva = this->primary_ns_.resolve(id);
 
         addr.locality_ = gva.endpoint;
         addr.type_ = gva.type;
@@ -415,17 +453,31 @@ struct agent_base : Base
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
     {
-        naming::gid_type r = this->symbol_ns_.rebind(name, id);
+        naming::gid_type r;
+
+        if (state() == agent_state_bootstrapping)
+            r = this->symbol_ns_server->rebind(name, id);
+        else
+            r = this->symbol_ns_.rebind(name, id);
+
         return r == id;
     }
 
     bool unregisterid(std::string const& name, error_code& ec = throws) 
-    { return this->symbol_ns_.unbind(name); }
+    {
+        if (state() == agent_state_bootstrapping)
+            return this->symbol_ns_server->unbind(name);
+        else  
+            return this->symbol_ns_.unbind(name);
+    }
 
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) 
     {
-        id = this->symbol_ns_.resolve(ns_name);
+        if (state() == agent_state_bootstrapping)
+            id = this->symbol_ns_server->resolve(ns_name);
+        else
+            id = this->symbol_ns_.resolve(ns_name);
         return id;         
     }
 };
