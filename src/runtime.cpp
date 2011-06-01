@@ -89,7 +89,8 @@ namespace hpx
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
 #if HPX_AGAS_VERSION <= 0x10
-        agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
+        agas_client_(agas_pool_, naming::locality(agas_address, agas_port),
+                     ini_, mode_ == runtime_mode_console),
 #else
         agas_client_(ini_, mode_),
 #endif
@@ -126,7 +127,7 @@ namespace hpx
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
 #if HPX_AGAS_VERSION <= 0x10
-        agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
+        agas_client_(agas_pool_, agas_address, ini_, mode_ == runtime_mode_console),
 #else
         agas_client_(ini_, mode_),
 #endif
@@ -308,6 +309,7 @@ namespace hpx
         // {{{ late startup - distributed
         // if there are more than one localities involved, wait for all
         // to get registered
+        #if HPX_AGAS_VERSION <= 0x10
         if (num_localities > 1) {
             bool foundall = false;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
@@ -365,6 +367,9 @@ namespace hpx
             this->process_.set_num_os_threads(num_threads);
             this->process_.set_localities(here_lid, prefixes);
         }
+        #else
+            this->process_.set_num_os_threads(num_threads);
+        #endif
         // }}}
 
         // {{{ launch main 
