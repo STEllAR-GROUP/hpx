@@ -1,0 +1,210 @@
+// Copyright (c) 2011 Matt Anderson <matt@phys.lsu.edu>
+// Copyright (c) 2011 Pedro Diniz
+//C++ include to permit output to the screen
+#include <iostream>
+#include <time.h>
+
+//HPX includes
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
+
+//Boost includes
+#include <boost/program_options.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
+
+using namespace hpx;
+namespace po = boost::program_options;
+
+int main(int argc, char* argv[])
+{
+    // Configure application-specific options
+    po::options_description desc_commandline ("usage:basic_example");
+
+    int retcode = hpx::init(desc_commandline, argc, argv);
+    return retcode;
+
+}
+
+naming::id_type set_initialdata(int);
+naming::id_type update(naming::id_type);
+
+typedef 
+    actions::plain_result_action1<naming::id_type,int, set_initialdata> 
+set_initialdata_action;
+
+typedef 
+    actions::plain_result_action1<naming::id_type,naming::id_type, update> 
+update_action;
+
+HPX_REGISTER_PLAIN_ACTION(set_initialdata_action);
+HPX_REGISTER_PLAIN_ACTION(update_action);
+
+struct data
+{
+    data()
+      : val_(0)
+    {}
+    ~data() {}
+
+    int val_;
+    std::vector<int> x_;
+    bool proceed_;
+
+private:
+    // serialization support
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & val_ & x_ & proceed_;
+    }
+};
+
+
+int hpx_main(po::variables_map &vm)
+{
+    int result = 0;
+    double elapsed = 0.0;
+
+    std::vector<naming::id_type> prefixes;
+    applier::applier& appl = applier::get_applier();
+
+    naming::id_type this_prefix = appl.get_runtime_support_gid();
+    
+    components::component_type type = 
+       components::get_component_type<components::server::plain_function<set_initialdata_action> >();
+
+    // Declaration used to store the first gid (if any) of the remote prefixes
+    naming::id_type that_prefix;
+    
+    if (appl.get_remote_prefixes(prefixes, type)) {
+      // If there is at least one such remote locality, store the first gid in the list
+      that_prefix = prefixes[0];
+    } else {
+      that_prefix = this_prefix;
+    }
+
+    
+    {
+        // Create a timer so see how its done
+        util::high_resolution_timer t;
+
+        std::vector<lcos::future_value< naming::id_type > > n;
+
+        int array_length = 6; 
+        for (int i=0;i<array_length;i++) {
+          n.push_back(lcos::eager_future<set_initialdata_action>(that_prefix,i));
+        }
+
+        srand( time(NULL) );
+
+        std::vector<lcos::future_value< naming::id_type > > future_update;
+        int N = 10; // number of random accesses to the array
+        for (int i=0;i<N;i++) {
+          int rn = rand() % array_length;
+          std::cout << " Random number element accessed: " << rn << std::endl;
+          naming::id_type tmp = n[rn].get();
+          future_update.push_back(lcos::eager_future<update_action>(that_prefix,tmp));
+        }
+
+        for (int i=0;i<N;i++) {
+          future_update[i].get();
+        }
+
+        for (int i=0;i<array_length;i++) {
+          components::access_memory_block<data> 
+                  result( components::stubs::memory_block::get(n[i].get()) );
+          std::cout << " Result index: " << i << " value : "  << result->val_ << std::endl;
+        }
+
+
+        //std::cout << " random number " << rn << std::endl;
+
+        //components::access_memory_block<data> val1( components::stubs::memory_block::get(n1.get()) );
+#if 0
+        naming::id_type id1 = n1.get();
+        naming::id_type id2 = n2.get();
+        naming::id_type result_that = ni1.get();
+        naming::id_type result_this = ni2.get();
+
+        // compute
+        lcos::eager_future<compute_action> n3(id1,id2,result_that);
+        lcos::eager_future<compute_action> n4(id1,id2,result_this);
+
+        naming::id_type id3 = n3.get();
+        naming::id_type id4 = n4.get();
+
+        // compute
+        lcos::eager_future<compute_action> n5(that_prefix,id3,id4,id1);
+        lcos::eager_future<compute_action> n6(this_prefix,id3,id4,id2);
+
+        naming::id_type id5 = n5.get();
+        naming::id_type id6 = n6.get();
+
+
+        // Access memory
+        components::access_memory_block<data> val1( components::stubs::memory_block::get(n5.get()) );
+        components::access_memory_block<data> val2( components::stubs::memory_block::get(n6.get()) );
+        std::cout << " Result " << val1->val_ << " " << val2->val_ << std::endl;
+        std::cout << " Vector Result " << val1->x_[0] << " " << val2->x_[0] << std::endl;
+        std::cout << " Proceed Result " << val1->proceed_ << " " << val2->proceed_ << std::endl;
+
+        //std::cout << " Result: " << n1.get() << " " << n2.get() << std::endl;
+        //result = n1.get()+n2.get();
+#endif
+        // What is the elapsed time?
+        elapsed = t.elapsed();
+
+        // Print out a completion message. The correct answer is 12 for this example.
+        std::cout << "Achieved result of " << result << " in " << elapsed << " seconds."<< std::endl;
+    }
+
+    // Initiate shutdown of the runtime systems on all localities
+    hpx::finalize();
+    return 0;
+}
+
+hpx::actions::manage_object_action<data> const manage_data =
+        hpx::actions::manage_object_action<data>();
+
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::actions::manage_object_action<data>, manage_object_action_data)
+
+naming::id_type set_initialdata (int i)
+{  
+
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    naming::id_type result = components::stubs::memory_block::create(
+            here, sizeof(data), manage_data);
+
+    components::access_memory_block<data> val(
+                components::stubs::memory_block::checkout(result));
+
+    int locality = get_prefix_from_id( here );
+
+    val->val_ = i;
+    std::cout << " locality : " << locality << " index : " << i << std::endl;
+
+    return result;
+}
+
+// the "work" 
+naming::id_type update (naming::id_type in)
+{  
+
+    components::access_memory_block<data> result(
+                components::stubs::memory_block::checkout(in));
+
+    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+    int locality = get_prefix_from_id( here );
+    std::cout << " locality update " << locality << std::endl;
+
+    result->val_ += 1;
+    return in;
+}
+
