@@ -47,7 +47,6 @@ namespace hpx { namespace components { namespace server
             hpl_solve=5,
             hpl_swap=6,
             hpl_gmain=7,
-            hpl_bsubst=8,
             hpl_check=9
         };
 
@@ -116,9 +115,9 @@ namespace hpx { namespace components { namespace server
     //the main gaussian function
     typedef actions::result_action4<HPLMatreX, int, hpl_gmain, int,
         int, int, int, &HPLMatreX::LU_gauss_main> gmain_action;
-    //backsubstitution function
-    typedef actions::result_action2<HPLMatreX, int, hpl_bsubst, int,
-        int, &HPLMatreX::part_bsub> bsubst_action;
+    //part_bsub function
+    typedef actions::result_action2<HPLMatreX, int, hpl_partbsub, int,
+        int, &HPLMatreX::part_bsub> partbsub_action;
     //checksolve function
     typedef actions::result_action3<HPLMatreX, double, hpl_check, int,
         int, bool, &HPLMatreX::checksolve> check_action;
@@ -136,7 +135,7 @@ namespace hpx { namespace components { namespace server
     //the backsubst future is used to make sure all computations are complete
     //before returning from LUsolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
-    typedef lcos::eager_future<server::HPLMatreX::bsubst_action> bsubst_future;
+    typedef lcos::eager_future<server::HPLMatreX::partbsub_action> partbsub_future;
 
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
@@ -563,30 +562,26 @@ namespace hpx { namespace components { namespace server
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
     int HPLMatreX::LUbacksubst(){
-    //i,j,k,l standard loop variables, row and col keep
-    //track of where the loops would be in terms of a single
-    //large data structure; using it allows addition
-    //where multiplication would need to be used without it
     int i,k,l,row,temp,nextFuture;
-    std::vector<bsubst_future> futures;
+    std::vector<partbsub_future> futures;
 
     for(i=0;i<brows;i++){
         temp = i*blocksize;
-        for(k=0;k<datablock[i][0]->getrows();k++){
+        for(k=0;k<datablock[i][0]->rows;k++){
         solution[temp+k] = datablock[i][brows-1]->get(k,
-            datablock[i][brows-1]->getcolumns()-1);
+            datablock[i][brows-1]->columns-1);
     }   }
 
     i = brows-1;
     row = i*blocksize;
-    for(k=datablock[i][i]->getcolumns()-2;k>=0;k--){
+    for(k=datablock[i][i]->columns-2;k>=0;k--){
         temp = row+k;
         solution[temp]/=datablock[i][i]->data[k][k];
         for(l=k-1;l>=0;l--){
             solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
     }   }
     nextFuture = futures.size();
-    for(k=brows-2;k>=0;k--){futures.push_back(bsubst_future(_gid,k,i));}
+    for(k=brows-2;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
     for(i=brows-2;i>=0;i--){
         row = i*blocksize;
         futures[nextFuture].get();
@@ -597,16 +592,18 @@ namespace hpx { namespace components { namespace server
                 solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
         }   }
         nextFuture = futures.size();
-        for(k=i-1;k>=0;k--){futures.push_back(bsubst_future(_gid,k,i));}
+        for(k=i-1;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
     }
     return 1;
     }
 
     //part_bsub performs backsubstitution on a single block of data
+    //the function is designed to both take advantage of cache locality
+    //and to allow fine grained parallelism of the back substitution
     int HPLMatreX::part_bsub(int brow, int bcol){
         int row = brow*blocksize, col = bcol*blocksize;
         int cols, i, j;
-        if(brow == brows-1){cols = datablock[brow][brow]->getcolumns()-1;}
+        if(brow == brows-1){cols = datablock[brow][brow]->columns-1;}
         else{cols = blocksize;}
 
         for(i=0;i<blocksize;i++){

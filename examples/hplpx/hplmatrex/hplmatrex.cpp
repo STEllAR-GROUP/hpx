@@ -35,7 +35,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::gmain_action,HPLgmain_action);
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::HPLMatreX::bsubst_action,HPLbsubst_action);
+    hpx::components::server::HPLMatreX::partbsub_action,HPLpartbsub_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::HPLMatreX::check_action,HPLcheck_action);
 
