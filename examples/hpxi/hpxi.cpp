@@ -39,6 +39,11 @@
 #include <phxpr/intrinsics/type_predicates.hpp>
 #include <phxpr/evaluator.hpp>
 
+#include "local_eager_future.hpp" // Temporary hackage until the runtime linker
+                                  // is completed.
+
+#include "serialize_utree.hpp" // Move this jazz to Prana?
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::positional_options_description;
