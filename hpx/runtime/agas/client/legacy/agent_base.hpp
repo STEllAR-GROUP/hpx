@@ -229,6 +229,14 @@ struct agent_base : Base
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
+        if ((at_c<0>(this->router) + count) < at_c<1>(this->router)) {
+          lower_bound = at_c<0>(this->router);
+          upper_bound = at_c<1>(this->router) + count;
+          at_c<0>(this->router) += count;
+
+          return lower_bound && upper_bound;
+        }
+
         address addr = address::from_string(l.get_address());
 
         endpoint_type ep(addr, l.get_port()); 
