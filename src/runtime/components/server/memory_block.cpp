@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         // we currently just write back to the memory block
         hpx::actions::manage_object_action_base const& obj = 
             wrapper_->component_->get_managing_object();
-        obj.assign()(this->get_ptr(), &data, data.get_size());
+        obj.assign()(this->get_ptr(), data.get_ptr(), data.get_size());
     }
 
     /// Clone this memory_block
