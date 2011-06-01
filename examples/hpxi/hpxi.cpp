@@ -167,7 +167,7 @@ int hpx_main(variables_map& vm) {
   e.define_intrinsic("list?", list_predicate());
   e.define_intrinsic("number?", number_predicate());
   e.define_intrinsic("string?", string_predicate());
-  e.define_intrinsic("nil?", nil_predicate());
+  e.define_intrinsic("null?", nil_predicate());
   e.define_intrinsic("unspecified?", invalid_predicate());
 
   // basic io
