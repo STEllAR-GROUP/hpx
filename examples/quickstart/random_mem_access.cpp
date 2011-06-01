@@ -110,7 +110,7 @@ int hpx_main(po::variables_map &vm)
           int rn = rand() % array_length;
           std::cout << " Random number element accessed: " << rn << std::endl;
           naming::id_type tmp = n[rn].get();
-          future_update.push_back(lcos::eager_future<update_action>(that_prefix,tmp));
+          future_update.push_back(lcos::eager_future<update_action, void>(that_prefix,tmp));
         }
 
         //for (int i=0;i<N;i++) {
