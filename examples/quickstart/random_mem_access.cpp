@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>
@@ -30,14 +31,14 @@ int main(int argc, char* argv[])
 }
 
 naming::id_type set_initialdata(int);
-naming::id_type update(naming::id_type);
+void update(naming::id_type);
 
 typedef 
     actions::plain_result_action1<naming::id_type,int, set_initialdata> 
 set_initialdata_action;
 
 typedef 
-    actions::plain_result_action1<naming::id_type,naming::id_type, update> 
+    actions::plain_action1<naming::id_type, update> 
 update_action;
 
 HPX_REGISTER_PLAIN_ACTION(set_initialdata_action);
@@ -103,7 +104,7 @@ int hpx_main(po::variables_map &vm)
 
         srand( time(NULL) );
 
-        std::vector<lcos::future_value< naming::id_type > > future_update;
+        std::vector<lcos::future_value< void > > future_update;
         int N = 10; // number of random accesses to the array
         for (int i=0;i<N;i++) {
           int rn = rand() % array_length;
@@ -112,9 +113,10 @@ int hpx_main(po::variables_map &vm)
           future_update.push_back(lcos::eager_future<update_action>(that_prefix,tmp));
         }
 
-        for (int i=0;i<N;i++) {
-          future_update[i].get();
-        }
+        //for (int i=0;i<N;i++) {
+        //  future_update[i].get();
+        //}
+        hpx::components::wait(future_update);
 
         for (int i=0;i<array_length;i++) {
           components::access_memory_block<data> 
@@ -159,7 +161,7 @@ naming::id_type set_initialdata (int i)
 }
 
 // the "work" 
-naming::id_type update (naming::id_type in)
+void update (naming::id_type in)
 {  
 
     components::access_memory_block<data> result(
@@ -174,7 +176,5 @@ naming::id_type update (naming::id_type in)
     // not implemented as of 1 June 2011.  Needed for remote writes
     // (remote read is working fine)
     //components::stubs::memory_block::checkin(in);
-
-    return in;
 }
 
