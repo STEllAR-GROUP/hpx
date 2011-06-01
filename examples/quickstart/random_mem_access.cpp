@@ -122,41 +122,6 @@ int hpx_main(po::variables_map &vm)
           std::cout << " Result index: " << i << " value : "  << result->val_ << std::endl;
         }
 
-
-        //std::cout << " random number " << rn << std::endl;
-
-        //components::access_memory_block<data> val1( components::stubs::memory_block::get(n1.get()) );
-#if 0
-        naming::id_type id1 = n1.get();
-        naming::id_type id2 = n2.get();
-        naming::id_type result_that = ni1.get();
-        naming::id_type result_this = ni2.get();
-
-        // compute
-        lcos::eager_future<compute_action> n3(id1,id2,result_that);
-        lcos::eager_future<compute_action> n4(id1,id2,result_this);
-
-        naming::id_type id3 = n3.get();
-        naming::id_type id4 = n4.get();
-
-        // compute
-        lcos::eager_future<compute_action> n5(that_prefix,id3,id4,id1);
-        lcos::eager_future<compute_action> n6(this_prefix,id3,id4,id2);
-
-        naming::id_type id5 = n5.get();
-        naming::id_type id6 = n6.get();
-
-
-        // Access memory
-        components::access_memory_block<data> val1( components::stubs::memory_block::get(n5.get()) );
-        components::access_memory_block<data> val2( components::stubs::memory_block::get(n6.get()) );
-        std::cout << " Result " << val1->val_ << " " << val2->val_ << std::endl;
-        std::cout << " Vector Result " << val1->x_[0] << " " << val2->x_[0] << std::endl;
-        std::cout << " Proceed Result " << val1->proceed_ << " " << val2->proceed_ << std::endl;
-
-        //std::cout << " Result: " << n1.get() << " " << n2.get() << std::endl;
-        //result = n1.get()+n2.get();
-#endif
         // What is the elapsed time?
         elapsed = t.elapsed();
 
@@ -205,6 +170,11 @@ naming::id_type update (naming::id_type in)
     std::cout << " locality update " << locality << std::endl;
 
     result->val_ += 1;
+
+    // not implemented as of 1 June 2011.  Needed for remote writes
+    // (remote read is working fine)
+    //components::stubs::memory_block::checkin(in);
+
     return in;
 }
 
