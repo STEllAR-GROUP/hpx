@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace server
             hpl_construct=0,
             hpl_destruct=1,
             hpl_assign=2,
-            hpl_mini=3,
+            hpl_partbsub=3,
             hpl_solve=5,
             hpl_swap=6,
             hpl_gmain=7,
@@ -71,6 +71,7 @@ namespace hpx { namespace components { namespace server
     void LU_gauss_trail(int brow, int bcol, int iter);
     int LU_gauss_main(int brow, int bcol, int iter, int type);
     int LUbacksubst();
+    int part_bsub(int brow, int bcol);
     double checksolve(int row, int offset, bool complete);
     void print();
     void print2();
@@ -116,8 +117,8 @@ namespace hpx { namespace components { namespace server
     typedef actions::result_action4<HPLMatreX, int, hpl_gmain, int,
         int, int, int, &HPLMatreX::LU_gauss_main> gmain_action;
     //backsubstitution function
-    typedef actions::result_action0<HPLMatreX, int, hpl_bsubst,
-        &HPLMatreX::LUbacksubst> bsubst_action;
+    typedef actions::result_action2<HPLMatreX, int, hpl_bsubst, int,
+        int, &HPLMatreX::part_bsub> bsubst_action;
     //checksolve function
     typedef actions::result_action3<HPLMatreX, double, hpl_check, int,
         int, bool, &HPLMatreX::checksolve> check_action;
@@ -566,42 +567,53 @@ namespace hpx { namespace components { namespace server
     //track of where the loops would be in terms of a single
     //large data structure; using it allows addition
     //where multiplication would need to be used without it
-    int i,j,k,l,row,col,temp;
+    int i,k,l,row,temp,nextFuture;
+    std::vector<bsubst_future> futures;
 
     for(i=0;i<brows;i++){
         temp = i*blocksize;
-        for(j=0;j<datablock[i][0]->getrows();j++){
-        solution[temp+j] = datablock[i][brows-1]->get(j,
+        for(k=0;k<datablock[i][0]->getrows();k++){
+        solution[temp+k] = datablock[i][brows-1]->get(k,
             datablock[i][brows-1]->getcolumns()-1);
     }   }
 
-    for(i=brows-1;i>=0;i--){
+    i = brows-1;
+    row = i*blocksize;
+    for(k=datablock[i][i]->getcolumns()-2;k>=0;k--){
+        temp = row+k;
+        solution[temp]/=datablock[i][i]->data[k][k];
+        for(l=k-1;l>=0;l--){
+            solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
+    }   }
+    nextFuture = futures.size();
+    for(k=brows-2;k>=0;k--){futures.push_back(bsubst_future(_gid,k,i));}
+    for(i=brows-2;i>=0;i--){
         row = i*blocksize;
-        for(j=brows-1;j>=i;j--){
-        col = j*blocksize;
-        //the block of code following the if statement handles all data blocks
-        //that to not include elements on the diagonal
-        if(i!=j){
-            for(k=datablock[i][j]->getcolumns()-
-                ((j>=brows-1)?(2):(1));k>=0;k--){
-                temp=col+k;
-                for(l=datablock[i][j]->getrows()-1;l>=0;l--){
-                    solution[row+l] -=
-                        datablock[i][j]->data[l][k]*solution[temp];
-        }   }   }
-        //this block of code following the else statement handles all data 
-        //blocks that do include elements on the diagonal
-        else{
-            for(k=datablock[i][i]->getcolumns()-
-                ((i==brows-1)?(2):(1));k>=0;k--){
-                solution[row+k]/=datablock[i][i]->data[k][k];
-                temp = col+k;
-                for(l=k-1;l>=0;l--){
-                    solution[row+l] -=
-                        datablock[i][i]->data[l][k]*solution[temp];
-        }   }    }   }    }
-
+        futures[nextFuture].get();
+        for(k=blocksize-1;k>=0;k--){
+            temp = row+k;
+            solution[temp]/=datablock[i][i]->data[k][k];
+            for(l=k-1;l>=0;l--){
+                solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
+        }   }
+        nextFuture = futures.size();
+        for(k=i-1;k>=0;k--){futures.push_back(bsubst_future(_gid,k,i));}
+    }
     return 1;
+    }
+
+    //part_bsub performs backsubstitution on a single block of data
+    int HPLMatreX::part_bsub(int brow, int bcol){
+        int row = brow*blocksize, col = bcol*blocksize;
+        int cols, i, j;
+        if(brow == brows-1){cols = datablock[brow][brow]->getcolumns()-1;}
+        else{cols = blocksize;}
+
+        for(i=0;i<blocksize;i++){
+            for(j=0;j<cols;j++){
+                solution[row+i]-=datablock[brow][bcol]->data[i][j]*solution[col+j];
+        }   }
+        return 1;
     }
 
     //finally, this function checks the accuracy of the LU computation a few
