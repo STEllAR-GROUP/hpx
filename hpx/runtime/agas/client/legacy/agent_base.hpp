@@ -288,7 +288,12 @@ struct agent_base : Base
     count_type
     incref(naming::gid_type const& id, count_type credits = 1,
            error_code& ec = throws) 
-    { return this->primary_ns_.increment(id, credits); } 
+    {
+        if (state() == agent_state_bootstrapping)
+            return this->primary_ns_server->increment(id, credits);
+        else
+            return this->primary_ns_.increment(id, credits);
+    } 
 
     count_type
     decref(naming::gid_type const& id, component_id_type& t,
@@ -296,7 +301,12 @@ struct agent_base : Base
     { // {{{ decref implementation
         using boost::fusion::at_c;
 
-        decrement_type r = this->primary_ns_.decrement(id, credits);
+        decrement_type r;
+        
+        if (state() == agent_state_bootstrapping)
+            r = this->primary_ns_server->decrement(id, credits);
+        else
+            r = this->primary_ns_.decrement(id, credits);
 
         if (at_c<0>(r) == 0)
             t = at_c<1>(r);
@@ -321,7 +331,12 @@ struct agent_base : Base
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       naming::address& addr, error_code& ec = throws) 
     { // {{{ unbind_range implementation
-        unbinding_type r = this->primary_ns_.unbind(lower_id, count);
+        unbinding_type r;
+
+        if (state() == agent_state_bootstrapping)
+            r = this->primary_ns_server->unbind(lower_id, count);
+        else
+            r = this->primary_ns_.unbind(lower_id, count);
 
         if (r)
         {
