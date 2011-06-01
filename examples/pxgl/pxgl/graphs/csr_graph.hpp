@@ -230,8 +230,6 @@ namespace pxgl { namespace graphs { namespace server {
     typedef pxgl::graphs::server::adjacency<size_type, double>  adjacency_type;
     typedef std::vector<adjacency_type> adjacencies_type;
     typedef boost::unordered_map<size_type, adjacencies_type> map_type;
-    //typedef std::vector<edge_tuple_type const &> edge_refs_type;
-    //typedef boost::unordered_map<size_type, edge_refs_type> map_type;
     typedef boost::unordered_map<size_type, size_type> vertex_map_type;
 
     csr_graph()
@@ -957,9 +955,6 @@ namespace pxgl { namespace graphs { namespace server {
 
       assert(0 < i);
       assert(i+1 < index_.size());
-
-      //LCSR_fatal("::neighbors(%u) has pos(%u) and end(%u)\n",
-      //    v, index_[i], index_[i+1]);
 
       return edge_iterator_type(&edges_, index_[i], index_[i+1]);
     }

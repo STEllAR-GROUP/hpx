@@ -457,7 +457,6 @@ namespace pxgl { namespace xua { namespace server {
 
     items_type * init_items(size_type size)
     {
-      //not_ready();
       assert(!initialized_);
 
       constructed();

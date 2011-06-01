@@ -9,11 +9,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 
-#define TSUSE_begin(name)
-//#define TSUSE_begin(name) YAP_T_begin(name)
-#define TSUSE_end(name)
-//#define TSUSE_end(name) YAP_T_end(name)
-
 ////////////////////////////////////////////////////////////////////////////////
 namespace pxgl { namespace util { 
   //////////////////////////////////////////////////////////////////////////////
@@ -27,9 +22,7 @@ namespace pxgl { namespace util {
     scoped_use(feb_type & feb)
       : feb_(feb)
     {
-TSUSE_begin(scoped_use_get)
       feb_.read_and_empty(d_);
-TSUSE_end(scoped_use_get)
 
       if (1 == d_.which())
       {
