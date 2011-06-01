@@ -10,6 +10,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/cache/local_cache.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 
@@ -89,6 +90,9 @@ struct resolver_cache
     typedef boost::cache::local_cache<naming::locality, locality_entry_type>
         locality_cache_type;
     // }}}
+
+    typedef boost::fusion::vector2<naming::gid_type, naming::gid_type>
+        router_type;
     
     typedef boost::atomic<boost::uint32_t> console_cache_type;
 
@@ -99,6 +103,9 @@ struct resolver_cache
     locality_cache_type locality_cache_;
 
     console_cache_type console_cache_;
+
+    cache_mutex_type router_mtx;
+    router_type router;
 
     resolver_cache(util::runtime_configuration const& ini_)
         : gva_cache_(ini_.get_agas_gva_cache_size())
