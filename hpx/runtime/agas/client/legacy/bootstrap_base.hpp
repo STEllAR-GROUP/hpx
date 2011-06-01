@@ -88,14 +88,7 @@ struct bootstrap_base : resolver_cache<tag::network::tcpip>
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
         this->symbol_ns_server->bind("/locality(agas#0)",
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
-        this->primary_ns_server->bind_locality(ep, HPX_AGAS_INITIAL_GID_RANGE);
-
-        at_c<0>(this->router)
-            = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX) + 4;
-
-        at_c<1>(this->router)
-            = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)
-            + HPX_AGAS_INITIAL_GID_RANGE;
+        this->primary_ns_server->bind_locality(ep);
 
         this->gva_cache_.insert(primary_key, primary_gva);
         this->gva_cache_.insert(component_key, component_gva); 

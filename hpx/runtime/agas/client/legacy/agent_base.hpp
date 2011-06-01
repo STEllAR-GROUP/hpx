@@ -229,14 +229,6 @@ struct agent_base : Base
         using boost::asio::ip::address;
         using boost::fusion::at_c;
 
-        if ((at_c<0>(this->router) + count) < at_c<1>(this->router)) {
-          lower_bound = at_c<0>(this->router);
-          upper_bound = at_c<1>(this->router) + count;
-          at_c<0>(this->router) += count;
-
-          return lower_bound && upper_bound;
-        }
-
         address addr = address::from_string(l.get_address());
 
         endpoint_type ep(addr, l.get_port()); 
@@ -268,6 +260,19 @@ struct agent_base : Base
         // parameters.
         gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
         
+        if (state() == agent_state_bootstrapping)
+        {
+            if (this->primary_ns_server->bind_gid(lower_id, gva)) 
+            { 
+                typename cache_mutex_type::scoped_lock
+                    lock(this->gva_cache_mtx_);
+                gva_cache_key key(lower_id, count);
+                this->gva_cache_.insert(key, gva);
+
+                return true;
+            }
+        }
+
         if (this->primary_ns_.bind(lower_id, gva)) 
         { 
             typename cache_mutex_type::scoped_lock lock(this->gva_cache_mtx_);
