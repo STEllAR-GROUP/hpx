@@ -31,6 +31,9 @@ if(NOT MSVC)
   if(CMAKE_Fortran_COMPILER)
     set(subdirs ${subdirs} marduk)
   endif()
+  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
+    set(subdirs ${subdirs} hpxi)
+  endif() 
 else()
   set(subdirs
       accumulator
