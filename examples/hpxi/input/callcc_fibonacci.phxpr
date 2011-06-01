@@ -9,6 +9,7 @@
 (link hpx as px)
 
 (import * from ports)
+(import (let) from r5rs-scheme)
 (import (cmdline) from platform)
 (import (eager-future call/cc) from px)
 
@@ -32,9 +33,6 @@
 
 (variable test-fibonacci
   (lambda (n)
-    ; note that I invoke the future (a nullary procedure) in the binding
-    ; expression - this causes the pxthread to wait for the result before
-    ; executing the I/O code in the body of the let
     (let ((r ((eager-future fibonacci n))))
       (display "fibonacci(")
       (display n)
@@ -42,10 +40,10 @@
       (display r)
       (newline))))
 
-; 'hpx_main' - module level code, which is executed when this file is evaluated
+; 'hpx_main' 
 (assert (number? cmdline))
 
 (test-fibonacci cmdline)
 
-0 ; return 0 to the driver
+0 
 

@@ -8,6 +8,7 @@
 (link hpx as px)
 
 (import * from ports)
+(import (let) from r5rs-scheme)
 (import (cmdline) from platform)
 (import (eager-future) from px)
 
