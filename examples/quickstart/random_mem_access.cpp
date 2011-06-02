@@ -1,6 +1,14 @@
 // Copyright (c) 2011 Matt Anderson <matt@phys.lsu.edu>
 // Copyright (c) 2011 Pedro Diniz
-//C++ include to permit output to the screen
+//
+// This is the non-atomic version of the random memory access.  The array length
+// is given by the variable array_length and N is the number of random accesses
+// to this array.  
+//
+//  At present, the entire array is placed in the root locality while all the random
+//  accesses and writes occur on the remote locality.
+//
+// Note that this is a *non-atomic* example.
 #include <iostream>
 #include <time.h>
 
@@ -10,6 +18,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/lcos/future_wait.hpp>
+#include <hpx/util/locking_helpers.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>
@@ -17,8 +26,37 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <boost/thread/locks.hpp>
+#include <boost/foreach.hpp>
+#include <boost/ref.hpp>
+
+#include <algorithm>
+#include <vector>
+
 using namespace hpx;
 namespace po = boost::program_options;
+
+struct data
+{
+    data()
+      : val_(0)
+    {}
+    ~data() {}
+
+    int val_;
+    std::vector<int> x_;
+    bool proceed_;
+
+private:
+    // serialization support
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & val_ & x_ & proceed_;
+    }
+};
 
 int main(int argc, char* argv[])
 {
@@ -43,29 +81,6 @@ update_action;
 
 HPX_REGISTER_PLAIN_ACTION(set_initialdata_action);
 HPX_REGISTER_PLAIN_ACTION(update_action);
-
-struct data
-{
-    data()
-      : val_(0)
-    {}
-    ~data() {}
-
-    int val_;
-    std::vector<int> x_;
-    bool proceed_;
-
-private:
-    // serialization support
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & val_ & x_ & proceed_;
-    }
-};
-
 
 int hpx_main(po::variables_map &vm)
 {
@@ -99,7 +114,7 @@ int hpx_main(po::variables_map &vm)
 
         int array_length = 6; 
         for (int i=0;i<array_length;i++) {
-          n.push_back(lcos::eager_future<set_initialdata_action>(that_prefix,i));
+          n.push_back(lcos::eager_future<set_initialdata_action>(this_prefix,i));
         }
 
         srand( time(NULL) );
@@ -132,7 +147,7 @@ int hpx_main(po::variables_map &vm)
     }
 
     // Initiate shutdown of the runtime systems on all localities
-    hpx::finalize();
+    hpx::finalize(5.0);
     return 0;
 }
 

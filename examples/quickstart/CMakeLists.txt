@@ -11,17 +11,21 @@ if(NOT MSVC)
   set(example_programs
       basic_example
       distributed_test
+      distributed_amrtest
+      random_mem_access
+      contact
       factorial
       factorial_get
       fibonacci1
       fibonacci2
-      fibonacci4
-      fibonacci4_phased
       quicksort)
 else()
   set(example_programs
       basic_example
       distributed_test
+      distributed_amrtest
+      random_mem_access
+      contact
       factorial
       factorial_get
       fibonacci1
