@@ -9,7 +9,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/applier/applier.hpp> 
+#include <hpx/runtime/applier/bind_naming_wrappers.hpp> 
 #include <hpx/util/static.hpp>
 #include <hpx/util/stringstream.hpp>
 
@@ -40,8 +44,11 @@ struct fixed_component_base : detail::fixed_component_tag
 
     /// \brief Destruct a fixed_component
     ~fixed_component_base()
-    {}
-  
+    {
+        if (gid_ != fixed_gid)
+            applier::unbind_gid(gid_); 
+    }
+ 
     /// \brief finalize() will be called just before the instance gets 
     ///        destructed
     void finalize() {}
@@ -61,9 +68,41 @@ struct fixed_component_base : detail::fixed_component_tag
     /// \returns      The fixed global id (GID) for this component
     naming::gid_type const& get_base_gid() const
     {
-        util::static_<naming::gid_type, gid_tag<MSB, LSB>, 1>
-            gid(naming::gid_type(MSB, LSB));
+        if (!gid_)
+        {
+            naming::address addr(applier::get_applier().here(),
+                components::get_component_type<wrapped_type>(),
+                hpx::uintptr_t(static_cast<this_component_type const&>(this)));
+
+            gid_ = fixed_gid();
+
+            // Try to bind the preset GID first
+            if (!applier::bind_gid(gid_, addr))
+            {
+                gid_ = applier::get_applier().get_parcel_handler().get_next_id();
+              
+                // If we can't bind the preset GID, then try to bind the next
+                // available GID on this locality. 
+                if (!applier::bind_gid(gid_, addr))
+                { 
+                    hpx::util::osstream strm;
+                    strm << gid_;
+                    gid_ = naming::gid_type();   // invalidate GID
+                    HPX_THROW_EXCEPTION(duplicate_component_address,
+                        "fixed_component_base<Component>::get_base_gid", 
+                        hpx::util::osstream_get_string(strm));
+                }
+            }
+        }
         return gid;
+    }
+
+    static naming::gid_type fixed_gid() const
+    {
+        util::static_<naming::gid_type, gid_tag<MSB, LSB>, 1>
+            fixed(naming::gid_type(MSB, LSB));
+
+        return fixed;
     }
 
     /// \brief  The function \a get_factory_properties is used to 
@@ -77,6 +116,14 @@ struct fixed_component_base : detail::fixed_component_tag
         // at a time
         return factory_none;
     }
+
+  private:
+    bool try_bind_gid() const
+    {
+
+    }
+
+    mutable naming::gid_type gid_;
 };
 
 
