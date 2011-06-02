@@ -334,7 +334,6 @@ namespace hpx { namespace components { namespace server
     return chk.get();
     }
 
-
     //pivot() finds the pivot element of each column and stores it. All
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
@@ -562,7 +561,8 @@ namespace hpx { namespace components { namespace server
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
     int HPLMatreX::LUbacksubst(){
-    int i,k,l,row,temp,nextFuture;
+    int i,k,l,row,temp;
+    int neededFuture[brows-1];
     std::vector<partbsub_future> futures;
 
     for(i=0;i<brows;i++){
@@ -580,18 +580,21 @@ namespace hpx { namespace components { namespace server
         for(l=k-1;l>=0;l--){
             solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
     }   }
-    nextFuture = futures.size();
+    neededFuture[0] = futures.size();
     for(k=brows-2;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
     for(i=brows-2;i>=0;i--){
         row = i*blocksize;
-        futures[nextFuture].get();
+        for(k=0;k<brows-i-1;k++){
+            futures[neededFuture[k]].get();
+            neededFuture[k]+=1;
+        }
         for(k=blocksize-1;k>=0;k--){
             temp = row+k;
             solution[temp]/=datablock[i][i]->data[k][k];
             for(l=k-1;l>=0;l--){
                 solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
         }   }
-        nextFuture = futures.size();
+        neededFuture[brows-i-1] = futures.size();
         for(k=i-1;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
     }
     return 1;
@@ -603,7 +606,7 @@ namespace hpx { namespace components { namespace server
     int HPLMatreX::part_bsub(int brow, int bcol){
         int row = brow*blocksize, col = bcol*blocksize;
         int cols, i, j;
-        if(brow == brows-1){cols = datablock[brow][brow]->columns-1;}
+        if(bcol == brows-1){cols = datablock[bcol][bcol]->columns-1;}
         else{cols = blocksize;}
 
         for(i=0;i<blocksize;i++){
@@ -617,7 +620,6 @@ namespace hpx { namespace components { namespace server
     //rows at a time
     double HPLMatreX::checksolve(int row, int offset, bool complete){
     double toterror = 0;    //total error from all checks
-
         //futures is used to allow this thread to continue spinning off new 
         //thread while other threads work, and is checked at the end to make
         // certain all threads are completed before returning.

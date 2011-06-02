@@ -283,25 +283,23 @@ int main(int argc, char* argv[]){
                         }
         }
         else{BOOST_ASSERT(false);}
-
-        //output the results
-                if(vm.count("csv")){
-                    std::cout<<num_threads<<","<<SIZE<<","<<BSIZE<<","<<ERROR<<","
-            <<ERROR/SIZE<<std::endl;
+            //output the results
+            if(vm.count("csv")){
+                std::cout<<num_threads<<","<<SIZE<<","<<BSIZE<<","<<ERROR<<","
+                <<ERROR/SIZE<<std::endl;
             }
-                else{
-                    std::cout<<"total error: "
-            <<ERROR<<std::endl<<"average error: "<<ERROR/SIZE<<std::endl
-            <<std::endl;
-                }
-    }
-    catch(std::exception& e){
-        std::cerr<<"std::exception caught: "<<e.what()<<std::endl;
-        return -1;
-    }
-    catch(...){
-        std::cerr<<"unexpected exception caught\n";
-        return -2;
-    }
-    return 0;
+            else{
+                std::cout<<"total error: "
+                <<ERROR<<std::endl<<"average error: "<<ERROR/SIZE<<std::endl;
+            }
+        }
+        catch(std::exception& e){
+            std::cerr<<"std::exception caught: "<<e.what()<<std::endl;
+            return -1;
+        }
+        catch(...){
+            std::cerr<<"unexpected exception caught\n";
+            return -2;
+        }
+        return 0;
 }
