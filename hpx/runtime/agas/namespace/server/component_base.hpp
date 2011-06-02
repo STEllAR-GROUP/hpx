@@ -15,12 +15,18 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Base, typename Database>
-struct HPX_COMPONENT_EXPORT component_namespace_base : Base
+template <typename Database>
+struct HPX_COMPONENT_EXPORT component_namespace :
+  components::fixed_component_base<
+    HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB, // constant GID
+    component_namespace<Database, Protocol>
+  >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -48,7 +54,8 @@ struct HPX_COMPONENT_EXPORT component_namespace_base : Base
     component_id_type type_counter; 
  
   public:
-    component_namespace_base(std::string const& name)
+    component_namespace(std::string const& name
+                                = "component_namespace")
       : mutex_(),
         component_ids_(std::string("hpx.agas.") + name + ".id"),
         factories_(std::string("hpx.agas.") + name + ".factory"),
@@ -197,43 +204,43 @@ struct HPX_COMPONENT_EXPORT component_namespace_base : Base
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        component_namespace_base<Base, Database>,
+        component_namespace<Database>,
         /* return type */ component_id_type,
         /* enum value */  namespace_bind_prefix,
         /* arguments */   component_name_type const&, prefix_type,
-        &component_namespace_base<Base, Database>::bind_prefix
+        &component_namespace<Database>::bind_prefix
     > bind_prefix_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace_base<Base, Database>,
+        component_namespace<Database>,
         /* return type */ component_id_type,
         /* enum value */  namespace_resolve_name,
         /* arguments */   component_name_type const&,
-        &component_namespace_base<Base, Database>::bind_name
+        &component_namespace<Database>::bind_name
     > bind_name_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace_base<Base, Database>,
+        component_namespace<Database>,
         /* return type */ prefixes_type,
         /* enum value */  namespace_resolve_id,
         /* arguments */   component_id_type,
-        &component_namespace_base<Base, Database>::resolve_id
+        &component_namespace<Database>::resolve_id
     > resolve_id_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace_base<Base, Database>,
+        component_namespace<Database>,
         /* return type */ component_id_type,
         /* enum value */  namespace_resolve_name,
         /* arguments */   component_name_type const&,
-        &component_namespace_base<Base, Database>::resolve_name
+        &component_namespace<Database>::resolve_name
     > resolve_name_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace_base<Base, Database>,
+        component_namespace<Database>,
         /* return type */ bool,
         /* enum value */  namespace_unbind,
         /* arguments */   component_name_type const&,
-        &component_namespace_base<Base, Database>::unbind
+        &component_namespace<Database>::unbind
     > unbind_action;
 };
 

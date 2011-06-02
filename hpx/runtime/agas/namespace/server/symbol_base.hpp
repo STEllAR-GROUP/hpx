@@ -11,12 +11,17 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Base, typename Database>
-struct HPX_COMPONENT_EXPORT symbol_namespace_base : Base 
+template <typename Database>
+struct HPX_COMPONENT_EXPORT symbol_namespace :
+  components::fixed_component_base<
+    HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
+    primary_namespace<Database, Protocol>
+  >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -33,7 +38,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace_base : Base
     gid_table_type gids_;
   
   public:
-    symbol_namespace_base(std::string const& name)
+    symbol_namespace(std::string const& name = "root_symbol_namespace")
       : mutex_(),
         gids_(std::string("hpx.agas.") + name + ".gid")
     { traits::initialize_mutex(mutex_); }
@@ -120,35 +125,35 @@ struct HPX_COMPONENT_EXPORT symbol_namespace_base : Base
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        symbol_namespace_base<Base, Database>,
+        symbol_namespace<Database>,
         /* return type */ bool,
         /* enum value */  namespace_bind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
-        &symbol_namespace_base<Base, Database>::bind
+        &symbol_namespace<Database>::bind
     > bind_action;
     
     typedef hpx::actions::result_action2<
-        symbol_namespace_base<Base, Database>,
+        symbol_namespace<Database>,
         /* return type */ naming::gid_type,
         /* enum value */  namespace_rebind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
-        &symbol_namespace_base<Base, Database>::rebind
+        &symbol_namespace<Database>::rebind
     > rebind_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace_base<Base, Database>,
+        symbol_namespace<Database>,
         /* return type */ naming::gid_type,
         /* enum value */  namespace_resolve,
         /* arguments */   symbol_type const&,
-        &symbol_namespace_base<Base, Database>::resolve
+        &symbol_namespace<Database>::resolve
     > resolve_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace_base<Base, Database>,
+        symbol_namespace<Database>,
         /* retrun type */ bool,
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
-        &symbol_namespace_base<Base, Database>::unbind
+        &symbol_namespace<Database>::unbind
     > unbind_action;
 };
 

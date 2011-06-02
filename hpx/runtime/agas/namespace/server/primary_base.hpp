@@ -19,6 +19,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
@@ -26,8 +27,12 @@
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Base, typename Database, typename Protocol>
-struct HPX_COMPONENT_EXPORT primary_namespace_base : Base
+template <typename Database, typename Protocol>
+struct HPX_COMPONENT_EXPORT primary_namespace : 
+  components::fixed_component_base<
+    HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
+    primary_namespace<Database, Protocol>
+  >
 {
     // {{{ nested types
     typedef typename traits::database::mutex_type<Database>::type
@@ -75,7 +80,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace_base : Base
     refcnt_table_type refcnts_;
   
   public:
-    primary_namespace_base(std::string const& name)
+    primary_namespace(std::string const& name = "root_primary_namespace")
       : mutex_(),
         gvas_(std::string("hpx.agas.") + name + ".gva"),
         partitions_(std::string("hpx.agas.") + name + ".partition"),
@@ -681,66 +686,66 @@ struct HPX_COMPONENT_EXPORT primary_namespace_base : Base
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ binding_type,
         /* enum value */  namespace_bind_locality,
         /* arguments */   endpoint_type const&, count_type,
-        &primary_namespace_base<Base, Database, Protocol>::bind_locality
+        &primary_namespace<Database, Protocol>::bind_locality
     > bind_locality_action; 
     
     typedef hpx::actions::result_action2<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ bool,
         /* enum value */  namespace_bind_gid,
         /* arguments */   naming::gid_type const&, gva_type const&,
-        &primary_namespace_base<Base, Database, Protocol>::bind_gid
+        &primary_namespace<Database, Protocol>::bind_gid
     > bind_gid_action;
     
     typedef hpx::actions::result_action1<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ locality_type,
         /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
-        &primary_namespace_base<Base, Database, Protocol>::resolve_locality
+        &primary_namespace<Database, Protocol>::resolve_locality
     > resolve_locality_action;
     
     typedef hpx::actions::result_action1<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ gva_type,
         /* enum value */  namespace_resolve_gid,
         /* arguments */   naming::gid_type const&,
-        &primary_namespace_base<Base, Database, Protocol>::resolve_gid
+        &primary_namespace<Database, Protocol>::resolve_gid
     > resolve_gid_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ unbinding_type,
         /* enum value */  namespace_unbind,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace_base<Base, Database, Protocol>::unbind
+        &primary_namespace<Database, Protocol>::unbind
     > unbind_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ count_type,  
         /* enum value */  namespace_increment,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace_base<Base, Database, Protocol>::increment
+        &primary_namespace<Database, Protocol>::increment
     > increment_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ decrement_type,
         /* enum value */  namespace_decrement,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace_base<Base, Database, Protocol>::decrement
+        &primary_namespace<Database, Protocol>::decrement
     > decrement_action;
     
     typedef hpx::actions::result_action0<
-        primary_namespace_base<Base, Database, Protocol>,
+        primary_namespace<Database, Protocol>,
         /* return type */ prefixes_type,
         /* enum value */  namespace_localities,
-        &primary_namespace_base<Base, Database, Protocol>::localities
+        &primary_namespace<Database, Protocol>::localities
     > localities_action;
 };
 
