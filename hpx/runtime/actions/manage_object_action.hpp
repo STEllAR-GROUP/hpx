@@ -128,7 +128,9 @@ namespace hpx { namespace actions
         static void assign_(void* dest, void const* src, std::size_t size)
         {
             BOOST_ASSERT(size == sizeof(T));
-            *reinterpret_cast<T*>(dest) = *reinterpret_cast<T const*>(src);
+            // do not overwrite ourselves
+            if (src != dest)
+                *reinterpret_cast<T*>(dest) = *reinterpret_cast<T const*>(src);
         }
         static void destruct_(void* memory)
         {
