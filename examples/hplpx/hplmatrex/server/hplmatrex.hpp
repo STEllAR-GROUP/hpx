@@ -62,15 +62,18 @@ namespace hpx { namespace components { namespace server
     void allocate();
     int assign(int row, int offset, bool complete, int seed);
     void pivot();
-    int swap(int brow, int bcol);
+    int swap(const int brow, const int bcol);
     void LU_gauss_manager();
-    void LU_gauss_corner(int iter);
-    void LU_gauss_top(int iter, int bcol);
-    void LU_gauss_left(int brow, int iter);
-    void LU_gauss_trail(int brow, int bcol, int iter);
-    int LU_gauss_main(int brow, int bcol, int iter, int type);
+    void LU_gauss_corner(const int iter);
+    void LU_gauss_top(const int iter, const int bcol);
+    void LU_gauss_left(const int brow, const int iter);
+    void LU_gauss_trail(const int brow, const int bcol, const int iter);
+//    int LU_mini_trail(const int srow, const int erow,
+//                      const int scol, const int ecol, const int iter);
+    int LU_gauss_main(const int brow, const int bcol,
+                      const int iter, const int type);
     int LUbacksubst();
-    int part_bsub(int brow, int bcol);
+    int part_bsub(const int brow, const int bcol);
     double checksolve(int row, int offset, bool complete);
     void print();
     void print2();
@@ -278,10 +281,10 @@ namespace hpx { namespace components { namespace server
     //print out the matrix
     void HPLMatreX::print(){
     for(int i = 0; i < brows; i++){
-        for(int j = 0; j < datablock[i][0]->getrows(); j++){
+        for(int j = 0; j < datablock[i][0]->rows; j++){
         for(int k = 0; k < brows; k++){
-            for(int l = 0; l < datablock[i][k]->getcolumns(); l++){
-            std::cout<<datablock[i][k]->get(j,l)<<" ";
+            for(int l = 0; l < datablock[i][k]->columns; l++){
+            std::cout<<datablock[i][k]->data[j][l]<<" ";
         }   }
         std::cout<<std::endl;
     }   }
@@ -386,8 +389,8 @@ namespace hpx { namespace components { namespace server
     //swap() creates the datablocks and reorders the original
     //trueData matrix when assigning the initial values to the datablocks
     //according to the pivotarr data.  trueData itself remains unchanged
-    int HPLMatreX::swap(int brow, int bcol){
-    int temp = rows/blocksize;
+    int HPLMatreX::swap(const int brow, const int bcol){
+    const int temp = rows/blocksize;
     int numrows = blocksize, numcols = blocksize;
     int i,j,k;
     for(k=0;k<brows;k++){
@@ -459,8 +462,8 @@ namespace hpx { namespace components { namespace server
 
     //LUgaussmain is a wrapper function which is used so that only one type of
     //action is needed instead of four types of actions
-    int HPLMatreX::LU_gauss_main(int brow,int bcol,int iter,
-        int type){
+    int HPLMatreX::LU_gauss_main(const int brow,const int bcol,const int iter,
+        const int type){
     if(type == 1){
         LU_gauss_trail(brow,bcol,iter);
     }
@@ -476,9 +479,9 @@ namespace hpx { namespace components { namespace server
     //LUgausscorner peforms gaussian elimination on the topleft corner block
     //of data that has not yet completed all of it's gaussian elimination
     //computations. Once complete, this block will need no further computations
-    void HPLMatreX::LU_gauss_corner(int iter){
+    void HPLMatreX::LU_gauss_corner(const int iter){
     int i, j, k;
-    int offset = iter*blocksize;        //factorData index offset
+    const int offset = iter*blocksize;        //factorData index offset
     double fFactor;
     double factor;
 
@@ -499,9 +502,9 @@ namespace hpx { namespace components { namespace server
     //LUgausstop performs gaussian elimination on the topmost row of blocks
     //that have not yet finished all gaussian elimination computation.
     //Once complete, these blocks will no longer need further computations
-    void HPLMatreX::LU_gauss_top(int iter, int bcol){
+    void HPLMatreX::LU_gauss_top(const int iter, const int bcol){
     int i,j,k;
-    int offset = iter*blocksize;        //factorData index offset
+    const int offset = iter*blocksize;        //factorData index offset
     double factor;
 
     for(i=0;i<datablock[iter][bcol]->rows;i++){
@@ -516,10 +519,10 @@ namespace hpx { namespace components { namespace server
     //LUgaussleft performs gaussian elimination on the leftmost column of
     //blocks that have not yet finished all gaussian elimination computation.
     //Upon completion, no further computations need be done on these blocks.
-    void HPLMatreX::LU_gauss_left(int brow, int iter){
+    void HPLMatreX::LU_gauss_left(const int brow, const int iter){
     int i,j,k;
-    int offset = brow*blocksize;
-    int offsetCol = iter*blocksize;    //factorData offset
+    const int offset = brow*blocksize;
+    const int offsetCol = iter*blocksize;    //factorData offset
     double fFactor[datablock[brow][iter]->columns];
     double factor;
 
@@ -545,7 +548,7 @@ namespace hpx { namespace components { namespace server
     //the blocks operated on during the current iteration of the Gaussian
     //elimination computations. These blocks will still require further 
     //computations to be performed in future iterations.
-    void HPLMatreX::LU_gauss_trail(int brow, int bcol, int iter){
+    void HPLMatreX::LU_gauss_trail(const int brow,const int bcol,const int iter){
     int i,j,k,jj;
     const int offset = brow*blocksize;    //factorData row offset
     const int offsetCol = iter*blocksize;    //factorData column offset
@@ -565,6 +568,27 @@ namespace hpx { namespace components { namespace server
     }   }   }
     }}
 
+/*    int HPLMatreX::LU_mini_trail(const int srow,const int erow,const int scol,
+                                 const int ecol,const int iter){
+    const int brow = std::min(srow/blocksize,brows-1);
+    const int bcol = std::min(scol/blocksize,brows-1);
+    const int startrow = srow-brow*blocksize;
+    const int endrow = erow-brow*blocksize;
+    const int startcol = scol-bcol*blocksize;
+    const int endcol = ecol-bcol*blocksize;
+    int i, j, k;
+    double factor;
+
+    for(j=startrow;j<endrow;j++){
+        for(i=0;i<blocksize;i++){
+            factor = factorData[j+srow][i+scol];
+            for(k=startcol;k<endcol;k++){
+                datablock[brow][bcol]->data[j][k] -=
+                    factor*datablock[iter][bcol]->data[i][k];
+    }   }   }
+    return 1;
+    }
+*/
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
     int HPLMatreX::LUbacksubst(){
@@ -575,8 +599,8 @@ namespace hpx { namespace components { namespace server
     for(i=0;i<brows;i++){
         temp = i*blocksize;
         for(k=0;k<datablock[i][0]->rows;k++){
-        solution[temp+k] = datablock[i][brows-1]->get(k,
-            datablock[i][brows-1]->columns-1);
+            solution[temp+k] = 
+            datablock[i][brows-1]->data[k][datablock[i][brows-1]->columns-1];
     }   }
 
     i = brows-1;
@@ -610,8 +634,8 @@ namespace hpx { namespace components { namespace server
     //part_bsub performs backsubstitution on a single block of data
     //the function is designed to both take advantage of cache locality
     //and to allow fine grained parallelism of the back substitution
-    int HPLMatreX::part_bsub(int brow, int bcol){
-        int row = brow*blocksize, col = bcol*blocksize;
+    int HPLMatreX::part_bsub(const int brow, const int bcol){
+        const int row = brow*blocksize, col = bcol*blocksize;
         int cols, i, j;
         if(bcol == brows-1){cols = datablock[bcol][bcol]->columns-1;}
         else{cols = blocksize;}

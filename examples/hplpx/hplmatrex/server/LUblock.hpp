@@ -21,10 +21,6 @@ class LUblock
     ~LUblock();
 
     //functions for assignment and data access
-    inline int getrows(){return rows;}
-    inline int getcolumns(){return columns;}
-    inline double get(unsigned int row, unsigned int col);
-    inline void set(unsigned int row, unsigned int col, double val);
 
 //    private://data members
     int rows;
@@ -52,15 +48,4 @@ LUblock::~LUblock(){
     free(workSpace);
     free(data);
 }
-
-//get() gives back an element in the original matrix
-double LUblock::get(unsigned int row, unsigned int col){
-    return data[row][col];
-}
-
-//set() assigns a value to an element in all matrices
-void LUblock::set(unsigned int row, unsigned int col, double val){
-    data[row][col] = val;
-}
-
 #endif
