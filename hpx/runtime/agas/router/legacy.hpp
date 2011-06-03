@@ -173,7 +173,7 @@ struct legacy_router : boost::noncopyable
       , router_type(router_type_)
       , state_(router_state_launching)
     {
-        parcel_port_.run(true);
+        //pp.run(true); TODO: this needs a wrapper function
 
         if (router_type == router_mode_bootstrap)
             launch_bootstrap(pp, ini_);
@@ -202,18 +202,18 @@ struct legacy_router : boost::noncopyable
                 static_cast<void*>(&bootstrap->component_ns_server));
         gva_type symbol_gva(ep,
             symbol_namespace_server_type::get_component_type(), 1U,
-                static_cast<void*>(&bootstrap->symbol_ns_server.get()));
+                static_cast<void*>(&bootstrap->symbol_ns_server));
         
         bootstrap->primary_ns_server.bind_locality(ep, 3);
         bootstrap->symbol_ns_server.bind("/locality(agas#0)",
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
 
         bootstrap->primary_ns_server.bind_gid
-            (primary_ns_server.get_base_gid(), primary_gva);
+            (bootstrap->primary_ns_server.get_base_gid(), primary_gva);
         bootstrap->primary_ns_server.bind_gid
-            (component_ns_server.get_base_gid(), component_gva);
+            (bootstrap->component_ns_server.get_base_gid(), component_gva);
         bootstrap->primary_ns_server.bind_gid
-            (symbol_ns_server.get_base_gid(), symbol_gva);
+            (bootstrap->symbol_ns_server.get_base_gid(), symbol_gva);
 
         if (runtime_type == runtime_mode_console)
             bootstrap->symbol_ns_server.bind("/locality(console)",
