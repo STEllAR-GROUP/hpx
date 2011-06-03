@@ -93,7 +93,7 @@ namespace hpx
         agas_client_(agas_pool_, naming::locality(agas_address, agas_port),
                      ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(parcel_pool_, ini_, mode_),
+        agas_client_(parcel_port_, ini_, mode_),
 #endif
         counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
@@ -131,7 +131,7 @@ namespace hpx
 #if HPX_AGAS_VERSION <= 0x10
         agas_client_(agas_pool_, agas_address, ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(parcel_pool_, ini_, mode_),
+        agas_client_(parcel_port_, ini_, mode_),
 #endif
         counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
@@ -169,7 +169,7 @@ namespace hpx
 #if HPX_AGAS_VERSION <= 0x10
         agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(parcel_pool_, ini_, mode_),
+        agas_client_(parcel_port_, ini_, mode_),
 #endif
         counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
