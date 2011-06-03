@@ -15,50 +15,22 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
+#include <hpx/runtime/agas/namespace/symbol.hpp>
 
 using hpx::components::component_agas_symbol_namespace;
 
-#if !defined(HPX_AGAS_SYSTEM)
-    #include <hpx/runtime/agas/namespace/user_symbol.hpp>
+typedef hpx::agas::server::symbol_namespace<
+    hpx::agas::tag::database::stdmap
+> agas_component;
 
-    typedef hpx::agas::server::user_symbol_namespace<
-        hpx::agas::tag::database::stdmap
-    > agas_component;
-    
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-        hpx::components::simple_component<agas_component>,
-        stdmap_symbol_namespace);
-    
-    HPX_DEFINE_GET_COMPONENT_TYPE(agas_component::base_type);
-    
-    namespace hpx { namespace components
-    {
-    
-    template <> HPX_ALWAYS_EXPORT
-    component_type component_type_database<agas_component>::get()
-    { return component_type_database<agas_component::base_type>::get(); }
-    
-    template <> HPX_ALWAYS_EXPORT
-    void component_type_database<agas_component>::set(component_type t)
-    { component_type_database<agas_component::base_type>::set(t); }
-    
-    }}
-#else    
-    #include <hpx/runtime/agas/namespace/bootstrap_symbol.hpp>
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::fixed_component<agas_component>,
+    stdmap_symbol_namespace);
 
-    typedef hpx::agas::server::bootstrap_symbol_namespace<
-        hpx::agas::tag::database::stdmap
-    > agas_component;
-    
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-        hpx::components::fixed_component<agas_component>,
-        stdmap_bootstrap_symbol_namespace);
-
-    HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-        agas_component, component_agas_symbol_namespace);
-    HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-        agas_component::base_type, component_agas_symbol_namespace);
-#endif
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    agas_component, component_agas_symbol_namespace);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    agas_component::base_type, component_agas_symbol_namespace);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_action,
