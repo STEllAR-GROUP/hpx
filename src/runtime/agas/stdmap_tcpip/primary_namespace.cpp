@@ -38,8 +38,6 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     agas_component, component_agas_primary_namespace);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component::base_type, component_agas_primary_namespace);
 
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<agas_component::gva_type>::set_result_action,

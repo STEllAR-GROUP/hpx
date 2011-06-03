@@ -29,8 +29,6 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     agas_component, component_agas_symbol_namespace);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component::base_type, component_agas_symbol_namespace);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_action,
