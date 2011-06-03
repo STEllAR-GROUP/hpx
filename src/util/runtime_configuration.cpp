@@ -50,6 +50,7 @@ namespace hpx { namespace util
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+            "router_mode = hosted",
 #endif
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
@@ -161,6 +162,33 @@ namespace hpx { namespace util
             (HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
 #endif
     }
+    
+#if HPX_AGAS_VERSION > 0x10
+    agas::router_mode runtime_configuration::get_agas_router_mode() const
+    {
+        // load all components as described in the configuration information
+        if (has_section("hpx.agas"))
+        {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec)
+            {
+                std::string const m = sec->get_entry("router_mode", "hosted");
+
+                if (m == "hosted")
+                    return agas::router_mode_hosted;
+                else if (m == "bootstrap")
+                    return agas::router_mode_bootstrap;
+                else {
+                    // REVIEW: overused exception type is overused
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "runtime_configuration::get_agas_router_mode", 
+                        std::string("invalid AGAS router mode \"") + m + "\"");
+                }
+            }
+        }
+        return agas::router_mode_hosted;
+    }
+#endif
 
     // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality(

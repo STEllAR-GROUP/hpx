@@ -27,6 +27,11 @@ namespace hpx { namespace util
                               std::vector<std::string> const& cmdline_ini_defs
                                   = std::vector<std::string>());
 
+
+#if HPX_AGAS_VERSION > 0x10
+        agas::router_mode get_agas_router_mode() const;
+#endif
+
         // Get the AGAS locality to use 
         naming::locality get_agas_locality() const;
 
