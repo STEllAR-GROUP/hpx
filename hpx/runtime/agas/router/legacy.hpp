@@ -164,7 +164,8 @@ struct legacy_router : boost::noncopyable
     boost::atomic<router_state> state_;
 
     legacy_router(
-        util::runtime_configuration const& ini_
+        parcelset::parcelport& pp 
+      , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
       , router_mode router_type_
     ):
@@ -172,14 +173,17 @@ struct legacy_router : boost::noncopyable
       , router_type(router_type_)
       , state_(router_state_launching)
     {
+        parcel_port_.run(true);
+
         if (router_type == router_mode_bootstrap)
-            launch_bootstrap(ini_);
+            launch_bootstrap(pp, ini_);
         else
-            launch_hosted(ini_);
+            launch_hosted(pp, ini_);
     } 
 
     void launch_bootstrap(
-        util::runtime_configuration const& ini_
+        parcelset::parcelport& pp 
+      , util::runtime_configuration const& ini_
     ) {
         using boost::asio::ip::address;
 
@@ -215,19 +219,23 @@ struct legacy_router : boost::noncopyable
             bootstrap->symbol_ns_server.bind("/locality(console)",
                 naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
 
-        // IMPLEMENT: wait for everyone else to come up, then enter active state
+        // IMPLEMENT: wait for everyone else to come up, then enter active state.
+        // we cannot send back ANY replies until we've registered the console,
+        // at a minimum. we cannot return from this ctor.
     }
 
-    void launch_bootstrap(
-        util::runtime_configuration const& ini_
+    void launch_hosted(
+        parcelset::parcelport& pp 
+      , util::runtime_configuration const& ini_
     ) {
         hosted = boost::make_shared<hosted_data_type>();
 
         hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
         hosted->locality_cache_.reserve(ini_.get_agas_locality_cache_size());
 
-        // IMPLEMENT: we need to send our initial request to the AGAS server -
-        // this means we need the parcelport and the threadmanager to be up
+        // IMPLEMENT: we need to send our initial request to the AGAS server
+        // and then wait for a reply. once we've been reactivated. we cannot
+        // return from this ctor.
     }
 
     router_state state() const

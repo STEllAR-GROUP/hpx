@@ -88,13 +88,14 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
+        parcel_port_(parcel_pool_, naming::locality(address, port)),
 #if HPX_AGAS_VERSION <= 0x10
         agas_client_(agas_pool_, naming::locality(agas_address, agas_port),
                      ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(ini_, mode_),
+        agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        parcel_port_(parcel_pool_, naming::locality(address, port)),
+        counters_(agas_client),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -126,12 +127,13 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
+        parcel_port_(parcel_pool_, address),
 #if HPX_AGAS_VERSION <= 0x10
         agas_client_(agas_pool_, agas_address, ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(ini_, mode_),
+        agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        parcel_port_(parcel_pool_, address),
+        counters_(agas_client),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -163,12 +165,13 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
+        parcel_port_(parcel_pool_, address),
 #if HPX_AGAS_VERSION <= 0x10
         agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
 #else
-        agas_client_(ini_, mode_),
+        agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        parcel_port_(parcel_pool_, address),
+        counters_(agas_client),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -253,10 +256,12 @@ namespace hpx
         runtime_support_.run();
         LRT_(info) << "runtime_impl: started runtime_support component";
 
-        // we don't get logs until the parcel port is up, at a minimum
+        // AGAS v2 starts the parcel port itself
+        #if HPX_AGAS_VERSION <= 0x10
         parcel_port_.run(false);            // starts parcel_pool_ as well
         LRT_(info) << "runtime_impl: started parcelport";
-        
+        #endif
+
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         LRT_(info) << "runtime_impl: started threadmanager";
         // }}}
@@ -264,46 +269,15 @@ namespace hpx
         // {{{ exiting bootstrap mode 
         LRT_(info) << "runtime_impl: registering runtime_support and memory components";
         // register the runtime_support and memory instances with the AGAS 
-        #if HPX_AGAS_VERSION <= 0x10
-            agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
-                naming::address(parcel_port_.here(), 
-                    components::get_component_type<components::server::runtime_support>(), 
-                    &runtime_support_));
+        agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
+            naming::address(parcel_port_.here(), 
+                components::get_component_type<components::server::runtime_support>(), 
+                &runtime_support_));
 
-            agas_client_.bind(applier_.get_memory_raw_gid(), 
-                naming::address(parcel_port_.here(), 
-                    components::get_component_type<components::server::memory>(), 
-                    &memory_));
-        #else
-            typedef naming::resolver_client::endpoint_type endpoint_type;
-            typedef naming::resolver_client::gva_type gva_type;
-
-            using boost::asio::ip::address;
-
-            address addr = address::from_string(parcel_port_.here().get_address());
-                
-            endpoint_type ep(addr, parcel_port_.here().get_port());
-           
-            gva_type runtime_gva(ep,  
-                components::get_component_type<
-                    components::server::runtime_support
-                >(), 1, reinterpret_cast<void*>(&runtime_support_));
-            
-            gva_type memory_gva(ep,  
-                components::get_component_type<
-                    components::server::memory
-                >(), 1, reinterpret_cast<void*>(&memory_));
-
-            // TODO: add a method to the client to handle this instead of making
-            // runtime_impl a friend class.
-            agas_client_.primary_ns_server->bind_gid
-                (applier_.get_runtime_support_raw_gid(), runtime_gva);
-            agas_client_.primary_ns_server->bind_gid
-                (applier_.get_memory_raw_gid(), memory_gva);
-
-            // finish the bootstrap
-            agas_client_.state(agas::agent_state_active);
-        #endif
+        agas_client_.bind(applier_.get_memory_raw_gid(), 
+            naming::address(parcel_port_.here(), 
+                components::get_component_type<components::server::memory>(), 
+                &memory_));
         // }}}
 
         // {{{ late startup - distributed

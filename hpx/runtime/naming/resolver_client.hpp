@@ -848,10 +848,12 @@ struct resolver_client
         hpx::agas::tag::database::default_
     > base_type;
 
-    resolver_client(util::runtime_configuration const& ini_
-                      = util::runtime_configuration(), 
-                    runtime_mode mode = runtime_mode_worker)
-        : base_type(ini_, mode, ini_.get_agas_router_mode()) {} 
+    resolver_client(
+        parcelset::parcelport& pp 
+      , util::runtime_configuration const& ini_ 
+      , runtime_mode mode
+    ) :
+        base_type(pp, ini_, mode, ini_.get_agas_router_mode()) {} 
 };
 
 }}  // namespace hpx::naming
