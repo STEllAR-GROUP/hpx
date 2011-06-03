@@ -482,11 +482,11 @@ namespace hpx { namespace components { namespace server
     double fFactor;
     double factor;
 
-    for(i=0;i<datablock[iter][iter]->getrows();i++){
-        if(datablock[iter][iter]->get(i,i) == 0){
+    for(i=0;i<datablock[iter][iter]->rows;i++){
+        if(datablock[iter][iter]->data[i][i] == 0){
             std::cerr<<"Warning: divided by zero\n";
         }
-        fFactor = 1/datablock[iter][iter]->get(i,i);
+        fFactor = 1/datablock[iter][iter]->data[i][i];
         for(j=i+1;j<datablock[iter][iter]->rows;j++){
             factor = fFactor*datablock[iter][iter]->data[j][i];
             factorData[j+offset][i+offset] = factor;
@@ -504,7 +504,7 @@ namespace hpx { namespace components { namespace server
     int offset = iter*blocksize;        //factorData index offset
     double factor;
 
-    for(i=0;i<datablock[iter][bcol]->getrows();i++){
+    for(i=0;i<datablock[iter][bcol]->rows;i++){
         for(j=i+1;j<datablock[iter][bcol]->rows;j++){
             factor = factorData[j+offset][i+offset];
             for(k=0;k<datablock[iter][bcol]->columns;k++){
@@ -520,13 +520,20 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     int offset = brow*blocksize;
     int offsetCol = iter*blocksize;    //factorData offset
-    double fFactor;
+    double fFactor[datablock[brow][iter]->columns];
     double factor;
 
-    for(i=0;i<datablock[brow][iter]->getcolumns();i++){
-        fFactor = 1/datablock[iter][iter]->get(i,i);
-        for(j=0;j<datablock[brow][iter]->rows;j++){
-            factor = fFactor*datablock[brow][iter]->data[j][i];
+    for(i=0;i<datablock[brow][iter]->columns;i++){
+        fFactor[i] = 1/datablock[iter][iter]->data[i][i];
+        factor = fFactor[i]*datablock[brow][iter]->data[0][i];
+        factorData[offset][i+offsetCol] = factor;
+        for(k=i+1;k<datablock[brow][iter]->columns;k++){
+            datablock[brow][iter]->data[0][k] -= 
+                factor*datablock[iter][iter]->data[i][k];
+    }   }
+    for(j=1;j<datablock[brow][iter]->rows;j++){
+        for(i=0;i<datablock[brow][iter]->columns;i++){
+            factor = fFactor[i]*datablock[brow][iter]->data[j][i];
             factorData[j+offset][i+offsetCol] = factor;
             for(k=i+1;k<datablock[brow][iter]->columns;k++){
             datablock[brow][iter]->data[j][k] -= 
