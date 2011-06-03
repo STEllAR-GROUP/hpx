@@ -44,7 +44,9 @@ struct primary_namespace :
     typedef typename server_type::decrement_type decrement_type;
     // }}}
 
-    explicit primary_namespace(naming::id_type const& id)
+    explicit primary_namespace(naming::id_type const& id =
+      naming::id_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB,
+                      naming::id_type::unmanaged))
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////

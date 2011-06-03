@@ -35,7 +35,9 @@ struct symbol_namespace :
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
-    explicit symbol_namespace(naming::id_type const& id)
+    explicit symbol_namespace(naming::id_type const& id =
+      naming::id_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB,
+                      naming::id_type::unmanaged))
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////

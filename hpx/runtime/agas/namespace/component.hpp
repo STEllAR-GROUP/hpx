@@ -38,7 +38,9 @@ struct component_namespace :
     typedef typename server_type::prefixes_type prefixes_type;
     // }}}
 
-    explicit component_namespace(naming::id_type const& id)
+    explicit component_namespace(naming::id_type const& id =
+      naming::id_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB,
+                      naming::id_type::unmanaged))
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
