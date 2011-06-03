@@ -95,7 +95,7 @@ namespace hpx
 #else
         agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        counters_(agas_client),
+        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -133,7 +133,7 @@ namespace hpx
 #else
         agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        counters_(agas_client),
+        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -171,7 +171,7 @@ namespace hpx
 #else
         agas_client_(parcel_pool_, ini_, mode_),
 #endif
-        counters_(agas_client),
+        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
