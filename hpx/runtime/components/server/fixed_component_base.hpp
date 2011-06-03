@@ -46,7 +46,7 @@ struct fixed_component_base : detail::fixed_component_tag
     /// \brief Destruct a fixed_component
     ~fixed_component_base()
     {
-        if (gid_ != fixed_gid)
+        if (gid_ != fixed_gid())
             applier::unbind_gid(gid_); 
     }
  
