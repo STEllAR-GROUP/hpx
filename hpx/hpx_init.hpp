@@ -13,6 +13,10 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#if HPX_AGAS_VERSION > 0x10
+    #include <boost/assign/std/vector.hpp>
+#endif
+
 #include <hpx/hpx.hpp>
 #include <hpx/util/asio_util.hpp>
 
@@ -110,7 +114,9 @@ namespace hpx
                 else
                   hpx_options.add_options()
                     ("console", "run this instance in console mode")
+#if HPX_AGAS_VERSION <= 0x10
                     ("run-agas-server-only", "run only the AGAS server")
+#endif
                   ;
 
                 hpx_options.add_options()
@@ -248,6 +254,11 @@ namespace hpx
             std::string queueing = "local";
             hpx::runtime_mode mode;
 
+            std::vector<std::string> ini_config;
+ 
+            if (vm.count("ini"))
+                ini_config = vm["ini"].as<std::vector<std::string> >();
+
             if (!is_hpx_runtime)
                 mode = hpx::runtime_mode_console;
             else
@@ -304,6 +315,12 @@ namespace hpx
                         (new detail::agas_server_helper(agas_host, agas_port, true));
                     return 0;
                 }
+            #else
+                if (vm.count("run-agas-server") || num_localities == 1)  
+                {
+                    using namespace boost::assign;
+                    ini_config += "hpx.agas.router_mode=bootstrap"; 
+                }
             #endif
 
             // Initialize and start the HPX runtime.
@@ -321,17 +338,11 @@ namespace hpx
                 boost::shared_ptr<runtime_type> rt;
 
                 // Build and configure this runtime instance.
-                if (vm.count("ini"))
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode,
-                        global_queue_policy::init_parameter_type(),
-                        vm["hpx-config"].as<std::string>(),
-                        vm["ini"].as<std::vector<std::string> >()));
-                else
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode,
-                        global_queue_policy::init_parameter_type(),
-                        vm["hpx-config"].as<std::string>()));
+                rt.reset(new runtime_type(
+                    hpx_host, hpx_port, agas_host, agas_port, mode,
+                    global_queue_policy::init_parameter_type(),
+                    vm["hpx-config"].as<std::string>(),
+                    ini_config));
                     
                 if (vm.count("app-config"))
                 {
@@ -365,15 +376,10 @@ namespace hpx
                 boost::shared_ptr<runtime_type> rt;
 
                 // Build and configure this runtime instance.
-                if (vm.count("ini"))
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>(),
-                        vm["ini"].as<std::vector<std::string> >()));
-                else
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>()));
+                rt.reset(new runtime_type(
+                    hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                    vm["hpx-config"].as<std::string>(),
+                    ini_config));
 
                 if (vm.count("app-config"))
                 {
@@ -407,15 +413,10 @@ namespace hpx
                 boost::shared_ptr<runtime_type> rt;
 
                 // Build and configure this runtime instance
-                if (vm.count("ini"))
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>(),
-                        vm["ini"].as<std::vector<std::string> >()));
-                else
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>()));
+                rt.reset(new runtime_type(
+                    hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                    vm["hpx-config"].as<std::string>(),
+                    ini_config)); 
 
                 if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
                 {
@@ -450,15 +451,10 @@ namespace hpx
                 boost::shared_ptr<runtime_type> rt;
 
                 // Build and configure this runtime instance
-                if (vm.count("ini"))
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>(),
-                        vm["ini"].as<std::vector<std::string> >()));
-                else
-                    rt.reset(new runtime_type(
-                        hpx_host, hpx_port, agas_host, agas_port, mode, init,
-                        vm["hpx-config"].as<std::string>()));
+                rt.reset(new runtime_type(
+                    hpx_host, hpx_port, agas_host, agas_port, mode, init,
+                    vm["hpx-config"].as<std::string>(),
+                    ini_config)); 
 
                 if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
                 {
