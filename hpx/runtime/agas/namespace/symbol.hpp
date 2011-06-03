@@ -11,23 +11,31 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future_value.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/namespace/stubs/symbol.hpp>
 
 namespace hpx { namespace agas 
 {
 
 // TODO: add error code parameters
-template <typename Base, typename Server>
-struct symbol_namespace_base : Base
+template <typename Database>
+struct symbol_namespace :
+    components::client_base<
+        symbol_namespace<Database>,
+        stubs::symbol_namespace<Database>
+    >
 {
     // {{{ nested types 
-    typedef Base base_type; 
-    typedef Server server_type;
+    typedef components::client_base<
+        symbol_namespace<Database>,
+        stubs::symbol_namespace<Database>
+    > base_type; 
+
+    typedef server::symbol_namespace<Database> server_type;
 
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
-    explicit symbol_namespace_base(naming::id_type const& id)
+    explicit symbol_namespace(naming::id_type const& id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////

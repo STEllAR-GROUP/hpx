@@ -10,17 +10,16 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/namespace/server/primary.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Base, typename Server>
-struct primary_namespace_base : Base 
+template <typename Database, typename Protocol>
+struct primary_namespace 
 {
     // {{{ nested types
-//    typedef components::stubs::stub_base<Server> base_type;
-    typedef Server server_type; 
+    typedef server::primary_namespace<Database, Protocol> server_type; 
 
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;

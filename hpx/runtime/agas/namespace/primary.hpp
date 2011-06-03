@@ -11,18 +11,26 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future_value.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/agas/traits.hpp>
+#include <hpx/runtime/agas/namespace/stubs/primary.hpp>
 
 namespace hpx { namespace agas 
 {
 
 // TODO: add error code parameters
-template <typename Base, typename Server>
-struct primary_namespace_base : Base
+template <typename Database, typename Protocol>
+struct primary_namespace :
+    components::client_base<
+        primary_namespace<Database, Protocol>,
+        stubs::primary_namespace<Database, Protocol>
+    >
 {
     // {{{ nested types 
-    typedef Base base_type; 
-    typedef Server server_type;
+    typedef components::client_base<
+        primary_namespace<Database, Protocol>,
+        stubs::primary_namespace<Database, Protocol>
+    > base_type; 
+
+    typedef server::primary_namespace<Database, Protocol> server_type;
 
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;
@@ -36,7 +44,7 @@ struct primary_namespace_base : Base
     typedef typename server_type::decrement_type decrement_type;
     // }}}
 
-    explicit primary_namespace_base(naming::id_type const& id)
+    explicit primary_namespace(naming::id_type const& id)
       : base_type(id) {}
 
     ///////////////////////////////////////////////////////////////////////////
