@@ -239,12 +239,11 @@ namespace hpx
 
     namespace agas
     {
-        enum agent_state
+        enum router_mode
         {
-            agent_state_invalid = -1,
-            agent_state_bootstrapping = 0,
-            agent_state_active = 1,
-            agent_state_terminated = 2
+            router_mode_invalid = -1,
+            router_mode_bootstrap = 0,
+            router_mode_hosted = 1,
         };
     }
  
