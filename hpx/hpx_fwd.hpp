@@ -245,6 +245,14 @@ namespace hpx
             router_mode_bootstrap = 0,
             router_mode_hosted = 1,
         };
+
+        enum router_state
+        {
+            router_state_invalid = -1,     
+            router_state_launching = 0,  
+            router_state_active = 1,
+            router_state_terminated = 2
+        };
     }
  
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);

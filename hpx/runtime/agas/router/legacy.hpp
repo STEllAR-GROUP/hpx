@@ -153,8 +153,6 @@ struct legacy_router : boost::noncopyable
         locality_cache_type locality_cache_;
 
         console_cache_type console_cache_;
-
-        boost::atomic<std::size_t> stage;
     }; // }}}
 
     const runtime_mode runtime_type;
@@ -163,6 +161,8 @@ struct legacy_router : boost::noncopyable
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
 
+    boost::atomic<router_state> state_;
+
     legacy_router(
         util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
@@ -170,14 +170,15 @@ struct legacy_router : boost::noncopyable
     ):
         runtime_type(runtime_type_)
       , router_type(router_type_)
+      , state_(router_state_launching)
     {
         if (router_type == router_mode_bootstrap)
-            start_bootstrap(ini_);
+            launch_bootstrap(ini_);
         else
-            start_hosted_stage0(ini_);
+            launch_hosted(ini_);
     } 
 
-    void start_bootstrap(
+    void launch_bootstrap(
         util::runtime_configuration const& ini_
     ) {
         using boost::asio::ip::address;
@@ -213,18 +214,32 @@ struct legacy_router : boost::noncopyable
         if (runtime_type == runtime_mode_console)
             bootstrap->symbol_ns_server.bind("/locality(console)",
                 naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
+
+        // IMPLEMENT: wait for everyone else to come up, then enter active state
     }
 
-    void start_hosted_stage0(
+    void launch_bootstrap(
         util::runtime_configuration const& ini_
     ) {
         hosted = boost::make_shared<hosted_data_type>();
 
-        hosted->stage.store(0);
-
         hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
         hosted->locality_cache_.reserve(ini_.get_agas_locality_cache_size());
+
+        // IMPLEMENT: we need to send our initial request to the AGAS server -
+        // this means we need the parcelport and the threadmanager to be up
     }
+
+    router_state state() const
+    {
+        if (!hosted && !bootstrap)
+            return router_state_terminated;
+        else
+            return state_.load();
+    }
+    
+    void state(router_state new_state) const
+    { state_.store(new_state); }
 
     bool is_bootstrap() const
     { return router_type == router_mode_bootstrap; } 
@@ -322,6 +337,9 @@ struct legacy_router : boost::noncopyable
     bool get_console_prefix(naming::gid_type& prefix,
                             bool try_cache = true, error_code& ec = throws) 
     { // {{{
+        if (state() != router_state_active)
+            return false;
+
         if (try_cache && !is_bootstrap())
         {
             if (hosted->console_cache_)
@@ -358,12 +376,12 @@ struct legacy_router : boost::noncopyable
                 raw_prefixes = bootstrap->component_ns_server.resolve_id(type);
             else
                 raw_prefixes = hosted->component_ns_.resolve(type);
-    
+   
             if (raw_prefixes.empty())
                 return false;
-    
+ 
             iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
-    
+   
             for (; it != end; ++it) 
                 prefixes.push_back(naming::get_gid_from_prefix(*it));
     
@@ -376,7 +394,7 @@ struct legacy_router : boost::noncopyable
             raw_prefixes = bootstrap->primary_ns_server.localities();
         else
             raw_prefixes = hosted->primary_ns_.localities();
-    
+            
         if (raw_prefixes.empty())
             return false;
     
