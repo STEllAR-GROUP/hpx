@@ -20,7 +20,7 @@ template <typename Database>
 struct HPX_COMPONENT_EXPORT symbol_namespace :
   components::fixed_component_base<
     HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-    symbol_namespace<Database, Protocol>
+    symbol_namespace<Database>
   >
 {
     // {{{ nested types
