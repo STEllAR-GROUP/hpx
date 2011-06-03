@@ -206,6 +206,12 @@ namespace hpx
         {
             return process_;
         }
+        
+        virtual performance_counters::registry&
+        get_counter_registry() = 0;
+
+        virtual performance_counters::registry const&
+        get_counter_registry() const = 0;
 
     protected:
         void init_tss();
