@@ -73,7 +73,7 @@ struct fixed_component_base : detail::fixed_component_tag
         {
             naming::address addr(applier::get_applier().here(),
                 components::get_component_type<wrapped_type>(),
-                hpx::uintptr_t(static_cast<this_component_type const&>(this)));
+                hpx::uintptr_t(static_cast<this_component_type const*>(this)));
 
             gid_ = fixed_gid();
 
@@ -95,15 +95,15 @@ struct fixed_component_base : detail::fixed_component_tag
                 }
             }
         }
-        return gid;
+        return gid_;
     }
 
-    static naming::gid_type fixed_gid() const
+    static naming::gid_type const& fixed_gid()
     {
         util::static_<naming::gid_type, gid_tag<MSB, LSB>, 1>
             fixed(naming::gid_type(MSB, LSB));
 
-        return fixed;
+        return fixed.get();
     }
 
     /// \brief  The function \a get_factory_properties is used to 
@@ -119,11 +119,6 @@ struct fixed_component_base : detail::fixed_component_tag
     }
 
   private:
-    bool try_bind_gid() const
-    {
-
-    }
-
     mutable naming::gid_type gid_;
 };
 
