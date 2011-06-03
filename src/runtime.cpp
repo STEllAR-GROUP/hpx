@@ -309,12 +309,13 @@ namespace hpx
         // {{{ late startup - distributed
         // if there are more than one localities involved, wait for all
         // to get registered
-        #if HPX_AGAS_VERSION <= 0x10
         if (num_localities > 1) {
             bool foundall = false;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
                 std::vector<naming::gid_type> prefixes;
                 error_code ec;
+                // NOTE: in AGAS v2, AGAS enforces a distributed, global barrier
+                // before we get here, so this should always succeed 
                 if (agas_client_.get_prefixes(prefixes, ec) &&
                     num_localities == prefixes.size()) 
                 {
@@ -367,9 +368,6 @@ namespace hpx
             this->process_.set_num_os_threads(num_threads);
             this->process_.set_localities(here_lid, prefixes);
         }
-        #else
-            this->process_.set_num_os_threads(num_threads);
-        #endif
         // }}}
 
         // {{{ launch main 
