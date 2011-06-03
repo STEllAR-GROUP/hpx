@@ -12,6 +12,7 @@
 #include <examples/marduk/mesh/functional_component.hpp>
 #include <examples/marduk/mesh/unigrid_mesh.hpp>
 #include <examples/marduk/amr_c/stencil.hpp>
+#include <examples/marduk/amr_c/stencil_data.hpp>
 #include <examples/marduk/amr_c/logging.hpp>
 #include "fname.h"
 #if defined(RNPL_FOUND)
@@ -109,7 +110,10 @@ extern "C" {void FNAME(level_clusterdd)(double *tmp_mini,double *tmp_maxi,
 int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[maxgids],
              std::vector<int> restrict_list[maxgids],parameter &par);
 int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
-                                double minx0,double miny0,double minz0,double h);
+                                double minx0,double miny0,double minz0,double h,double time,
+                                int gi,
+                                boost::shared_ptr<std::vector<id_type> > &result_data,
+                                parameter &par);
 int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
                                  double &minz, double &maxz, parameter &par);
@@ -122,7 +126,7 @@ bool intersection(double xmin,double xmax,
                   double zmin2,double zmax2);
 bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
-int level_refine(int level,parameter &par);
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
 int grid_return_existence(int gridnum,parameter &par);
@@ -133,6 +137,7 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
 int grid_find_bounds(int gi,double &minx,double &maxx,
                      double &miny,double &maxy,
                      double &minz,double &maxz,parameter &par);
+int compute_rowsize(parameter &par);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
@@ -282,15 +287,17 @@ int hpx_main(variables_map& vm)
     }   
     par->h = h;
 
+    //std::vector<double> localerror[maxgids];
+
     // memory allocation
     par->levelp.resize(par->allowedl+1);
     par->levelp[0] = 0; 
 
     // Compute the grid sizes
-    // query error tolerance
-    int rc = level_refine(-1,par);
+    boost::shared_ptr<std::vector<id_type> > placeholder;
+    int rc = level_refine(-1,par,placeholder);
     for (std::size_t i=0;i<par->allowedl;i++) {
-      rc = level_refine(i,par);
+      rc = level_refine(i,par,placeholder);
     }  
 
     //std::vector<int> comm_list[maxgids];
@@ -298,69 +305,8 @@ int hpx_main(variables_map& vm)
     //std::vector<int> restrict_list[maxgids];
     //rc = dataflow(comm_list,prolong_list,restrict_list,par);
 
-    // for each row, record what the lowest level on the row is
-    std::size_t num_rows = 1 << par->allowedl;
-
-    // account for prolongation and restriction (which is done every other step)
-    if (par->allowedl > 0)
-        num_rows += (1 << par->allowedl) / 2;
-
-    num_rows *= 2; // we take two timesteps in the mesh
-    par->num_rows = num_rows;
-
-    int ii = -1; 
-    for (std::size_t i = 0; i < num_rows; ++i)
-    {
-        if (((i + 5) % 3) != 0 || (par->allowedl == 0))
-            ii++;
-
-        std::size_t level = 0;
-        for (std::size_t j = par->allowedl; j>=0; --j)
-        {
-            if ((ii % (1 << j)) == 0)
-            {
-                level = par->allowedl - j;
-                par->level_row.push_back(level);
-                break;
-            }
-        }
-    }
- 
-    // discover each rowsize
-    std::size_t count;
-    par->rowsize.resize(par->allowedl+1);
-    for (std::size_t i=0;i<=par->allowedl;i++) {
-      count = 0; 
-      int gi = level_return_start(i,par);
-      count++;
-      gi = par->gr_sibling[gi];
-      while ( grid_return_existence(gi,par) ) {
-        count++;
-        gi = par->gr_sibling[gi];
-      }
-      par->rowsize[i] = count;
-    } 
-    for (std::size_t i=0;i<=par->allowedl;i++) {
-      for (std::size_t j=i+1;j<=par->allowedl;j++) {
-        par->rowsize[i] += par->rowsize[j];
-      }
-    }
-
-    // here we create a correspondence getween the gi number used in 'had' 
-    // and the index number used in hpx
-    par->item2gi.resize(par->rowsize[0]);
-    count = 0;
-    for (int i=par->allowedl;i>=0;i--) {
-      int gi = level_return_start(i,par);
-      par->item2gi[count] = gi; 
-      count++;
-      gi = par->gr_sibling[gi];
-      while ( grid_return_existence(gi,par) ) {
-        par->item2gi[count] = gi; 
-        count++;
-        gi = par->gr_sibling[gi];
-      }
-    } 
+    // compute the number of rows needed for two timesteps and the rowsize of each row
+    rc = compute_rowsize(par);
 
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
@@ -377,6 +323,13 @@ int hpx_main(variables_map& vm)
         boost::shared_ptr<std::vector<id_type> > result_data =
             um.init_execute(function_type, par->rowsize[0], numsteps,
                 par->loglevel ? logging_type : component_invalid, par);
+
+        // update gr_t (or pass time in explicitly to level_refine and get rid of gr_t)
+
+        // Regrid
+        //for (std::size_t i=0;i<par->allowedl;i++) {
+        //  rc = level_refine(i,par,result_data);
+        //}  
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
 
@@ -509,7 +462,7 @@ int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[m
 // }}}
 
 // level_refine {{{
-int level_refine(int level,parameter &par)
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data)
 {
   int rc;
   int numprocs = par->num_px_threads;
@@ -648,11 +601,12 @@ int level_refine(int level,parameter &par)
 #if defined(RNPL_FOUND)
       // output
       {
+        int gi = par->gr_h.size()-1;
         std::vector<double> localerror;
         localerror.resize(nx*ny*nz);
         double h = hl/refine_factor;
         rc = compute_error(localerror,nx,ny,nz,
-                         lminx,lminy,lminz,h);
+                         lminx,lminy,lminz,h,time,gi,result_data,par);
         int shape[3];
         std::vector<double> coord;
         coord.resize(nx+ny+nz);
@@ -674,7 +628,7 @@ int level_refine(int level,parameter &par)
         char crdnme[80];
         sprintf(nme,"error");
         sprintf(crdnme,"x|y|z");
-        gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
+        gft_out_full(nme,time,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
       }
 #endif
     }
@@ -699,7 +653,7 @@ int level_refine(int level,parameter &par)
       double lmaxz = par->gr_maxz[gi];
 
       rc = compute_error(localerror,nx,ny,nz,
-                         lminx,lminy,lminz,par->gr_h[gi]);
+                         lminx,lminy,lminz,par->gr_h[gi],time,gi,result_data,par);
 
       int mini = (int) ((lminx - minx)/hl+0.5);
       int minj = (int) ((lminy - miny)/hl+0.5);
@@ -835,11 +789,12 @@ int level_refine(int level,parameter &par)
 #if defined(RNPL_FOUND)
     // output
     {
+      int gi = par->gr_h.size()-1;
       std::vector<double> localerror;
       localerror.resize(nx*ny*nz);
       double h = hl/refine_factor;
       rc = compute_error(localerror,nx,ny,nz,
-                       lminx,lminy,lminz,h);
+                       lminx,lminy,lminz,h,time,gi,result_data,par);
       int shape[3];
       std::vector<double> coord;
       coord.resize(nx+ny+nz);
@@ -861,7 +816,7 @@ int level_refine(int level,parameter &par)
       char crdnme[80];
       sprintf(nme,"error");
       sprintf(crdnme,"x|y|z");
-      gft_out_full(nme,0.0,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
+      gft_out_full(nme,time,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
     }
 #endif
   }
@@ -872,30 +827,37 @@ int level_refine(int level,parameter &par)
 
 // compute_error {{{
 int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
-                                double minx0,double miny0,double minz0,double h)
+                                double minx0,double miny0,double minz0,double h,double t,
+                                int gi,
+				boost::shared_ptr<std::vector<id_type> > &result_data,
+                                parameter &par)
 {
     // initialize some positive error
-    for (int k=0;k<nz0;k++) {
-      double z = minz0 + k*h;
-    for (int j=0;j<ny0;j++) {
-      double y = miny0 + j*h;
-    for (int i=0;i<nx0;i++) {
-      error[i+nx0*(j+ny0*k)] = 0.0;
-      double x = minx0 + i*h + 2.25;
-      double r = sqrt(x*x+y*y+z*z);
-      if ( pow(r-1.0,2) <= 0.5*0.5 && r > 0 ) {
-        error[i+nx0*(j+ny0*k)] = pow((r-1.0)*(r-1.0)-0.5*0.5,3)*8.0*(1.0-r)/pow(0.5,8)/r;
-        if ( error[i+nx0*(j+ny0*k)] < 0.0 ) error[i+nx0*(j+ny0*k)] = 0.0;
-      }
+    if ( t < 1.e-8 ) {
+      for (int k=0;k<nz0;k++) {
+        double z = minz0 + k*h;
+      for (int j=0;j<ny0;j++) {
+        double y = miny0 + j*h;
+      for (int i=0;i<nx0;i++) {
+        double x = minx0 + i*h;
 
-      x = minx0 + i*h - 2.25;
-      r = sqrt(x*x+y*y+z*z);
-      if ( pow(r-1.0,2) <= 0.5*0.5 && r > 0 ) {
-        error[i+nx0*(j+ny0*k)] = pow((r-1.0)*(r-1.0)-0.5*0.5,3)*8.0*(1.0-r)/pow(0.5,8)/r;
-        if ( error[i+nx0*(j+ny0*k)] < 0.0 ) error[i+nx0*(j+ny0*k)] = 0.0;
-      }
+        // Provide initial error
+        double d = 11.0;
+        double A = -(x-0.5*d*cos(t))*(x-0.5*d*cos(t)) - (y+0.5*d*sin(t))*(y+0.5*d*sin(t)) - z*z;
+        double B = -(x+0.5*d*cos(t))*(x+0.5*d*cos(t)) - (y-0.5*d*sin(t))*(y-0.5*d*sin(t)) - z*z;
+        double Phi = exp(A) + exp(B);
+        error[i+nx0*(j+ny0*k)] = Phi;
+      } } }
+    } else {
+      hpx::components::access_memory_block<hpx::components::amr::stencil_data>
+              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
+      for (int k=0;k<nz0;k++) {
+      for (int j=0;j<ny0;j++) {
+      for (int i=0;i<nx0;i++) {
+        error[i+nx0*(j+ny0*k)] = result->value_[i+nx0*(j+ny0*k)].error;
+      } } }
+    }
 
-    } } }
     return 0;
 }
 // }}}
@@ -1088,6 +1050,80 @@ int level_find_bounds(int level, double &minx, double &maxx,
   }
 
   return 0;
+}
+// }}}
+
+// compute_rowsize {{{
+int compute_rowsize(parameter &par)
+{
+    // for each row, record what the lowest level on the row is
+    std::size_t num_rows = 1 << par->allowedl;
+
+    // account for prolongation and restriction (which is done every other step)
+    if (par->allowedl > 0)
+        num_rows += (1 << par->allowedl) / 2;
+
+    num_rows *= 2; // we take two timesteps in the mesh
+    par->num_rows = num_rows;
+
+    int ii = -1; 
+    for (std::size_t i = 0; i < num_rows; ++i)
+    {
+        if (((i + 5) % 3) != 0 || (par->allowedl == 0))
+            ii++;
+
+        std::size_t level = 0;
+        for (std::size_t j = par->allowedl; j>=0; --j)
+        {
+            if ((ii % (1 << j)) == 0)
+            {
+                level = par->allowedl - j;
+                par->level_row.push_back(level);
+                break;
+            }
+        }
+    }
+ 
+    // discover each rowsize
+    std::size_t count;
+    par->rowsize.resize(par->allowedl+1);
+    for (std::size_t i=0;i<=par->allowedl;i++) {
+      count = 0; 
+      int gi = level_return_start(i,par);
+      count++;
+      gi = par->gr_sibling[gi];
+      while ( grid_return_existence(gi,par) ) {
+        count++;
+        gi = par->gr_sibling[gi];
+      }
+      par->rowsize[i] = count;
+    } 
+    for (std::size_t i=0;i<=par->allowedl;i++) {
+      for (std::size_t j=i+1;j<=par->allowedl;j++) {
+        par->rowsize[i] += par->rowsize[j];
+      }
+    }
+
+    // here we create a correspondence getween the gi number used in 'had' 
+    // and the index number used in hpx
+    par->item2gi.resize(par->rowsize[0]);
+    par->gi2item.resize(maxgids);
+    count = 0;
+    for (int i=par->allowedl;i>=0;i--) {
+      int gi = level_return_start(i,par);
+      par->item2gi[count] = gi; 
+      par->gi2item[gi] = count; 
+      count++;
+      gi = par->gr_sibling[gi];
+      while ( grid_return_existence(gi,par) ) {
+        par->item2gi[count] = gi; 
+        par->gi2item[gi] = count; 
+        count++;
+        gi = par->gr_sibling[gi];
+      }
+    } 
+
+    return 0;
 }
 // }}}
 

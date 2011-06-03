@@ -33,6 +33,14 @@ inline int floatcmp(double_type const& x1, double_type const& x2)
   }
 }
 
+double_type phi_analytic(double_type x,double_type y,double_type z,double_type t,double_type d)
+{
+  double_type A = -(x-0.5*d*cos(t))*(x-0.5*d*cos(t)) - (y+0.5*d*sin(t))*(y+0.5*d*sin(t)) - z*z;
+  double_type B = -(x+0.5*d*cos(t))*(x+0.5*d*cos(t)) - (y-0.5*d*sin(t))*(y-0.5*d*sin(t)) - z*z;
+  double_type Phi = exp(A) + exp(B);
+  return Phi;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     detail::parameter const& par)
@@ -54,16 +62,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     int ny = par.gr_ny[gi];
     int nz = par.gr_nz[gi];
 
-    double_type delta   = 0.5;
-    double_type amp     = 0.0;
-    double_type amp_dot = 1.0;
-    double_type R0      = 1.0;
-
-    static double_type const c_0 = 0.0;
-    static double_type const c_7 = 7.0;
-    static double_type const c_6 = 6.0;
-    static double_type const c_8 = 8.0;
-    
     bool found = false;
     int level;
     for (int ii=par.allowedl;ii>=0;ii--) {
@@ -81,42 +79,26 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     val->value_.resize(nx*ny*nz);
 
+    // initial separation
+    double_type d = 11.0;
+    double_type t = 0.0;
+    double_type dx = 1.e-10;
+
     for (int k=0;k<nz;k++) {
-      double z = minz + k*h;
+      double_type z = minz + k*h;
     for (int j=0;j<ny;j++) {
-      double y = miny + j*h;
+      double_type y = miny + j*h;
     for (int i=0;i<nx;i++) {
-      double x = minx + i*h;
+      double_type x = minx + i*h;
 
-      double_type r = sqrt(x*x+y*y+z*z);
+      node.phi[0][0] = phi_analytic(x,y,z,t,d);
+      node.phi[0][1] = 0.5*( phi_analytic(x+dx,y,z,t,d) - phi_analytic(x-dx,y,z,t,d) );
+      node.phi[0][2] = 0.5*( phi_analytic(x,y+dx,z,t,d) - phi_analytic(x,y-dx,z,t,d) );
+      node.phi[0][3] = 0.5*( phi_analytic(x,y,z+dx,t,d) - phi_analytic(x,y,z-dx,t,d) );
+      node.phi[0][4] = 0.5*( phi_analytic(x,y,z,t-dx,d) - phi_analytic(x,y,z,t+dx,d) );
 
-      if ( pow(r-R0,2) <= delta*delta && r > 0 ) {
-        double_type Phi = amp*pow((r-R0)*(r-R0)
-                             -delta*delta,4)/pow(delta,8)/r;
-        double_type D1Phi = amp*pow((r-R0)*(r-R0)-delta*delta,3)*
-                                 (c_7*r*r-c_6*r*R0+R0*R0+delta*delta)*
-                                 x/(r*r)/pow(delta,8);
-        double_type D2Phi  = amp*pow((r-R0)*(r-R0)-delta*delta,3)*
-                                 (c_7*r*r-c_6*r*R0+R0*R0+delta*delta)*
-                                 y/(r*r)/pow(delta,8);
-        double_type D3Phi = amp*pow((r-R0)*(r-R0)-delta*delta,3)*
-                                 (c_7*r*r-c_6*r*R0+R0*R0+delta*delta)*
-                                 z/(r*r)/pow(delta,8);
-        double_type D4Phi = amp_dot*pow((r-R0)*(r-R0)-delta*delta,3)*
-                                c_8*(R0-r)/pow(delta,8)/r;
-
-        node.phi[0][0] = Phi;
-        node.phi[0][1] = D1Phi;
-        node.phi[0][2] = D2Phi;
-        node.phi[0][3] = D3Phi;
-        node.phi[0][4] = D4Phi;
-      } else {
-        node.phi[0][0] = c_0;
-        node.phi[0][1] = c_0;
-        node.phi[0][2] = c_0;
-        node.phi[0][3] = c_0;
-        node.phi[0][4] = c_0;
-      }
+      // initial error estimate (for driving refinement)
+      node.error = phi_analytic(x,y,z,t,d);
    
       val->value_[i + nx*(j+k*ny)] = node;
     } } }

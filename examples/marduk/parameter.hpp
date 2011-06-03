@@ -75,6 +75,7 @@ struct HPX_COMPONENT_EXPORT parameter
     std::vector<int> gr_alive;
     std::vector<std::size_t> levelp;
     std::vector<std::size_t> item2gi;
+    std::vector<std::size_t> gi2item;
 
     std::vector<std::size_t> rowsize,level_row;
 };

@@ -21,6 +21,7 @@ namespace hpx { namespace components { namespace amr
 struct nodedata
 {
     double_type phi[2][HPX_SMP_AMR3D_NUM_EQUATIONS];
+    double_type error;
 
 private:
     // serialization support
@@ -29,7 +30,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & phi;
+        ar & phi & error;
     }
 };
 
