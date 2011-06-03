@@ -13,7 +13,6 @@ if(NOT MSVC)
       distributed_test
       distributed_amrtest
       random_mem_access
-      contact
       factorial
       factorial_get
       fibonacci1
