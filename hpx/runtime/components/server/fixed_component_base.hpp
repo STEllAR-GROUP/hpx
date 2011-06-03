@@ -15,6 +15,7 @@
 #include <hpx/runtime/applier/applier.hpp> 
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp> 
 #include <hpx/util/static.hpp>
+#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/stringstream.hpp>
 
 namespace hpx { namespace components 
