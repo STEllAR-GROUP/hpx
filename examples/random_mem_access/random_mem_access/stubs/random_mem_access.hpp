@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace stubs
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
             // to call get() on the return value to obtain the result
-            typedef server::random_mem_access::add_action action_type;
+            typedef server::random_mem_access::print_action action_type;
             return lcos::eager_future<action_type,void>(gid);
         }
 
