@@ -7,6 +7,10 @@
 #if !defined(HPX_UTIL_RUNTIME_CONFIGURATION_OCT_02_2008_0530PM)
 #define HPX_UTIL_RUNTIME_CONFIGURATION_OCT_02_2008_0530PM
 
+#include <vector>
+#include <string>
+
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/ini.hpp>
@@ -14,6 +18,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+#if HPX_AGAS_VERSION > 0x10
+    void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
+        std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>()) HPX_EXPORT;
+#endif
+
     // The runtime_configuration class is a wrapper for the runtime 
     // configuration data allowing to extract configuration information in a 
     // more convenient way
