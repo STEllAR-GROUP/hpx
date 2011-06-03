@@ -833,25 +833,25 @@ namespace hpx { namespace naming
 
 #else
 
-#include <hpx/runtime/agas/client/legacy/bootstrap_agent.hpp>
+#include <hpx/runtime/agas/router/legacy.hpp>
 #include <hpx/runtime/agas/database/backend/default.hpp>
 
 namespace hpx { namespace naming
 {
 
 struct resolver_client
-    : hpx::agas::legacy::bootstrap_agent<
+    : hpx::agas::legacy_router<
         hpx::agas::tag::database::default_
     >
 {
-    typedef hpx::agas::legacy::bootstrap_agent<
+    typedef hpx::agas::legacy_router<
         hpx::agas::tag::database::default_
     > base_type;
 
     resolver_client(util::runtime_configuration const& ini_
                       = util::runtime_configuration(), 
                     runtime_mode mode = runtime_mode_worker)
-        : base_type(ini_, mode) {} 
+        : base_type(ini_, mode, ini_.get_agas_router_mode()) {} 
 };
 
 }}  // namespace hpx::naming
