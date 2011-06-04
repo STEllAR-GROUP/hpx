@@ -22,6 +22,7 @@ if(NOT MSVC)
       nqueen
       parcelset
       pxgl
+      random_mem_access
       queue
       quickstart
       smp_amr3d)
