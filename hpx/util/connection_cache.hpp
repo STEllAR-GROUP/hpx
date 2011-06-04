@@ -52,15 +52,15 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock lock(mtx_);
 
-            LHPX_(debug, logdest_) << "connection_cache: requesting: " << l;
+//            LHPX_(debug, logdest_) << "connection_cache: requesting: " << l;
 
             // see if the object is already in the cache:
             std::pair<map_iterator, map_iterator> mpos = index_.equal_range(l);
             if (mpos.first != mpos.second) {
             // We have a cached item, return it
-                LHPX_(debug, logdest_) 
-                    << "connection_cache: reusing existing connection for: " 
-                    << l;
+//                LHPX_(debug, logdest_) 
+//                    << "connection_cache: reusing existing connection for: " 
+//                    << l;
 
                 connection_type result(mpos.first->second.first->first);
                 cont_.erase(mpos.first->second.first);
@@ -68,8 +68,8 @@ namespace hpx { namespace util
                 return result;
             }
 
-            LHPX_(debug, logdest_) 
-                << "connection_cache: no existing connection for: " << l;
+//            LHPX_(debug, logdest_) 
+//                << "connection_cache: no existing connection for: " << l;
 
             // if we get here then the item is not in the cache
             return connection_type();
@@ -79,8 +79,8 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock lock(mtx_);
 
-            LHPX_(debug, logdest_) 
-                << "connection_cache: returning connection to cache: " << l;
+//            LHPX_(debug, logdest_) 
+//                << "connection_cache: returning connection to cache: " << l;
 
             // Add it to the list, and index it
             cont_.push_back(value_type(conn, 
@@ -98,9 +98,9 @@ namespace hpx { namespace util
             if (s > max_cache_size_) {
             // We have too many items in the list, so we need to start popping them 
             // off the back of the list
-                LHPX_(debug, logdest_) 
-                    << "connection_cache: cache full, removing least recently "
-                       "used entries";
+//                LHPX_(debug, logdest_) 
+//                    << "connection_cache: cache full, removing least recently "
+//                       "used entries";
 
                 list_iterator pos = cont_.begin();
                 list_iterator last = cont_.end();
@@ -109,9 +109,9 @@ namespace hpx { namespace util
                     list_iterator condemmed(pos);
                     ++pos;
 
-                    LHPX_(debug, logdest_) 
-                        << "connection_cache: removing entry for: " 
-                        << *(condemmed->second.first);
+//                    LHPX_(debug, logdest_) 
+//                        << "connection_cache: removing entry for: " 
+//                        << *(condemmed->second.first);
 
                     int generational_count = condemmed->second.second;
                     std::pair<map_iterator, map_iterator> mpos = 
