@@ -102,7 +102,7 @@ namespace hpx { namespace util
     runtime_configuration::runtime_configuration()
     {
         pre_initialize_ini(*this);
-#if HPX_AGAS_VERSION > 0x10
+#if HPX_AGAS_VERSION <= 0x10
         post_initialize_ini(*this);
 #endif
 
@@ -123,7 +123,7 @@ namespace hpx { namespace util
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-#if HPX_AGAS_VERSION > 0x10
+#if HPX_AGAS_VERSION <= 0x10
         post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
 #endif
 
