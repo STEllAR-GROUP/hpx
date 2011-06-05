@@ -853,7 +853,7 @@ struct resolver_client
       , util::runtime_configuration const& ini_ 
       , runtime_mode mode
     ) :
-        base_type(pp, ini_, mode, ini_.get_agas_router_mode()) {} 
+        base_type(pp, ini_, mode) {} 
 };
 
 }}  // namespace hpx::naming
