@@ -15,6 +15,7 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
