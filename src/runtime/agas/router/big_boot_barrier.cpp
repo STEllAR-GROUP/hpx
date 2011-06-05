@@ -8,10 +8,13 @@
 
 #include <boost/thread.hpp>
 #include <boost/assert.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
+#include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-
+#include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/static.hpp>
@@ -64,7 +67,7 @@ void early_write_handler(
   , std::size_t size
 ) {
     hpx::util::osstream strm;
-    strm << error.message() << " (read " 
+    strm << e.message() << " (read " 
          << size << " bytes)";
     HPX_THROW_EXCEPTION(network_error, 
         "early_write_handler", 
@@ -123,10 +126,15 @@ typedef actions::plain_action2<
 
 }}
 
-HPX_REGISTER_PLAIN_ACTION(hpx::agas::register_console_action);
-HPX_REGISTER_PLAIN_ACTION(hpx::agas::notify_console_action);
-HPX_REGISTER_PLAIN_ACTION(hpx::agas::register_worker_action);
-HPX_REGISTER_PLAIN_ACTION(hpx::agas::notify_worker_action);
+using hpx::agas::register_console_action;
+using hpx::agas::notify_console_action;
+using hpx::agas::register_worker_action;
+using hpx::agas::notify_worker_action;
+
+HPX_REGISTER_PLAIN_ACTION(register_console_action);
+HPX_REGISTER_PLAIN_ACTION(notify_console_action);
+HPX_REGISTER_PLAIN_ACTION(register_worker_action);
+HPX_REGISTER_PLAIN_ACTION(notify_worker_action);
   
 namespace hpx { namespace agas
 {
@@ -291,15 +299,19 @@ void create_big_boot_barrier(
             "create_big_boot_barrier",
             "create_big_boot_barrier was called more than once");
     }
-    bbb.get() = boost::make_shared(pp_, ini_, runtime_type_);
+    bbb.get().reset(new big_boot_barrier(pp_, ini_, runtime_type_));
 }
 
 big_boot_barrier& get_big_boot_barrier()
 {
     util::static_<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
-    HPX_THROW_EXCEPTION(internal_server_error, 
-        "get_big_boot_barrier", "big_boot_barrier has not been created yet");
-    return *(fixed.get());
+    if (!bbb.get())
+    {
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "get_big_boot_barrier",
+            "big_boot_barrier has not been created yet");
+    }
+    return *(bbb.get());
 }
 
 }}
