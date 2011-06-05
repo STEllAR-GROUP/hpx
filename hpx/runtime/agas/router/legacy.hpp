@@ -23,7 +23,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
-//#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
@@ -173,7 +173,7 @@ struct legacy_router : boost::noncopyable
       , runtime_type(runtime_type_)
       , state_(router_state_launching)
     {
-        create_big_boot_barrier(pp_, ini_, runtime_type_);
+        create_big_boot_barrier(pp, ini_, runtime_type_);
 
         if (router_type == router_mode_bootstrap)
             launch_bootstrap(pp, ini_);
@@ -219,9 +219,25 @@ struct legacy_router : boost::noncopyable
             bootstrap->symbol_ns_server.bind("/locality(console)",
                 naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
 
-        // IMPLEMENT: wait for everyone else to come up, then enter active state.
-        // we cannot send back ANY replies until we've registered the console,
-        // at a minimum. we cannot return from this ctor.
+        // debug code
+        /*
+        hosted = boost::make_shared<hosted_data_type>();
+
+        hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
+        hosted->locality_cache_.reserve(ini_.get_agas_locality_cache_size());
+
+        gva_cache_key primary_key(primary_namespace_server_type::fixed_gid());
+        gva_cache_key component_key(component_namespace_server_type::fixed_gid());
+        gva_cache_key symbol_key(symbol_namespace_server_type::fixed_gid());
+        hosted->gva_cache_.insert(primary_key, primary_gva);
+        hosted->gva_cache_.insert(component_key, component_gva);
+        hosted->gva_cache_.insert(symbol_key, symbol_gva);
+        */
+        // end debug code
+
+        get_big_boot_barrier().wait();
+
+        state_.store(router_state_active);
     }
 
     void launch_hosted(
@@ -233,9 +249,9 @@ struct legacy_router : boost::noncopyable
         hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
         hosted->locality_cache_.reserve(ini_.get_agas_locality_cache_size());
 
-        // IMPLEMENT: we need to send our initial request to the AGAS server
-        // and then wait for a reply. once we've been reactivated. we cannot
-        // return from this ctor.
+        get_big_boot_barrier().wait();
+
+        state_.store(router_state_active);
     }
 
     router_state state() const
@@ -515,7 +531,7 @@ struct legacy_router : boost::noncopyable
            count_type credits = 1, error_code& ec = throws) 
     { // {{{ decref implementation
         using boost::fusion::at_c;
-
+        
         decrement_type r;
         
         if (is_bootstrap())
@@ -583,21 +599,19 @@ struct legacy_router : boost::noncopyable
         addr.type_ = gva.type;
         addr.address_ = gva.lva();
 
-        if (HPX_LIKELY((gva.endpoint != endpoint_type()) &&
-                       (gva.type != components::component_invalid) &&
-                       (gva.lva() != 0)))
-        {     
-            if (is_bootstrap())
-                return true;
+        if (HPX_LIKELY((gva.endpoint == endpoint_type()) &&
+                       (gva.type == components::component_invalid) &&
+                       (gva.lva() == 0)))
+            return false;
 
-            // We only insert the entry into the cache if it's valid
-            typename cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(id);
-            hosted->gva_cache_.insert(key, gva);
+        if (is_bootstrap())
             return true;
-        }
 
-        return false;
+        // We only insert the entry into the cache if it's valid
+        typename cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+        gva_cache_key key(id);
+        hosted->gva_cache_.insert(key, gva);
+        return true;
     } // }}}
 
     bool resolve(naming::id_type const& id, naming::address& addr,
