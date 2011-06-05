@@ -1,0 +1,410 @@
+////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
+#define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+
+#include <limits.h>
+
+#include <boost/assert.hpp>
+#include <boost/utility/binary.hpp>
+#include <boost/cstdint.hpp>
+
+#include <hpx/exception.hpp>
+#include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+
+namespace hpx { namespace agas
+{
+
+template <typename Endpoint>
+struct pod_endpoint
+{
+    typedef pod_endpoint type;
+    boost::uint8_t data [sizeof(Endpoint) * CHAR_BIT]; 
+
+    Endpoint& get()
+    { return *reinterpret_cast<Endpoint*>(this); } 
+
+    Endpoint const& get()
+    { return *reinterpret_cast<Endpoint const*>(this); } 
+};
+
+struct pod_gid
+{
+    boost::uint64_t msb;
+    boost::uint64_t lsb;
+};
+
+template <typename Protocol>
+struct pod_gva
+{
+    typedef typename traits::network::endpoint_type<Protocol>::type
+        endpoint_type;
+
+    pod_endpoint<endpoint_type> ep; 
+    boost::int32_t ctype;
+    boost::uint64_t count;
+    boost::uint64_t lva;
+    boost::uint64_t offset;
+};
+
+enum request_type 
+{ 
+    primary_ns_bind_locality    = BOOST_BINARY_U(1000000), 
+    primary_ns_bind_gid         = BOOST_BINARY_U(1000001), 
+    primary_ns_resolve_locality = BOOST_BINARY_U(1000010), 
+    primary_ns_resolve_gid      = BOOST_BINARY_U(1000011), 
+    primary_ns_unbind           = BOOST_BINARY_U(1000100), 
+    primary_ns_increment        = BOOST_BINARY_U(1000101), 
+    primary_ns_decrement        = BOOST_BINARY_U(1000110), 
+    primary_ns_localities       = BOOST_BINARY_U(1000111)  
+    component_ns_bind_prefix    = BOOST_BINARY_U(0100000), 
+    component_ns_bind_name      = BOOST_BINARY_U(0100001), 
+    component_ns_resolve_id     = BOOST_BINARY_U(0100010), 
+    component_ns_resolve_name   = BOOST_BINARY_U(0100011), 
+    component_ns_unbind         = BOOST_BINARY_U(0100100)  
+    symbol_ns_bind              = BOOST_BINARY_U(0010000), 
+    symbol_ns_rebind            = BOOST_BINARY_U(0010001), 
+    symbol_ns_resolve           = BOOST_BINARY_U(0010010), 
+    symbol_ns_unbind            = BOOST_BINARY_U(0010011)  
+};
+
+template <typename Protocol>
+struct response
+{
+    enum { boolean_bitmask      = BOOST_BINARY_U(10000000) };
+    enum { request_type_bitmask = BOOST_BINARY_U(01111111) };
+
+    void assign(
+        request_type type_
+      , bool b
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_bind_gid:
+            case component_ns_unbind:
+            case symbol_ns_bind:
+            case symbol_ns_unbind:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        if (b)
+            meta = boolean_bitmask & type_;
+        else
+            meta = type_;
+    } // }}} 
+
+    // forwarder
+    void assign(
+        request_type type_
+      , components::component_type ctype_
+    ) {
+        assign(type_, boost::int32_t(ctype_));
+    }
+
+    void assign(
+        request_type type_
+      , boost::int32_t ctype_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case component_ns_bind_prefix:
+            case component_ns_bind_name:
+            case component_ns_resolve_name:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.ctype = ctype_;
+        meta = type_;
+    } // }}} 
+    
+    void assign(
+        request_type type_
+      , naming::gid_type gid_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case symbol_ns_rebind:
+            case symbol_ns_resolve:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.gid.msb = gid_.get_msb();
+        data.gid.lsb = gid_.get_lsb();
+        meta = type_;
+    } // }}} 
+    
+    void assign(
+        request_type type_
+      , boost::uint32_t prefix_
+      , gva<Protocol> const& gva_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_resolve_locality:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.resolved_locality.prefix = prefix_;
+        data.resolved_locality.gva.ep.get() = gva_.endpoint;
+        data.resolved_locality.gva.ctype = gva_.type;
+        data.resolved_locality.gva.count = gva_.count;
+        data.resolved_locality.gva.lva = gva_.lva();
+        data.resolved_locality.gva.offset = gva_.offset;
+        meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , gva<Protocol> const& gva_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_resolve_gid:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.gva.ep.get() = gva_.endpoint;
+        data.gva.ctype = gva_.type;
+        data.gva.count = gva_.count;
+        data.gva.lva = gva_.lva();
+        data.gva.offset = gva_.offset;
+        meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , gva<Protocol> const& gva_
+      , bool b
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_unbind:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.gva.ep.get() = gva_.endpoint;
+        data.gva.ctype = gva_.type;
+        data.gva.count = gva_.count;
+        data.gva.lva = gva_.lva();
+        data.gva.offset = gva_.offset;
+
+        if (b)
+            meta = boolean_bitmask & type_;
+        else
+            meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , boost::uint64_t size_ 
+      , boost::uint32_t* array_ 
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_localities:
+            case component_ns_resolve_id:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.localities.size = size_;
+        data.localities.array = array_;
+        meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , naming::gid_type lower_
+      , naming::gid_type upper_
+      , boost::uint32_t prefix_
+      , bool b
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_bind_locality:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.locality_binding.lower.gid.msb = lower_.get_msb();
+        data.locality_binding.lower.gid.lsb = lower_.get_lsb();
+        data.locality_binding.upper.gid.msb = upper_.get_msb();
+        data.locality_binding.upper.gid.lsb = upper_.get_lsb();
+        data.locality_binding.prefix = prefix_;
+
+        if (b)
+            meta = boolean_bitmask & type_;
+        else
+            meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , boost::uint64_t count_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_increment:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.count = count_;
+        meta = type_;
+    } // }}} 
+
+    void assign(
+        request_type type_
+      , boost::uint64_t count_
+      , boost::int32_t ctype_
+    ) { // {{{
+        clear();
+
+        switch (type_)
+        {
+            case primary_ns_increment:
+                break;
+
+            default: {
+                HPX_THROW_EXCEPTION(internal_server_error, 
+                    "response::assign", "invalid response created");
+            }
+        };
+
+        data.decrement.count = count_;
+        data.decrement.ctype = ctype_;
+        meta = type_;
+    } // }}} 
+
+    void clear (void)
+    { // {{{
+        switch (type_ ^ boolean_bitmask)
+        {
+            case primary_ns_localities:
+            case component_ns_resolve_id:
+                delete[] localities.array; 
+        };
+ 
+        typedef typename boost::uint_t<
+            boost::alignment_of<data_type>::value * CHAR_BIT
+        >::exact unit_type;
+
+        unit_type* p = reinterpret_cast<unit_type*>(&data);
+
+        for (std::size_t i = 0, end = sizeof(data_type) / sizeof(unit_type);
+             i != end; ++i)
+            p[i] = 0;
+    } // }}}
+
+  private:
+    boost::uint8_t meta;
+    error_code ec;
+
+    union data_type
+    {
+        struct locality_binding_type
+        {
+            pod_gid lower;
+            pod_gid upper;
+            boost::uint32_t prefix;
+        } locality_binding;
+
+        struct resolved_locality_type
+        {
+            boost::uint32_t prefix;
+            pod_gva<Protocol> gva;
+        } resolved_locality;
+
+        pod_gva<Protocol> gva;
+
+        boost::uint64_t count;
+
+        struct decrement_type
+        {
+            boost::uint64_t count;
+            boost::int32_t ctype; 
+        } decrement;
+
+        struct localities_type
+        {
+            boost::uint64_t size;
+            boost::uint32_t* array;
+        } localities; 
+
+        boost::int32_t ctype;
+
+        pod_gid gid;
+    } data;
+};
+
+}}
+
+#endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+
