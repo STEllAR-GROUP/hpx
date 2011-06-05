@@ -200,6 +200,9 @@ struct response
         assign(other);
     }
 
+    ~response()
+    { clear(); }
+
     // copy assignment
     response& operator=(
         BOOST_COPY_ASSIGN_REF(response) other
