@@ -43,7 +43,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     base_lco_with_value<agas_binding_type>,
     component_base_lco_with_value);
 
-typedef vector2<boost::uint64_t, boost::uint32_t> agas_decrement_type;
+typedef vector2<boost::uint64_t, boost::int32_t> agas_decrement_type;
  
 // primary_namespaces's decrement_type
 HPX_REGISTER_ACTION_EX(

@@ -13,6 +13,7 @@
 
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/utility/binary.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -44,7 +45,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     typedef gva<Protocol> gva_type;
     typedef typename gva_type::count_type count_type;
     typedef typename gva_type::offset_type offset_type;
-    typedef boost::uint32_t component_type;
+    typedef boost::int32_t component_type;
     typedef boost::uint32_t prefix_type;
     typedef std::vector<prefix_type> prefixes_type;
 
@@ -675,14 +676,14 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
 
     enum actions 
     { // {{{ action enum
-        namespace_bind_locality,
-        namespace_bind_gid,
-        namespace_resolve_locality,
-        namespace_resolve_gid,
-        namespace_unbind,
-        namespace_increment,
-        namespace_decrement,
-        namespace_localities
+        namespace_bind_locality    = BOOST_BINARY_U(1000000),
+        namespace_bind_gid         = BOOST_BINARY_U(1000001),
+        namespace_resolve_locality = BOOST_BINARY_U(1000010),
+        namespace_resolve_gid      = BOOST_BINARY_U(1000011),
+        namespace_unbind           = BOOST_BINARY_U(1000100),
+        namespace_increment        = BOOST_BINARY_U(1000101),
+        namespace_decrement        = BOOST_BINARY_U(1000110),
+        namespace_localities       = BOOST_BINARY_U(1000111)
     }; // }}}
     
     typedef hpx::actions::result_action2<

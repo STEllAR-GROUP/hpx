@@ -8,6 +8,8 @@
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
+#include <boost/utility/binary.hpp>
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
@@ -118,10 +120,10 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
 
     enum actions
     { // {{{ action enum
-        namespace_bind,
-        namespace_rebind,
-        namespace_resolve,
-        namespace_unbind,
+        namespace_bind              = BOOST_BINARY_U(0 0 1 00000),
+        namespace_rebind            = BOOST_BINARY_U(0 0 1 00001),
+        namespace_resolve           = BOOST_BINARY_U(0 0 1 00010),
+        namespace_unbind            = BOOST_BINARY_U(0 0 1 00011)
     }; // }}}
     
     typedef hpx::actions::result_action2<

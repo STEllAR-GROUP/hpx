@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <boost/assert.hpp>
+#include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/traits.hpp>
