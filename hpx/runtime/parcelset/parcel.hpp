@@ -68,6 +68,12 @@ namespace hpx { namespace parcelset
           : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
         {}
+        
+        parcel(naming::address addr, actions::base_action* act) 
+          : tag_(0), destination_id_(), destination_addr_(addr), source_id_(),
+            action_(act), continuation_(), start_time_(0),
+            creation_time_(0)
+        {}
 
         ~parcel()
         {}
