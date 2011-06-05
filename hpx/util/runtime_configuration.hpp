@@ -18,26 +18,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-#if HPX_AGAS_VERSION > 0x10
-    void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
-        std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>()) HPX_EXPORT;
-#endif
 
     // The runtime_configuration class is a wrapper for the runtime 
     // configuration data allowing to extract configuration information in a 
     // more convenient way
     class HPX_API_EXPORT runtime_configuration : public section
     {
+#if HPX_AGAS_VERSION > 0x10
+    std::string hpx_ini_file;
+    std::vector<std::string> cmdline_ini_defs;
+#endif
+ 
     public:
         // initialize and load configuration information
         runtime_configuration();
         runtime_configuration(std::vector<std::string> const& prefill,
-                              std::string const& hpx_ini_file = "",
-                              std::vector<std::string> const& cmdline_ini_defs
+                              std::string const& hpx_ini_file_ = "",
+                              std::vector<std::string> const& cmdline_ini_defs_
                                   = std::vector<std::string>());
 
-
 #if HPX_AGAS_VERSION > 0x10
+        void load_components();
+
         agas::router_mode get_agas_router_mode() const;
 #endif
 
