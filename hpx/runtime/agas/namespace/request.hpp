@@ -31,7 +31,7 @@ struct pod_endpoint
     Endpoint& get()
     { return *reinterpret_cast<Endpoint*>(this); } 
 
-    Endpoint const& get()
+    Endpoint const& get() const
     { return *reinterpret_cast<Endpoint const*>(this); } 
 };
 
@@ -63,12 +63,12 @@ enum request_type
     primary_ns_unbind           = BOOST_BINARY_U(1000100), 
     primary_ns_increment        = BOOST_BINARY_U(1000101), 
     primary_ns_decrement        = BOOST_BINARY_U(1000110), 
-    primary_ns_localities       = BOOST_BINARY_U(1000111)  
+    primary_ns_localities       = BOOST_BINARY_U(1000111), 
     component_ns_bind_prefix    = BOOST_BINARY_U(0100000), 
     component_ns_bind_name      = BOOST_BINARY_U(0100001), 
     component_ns_resolve_id     = BOOST_BINARY_U(0100010), 
     component_ns_resolve_name   = BOOST_BINARY_U(0100011), 
-    component_ns_unbind         = BOOST_BINARY_U(0100100)  
+    component_ns_unbind         = BOOST_BINARY_U(0100100), 
     symbol_ns_bind              = BOOST_BINARY_U(0010000), 
     symbol_ns_rebind            = BOOST_BINARY_U(0010001), 
     symbol_ns_resolve           = BOOST_BINARY_U(0010010), 
@@ -78,8 +78,8 @@ enum request_type
 template <typename Protocol>
 struct response
 {
-    enum { boolean_bitmask      = BOOST_BINARY_U(10000000) };
-    enum { request_type_bitmask = BOOST_BINARY_U(01111111) };
+    enum { boolean_mask      = BOOST_BINARY_U(10000000) };
+    enum { request_type_mask = BOOST_BINARY_U(01111111) };
 
     void assign(
         request_type type_
@@ -102,7 +102,7 @@ struct response
         };
 
         if (b)
-            meta = boolean_bitmask & type_;
+            meta = boolean_mask | type_;
         else
             meta = type_;
     } // }}} 
@@ -238,7 +238,7 @@ struct response
         data.gva.offset = gva_.offset;
 
         if (b)
-            meta = boolean_bitmask & type_;
+            meta = boolean_mask | type_;
         else
             meta = type_;
     } // }}} 
@@ -294,7 +294,7 @@ struct response
         data.locality_binding.prefix = prefix_;
 
         if (b)
-            meta = boolean_bitmask & type_;
+            meta = boolean_mask | type_;
         else
             meta = type_;
     } // }}} 
@@ -329,7 +329,7 @@ struct response
 
         switch (type_)
         {
-            case primary_ns_increment:
+            case primary_ns_decrement:
                 break;
 
             default: {
@@ -343,13 +343,170 @@ struct response
         meta = type_;
     } // }}} 
 
-    void clear (void)
+    gva<Protocol> const& get_gva() const
     { // {{{
-        switch (type_ ^ boolean_bitmask)
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_unbind:
+                return data.gva.ep.get();
+            case primary_ns_resolve_gid:
+                return data.gva.ep.get();
+            case primary_ns_resolve_locality:
+                return data.resolved_locality.gva.ep.get();
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_gva",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}}
+
+    boost::uint64_t get_count() const
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_increment:
+                return data.count;
+
+            case primary_ns_decrement:
+                return data.decrement.count;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_count",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    boost::uint32_t* get_prefixes() const
+    { // {{{
+        switch (meta & request_type_mask)
         {
             case primary_ns_localities:
             case component_ns_resolve_id:
-                delete[] localities.array; 
+                return data.localities.array;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_prefixes",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    boost::uint64_t get_prefixes_size() const
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_localities:
+            case component_ns_resolve_id:
+                return data.localities.size;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_prefixes_size",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    boost::int32_t get_component_type()
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_decrement:
+                return data.decrement.ctype;
+
+            case component_ns_bind_prefix:
+            case component_ns_bind_name:
+            case component_ns_resolve_name:
+                return data.ctype;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_component_type",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    boost::uint32_t get_prefix()
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_resolve_locality:
+                return data.resolved_locality.prefix;
+
+            case primary_ns_bind_locality:
+                return data.locality_binding.prefix;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_component_type",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    naming::gid_type const& get_lower_bound()
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_bind_locality:
+                return data.locality_binding.lower;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_lower_bound",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    naming::gid_type const& get_upper_bound()
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_bind_locality:
+                return data.locality_binding.upper;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_upper_bound",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    bool get_flag()
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_bind_locality:
+            case primary_ns_unbind:
+            case primary_ns_bind_gid:
+            case component_ns_unbind:
+            case symbol_ns_bind:
+            case symbol_ns_unbind:
+                return meta & boolean_mask;
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_flag",
+                    "invalid operation for request type");
+            }
+        };
+    } // }}} 
+
+    void clear (void)
+    { // {{{
+        switch (meta & request_type_mask)
+        {
+            case primary_ns_localities:
+            case component_ns_resolve_id:
+                delete[] data.localities.array; 
         };
  
         typedef typename boost::uint_t<
@@ -364,6 +521,22 @@ struct response
     } // }}}
 
   private:
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive& ar, const unsigned int) const
+    {
+        // IMPLEMENT
+    }
+
+    template <typename Archive>
+    void load(Archive& ar, const unsigned int)
+    {
+        // IMPLEMENT
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
     boost::uint8_t meta;
     error_code ec;
 
