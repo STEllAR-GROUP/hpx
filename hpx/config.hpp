@@ -221,6 +221,14 @@
 #  define HPX_LOCK_LIMIT 28
 #endif
 
+#if !defined(HPX_WRAPPER_HEAP_STEP)
+  #define HPX_WRAPPER_HEAP_STEP 0xFFFFU
+#endif
+
+#if !defined(HPX_INITIAL_GID_RANGE)
+  #define HPX_INITIAL_GID_RANGE 0xFFFFFFU
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEFAULT_STACK_SIZE)
   #if defined(BOOST_WINDOWS)

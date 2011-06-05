@@ -4,9 +4,5 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_library_sources(hpx
-  common_actions.cpp)
-
-add_subdirectory(router)
-add_subdirectory(stdmap)
-add_subdirectory(stdmap_tcpip)
+  big_boot_barrier.cpp)
 
