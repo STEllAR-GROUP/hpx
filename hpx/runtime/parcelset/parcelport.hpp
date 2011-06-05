@@ -159,6 +159,11 @@ namespace hpx { namespace parcelset
             return io_service_pool_;
         }
 
+        util::connection_cache<parcelport_connection>& get_connection_cache()
+        {
+            return connection_cache_;
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
