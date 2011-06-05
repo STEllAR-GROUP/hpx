@@ -108,6 +108,9 @@ struct response
   public:
     enum { boolean_mask      = BOOST_BINARY_U(10000000) };
     enum { request_type_mask = BOOST_BINARY_U(01111111) };
+
+    response(void)
+    { clear(); }
     
     response(
         request_type type_
@@ -284,11 +287,8 @@ struct response
                 data.localities.array
                     = new boost::uint32_t [data.localities.size];
 
-                for (boost::uint64_t i = 0; i < data.localities.size;
-                     i < data.localities.size; ++i)
-                {
+                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
                     data.localities.array[i] = other.data.localities.array[i];
-                }
 
                 return;
             }
@@ -828,6 +828,9 @@ struct response
         for (std::size_t i = 0, end = sizeof(data_type) / sizeof(unit_type);
              i != end; ++i)
             p[i] = 0;
+
+        code = error_code();
+        meta = invalid_request;
     } // }}}
 
     request_type get_request_type() const
@@ -891,11 +894,8 @@ struct response
             case component_ns_resolve_id: {
                 ar & data.localities.size;
 
-                for (boost::uint64_t i = 0; i < data.localities.size;
-                     i < data.localities.size; ++i)
-                {
+                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
                     ar & data.localities.array[i];
-                }
 
                 return;
             }
@@ -978,11 +978,8 @@ struct response
                 data.localities.array
                     = new boost::uint32_t [data.localities.size];
 
-                for (boost::uint64_t i = 0; i < data.localities.size;
-                     i < data.localities.size; ++i)
-                {
+                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
                     ar & data.localities.array[i];
-                }
 
                 return;
             }
