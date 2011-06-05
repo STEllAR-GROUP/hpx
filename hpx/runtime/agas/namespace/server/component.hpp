@@ -196,11 +196,11 @@ struct HPX_COMPONENT_EXPORT component_namespace :
 
     enum actions
     { // {{{ action enum
-        namespace_bind_prefix,
-        namespace_bind_name,
-        namespace_resolve_name,
-        namespace_resolve_id,
-        namespace_unbind
+        namespace_bind_prefix    = BOOST_BINARY_U(0 1 0 00000),
+        namespace_bind_name      = BOOST_BINARY_U(0 1 0 00001),
+        namespace_resolve_id     = BOOST_BINARY_U(0 1 0 00010),
+        namespace_resolve_name   = BOOST_BINARY_U(0 1 0 00011),
+        namespace_unbind         = BOOST_BINARY_U(0 1 0 00100)
     }; // }}}
     
     typedef hpx::actions::result_action2<
@@ -214,7 +214,7 @@ struct HPX_COMPONENT_EXPORT component_namespace :
     typedef hpx::actions::result_action1<
         component_namespace<Database>,
         /* return type */ component_id_type,
-        /* enum value */  namespace_resolve_name,
+        /* enum value */  namespace_bind_name,
         /* arguments */   component_name_type const&,
         &component_namespace<Database>::bind_name
     > bind_name_action;
