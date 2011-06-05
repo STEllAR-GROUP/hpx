@@ -23,6 +23,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
+//#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
@@ -155,8 +156,8 @@ struct legacy_router : boost::noncopyable
         console_cache_type console_cache_;
     }; // }}}
 
-    const runtime_mode runtime_type;
     const router_mode router_type;
+    const runtime_mode runtime_type;
 
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
@@ -167,13 +168,12 @@ struct legacy_router : boost::noncopyable
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
-      , router_mode router_type_
     ):
-        runtime_type(runtime_type_)
-      , router_type(router_type_)
+        router_type(ini_.get_agas_router_mode())
+      , runtime_type(runtime_type_)
       , state_(router_state_launching)
     {
-        //pp.run(true); TODO: this needs a wrapper function
+        create_big_boot_barrier(pp_, ini_, runtime_type_);
 
         if (router_type == router_mode_bootstrap)
             launch_bootstrap(pp, ini_);
@@ -209,11 +209,11 @@ struct legacy_router : boost::noncopyable
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
 
         bootstrap->primary_ns_server.bind_gid
-            (bootstrap->primary_ns_server.get_base_gid(), primary_gva);
+            (primary_namespace_server_type::fixed_gid(), primary_gva);
         bootstrap->primary_ns_server.bind_gid
-            (bootstrap->component_ns_server.get_base_gid(), component_gva);
+            (component_namespace_server_type::fixed_gid(), component_gva);
         bootstrap->primary_ns_server.bind_gid
-            (bootstrap->symbol_ns_server.get_base_gid(), symbol_gva);
+            (symbol_namespace_server_type::fixed_gid(), symbol_gva);
 
         if (runtime_type == runtime_mode_console)
             bootstrap->symbol_ns_server.bind("/locality(console)",
@@ -352,7 +352,7 @@ struct legacy_router : boost::noncopyable
         {
             if (hosted->console_cache_)
             {
-                prefix = naming::get_gid_from_prefix(bootstrap->console_cache_);
+                prefix = naming::get_gid_from_prefix(hosted->console_cache_);
                 return true;
             }
         }
