@@ -161,6 +161,62 @@ int main(void)
         HPX_TEST_EQ(g1, r1.get_gva());
     }
 
+    
+    {   // primary_ns_localities
+        // component_ns_resolve_id
+
+        boost::uint32_t* l0 = new boost::uint32_t [1];
+        boost::uint32_t* l1 = new boost::uint32_t [10];
+        boost::uint32_t* l2 = 0;
+        boost::uint32_t* l3 = new boost::uint32_t [1];
+        boost::uint32_t* l4 = new boost::uint32_t [16];
+        boost::uint32_t* l5 = 0;
+
+        l0[0] = 17;
+        l3[0] = 42;
+
+        for (boost::uint64_t i = 0; i < 10; ++i)
+            l1[i] = 42 + (i * 2);
+
+        for (boost::uint64_t i = 0; i < 16; ++i)
+            l4[i] = i * i;
+
+        response_type r0(primary_ns_localities,   boost::uint64_t(1),  l0)
+                    , r1(primary_ns_localities,   boost::uint64_t(10), l1)
+                    , r2(primary_ns_localities,   boost::uint64_t(0),  l2)
+                    , r3(component_ns_resolve_id, boost::uint64_t(1),  l3)
+                    , r4(component_ns_resolve_id, boost::uint64_t(16), l4)
+                    , r5(component_ns_resolve_id, boost::uint64_t(0),  l5)
+                    ;
+
+        HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r0.which()));
+        HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r1.which()));
+        HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r2.which()));
+        HPX_TEST_EQ(unsigned(component_ns_resolve_id), unsigned(r3.which()));
+        HPX_TEST_EQ(unsigned(component_ns_resolve_id), unsigned(r4.which()));
+        HPX_TEST_EQ(unsigned(component_ns_resolve_id), unsigned(r5.which()));
+
+        HPX_TEST_EQ(boost::uint64_t(1), r0.get_localities_size());
+        HPX_TEST_EQ(17U, r0.get_localities()[0]);
+
+        HPX_TEST_EQ(boost::uint64_t(10), r1.get_localities_size());
+        for (boost::uint64_t i = 0; i < 10; ++i)
+            HPX_TEST_EQ(boost::uint32_t(42 + (i * 2)), r1.get_localities()[i]);
+
+        HPX_TEST_EQ(boost::uint64_t(0), r2.get_localities_size());
+        HPX_TEST_EQ(l2, r2.get_localities());
+
+        HPX_TEST_EQ(boost::uint64_t(1), r3.get_localities_size());
+        HPX_TEST_EQ(42U, r3.get_localities()[0]);
+
+        HPX_TEST_EQ(boost::uint64_t(16), r4.get_localities_size());
+        for (boost::uint64_t i = 0; i < 16; ++i)
+            HPX_TEST_EQ(boost::uint32_t(i * i), r4.get_localities()[i]);
+
+        HPX_TEST_EQ(boost::uint64_t(0), r5.get_localities_size());
+        HPX_TEST_EQ(l2, r5.get_localities());
+    }
+
     return hpx::util::report_errors();
 }
 
