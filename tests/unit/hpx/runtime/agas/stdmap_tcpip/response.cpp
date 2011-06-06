@@ -56,7 +56,6 @@ int main(void)
         // component_ns_unbind
         // symbol_ns_bind
         // symbol_ns_unbind
-
         response_type r0(primary_ns_bind_gid, success)
                     , r1(primary_ns_bind_gid, no_success)
                     , r2(component_ns_unbind, success)
@@ -88,7 +87,6 @@ int main(void)
     {   // component_ns_bind_prefix
         // component_ns_bind_name
         // component_ns_resolve_name
-
         response_type r0(component_ns_bind_prefix,  component_base_lco)
                     , r1(component_ns_bind_prefix,  56)
                     , r2(component_ns_bind_name,    component_memory_block)
@@ -119,7 +117,6 @@ int main(void)
 
     {   // symbol_ns_rebind
         // symbol_ns_resolve
-
         response_type r0(symbol_ns_rebind,  gid_type(5, 5))
                     , r1(symbol_ns_rebind,  gid_type(0xdead, 0xbeef))
                     , r2(symbol_ns_resolve, gid_type(17, 42))
@@ -164,7 +161,6 @@ int main(void)
     
     {   // primary_ns_localities
         // component_ns_resolve_id
-
         boost::uint32_t* l0 = new boost::uint32_t [1];
         boost::uint32_t* l1 = new boost::uint32_t [10];
         boost::uint32_t* l2 = 0;
@@ -186,8 +182,7 @@ int main(void)
                     , r2(primary_ns_localities,   boost::uint64_t(0),  l2)
                     , r3(component_ns_resolve_id, boost::uint64_t(1),  l3)
                     , r4(component_ns_resolve_id, boost::uint64_t(16), l4)
-                    , r5(component_ns_resolve_id, boost::uint64_t(0),  l5)
-                    ;
+                    , r5(component_ns_resolve_id, boost::uint64_t(0),  l5);
 
         HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r0.which()));
         HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r1.which()));
@@ -214,7 +209,7 @@ int main(void)
             HPX_TEST_EQ(boost::uint32_t(i * i), r4.get_localities()[i]);
 
         HPX_TEST_EQ(boost::uint64_t(0), r5.get_localities_size());
-        HPX_TEST_EQ(l2, r5.get_localities());
+        HPX_TEST_EQ(l5, r5.get_localities());
     }
 
     return hpx::util::report_errors();
