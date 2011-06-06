@@ -51,6 +51,7 @@ namespace hpx
         no_registered_console = 20,
         startup_timed_out = 21,
         uninitialized_value = 22,
+        bad_response_type = 23,
         last_error
     };
 

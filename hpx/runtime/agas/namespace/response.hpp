@@ -77,7 +77,7 @@ struct pod_gva
     }
 };
 
-enum request_type 
+enum request_code
 { 
     invalid_request             = 0,
     primary_ns_bind_locality    = BOOST_BINARY_U(1000000), 
@@ -106,87 +106,91 @@ struct response
     BOOST_COPYABLE_AND_MOVABLE(response);
 
   public:
-    enum { boolean_mask      = BOOST_BINARY_U(10000000) };
-    enum { request_type_mask = BOOST_BINARY_U(01111111) };
-
     response(void)
     { clear(); }
     
     response(
-        request_type type_
-      , bool b
+        request_code type_
+      , error e = success
     ) {
-        assign(type_, b);
+        assign(type_, e);
     }
     
     response(
-        request_type type_
+        request_code type_
       , components::component_type ctype_
+      , error e = success
     ) {
-        assign(type_, ctype_);
+        assign(type_, ctype_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , boost::int32_t ctype_
+      , error e = success
     ) {
-        assign(type_, ctype_);
+        assign(type_, ctype_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , naming::gid_type gid_
+      , error e = success
     ) {
-        assign(type_, gid_);
+        assign(type_, gid_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , boost::uint32_t prefix_
       , gva<Protocol> const& gva_
+      , error e = success
     ) {
-        assign(type_, prefix_, gva_);
+        assign(type_, prefix_, gva_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , gva<Protocol> const& gva_
-      , bool b
+      , error e = success
     ) {
-        assign(type_, gva_, b);
+        assign(type_, gva_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , boost::uint64_t size_ 
       , boost::uint32_t* array_ 
+      , error e = success
     ) {
-        assign(type_, size_, array_);
+        assign(type_, size_, array_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
       , boost::uint32_t prefix_
-      , bool b
+      , error e = success
     ) {
-        assign(type_, lower_, upper_, prefix_, b);
+        assign(type_, lower_, upper_, prefix_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , boost::uint64_t count_
+      , error e = success
     ) {
-        assign(type_, count_);
+        assign(type_, count_, e);
     }
 
     response(
-        request_type type_
+        request_code type_
       , boost::uint64_t count_
       , boost::int32_t ctype_
+      , error e = success
     ) {
-        assign(type_, count_, ctype_);
+        assign(type_, count_, ctype_, e);
     }
 
     // copy constructor
@@ -230,14 +234,11 @@ struct response
     ) { // {{{
         clear();
 
-        meta = other.meta;
-        code = other.code;
+        rc = other.rc;
+        status = other.status;
 
-        switch (meta & request_type_mask) {
-            case primary_ns_bind_gid:
-            case component_ns_unbind:
-            case symbol_ns_bind:
-            case symbol_ns_unbind:
+        switch (rc) {
+            default:
                 return;
 
             case component_ns_bind_prefix:
@@ -294,14 +295,14 @@ struct response
             }
 
             case primary_ns_bind_locality: {
-                data.locality_binding.lower.gid.msb
-                    = other.data.locality_binding.lower.gid.msb;
-                data.locality_binding.lower.gid.lsb
-                    = other.data.locality_binding.lower.gid.lsb;
-                data.locality_binding.upper.gid.msb
-                    = other.data.locality_binding.upper.gid.msb;
-                data.locality_binding.upper.gid.lsb
-                    = other.data.locality_binding.upper.gid.lsb;
+                data.locality_binding.lower.msb
+                    = other.data.locality_binding.lower.msb;
+                data.locality_binding.lower.lsb
+                    = other.data.locality_binding.lower.lsb;
+                data.locality_binding.upper.msb
+                    = other.data.locality_binding.upper.msb;
+                data.locality_binding.upper.lsb
+                    = other.data.locality_binding.upper.lsb;
                 data.locality_binding.prefix
                     = other.data.locality_binding.prefix;
                 return;
@@ -326,14 +327,11 @@ struct response
     ) { // {{{
         clear();
 
-        meta = other.meta;
-        code = other.code;
+        rc = other.rc;
+        status = other.status;
 
-        switch (meta & request_type_mask) {
-            case primary_ns_bind_gid:
-            case component_ns_unbind:
-            case symbol_ns_bind:
-            case symbol_ns_unbind:
+        switch (rc) {
+            default:
                 break;
 
             case component_ns_bind_prefix:
@@ -409,13 +407,17 @@ struct response
             }
         };
 
-        other.meta = invalid_request; // prevent deallocation
+        other.rc = invalid_request; // prevent deallocation
         other.clear();
     } // }}}
 
+    // primary_ns_bind_gid
+    // primary_ns_unbind
+    // symbol_ns_bind
+    // symbol_ns_unbind
     void assign(
-        request_type type_
-      , bool b
+        request_code type_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -428,28 +430,31 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
-        if (b)
-            meta = boolean_mask | type_;
-        else
-            meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
     // forwarder
     void assign(
-        request_type type_
+        request_code type_
       , components::component_type ctype_
+      , error e = success
     ) {
-        assign(type_, boost::int32_t(ctype_));
+        assign(type_, boost::int32_t(ctype_), e);
     }
 
+    // component_ns_bind_prefix
+    // component_ns_bind_name
+    // component_ns_resolve_name
     void assign(
-        request_type type_
+        request_code type_
       , boost::int32_t ctype_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -461,18 +466,22 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
         data.ctype = ctype_;
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
-    
+   
+    // symbol_ns_rebind
+    // symbol_ns_resolve 
     void assign(
-        request_type type_
+        request_code type_
       , naming::gid_type gid_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -483,20 +492,23 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
         data.gid.msb = gid_.get_msb();
         data.gid.lsb = gid_.get_lsb();
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
     
+    // primary_ns_resolve_locality
     void assign(
-        request_type type_
+        request_code type_
       , boost::uint32_t prefix_
       , gva<Protocol> const& gva_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -506,7 +518,7 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
@@ -517,13 +529,16 @@ struct response
         data.resolved_locality.gva.count = gva_.count;
         data.resolved_locality.gva.lva = gva_.lva();
         data.resolved_locality.gva.offset = gva_.offset;
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
+    // primary_ns_resolve_gid
+    // primary_ns_unbind
     void assign(
-        request_type type_
+        request_code type_
       , gva<Protocol> const& gva_
-      , bool b
+      , error e = success
     ) { // {{{
         clear();
 
@@ -534,7 +549,7 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
@@ -544,17 +559,17 @@ struct response
         data.gva.count = gva_.count;
         data.gva.lva = gva_.lva();
         data.gva.offset = gva_.offset;
-
-        if (b)
-            meta = boolean_mask | type_;
-        else
-            meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
+    // primary_ns_localities
+    // component_ns_resolve_id
     void assign(
-        request_type type_
+        request_code type_
       , boost::uint64_t size_ 
       , boost::uint32_t* array_ 
+      , error e = success
     ) { // {{{
         clear();
 
@@ -565,22 +580,24 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
         data.localities.size = size_;
         data.localities.array = array_;
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
+    // primary_ns_bind_locality
     void assign(
-        request_type type_
+        request_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
       , boost::uint32_t prefix_
-      , bool b
+      , error e = success
     ) { // {{{
         clear();
 
@@ -590,7 +607,7 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
@@ -600,16 +617,15 @@ struct response
         data.locality_binding.upper.gid.msb = upper_.get_msb();
         data.locality_binding.upper.gid.lsb = upper_.get_lsb();
         data.locality_binding.prefix = prefix_;
-
-        if (b)
-            meta = boolean_mask | type_;
-        else
-            meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
+    // primary_ns_increment
     void assign(
-        request_type type_
+        request_code type_
       , boost::uint64_t count_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -619,19 +635,22 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
         data.count = count_;
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
+    // primary_ns_decrement
     void assign(
-        request_type type_
+        request_code type_
       , boost::uint64_t count_
       , boost::int32_t ctype_
+      , error e = success
     ) { // {{{
         clear();
 
@@ -641,38 +660,47 @@ struct response
                 break;
 
             default: {
-                HPX_THROW_EXCEPTION(internal_server_error, 
+                HPX_THROW_EXCEPTION(bad_response_type, 
                     "response::assign", "invalid response created");
             }
         };
 
         data.decrement.count = count_;
         data.decrement.ctype = ctype_;
-        meta = type_;
+        rc = type_;
+        status = e;
     } // }}} 
 
-    gva<Protocol> const& get_gva() const
+    gva<Protocol> get_gva() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_unbind:
-                return data.gva.ep.get();
             case primary_ns_resolve_gid:
-                return data.gva.ep.get();
+                return gva<Protocol>(data.gva.ep.get()
+                                   , data.gva.ctype
+                                   , data.gva.count
+                                   , data.gva.lva
+                                   , data.gva.offset);
             case primary_ns_resolve_locality:
-                return data.resolved_locality.gva.ep.get();
+                return gva<Protocol>(data.resolved_locality.gva.ep.get()
+                                   , data.resolved_locality.gva.ctype
+                                   , data.resolved_locality.gva.count
+                                   , data.resolved_locality.gva.lva
+                                   , data.resolved_locality.gva.offset);
 
             default: {
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_gva",
                     "invalid operation for request type");
+                return gva<Protocol>();
             }
         };
     } // }}}
 
     boost::uint64_t get_count() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_increment:
                 return data.count;
@@ -684,13 +712,14 @@ struct response
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_count",
                     "invalid operation for request type");
+                return 0;
             }
         };
     } // }}} 
 
     boost::uint32_t* get_prefixes() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_localities:
             case component_ns_resolve_id:
@@ -700,13 +729,14 @@ struct response
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_prefixes",
                     "invalid operation for request type");
+                return 0;
             }
         };
     } // }}} 
 
     boost::uint64_t get_prefixes_size() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_localities:
             case component_ns_resolve_id:
@@ -716,13 +746,14 @@ struct response
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_prefixes_size",
                     "invalid operation for request type");
+                return 0;
             }
         };
     } // }}} 
 
     boost::int32_t get_component_type() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_decrement:
                 return data.decrement.ctype;
@@ -736,13 +767,14 @@ struct response
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_component_type",
                     "invalid operation for request type");
+                return 0;
             }
         };
     } // }}} 
 
     boost::uint32_t get_prefix() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_resolve_locality:
                 return data.resolved_locality.prefix;
@@ -754,63 +786,68 @@ struct response
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_component_type",
                     "invalid operation for request type");
+                return 0;
             }
         };
     } // }}} 
 
-    naming::gid_type const& get_lower_bound() const
+    naming::gid_type get_gid() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
+        {
+            case symbol_ns_rebind:
+            case symbol_ns_resolve:
+                return naming::gid_type(data.gid.msb, data.gid.lsb);
+
+            default: {
+                HPX_THROW_EXCEPTION(bad_parameter, 
+                    "response::get_gid",
+                    "invalid operation for request type");
+                return naming::invalid_gid;
+            }
+        };
+    } // }}} 
+
+    naming::gid_type get_lower_bound() const
+    { // {{{
+        switch (rc)
         {
             case primary_ns_bind_locality:
-                return data.locality_binding.lower;
+                return naming::gid_type(data.locality_binding.lower.msb
+                                      , data.locality_binding.lower.lsb);
 
             default: {
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_lower_bound",
                     "invalid operation for request type");
+                return naming::invalid_gid;
             }
         };
     } // }}} 
 
-    naming::gid_type const& get_upper_bound() const
+    naming::gid_type get_upper_bound() const
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_bind_locality:
-                return data.locality_binding.upper;
+                return naming::gid_type(data.locality_binding.upper.msb
+                                      , data.locality_binding.upper.lsb);
 
             default: {
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "response::get_upper_bound",
                     "invalid operation for request type");
+                return naming::invalid_gid;
             }
         };
     } // }}} 
 
-    bool get_flag() const
-    { // {{{
-        switch (meta & request_type_mask)
-        {
-            case primary_ns_bind_locality:
-            case primary_ns_unbind:
-            case primary_ns_bind_gid:
-            case component_ns_unbind:
-            case symbol_ns_bind:
-            case symbol_ns_unbind:
-                return meta & boolean_mask;
-
-            default: {
-                HPX_THROW_EXCEPTION(bad_parameter, 
-                    "response::get_flag",
-                    "invalid operation for request type");
-            }
-        };
-    } // }}} 
+    error get_status() const
+    { return status; }
 
     void clear (void)
     { // {{{
-        switch (meta & request_type_mask)
+        switch (rc)
         {
             case primary_ns_localities:
             case component_ns_resolve_id:
@@ -829,15 +866,13 @@ struct response
              i != end; ++i)
             p[i] = 0;
 
-        code = error_code();
-        meta = invalid_request;
+        status = success;
+        rc = invalid_request;
     } // }}}
 
-    request_type get_request_type() const
-    { return (request_type) (meta & request_type_mask); }
+    request_code which() const
+    { return rc; } 
         
-    error_code code;
-
   private:
     friend class boost::serialization::access;
 
@@ -846,14 +881,11 @@ struct response
         Archive& ar
       , const unsigned int
     ) const { // {{{
-        ar & meta; 
-        ar & code;
+        ar & rc; 
+        ar & status;
 
-        switch (meta & request_type_mask) {
-            case primary_ns_bind_gid:
-            case component_ns_unbind:
-            case symbol_ns_bind:
-            case symbol_ns_unbind:
+        switch (rc) {
+            default:
                 return;
 
             case component_ns_bind_prefix:
@@ -901,10 +933,10 @@ struct response
             }
 
             case primary_ns_bind_locality: {
-                ar & data.locality_binding.lower.gid.msb;
-                ar & data.locality_binding.lower.gid.lsb;
-                ar & data.locality_binding.upper.gid.msb;
-                ar & data.locality_binding.upper.gid.lsb;
+                ar & data.locality_binding.lower.msb;
+                ar & data.locality_binding.lower.lsb;
+                ar & data.locality_binding.upper.msb;
+                ar & data.locality_binding.upper.lsb;
                 ar & data.locality_binding.prefix;
                 return;
             }
@@ -927,14 +959,11 @@ struct response
         Archive& ar
       , const unsigned int
     ) { // {{{
-        ar & meta;
-        ar & code;
+        ar & rc;
+        ar & status;
 
-        switch (meta & request_type_mask) {
-            case primary_ns_bind_gid:
-            case component_ns_unbind:
-            case symbol_ns_bind:
-            case symbol_ns_unbind:
+        switch (rc) {
+            default:
                 return;
 
             case component_ns_bind_prefix:
@@ -985,10 +1014,10 @@ struct response
             }
 
             case primary_ns_bind_locality: {
-                ar & data.locality_binding.lower.gid.msb;
-                ar & data.locality_binding.lower.gid.lsb;
-                ar & data.locality_binding.upper.gid.msb;
-                ar & data.locality_binding.upper.gid.lsb;
+                ar & data.locality_binding.lower.msb;
+                ar & data.locality_binding.lower.lsb;
+                ar & data.locality_binding.upper.msb;
+                ar & data.locality_binding.upper.lsb;
                 ar & data.locality_binding.prefix;
                 return;
             }
@@ -1008,7 +1037,8 @@ struct response
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    boost::uint8_t meta;
+    request_code rc;
+    error status;
 
     union data_type
     {
