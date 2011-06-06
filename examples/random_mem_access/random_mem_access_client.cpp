@@ -6,9 +6,22 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/components/distributing_factory/distributing_factory.hpp>
+
+#include <boost/foreach.hpp>
 #include <time.h>
 
 #include "random_mem_access/random_mem_access.hpp"
+
+inline void 
+init(hpx::components::server::distributing_factory::iterator_range_type r,
+    std::vector<hpx::components::random_mem_access>& accu)
+{
+    BOOST_FOREACH(hpx::naming::id_type const& id, r)
+    {
+        accu.push_back(hpx::components::random_mem_access(id));
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map&)
@@ -20,13 +33,16 @@ int hpx_main(boost::program_options::variables_map&)
         //hpx::naming::id_type prefix;
 
         // create a distributing factory locally
-        components::distributing_factory factory;
+        hpx::components::distributing_factory factory;
         factory.create(hpx::applier::get_applier().get_runtime_support_gid());
 
-        component_type function_type = get_component_type<hpx::components::random_mem_access>();
+        hpx::components::component_type mem_block_type = 
+            hpx::components::get_component_type<
+                hpx::components::random_mem_access::server_component_type>();
 
         int array_size = 6;
-        result_type functions = factory.create_components(function_type, array_size);
+        hpx::components::distributing_factory::result_type mem_blocks = 
+            factory.create_components(mem_block_type, array_size);
 
         //if (appl.get_remote_prefixes(prefixes))
         //    // create random_mem_access on any of the remote localities
@@ -35,7 +51,7 @@ int hpx_main(boost::program_options::variables_map&)
         //    // create an accumulator locally
         //    prefix = appl.get_runtime_support_gid();
 
-        //std::vector< hpx::components::random_mem_access > accu;
+        std::vector<hpx::components::random_mem_access> accu;
 
         //int array_size = 6;
         //accu.resize(array_size);
@@ -44,7 +60,7 @@ int hpx_main(boost::program_options::variables_map&)
         //  accu[i].create(prefix);
         //}
 
-        init(locality_results(functions), numsteps);
+        init(locality_results(mem_blocks), accu);
 
         // initialize the array
         for (int i=0;i<array_size;i++) {
