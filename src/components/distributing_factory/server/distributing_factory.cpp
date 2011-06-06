@@ -47,8 +47,7 @@ namespace hpx { namespace components { namespace server
 
         std::size_t created_count = 0;
         std::size_t count_on_locality = count / prefixes.size();
-        if (0 == count_on_locality)
-            count_on_locality = 1;
+        std::size_t excess = count - count_on_locality*prefixes.size();
 
         // distribute the number of components to create evenly over all 
         // available localities
@@ -61,8 +60,16 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(naming::gid_type const& gid, prefixes)
         {
             std::size_t numcreate = count_on_locality;
+            if (excess != 0) {
+                --excess;
+                ++numcreate;
+            }
+
             if (created_count + numcreate > count)
                 numcreate = count - created_count;
+
+            if (numcreate == 0)
+                break;
 
             // create one component at a time
             naming::id_type fact(gid, naming::id_type::unmanaged);

@@ -58,12 +58,11 @@ namespace hpx { namespace components
     inline void
     wait (std::vector<lcos::future_value<T, TR> > const& v, std::vector<TR>& r)
     {
-        r.resize(v.size());
+        r.reserve(v.size());
 
-        std::size_t i = 0;
         typedef lcos::future_value<T, TR> value_type;
         BOOST_FOREACH(value_type const& f, v)
-            r[i++] = f.get();
+            r.push_back(f.get());
     }
 
     template <typename T, typename TR>
