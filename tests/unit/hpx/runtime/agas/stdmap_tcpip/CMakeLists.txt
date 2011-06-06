@@ -12,13 +12,15 @@
 set(group unit.hpx.runtime.agas.stdmap_tcpip)
 
 set(testcases
-    legacy_agent_serial)
+    #legacy_agent_serial
+    response
+    serialize_response)
 
 foreach(testcase ${testcases})
   add_hpx_test(${group}.${testcase}
                SOURCES ${testcase}.cpp
-               DEPENDENCIES agas_stdmap_component
-                            agas_stdmap_tcpip_component
+#               DEPENDENCIES agas_stdmap_component
+#                            agas_stdmap_tcpip_component
                ARGS "-r" "--agas" "${HPX_TEST_AGAS_ADDRESS}"
                          "--hpx" "${HPX_TEST_PARCEL_ADDRESS}"
                          "-t" "${HPX_TEST_NUM_THREADS}"
@@ -29,14 +31,14 @@ foreach(testcase ${testcases})
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
 endforeach()
 
-set(subdirs 
-    component_namespace
-    primary_namespace
-    symbol_namespace)
+#set(subdirs 
+#    component_namespace
+#    primary_namespace
+#    symbol_namespace)
 
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(${group}.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(${group} ${group}.${subdir})
-endforeach()
+#foreach(subdir ${subdirs})
+#  add_hpx_pseudo_target(${group}.${subdir})
+#  add_subdirectory(${subdir})
+#  add_hpx_pseudo_dependencies(${group} ${group}.${subdir})
+#endforeach()
 
