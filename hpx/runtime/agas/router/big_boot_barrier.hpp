@@ -55,13 +55,13 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     void notify();
 };
 
-void create_big_boot_barrier(
+HPX_EXPORT void create_big_boot_barrier(
     parcelset::parcelport& pp_ 
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
-) HPX_EXPORT;
+);
 
-big_boot_barrier& get_big_boot_barrier() HPX_EXPORT;
+HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 
 }}
 

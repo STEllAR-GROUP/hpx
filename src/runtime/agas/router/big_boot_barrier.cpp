@@ -6,10 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/thread.hpp>
-#include <boost/assert.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <hpx/hpx_fwd.hpp>
+
+#if HPX_AGAS_VERSION > 0x10
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -18,11 +17,17 @@
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/static.hpp>
+#include <hpx/util/uintptr_t.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
+
+#include <boost/thread.hpp>
+#include <boost/assert.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace agas
 {
@@ -316,3 +321,4 @@ big_boot_barrier& get_big_boot_barrier()
 
 }}
 
+#endif
