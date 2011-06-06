@@ -944,8 +944,11 @@ struct response
             case component_ns_resolve_id: {
                 ar & data.localities.size;
 
-                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
-                    ar & data.localities.array[i];
+                if (data.localities.size > 0)
+                {
+                    for (boost::uint64_t i = 0; i < data.localities.size; ++i)
+                        ar & data.localities.array[i];
+                }
 
                 return;
             }
@@ -977,6 +980,8 @@ struct response
         Archive& ar
       , const unsigned int
     ) { // {{{
+        clear();
+
         ar & rc;
         ar & status;
 
@@ -1022,11 +1027,17 @@ struct response
             case component_ns_resolve_id: {
                 ar & data.localities.size;
 
-                data.localities.array
-                    = new boost::uint32_t [data.localities.size];
+                if (data.localities.size > 0)
+                {
+                    data.localities.array
+                        = new boost::uint32_t [data.localities.size];
 
-                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
-                    ar & data.localities.array[i];
+                    for (boost::uint64_t i = 0; i < data.localities.size; ++i)
+                        ar & data.localities.array[i];
+                }
+
+                else
+                    data.localities.array = 0; 
 
                 return;
             }
