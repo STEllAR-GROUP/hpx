@@ -285,11 +285,20 @@ struct response
             case component_ns_resolve_id: {
                 data.localities.size = other.data.localities.size;
 
-                data.localities.array
-                    = new boost::uint32_t [data.localities.size];
+                if (data.localities.size > 0)
+                {
+                    data.localities.array
+                        = new boost::uint32_t [data.localities.size];
 
-                for (boost::uint64_t i = 0; i < data.localities.size; ++i)
-                    data.localities.array[i] = other.data.localities.array[i];
+                    for (boost::uint64_t i = 0; i < data.localities.size; ++i)
+                        data.localities.array[i]
+                            = other.data.localities.array[i];
+                }
+
+                else {
+                    BOOST_ASSERT(other.data.localities.array == 0);
+                    data.localities.array = 0;
+                }
 
                 return;
             }
@@ -585,6 +594,9 @@ struct response
             }
         };
 
+        if (size_ == 0)
+            BOOST_ASSERT(array_ == 0);
+
         data.localities.size = size_;
         data.localities.array = array_;
         rc = type_;
@@ -717,7 +729,7 @@ struct response
         };
     } // }}} 
 
-    boost::uint32_t* get_prefixes() const
+    boost::uint32_t* get_localities() const
     { // {{{
         switch (rc)
         {
@@ -727,14 +739,14 @@ struct response
 
             default: {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "response::get_prefixes",
+                    "response::get_localities",
                     "invalid operation for request type");
                 return 0;
             }
         };
     } // }}} 
 
-    boost::uint64_t get_prefixes_size() const
+    boost::uint64_t get_localities_size() const
     { // {{{
         switch (rc)
         {
@@ -744,7 +756,7 @@ struct response
 
             default: {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "response::get_prefixes_size",
+                    "response::get_localities_size",
                     "invalid operation for request type");
                 return 0;
             }
@@ -845,13 +857,19 @@ struct response
     error get_status() const
     { return status; }
 
-    void clear (void)
+    void clear()
     { // {{{
         switch (rc)
         {
             case primary_ns_localities:
-            case component_ns_resolve_id:
-                delete[] data.localities.array; 
+            case component_ns_resolve_id: {
+                if (data.localities.array)
+                {
+                    BOOST_ASSERT(data.localities.size != 0);
+                    delete[] data.localities.array;
+                    break;
+                } 
+            }
             default:
                 break;
         };
