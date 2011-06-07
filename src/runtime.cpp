@@ -96,12 +96,17 @@ namespace hpx
         agas_client_(parcel_port_, ini_, mode_),
 #endif
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+#if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
+#if HPX_AGAS_VERSION > 0x10
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
@@ -133,12 +138,17 @@ namespace hpx
         agas_client_(parcel_port_, ini_, mode_),
 #endif
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+#if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
+#if HPX_AGAS_VERSION > 0x10
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
@@ -170,12 +180,17 @@ namespace hpx
         agas_client_(parcel_port_, ini_, mode_),
 #endif
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+#if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
+#if HPX_AGAS_VERSION > 0x10
+        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+#endif
         applier_(parcel_handler_, thread_manager_, 
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),

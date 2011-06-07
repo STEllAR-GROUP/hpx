@@ -555,6 +555,17 @@ namespace hpx
         parcelset::parcelport parcel_port_;
         naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;
+        #if HPX_AGAS_VERSION <= 0x10
+            util::detail::init_logging init_logging_;
+            scheduling_policy_type scheduler_;
+            notification_policy_type notifier_;
+            threadmanager_type thread_manager_;
+        #else
+            scheduling_policy_type scheduler_;
+            notification_policy_type notifier_;
+            threadmanager_type thread_manager_;
+            util::detail::init_logging init_logging_;
+        #endif
         util::detail::init_logging init_logging_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
