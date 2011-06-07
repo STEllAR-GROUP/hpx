@@ -95,7 +95,6 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -133,7 +132,6 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -171,7 +169,6 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        counters_(agas_client_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         scheduler_(init),
@@ -245,7 +242,12 @@ namespace hpx
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
 #endif
-        // {{{ early startup code - still in bootstrap mode
+        // {{{ early startup code
+        #if HPX_AGAS_VERSION > 0x10
+            // load components now that AGAS is up
+            get_config().load_components();
+        #endif
+
         // init TSS for the main thread, this enables logging, time logging, etc.
         init_tss();
         
@@ -258,8 +260,8 @@ namespace hpx
 
         // AGAS v2 starts the parcel port itself
         #if HPX_AGAS_VERSION <= 0x10
-        parcel_port_.run(false);            // starts parcel_pool_ as well
-        LRT_(info) << "runtime_impl: started parcelport";
+            parcel_port_.run(false);            // starts parcel_pool_ as well
+            LRT_(info) << "runtime_impl: started parcelport";
         #endif
 
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
@@ -464,13 +466,22 @@ namespace hpx
         boost::mutex mtx;
         boost::condition cond;
         boost::mutex::scoped_lock l(mtx);
-        parcel_port_.get_io_service_pool().get_io_service().post(
-            boost::bind(&runtime_impl::stopped, this, blocking, 
+
+        #if HPX_AGAS_VERSION <= 0x10
+            parcel_port_.get_io_service_pool().get_io_service().post
+        #else
+            boost::thread t
+        #endif
+            (boost::bind(&runtime_impl::stopped, this, blocking, 
                 boost::ref(cond), boost::ref(mtx)));
         cond.wait(l);
 
-//         // stop the rest of the system
-//         parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+        #if HPX_AGAS_VERSION > 0x10
+            t.join();
+        #endif
+
+//        // stop the rest of the system
+//        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
 
         deinit_tss();
     }
@@ -488,9 +499,11 @@ namespace hpx
 
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
-        error_code ec;
-        agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
-        agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
+        #if 1 //HPX_AGAS_VERSION <= 0x10
+            error_code ec;
+            agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
+            agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
+        #endif
 
         // this disables all logging from the main thread
         deinit_tss();

@@ -140,6 +140,7 @@ namespace hpx
                     = std::vector<std::string>())
           : ini_(util::detail::get_logging_data(), hpx_ini_file,
                  cmdline_ini_defs),
+            counters_(agas_client),
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
@@ -207,11 +208,19 @@ namespace hpx
             return process_;
         }
         
-        virtual performance_counters::registry&
-        get_counter_registry() = 0;
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry& get_counter_registry()
+        {
+            return counters_;
+        }
 
-        virtual performance_counters::registry const&
-        get_counter_registry() const = 0;
+        /// \brief Allow access to the registry counter registry instance used 
+        ///        by the HPX runtime.
+        performance_counters::registry const& get_counter_registry() const
+        {
+            return counters_;
+        }
 
     protected:
         void init_tss();
@@ -226,6 +235,7 @@ namespace hpx
         boost::mutex on_exit_functions_mtx_;
 
         util::runtime_configuration ini_;
+        performance_counters::registry counters_;
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
@@ -443,20 +453,6 @@ namespace hpx
         ///
         /// \returns          This function will always return 0 (zero).
         int run(std::size_t num_threads, std::size_t num_localities = 1);
-        
-        /// \brief Allow access to the registry counter registry instance used 
-        ///        by the HPX runtime.
-        performance_counters::registry& get_counter_registry()
-        {
-            return counters_;
-        }
-
-        /// \brief Allow access to the registry counter registry instance used 
-        ///        by the HPX runtime.
-        performance_counters::registry const& get_counter_registry() const
-        {
-            return counters_;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Connection>
@@ -471,7 +467,6 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
         naming::resolver_client& get_agas_client()
@@ -540,7 +535,6 @@ namespace hpx
         util::io_service_pool timer_pool_; 
         parcelset::parcelport parcel_port_;
         naming::resolver_client agas_client_;
-        performance_counters::registry counters_;
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
         scheduling_policy_type scheduler_;
