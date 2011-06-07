@@ -83,13 +83,13 @@ namespace hpx { namespace threads
         scheduler_(scheduler),
         notifier_(notifier)
     {
-        LTM_(debug) << "threadmanager_impl ctor";
+        //LTM_(debug) << "threadmanager_impl ctor";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threadmanager_impl<SchedulingPolicy, NotificationPolicy>::~threadmanager_impl() 
     {
-        LTM_(debug) << "~threadmanager_impl";
+        //LTM_(debug) << "~threadmanager_impl";
         if (!threads_.empty()) {
             if (running_) 
                 stop();
