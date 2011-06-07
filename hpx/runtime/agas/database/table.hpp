@@ -30,6 +30,8 @@ struct table
     ~table()
     { traits::database::disconnect_table<Database, Key, Value>(table_); }
 
+    // REVIEW: requiring these to return by reference/const reference might be
+    // a little too restrictive.
     map_type& get() { return table_; }
     map_type const& get() const { return table_; }
 };
