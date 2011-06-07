@@ -314,6 +314,7 @@ struct legacy_router : boost::noncopyable
 
             // TODO: I don't think we actually need this code here, because
             // AGAS can't enter active state without a registered console.
+#if 0
             if ((success == r.get_status()) && is_console())
             {
                 // TODO: Should we really be using the client API for this?
@@ -323,6 +324,7 @@ struct legacy_router : boost::noncopyable
                         "a console locality is already registered");
                 }
             } 
+#endif
 
             return r.get_status() == success;
         }
@@ -418,16 +420,18 @@ struct legacy_router : boost::noncopyable
     } // }}}
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      component_id_type type, error_code& ec = throws) 
+                      components::component_type type, error_code& ec = throws) 
     { // {{{ get_prefixes implementation
         if (type != components::component_invalid)
         {
             response_type r;
 
             if (is_bootstrap())
-                r = bootstrap->component_ns_server.resolve_id(type);
+                r = bootstrap->component_ns_server.resolve_id
+                    (component_id_type(type));
             else
-                r = hosted->component_ns_.resolve(type);
+                r = hosted->component_ns_.resolve
+                    (component_id_type(type));
    
             const count_type s = r.get_localities_size();
             prefix_type* p = r.get_localities();
@@ -470,7 +474,7 @@ struct legacy_router : boost::noncopyable
                       error_code& ec = throws) 
     { return get_prefixes(prefixes, components::component_invalid, ec); }
 
-    component_id_type
+    components::component_type
     get_component_id(std::string const& name, error_code& ec = throws) 
     { /// {{{
         response_type r;
@@ -481,7 +485,7 @@ struct legacy_router : boost::noncopyable
             r = hosted->component_ns_.bind(name);
 
         // REVIEW: Check response status?
-        return r.get_component_type();
+        return (components::component_type) r.get_component_type();
     } // }}} 
 
     component_id_type
@@ -489,11 +493,13 @@ struct legacy_router : boost::noncopyable
                      error_code& ec = throws) 
     { // {{{
         if (is_bootstrap())
-            return bootstrap->component_ns_server.bind_prefix(name,
-                naming::get_prefix_from_gid(prefix)).get_component_type();
+            return (components::component_type)
+                bootstrap->component_ns_server.bind_prefix(name,
+                    naming::get_prefix_from_gid(prefix)).get_component_type();
         else
-            return hosted->component_ns_.bind(name,
-                naming::get_prefix_from_gid(prefix)).get_component_type();
+            return (components::component_type)
+                hosted->component_ns_.bind(name,
+                    naming::get_prefix_from_gid(prefix)).get_component_type();
     } // }}}
 
     bool get_id_range(naming::locality const& l, count_type count, 
@@ -578,7 +584,7 @@ struct legacy_router : boost::noncopyable
     } 
 
     count_type
-    decref(naming::gid_type const& id, component_id_type& t,
+    decref(naming::gid_type const& id, components::component_type& t,
            count_type credits = 1, error_code& ec = throws) 
     { // {{{ decref implementation
         using boost::fusion::at_c;
@@ -591,7 +597,7 @@ struct legacy_router : boost::noncopyable
             r = hosted->primary_ns_.decrement(id, credits);
 
         if (0 == r.get_count())
-            t = r.get_component_type();
+            t = (components::component_type) r.get_component_type();
 
         return r.get_count();
     } // }}}

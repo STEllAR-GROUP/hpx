@@ -39,11 +39,7 @@ namespace hpx { namespace naming
 
                 error_code ec;
 
-#if HPX_AGAS_VERSION <= 0x10
                 components::component_type t = components::component_invalid;
-#else
-                naming::resolver_client::component_id_type t = components::component_invalid;
-#endif
                 if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
                 {
                     components::stubs::runtime_support::free_component_sync((components::component_type)t, *p);
