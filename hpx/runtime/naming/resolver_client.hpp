@@ -834,19 +834,13 @@ namespace hpx { namespace naming
 #else
 
 #include <hpx/runtime/agas/router/legacy.hpp>
-#include <hpx/runtime/agas/database/backend/default.hpp>
 
 namespace hpx { namespace naming
 {
 
-struct resolver_client
-    : hpx::agas::legacy_router<
-        hpx::agas::tag::database::default_
-    >
+struct resolver_client : hpx::agas::legacy_router
 {
-    typedef hpx::agas::legacy_router<
-        hpx::agas::tag::database::default_
-    > base_type;
+    typedef hpx::agas::legacy_router base_type;
 
     resolver_client(
         parcelset::parcelport& pp 

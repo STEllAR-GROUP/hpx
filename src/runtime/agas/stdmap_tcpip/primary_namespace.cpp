@@ -20,16 +20,11 @@
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 
-using boost::optional;
-
 using hpx::components::component_agas_symbol_namespace;
-using hpx::components::component_base_lco_with_value;
-using hpx::lcos::base_lco_with_value;
-using hpx::naming::gid_type;
 
 typedef hpx::agas::server::primary_namespace<
-    hpx::agas::tag::database::stdmap,
-    hpx::agas::tag::network::tcpip
+    hpx::agas::tag::database::stdmap
+  , hpx::agas::tag::network::tcpip
 > agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
@@ -38,27 +33,6 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     agas_component, component_agas_primary_namespace);
-
-HPX_REGISTER_ACTION_EX(
-    base_lco_with_value<agas_component::gva_type>::set_result_action,
-    set_result_action_agas_stdmap_tcpip_gva_type);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    base_lco_with_value<agas_component::gva_type>,
-    component_base_lco_with_value);
-
-HPX_REGISTER_ACTION_EX(
-    base_lco_with_value<agas_component::locality_type>::set_result_action,
-    set_result_action_agas_stdmap_tcpip_locality_type);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    base_lco_with_value<agas_component::locality_type>,
-    component_base_lco_with_value);
-
-HPX_REGISTER_ACTION_EX(
-    base_lco_with_value<optional<agas_component::gva_type> >::set_result_action,
-    set_result_action_agas_stdmap_tcpip_binding_type);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    base_lco_with_value<optional<agas_component::gva_type> >,
-    component_base_lco_with_value);
 
 HPX_REGISTER_ACTION_EX(
     agas_component::bind_locality_action,
@@ -78,8 +52,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     agas_component::localities_action,
     stdmap_tcpip_primary_namespace_localities_action);
-
-// GID reference count interface
 HPX_REGISTER_ACTION_EX(
     agas_component::increment_action,
     stdmap_tcpip_primary_namespace_increment_action);

@@ -17,21 +17,22 @@ namespace hpx { namespace agas
 {
 
 // TODO: add error code parameters
-template <typename Database>
+template <typename Database, typename Protocol>
 struct component_namespace :
     components::client_base<
-        component_namespace<Database>,
-        stubs::component_namespace<Database>
+        component_namespace<Database, Protocol>,
+        stubs::component_namespace<Database, Protocol>
     >
 {
     // {{{ nested types 
     typedef components::client_base<
-        component_namespace<Database>,
-        stubs::component_namespace<Database>
+        component_namespace<Database, Protocol>,
+        stubs::component_namespace<Database, Protocol>
     > base_type; 
 
-    typedef server::component_namespace<Database> server_type;
+    typedef server::component_namespace<Database, Protocol> server_type;
     
+    typedef typename server_type::response_type response_type;
     typedef typename server_type::component_name_type component_name_type;
     typedef typename server_type::component_id_type component_id_type;
     typedef typename server_type::prefix_type prefix_type;
@@ -45,45 +46,41 @@ struct component_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<component_id_type>
+    lcos::future_value<response_type>
     bind_async(component_name_type const& key, prefix_type prefix)
     { return this->base_type::bind_prefix_async(this->gid_, key, prefix); }
 
-    component_id_type
-    bind(component_name_type const& key, prefix_type prefix)
+    response_type bind(component_name_type const& key, prefix_type prefix)
     { return this->base_type::bind_prefix(this->gid_, key, prefix); }
     
-    lcos::future_value<component_id_type>
-    bind_async(component_name_type const& key)
+    lcos::future_value<response_type> bind_async(component_name_type const& key)
     { return this->base_type::bind_name_async(this->gid_, key); }
     
-    component_id_type bind(component_name_type const& key)
+    response_type bind(component_name_type const& key)
     { return this->base_type::bind_name(this->gid_, key); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // resolve_id and resolve_name interface - note the clever use of overloads
-    // in the client.
-    lcos::future_value<prefixes_type>
-    resolve_async(component_id_type key)
+    // resolve_id and resolve_name interface 
+    lcos::future_value<response_type> resolve_async(component_id_type key)
     { return this->base_type::resolve_id_async(this->gid_, key); }
     
-    prefixes_type resolve(component_id_type key)
+    response_type resolve(component_id_type key)
     { return this->base_type::resolve_id(this->gid_, key); }
 
-    lcos::future_value<component_id_type>
+    lcos::future_value<response_type>
     resolve_async(component_name_type const& key)
     { return this->base_type::resolve_name_async(this->gid_, key); }
     
-    component_id_type resolve(component_name_type const& key)
+    response_type resolve(component_name_type const& key)
     { return this->base_type::resolve_name(this->gid_, key); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<bool>
+    lcos::future_value<response_type>
     unbind_async(component_name_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    bool unbind(component_name_type const& key)
+    response_type unbind(component_name_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
 

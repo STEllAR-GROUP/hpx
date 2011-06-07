@@ -52,6 +52,8 @@ namespace hpx
         startup_timed_out = 21,
         uninitialized_value = 22,
         bad_response_type = 23,
+        unknown_locality = 24,
+        unknown_gid = 25,
         last_error
     };
 

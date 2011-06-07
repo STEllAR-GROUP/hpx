@@ -24,6 +24,9 @@
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/runtime/agas/namespace/response.hpp>
+
+// TODO: use response move semantics (?)
 
 namespace hpx { namespace agas { namespace server
 {
@@ -59,10 +62,10 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         naming::gid_type, naming::gid_type, naming::gid_type, bool
     > binding_type;
 
-    typedef boost::optional<gva_type> unbinding_type;
-
     typedef boost::fusion::vector2<naming::gid_type, gva_type>
         locality_type;
+
+    typedef response<Protocol> response_type;
 
     typedef table<Database, naming::gid_type, gva_type>
         gva_table_type; 
@@ -88,8 +91,10 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         refcnts_(std::string("hpx.agas.") + name +".refcnt")
     { traits::initialize_mutex(mutex_); }
 
-    binding_type bind_locality(endpoint_type const& ep, count_type count)
-    { // {{{ bind_locality implementation
+    response_type bind_locality(
+        endpoint_type const& ep
+      , count_type count
+    ) { // {{{ bind_locality implementation
         using boost::fusion::at_c;
 
         typename database_mutex_type::scoped_lock l(mutex_);
@@ -109,8 +114,11 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         {
             // Just return the prefix
             if (count == 0)
-              return binding_type(at_c<1>(it->second), at_c<1>(it->second),
-                  naming::get_gid_from_prefix(at_c<0>(it->second)), false);
+              return response_type(primary_ns_bind_locality
+                                 , at_c<1>(it->second)
+                                 , at_c<1>(it->second)
+                                 , at_c<0>(it->second)
+                                 , repeated_request);
 
             // Compute the new allocation.
             naming::gid_type lower(at_c<1>(it->second) + 1),
@@ -138,8 +146,11 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
-            return binding_type(lower, upper,
-                naming::get_gid_from_prefix(at_c<0>(it->second)), false);
+            return response_type(primary_ns_bind_locality
+                               , lower
+                               , upper
+                               , at_c<0>(it->second)
+                               , repeated_request);
         }
 
         // If the endpoint isn't in the table, then we're registering it.
@@ -194,7 +205,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
             if (HPX_UNLIKELY(!git.second))
             {
                 // REVIEW: Is this the right error code to use?
-                HPX_THROW_IN_CURRENT_FUNC(no_success, 
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
                     "insertion failed due to memory corruption or a locking "
                     "error");
             }
@@ -211,16 +222,23 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
                 naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
-                return binding_type(lower, upper, id, true);
+                return response_type(primary_ns_bind_locality
+                                   , lower
+                                   , upper
+                                   , prefix);
             }
 
-            return binding_type
-                (naming::invalid_gid, naming::invalid_gid, id, true);
+            return response_type(primary_ns_bind_locality
+                               , naming::invalid_gid
+                               , naming::invalid_gid
+                               , prefix);
         }
     } // }}}
 
-    bool bind_gid(naming::gid_type const& gid, gva_type const& gva)
-    { // {{{ bind_gid implementation
+    response_type bind_gid(
+        naming::gid_type const& gid
+      , gva_type const& gva
+    ) { // {{{ bind_gid implementation
         using boost::fusion::at_c;
 
         // TODO: Implement and use a non-mutating version of
@@ -258,7 +276,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 it->second.type = gva.type;
                 it->second.lva(gva.lva());
                 it->second.offset = gva.offset;
-                return false;
+                return response_type(primary_ns_bind_gid, repeated_request);
             }
 
             // We're about to decrement it, so make sure it's safe to do so.
@@ -309,11 +327,12 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 "error");
         }
 
-        return true;
+        return response_type(primary_ns_bind_gid);
     } // }}}
 
-    locality_type resolve_locality(endpoint_type const& ep) 
-    { // {{{ resolve_endpoint implementation
+    response_type resolve_locality(
+        endpoint_type const& ep
+    ) { // {{{ resolve_endpoint implementation
         using boost::fusion::at_c;
 
         typename database_mutex_type::scoped_lock l(mutex_);
@@ -343,7 +362,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
             {
                 // Check for exact match
                 if (git->first == id)
-                    return locality_type(git->first, git->second);
+                    return response_type(primary_ns_resolve_locality
+                                       , naming::get_prefix_from_gid(git->first)
+                                       , git->second);
     
                 // We need to decrement the iterator, check that it's safe to do
                 // so.
@@ -357,12 +378,16 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                         if (HPX_UNLIKELY(id.get_msb() != git->first.get_msb()))
                         {
                             HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                                "MSBs of lower and upper range bound do not match");
+                                "MSBs of lower and upper range bound do not "
+                                "match");
                         }
      
-                        // Calculation of the lva address occurs in gva<>::resolve()
-                        return locality_type
-                            (git->first, git->second.resolve(id, git->first));
+                        // Calculation of the lva address occurs in
+                        // gva<>::resolve()
+                        return response_type
+                            (primary_ns_resolve_locality
+                           , naming::get_prefix_from_gid(git->first)
+                           , git->second.resolve(id, git->first));
                     }
                 }
             }
@@ -380,18 +405,24 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                             "MSBs of lower and upper range bound do not match");
                     }
      
-                    // Calculation of the local address occurs in gva<>::resolve()
-                    return locality_type
-                        (git->first, git->second.resolve(id, git->first));
+                    // Calculation of the local address occurs in
+                    // gva<>::resolve()
+                    return response_type(primary_ns_resolve_locality
+                                       , naming::get_prefix_from_gid(git->first)
+                                       , git->second.resolve(id, git->first));
                 }
             }
         }
 
-        return locality_type();
+        return response_type(primary_ns_resolve_locality
+                           , 0
+                           , gva_type()
+                           , unknown_locality);
     } // }}}
 
-    gva_type resolve_gid(naming::gid_type const& gid) 
-    { // {{{ resolve_gid implementation 
+    response_type resolve_gid(
+        naming::gid_type const& gid
+    ) { // {{{ resolve_gid implementation 
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -411,7 +442,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         {
             // Check for exact match
             if (it->first == id)
-                return it->second;
+                return response_type(primary_ns_resolve_gid
+                                   , it->second);
 
             // We need to decrement the iterator, check that it's safe to do
             // so.
@@ -429,7 +461,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                     }
  
                     // Calculation of the lva address occurs in gva<>::resolve()
-                    return it->second.resolve(id, it->first);
+                    return response_type(primary_ns_resolve_gid
+                                       , it->second.resolve(id, it->first));
                 }
             }
         }
@@ -448,15 +481,20 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 }
  
                 // Calculation of the local address occurs in gva<>::resolve()
-                return it->second.resolve(id, it->first);
+                return response_type(primary_ns_resolve_gid
+                                   , it->second.resolve(id, it->first));
             }
         }
 
-        return gva_type();
+        return response_type(primary_ns_resolve_gid
+                           , naming::invalid_gid
+                           , unknown_gid);
     } // }}}
 
-    unbinding_type unbind(naming::gid_type const& gid, count_type count)
-    { // {{{ unbind implementation
+    response_type unbind(
+        naming::gid_type const& gid
+      , count_type count
+    ) { // {{{ unbind implementation
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -479,17 +517,20 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                     "block sizes must match");
             }
 
-            unbinding_type ep(it->second);
             gva_table.erase(it);
-            return ep;
+            return response_type(primary_ns_unbind, it->second);
         }
 
         else
-            return unbinding_type();       
+            return response_type(primary_ns_unbind
+                               , endpoint_type()
+                               , unknown_gid);
     } // }}}
 
-    count_type increment(naming::gid_type const& gid, count_type credits)
-    { // {{{ increment implementation
+    response_type increment(
+        naming::gid_type const& gid
+      , count_type credits
+    ) { // {{{ increment implementation
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -522,12 +563,13 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         }
        
         // Add the requested amount and return the new total 
-        return (it->second += credits);
+        return response_type(primary_ns_increment, it->second += credits);
     } // }}}
     
-    decrement_type 
-    decrement(naming::gid_type const& gid, count_type credits)
-    { // {{{ decrement implementation
+    response_type decrement(
+        naming::gid_type const& gid
+      , count_type credits
+    ) { // {{{ decrement implementation
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -577,7 +619,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 {
                     // Did we get an exact match?
                     if (git->first == id)
-                        return decrement_type(cnt, git->second.type);
+                        return response_type(primary_ns_decrement
+                                           , cnt
+                                           , git->second.type);
 
                     // Check if we can safely decrement the iterator.
                     else if (git != gbegin)
@@ -589,8 +633,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                         {
                             // Make sure that the msbs match
                             if (id.get_msb() == git->first.get_msb())
-                                return decrement_type
-                                    (cnt, git->second.type);
+                                return response_type(primary_ns_decrement
+                                                   , cnt
+                                                   , git->second.type);
                         } 
                     }
                 }
@@ -604,7 +649,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                     {
                         // Make sure that the msbs match
                         if (id.get_msb() == git->first.get_msb())
-                            return decrement_type(cnt, git->second.type);
+                            return response_type(primary_ns_decrement
+                                               , cnt
+                                               , git->second.type);
                     } 
                 }
 
@@ -615,7 +662,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
             }
 
             else
-                return decrement_type(cnt, components::component_invalid);
+                return response_type(primary_ns_decrement
+                                   , cnt
+                                   , components::component_invalid);
         }
         
         // We need to insert a new reference count entry. We assume that
@@ -647,14 +696,14 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         
         BOOST_ASSERT(0 != cnt);
  
-        return decrement_type(cnt, components::component_invalid);
+        return response_type(primary_ns_decrement
+                           , cnt
+                           , components::component_invalid);
     } // }}}
  
-    prefixes_type localities()
+    response_type localities()
     { // {{{ localities implementation
         using boost::fusion::at_c;
-
-        prefixes_type prefixes;
 
         typename database_mutex_type::scoped_lock l(mutex_);
 
@@ -662,16 +711,27 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         typename partition_table_type::map_type const&
             partition_table = partitions_.get();
 
-        prefixes.reserve(partition_table.size());
+        const count_type s = partition_table.size();
 
-        typename partition_table_type::map_type::const_iterator
-            it = partition_table.begin(),
-            end = partition_table.end(); 
+        if (s == 0)
+        {
+            prefix_type* p = 0;
+            return response_type(primary_ns_localities, 0, p);
+        }
 
-        for (; it != end; ++it)
-            prefixes.push_back(at_c<0>(it->second));
+        else
+        {
+            prefix_type* p = new prefix_type [s];
 
-        return prefixes;
+            typename partition_table_type::map_type::const_iterator
+                it = partition_table.begin(),
+                end = partition_table.end(); 
+
+            for (count_type i = 0; it != end; ++it, ++i)
+                p[i] = at_c<0>(it->second); 
+
+            return response_type(primary_ns_localities, s, p);
+        }
     } // }}}
 
     enum actions 
@@ -688,7 +748,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ binding_type,
+        /* return type */ response_type,
         /* enum value */  namespace_bind_locality,
         /* arguments */   endpoint_type const&, count_type,
         &primary_namespace<Database, Protocol>::bind_locality
@@ -696,7 +756,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ bool,
+        /* return type */ response_type,
         /* enum value */  namespace_bind_gid,
         /* arguments */   naming::gid_type const&, gva_type const&,
         &primary_namespace<Database, Protocol>::bind_gid
@@ -704,7 +764,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
-        /* return type */ locality_type,
+        /* return type */ response_type,
         /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
         &primary_namespace<Database, Protocol>::resolve_locality
@@ -712,7 +772,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
-        /* return type */ gva_type,
+        /* return type */ response_type,
         /* enum value */  namespace_resolve_gid,
         /* arguments */   naming::gid_type const&,
         &primary_namespace<Database, Protocol>::resolve_gid
@@ -720,7 +780,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ unbinding_type,
+        /* return type */ response_type,
         /* enum value */  namespace_unbind,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::unbind
@@ -728,7 +788,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ count_type,  
+        /* return type */ response_type,  
         /* enum value */  namespace_increment,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::increment
@@ -736,7 +796,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
-        /* return type */ decrement_type,
+        /* return type */ response_type,
         /* enum value */  namespace_decrement,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::decrement
@@ -744,7 +804,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     
     typedef hpx::actions::result_action0<
         primary_namespace<Database, Protocol>,
-        /* return type */ prefixes_type,
+        /* return type */ response_type,
         /* enum value */  namespace_localities,
         &primary_namespace<Database, Protocol>::localities
     > localities_action;

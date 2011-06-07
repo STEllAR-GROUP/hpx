@@ -15,17 +15,19 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
+#include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
 
 using hpx::components::component_agas_component_namespace;
 
 typedef hpx::agas::server::component_namespace<
     hpx::agas::tag::database::stdmap
+  , hpx::agas::tag::network::tcpip
 > agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::fixed_component<agas_component>,
-    stdmap_component_namespace);
+    stdmap_tcpip_component_namespace);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     agas_component, component_agas_component_namespace);

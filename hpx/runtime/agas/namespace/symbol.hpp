@@ -17,21 +17,22 @@ namespace hpx { namespace agas
 {
 
 // TODO: add error code parameters
-template <typename Database>
+template <typename Database, typename Protocol>
 struct symbol_namespace :
     components::client_base<
-        symbol_namespace<Database>,
-        stubs::symbol_namespace<Database>
+        symbol_namespace<Database, Protocol>,
+        stubs::symbol_namespace<Database, Protocol>
     >
 {
     // {{{ nested types 
     typedef components::client_base<
-        symbol_namespace<Database>,
-        stubs::symbol_namespace<Database>
+        symbol_namespace<Database, Protocol>,
+        stubs::symbol_namespace<Database, Protocol>
     > base_type; 
 
-    typedef server::symbol_namespace<Database> server_type;
+    typedef server::symbol_namespace<Database, Protocol> server_type;
 
+    typedef typename server_type::response_type response_type;
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
@@ -42,36 +43,36 @@ struct symbol_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<bool>
+    lcos::future_value<response_type>
     bind_async(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind_async(this->gid_, key, gid); }
 
-    bool bind(symbol_type const& key, naming::gid_type const& gid)
+    response_type bind(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind(this->gid_, key, gid); }
     
     ///////////////////////////////////////////////////////////////////////////
     // rebind interface 
-    lcos::future_value<naming::gid_type>
+    lcos::future_value<response_type>
     rebind_async(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::rebind_async(this->gid_, key, gid); }
 
-    naming::gid_type rebind(symbol_type const& key, naming::gid_type const& gid)
+    response_type rebind(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::rebind(this->gid_, key, gid); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve interface 
-    lcos::future_value<naming::gid_type> resolve_async(symbol_type const& key)
+    lcos::future_value<response_type> resolve_async(symbol_type const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
-    naming::gid_type resolve(symbol_type const& key)
+    response_type resolve(symbol_type const& key)
     { return this->base_type::resolve(this->gid_, key); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<bool> unbind_async(symbol_type const& key)
+    lcos::future_value<response_type> unbind_async(symbol_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    bool unbind(symbol_type const& key)
+    response_type unbind(symbol_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
 };            
 

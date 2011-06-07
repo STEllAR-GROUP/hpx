@@ -32,6 +32,7 @@ struct primary_namespace :
 
     typedef server::primary_namespace<Database, Protocol> server_type;
 
+    typedef typename server_type::response_type response_type;
     typedef typename server_type::endpoint_type endpoint_type;
     typedef typename server_type::gva_type gva_type;
     typedef typename server_type::count_type count_type;
@@ -39,7 +40,6 @@ struct primary_namespace :
     typedef typename server_type::prefix_type prefix_type;
     typedef typename server_type::prefixes_type prefixes_type;
     typedef typename server_type::binding_type binding_type;
-    typedef typename server_type::unbinding_type unbinding_type;
     typedef typename server_type::locality_type locality_type;
     typedef typename server_type::decrement_type decrement_type;
     // }}}
@@ -51,70 +51,70 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind_locality and bind_gid interface 
-    lcos::future_value<binding_type>
+    lcos::future_value<response_type>
     bind_async(endpoint_type const& ep, count_type count = 0)
     { return this->base_type::bind_locality_async(this->gid_, ep, count); }
 
-    binding_type bind(endpoint_type const& ep, count_type count = 0)
+    response_type bind(endpoint_type const& ep, count_type count = 0)
     { return this->base_type::bind_locality(this->gid_, ep, count); }
     
-    lcos::future_value<bool>
+    lcos::future_value<response_type>
     bind_async(naming::gid_type const& gid, gva_type const& gva)
     { return this->base_type::bind_gid_async(this->gid_, gid, gva); }
 
-    bool bind(naming::gid_type const& gid, gva_type const& gva)
+    response_type bind(naming::gid_type const& gid, gva_type const& gva)
     { return this->base_type::bind_gid(this->gid_, gid, gva); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_endpoint and resolve_gid interface
-    lcos::future_value<locality_type>
+    lcos::future_value<response_type>
     resolve_async(endpoint_type const& ep)
     { return this->base_type::resolve_locality_async(this->gid_, ep); }
     
-    locality_type resolve(endpoint_type const& ep)
+    response_type resolve(endpoint_type const& ep)
     { return this->base_type::resolve_locality(this->gid_, ep); }
 
-    lcos::future_value<gva_type>
+    lcos::future_value<response_type>
     resolve_async(naming::gid_type const& gid)
     { return this->base_type::resolve_gid_async(this->gid_, gid); }
     
-    gva_type resolve(naming::gid_type const& gid)
+    response_type resolve(naming::gid_type const& gid)
     { return this->base_type::resolve_gid(this->gid_, gid); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<unbinding_type>
+    lcos::future_value<response_type>
     unbind_async(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind_async(this->gid_, gid, count); }
     
-    unbinding_type unbind(naming::gid_type const& gid, count_type count)
+    response_type unbind(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind(this->gid_, gid, count); }
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 
-    lcos::future_value<count_type>
+    lcos::future_value<response_type>
     increment_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::increment_async(this->gid_, gid, credits); }
     
-    count_type increment(naming::gid_type const& gid, count_type credits)
+    response_type increment(naming::gid_type const& gid, count_type credits)
     { return this->base_type::increment(this->gid_, gid, credits); }
     
     ///////////////////////////////////////////////////////////////////////////
     // decrement interface 
-    lcos::future_value<decrement_type>
+    lcos::future_value<response_type>
     decrement_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::decrement_async(this->gid_, gid, credits); }
     
-    decrement_type 
+    response_type 
     decrement(naming::gid_type const& gid, count_type credits)
     { return this->base_type::decrement(this->gid_, gid, credits); }
 
     ///////////////////////////////////////////////////////////////////////////
     // localities interface 
-    lcos::future_value<prefixes_type> localities_async()
+    lcos::future_value<response_type> localities_async()
     { return this->base_type::localities_async(this->gid_); }
     
-    prefixes_type localities()
+    response_type localities()
     { return this->base_type::localities(this->gid_); }
 }; 
 

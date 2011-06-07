@@ -13,16 +13,19 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
+#include <hpx/runtime/agas/namespace/response.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+
+// TODO: use response move semantics (?)
 
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database>
+template <typename Database, typename Protocol>
 struct HPX_COMPONENT_EXPORT symbol_namespace :
   components::fixed_component_base<
     HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-    symbol_namespace<Database>
+    symbol_namespace<Database, Protocol>
   >
 {
     // {{{ nested types
@@ -30,6 +33,8 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
         database_mutex_type;
 
     typedef std::string symbol_type;
+
+    typedef response<Protocol> response_type;
 
     typedef table<Database, symbol_type, naming::gid_type>
         gid_table_type; 
@@ -45,8 +50,10 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
         gids_(std::string("hpx.agas.") + name + ".gid")
     { traits::initialize_mutex(mutex_); }
 
-    bool bind(symbol_type const& key, naming::gid_type const& gid)
-    { // {{{ bind implementation
+    response_type bind(
+        symbol_type const& key
+      , naming::gid_type const& gid
+    ) { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Always load the table once, as this operation might be slow for some
@@ -57,15 +64,16 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it != end)
-            return false;
+            return response_type(symbol_ns_bind, no_success);
 
         gid_table.insert(typename
             gid_table_type::map_type::value_type(key, gid));
-        return true; 
+        return response_type(symbol_ns_bind); 
     } // }}}
     
-    naming::gid_type rebind(symbol_type const& key, naming::gid_type const& gid)
-    { // {{{ bind implementation
+    response_type rebind(
+        symbol_type const& key, naming::gid_type const& gid
+    ) { // {{{ bind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
         // Always load the table once, as this operation might be slow for some
@@ -79,16 +87,17 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
         {
             naming::gid_type old = it->second;
             it->second = gid;
-            return old;
+            return response_type(symbol_ns_rebind, old);
         }
 
         gid_table.insert(typename
             gid_table_type::map_type::value_type(key, gid));
-        return gid; 
+        return response_type(symbol_ns_rebind, gid); 
     } // }}}
 
-    naming::gid_type resolve(symbol_type const& key)
-    { // {{{ resolve implementation
+    response_type resolve(
+        symbol_type const& key
+    ) { // {{{ resolve implementation
         typename database_mutex_type::scoped_lock l(mutex_);
 
         typename gid_table_type::map_type& gid_table = gids_.get();
@@ -97,13 +106,16 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it == end)
-            return naming::invalid_gid;
+            return response_type(symbol_ns_resolve
+                               , naming::invalid_gid
+                               , no_success);
 
-        return it->second;
+        return response_type(symbol_ns_resolve, it->second);
     } // }}}  
     
-    bool unbind(symbol_type const& key)
-    { // {{{ unbind implementation
+    response_type unbind(
+        symbol_type const& key
+    ) { // {{{ unbind implementation
         typename database_mutex_type::scoped_lock l(mutex_);
         
         typename gid_table_type::map_type& gid_table = gids_.get();
@@ -112,50 +124,50 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it == end)
-            return false;
+            return response_type(symbol_ns_unbind, no_success);
 
         gid_table.erase(key);
-        return true;
+        return response_type(symbol_ns_unbind);
     } // }}} 
 
     enum actions
     { // {{{ action enum
-        namespace_bind              = BOOST_BINARY_U(0 0 1 00000),
-        namespace_rebind            = BOOST_BINARY_U(0 0 1 00001),
-        namespace_resolve           = BOOST_BINARY_U(0 0 1 00010),
-        namespace_unbind            = BOOST_BINARY_U(0 0 1 00011)
+        namespace_bind    = BOOST_BINARY_U(0010000),
+        namespace_rebind  = BOOST_BINARY_U(0010001),
+        namespace_resolve = BOOST_BINARY_U(0010010),
+        namespace_unbind  = BOOST_BINARY_U(0010011)
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        symbol_namespace<Database>,
-        /* return type */ bool,
+        symbol_namespace<Database, Protocol>,
+        /* return type */ response_type,
         /* enum value */  namespace_bind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
-        &symbol_namespace<Database>::bind
+        &symbol_namespace<Database, Protocol>::bind
     > bind_action;
     
     typedef hpx::actions::result_action2<
-        symbol_namespace<Database>,
-        /* return type */ naming::gid_type,
+        symbol_namespace<Database, Protocol>,
+        /* return type */ response_type,
         /* enum value */  namespace_rebind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
-        &symbol_namespace<Database>::rebind
+        &symbol_namespace<Database, Protocol>::rebind
     > rebind_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace<Database>,
-        /* return type */ naming::gid_type,
+        symbol_namespace<Database, Protocol>,
+        /* return type */ response_type,
         /* enum value */  namespace_resolve,
         /* arguments */   symbol_type const&,
-        &symbol_namespace<Database>::resolve
+        &symbol_namespace<Database, Protocol>::resolve
     > resolve_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace<Database>,
-        /* retrun type */ bool,
+        symbol_namespace<Database, Protocol>,
+        /* retrun type */ response_type,
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
-        &symbol_namespace<Database>::unbind
+        &symbol_namespace<Database, Protocol>::unbind
     > unbind_action;
 };
 

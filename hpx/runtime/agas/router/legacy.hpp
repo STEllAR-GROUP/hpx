@@ -28,6 +28,7 @@
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
+#include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -39,37 +40,36 @@ namespace hpx { namespace agas
 {
 
 // TODO: pass error codes once they're implemented in AGAS.
-template <typename Database>
 struct legacy_router : boost::noncopyable
 {
     // {{{ types 
-    typedef primary_namespace<Database, tag::network::tcpip>
+    typedef primary_namespace<tag::database::stdmap, tag::network::tcpip>
         primary_namespace_type;
 
-    typedef component_namespace<Database> component_namespace_type;
-    typedef symbol_namespace<Database> symbol_namespace_type;
+    typedef component_namespace<tag::database::stdmap, tag::network::tcpip>
+        component_namespace_type;
 
-    typedef typename primary_namespace_type::server_type
+    typedef symbol_namespace<tag::database::stdmap, tag::network::tcpip>
+        symbol_namespace_type;
+
+    typedef primary_namespace_type::server_type
         primary_namespace_server_type; 
 
-    typedef typename component_namespace_type::server_type
+    typedef component_namespace_type::server_type
         component_namespace_server_type; 
 
-    typedef typename symbol_namespace_type::server_type
+    typedef symbol_namespace_type::server_type
         symbol_namespace_server_type; 
 
-    typedef typename component_namespace_type::component_id_type
-        component_id_type;
+    typedef component_namespace_type::component_id_type component_id_type;
 
-    typedef typename primary_namespace_type::gva_type gva_type;
-    typedef typename primary_namespace_type::count_type count_type;
-    typedef typename primary_namespace_type::offset_type offset_type;
-    typedef typename primary_namespace_type::endpoint_type endpoint_type;
-    typedef typename primary_namespace_type::unbinding_type unbinding_type;
-    typedef typename primary_namespace_type::binding_type binding_type;
-    typedef typename component_namespace_type::prefixes_type prefixes_type;
-    typedef typename component_namespace_type::prefix_type prefix_type;
-    typedef typename primary_namespace_type::decrement_type decrement_type;
+    typedef response<tag::network::tcpip> response_type; 
+
+    typedef primary_namespace_type::gva_type gva_type;
+    typedef primary_namespace_type::count_type count_type;
+    typedef primary_namespace_type::offset_type offset_type;
+    typedef primary_namespace_type::endpoint_type endpoint_type;
+    typedef component_namespace_type::prefix_type prefix_type;
 
     typedef hpx::lcos::mutex cache_mutex_type;
 
@@ -262,7 +262,7 @@ struct legacy_router : boost::noncopyable
             return state_.load();
     }
     
-    void state(router_state new_state) const
+    void state(router_state new_state) 
     { state_.store(new_state); }
 
     bool is_bootstrap() const
@@ -291,47 +291,63 @@ struct legacy_router : boost::noncopyable
 
         if (self)
         {
-            binding_type r;
+            response_type r;
 
             if (is_bootstrap())
                 r = bootstrap->primary_ns_server.bind_locality(ep, 0);
             else
                 r = hosted->primary_ns_.bind(ep, 0);
 
-            prefix = at_c<2>(r);
+            naming::gid_type gid_ = naming::get_gid_from_prefix(r.get_prefix());
 
-            if (!is_bootstrap() && prefix != naming::invalid_gid)
+            if (gid_ != naming::invalid_gid)
             {
-                typename cache_mutex_type::scoped_lock
-                    lock(hosted->locality_cache_mtx_);
-                hosted->locality_cache_.insert(l, prefix);
+                prefix = gid_; 
+
+                if (!is_bootstrap())
+                {
+                    cache_mutex_type::scoped_lock
+                        lock(hosted->locality_cache_mtx_);
+                    hosted->locality_cache_.insert(l, prefix);
+                }
             }
 
-            if (at_c<3>(r) && is_console())
+            // TODO: I don't think we actually need this code here, because
+            // AGAS can't enter active state without a registered console.
+            if ((success == r.get_status()) && is_console())
             {
-                if (!registerid("/locality(console)", at_c<2>(r), ec))
+                // TODO: Should we really be using the client API for this?
+                if (!registerid("/locality(console)", gid_, ec))
                 {
                     HPX_THROWS_IN_CURRENT_FUNC_IF(ec, duplicate_console, 
                         "a console locality is already registered");
                 }
             } 
 
-            return at_c<3>(r);
+            return r.get_status() == success;
         }
         
         else 
         {
-            if (is_bootstrap())
-                prefix = at_c<0>
-                    (bootstrap->primary_ns_server.resolve_locality(ep));
-            else
-                prefix = at_c<0>(hosted->primary_ns_.resolve(ep)); 
+            response_type r;
 
-            if (!is_bootstrap() && prefix != naming::invalid_gid)
+            if (is_bootstrap())
+                r = bootstrap->primary_ns_server.resolve_locality(ep);
+            else
+                r = hosted->primary_ns_.resolve(ep); 
+
+            naming::gid_type gid_ = naming::get_gid_from_prefix(r.get_prefix());
+
+            if (gid_ != naming::invalid_gid)
             {
-                typename cache_mutex_type::scoped_lock
-                    lock(hosted->locality_cache_mtx_);
-                hosted->locality_cache_.insert(l, prefix);
+                prefix = gid_;
+
+                if (!is_bootstrap())
+                {
+                    cache_mutex_type::scoped_lock
+                        lock(hosted->locality_cache_mtx_);
+                    hosted->locality_cache_.insert(l, prefix);
+                }
             }
 
             return false;
@@ -346,7 +362,7 @@ struct legacy_router : boost::noncopyable
  
         locality_entry_type e;
 
-        typename cache_mutex_type::scoped_lock
+        cache_mutex_type::scoped_lock
             lock(hosted->locality_cache_mtx_);
 
         if (hosted->locality_cache_.get_entry(l, e))
@@ -373,63 +389,83 @@ struct legacy_router : boost::noncopyable
             }
         }
 
-        if (is_bootstrap())
-            prefix = bootstrap->symbol_ns_server.resolve("/locality(console)");
+        if (is_bootstrap()) {
+            response_type r = 
+                bootstrap->symbol_ns_server.resolve("/locality(console)");
 
-        else {
-            prefix = hosted->symbol_ns_.resolve("/locality(console)");
-
-            if (prefix != naming::invalid_gid)
-                hosted->console_cache_.store
-                    (naming::get_prefix_from_gid(prefix));
+            if ((r.get_gid() != naming::invalid_gid) &&
+                (r.get_status() == success))
+            {
+                prefix = r.get_gid();
+                return true;
+            }
         }
 
-        return prefix;
+        else {
+            response_type r = hosted->symbol_ns_.resolve("/locality(console)");
+
+            if ((r.get_gid() != naming::invalid_gid) &&
+                (r.get_status() == success))
+            {
+                prefix = r.get_gid();
+                hosted->console_cache_.store
+                    (naming::get_prefix_from_gid(prefix));
+                return true;
+            }
+        }
+
+        return false;
     } // }}}
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       component_id_type type, error_code& ec = throws) 
     { // {{{ get_prefixes implementation
-        typedef typename prefixes_type::const_iterator iterator;
-
         if (type != components::component_invalid)
         {
-            prefixes_type raw_prefixes;
+            response_type r;
 
             if (is_bootstrap())
-                raw_prefixes = bootstrap->component_ns_server.resolve_id(type);
+                r = bootstrap->component_ns_server.resolve_id(type);
             else
-                raw_prefixes = hosted->component_ns_.resolve(type);
+                r = hosted->component_ns_.resolve(type);
    
-            if (raw_prefixes.empty())
+            const count_type s = r.get_localities_size();
+            prefix_type* p = r.get_localities();
+
+            // REVIEW: Check response status too? 
+            if (!s)
                 return false;
  
-            iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
-   
-            for (; it != end; ++it) 
-                prefixes.push_back(naming::get_gid_from_prefix(*it));
+            for (count_type i = 0; i < s; ++i) 
+                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
     
             return true; 
         }
 
-        prefixes_type raw_prefixes;
-
-        if (is_bootstrap())
-            raw_prefixes = bootstrap->primary_ns_server.localities();
         else
-            raw_prefixes = hosted->primary_ns_.localities();
-            
-        if (raw_prefixes.empty())
-            return false;
+        {
+            response_type r;
     
-        iterator it = raw_prefixes.begin(), end = raw_prefixes.end();
-    
-        for (; it != end; ++it) 
-            prefixes.push_back(naming::get_gid_from_prefix(*it));
-    
-        return true; 
+            if (is_bootstrap())
+                r = bootstrap->primary_ns_server.localities();
+            else
+                r = hosted->primary_ns_.localities();
+           
+            const count_type s = r.get_localities_size();
+            prefix_type* p = r.get_localities();
+ 
+            // REVIEW: Check response status too? 
+            if (!s)
+                return false;
+
+            for (count_type i = 0; i < s; ++i) 
+                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+        
+            return true;
+        }
     } // }}} 
 
+    // forwarder
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       error_code& ec = throws) 
     { return get_prefixes(prefixes, components::component_invalid, ec); }
@@ -437,10 +473,15 @@ struct legacy_router : boost::noncopyable
     component_id_type
     get_component_id(std::string const& name, error_code& ec = throws) 
     { /// {{{
+        response_type r;
+
         if (is_bootstrap())
-            return bootstrap->component_ns_server.bind_name(name);
+            r = bootstrap->component_ns_server.bind_name(name);
         else
-            return hosted->component_ns_.bind(name);
+            r = hosted->component_ns_.bind(name);
+
+        // REVIEW: Check response status?
+        return r.get_component_type();
     } // }}} 
 
     component_id_type
@@ -448,11 +489,11 @@ struct legacy_router : boost::noncopyable
                      error_code& ec = throws) 
     { // {{{
         if (is_bootstrap())
-            return bootstrap->component_ns_server.bind_prefix
-                (name, naming::get_prefix_from_gid(prefix));
+            return bootstrap->component_ns_server.bind_prefix(name,
+                naming::get_prefix_from_gid(prefix)).get_component_type();
         else
-            return hosted->component_ns_.bind
-                (name, naming::get_prefix_from_gid(prefix));
+            return hosted->component_ns_.bind(name,
+                naming::get_prefix_from_gid(prefix)).get_component_type();
     } // }}}
 
     bool get_id_range(naming::locality const& l, count_type count, 
@@ -466,19 +507,20 @@ struct legacy_router : boost::noncopyable
 
         endpoint_type ep(addr, l.get_port()); 
          
-        binding_type range;
+        response_type r;
 
         if (is_bootstrap())
-            range = bootstrap->primary_ns_server.bind_locality(ep, count);
+            r = bootstrap->primary_ns_server.bind_locality(ep, count);
         else
-            range = hosted->primary_ns_.bind(ep, count);
+            r = hosted->primary_ns_.bind(ep, count);
 
-        lower_bound = at_c<0>(range);
-        upper_bound = at_c<1>(range);
+        lower_bound = r.get_lower_bound(); 
+        upper_bound = r.get_upper_bound();
 
         return lower_bound && upper_bound;
     } // }}}
 
+    // forwarder
     bool bind(naming::gid_type const& id, naming::address const& addr,
               error_code& ec = throws) 
     { return bind_range(id, 1, addr, 0, ec); }
@@ -500,17 +542,25 @@ struct legacy_router : boost::noncopyable
         
         if (is_bootstrap())
         {
-            if (bootstrap->primary_ns_server.bind_gid(lower_id, gva)) 
+            response_type r
+                = bootstrap->primary_ns_server.bind_gid(lower_id, gva);
+
+            if (success == r.get_status()) 
                 return true;
         }
 
-        else if (hosted->primary_ns_.bind(lower_id, gva)) 
-        { 
-            typename cache_mutex_type::scoped_lock
-                lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(lower_id, count);
-            hosted->gva_cache_.insert(key, gva);
-            return true;
+        else
+        {
+            response_type r = hosted->primary_ns_.bind(lower_id, gva);
+
+            if (success == r.get_status()) 
+            { 
+                cache_mutex_type::scoped_lock
+                    lock(hosted->gva_cache_mtx_);
+                gva_cache_key key(lower_id, count);
+                hosted->gva_cache_.insert(key, gva);
+                return true;
+            }
         }
 
         return false; 
@@ -521,9 +571,10 @@ struct legacy_router : boost::noncopyable
            error_code& ec = throws) 
     {
         if (is_bootstrap())
-            return bootstrap->primary_ns_server.increment(id, credits);
+            return bootstrap->primary_ns_server.increment(id, credits).
+                get_count();
         else
-            return hosted->primary_ns_.increment(id, credits);
+            return hosted->primary_ns_.increment(id, credits).get_count();
     } 
 
     count_type
@@ -532,26 +583,29 @@ struct legacy_router : boost::noncopyable
     { // {{{ decref implementation
         using boost::fusion::at_c;
         
-        decrement_type r;
+        response_type r;
         
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.decrement(id, credits);
         else
             r = hosted->primary_ns_.decrement(id, credits);
 
-        if (at_c<0>(r) == 0)
-            t = at_c<1>(r);
+        if (0 == r.get_count())
+            t = r.get_component_type();
 
-        return at_c<0>(r);
+        return r.get_count();
     } // }}}
 
+    // forwarder
     bool unbind(naming::gid_type const& id, error_code& ec = throws) 
     { return unbind_range(id, 1, ec); } 
         
+    // forwarder
     bool unbind(naming::gid_type const& id, naming::address& addr,
                 error_code& ec = throws) 
     { return unbind_range(id, 1, addr, ec); }
 
+    // forwarder
     bool unbind_range(naming::gid_type const& lower_id, count_type count,
                       error_code& ec = throws) 
     {
@@ -562,24 +616,24 @@ struct legacy_router : boost::noncopyable
     bool unbind_range(naming::gid_type const& lower_id, count_type count, 
                       naming::address& addr, error_code& ec = throws) 
     { // {{{ unbind_range implementation
-        unbinding_type r;
+        response_type r;
 
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.unbind(lower_id, count);
         else
             r = hosted->primary_ns_.unbind(lower_id, count);
 
-        if (!is_bootstrap() && r)
+        if (!is_bootstrap() && (success == r.get_status()))
         {
-            typename cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             gva_erase_policy ep(lower_id, count);
             hosted->gva_cache_.erase(ep);
-            addr.locality_ = r->endpoint;
-            addr.type_ = r->type;
-            addr.address_ = r->lva();
+            addr.locality_ = r.get_gva().endpoint;
+            addr.type_ = r.get_gva().type;
+            addr.address_ = r.get_gva().lva();
         }
 
-        return r; 
+        return success == r.get_status(); 
     } // }}}
 
     bool resolve(naming::gid_type const& id, naming::address& addr,
@@ -588,32 +642,34 @@ struct legacy_router : boost::noncopyable
         if (try_cache && !is_bootstrap() && resolve_cached(id, addr, ec))
             return true;
         
-        gva_type gva; 
+        response_type r; 
 
         if (is_bootstrap())
-            gva = bootstrap->primary_ns_server.resolve_gid(id);
+            r = bootstrap->primary_ns_server.resolve_gid(id);
         else
-            gva = hosted->primary_ns_.resolve(id);
+            r = hosted->primary_ns_.resolve(id);
 
-        addr.locality_ = gva.endpoint;
-        addr.type_ = gva.type;
-        addr.address_ = gva.lva();
+        addr.locality_ = r.get_gva().endpoint;
+        addr.type_ = r.get_gva().type;
+        addr.address_ = r.get_gva().lva();
 
-        if (HPX_LIKELY((gva.endpoint == endpoint_type()) &&
-                       (gva.type == components::component_invalid) &&
-                       (gva.lva() == 0)))
+        if (success != r.get_status())
             return false;
 
-        if (is_bootstrap())
+        else if (is_bootstrap())
             return true;
-
-        // We only insert the entry into the cache if it's valid
-        typename cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-        gva_cache_key key(id);
-        hosted->gva_cache_.insert(key, gva);
-        return true;
+ 
+        else
+        {
+            // We only insert the entry into the cache if it's valid
+            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            gva_cache_key key(id);
+            hosted->gva_cache_.insert(key, r.get_gva());
+            return true;
+        }
     } // }}}
 
+    // forwarder
     bool resolve(naming::id_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
     { return resolve(id.get_gid(), addr, try_cache, ec); }
@@ -626,9 +682,9 @@ struct legacy_router : boost::noncopyable
 
         // first look up the requested item in the cache
         gva_cache_key k(id);
-        typename cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+        cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
         gva_cache_key idbase;
-        typename gva_cache_type::entry_type e;
+        gva_cache_type::entry_type e;
 
         // Check if the entry is currently in the cache
         if (hosted->gva_cache_.get_entry(k, idbase, e))
@@ -655,32 +711,46 @@ struct legacy_router : boost::noncopyable
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws) 
     {
-        naming::gid_type r;
+        response_type r;
 
         if (is_bootstrap())
             r = bootstrap->symbol_ns_server.rebind(name, id);
         else
             r = hosted->symbol_ns_.rebind(name, id);
 
-        return r == id;
+        return r.get_gid() == id;
     }
 
     bool unregisterid(std::string const& name, error_code& ec = throws) 
     {
+        response_type r;
+
         if (is_bootstrap())
-            return bootstrap->symbol_ns_server.unbind(name);
+            r = bootstrap->symbol_ns_server.unbind(name);
         else  
-            return hosted->symbol_ns_.unbind(name);
+            r = hosted->symbol_ns_.unbind(name);
+
+        return r.get_status() == success;
     }
 
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws) 
     {
+        response_type r;
+
         if (is_bootstrap())
-            id = bootstrap->symbol_ns_server.resolve(ns_name);
+            r = bootstrap->symbol_ns_server.resolve(ns_name);
         else
-            id = hosted->symbol_ns_.resolve(ns_name);
-        return id;         
+            r = hosted->symbol_ns_.resolve(ns_name);
+
+        if (r.get_status() == success)
+        {
+            id = r.get_gid();
+            return true;
+        }
+
+        else
+            return false;
     }
 };
 

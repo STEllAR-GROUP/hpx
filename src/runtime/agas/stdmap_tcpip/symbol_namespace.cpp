@@ -15,12 +15,14 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/runtime/agas/database/backend/stdmap.hpp>
+#include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
 
 using hpx::components::component_agas_symbol_namespace;
 
 typedef hpx::agas::server::symbol_namespace<
     hpx::agas::tag::database::stdmap
+  , hpx::agas::tag::network::tcpip
 > agas_component;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(

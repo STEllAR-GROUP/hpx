@@ -15,67 +15,69 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database>
+template <typename Database, typename Protocol>
 struct symbol_namespace 
 {
     // {{{ nested types
-    typedef server::symbol_namespace<Database> server_type; 
+    typedef server::symbol_namespace<Database, Protocol> server_type; 
 
+    typedef typename server_type::response_type response_type;
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
     // {{{ bind dispatch
-    static lcos::future_value<bool>
+    static lcos::future_value<response_type>
     bind_async(naming::id_type const& gid, symbol_type const& key,
                naming::gid_type const& value)
     {
         typedef typename server_type::bind_action action_type;
-        return lcos::eager_future<action_type, bool>(gid, key, value);
+        return lcos::eager_future<action_type, response_type>(gid, key, value);
     }
 
-    static bool bind(naming::id_type const& gid, symbol_type const& key,
+    static response_type bind(naming::id_type const& gid, symbol_type const& key,
                      naming::gid_type const& value)
     { return bind_async(gid, key, value).get(); } 
     // }}}
     
     // {{{ rebind dispatch
-    static lcos::future_value<naming::gid_type>
+    static lcos::future_value<response_type>
     rebind_async(naming::id_type const& gid, symbol_type const& key,
                  naming::gid_type const& value)
     {
         typedef typename server_type::rebind_action action_type;
-        return lcos::eager_future<action_type, naming::gid_type>  
+        return lcos::eager_future<action_type, response_type>  
             (gid, key, value);
     }
 
-    static naming::gid_type
+    static response_type
     rebind(naming::id_type const& gid, symbol_type const& key,
            naming::gid_type const& value)
     { return rebind_async(gid, key, value).get(); } 
     // }}}
 
     // {{{ resolve dispatch 
-    static lcos::future_value<naming::gid_type>
+    static lcos::future_value<response_type>
     resolve_async(naming::id_type const& gid, symbol_type const& key)
     {
         typedef typename server_type::resolve_action action_type;
-        return lcos::eager_future<action_type, naming::gid_type>(gid, key);
+        return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
-    static naming::gid_type
+    static response_type
     resolve(naming::id_type const& gid, symbol_type const& key)
     { return resolve_async(gid, key).get(); } 
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<bool>
+    static lcos::future_value<response_type>
     unbind_async(naming::id_type const& gid, symbol_type const& key)
     {
         typedef typename server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, bool>(gid, key);
+        return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
-    static bool unbind(naming::id_type const& gid, symbol_type const& key)
+    static response_type
+    unbind(naming::id_type const& gid, symbol_type const& key)
     { return unbind_async(gid, key).get(); } 
     // }}}
 };            

@@ -121,7 +121,7 @@ if(UNIX)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     target_link_libraries(hpx hpx_serialization hpx_ini
-      agas_stdmap_bs_lib agas_stdmap_tcpip_bs_lib
+      agas_stdmap_tcpip_lib
       ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
   else()
     target_link_libraries(hpx hpx_serialization hpx_ini

@@ -106,7 +106,7 @@ struct response
     BOOST_COPYABLE_AND_MOVABLE(response);
 
   public:
-    response(void)
+    response(void) : rc(invalid_request)
     { clear(); }
     
     response(
@@ -120,7 +120,9 @@ struct response
         request_code type_
       , components::component_type ctype_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, ctype_, e);
     }
 
@@ -128,7 +130,9 @@ struct response
         request_code type_
       , boost::int32_t ctype_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, ctype_, e);
     }
 
@@ -136,7 +140,9 @@ struct response
         request_code type_
       , naming::gid_type gid_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, gid_, e);
     }
 
@@ -153,7 +159,9 @@ struct response
         request_code type_
       , gva<Protocol> const& gva_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, gva_, e);
     }
 
@@ -172,7 +180,9 @@ struct response
       , naming::gid_type upper_
       , boost::uint32_t prefix_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, lower_, upper_, prefix_, e);
     }
 
@@ -180,7 +190,9 @@ struct response
         request_code type_
       , boost::uint64_t count_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, count_, e);
     }
 
@@ -189,21 +201,27 @@ struct response
       , boost::uint64_t count_
       , boost::int32_t ctype_
       , error e = success
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(type_, count_, ctype_, e);
     }
 
     // copy constructor
     response(
         response const& other
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(other);
     }   
 
     // move constructor
     response(
         BOOST_RV_REF(response) other
-    ) {
+    ) :
+      rc(invalid_request)
+    {
         assign(other);
     }
 
