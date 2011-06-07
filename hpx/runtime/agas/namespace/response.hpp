@@ -391,14 +391,14 @@ struct response
             }
 
             case primary_ns_bind_locality: {
-                data.locality_binding.lower.gid.msb
-                    = other.data.locality_binding.lower.gid.msb;
-                data.locality_binding.lower.gid.lsb
-                    = other.data.locality_binding.lower.gid.lsb;
-                data.locality_binding.upper.gid.msb
-                    = other.data.locality_binding.upper.gid.msb;
-                data.locality_binding.upper.gid.lsb
-                    = other.data.locality_binding.upper.gid.lsb;
+                data.locality_binding.lower.msb
+                    = other.data.locality_binding.lower.msb;
+                data.locality_binding.lower.lsb
+                    = other.data.locality_binding.lower.lsb;
+                data.locality_binding.upper.msb
+                    = other.data.locality_binding.upper.msb;
+                data.locality_binding.upper.lsb
+                    = other.data.locality_binding.upper.lsb;
                 data.locality_binding.prefix
                     = other.data.locality_binding.prefix;
                 return;
@@ -624,10 +624,10 @@ struct response
             }
         };
 
-        data.locality_binding.lower.gid.msb = lower_.get_msb();
-        data.locality_binding.lower.gid.lsb = lower_.get_lsb();
-        data.locality_binding.upper.gid.msb = upper_.get_msb();
-        data.locality_binding.upper.gid.lsb = upper_.get_lsb();
+        data.locality_binding.lower.msb = lower_.get_msb();
+        data.locality_binding.lower.lsb = lower_.get_lsb();
+        data.locality_binding.upper.msb = upper_.get_msb();
+        data.locality_binding.upper.lsb = upper_.get_lsb();
         data.locality_binding.prefix = prefix_;
         rc = type_;
         status = e;
@@ -656,6 +656,16 @@ struct response
         rc = type_;
         status = e;
     } // }}} 
+
+    // forwarder
+    void assign(
+        request_code type_
+      , boost::uint64_t count_
+      , components::component_type ctype_
+      , error e = success
+    ) {
+        assign(type_, count_, boost::int32_t(ctype_), e);
+    }
 
     // primary_ns_decrement
     void assign(

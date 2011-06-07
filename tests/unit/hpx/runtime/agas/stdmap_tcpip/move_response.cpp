@@ -56,14 +56,23 @@ int main(void)
         // component_ns_unbind
         // symbol_ns_bind
         // symbol_ns_unbind
-        response_type r0(primary_ns_bind_gid, success)
-                    , r1(primary_ns_bind_gid, no_success)
-                    , r2(component_ns_unbind, success)
-                    , r3(component_ns_unbind, no_success)
-                    , r4(symbol_ns_bind,      success)
-                    , r5(symbol_ns_bind,      no_success)
-                    , r6(symbol_ns_unbind,    success)
-                    , r7(symbol_ns_unbind,    no_success);
+        response_type o0(primary_ns_bind_gid, success)
+                    , o1(primary_ns_bind_gid, no_success)
+                    , o2(component_ns_unbind, success)
+                    , o3(component_ns_unbind, no_success)
+                    , o4(symbol_ns_bind,      success)
+                    , o5(symbol_ns_bind,      no_success)
+                    , o6(symbol_ns_unbind,    success)
+                    , o7(symbol_ns_unbind,    no_success);
+
+        response_type r0(boost::move(o0))
+                    , r1(boost::move(o1))
+                    , r2(boost::move(o2))
+                    , r3(boost::move(o3))
+                    , r4(boost::move(o4))
+                    , r5(boost::move(o5))
+                    , r6(boost::move(o6))
+                    , r7(boost::move(o7));
 
         HPX_TEST_EQ(unsigned(primary_ns_bind_gid), unsigned(r0.which()));
         HPX_TEST_EQ(unsigned(primary_ns_bind_gid), unsigned(r1.which()));
@@ -87,12 +96,19 @@ int main(void)
     {   // component_ns_bind_prefix
         // component_ns_bind_name
         // component_ns_resolve_name
-        response_type r0(component_ns_bind_prefix,  component_base_lco)
-                    , r1(component_ns_bind_prefix,  56)
-                    , r2(component_ns_bind_name,    component_memory_block)
-                    , r3(component_ns_bind_name,    12)
-                    , r4(component_ns_resolve_name, component_dataflow_block)
-                    , r5(component_ns_resolve_name, 67);
+        response_type o0(component_ns_bind_prefix,  component_base_lco)
+                    , o1(component_ns_bind_prefix,  56)
+                    , o2(component_ns_bind_name,    component_memory_block)
+                    , o3(component_ns_bind_name,    12)
+                    , o4(component_ns_resolve_name, component_dataflow_block)
+                    , o5(component_ns_resolve_name, 67);
+
+        response_type r0(boost::move(o0))
+                    , r1(boost::move(o1))
+                    , r2(boost::move(o2))
+                    , r3(boost::move(o3))
+                    , r4(boost::move(o4))
+                    , r5(boost::move(o5));
 
         HPX_TEST_EQ(unsigned(component_ns_bind_prefix),  unsigned(r0.which()));
         HPX_TEST_EQ(unsigned(component_ns_bind_prefix),  unsigned(r1.which()));
@@ -117,10 +133,15 @@ int main(void)
 
     {   // symbol_ns_rebind
         // symbol_ns_resolve
-        response_type r0(symbol_ns_rebind,  gid_type(5, 5))
-                    , r1(symbol_ns_rebind,  gid_type(0xdead, 0xbeef))
-                    , r2(symbol_ns_resolve, gid_type(17, 42))
-                    , r3(symbol_ns_resolve, gid_type(60));
+        response_type o0(symbol_ns_rebind,  gid_type(5, 5))
+                    , o1(symbol_ns_rebind,  gid_type(0xdead, 0xbeef))
+                    , o2(symbol_ns_resolve, gid_type(17, 42))
+                    , o3(symbol_ns_resolve, gid_type(60));
+
+        response_type r0(boost::move(o0))
+                    , r1(boost::move(o1))
+                    , r2(boost::move(o2))
+                    , r3(boost::move(o3));
 
         HPX_TEST_EQ(unsigned(symbol_ns_rebind),  unsigned(r0.which()));
         HPX_TEST_EQ(unsigned(symbol_ns_rebind),  unsigned(r1.which()));
@@ -146,8 +167,11 @@ int main(void)
         gva_type g0(ep0, component_base_lco, 0x100, p0, 0x10)
                , g1(ep1, component_memory_block, 0x20, p1, 0x2a); 
 
-        response_type r0(primary_ns_resolve_locality, boost::uint32_t(1), g0)
-                    , r1(primary_ns_resolve_locality, boost::uint32_t(2), g1);
+        response_type o0(primary_ns_resolve_locality, boost::uint32_t(1), g0)
+                    , o1(primary_ns_resolve_locality, boost::uint32_t(2), g1);
+
+        response_type r0(boost::move(o0))
+                    , r1(boost::move(o1));
 
         HPX_TEST_EQ(unsigned(primary_ns_resolve_locality),
                     unsigned(r0.which()));
@@ -157,6 +181,7 @@ int main(void)
         HPX_TEST_EQ(g0, r0.get_gva());
         HPX_TEST_EQ(g1, r1.get_gva());
     }
+
     
     {   // primary_ns_localities
         // component_ns_resolve_id
@@ -176,12 +201,19 @@ int main(void)
         for (boost::uint64_t i = 0; i < 16; ++i)
             l4[i] = i * i;
 
-        response_type r0(primary_ns_localities,   boost::uint64_t(1),  l0)
-                    , r1(primary_ns_localities,   boost::uint64_t(10), l1)
-                    , r2(primary_ns_localities,   boost::uint64_t(0),  l2)
-                    , r3(component_ns_resolve_id, boost::uint64_t(1),  l3)
-                    , r4(component_ns_resolve_id, boost::uint64_t(16), l4)
-                    , r5(component_ns_resolve_id, boost::uint64_t(0),  l5);
+        response_type o0(primary_ns_localities,   boost::uint64_t(1),  l0)
+                    , o1(primary_ns_localities,   boost::uint64_t(10), l1)
+                    , o2(primary_ns_localities,   boost::uint64_t(0),  l2)
+                    , o3(component_ns_resolve_id, boost::uint64_t(1),  l3)
+                    , o4(component_ns_resolve_id, boost::uint64_t(16), l4)
+                    , o5(component_ns_resolve_id, boost::uint64_t(0),  l5);
+
+        response_type r0(boost::move(o0))
+                    , r1(boost::move(o1))
+                    , r2(boost::move(o2))
+                    , r3(boost::move(o3))
+                    , r4(boost::move(o4))
+                    , r5(boost::move(o5));
 
         HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r0.which()));
         HPX_TEST_EQ(unsigned(primary_ns_localities),   unsigned(r1.which()));
@@ -209,55 +241,6 @@ int main(void)
 
         HPX_TEST_EQ(boost::uint64_t(0), r5.get_localities_size());
         HPX_TEST_EQ(l5, r5.get_localities());
-    }
-
-    {   // primary_ns_bind_locality
-        response_type r0(primary_ns_bind_locality
-                       , gid_type(0xff, 0xaa)
-                       , gid_type(0xff, 0xff)
-                       , boost::uint32_t(32))
-                    , r1(primary_ns_bind_locality
-                       , gid_type(10)
-                       , gid_type(50)
-                       , boost::uint32_t(1));
-
-        HPX_TEST_EQ(unsigned(primary_ns_bind_locality), unsigned(r0.which()));
-        HPX_TEST_EQ(unsigned(primary_ns_bind_locality), unsigned(r1.which()));
-
-        HPX_TEST_EQ(gid_type(0xff, 0xaa), r0.get_lower_bound());
-        HPX_TEST_EQ(gid_type(0xff, 0xff), r0.get_upper_bound());
-        HPX_TEST_EQ(boost::uint32_t(32),  r0.get_prefix());
-        HPX_TEST_EQ(gid_type(10),         r1.get_lower_bound());
-        HPX_TEST_EQ(gid_type(50),         r1.get_upper_bound());
-        HPX_TEST_EQ(boost::uint32_t(1),   r1.get_prefix());
-    }
-
-    {   // primary_ns_increment
-        response_type r0(primary_ns_increment, boost::uint64_t(42))
-                    , r1(primary_ns_increment, boost::uint64_t(128));
-
-        HPX_TEST_EQ(unsigned(primary_ns_increment), unsigned(r0.which()));
-        HPX_TEST_EQ(unsigned(primary_ns_increment), unsigned(r1.which()));
-
-        HPX_TEST_EQ(boost::uint64_t(42),  r0.get_count());
-        HPX_TEST_EQ(boost::uint64_t(128), r1.get_count());
-    }
-
-    {   // primary_ns_decrement
-        response_type r0(primary_ns_decrement, boost::uint64_t(5)
-                       , component_base_lco)
-                    , r1(primary_ns_decrement, boost::uint64_t(17)
-                       , component_memory_block);
-
-        HPX_TEST_EQ(unsigned(primary_ns_decrement), unsigned(r0.which()));
-        HPX_TEST_EQ(unsigned(primary_ns_decrement), unsigned(r1.which()));
-
-        HPX_TEST_EQ(boost::uint64_t(5),  r0.get_count());
-        HPX_TEST_EQ(boost::int32_t(component_base_lco),
-                    r0.get_component_type());
-        HPX_TEST_EQ(boost::uint64_t(17), r1.get_count());
-        HPX_TEST_EQ(boost::int32_t(component_memory_block),
-                    r1.get_component_type());
     }
 
     return hpx::util::report_errors();

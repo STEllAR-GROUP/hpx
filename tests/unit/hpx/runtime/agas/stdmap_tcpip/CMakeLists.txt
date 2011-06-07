@@ -14,6 +14,8 @@ set(group unit.hpx.runtime.agas.stdmap_tcpip)
 set(testcases
     #legacy_agent_serial
     response
+    move_response
+    copy_response
     serialize_response)
 
 foreach(testcase ${testcases})
