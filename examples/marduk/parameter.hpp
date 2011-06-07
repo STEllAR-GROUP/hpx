@@ -70,7 +70,6 @@ struct HPX_COMPONENT_EXPORT parameter
     std::vector<std::size_t> gr_nx;
     std::vector<std::size_t> gr_ny;
     std::vector<std::size_t> gr_nz;
-    std::vector<std::size_t> gr_proc;
     std::vector<double_type> gr_h;
     std::vector<int> gr_alive;
     std::vector<std::size_t> levelp;

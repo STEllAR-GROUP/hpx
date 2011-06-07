@@ -41,6 +41,8 @@ endif()
 
 source_group("Source Files" FILES ${sources})
 
+set(hpx_LIBRARIES ${hpx_LIBRARIES} gfortran)
+
 add_hpx_executable(marduk 
   MODULE ssmp_amr3d
   SOURCES ${sources}

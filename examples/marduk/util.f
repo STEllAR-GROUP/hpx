@@ -612,9 +612,9 @@ cc                                                                            cc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine level_makeflag_simple( flag, error, level,
      *                           minx,miny,minz, h,nx,ny,nz,
-     *                           ethreshold)
+     *                           ethreshold,ghostwidth)
       implicit none
-      integer       nx,ny,nz, level
+      integer       nx,ny,nz, level, ghostwidth
       real(kind=8)  minx,miny,minz, h, ethreshold
       real(kind=8)  flag(nx,ny,nz), error(nx,ny,nz)
       include      'largesmall.inc'

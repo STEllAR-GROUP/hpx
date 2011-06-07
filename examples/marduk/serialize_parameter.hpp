@@ -67,7 +67,6 @@ void serialize(Archive &ar, hpx::components::amr::detail::parameter& par,
     ar & par.gr_nx;
     ar & par.gr_ny;
     ar & par.gr_nz;
-    ar & par.gr_proc;
     ar & par.gr_h;
     ar & par.gr_alive;
     ar & par.levelp;
