@@ -566,10 +566,6 @@ namespace hpx
             threadmanager_type thread_manager_;
             util::detail::init_logging init_logging_;
         #endif
-        util::detail::init_logging init_logging_;
-        scheduling_policy_type scheduler_;
-        notification_policy_type notifier_;
-        threadmanager_type thread_manager_;
         components::server::memory memory_;
         applier::applier applier_;
         actions::action_manager action_manager_;
