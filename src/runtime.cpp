@@ -580,8 +580,10 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
-        // initialize our TSS
-        this->runtime::init_tss();
+        #if HPX_AGAS_VERSION <= 0x10
+            // initialize our TSS
+            this->runtime::init_tss();
+        #endif
 
         // initialize applier TSS
         applier_.init_tss();

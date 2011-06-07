@@ -140,10 +140,16 @@ namespace hpx
                     = std::vector<std::string>())
           : ini_(util::detail::get_logging_data(), hpx_ini_file,
                  cmdline_ini_defs),
-            counters_(agas_client),
+            #if HPX_AGAS_VERSION <= 0x10
+                counters_(agas_client),
+            #endif
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
+            #if HPX_AGAS_VERSION > 0x10
+                runtime::init_tss();
+                counters_.reset(new performance_counters::registry(agas_client));
+            #endif
         }
 
         ~runtime()
@@ -212,14 +218,22 @@ namespace hpx
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
         {
-            return counters_;
+            #if HPX_AGAS_VERSION <= 0x10
+                return counters_;
+            #else
+                return *counters_;
+            #endif
         }
 
         /// \brief Allow access to the registry counter registry instance used 
         ///        by the HPX runtime.
         performance_counters::registry const& get_counter_registry() const
         {
-            return counters_;
+            #if HPX_AGAS_VERSION <= 0x10
+                return counters_;
+            #else
+                return *counters_;
+            #endif
         }
 
     protected:
@@ -235,7 +249,12 @@ namespace hpx
         boost::mutex on_exit_functions_mtx_;
 
         util::runtime_configuration ini_;
-        performance_counters::registry counters_;
+
+        #if HPX_AGAS_VERSION <= 0x10
+            performance_counters::registry counters_;
+        #else
+            boost::shared_ptr<performance_counters::registry> counters_;
+        #endif
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
