@@ -6,10 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
-
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -92,7 +91,7 @@ void early_write_handler(
     strm << e.message() << " (read " 
          << size << " bytes)";
     HPX_THROW_EXCEPTION(network_error, 
-        "early_write_handler", 
+        "agas::early_write_handler", 
         hpx::util::osstream_get_string(strm));
 }
 
@@ -102,6 +101,24 @@ void register_console(
   , naming::address const& baseaddr
   , hpx::uintptr_t offset
 ) {
+    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+
+    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
+    {
+        hpx::util::osstream strm;
+        strm << "AGAS server has already launched, can't register "
+             << baseaddr.locality_; 
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "agas::register_console", 
+            hpx::util::osstream_get_string(strm));
+    }
+
+    naming::gid_type prefix, lower, upper;
+
+    agas_client.get_prefix(baseaddr.locality_, prefix, true, false); 
+    agas_client.get_id_range(baseaddr.locality_, count, lower, upper);
+    agas_client.bind_range(lower, count, baseaddr, offset); 
+
     // IMPLEMENT
 }
 
@@ -170,7 +187,7 @@ namespace hpx { namespace agas
 void big_boot_barrier::spin()
 {
     boost::unique_lock<boost::mutex> lock(mtx);
-    while (!connected)
+    while (connected)
         cond.wait(lock);
 }
 
@@ -187,7 +204,9 @@ big_boot_barrier::big_boot_barrier(
   , bootstrap_agas(ini_.get_agas_locality())
   , cond()
   , mtx()
-  , connected(false) 
+  , connected( (router_mode_bootstrap == router_type)
+             ? (ini_.get_num_localities() - 1)
+             : 1) 
 {
     pp_.register_event_handler(boost::bind(&early_parcel_sink, _1, _2));
 }
@@ -271,8 +290,7 @@ void big_boot_barrier::wait()
     {
         // bootstrap, console
         if (runtime_mode_console == runtime_type)
-            // we don't have to wait on anyone!
-            return;
+            spin();
 
         // bootstrap, worker
         else
@@ -320,7 +338,7 @@ void big_boot_barrier::wait()
 void big_boot_barrier::notify()
 {
     boost::mutex::scoped_lock lk(mtx);
-    connected = true;
+    --connected;
     cond.notify_all();
 }
 
