@@ -88,6 +88,7 @@ enum request_code
     primary_ns_increment        = BOOST_BINARY_U(1000101), 
     primary_ns_decrement        = BOOST_BINARY_U(1000110), 
     primary_ns_localities       = BOOST_BINARY_U(1000111), 
+    primary_ns_route            = BOOST_BINARY_U(1001000), 
     component_ns_bind_prefix    = BOOST_BINARY_U(0100000), 
     component_ns_bind_name      = BOOST_BINARY_U(0100001), 
     component_ns_resolve_id     = BOOST_BINARY_U(0100010), 
@@ -439,7 +440,8 @@ struct response
     } // }}}
 
     // primary_ns_bind_gid
-    // primary_ns_unbind
+    // primary_ns_route
+    // component_ns_unbind
     // symbol_ns_bind
     // symbol_ns_unbind
     void assign(
@@ -451,6 +453,7 @@ struct response
         switch (type_)
         {
             case primary_ns_bind_gid:
+            case primary_ns_route:
             case component_ns_unbind:
             case symbol_ns_bind:
             case symbol_ns_unbind:

@@ -50,20 +50,9 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
     typedef typename gva_type::offset_type offset_type;
     typedef boost::int32_t component_type;
     typedef boost::uint32_t prefix_type;
-    typedef std::vector<prefix_type> prefixes_type;
-
-    typedef boost::fusion::vector2<count_type, component_type>
-        decrement_type;
 
     typedef boost::fusion::vector2<prefix_type, naming::gid_type>
         partition_type;
-
-    typedef boost::fusion::vector4<
-        naming::gid_type, naming::gid_type, naming::gid_type, bool
-    > binding_type;
-
-    typedef boost::fusion::vector2<naming::gid_type, gva_type>
-        locality_type;
 
     typedef response<Protocol> response_type;
 
@@ -743,7 +732,8 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         namespace_unbind           = BOOST_BINARY_U(1000100),
         namespace_increment        = BOOST_BINARY_U(1000101),
         namespace_decrement        = BOOST_BINARY_U(1000110),
-        namespace_localities       = BOOST_BINARY_U(1000111)
+        namespace_localities       = BOOST_BINARY_U(1000111),
+        namespace_route            = BOOST_BINARY_U(1001000) // IMPLEMENT
     }; // }}}
     
     typedef hpx::actions::result_action2<
