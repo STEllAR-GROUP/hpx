@@ -34,7 +34,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     boost::condition_variable cond;
     boost::mutex mtx;
-    bool connected;
+    std::size_t connected;
 
     void spin();
 
