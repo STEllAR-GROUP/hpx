@@ -110,9 +110,12 @@ extern "C" {void FNAME(level_clusterdd)(double *tmp_mini,double *tmp_maxi,
 int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[maxgids],
              std::vector<int> restrict_list[maxgids],parameter &par);
 int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
-                                double minx0,double miny0,double minz0,double h,double time,
+                                double minx0,double miny0,double minz0,
+                                double maxx0,double maxy0,double maxz0,
+                                double h,double time,
                                 int gi,
                                 boost::shared_ptr<std::vector<id_type> > &result_data,
+                                std::vector<int> &old_gis,
                                 parameter &par);
 int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
@@ -126,7 +129,10 @@ bool intersection(double xmin,double xmax,
                   double zmin2,double zmax2);
 bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
-int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,double);
+double max(double,double);
+double min(double,double);
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,
+                 std::vector<int> &, double);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
 int grid_return_existence(int gridnum,parameter &par);
@@ -142,10 +148,9 @@ int increment_gi(int level,int nx,int ny,int nz,
                  double lminx,double lminy,double lminz,
                  double lmaxx,double lmaxy,double lmaxz,
                  double hl,int refine_factor,parameter &par);
-int write_sdf(int nx,int ny,int nz,
-              double lminx, double lminy,double lminz,double hl,
-              int refine_factor,double time,int tgi,
+int write_sdf(double time,
               boost::shared_ptr<std::vector<id_type> > &result_data,
+              std::vector<int> &old_gis,
               parameter &par);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -304,11 +309,15 @@ int hpx_main(variables_map& vm)
 
     // Compute the grid sizes
     boost::shared_ptr<std::vector<id_type> > placeholder;
+    std::vector<int> old_placeholder;
     double initial_time = 0.0;
-    int rc = level_refine(-1,par,placeholder,initial_time);
+    int rc = level_refine(-1,par,placeholder,old_placeholder,initial_time);
     for (std::size_t i=0;i<par->allowedl;i++) {
-      rc = level_refine(i,par,placeholder,initial_time);
+      rc = level_refine(i,par,placeholder,old_placeholder,initial_time);
     }  
+
+    // Output error
+    write_sdf(initial_time,placeholder,old_placeholder,par);
 
     //std::vector<int> comm_list[maxgids];
     //std::vector<int> prolong_list[maxgids];
@@ -336,9 +345,24 @@ int hpx_main(variables_map& vm)
 
         // Regrid
         double time = par->nt0*par->lambda*par->h;
+
+        // grab the gi's associated with the steps just completed
+        std::vector<int> old_gis;
+        for (std::size_t i=0;i<=par->allowedl;i++) {
+          int gi = level_return_start(i,par);
+          old_gis.push_back(gi);
+          while ( grid_return_existence(gi,par) ) {
+            gi = par->gr_sibling[gi];
+            old_gis.push_back(gi);
+          }
+        }
+
         for (std::size_t i=0;i<par->allowedl;i++) {
-          rc = level_refine(i,par,result_data,time);
+          rc = level_refine(i,par,result_data,old_gis,time);
         }  
+
+        // Output error
+        write_sdf(time,result_data,old_gis,par);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
 
@@ -471,7 +495,8 @@ int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[m
 // }}}
 
 // level_refine {{{
-int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,double time)
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,
+                 std::vector<int> &old_gis, double time)
 {
   int rc;
   int numprocs = par->num_px_threads;
@@ -622,7 +647,9 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       double lmaxz = par->gr_maxz[gi];
 
       rc = compute_error(localerror,nx,ny,nz,
-                         lminx,lminy,lminz,par->gr_h[gi],time,gi,result_data,par);
+                         lminx,lminy,lminz,
+                         lmaxx,lmaxy,lmaxz,
+                         par->gr_h[gi],time,gi,result_data,old_gis,par);
 
       int mini = (int) ((lminx - minx)/hl+0.5);
       int minj = (int) ((lminy - miny)/hl+0.5);
@@ -697,6 +724,13 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
                        &ghostwidth,&refine_factor,
                        &minx0,&miny0,&minz0,
                        &maxx0,&maxy0,&maxz0);
+  //std::cout << " pre DD numbox TEST " << numbox << std::endl;
+
+  //for (int i=0;i<numbox;i++) {
+  //  std::cout << " bbox : " << b_minx[i] << " " << b_maxx[i] << std::endl; 
+  //  std::cout << "      : " << b_miny[i] << " " << b_maxy[i] << std::endl; 
+  //  std::cout << "      : " << b_minz[i] << " " << b_maxz[i] << std::endl; 
+  //}
 
   // Take the set of subgrids to create and then output the same set but domain decomposed
   tmp_mini.resize(maxbboxsize);
@@ -705,6 +739,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   tmp_maxj.resize(maxbboxsize);
   tmp_mink.resize(maxbboxsize);
   tmp_maxk.resize(maxbboxsize);
+
   FNAME(level_clusterdd)(&*tmp_mini.begin(),&*tmp_maxi.begin(),
                          &*tmp_minj.begin(),&*tmp_maxj.begin(),
                          &*tmp_mink.begin(),&*tmp_maxk.begin(),
@@ -759,9 +794,12 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
 
 // compute_error {{{
 int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
-                                double minx0,double miny0,double minz0,double h,double t,
+                                double minx0,double miny0,double minz0,
+                                double maxx0,double maxy0,double maxz0,
+                                double h,double t,
                                 int gi,
 				boost::shared_ptr<std::vector<id_type> > &result_data,
+                                std::vector<int> &old_gis,
                                 parameter &par)
 {
     // initialize some positive error
@@ -781,15 +819,100 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
     } else {
-      hpx::components::access_memory_block<hpx::components::amr::stencil_data>
-              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
-      std::cout << " TEST size " << result->value_.size() << " grids " << nx0*ny0*nz0 << std::endl;
-      std::cout << " TEST gi " << gi << " item " << par->gi2item[gi] << std::endl;
-      for (int k=0;k<nz0;k++) {
-      for (int j=0;j<ny0;j++) {
-      for (int i=0;i<nx0;i++) {
-        error[i+nx0*(j+ny0*k)] = result->value_[i+nx0*(j+ny0*k)].error;
-      } } }
+      // This is the old mesh structure; we need the error for the new mesh structure
+      // Some re-assembly is necessary
+      // go through all of the old mesh gi's; see if they overlap this new mesh
+      for (int i=0;i<old_gis.size();i++) {
+        // see if the new gi is the same as the old
+        if ( floatcmp(minx0,par->gr_minx[i]) && 
+             floatcmp(miny0,par->gr_miny[i]) && 
+             floatcmp(minz0,par->gr_minz[i]) && 
+             floatcmp(h,par->gr_h[i]) && 
+             nx0 == par->gr_nx[i] && 
+             ny0 == par->gr_ny[i] && 
+             nz0 == par->gr_nz[i] 
+           ) {
+          hpx::components::access_memory_block<hpx::components::amr::stencil_data>
+              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[i]]) );
+          for (int k=0;k<nz0;k++) {
+          for (int j=0;j<ny0;j++) {
+          for (int i=0;i<nx0;i++) {
+            error[i+nx0*(j+ny0*k)] = result->value_[i+nx0*(j+ny0*k)].error;
+          } } }
+        } else if ( intersection(minx0,maxx0,
+                                 miny0,maxy0,
+                                 minz0,maxz0,
+                                 par->gr_minx[i],par->gr_maxx[i],
+                                 par->gr_miny[i],par->gr_maxy[i],
+                                 par->gr_minz[i],par->gr_maxz[i]) &&
+                    floatcmp(h,par->gr_h[i])
+                  ) { 
+          hpx::components::access_memory_block<hpx::components::amr::stencil_data>
+              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[i]]) );
+
+          // find the intersection index
+          double x1 = max(minx0,par->gr_minx[i]); 
+          double x2 = min(maxx0,par->gr_maxx[i]); 
+          double y1 = max(miny0,par->gr_miny[i]); 
+          double y2 = min(maxy0,par->gr_maxy[i]); 
+          double z1 = max(minz0,par->gr_minz[i]); 
+          double z2 = min(maxz0,par->gr_maxz[i]); 
+
+          //std::cout << " x TEST " << minx0 << " " << maxx0 << std::endl;
+          //std::cout << " y TEST " << miny0 << " " << maxy0 << std::endl;
+          //std::cout << " z TEST " << minz0 << " " << maxz0 << std::endl;
+          //std::cout << " x gr TEST " << par->gr_minx[i] << " " << par->gr_maxx[i] << std::endl;
+          //std::cout << " y gr TEST " << par->gr_miny[i] << " " << par->gr_maxy[i] << std::endl;
+          //std::cout << " z gr TEST " << par->gr_minz[i] << " " << par->gr_maxz[i] << std::endl;
+          //std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
+          //std::cout << " HELLO WORLD " << result->value_.size() << std::endl;
+
+          int isize = (int) ( (x2-x1)/h );
+          int jsize = (int) ( (y2-y1)/h );
+          int ksize = (int) ( (z2-z1)/h );
+
+          int lnx = par->gr_nx[i]; 
+          int lny = par->gr_ny[i]; 
+
+          int istart_dst = (int) ( (x1 - minx0)/h );
+          int jstart_dst = (int) ( (y1 - miny0)/h );
+          int kstart_dst = (int) ( (z1 - minz0)/h );
+
+          int istart_src = (int) ( (x1 - par->gr_minx[i])/h );
+          int jstart_src = (int) ( (y1 - par->gr_miny[i])/h );
+          int kstart_src = (int) ( (z1 - par->gr_minz[i])/h );
+
+#if 0
+          std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
+          std::cout << " result val size " << result->value_.size() << std::endl;
+          std::cout << " istart_src " << istart_src << std::endl;
+          std::cout << " jstart_src " << jstart_src << std::endl;
+          std::cout << " kstart_src " << kstart_src << std::endl;
+          std::cout << " isize " << isize << std::endl;
+          std::cout << " jsize " << jsize << std::endl;
+          std::cout << " ksize " << ksize << std::endl;
+          std::cout << " lnx " << lnx << std::endl;
+          std::cout << " lny " << lny << std::endl;
+          std::cout << " lnz " << par->gr_nz[i] << std::endl;
+#endif
+
+          for (int kk=0;kk<=ksize;kk++) {
+          for (int jj=0;jj<=jsize;jj++) {
+          for (int ii=0;ii<=isize;ii++) {
+            int i = ii + istart_dst;
+            int j = jj + jstart_dst;
+            int k = kk + kstart_dst;
+
+            int si = ii + istart_src;
+            int sj = jj + jstart_src;
+            int sk = kk + kstart_src;
+            BOOST_ASSERT(i+nx0*(j+ny0*k) < error.size());
+            BOOST_ASSERT(si+lnx*(sj+lny*sk) < result->value_.size());
+            error[i+nx0*(j+ny0*k)] = result->value_[si+lnx*(sj+lny*sk)].error;
+          } } }
+
+        }
+      }
     }
 
     return 0;
@@ -888,6 +1011,20 @@ int floatcmp(double const& x1, double const& x2) {
   } else {
     return false;
   }
+}
+// }}}
+
+// max {{{
+double max(double x1, double x2) {
+  if ( x1 > x2 ) return x1;
+  else return x2;
+}
+// }}}
+
+// min {{{
+double min(double x1, double x2) {
+  if ( x1 < x2 ) return x1;
+  else return x2;
 }
 // }}}
 
@@ -1068,7 +1205,8 @@ int increment_gi(int level,int nx,int ny,int nz,
                  double hl,int refine_factor,parameter &par)
 {
     int gi_tmp = level_return_start(level+1,par);
-    if ( grid_return_existence(gi_tmp,par) ) {
+    bool found = false;
+    while ( grid_return_existence(gi_tmp,par) ) {
       int lnx = par->gr_nx[gi_tmp];
       int lny = par->gr_ny[gi_tmp];
       int lnz = par->gr_nz[gi_tmp];
@@ -1077,10 +1215,12 @@ int increment_gi(int level,int nx,int ny,int nz,
            floatcmp(lminz,par->gr_minz[gi_tmp]) &&
            nx == lnx && ny == lny && nz == lnz ) {
         par->gr_alive[gi_tmp] = PENDING;
-        return gi_tmp;
+        found = true;
+        break;
       }
       gi_tmp = par->gr_sibling[gi_tmp];
     }
+    if ( found ) return gi_tmp;
 
     // none found; this is a new gi
     int gi = par->gr_h.size();
@@ -1115,41 +1255,56 @@ int increment_gi(int level,int nx,int ny,int nz,
 // }}}
 
 // write_sdf {{{
-int write_sdf(int nx,int ny,int nz,
-              double lminx, double lminy,double lminz,double hl,
-              int refine_factor,double time,int tgi,
+int write_sdf(double time,
               boost::shared_ptr<std::vector<id_type> > &result_data,
+              std::vector<int> &old_gis,
               parameter &par)
 {
-  std::vector<double> localerror;
-  localerror.resize(nx*ny*nz);
-  double h = hl/refine_factor;
-  int rc = compute_error(localerror,nx,ny,nz,
-                   lminx,lminy,lminz,h,time,tgi,result_data,par);
-  int shape[3];
-  std::vector<double> coord;
-  coord.resize(nx+ny+nz);
-  double hh = hl/refine_factor;
-  for (int i=0;i<nx;i++) {
-    coord[i] = lminx + i*hh;
-  }
-  for (int i=0;i<ny;i++) {
-    coord[i+nx] = lminy + i*hh;
-  }
-  for (int i=0;i<nz;i++) {
-    coord[i+nx+ny] = lminz + i*hh;
-  }
 
-  shape[0] = nx;
-  shape[1] = ny;
-  shape[2] = nz;
-  char nme[80];
-  char crdnme[80];
-  sprintf(nme,"error");
-  sprintf(crdnme,"x|y|z");
+  for (std::size_t i=0;i<=par->allowedl;i++) {
+    int gi = level_return_start(i,par);
+    while ( grid_return_existence(gi,par) ) {
+      int nx = par->gr_nx[gi];
+      int ny = par->gr_ny[gi];
+      int nz = par->gr_nz[gi];
+      double h = par->gr_h[gi];
+      double minx = par->gr_minx[gi];
+      double miny = par->gr_miny[gi];
+      double minz = par->gr_minz[gi];
+      double maxx = par->gr_maxx[gi];
+      double maxy = par->gr_maxy[gi];
+      double maxz = par->gr_maxz[gi];
+
+      std::vector<double> localerror;
+      localerror.resize(nx*ny*nz);
+      int rc = compute_error(localerror,nx,ny,nz,
+                   minx,miny,minz,maxx,maxy,maxz,h,time,gi,result_data,old_gis,par);
+      int shape[3];
+      std::vector<double> coord;
+      coord.resize(nx+ny+nz);
+      for (int i=0;i<nx;i++) {
+        coord[i] = minx + i*h;
+      }
+      for (int i=0;i<ny;i++) {
+        coord[i+nx] = miny + i*h;
+      }
+      for (int i=0;i<nz;i++) {
+        coord[i+nx+ny] = minz + i*h;
+      }
+
+      shape[0] = nx;
+      shape[1] = ny;
+      shape[2] = nz;
+      char nme[80];
+      char crdnme[80];
+      sprintf(nme,"error");
+      sprintf(crdnme,"x|y|z");
 #if defined(RNPL_FOUND)
-  gft_out_full(nme,time,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
+      gft_out_full(nme,time,shape,crdnme, 3,&*coord.begin(),&*localerror.begin());
 #endif
+      gi = par->gr_sibling[gi];
+    }
+  }
 
   return 0;
 }
