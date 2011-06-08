@@ -41,6 +41,8 @@ namespace hpx { namespace util
         void load_components();
 
         agas::router_mode get_agas_router_mode() const;
+
+        std::size_t get_num_localities() const;
 #endif
 
         // Get the AGAS locality to use 
