@@ -234,6 +234,32 @@ namespace hpx { namespace util
         }
         return 1;
     }
+
+    std::size_t
+    runtime_configuration::get_agas_allocate_response_pool_size() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("allocate_response_pool_size", 4));
+            }
+        }
+        return 4;
+    }
+
+    std::size_t
+    runtime_configuration::get_agas_bind_response_pool_size() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("bind_response_pool_size", 16));
+            }
+        }
+        return 16;
+    }
 #endif
 
     // TODO: implement for AGAS v2

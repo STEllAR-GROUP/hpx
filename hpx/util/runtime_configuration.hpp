@@ -43,6 +43,10 @@ namespace hpx { namespace util
         agas::router_mode get_agas_router_mode() const;
 
         std::size_t get_num_localities() const;
+
+        std::size_t get_agas_allocate_response_pool_size() const;
+
+        std::size_t get_agas_bind_response_pool_size() const;
 #endif
 
         // Get the AGAS locality to use 
