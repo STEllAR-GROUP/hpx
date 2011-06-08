@@ -234,6 +234,25 @@ namespace hpx { namespace components { namespace detail
             return base_gid_ + (static_cast<value_type*>(p) - addr);
         }
 
+        void set_gid(naming::gid_type const& g)
+        {
+#if !defined(DEBUG)
+                scoped_lock l(this);
+#else
+                scoped_lock l(mtx_);
+#endif
+                base_gid_ = g;
+        } 
+
+        naming::address get_address()
+        {
+            value_type* addr = static_cast<value_type*>(pool_->address());
+            return naming::address  
+                (applier::get_applier().here(),
+                 components::get_component_type<typename value_type::type_holder>(), 
+                 addr);
+        }
+
         /// \brief Get the global id of the managed_component instance 
         ///        given by the parameter \a p. 
         ///
