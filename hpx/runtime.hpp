@@ -236,6 +236,8 @@ namespace hpx
             #endif
         }
 
+        virtual naming::resolver_client& get_agas_client() = 0;
+
     protected:
         void init_tss();
         void deinit_tss();
