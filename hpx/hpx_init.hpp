@@ -323,6 +323,14 @@ namespace hpx
                 }
             #endif
 
+            #if HPX_AGAS_VERSION > 0x10
+            {
+                using namespace boost::assign;
+                ini_config += "hpx.num_localities="
+                            + boost::lexical_cast<std::string>(num_localities);
+            }
+            #endif
+
             // Initialize and start the HPX runtime.
             if (queueing.empty())
             {
