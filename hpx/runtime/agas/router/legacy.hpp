@@ -199,7 +199,7 @@ struct legacy_router : boost::noncopyable
       , prefix_()
     {
         // boot the parcel port
-        parcel_port_.run(true);
+        pp.run(true);
 
         create_big_boot_barrier(pp, ini_, runtime_type_);
 
