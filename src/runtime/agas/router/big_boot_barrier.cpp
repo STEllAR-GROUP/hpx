@@ -33,6 +33,16 @@
 namespace hpx { namespace agas
 {
 
+typedef lcos::eager_future<
+    primary_namespace_server_type::bind_locality_action,
+    response_type
+> allocate_response_future_type;
+
+typedef lcos::eager_future<
+    primary_namespace_server_type::bind_gid_action,
+    response_type
+> bind_response_future_type;
+
 typedef components::heap_factory<
     lcos::detail::future_value<
         naming::resolver_client::response_type
@@ -228,7 +238,18 @@ void notify_console(
     naming::resolver_client::bind_response_pool_type&
         bind_pool = agas_client.get_bind_response_pool();
 
-    // IMPLEMENT
+    util::runtime_configuration const& ini_ = get_runtime().get_config();
+
+    const std::size_t allocate_size =
+        ini_.get_agas_allocate_response_pool_size();
+    const std::size_t bind_size =
+        ini_.get_agas_bind_response_pool_size();
+
+    for (std::size_t i = 0; i < allocate_size; ++i)
+        allocate_pool.enqueue(new allocate_response_future_type);     
+
+    for (std::size_t i = 0; i < bind_size; ++i)
+        bind_pool.enqueue(new bind_response_future_type);     
 }
 
 // remote call to AGAS
