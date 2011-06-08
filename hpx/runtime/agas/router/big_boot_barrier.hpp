@@ -46,8 +46,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     );
 
     void apply(
-        actions::base_action* act 
-      , naming::address const& addr
+        naming::address const& addr
+      , actions::base_action* act 
     );
 
     void wait();

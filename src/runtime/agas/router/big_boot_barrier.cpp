@@ -13,6 +13,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -22,6 +23,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
 
 #include <boost/thread.hpp>
@@ -31,6 +33,21 @@
 
 namespace hpx { namespace agas
 {
+
+typedef components::heap_factory<
+    lcos::detail::future_value<
+        naming::resolver_client::response_type
+      , naming::resolver_client::response_type
+      , 1
+    >
+  , components::managed_component<
+        lcos::detail::future_value<
+            naming::resolver_client::response_type
+          , naming::resolver_client::response_type
+          , 1
+        >
+    >
+> response_heap_type; 
 
 void early_parcel_sink(
     parcelset::parcelport&
@@ -88,6 +105,8 @@ void register_console(
     // IMPLEMENT
 }
 
+// TODO: callback must finishing installing new heap
+// TODO: callback must set up future pool 
 // AGAS callback to client
 void notify_console(
     naming::gid_type const& prefix
@@ -105,6 +124,8 @@ void register_worker(
     // IMPLEMENT
 }
 
+// TODO: callback must finishing installing new heap
+// TODO: callback must set up future pool 
 // AGAS callback to client
 void notify_worker(
     naming::gid_type const& prefix
@@ -170,8 +191,8 @@ big_boot_barrier::big_boot_barrier(
 }
 
 void big_boot_barrier::apply(
-    actions::base_action* act 
-  , naming::address const& addr
+    naming::address const& addr
+  , actions::base_action* act 
 ) { // {{{
     parcelset::parcel p(addr, act);
 
@@ -261,6 +282,9 @@ void big_boot_barrier::wait()
 
     else
     {
+        // allocate our first heap
+        response_heap_type::block_type* p = response_heap_type::alloc_heap();
+
         // hosted, console
         if (runtime_mode_console == runtime_type)
         {
@@ -269,7 +293,11 @@ void big_boot_barrier::wait()
             // on the bootstrap AGAS node, and sleeping on this node. We'll
             // be woken up by notify_console. 
 
-            // IMPLEMENT
+            apply(bootstrap_agas, new register_console_action
+                ((boost::uint64_t) response_heap_type::block_type::heap_step,
+                    p->get_address(), (boost::uint64_t)
+                        response_heap_type::block_type::heap_size)); 
+            spin();
         }
 
         // hosted, worker
@@ -278,7 +306,11 @@ void big_boot_barrier::wait()
             // we need to contact the bootstrap AGAS node, and then wait
             // for it to signal us. 
 
-            // IMPLEMENT
+            apply(bootstrap_agas, new register_worker_action
+                ((boost::uint64_t) response_heap_type::block_type::heap_step,
+                    p->get_address(), (boost::uint64_t)
+                        response_heap_type::block_type::heap_size)); 
+            spin();
         }
     }  
 } // }}}
