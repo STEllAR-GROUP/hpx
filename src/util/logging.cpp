@@ -337,6 +337,9 @@ namespace hpx { namespace util
 #endif
         }
 
+#if HPX_AGAS_VERSION <= 0x10
+        naming::id_type prefix_;
+#endif
         int level_;
         components::server::logging_destination dest_;
     };
