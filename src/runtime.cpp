@@ -263,8 +263,14 @@ namespace hpx
             get_config().load_components();
         #endif
 
-        // init TSS for the main thread, this enables logging, time logging, etc.
-        init_tss();
+        #if HPX_AGAS_VERSION <= 0x10
+            // init TSS for the main thread, this enables logging, time logging, etc.
+            init_tss();
+        #else
+            // in AGAS v2, the runtime pointer (accessible through get_runtime
+            // and get_runtime_ptr) is already initialized at this point.
+            applier_.init_tss();
+        #endif
         
         LRT_(info) << "runtime_impl: beginning startup sequence";
 
@@ -595,10 +601,8 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            // initialize our TSS
-            this->runtime::init_tss();
-        #endif
+        // initialize our TSS
+        this->runtime::init_tss();
 
         // initialize applier TSS
         applier_.init_tss();
