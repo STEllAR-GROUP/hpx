@@ -190,7 +190,7 @@ void register_console(
     get_big_boot_barrier().notify();
 
     get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
-        new notify_console_action(prefix, count, baseaddr));
+        new notify_console_action(prefix, count, baseaddr, p));
 }
 
 // TODO: callback must finishing installing new heap
@@ -259,7 +259,35 @@ void register_worker(
   , hpx::uintptr_t offset
   , hpx::uintptr_t heap_ptr
 ) {
-    // IMPLEMENT
+    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+
+    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
+    {
+        hpx::util::osstream strm;
+        strm << "AGAS server has already launched, can't register "
+             << baseaddr.locality_; 
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "agas::register_worker", 
+            hpx::util::osstream_get_string(strm));
+    }
+
+    naming::gid_type prefix, lower, upper;
+
+    agas_client.get_prefix(baseaddr.locality_, prefix, true, false); 
+    agas_client.get_id_range(baseaddr.locality_, count, lower, upper);
+    agas_client.bind_range(lower, count, baseaddr, offset); 
+
+    if (HPX_UNLIKELY((prefix + 1) != lower))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error,
+            "agas::register_worker",
+            "bad initial GID range allocation");
+    }
+
+    get_big_boot_barrier().notify();
+
+    get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
+        new notify_worker_action(prefix, count, baseaddr, p));
 }
 
 // TODO: callback must finishing installing new heap
@@ -271,7 +299,54 @@ void notify_worker(
   , naming::address const& baseaddr
   , hpx::uintptr_t heap_ptr
 ) {
-    // IMPLEMENT
+    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+
+    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
+    {
+        hpx::util::osstream strm;
+        strm << "locality "
+             << baseaddr.locality_
+             << " has launched early"; 
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "agas::notify_worker", 
+            hpx::util::osstream_get_string(strm));
+    }
+
+    // set our prefix
+    agas_client.local_prefix(prefix);
+
+    // assign the initial gid range to the unique id range allocator that our
+    // response heap is using
+    response_heap_type::get_heap().set_range(prefix + 1, prefix + 1 + count); 
+
+    // finish setting up the first heap. 
+    response_heap_type::block_type* p
+        = static_cast<response_heap_type::block_type*>(p);
+
+    // set the base gid that we bound to this heap
+    p->set_gid(prefix + 1); 
+
+    // push the heap onto the OSHL
+    response_heap_type::get_heap().add_heap(p); 
+
+    // set up the future pools
+    naming::resolver_client::allocate_response_pool_type&
+        allocate_pool = agas_client.get_allocate_response_pool();
+    naming::resolver_client::bind_response_pool_type&
+        bind_pool = agas_client.get_bind_response_pool();
+
+    util::runtime_configuration const& ini_ = get_runtime().get_config();
+
+    const std::size_t allocate_size =
+        ini_.get_agas_allocate_response_pool_size();
+    const std::size_t bind_size =
+        ini_.get_agas_bind_response_pool_size();
+
+    for (std::size_t i = 0; i < allocate_size; ++i)
+        allocate_pool.enqueue(new allocate_response_future_type);     
+
+    for (std::size_t i = 0; i < bind_size; ++i)
+        bind_pool.enqueue(new bind_response_future_type);     
 }
 // }}}
 
