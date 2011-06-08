@@ -78,6 +78,8 @@ namespace hpx { namespace components
         typedef detail::wrapper_heap_list<
             detail::fixed_wrapper_heap<Derived> > heap_type;
 
+        typedef detail::fixed_wrapper_heap<Derived> block_type;
+
         struct wrapper_heap_tag {};
 
         static heap_type& get_heap()
@@ -86,6 +88,16 @@ namespace hpx { namespace components
             util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
                 heap(components::get_component_type<Component>());
             return heap.get(get_runtime_instance_number());
+        }
+
+        static block_type* alloc_heap()
+        {
+            return get_heap().alloc_heap();
+        }
+
+        static void add_heap(block_type* p)
+        {
+            return get_heap().add_heap(p);
         }
 
         static Derived* alloc(std::size_t count = 1)
