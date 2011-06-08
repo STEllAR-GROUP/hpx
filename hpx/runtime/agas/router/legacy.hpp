@@ -163,6 +163,7 @@ struct legacy_router : boost::noncopyable
     boost::shared_ptr<hosted_data_type> hosted;
 
     boost::atomic<router_state> state_;
+    boost::uint32_t prefix_;
 
     legacy_router(
         parcelset::parcelport& pp 
@@ -207,6 +208,8 @@ struct legacy_router : boost::noncopyable
         bootstrap->primary_ns_server.bind_locality(ep, 3);
         bootstrap->symbol_ns_server.bind("/locality(agas#0)",
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
+
+        prefix_ = HPX_AGAS_BOOTSTRAP_PREFIX;
 
         bootstrap->primary_ns_server.bind_gid
             (primary_namespace_server_type::fixed_gid(), primary_gva);
@@ -264,6 +267,12 @@ struct legacy_router : boost::noncopyable
     
     void state(router_state new_state) 
     { state_.store(new_state); }
+
+    naming::gid_type local_prefix() const
+    {
+        BOOST_ASSERT(prefix_ != 0);
+        return naming::get_gid_from_prefix(prefix_);
+    }
 
     bool is_bootstrap() const
     { return router_type == router_mode_bootstrap; } 
@@ -430,8 +439,7 @@ struct legacy_router : boost::noncopyable
                 r = bootstrap->component_ns_server.resolve_id
                     (component_id_type(type));
             else
-                r = hosted->component_ns_.resolve
-                    (component_id_type(type));
+                r = hosted->component_ns_.resolve(component_id_type(type));
    
             const count_type s = r.get_localities_size();
             prefix_type* p = r.get_localities();
@@ -488,7 +496,7 @@ struct legacy_router : boost::noncopyable
         return (components::component_type) r.get_component_type();
     } // }}} 
 
-    component_id_type
+    components::component_type
     register_factory(naming::gid_type const& prefix, std::string const& name,
                      error_code& ec = throws) 
     { // {{{
