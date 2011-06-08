@@ -95,11 +95,61 @@ void early_write_handler(
         hpx::util::osstream_get_string(strm));
 }
 
+// {{{ early action forwards
+void register_console(
+    boost::uint64_t count
+  , naming::address const& baseaddr
+  , hpx::uintptr_t offset
+  , hpx::uintptr_t heap_ptr
+);
+
+void notify_console(
+    naming::gid_type const& prefix
+  , boost::uint64_t count
+  , naming::address const& baseaddr
+  , hpx::uintptr_t heap_ptr
+);
+
+void register_worker(
+    boost::uint64_t count
+  , naming::address const& baseaddr
+  , hpx::uintptr_t offset
+  , hpx::uintptr_t heap_ptr
+);
+
+void notify_worker(
+    naming::gid_type const& prefix
+  , boost::uint64_t count
+  , naming::address const& baseaddr
+  , hpx::uintptr_t heap_ptr
+);
+// }}}
+
+// {{{ early action types
+typedef actions::plain_action3<
+    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_console
+> register_console_action;
+
+typedef actions::plain_action2<
+    naming::gid_type const&, boost::uint64_t, notify_console
+> notify_console_action;
+
+typedef actions::plain_action3<
+    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_worker
+> register_worker_action;
+
+typedef actions::plain_action2<
+    naming::gid_type const&, boost::uint64_t, notify_worker
+> notify_worker_action;
+// }}}
+
+// {{{ early action definitions
 // remote call to AGAS
 void register_console(
     boost::uint64_t count
   , naming::address const& baseaddr
   , hpx::uintptr_t offset
+  , hpx::uintptr_t heap_ptr
 ) {
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
@@ -118,18 +168,66 @@ void register_console(
     agas_client.get_prefix(baseaddr.locality_, prefix, true, false); 
     agas_client.get_id_range(baseaddr.locality_, count, lower, upper);
     agas_client.bind_range(lower, count, baseaddr, offset); 
+    agas_client.registerid("/locality(console)", prefix);
 
-    // IMPLEMENT
+    if (HPX_UNLIKELY((prefix + 1) != lower))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error,
+            "agas::register_console",
+            "bad initial GID range allocation");
+    }
+
+    get_big_boot_barrier().notify();
+
+    get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
+        new notify_console_action(prefix, count, baseaddr));
 }
 
 // TODO: callback must finishing installing new heap
 // TODO: callback must set up future pool 
 // AGAS callback to client
 void notify_console(
-    naming::gid_type const& prefix
+    naming::gid_type const& prefix // TODO: this could be sent as a uint32_t
   , boost::uint64_t count
   , naming::address const& baseaddr
+  , hpx::uintptr_t heap_ptr
 ) {
+    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+
+    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
+    {
+        hpx::util::osstream strm;
+        strm << "locality "
+             << baseaddr.locality_
+             << " has launched early"; 
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "agas::notify_console", 
+            hpx::util::osstream_get_string(strm));
+    }
+
+    // set our prefix
+    agas_client.local_prefix(prefix);
+
+    // assign the initial gid range to the unique id range allocator that our
+    // response heap is using
+    response_heap_type::get_heap().set_range(prefix + 1, prefix + 1 + count); 
+
+    // finish setting up the first heap. 
+    response_heap_type::block_type* p
+        = static_cast<response_heap_type::block_type*>(p);
+
+    // set the base gid that we bound to this heap
+    p->set_gid(prefix + 1); 
+
+    // push the heap onto the OSHL
+    response_heap_type::get_heap().add_heap(p); 
+
+    // set up the future pools
+    naming::resolver_client::allocate_response_pool_type&
+        allocate_pool = agas_client.get_allocate_response_pool();
+    naming::resolver_client::bind_response_pool_type&
+        bind_pool = agas_client.get_bind_response_pool();
+
     // IMPLEMENT
 }
 
@@ -138,6 +236,7 @@ void register_worker(
     boost::uint64_t count
   , naming::address const& baseaddr
   , hpx::uintptr_t offset
+  , hpx::uintptr_t heap_ptr
 ) {
     // IMPLEMENT
 }
@@ -146,28 +245,14 @@ void register_worker(
 // TODO: callback must set up future pool 
 // AGAS callback to client
 void notify_worker(
-    naming::gid_type const& prefix
+    naming::gid_type const& prefix // TODO: this could be sent as a uint32_t
   , boost::uint64_t count
   , naming::address const& baseaddr
+  , hpx::uintptr_t heap_ptr
 ) {
     // IMPLEMENT
 }
-
-typedef actions::plain_action3<
-    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_console
-> register_console_action;
-
-typedef actions::plain_action2<
-    naming::gid_type const&, boost::uint64_t, notify_console
-> notify_console_action;
-
-typedef actions::plain_action3<
-    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_worker
-> register_worker_action;
-
-typedef actions::plain_action2<
-    naming::gid_type const&, boost::uint64_t, notify_worker
-> notify_worker_action;
+// }}}
 
 }}
 
@@ -316,7 +401,8 @@ void big_boot_barrier::wait()
             apply(bootstrap_agas, new register_console_action
                 ((boost::uint64_t) response_heap_type::block_type::heap_step,
                     p->get_address(), (boost::uint64_t)
-                        response_heap_type::block_type::heap_size)); 
+                        response_heap_type::block_type::heap_size),
+                            (hpx::uintptr_t) p); 
             spin();
         }
 
@@ -329,7 +415,8 @@ void big_boot_barrier::wait()
             apply(bootstrap_agas, new register_worker_action
                 ((boost::uint64_t) response_heap_type::block_type::heap_step,
                     p->get_address(), (boost::uint64_t)
-                        response_heap_type::block_type::heap_size)); 
+                        response_heap_type::block_type::heap_size,
+                            (hpx::uintptr_t) p)); 
             spin();
         }
     }  
