@@ -29,7 +29,10 @@ namespace hpx { namespace parcelset
         ar << tag_;
         ar << destination_id_;    // don't increment global refcnt
         ar << destination_addr_;
-        ar << source_id_;
+        bool has_source_id = source_id_;
+        ar << has_source_id;
+        if (has_source_id)
+            ar << source_id_;
         ar << action_;
         bool has_continuations = continuation_;
         ar << has_continuations;
@@ -48,11 +51,14 @@ namespace hpx { namespace parcelset
         }
 
         bool has_continuation = false;
+        bool has_source_id = false;
         ar >> tag_;
 
         ar >> destination_id_;
         ar >> destination_addr_;
-        ar >> source_id_;
+        ar >> has_source_id;
+        if (has_source_id) 
+            ar >> source_id_;
         ar >> action_;
         ar >> has_continuation;
         if (has_continuation) {
