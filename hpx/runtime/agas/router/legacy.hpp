@@ -38,10 +38,12 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+// TODO: use the response pools for GID range allocation and bind requests.
+// TODO: pass error codes once they're implemented in AGAS.
+
 namespace hpx { namespace agas
 {
 
-// TODO: pass error codes once they're implemented in AGAS.
 struct legacy_router : boost::noncopyable
 {
     // {{{ types 
@@ -136,7 +138,7 @@ struct legacy_router : boost::noncopyable
         locality_cache_type;
     // }}}
 
-    // {{{ freelist
+    // {{{ future freelists
     typedef boost::lockfree::fifo<
         lcos::eager_future<
             primary_namespace_server_type::bind_locality_action,
