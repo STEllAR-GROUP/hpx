@@ -198,6 +198,9 @@ struct legacy_router : boost::noncopyable
       , state_(router_state_launching)
       , prefix_()
     {
+        // boot the parcel port
+        parcel_port_.run(true);
+
         create_big_boot_barrier(pp, ini_, runtime_type_);
 
         if (router_type == router_mode_bootstrap)
