@@ -38,10 +38,6 @@ struct primary_namespace :
     typedef typename server_type::count_type count_type;
     typedef typename server_type::offset_type offset_type;
     typedef typename server_type::prefix_type prefix_type;
-    typedef typename server_type::prefixes_type prefixes_type;
-    typedef typename server_type::binding_type binding_type;
-    typedef typename server_type::locality_type locality_type;
-    typedef typename server_type::decrement_type decrement_type;
     // }}}
 
     explicit primary_namespace(naming::id_type const& id =
