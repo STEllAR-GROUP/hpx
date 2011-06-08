@@ -248,7 +248,7 @@ namespace hpx { namespace components { namespace detail
         {
             value_type* addr = static_cast<value_type*>(pool_->address());
             return naming::address  
-                (applier::get_applier().here(),
+                (get_runtime().here(),
                  components::get_component_type<typename value_type::type_holder>(), 
                  addr);
         }
