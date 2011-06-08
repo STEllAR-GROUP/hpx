@@ -238,6 +238,8 @@ namespace hpx
 
         virtual naming::resolver_client& get_agas_client() = 0;
 
+        virtual naming::locality const& here() const = 0;
+
     protected:
         void init_tss();
         void deinit_tss();
