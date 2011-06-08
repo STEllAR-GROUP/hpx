@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <boost/atomic.hpp>
+#include <boost/lockfree/fifo.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 #include <boost/cache/local_cache.hpp>
@@ -23,6 +24,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
@@ -134,6 +136,22 @@ struct legacy_router : boost::noncopyable
         locality_cache_type;
     // }}}
 
+    // {{{ freelist
+    typedef boost::lockfree::fifo<
+        lcos::eager_future<
+            primary_namespace_server_type::bind_locality_action,
+            response_type
+        >*
+    > bind_locality_cache_type;
+
+    typedef boost::lockfree::fifo<
+        lcos::eager_future<
+            primary_namespace_server_type::bind_gid_action,
+            response_type
+        >*
+    > bind_gid_cache_type;
+    // }}}
+
     struct bootstrap_data_type
     { // {{{
         primary_namespace_server_type primary_ns_server;
@@ -154,6 +172,9 @@ struct legacy_router : boost::noncopyable
         locality_cache_type locality_cache_;
 
         console_cache_type console_cache_;
+
+        bind_locality_cache_type bind_locality_cache_;
+        bind_gid_cache_type bind_gid_cache_;
     }; // }}}
 
     const router_mode router_type;
