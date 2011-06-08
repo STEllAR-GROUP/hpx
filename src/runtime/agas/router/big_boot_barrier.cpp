@@ -111,6 +111,7 @@ void register_console(
 void notify_console(
     naming::gid_type const& prefix
   , boost::uint64_t count
+  , naming::address const& baseaddr
 ) {
     // IMPLEMENT
 }
@@ -130,6 +131,7 @@ void register_worker(
 void notify_worker(
     naming::gid_type const& prefix
   , boost::uint64_t count
+  , naming::address const& baseaddr
 ) {
     // IMPLEMENT
 }
