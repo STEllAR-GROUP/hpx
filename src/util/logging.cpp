@@ -306,24 +306,37 @@ namespace hpx { namespace util
     // custom log destination: send generated strings to console
     struct console : boost::logging::destination::is_generic 
     {
+#if HPX_AGAS_VERSION <= 0x10
         console(naming::gid_type const& prefix, int level, 
                 components::server::logging_destination dest)
           : prefix_(naming::id_type(prefix, naming::id_type::unmanaged)), 
             level_(level), dest_(dest)
         {}
+#else
+        console(int level, components::server::logging_destination dest)
+          : level_(level), dest_(dest)
+        {}
+#endif
 
         template<typename MsgType> 
         void operator()(MsgType const& msg) const 
         {
+#if HPX_AGAS_VERSION <= 0x10
             components::console_logging(prefix_, dest_, level_, msg);
+#else
+            components::console_logging(dest_, level_, msg);
+#endif
         }
 
         bool operator==(console const& rhs) const 
         { 
+#if HPX_AGAS_VERSION <= 0x10
             return prefix_ == rhs.prefix_ && dest_ == rhs.dest_; 
+#else
+            return dest_ == rhs.dest_; 
+#endif
         }
 
-        naming::id_type prefix_;
         int level_;
         components::server::logging_destination dest_;
     };
@@ -336,8 +349,12 @@ namespace hpx { namespace util
     BOOST_DEFINE_LOG(agas_logger, logger_type) 
 
     // initialize logging for AGAS
+#if HPX_AGAS_VERSION <= 0x10
     void init_agas_log(util::section const& ini, bool isconsole, 
         naming::gid_type const& console_prefix) 
+#else
+    void init_agas_log(util::section const& ini, bool isconsole)
+#endif
     {
         std::string loglevel, logdest, logformat;
 
@@ -363,7 +380,12 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             agas_logger()->writer().add_destination("console",
-                console(console_prefix, lvl, components::server::destination_agas));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_agas)
+#else
+                console(lvl, components::server::destination_agas)
+#endif
+                );
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             agas_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -385,8 +407,12 @@ namespace hpx { namespace util
     BOOST_DEFINE_LOG(timing_logger, logger_type) 
 
     // initialize logging for performance measurements
+#if HPX_AGAS_VERSION <= 0x10
     void init_timing_log(util::section const& ini, bool isconsole, 
         naming::gid_type const& console_prefix) 
+#else
+    void init_timing_log(util::section const& ini, bool isconsole)
+#endif
     {
         std::string loglevel, logdest, logformat;
 
@@ -412,7 +438,12 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             timing_logger()->writer().add_destination("console",
-                console(console_prefix, lvl, components::server::destination_timing));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_timing)
+#else
+                console(lvl, components::server::destination_timing)
+#endif
+                );
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             timing_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -436,9 +467,13 @@ namespace hpx { namespace util
         boost::logging::level::fatal) 
     BOOST_DEFINE_LOG(hpx_error_logger, logger_type)
 
+#if HPX_AGAS_VERSION <= 0x10
     // initialize logging for HPX runtime
     void init_hpx_logs(util::section const& ini, bool isconsole, 
         naming::gid_type const& console_prefix) 
+#else
+    void init_hpx_logs(util::section const& ini, bool isconsole)     
+#endif
     {
         std::string loglevel, logdest, logformat;
 
@@ -463,7 +498,12 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl) {
             hpx_logger()->writer().add_destination("console",
-                console(console_prefix, lvl, components::server::destination_hpx));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_hpx)
+#else
+                console(lvl, components::server::destination_hpx)
+#endif
+                );
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             hpx_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -478,7 +518,12 @@ namespace hpx { namespace util
 
             // errors are logged to the given destination and to cerr
             hpx_error_logger()->writer().add_destination("console",
-                console(console_prefix, lvl, components::server::destination_hpx));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_hpx)
+#else
+                console(lvl, components::server::destination_hpx)
+#endif
+                );
             hpx_error_logger()->writer().write(logformat, logdest + " cerr");
             hpx_error_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -495,7 +540,12 @@ namespace hpx { namespace util
             // errors are always logged to cerr 
             if (!isconsole) {
                 hpx_error_logger()->writer().add_destination("console",
-                    console(console_prefix, lvl, components::server::destination_hpx));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_hpx)
+#else
+                console(lvl, components::server::destination_hpx)
+#endif
+                );
                 hpx_error_logger()->writer().write(logformat, "console");
             }
             else {
@@ -524,8 +574,12 @@ namespace hpx { namespace util
     BOOST_DEFINE_LOG(app_error_logger, logger_type)
 
     // initialize logging for application
+#if HPX_AGAS_VERSION <= 0x10
     void init_app_logs(util::section const& ini, bool isconsole, 
         naming::gid_type const& console_prefix) 
+#else
+    void init_app_logs(util::section const& ini, bool isconsole)
+#endif
     {
         std::string loglevel, logdest, logformat;
 
@@ -550,7 +604,12 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             app_logger()->writer().add_destination("console",
-                console(console_prefix, lvl, components::server::destination_app));
+#if HPX_AGAS_VERSION <= 0x10
+                console(console_prefix, lvl, components::server::destination_app)
+#else
+                console(lvl, components::server::destination_app)
+#endif
+                );
             app_logger()->writer().write(logformat, logdest);
             app_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
             app_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -821,6 +880,7 @@ namespace hpx { namespace util { namespace detail
     init_logging::init_logging(runtime_configuration& ini, bool isconsole,
         naming::resolver_client& agas_client)
     {
+        #if HPX_AGAS_VERSION <= 0x10
         naming::gid_type console_prefix;
         for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
@@ -843,6 +903,14 @@ namespace hpx { namespace util { namespace detail
         init_timing_log(ini, isconsole, console_prefix);
         init_hpx_logs(ini, isconsole, console_prefix);
         init_app_logs(ini, isconsole, console_prefix);
+        #else
+
+        init_agas_log(ini, isconsole);
+        init_timing_log(ini, isconsole);
+        init_hpx_logs(ini, isconsole);
+        init_app_logs(ini, isconsole);
+
+        #endif
 
         // initialize console logs 
         init_agas_console_log(ini);

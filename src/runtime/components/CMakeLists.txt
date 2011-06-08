@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_library_sources(hpx
-  component_type.cpp)
+  component_type.cpp
+  console_logging.cpp)
 
 add_subdirectory(server)
 

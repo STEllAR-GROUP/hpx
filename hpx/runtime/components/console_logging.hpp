@@ -121,6 +121,7 @@ namespace hpx { namespace components
         bool oldval_;
     };
 
+#if HPX_AGAS_VERSION <= 0x10
     // stub function allowing to apply the console_logging action
     void console_logging(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
@@ -141,6 +142,14 @@ namespace hpx { namespace components
             logs.get().add_pending(msg);
         }
     }
+#else
+    // stub function allowing to apply the console_logging action
+    HPX_EXPORT void console_logging(
+        server::logging_destination dest
+      , int level
+      , std::string const& msg
+    );
+#endif
 
     // special initialization functions for console logging 
     namespace detail
