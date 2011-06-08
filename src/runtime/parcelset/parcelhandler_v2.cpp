@@ -156,10 +156,13 @@ namespace hpx { namespace parcelset
       : resolver_(resolver), pp_(pp), tm_(tm), parcels_(This()),
         startup_time_(util::high_resolution_timer::now()), timer_()
     {
-        // AGAS v2 handles this in the client
         #if HPX_AGAS_VERSION <= 0x10
             // retrieve the prefix to be used for this site
             resolver_.get_prefix(pp.here(), prefix_);    // throws on error
+        #else
+            // AGAS v2 registers itself in the client before the parcelhandler
+            // is booted.
+            prefix_ = resolver_.local_prefix();
         #endif
 
         // register our callback function with the parcelport
