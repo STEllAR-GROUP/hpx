@@ -272,6 +272,9 @@ namespace hpx
     HPX_API_EXPORT runtime& get_runtime();
     HPX_API_EXPORT runtime* get_runtime_ptr();
 
+    /// The function \a get_locality returns a reference to the locality
+    HPX_API_EXPORT naming::locality const& get_locality();
+
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();

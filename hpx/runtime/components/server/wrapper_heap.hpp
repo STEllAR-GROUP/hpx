@@ -15,6 +15,7 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -248,7 +249,7 @@ namespace hpx { namespace components { namespace detail
         {
             value_type* addr = static_cast<value_type*>(pool_->address());
             return naming::address  
-                (get_runtime().here(),
+                (get_locality(),
                  components::get_component_type<typename value_type::type_holder>(), 
                  addr);
         }

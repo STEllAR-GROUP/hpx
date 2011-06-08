@@ -646,6 +646,9 @@ namespace hpx
         return rt ? *rt : NULL;
     }
 
+    naming::locality const& get_runtime()
+    { return get_runtime().here(); }
+
     bool register_on_exit(boost::function<void()> f)
     {
         runtime* rt = get_runtime_ptr();
