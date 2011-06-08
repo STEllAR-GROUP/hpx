@@ -142,14 +142,14 @@ struct legacy_router : boost::noncopyable
             primary_namespace_server_type::bind_locality_action,
             response_type
         >*
-    > bind_locality_cache_type;
+    > allocate_response_pool_type;
 
     typedef boost::lockfree::fifo<
         lcos::eager_future<
             primary_namespace_server_type::bind_gid_action,
             response_type
         >*
-    > bind_gid_cache_type;
+    > bind_response_pool_type;
     // }}}
 
     struct bootstrap_data_type
@@ -173,8 +173,8 @@ struct legacy_router : boost::noncopyable
 
         console_cache_type console_cache_;
 
-        bind_locality_cache_type bind_locality_cache_;
-        bind_gid_cache_type bind_gid_cache_;
+        allocate_response_pool_type allocate_response_pool_;
+        bind_response_pool_type bind_response_pool_;
     }; // }}}
 
     const router_mode router_type;
@@ -184,7 +184,7 @@ struct legacy_router : boost::noncopyable
     boost::shared_ptr<hosted_data_type> hosted;
 
     boost::atomic<router_state> state_;
-    boost::uint32_t prefix_;
+    naming::gid_type prefix_;
 
     legacy_router(
         parcelset::parcelport& pp 
@@ -194,6 +194,7 @@ struct legacy_router : boost::noncopyable
         router_type(ini_.get_agas_router_mode())
       , runtime_type(runtime_type_)
       , state_(router_state_launching)
+      , prefix_()
     {
         create_big_boot_barrier(pp, ini_, runtime_type_);
 
@@ -291,9 +292,24 @@ struct legacy_router : boost::noncopyable
 
     naming::gid_type local_prefix() const
     {
-        BOOST_ASSERT(prefix_ != 0);
-        return naming::get_gid_from_prefix(prefix_);
+        BOOST_ASSERT(prefix_ != naming::invalid_gid);
+        return prefix_;
     }
+
+    void local_prefix(naming::gid_type const& g)
+    { prefix_ = g; }
+
+    allocate_response_pool_type& get_allocate_response_pool()
+    {
+        BOOST_ASSERT(!is_bootstrap());
+        return hosted->allocate_response_pool_;
+    } 
+
+    bind_response_pool_type& get_bind_response_pool()
+    {
+        BOOST_ASSERT(!is_bootstrap());
+        return hosted->bind_response_pool_;
+    } 
 
     bool is_bootstrap() const
     { return router_type == router_mode_bootstrap; } 
