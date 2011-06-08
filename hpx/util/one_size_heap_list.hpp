@@ -146,6 +146,30 @@ namespace hpx { namespace util
             return p;
         }
 
+        heap_type* alloc_heap()
+        {
+            return new heap_type(class_name_.c_str(),
+                false, true, 0, heap_step);
+        }
+
+        void add_heap(heap_type* p)
+        {
+            BOOST_ASSERT(p);
+
+            // acquire exclusive access
+            unique_lock_type ul (mtx_); 
+
+            p->heap_count_ = heap_count_; 
+
+            iterator it = heap_list_.insert(heap_list_.begin(),
+                typename list_type::value_type(p));
+
+            if (it == heap_list_.end())
+                throw std::bad_alloc();   // insert failed
+
+            ++heap_count_;
+        }
+
         void free(void* p, std::size_t count = 1)
         {
             if (NULL == p)
