@@ -144,6 +144,7 @@ int grid_find_bounds(int gi,double &minx,double &maxx,
                      double &miny,double &maxy,
                      double &minz,double &maxz,parameter &par);
 int compute_rowsize(parameter &par);
+int compute_numrows(parameter &par);
 int increment_gi(int level,int nx,int ny,int nz,
                  double lminx,double lminy,double lminz,
                  double lmaxx,double lmaxy,double lmaxz,
@@ -325,6 +326,7 @@ int hpx_main(variables_map& vm)
     //rc = dataflow(comm_list,prolong_list,restrict_list,par);
 
     // compute the number of rows needed for two timesteps and the rowsize of each row
+    rc = compute_numrows(par);
     rc = compute_rowsize(par);
 
     // get component types needed below
@@ -343,26 +345,38 @@ int hpx_main(variables_map& vm)
             um.init_execute(function_type, par->rowsize[0], numsteps,
                 par->loglevel ? logging_type : component_invalid, par);
 
-        // Regrid
-        double time = par->nt0*par->lambda*par->h;
-
-        // grab the gi's associated with the steps just completed
         std::vector<int> old_gis;
-        for (std::size_t i=0;i<=par->allowedl;i++) {
-          int gi = level_return_start(i,par);
-          old_gis.push_back(gi);
-          while ( grid_return_existence(gi,par) ) {
-            gi = par->gr_sibling[gi];
+        for (int j=0;j<9;j++) {
+          // Regrid
+          double time = (j+1)*par->nt0*par->lambda*par->h;
+
+          // grab the gi's associated with the steps just completed
+          old_gis.resize(0);
+          for (std::size_t i=0;i<=par->allowedl;i++) {
+            int gi = level_return_start(i,par);
             old_gis.push_back(gi);
+            while ( grid_return_existence(gi,par) ) {
+              gi = par->gr_sibling[gi];
+              old_gis.push_back(gi);
+            }
           }
+  
+          for (std::size_t i=0;i<par->allowedl;i++) {
+            rc = level_refine(i,par,result_data,old_gis,time);
+          }  
+  
+          // Output error
+          write_sdf(time,result_data,old_gis,par);
+  
+          std::cout << " PRE TEST rowsize " << par->rowsize[0] << std::endl;
+  
+          // re-compute rowsize information
+          rc = compute_rowsize(par);
+  
+          std::cout << " TEST rowsize " << par->rowsize[0] << std::endl;
+          // augment/adjust result_data (w/ interp) to reflect the new mesh hierarchy
+          // call execute (instead of init_execute)
         }
-
-        for (std::size_t i=0;i<par->allowedl;i++) {
-          rc = level_refine(i,par,result_data,old_gis,time);
-        }  
-
-        // Output error
-        write_sdf(time,result_data,old_gis,par);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
 
@@ -819,6 +833,22 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
     } else {
+      // TEST
+      for (int k=0;k<nz0;k++) {
+        double z = minz0 + k*h;
+      for (int j=0;j<ny0;j++) {
+        double y = miny0 + j*h;
+      for (int i=0;i<nx0;i++) {
+        double x = minx0 + i*h;
+
+        // Provide initial error
+        double d = 11.0;
+        double A = -(x-0.5*d*cos(t))*(x-0.5*d*cos(t)) - (y+0.5*d*sin(t))*(y+0.5*d*sin(t)) - z*z;
+        double B = -(x+0.5*d*cos(t))*(x+0.5*d*cos(t)) - (y-0.5*d*sin(t))*(y-0.5*d*sin(t)) - z*z;
+        double Phi = exp(A) + exp(B);
+        error[i+nx0*(j+ny0*k)] = Phi;
+      } } }
+#if 0
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
@@ -882,19 +912,17 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
           int jstart_src = (int) ( (y1 - par->gr_miny[i])/h );
           int kstart_src = (int) ( (z1 - par->gr_minz[i])/h );
 
-#if 0
-          std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
-          std::cout << " result val size " << result->value_.size() << std::endl;
-          std::cout << " istart_src " << istart_src << std::endl;
-          std::cout << " jstart_src " << jstart_src << std::endl;
-          std::cout << " kstart_src " << kstart_src << std::endl;
-          std::cout << " isize " << isize << std::endl;
-          std::cout << " jsize " << jsize << std::endl;
-          std::cout << " ksize " << ksize << std::endl;
-          std::cout << " lnx " << lnx << std::endl;
-          std::cout << " lny " << lny << std::endl;
-          std::cout << " lnz " << par->gr_nz[i] << std::endl;
-#endif
+       //   std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
+       //   std::cout << " result val size " << result->value_.size() << std::endl;
+       //   std::cout << " istart_src " << istart_src << std::endl;
+       //   std::cout << " jstart_src " << jstart_src << std::endl;
+       //   std::cout << " kstart_src " << kstart_src << std::endl;
+       //   std::cout << " isize " << isize << std::endl;
+       //   std::cout << " jsize " << jsize << std::endl;
+       //   std::cout << " ksize " << ksize << std::endl;
+       //   std::cout << " lnx " << lnx << std::endl;
+       //   std::cout << " lny " << lny << std::endl;
+       //   std::cout << " lnz " << par->gr_nz[i] << std::endl;
 
           for (int kk=0;kk<=ksize;kk++) {
           for (int jj=0;jj<=jsize;jj++) {
@@ -913,6 +941,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
 
         }
       }
+#endif
     }
 
     return 0;
@@ -1124,8 +1153,8 @@ int level_find_bounds(int level, double &minx, double &maxx,
 }
 // }}}
 
-// compute_rowsize {{{
-int compute_rowsize(parameter &par)
+// compute_numrows {{{
+int compute_numrows(parameter &par)
 {
     // for each row, record what the lowest level on the row is
     std::size_t num_rows = 1 << par->allowedl;
@@ -1154,7 +1183,13 @@ int compute_rowsize(parameter &par)
             }
         }
     }
- 
+    return 0;
+}
+// }}}
+
+// compute_rowsize {{{
+int compute_rowsize(parameter &par)
+{
     // discover each rowsize
     std::size_t count;
     par->rowsize.resize(par->allowedl+1);
