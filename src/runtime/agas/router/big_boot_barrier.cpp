@@ -97,12 +97,14 @@ void early_write_handler(
     boost::system::error_code const& e 
   , std::size_t size
 ) {
+/*
     hpx::util::osstream strm;
     strm << e.message() << " (read " 
          << size << " bytes)";
     HPX_THROW_EXCEPTION(network_error, 
         "agas::early_write_handler", 
         hpx::util::osstream_get_string(strm));
+*/
 }
 
 // {{{ early action forwards
