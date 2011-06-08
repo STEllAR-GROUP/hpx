@@ -34,13 +34,13 @@ namespace hpx { namespace agas
 {
 
 typedef lcos::eager_future<
-    primary_namespace_server_type::bind_locality_action,
-    response_type
+    naming::resolver_client::primary_namespace_server_type::bind_locality_action,
+    naming::resolver_client::response_type
 > allocate_response_future_type;
 
 typedef lcos::eager_future<
-    primary_namespace_server_type::bind_gid_action,
-    response_type
+    naming::resolver_client::primary_namespace_server_type::bind_gid_action,
+    naming::resolver_client::response_type
 > bind_response_future_type;
 
 typedef components::heap_factory<
@@ -136,20 +136,24 @@ void notify_worker(
 // }}}
 
 // {{{ early action types
-typedef actions::plain_action3<
-    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_console
+typedef actions::plain_action4<
+    boost::uint64_t, naming::address const&, hpx::uintptr_t, hpx::uintptr_t
+  , register_console
 > register_console_action;
 
-typedef actions::plain_action2<
-    naming::gid_type const&, boost::uint64_t, notify_console
+typedef actions::plain_action4<
+    naming::gid_type const&, boost::uint64_t, naming::address const&
+  , hpx::uintptr_t, notify_console
 > notify_console_action;
 
-typedef actions::plain_action3<
-    boost::uint64_t, naming::address const&, hpx::uintptr_t, register_worker
+typedef actions::plain_action4<
+    boost::uint64_t, naming::address const&, hpx::uintptr_t, hpx::uintptr_t
+  , register_worker
 > register_worker_action;
 
-typedef actions::plain_action2<
-    naming::gid_type const&, boost::uint64_t, notify_worker
+typedef actions::plain_action4<
+    naming::gid_type const&, boost::uint64_t, naming::address const&
+  , hpx::uintptr_t, notify_worker
 > notify_worker_action;
 // }}}
 
@@ -190,7 +194,7 @@ void register_console(
     get_big_boot_barrier().notify();
 
     get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
-        new notify_console_action(prefix, count, baseaddr, p));
+        new notify_console_action(prefix, count, baseaddr, heap_ptr));
 }
 
 // TODO: callback must finishing installing new heap
@@ -224,7 +228,7 @@ void notify_console(
 
     // finish setting up the first heap. 
     response_heap_type::block_type* p
-        = static_cast<response_heap_type::block_type*>(p);
+        = reinterpret_cast<response_heap_type::block_type*>(heap_ptr);
 
     // set the base gid that we bound to this heap
     p->set_gid(prefix + 1); 
@@ -287,7 +291,7 @@ void register_worker(
     get_big_boot_barrier().notify();
 
     get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
-        new notify_worker_action(prefix, count, baseaddr, p));
+        new notify_worker_action(prefix, count, baseaddr, heap_ptr));
 }
 
 // TODO: callback must finishing installing new heap
@@ -321,7 +325,7 @@ void notify_worker(
 
     // finish setting up the first heap. 
     response_heap_type::block_type* p
-        = static_cast<response_heap_type::block_type*>(p);
+        = reinterpret_cast<response_heap_type::block_type*>(heap_ptr);
 
     // set the base gid that we bound to this heap
     p->set_gid(prefix + 1); 
@@ -497,8 +501,8 @@ void big_boot_barrier::wait()
             apply(bootstrap_agas, new register_console_action
                 ((boost::uint64_t) response_heap_type::block_type::heap_step,
                     p->get_address(), (boost::uint64_t)
-                        response_heap_type::block_type::heap_size),
-                            (hpx::uintptr_t) p); 
+                        response_heap_type::block_type::heap_size,
+                            (hpx::uintptr_t) p)); 
             spin();
         }
 
