@@ -289,23 +289,27 @@ namespace hpx
         LRT_(info) << "runtime_impl: started threadmanager";
         // }}}
 
-        // {{{ exiting bootstrap mode 
-        LRT_(info) << "runtime_impl: registering runtime_support and memory components";
-        // register the runtime_support and memory instances with the AGAS 
-        agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
-            naming::address(parcel_port_.here(), 
-                components::get_component_type<components::server::runtime_support>(), 
-                &runtime_support_));
+        // AGAS v2 handles this in the client
+        #if HPX_AGAS_VERSION <= 0x10
+            // {{{ exiting bootstrap mode 
+            LRT_(info) << "runtime_impl: registering runtime_support and memory components";
+            // register the runtime_support and memory instances with the AGAS 
+            agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
+                naming::address(parcel_port_.here(), 
+                    components::get_component_type<components::server::runtime_support>(), 
+                    &runtime_support_));
 
-        agas_client_.bind(applier_.get_memory_raw_gid(), 
-            naming::address(parcel_port_.here(), 
-                components::get_component_type<components::server::memory>(), 
-                &memory_));
+            agas_client_.bind(applier_.get_memory_raw_gid(), 
+                naming::address(parcel_port_.here(), 
+                    components::get_component_type<components::server::memory>(), 
+                    &memory_));
+        #endif
         // }}}
 
         // {{{ late startup - distributed
         // if there are more than one localities involved, wait for all
         // to get registered
+        #if HPX_AGAS_VERSION <= 0x10
         if (num_localities > 1) {
             bool foundall = false;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
@@ -328,7 +332,9 @@ namespace hpx
                     "timed out while waiting for other localities");
             }
         }
+        #endif
 
+        #if HPX_AGAS_VERSION <= 0x10
         LRT_(info) << "runtime_impl: setting initial locality prefixes";
         // Set localities prefixes once per runtime instance. This should
         // work fine until we support adding and removing localities.
@@ -365,6 +371,9 @@ namespace hpx
             this->process_.set_num_os_threads(num_threads);
             this->process_.set_localities(here_lid, prefixes);
         }
+        #else
+        this->process_.set_num_os_threads(num_threads);
+        #endif
         // }}}
 
         // {{{ launch main 
