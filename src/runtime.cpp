@@ -529,7 +529,7 @@ namespace hpx
 
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
-        #if 1 //HPX_AGAS_VERSION <= 0x10
+        #if HPX_AGAS_VERSION <= 0x10
             error_code ec;
             agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
             agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
