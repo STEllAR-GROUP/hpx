@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
+//  Copyright (c) 2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +15,7 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/parcelset/server/parcelport_server_connection.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -164,6 +166,18 @@ namespace hpx { namespace parcelset
             return connection_cache_;
         }
 
+        util::unique_ids& get_id_range()
+        {
+            return id_range_;
+        }
+
+        void set_range(
+            naming::gid_type const& lower
+          , naming::gid_type const& upper
+        ) {
+            id_range_.set_range(lower, upper);
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -175,6 +189,9 @@ namespace hpx { namespace parcelset
             handler_type f);
 
     private:
+        /// The site current range of ids to be used for id_type instances
+        util::unique_ids id_range_;
+
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool& io_service_pool_;
 

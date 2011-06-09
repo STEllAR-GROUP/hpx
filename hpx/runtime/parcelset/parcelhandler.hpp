@@ -23,7 +23,6 @@
 
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/server/parcelhandler_queue.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -422,7 +421,7 @@ namespace hpx { namespace parcelset
         /// generate next unique id
         parcel_id get_next_id()
         {
-            return id_range_.get_id(pp_.here(), resolver_);
+            return pp_.get_id_range().get_id(pp_.here(), resolver_);
         }
 
     private:
@@ -440,9 +439,6 @@ namespace hpx { namespace parcelset
 
         /// 
         server::parcelhandler_queue parcels_;
-
-        /// The site current range of ids to be used for id_type instances
-        util::unique_ids id_range_;
 
         /// This is the timer instance for this parcelhandler
         double startup_time_;
