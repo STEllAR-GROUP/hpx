@@ -212,6 +212,20 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(gid.get_gid(), count, act).get();
         }
 
+#if HPX_AGAS_VERSION > 0x10
+        static lcos::future_value<void>
+        load_components_async(naming::id_type const& gid)
+        {
+            typedef server::runtime_support::load_components_action action_type;
+            return lcos::eager_future<action_type, void>(gid.get_gid());
+        }
+
+        static void load_components(naming::id_type const& gid)
+        {
+            load_components_async(gid).get();
+        }
+#endif
+
         /// Destroy an existing component
 //         static void free_component(components::component_type type, 
 //             naming::gid_type const& gid) 

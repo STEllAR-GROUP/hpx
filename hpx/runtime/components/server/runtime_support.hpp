@@ -53,6 +53,9 @@ namespace hpx { namespace components { namespace server
 
             runtime_support_get_config = 6,         ///< get configuration information 
             runtime_support_create_memory_block = 7,   ///< create new memory block
+#if HPX_AGAS_VERSION > 0x10
+            runtime_support_load_components = 8,
+#endif
         };
 
         static component_type get_component_type() 
@@ -116,6 +119,10 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
+#if HPX_AGAS_VERSION > 0x10
+        void load_components();
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
@@ -171,6 +178,14 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_memory_block
         > create_memory_block_action;
 #endif
+
+#if HPX_AGAS_VERSION > 0x10
+        typedef hpx::actions::direct_action0<
+            runtime_support, runtime_support_load_components, 
+            &runtime_support::load_components
+        > load_components_action;
+#endif
+
         typedef hpx::actions::direct_action2<
             runtime_support, runtime_support_free_component, 
             components::component_type, naming::gid_type const&, 
