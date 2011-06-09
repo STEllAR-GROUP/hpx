@@ -16,14 +16,17 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#if HPX_AGAS_VERSION > 0x10
+    #include <hpx/lcos/mutex.hpp>
+#endif
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#if !defined(DEBUG)
-#include <hpx/util/spinlock_pool.hpp>
+#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
+    #include <hpx/util/spinlock_pool.hpp>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,12 +75,17 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-#if !defined(DEBUG)
+#if HPX_AGAS_VERSION <= 0x10
+    #if !defined(DEBUG)
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
-#else
+    #else
         typedef boost::mutex mutex_type;
+    #endif
+#else
+        typedef hpx::lcos::mutex mutex_type;
 #endif
+
         typedef typename mutex_type::scoped_lock scoped_lock;
 
         typedef boost::aligned_storage<sizeof(value_type),
