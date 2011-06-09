@@ -24,8 +24,17 @@ init(hpx::components::server::distributing_factory::iterator_range_type r,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main(boost::program_options::variables_map& vm)
 {
+    std::size_t array_size = 0;
+    std::size_t iterations = 0;
+
+    if (vm.count("array-size"))
+        array_size = vm["array-size"].as<std::size_t>();
+
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
+
     {
         // get list of all known localities
         //std::vector<hpx::naming::id_type> prefixes;
@@ -40,7 +49,6 @@ int hpx_main(boost::program_options::variables_map&)
             hpx::components::get_component_type<
                 hpx::components::random_mem_access::server_component_type>();
 
-        int array_size = 6;
         hpx::components::distributing_factory::result_type mem_blocks = 
             factory.create_components(mem_block_type, array_size);
 
@@ -63,16 +71,15 @@ int hpx_main(boost::program_options::variables_map&)
         init(locality_results(mem_blocks), accu);
 
         // initialize the array
-        for (int i=0;i<array_size;i++) {
+        for (std::size_t i=0;i<array_size;i++) {
           accu[i].init(i); 
         }
 
         srand( time(NULL) );
 
-        int N = 10;
         std::vector<hpx::lcos::future_value<void> > barrier;
-        for (int i=0;i<N;i++) {
-          int rn = rand() % array_size;
+        for (std::size_t i=0;i<iterations;i++) {
+          std::size_t rn = rand() % array_size;
           std::cout << " Random element access: " << rn << std::endl;
           barrier.push_back(accu[rn].add_async());
         }
@@ -80,7 +87,7 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::components::wait(barrier);
 
         std::vector<hpx::lcos::future_value<void> > barrier2;
-        for (int i=0;i<array_size;i++) {
+        for (std::size_t i=0;i<array_size;i++) {
           barrier2.push_back(accu[i].print_async()); 
         }
 
@@ -96,10 +103,18 @@ int hpx_main(boost::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    using boost::program_options::value;
+
     // Configure application-specific options
     boost::program_options::options_description
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    desc_commandline.add_options()
+        ("array-size", value<std::size_t>()->default_value(8), 
+            "the size of the array")
+        ("iterations", value<std::size_t>()->default_value(16), 
+            "the number of lookups to perform") 
+        ;
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
