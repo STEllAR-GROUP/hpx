@@ -142,15 +142,19 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(
         std::vector<std::string> const& prefill,
-        std::string const& hpx_ini_file,
-        std::vector<std::string> const& cmdline_ini_defs)
+        std::string const& hpx_ini_file_,
+        std::vector<std::string> const& cmdline_ini_defs_)
+#if HPX_AGAS_VERSION > 0x10
+        : hpx_ini_file(hpx_ini_file_)
+        , cmdline_ini_defs(cmdline_ini_defs_)
+#endif
     {
         pre_initialize_ini(*this);
 
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+        post_initialize_ini(*this, hpx_ini_file_, cmdline_ini_defs_);
 
         // set global config options
 #if HPX_USE_ITT == 1
