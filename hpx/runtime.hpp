@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -236,9 +237,15 @@ namespace hpx
             #endif
         }
 
+        virtual parcelset::parcelport& get_parcel_port() = 0;
+
         virtual naming::resolver_client& get_agas_client() = 0;
 
         virtual naming::locality const& here() const = 0;
+
+        virtual hpx::uintptr_t get_runtime_support_lva() const = 0;
+
+        virtual hpx::uintptr_t get_memory_lva() const = 0;
 
     protected:
         void init_tss();
@@ -497,6 +504,13 @@ namespace hpx
             return agas_client_;
         }
 
+        /// \brief Allow access to the parcel port instance used by the HPX
+        ///        runtime.
+        parcelset::parcelport& get_parcel_port()
+        {
+            return parcel_port_;
+        }
+
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
         parcelset::parcelhandler& get_parcel_handler()
@@ -544,6 +558,16 @@ namespace hpx
         std::size_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
             return thread_manager_.get_executed_threads(num);
+        }
+
+        hpx::uintptr_t get_runtime_support_lva() const
+        {
+            return (hpx::uintptr_t) &runtime_support_;
+        }
+
+        hpx::uintptr_t get_memory_lva() const
+        {
+            return (hpx::uintptr_t) &memory_;
         }
 
     private:
