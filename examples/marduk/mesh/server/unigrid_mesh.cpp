@@ -231,6 +231,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         distributed_iterator_range_type const& functions, 
         std::vector<naming::id_type> const& interp_src_data,
         std::vector<naming::id_type>& initial_data,
+        double time,
         std::size_t numvalues,
         parameter const& par)
     {
@@ -243,7 +244,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         for (std::size_t i = 0; function != functions.second; ++function, ++i)
         {
             lazyvals.push_back(components::amr::stubs::functional_component::
-                alloc_data_async(*function, i, numvalues, 0,par));
+                alloc_data_async(*function, i, numvalues, 0,interp_src_data,time,par));
         }
 
         wait (lazyvals, initial_data);      // now wait for the results
@@ -407,7 +408,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), interp_src_data,
-                             initial_data, 
+                             initial_data,time, 
                              each_row[0],par);
 
         //std::cout << " Startup grid cost " << t.elapsed() << std::endl;

@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
+//  Copyright (c) 2009-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -51,19 +52,24 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
-            int row, parameter const& par)
+            int row,std::vector<naming::id_type> const& interp_src_data,
+            double time, parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::eager_future<action_type>(gid, item, maxitems, row, par);
+            return lcos::eager_future<action_type>(gid, item, maxitems, 
+                                                   row, interp_src_data,time,par);
         }
 
         static naming::id_type alloc_data(naming::id_type const& gid, 
-            int item, int maxitems, int row, parameter const& par)
+            int item, int maxitems, int row, 
+            std::vector<naming::id_type> const& interp_src_data,double time,
+            parameter const& par)
         {
-            return alloc_data_async(gid, item, maxitems, row, par).get();
+            return alloc_data_async(gid, item, maxitems, row,
+                                    interp_src_data,time, par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

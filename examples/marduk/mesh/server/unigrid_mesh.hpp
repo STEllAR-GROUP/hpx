@@ -91,6 +91,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             distributed_iterator_range_type const& functions, 
             std::vector<naming::id_type> const& interp_src_data,
             std::vector<naming::id_type>& initial_data,
+            double time,
             std::size_t numvalues,
             parameter const& par);
 

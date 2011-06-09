@@ -339,7 +339,6 @@ int hpx_main(variables_map& vm)
         int numsteps = par->nt0/2;
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
 
-        
         for (int j=0;j<9;j++) {
           double time = j*par->nt0*par->lambda*par->h;
 
@@ -763,7 +762,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
                          &bound_width);
 
   std::cout << " numbox post DD " << numbox << std::endl;
-  int prev_tgi;
+  int prev_tgi = 0;
   int tgi = 0;
   for (int i=0;i<numbox;i++) {
     //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;

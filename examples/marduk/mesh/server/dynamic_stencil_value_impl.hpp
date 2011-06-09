@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2009 Matt Anderson
+//  Copyright (c) 2009-2011 Matt Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -43,9 +43,11 @@ namespace hpx { namespace components { namespace amr { namespace server
     alloc_helper(Lock& l, naming::id_type const& gid, int row,
         parameter const& par)
     {
+        double time = -1.0;
+        std::vector<naming::id_type> placeholder;
         util::unlock_the_lock<Lock> ul(l);
         return components::amr::stubs::functional_component::alloc_data(
-            gid, -1, -1, row, par);
+            gid, -1, -1, row,placeholder,time,par);
     }
 
     inline void 

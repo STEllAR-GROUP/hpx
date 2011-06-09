@@ -185,6 +185,8 @@ namespace hpx { namespace components { namespace amr
 
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
+                           std::vector<naming::id_type> const& interp_src_data,
+                           double time,
                            parameter const& par)
     {
         naming::id_type here = applier::get_applier().get_runtime_support_gid();
@@ -196,8 +198,12 @@ namespace hpx { namespace components { namespace amr
             access_memory_block<stencil_data> val(
                 components::stubs::memory_block::checkout(result));
 
+            //if ( time > 1.e-8 ) {
             // call provided (external) function
             generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+            //} else {
+            // data is generated from interpolation using interp_src_data
+            //}
 
             if (log_ && par->loglevel > 1)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row,0, par);
