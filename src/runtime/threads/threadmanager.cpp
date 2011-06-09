@@ -962,7 +962,9 @@ namespace hpx { namespace threads
         util::time_logger tl2("tfunc2", num_thread);
 
         // the thread with number zero is the master
+#if HPX_AGAS_VERSION <= 0x10
         bool is_master_thread = (0 == num_thread) ? true : false;
+#endif
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
 #if HPX_AGAS_VERSION <= 0x10
