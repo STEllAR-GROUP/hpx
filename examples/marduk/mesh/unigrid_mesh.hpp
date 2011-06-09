@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2009-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,23 +41,29 @@ namespace hpx { namespace components { namespace amr
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
         lcos::future_value<boost::shared_ptr<std::vector<naming::id_type> > > 
-        init_execute_async(components::component_type function_type, 
+        init_execute_async(std::vector<naming::id_type> const& interp_src_data,
+            double time,
+            components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
            // components::component_type logging_type = components::component_invalid,
             components::component_type logging_type, 
             parameter const& par)
         {
-            return this->base_type::init_execute_async(this->gid_, function_type,
+            return this->base_type::init_execute_async(this->gid_, 
+                interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
 
         boost::shared_ptr<std::vector<naming::id_type> > 
-        init_execute(components::component_type function_type, 
+        init_execute(std::vector<naming::id_type> const& interp_src_data,
+            double time,
+            components::component_type function_type, 
             std::size_t numvalues, std::size_t numsteps,
             components::component_type logging_type,
             parameter const& par)
         {
-            return this->base_type::init_execute(this->gid_, function_type,
+            return this->base_type::init_execute(this->gid_,
+                interp_src_data,time, function_type,
                 numvalues, numsteps,logging_type,par);
         }
 

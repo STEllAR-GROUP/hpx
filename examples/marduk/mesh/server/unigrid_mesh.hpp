@@ -45,6 +45,8 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         /// This is the main entry point of this component. 
         boost::shared_ptr<std::vector<naming::id_type> > init_execute(
+            std::vector<naming::id_type> const& interp_src_data,
+            double time,
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps,
             components::component_type logging_type, 
@@ -60,9 +62,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action5<
+        typedef hpx::actions::result_action7<
             unigrid_mesh, boost::shared_ptr<std::vector<naming::id_type> >,
-            unigrid_mesh_init_execute, components::component_type,
+            unigrid_mesh_init_execute,std::vector<naming::id_type> const&,
+            double,
+            components::component_type,
             std::size_t, std::size_t, components::component_type,
             parameter const&, &unigrid_mesh::init_execute
         > init_execute_action;
@@ -85,6 +89,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         void prepare_initial_data(
             distributed_iterator_range_type const& functions, 
+            std::vector<naming::id_type> const& interp_src_data,
             std::vector<naming::id_type>& initial_data,
             std::size_t numvalues,
             parameter const& par);

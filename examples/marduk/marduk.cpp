@@ -115,7 +115,6 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
                                 double h,double time,
                                 int gi,
                                 boost::shared_ptr<std::vector<id_type> > &result_data,
-                                std::vector<int> &old_gis,
                                 parameter &par);
 int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
@@ -131,8 +130,7 @@ bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
 double max(double,double);
 double min(double,double);
-int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,
-                 std::vector<int> &, double);
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
 int grid_return_existence(int gridnum,parameter &par);
@@ -151,7 +149,6 @@ int increment_gi(int level,int nx,int ny,int nz,
                  double hl,int refine_factor,parameter &par);
 int write_sdf(double time,
               boost::shared_ptr<std::vector<id_type> > &result_data,
-              std::vector<int> &old_gis,
               parameter &par);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,15 +307,14 @@ int hpx_main(variables_map& vm)
 
     // Compute the grid sizes
     boost::shared_ptr<std::vector<id_type> > placeholder;
-    std::vector<int> old_placeholder;
     double initial_time = 0.0;
-    int rc = level_refine(-1,par,placeholder,old_placeholder,initial_time);
+    int rc = level_refine(-1,par,placeholder,initial_time);
     for (std::size_t i=0;i<par->allowedl;i++) {
-      rc = level_refine(i,par,placeholder,old_placeholder,initial_time);
+      rc = level_refine(i,par,placeholder,initial_time);
     }  
 
     // Output error
-    write_sdf(initial_time,placeholder,old_placeholder,par);
+    write_sdf(initial_time,placeholder,par);
 
     //std::vector<int> comm_list[maxgids];
     //std::vector<int> prolong_list[maxgids];
@@ -341,32 +337,35 @@ int hpx_main(variables_map& vm)
         unigrid_mesh um;
         um.create(here);
         int numsteps = par->nt0/2;
-        boost::shared_ptr<std::vector<id_type> > result_data =
-            um.init_execute(function_type, par->rowsize[0], numsteps,
-                par->loglevel ? logging_type : component_invalid, par);
-
-        std::vector<int> old_gis;
+        boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
         for (int j=0;j<9;j++) {
+          double time = j*par->nt0*par->lambda*par->h;
+
+          result_data = um.init_execute(*result_data,time,function_type, 
+                                        par->rowsize[0], numsteps,
+                                par->loglevel ? logging_type : component_invalid, par);
+
           // Regrid
-          double time = (j+1)*par->nt0*par->lambda*par->h;
+          time = (j+1)*par->nt0*par->lambda*par->h;
 
           // grab the gi's associated with the steps just completed
-          old_gis.resize(0);
+          par->prev_gi.resize(0);
           for (std::size_t i=0;i<=par->allowedl;i++) {
             int gi = level_return_start(i,par);
-            old_gis.push_back(gi);
+            par->prev_gi.push_back(gi);
             while ( grid_return_existence(gi,par) ) {
               gi = par->gr_sibling[gi];
-              old_gis.push_back(gi);
+              par->prev_gi.push_back(gi);
             }
           }
+          par->prev_gi2item = par->gi2item;
   
           for (std::size_t i=0;i<par->allowedl;i++) {
-            rc = level_refine(i,par,result_data,old_gis,time);
+            rc = level_refine(i,par,result_data,time);
           }  
   
           // Output error
-          write_sdf(time,result_data,old_gis,par);
+          write_sdf(time,result_data,par);
   
           std::cout << " PRE TEST rowsize " << par->rowsize[0] << std::endl;
   
@@ -374,8 +373,6 @@ int hpx_main(variables_map& vm)
           rc = compute_rowsize(par);
   
           std::cout << " TEST rowsize " << par->rowsize[0] << std::endl;
-          // augment/adjust result_data (w/ interp) to reflect the new mesh hierarchy
-          // call execute (instead of init_execute)
         }
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
@@ -509,8 +506,7 @@ int dataflow(std::vector<int> comm_list[maxgids],std::vector<int> prolong_list[m
 // }}}
 
 // level_refine {{{
-int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data,
-                 std::vector<int> &old_gis, double time)
+int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double time)
 {
   int rc;
   int numprocs = par->num_px_threads;
@@ -663,7 +659,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       rc = compute_error(localerror,nx,ny,nz,
                          lminx,lminy,lminz,
                          lmaxx,lmaxy,lmaxz,
-                         par->gr_h[gi],time,gi,result_data,old_gis,par);
+                         par->gr_h[gi],time,gi,result_data,par);
 
       int mini = (int) ((lminx - minx)/hl+0.5);
       int minj = (int) ((lminy - miny)/hl+0.5);
@@ -813,7 +809,6 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
                                 double h,double t,
                                 int gi,
 				boost::shared_ptr<std::vector<id_type> > &result_data,
-                                std::vector<int> &old_gis,
                                 parameter &par)
 {
     // initialize some positive error
@@ -852,15 +847,16 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
-      for (int i=0;i<old_gis.size();i++) {
+      for (int step=0;step<par->prev_gi.size();step++) {
         // see if the new gi is the same as the old
-        if ( floatcmp(minx0,par->gr_minx[i]) && 
-             floatcmp(miny0,par->gr_miny[i]) && 
-             floatcmp(minz0,par->gr_minz[i]) && 
-             floatcmp(h,par->gr_h[i]) && 
-             nx0 == par->gr_nx[i] && 
-             ny0 == par->gr_ny[i] && 
-             nz0 == par->gr_nz[i] 
+        int gi = par->prev_gi[step];
+        if ( floatcmp(minx0,par->gr_minx[gi]) && 
+             floatcmp(miny0,par->gr_miny[gi]) && 
+             floatcmp(minz0,par->gr_minz[gi]) && 
+             floatcmp(h,par->gr_h[gi]) && 
+             nx0 == par->gr_nx[gi] && 
+             ny0 == par->gr_ny[gi] && 
+             nz0 == par->gr_nz[gi] 
            ) {
           hpx::components::access_memory_block<hpx::components::amr::stencil_data>
               result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[i]]) );
@@ -872,28 +868,28 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         } else if ( intersection(minx0,maxx0,
                                  miny0,maxy0,
                                  minz0,maxz0,
-                                 par->gr_minx[i],par->gr_maxx[i],
-                                 par->gr_miny[i],par->gr_maxy[i],
-                                 par->gr_minz[i],par->gr_maxz[i]) &&
-                    floatcmp(h,par->gr_h[i])
+                                 par->gr_minx[gi],par->gr_maxx[gi],
+                                 par->gr_miny[gi],par->gr_maxy[gi],
+                                 par->gr_minz[gi],par->gr_maxz[gi]) &&
+                    floatcmp(h,par->gr_h[gi])
                   ) { 
           hpx::components::access_memory_block<hpx::components::amr::stencil_data>
-              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[i]]) );
+              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
 
           // find the intersection index
-          double x1 = max(minx0,par->gr_minx[i]); 
-          double x2 = min(maxx0,par->gr_maxx[i]); 
-          double y1 = max(miny0,par->gr_miny[i]); 
-          double y2 = min(maxy0,par->gr_maxy[i]); 
-          double z1 = max(minz0,par->gr_minz[i]); 
-          double z2 = min(maxz0,par->gr_maxz[i]); 
+          double x1 = max(minx0,par->gr_minx[gi]); 
+          double x2 = min(maxx0,par->gr_maxx[gi]); 
+          double y1 = max(miny0,par->gr_miny[gi]); 
+          double y2 = min(maxy0,par->gr_maxy[gi]); 
+          double z1 = max(minz0,par->gr_minz[gi]); 
+          double z2 = min(maxz0,par->gr_maxz[gi]); 
 
           //std::cout << " x TEST " << minx0 << " " << maxx0 << std::endl;
           //std::cout << " y TEST " << miny0 << " " << maxy0 << std::endl;
           //std::cout << " z TEST " << minz0 << " " << maxz0 << std::endl;
-          //std::cout << " x gr TEST " << par->gr_minx[i] << " " << par->gr_maxx[i] << std::endl;
-          //std::cout << " y gr TEST " << par->gr_miny[i] << " " << par->gr_maxy[i] << std::endl;
-          //std::cout << " z gr TEST " << par->gr_minz[i] << " " << par->gr_maxz[i] << std::endl;
+          //std::cout << " x gr TEST " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
+          //std::cout << " y gr TEST " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
+          //std::cout << " z gr TEST " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
           //std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
           //std::cout << " HELLO WORLD " << result->value_.size() << std::endl;
 
@@ -901,16 +897,16 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
           int jsize = (int) ( (y2-y1)/h );
           int ksize = (int) ( (z2-z1)/h );
 
-          int lnx = par->gr_nx[i]; 
-          int lny = par->gr_ny[i]; 
+          int lnx = par->gr_nx[gi]; 
+          int lny = par->gr_ny[gi]; 
 
           int istart_dst = (int) ( (x1 - minx0)/h );
           int jstart_dst = (int) ( (y1 - miny0)/h );
           int kstart_dst = (int) ( (z1 - minz0)/h );
 
-          int istart_src = (int) ( (x1 - par->gr_minx[i])/h );
-          int jstart_src = (int) ( (y1 - par->gr_miny[i])/h );
-          int kstart_src = (int) ( (z1 - par->gr_minz[i])/h );
+          int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
+          int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
+          int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
 
        //   std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
        //   std::cout << " result val size " << result->value_.size() << std::endl;
@@ -1292,7 +1288,6 @@ int increment_gi(int level,int nx,int ny,int nz,
 // write_sdf {{{
 int write_sdf(double time,
               boost::shared_ptr<std::vector<id_type> > &result_data,
-              std::vector<int> &old_gis,
               parameter &par)
 {
 
@@ -1313,7 +1308,7 @@ int write_sdf(double time,
       std::vector<double> localerror;
       localerror.resize(nx*ny*nz);
       int rc = compute_error(localerror,nx,ny,nz,
-                   minx,miny,minz,maxx,maxy,maxz,h,time,gi,result_data,old_gis,par);
+                   minx,miny,minz,maxx,maxy,maxz,h,time,gi,result_data,par);
       int shape[3];
       std::vector<double> coord;
       coord.resize(nx+ny+nz);

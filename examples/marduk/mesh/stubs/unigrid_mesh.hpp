@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
-//  Matt Anderson
+//  Copyright (c) 2009-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,8 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<boost::shared_ptr<std::vector<naming::id_type> > > 
         init_execute_async(naming::id_type const& gid, 
+            std::vector<naming::id_type> const& interp_src_data,
+            double time,
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps, components::component_type logging_type,
             parameter const& par)
@@ -36,17 +38,20 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::unigrid_mesh::init_execute_action action_type;
-            return lcos::eager_future<action_type>(gid, function_type,
+            return lcos::eager_future<action_type>(gid, interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
 
         static boost::shared_ptr<std::vector<naming::id_type> >
         init_execute(naming::id_type const& gid, 
+            std::vector<naming::id_type> const& interp_src_data,
+            double time,
             components::component_type function_type, std::size_t numvalues, 
             std::size_t numsteps, components::component_type logging_type,
             parameter const& par)
         {
-            return init_execute_async(gid, function_type, numvalues, numsteps,
+            return init_execute_async(gid, interp_src_data,time,
+                function_type, numvalues, numsteps,
                 logging_type,par).get();
         }
 

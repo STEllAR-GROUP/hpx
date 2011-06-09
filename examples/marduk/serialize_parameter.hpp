@@ -72,6 +72,8 @@ void serialize(Archive &ar, hpx::components::amr::detail::parameter& par,
     ar & par.levelp;
     ar & par.item2gi;
     ar & par.gi2item;
+    ar & par.prev_gi2item;
+    ar & par.prev_gi;
 
     ar & par.rowsize;
     ar & par.level_row;
