@@ -49,7 +49,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_memory_block_action,
     create_memory_block_action);
-#if HPX_AGAS_VERSION <= 0x10
+#if HPX_AGAS_VERSION > 0x10
     HPX_REGISTER_ACTION_EX(
         hpx::components::server::runtime_support::load_components_action,
         load_components_action);
