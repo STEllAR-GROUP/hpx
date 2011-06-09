@@ -107,6 +107,53 @@ void early_write_handler(
 */
 }
 
+struct notification_header
+{
+    notification_header() {}
+
+    notification_header(
+        naming::gid_type const& prefix_
+      , naming::address const& response_pool_address_
+      , hpx::uintptr_t response_heap_ptr_
+      , naming::gid_type const& response_lower_gid_
+      , naming::gid_type const& response_upper_gid_
+      , naming::address const& primary_ns_address_
+      , naming::address const& component_ns_address_
+      , naming::address const& symbol_ns_address_
+    ) :
+        prefix(prefix_)
+      , response_pool_address(response_pool_address_)
+      , response_heap_ptr(response_heap_ptr_)
+      , response_lower_gid(response_lower_gid_)
+      , response_upper_gid(response_upper_gid_)
+      , primary_ns_address(primary_ns_address_)
+      , component_ns_address(component_ns_address_)
+      , symbol_ns_address(symbol_ns_address_)
+    {}
+
+    naming::gid_type prefix;
+    naming::address response_pool_address;
+    hpx::uintptr_t response_heap_ptr;
+    naming::gid_type response_lower_gid;
+    naming::gid_type response_upper_gid;
+    naming::address primary_ns_address;
+    naming::address component_ns_address;
+    naming::address symbol_ns_address;
+
+    template <typename Archive>
+    void serialize(Archive & ar, const unsigned int) 
+    {
+        ar & prefix;
+        ar & response_pool_address;
+        ar & response_heap_ptr;
+        ar & response_lower_gid;
+        ar & response_upper_gid;
+        ar & primary_ns_address;
+        ar & component_ns_address;
+        ar & symbol_ns_address;
+    }
+};
+
 // {{{ early action forwards
 void register_console(
     boost::uint64_t count
@@ -115,12 +162,7 @@ void register_console(
   , hpx::uintptr_t heap_ptr
 );
 
-void notify_console(
-    naming::gid_type const& prefix
-  , boost::uint64_t count
-  , naming::address const& baseaddr
-  , hpx::uintptr_t heap_ptr
-);
+void notify_console(notification_header const& header);
 
 void register_worker(
     boost::uint64_t count
@@ -129,12 +171,7 @@ void register_worker(
   , hpx::uintptr_t heap_ptr
 );
 
-void notify_worker(
-    naming::gid_type const& prefix
-  , boost::uint64_t count
-  , naming::address const& baseaddr
-  , hpx::uintptr_t heap_ptr
-);
+void notify_worker(notification_header const& header);
 // }}}
 
 // {{{ early action types
@@ -143,9 +180,8 @@ typedef actions::plain_action4<
   , register_console
 > register_console_action;
 
-typedef actions::plain_action4<
-    naming::gid_type const&, boost::uint64_t, naming::address const&
-  , hpx::uintptr_t, notify_console
+typedef actions::plain_action1<
+    notification_header const&, notify_console
 > notify_console_action;
 
 typedef actions::plain_action4<
@@ -153,14 +189,14 @@ typedef actions::plain_action4<
   , register_worker
 > register_worker_action;
 
-typedef actions::plain_action4<
-    naming::gid_type const&, boost::uint64_t, naming::address const&
-  , hpx::uintptr_t, notify_worker
+typedef actions::plain_action1<
+    notification_header const&, notify_worker
 > notify_worker_action;
 // }}}
 
 // {{{ early action definitions
 // remote call to AGAS
+// TODO: merge with register_worker which is all but identical
 void register_console(
     boost::uint64_t count
   , naming::address const& baseaddr
@@ -186,35 +222,56 @@ void register_console(
     agas_client.bind_range(lower, count, baseaddr, offset); 
     agas_client.registerid("/locality(console)", prefix);
 
+    /*
     if (HPX_UNLIKELY((prefix + 1) != lower))
     {
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::register_console",
             "bad initial GID range allocation");
     }
+    */
+
+    typedef naming::resolver_client::primary_namespace_server_type
+        primary_namespace_server_type;
+    typedef naming::resolver_client::component_namespace_server_type
+        component_namespace_server_type;
+    typedef naming::resolver_client::symbol_namespace_server_type
+        symbol_namespace_server_type;
+
+    naming::address primary_addr(get_runtime().here(),
+        primary_namespace_server_type::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
+    naming::address component_addr(get_runtime().here(),
+        component_namespace_server_type::get_component_type(), 
+            static_cast<void*>(&agas_client.bootstrap->component_ns_server));
+    naming::address symbol_addr(get_runtime().here(),
+        symbol_namespace_server_type::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
+
+    actions::base_action* p =
+        new notify_console_action(
+            notification_header(
+                prefix, baseaddr, heap_ptr, lower, upper,
+                primary_addr, component_addr, symbol_addr));
+
+    get_big_boot_barrier().apply(naming::address(baseaddr.locality_), p);
 
     get_big_boot_barrier().notify();
-
-    get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
-        new notify_console_action(prefix, count, baseaddr, heap_ptr));
 }
 
+// TODO: merge with notify_worker which is all but identical
 // TODO: callback must finishing installing new heap
 // TODO: callback must set up future pool 
 // AGAS callback to client
-void notify_console(
-    naming::gid_type const& prefix // TODO: this could be sent as a uint32_t
-  , boost::uint64_t count
-  , naming::address const& baseaddr
-  , hpx::uintptr_t heap_ptr
-) {
+void notify_console(notification_header const& header)
+{
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
     {
         hpx::util::osstream strm;
         strm << "locality "
-             << baseaddr.locality_
+             << get_runtime().here() 
              << " has launched early"; 
         HPX_THROW_EXCEPTION(internal_server_error, 
             "agas::notify_console", 
@@ -222,18 +279,25 @@ void notify_console(
     }
 
     // set our prefix
-    agas_client.local_prefix(prefix);
+    agas_client.local_prefix(header.prefix);
+
+    // store the full addresses of the agas servers in our local router
+    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
+    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
+    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(prefix + 1, prefix + 1 + count); 
+    response_heap_type::get_heap().set_range(header.response_lower_gid
+                                           , header.response_upper_gid); 
 
     // finish setting up the first heap. 
     response_heap_type::block_type* p
-        = reinterpret_cast<response_heap_type::block_type*>(heap_ptr);
+        = reinterpret_cast<response_heap_type::block_type*>
+            (header.response_heap_ptr);
 
     // set the base gid that we bound to this heap
-    p->set_gid(prefix + 1); 
+    p->set_gid(header.response_lower_gid); 
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p); 
@@ -256,6 +320,8 @@ void notify_console(
 
     for (std::size_t i = 0; i < bind_size; ++i)
         bind_pool.enqueue(new bind_response_future_type);     
+
+    get_big_boot_barrier().notify();
 }
 
 // remote call to AGAS
@@ -283,35 +349,55 @@ void register_worker(
     agas_client.get_id_range(baseaddr.locality_, count, lower, upper);
     agas_client.bind_range(lower, count, baseaddr, offset); 
 
+    /* 
     if (HPX_UNLIKELY((prefix + 1) != lower))
     {
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::register_worker",
             "bad initial GID range allocation");
     }
+    */ 
+
+    typedef naming::resolver_client::primary_namespace_server_type
+        primary_namespace_server_type;
+    typedef naming::resolver_client::component_namespace_server_type
+        component_namespace_server_type;
+    typedef naming::resolver_client::symbol_namespace_server_type
+        symbol_namespace_server_type;
+
+    naming::address primary_addr(get_runtime().here(),
+        primary_namespace_server_type::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
+    naming::address component_addr(get_runtime().here(),
+        component_namespace_server_type::get_component_type(), 
+            static_cast<void*>(&agas_client.bootstrap->component_ns_server));
+    naming::address symbol_addr(get_runtime().here(),
+        symbol_namespace_server_type::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
+
+    actions::base_action* p =
+        new notify_console_action(
+            notification_header(
+                prefix, baseaddr, heap_ptr, lower, upper,
+                primary_addr, component_addr, symbol_addr));
+
+    get_big_boot_barrier().apply(naming::address(baseaddr.locality_), p);
 
     get_big_boot_barrier().notify();
-
-    get_big_boot_barrier().apply(naming::address(baseaddr.locality_),
-        new notify_worker_action(prefix, count, baseaddr, heap_ptr));
 }
 
-// TODO: callback must finishing installing new heap
+// TODO: callback must finish installing new heap
 // TODO: callback must set up future pool 
 // AGAS callback to client
-void notify_worker(
-    naming::gid_type const& prefix // TODO: this could be sent as a uint32_t
-  , boost::uint64_t count
-  , naming::address const& baseaddr
-  , hpx::uintptr_t heap_ptr
-) {
+void notify_worker(notification_header const& header)
+{
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
     {
         hpx::util::osstream strm;
         strm << "locality "
-             << baseaddr.locality_
+             << get_runtime().here() 
              << " has launched early"; 
         HPX_THROW_EXCEPTION(internal_server_error, 
             "agas::notify_worker", 
@@ -319,18 +405,25 @@ void notify_worker(
     }
 
     // set our prefix
-    agas_client.local_prefix(prefix);
+    agas_client.local_prefix(header.prefix);
+
+    // store the full addresses of the agas servers in our local router
+    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
+    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
+    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(prefix + 1, prefix + 1 + count); 
+    response_heap_type::get_heap().set_range(header.response_lower_gid
+                                           , header.response_upper_gid); 
 
     // finish setting up the first heap. 
     response_heap_type::block_type* p
-        = reinterpret_cast<response_heap_type::block_type*>(heap_ptr);
+        = reinterpret_cast<response_heap_type::block_type*>
+            (header.response_heap_ptr);
 
     // set the base gid that we bound to this heap
-    p->set_gid(prefix + 1); 
+    p->set_gid(header.response_lower_gid); 
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p); 
@@ -353,6 +446,8 @@ void notify_worker(
 
     for (std::size_t i = 0; i < bind_size; ++i)
         bind_pool.enqueue(new bind_response_future_type);     
+
+    get_big_boot_barrier().notify();
 }
 // }}}
 
@@ -392,7 +487,9 @@ big_boot_barrier::big_boot_barrier(
   , cond()
   , mtx()
   , connected( (router_mode_bootstrap == router_type)
-             ? (ini_.get_num_localities() - 1)
+             ? ( ini_.get_num_localities()
+               ? (ini_.get_num_localities() - 1)
+               : 0)
              : 1) 
 {
     pp_.register_event_handler(boost::bind(&early_parcel_sink, _1, _2));
@@ -419,7 +516,7 @@ void big_boot_barrier::apply(
         // Connect to the target locality, retry if needed
         boost::system::error_code error = boost::asio::error::try_again;
 
-        for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+        for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
             try 
             { // {{{
@@ -442,7 +539,7 @@ void big_boot_barrier::apply(
 
                 // wait for a really short amount of time (usually 100 ms)
                 boost::this_thread::sleep(boost::get_system_time() + 
-                    boost::posix_time::microseconds
+                    boost::posix_time::milliseconds
                         (HPX_NETWORK_RETRIES_SLEEP));
             } // }}}
 
@@ -460,7 +557,8 @@ void big_boot_barrier::apply(
             hpx::util::osstream strm;
             strm << error.message() << " (while trying to connect to: " 
                  << addr.locality_ << ")";
-            HPX_THROW_EXCEPTION(network_error, "parcelport::get_connection", 
+            HPX_THROW_EXCEPTION(network_error,
+                "big_boot_barrier::get_connection", 
                 hpx::util::osstream_get_string(strm));
         } // }}}
     }
@@ -474,18 +572,7 @@ void big_boot_barrier::apply(
 void big_boot_barrier::wait()
 { // {{{
     if (router_mode_bootstrap == router_type)
-    {
-        // bootstrap, console
-        if (runtime_mode_console == runtime_type)
-            spin();
-
-        // bootstrap, worker
-        else
-            // We need to wait for the console to connect to us. The console
-            // will send register_console to our parcelport, which will wake us
-            // up.
-            spin();
-    }
+        spin();
 
     else
     {
