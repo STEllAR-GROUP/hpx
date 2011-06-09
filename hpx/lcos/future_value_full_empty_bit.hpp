@@ -407,6 +407,7 @@ namespace hpx { namespace lcos
 //             return impl_->get_full_address(fa);
 //         }
 
+    public:
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
@@ -414,7 +415,6 @@ namespace hpx { namespace lcos
             (*impl_)->reset();
         }
 
-    public:
         /// \brief Return the global id of this \a future instance
         naming::id_type const& get_gid() const
         {
@@ -492,6 +492,7 @@ namespace hpx { namespace lcos
 //             return impl_->get_full_address(fa);
 //         }
 
+    public:
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
@@ -499,7 +500,6 @@ namespace hpx { namespace lcos
             (*impl_)->reset();
         }
 
-    public:
         /// \brief Return the global id of this \a future instance
         naming::id_type const& get_gid() const
         {
