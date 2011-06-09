@@ -258,11 +258,6 @@ namespace hpx
         _isatty(0);
 #endif
         // {{{ early startup code
-        #if HPX_AGAS_VERSION > 0x10
-            // load components now that AGAS is up
-            get_config().load_components();
-        #endif
-
         #if HPX_AGAS_VERSION <= 0x10
             // init TSS for the main thread, this enables logging, time logging, etc.
             init_tss();
