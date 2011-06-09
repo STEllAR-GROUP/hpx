@@ -697,6 +697,7 @@ namespace hpx { namespace threads
         scheduler_.on_start_thread(num_thread);
 
         {
+        #if HPX_AGAS_VERSION <= 0x10
             manage_counter_type counter_type;
             if (0 == num_thread) {
                 // register counter types
@@ -708,6 +709,7 @@ namespace hpx { namespace threads
                         "counter type '/queue/length': " << ec.get_message();
                 }
             }
+        #endif
 
             LTM_(info) << "tfunc(" << num_thread << "): start";
             try {
@@ -963,6 +965,7 @@ namespace hpx { namespace threads
         bool is_master_thread = (0 == num_thread) ? true : false;
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
+#if HPX_AGAS_VERSION <= 0x10
         // register performance counters
         manage_counter queue_length_counter; 
         if (is_master_thread) {
@@ -971,6 +974,7 @@ namespace hpx { namespace threads
                 boost::bind(&scheduling_policy_type::get_queue_lengths, 
                     &scheduler_, num_thread));
         }
+#endif
 
         std::size_t idle_loop_count = 0;
         
@@ -1071,7 +1075,9 @@ namespace hpx { namespace threads
             else if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
             {
                 // if we need to terminate, unregister the counter first
+#if HPX_AGAS_VERSION <= 0x10
                 queue_length_counter.uninstall();
+#endif
                 count.exit();
                 break;
             }
