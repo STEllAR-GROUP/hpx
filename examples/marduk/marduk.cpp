@@ -338,6 +338,8 @@ int hpx_main(variables_map& vm)
         um.create(here);
         int numsteps = par->nt0/2;
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
+
+        
         for (int j=0;j<9;j++) {
           double time = j*par->nt0*par->lambda*par->h;
 
@@ -761,6 +763,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
                          &bound_width);
 
   std::cout << " numbox post DD " << numbox << std::endl;
+  int prev_tgi;
+  int tgi = 0;
   for (int i=0;i<numbox;i++) {
     //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
     //std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
@@ -776,7 +780,6 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
     double lmaxy = miny + (b_maxy[i]-1)*hl;
     double lmaxz = minz + (b_maxz[i]-1)*hl;
 
-    int prev_tgi,tgi;
     if ( i != 0 ) {
       prev_tgi = tgi;
     }
@@ -995,7 +998,7 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
 {
   int il,jl,kl;
   // combine local grid error into global grid error
-  for (int k=0;k<nx;k++) {
+  for (int k=0;k<nz;k++) {
     kl = k + mink;
   for (int j=0;j<ny;j++) {
     jl = j + minj;
