@@ -177,6 +177,10 @@ struct legacy_router : boost::noncopyable
 
         allocate_response_pool_type allocate_response_pool_;
         bind_response_pool_type bind_response_pool_;
+
+        naming::address primary_ns_addr_;
+        naming::address component_ns_addr_;
+        naming::address symbol_ns_addr_;
     }; // }}}
 
     const router_mode router_type;
@@ -236,7 +240,7 @@ struct legacy_router : boost::noncopyable
         bootstrap->symbol_ns_server.bind("/locality(agas#0)",
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
 
-        prefix_ = HPX_AGAS_BOOTSTRAP_PREFIX;
+        local_prefix(naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
 
         bootstrap->primary_ns_server.bind_gid
             (primary_namespace_server_type::fixed_gid(), primary_gva);
@@ -295,7 +299,7 @@ struct legacy_router : boost::noncopyable
     void state(router_state new_state) 
     { state_.store(new_state); }
 
-    naming::gid_type local_prefix() const
+    naming::gid_type const& local_prefix() const
     {
         BOOST_ASSERT(prefix_ != naming::invalid_gid);
         return prefix_;
@@ -567,8 +571,42 @@ struct legacy_router : boost::noncopyable
 
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.bind_locality(ep, count);
+
+        // WARNING: this deadlocks if AGAS is unresponsive and all response
+        // futures are checked out and pending.
         else
+        {
+            lcos::eager_future<
+                primary_namespace_server_type::bind_locality_action,
+                response_type
+            >* f = 0;
+
+            // get a future
+            while (!hosted->allocate_response_pool_.dequeue(&f)) {} 
+
+            BOOST_ASSERT(f);
+
+            // reset the future
+            f->reset();
+
+            // execute the action (synchronously)
+            f->apply(
+                naming::id_type(primary_namespace_server_type::fixed_gid()
+                              , naming::id_type::unmanaged),
+                ep, count);
+            r = f->get();
+
+            // return the future to the pool
+            hosted->allocate_response_pool_.enqueue(f);
+        }
+
+/*
+        else
+        {
+            // IMPLEMENT check if we're running low on response futures
             r = hosted->primary_ns_.bind(ep, count);
+        }
+*/
 
         lower_bound = r.get_lower_bound(); 
         upper_bound = r.get_upper_bound();
@@ -607,8 +645,36 @@ struct legacy_router : boost::noncopyable
 
         else
         {
-            response_type r = hosted->primary_ns_.bind(lower_id, gva);
+            // WARNING: this deadlocks if AGAS is unresponsive and all response
+            // futures are checked out and pending.
+            lcos::eager_future<
+                primary_namespace_server_type::bind_gid_action,
+                response_type
+            >* f = 0;
 
+            // get a future
+            while (!hosted->bind_response_pool_.dequeue(&f)) {} 
+
+            BOOST_ASSERT(f);
+
+            // reset the future
+            f->reset();
+
+            // execute the action (synchronously)
+            f->apply(
+                naming::id_type(primary_namespace_server_type::fixed_gid()
+                              , naming::id_type::unmanaged),
+                lower_id, gva);
+            response_type r = f->get();
+
+            // return the future to the pool
+            hosted->bind_response_pool_.enqueue(f);
+
+/*
+            // IMPLEMENT check if we're running low on response futures
+            response_type r = hosted->primary_ns_.bind(lower_id, gva);
+*/
+         
             if (success == r.get_status()) 
             { 
                 cache_mutex_type::scoped_lock
@@ -695,8 +761,32 @@ struct legacy_router : boost::noncopyable
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws) 
     { // {{{ resolve implementation
-        if (try_cache && !is_bootstrap() && resolve_cached(id, addr, ec))
-            return true;
+        if (!is_bootstrap())
+        {
+            // {{{ special cases: authoritative AGAS component address
+            // resolution
+            if (id == primary_namespace_server_type::fixed_gid())
+            {
+                addr =hosted->primary_ns_addr_;
+                return true;
+            }
+
+            else if (id == component_namespace_server_type::fixed_gid())
+            {
+                addr = hosted->component_ns_addr_;
+                return true;
+            }
+
+            else if (id == symbol_namespace_server_type::fixed_gid())
+            {
+                addr = hosted->symbol_ns_addr_;
+                return true;
+            }
+            // }}}
+
+            else if (try_cache && resolve_cached(id, addr, ec))
+                return true;
+        }
         
         response_type r; 
 
@@ -733,6 +823,7 @@ struct legacy_router : boost::noncopyable
     bool resolve_cached(naming::gid_type const& id, naming::address& addr,
                         error_code& ec = throws) 
     { // {{{ resolve_cached implementation
+        // TODO: assert?
         if (is_bootstrap())
             return resolve(id, addr, false, ec);
 
