@@ -227,11 +227,11 @@ namespace hpx { namespace applier
 
     naming::resolver_client& applier::get_agas_client()
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            return parcel_handler_.get_resolver();
-        #else
-            return get_runtime().get_agas_client();
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        return parcel_handler_.get_resolver();
+#else
+        return get_runtime().get_agas_client();
+#endif
     }
 
     parcelset::parcelhandler& applier::get_parcel_handler() 
@@ -246,31 +246,27 @@ namespace hpx { namespace applier
 
     naming::locality const& applier::here() const
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            return parcel_handler_.here();
-        #else
-            return get_runtime().here();
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        return parcel_handler_.here();
+#else
+        return get_runtime().here();
+#endif
     }
 
     naming::gid_type const& applier::get_prefix() const
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            return parcel_handler_.here();
-        #else
-            return get_runtime().get_agas_client().local_prefix();
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        return parcel_handler_.get_prefix();
+#else
+        return get_runtime().get_agas_client().local_prefix();
+#endif
     }
 
     boost::uint32_t applier::get_prefix_id() const
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            return naming::get_prefix_from_gid(parcel_handler_.get_prefix());
-        #else
-            return naming::get_prefix_from_gid(get_prefix()); 
-        #endif
+        return naming::get_prefix_from_gid(get_prefix()); 
     }
-        
+
     bool applier::get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
