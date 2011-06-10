@@ -23,6 +23,15 @@
 #include <sdf.h>
 #endif
 
+bool intersection(double xmin,double xmax,
+                  double ymin,double ymax,
+                  double zmin,double zmax,
+                  double xmin2,double xmax2,
+                  double ymin2,double ymax2,
+                  double zmin2,double zmax2);
+double max(double,double);
+double min(double,double);
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
 {
@@ -198,12 +207,110 @@ namespace hpx { namespace components { namespace amr
             access_memory_block<stencil_data> val(
                 components::stubs::memory_block::checkout(result));
 
-            //if ( time > 1.e-8 ) {
-            // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
-            //} else {
-            // data is generated from interpolation using interp_src_data
-            //}
+            if ( time < 1.e-8 ) {
+              // call provided (external) function
+              generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+            } else {
+              // data is generated from interpolation using interp_src_data
+              // find the bounding box for this item
+              double minx = par->gr_minx[par->item2gi[item]];
+              double miny = par->gr_miny[par->item2gi[item]];
+              double minz = par->gr_minz[par->item2gi[item]];
+              double maxx = par->gr_maxx[par->item2gi[item]];
+              double maxy = par->gr_maxy[par->item2gi[item]];
+              double maxz = par->gr_maxz[par->item2gi[item]];
+              double h = par->gr_h[par->item2gi[item]];
+              int nx0 = par->gr_nx[par->item2gi[item]];
+              int ny0 = par->gr_ny[par->item2gi[item]];
+              int nz0 = par->gr_nz[par->item2gi[item]];
+
+              val->max_index_ = maxitems;
+              val->index_ = item;
+              val->timestep_ = 0;
+              val->value_.resize(nx0*ny0*nz0);
+              for (int step=0;step<par->prev_gi.size();step++) {
+                // see if the new gi is the same as the old
+                int gi = par->prev_gi[step];
+                if ( floatcmp(minx,par->gr_minx[gi]) && 
+                     floatcmp(miny,par->gr_miny[gi]) && 
+                     floatcmp(minz,par->gr_minz[gi]) && 
+                     floatcmp(maxx,par->gr_maxx[gi]) && 
+                     floatcmp(maxy,par->gr_maxy[gi]) && 
+                     floatcmp(maxz,par->gr_maxz[gi]) && 
+                     floatcmp(h,par->gr_h[gi]) 
+                   ) 
+                {
+                  // This has the same data -- copy it over
+                  access_memory_block<stencil_data> prev_val(
+                    components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
+                  val.get() = prev_val.get();
+
+                  val->max_index_ = maxitems;
+                  val->index_ = item;
+                  val->timestep_ = 0;
+                  break;
+                } else if (
+                  intersection(minx,maxx,
+                               miny,maxy,
+                               minz,maxz,
+                               par->gr_minx[gi],par->gr_maxx[gi],
+                               par->gr_miny[gi],par->gr_maxy[gi],
+                               par->gr_minz[gi],par->gr_maxz[gi])
+                  && floatcmp(h,par->gr_h[gi]) 
+                          ) 
+                {
+                  access_memory_block<stencil_data> prev_val(
+                    components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
+                  // find the intersection index
+                  double x1 = max(minx,par->gr_minx[gi]); 
+                  double x2 = min(maxx,par->gr_maxx[gi]); 
+                  double y1 = max(miny,par->gr_miny[gi]); 
+                  double y2 = min(maxy,par->gr_maxy[gi]); 
+                  double z1 = max(minz,par->gr_minz[gi]); 
+                  double z2 = min(maxz,par->gr_maxz[gi]);
+
+                  int isize = (int) ( (x2-x1)/h );
+                  int jsize = (int) ( (y2-y1)/h );
+                  int ksize = (int) ( (z2-z1)/h );
+
+                  int lnx = par->gr_nx[gi]; 
+                  int lny = par->gr_ny[gi]; 
+                  int lnz = par->gr_nz[gi]; 
+
+                  int istart_dst = (int) ( (x1 - minx)/h );
+                  int jstart_dst = (int) ( (y1 - miny)/h );
+                  int kstart_dst = (int) ( (z1 - minz)/h );
+
+                  int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
+                  int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
+                  int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
+
+                  val->level_ = prev_val->level_;
+                  for (int kk=0;kk<=ksize;kk++) {
+                  for (int jj=0;jj<=jsize;jj++) {
+                  for (int ii=0;ii<=isize;ii++) {
+                    int i = ii + istart_dst;
+                    int j = jj + jstart_dst;
+                    int k = kk + kstart_dst;
+
+                    int si = ii + istart_src;
+                    int sj = jj + jstart_src;
+                    int sk = kk + kstart_src;
+                    BOOST_ASSERT(i+nx0*(j+ny0*k) < val->value_.size());
+                    BOOST_ASSERT(si+lnx*(sj+lny*sk) < prev_val->value_.size());
+                    val->value_[i+nx0*(j+ny0*k)] = prev_val->value_[si+lnx*(sj+lny*sk)];
+                  } } }
+
+                }
+              }
+              //std::cout << " TEST bbox in gen init data " << xmin << " " << xmax << std::endl;
+              //std::cout << "                            " << ymin << " " << ymax << std::endl;
+              //std::cout << "                            " << zmin << " " << zmax << std::endl;
+
+              // TEST
+              generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+               
+            }
 
             if (log_ && par->loglevel > 1)         // send initial value to logging instance
                 stubs::logging::logentry(log_, val.get(), row,0, par);
