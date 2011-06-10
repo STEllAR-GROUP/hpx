@@ -185,8 +185,17 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();
-        if (std::size_t(-1)  == data.num_os_thread) 
-            data.num_os_thread = get_thread_num();
+
+        // NOTE: This code overrides a request to schedule a thread on a scheduler
+        // selected queue. The schedulers are written to select a queue to put
+        // a thread in if the os thread number is -1. Not only does overriding this
+        // prevent extensibility by forcing a certain queueing behavior, but it also
+        // schedules unfairly. A px thread is always put into the queue of the
+        // os thread that it's producer is currently running on. In a single
+        // producer environment, this can lead to unexpected inbalances and
+        // work only gets distributed by work stealing.
+        //if (std::size_t(-1)  == data.num_os_thread) 
+        //    data.num_os_thread = get_thread_num();
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
@@ -261,8 +270,16 @@ namespace hpx { namespace threads
         if (0 == data.parent_prefix) 
             data.parent_prefix = applier::get_prefix_id();
 
-        if (std::size_t(-1)  == data.num_os_thread) 
-            data.num_os_thread = get_thread_num();
+        // NOTE: This code overrides a request to schedule a thread on a scheduler
+        // selected queue. The schedulers are written to select a queue to put
+        // a thread in if the os thread number is -1. Not only does overriding this
+        // prevent extensibility by forcing a certain queueing behavior, but it also
+        // schedules unfairly. A px thread is always put into the queue of the
+        // os thread that it's producer is currently running on. In a single
+        // producer environment, this can lead to unexpected inbalances and
+        // work only gets distributed by work stealing.
+        //if (std::size_t(-1) == data.num_os_thread) 
+        //    data.num_os_thread = get_thread_num();
 
         // create the new thread
         scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
