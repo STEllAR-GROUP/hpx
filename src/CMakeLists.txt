@@ -16,6 +16,7 @@ if(UNIX)
   add_hpx_library_sources(hpx
     exception.cpp
     exception_list.cpp
+    hpx_init.cpp
     runtime.cpp)
 
   add_subdirectory(lcos)
@@ -121,7 +122,7 @@ if(UNIX)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     target_link_libraries(hpx hpx_serialization hpx_ini
-      agas_stdmap_tcpip_lib
+      agas_stdmap_tcpip_lib barrier_component
       ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
   else()
     target_link_libraries(hpx hpx_serialization hpx_ini
@@ -485,6 +486,7 @@ else()
   set(hpxlib_global_SOURCES
       ${hpx_SOURCE_DIR}/src/exception.cpp
       ${hpx_SOURCE_DIR}/src/exception_list.cpp
+      ${hpx_SOURCE_DIR}/src/hpx_init.cpp
       ${hpx_SOURCE_DIR}/src/runtime.cpp)
   source_group("Source Files" 
       FILES ${hpxlib_global_SOURCES})
