@@ -1,5 +1,6 @@
-//  Copyright (c)      2011 Hartmut Kaiser
-//  Copyright (c)      2011 Matt Anderson
+//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2011 Matt Anderson
+//  Copyright (c) 2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -80,7 +81,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::vector<hpx::lcos::future_value<void> > barrier;
         for (std::size_t i=0;i<iterations;i++) {
           std::size_t rn = rand() % array_size;
-          std::cout << " Random element access: " << rn << std::endl;
+          //std::cout << " Random element access: " << rn << std::endl;
           barrier.push_back(accu[rn].add_async());
         }
 
@@ -94,7 +95,6 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::components::wait(barrier2);
     }
 
-    // initiate shutdown of the runtime systems on all localities
     hpx::finalize();
 
     return 0;

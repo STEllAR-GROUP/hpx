@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Matt Anderson
+//  Copyright (c) 2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,6 +7,7 @@
 #if !defined(HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM)
 #define HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
 
+#include <sstream>
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
@@ -48,8 +50,12 @@ namespace hpx { namespace components { namespace server
 
         // constructor: initialize random_mem_access value
         random_mem_access()
-          : arg_(0)
-        {}
+          : arg_(0), arg_init_(0), prefix_(0)
+        {
+            applier::applier* appl = applier::get_applier_ptr();
+            if (appl)
+                prefix_ = naming::get_prefix_from_gid(appl->get_prefix());
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -58,6 +64,12 @@ namespace hpx { namespace components { namespace server
         void init(int i) 
         {
             hpx::lcos::mutex::scoped_lock l(mtx_);
+
+            std::ostringstream oss;
+            oss << "[L" << prefix_ << "/" << this << "]"
+                << " Initializing count to " << i << "\n";
+            std::cout << oss.str() << std::flush;
+
             arg_ = i;
             arg_init_ = i;
         }
@@ -66,6 +78,13 @@ namespace hpx { namespace components { namespace server
         void add() 
         {
             hpx::lcos::mutex::scoped_lock l(mtx_);
+
+            std::ostringstream oss;
+            oss << "[L" << prefix_ << "/" << this << "]"
+                << " Incrementing count from " << arg_
+                << " to " << (arg_ + 1) << "\n";
+            std::cout << oss.str() << std::flush;
+
             arg_ += 1;
         }
 
@@ -73,6 +92,12 @@ namespace hpx { namespace components { namespace server
         int query() 
         {
             hpx::lcos::mutex::scoped_lock l(mtx_);
+
+            std::ostringstream oss;
+            oss << "[L" << prefix_ << "/" << this << "]"
+                << " Querying count, current value is " << arg_ << "\n"; 
+            std::cout << oss.str() << std::flush;
+
             return arg_;
         }
 
@@ -80,7 +105,12 @@ namespace hpx { namespace components { namespace server
         void print() 
         {
             hpx::lcos::mutex::scoped_lock l(mtx_);
-            std::cout << " I started as " << arg_init_ << " and I finished as " << arg_ << std::flush << std::endl;
+
+            std::ostringstream oss;
+            oss << "[L" << prefix_ << "/" << this << "]"
+                << " Initial count was " << arg_init_
+                << ", final count is " << arg_ << "\n";
+            std::cout << oss.str() << std::flush;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -88,7 +118,7 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action1<
-            random_mem_access, random_mem_access_init,int, 
+            random_mem_access, random_mem_access_init, int, 
             &random_mem_access::init
         > init_action;
 
@@ -110,9 +140,11 @@ namespace hpx { namespace components { namespace server
     private:
         int arg_;
         int arg_init_;
+        boost::uint32_t prefix_;
         hpx::lcos::mutex mtx_;
     };
 
 }}}
 
 #endif
+
