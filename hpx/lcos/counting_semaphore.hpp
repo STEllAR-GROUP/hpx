@@ -8,6 +8,7 @@
 #define HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
@@ -40,8 +41,13 @@ namespace hpx { namespace lcos
     class counting_semaphore
     {
     private:
+#if HPX_AGAS_VERSION <= 0x10
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
+#else
+        typedef hpx::lcos::mutex mutex_type;
+        mutex_type mtx_;
+#endif
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -90,7 +96,11 @@ namespace hpx { namespace lcos
                 LERR_(fatal) << "lcos::counting_semaphore::~counting_semaphore:"
                                 " queue is not empty, aborting threads";
 
+#if HPX_AGAS_VERSION <= 0x10
                 mutex_type::scoped_lock l(this);
+#else
+                mutex_type::scoped_lock l(mtx_);
+#endif
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
@@ -128,7 +138,11 @@ namespace hpx { namespace lcos
         ///                 yielded.
         void wait(long count = 1)
         {
+#if HPX_AGAS_VERSION <= 0x10
             mutex_type::scoped_lock l(this);
+#else
+            mutex_type::scoped_lock l(mtx_);
+#endif
 
             while (value_ < count) {
                 // we need to get the self anew for each round as it might
@@ -173,7 +187,11 @@ namespace hpx { namespace lcos
         /// 
         void signal(long count = 1)
         {
+#if HPX_AGAS_VERSION <= 0x10
             mutex_type::scoped_lock l(this);
+#else
+            mutex_type::scoped_lock l(mtx_);
+#endif
 
             value_ += count;
             if (value_ >= 0) {
@@ -214,3 +232,4 @@ namespace hpx { namespace lcos
 }}
 
 #endif
+
