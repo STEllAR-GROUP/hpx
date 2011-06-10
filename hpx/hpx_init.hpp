@@ -20,28 +20,20 @@
 #endif
 
 #include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/asio_util.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // this function has to be implemented by the user
-int hpx_main(boost::program_options::variables_map& vm);
+int hpx_main(boost::program_options::variables_map& vm) HPX_EXPORT; 
 
-#if HPX_AGAS_VERSION > 0x10
-    int hpx_pre_main(boost::program_options::variables_map& vm)
-    {
-        hpx::naming::id_type rt_id
-            = hpx::applier::get_applier().get_runtime_support_gid();
-
-        hpx::components::stubs::runtime_support::load_components(rt_id);
-
-        // Should we schedule a new thread for hpx_main?
-        return hpx_main(vm);
-    }
-#endif
- 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    #if HPX_AGAS_VERSION > 0x10
+        void pre_main() HPX_EXPORT;
+    #endif
+ 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
     inline naming::id_type find_here()
@@ -383,14 +375,10 @@ namespace hpx
                 // Run this runtime instance.
                 else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
                     result = rt->run(boost::bind
-#if HPX_AGAS_VERSION <= 0x10
                         (hpx_main, vm), num_threads, num_localities
-#else
-                        (hpx_pre_main, vm), num_threads, num_localities
-#endif
                     );
                 else 
-                    result = rt->run(num_threads, num_localities);
+                  result = rt->run(num_threads, num_localities);
             }
             else if ((0 == std::string("local").find(queueing)))
             {
@@ -425,14 +413,10 @@ namespace hpx
                 // Run this runtime instance.
                 else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
                     result = rt->run(boost::bind
-#if HPX_AGAS_VERSION <= 0x10
                         (hpx_main, vm), num_threads, num_localities
-#else
-                        (hpx_pre_main, vm), num_threads, num_localities
-#endif
                     );
                 else
-                    result = rt->run(num_threads, num_localities);
+                  result = rt->run(num_threads, num_localities);
             }
             else if ((0 == std::string("priority_local").find(queueing)))
             {
@@ -466,11 +450,7 @@ namespace hpx
                 // Run this runtime instance
                 else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
                     result = rt->run(boost::bind 
-#if HPX_AGAS_VERSION <= 0x10
                         (hpx_main, vm), num_threads, num_localities
-#else
-                        (hpx_pre_main, vm), num_threads, num_localities
-#endif
                     );
                 }
                 else {
@@ -509,11 +489,7 @@ namespace hpx
                 // Run this runtime instance
                 if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
                     result = rt->run(boost::bind 
-#if HPX_AGAS_VERSION <= 0x10
                         (hpx_main, vm), num_threads, num_localities
-#else
-                        (hpx_pre_main, vm), num_threads, num_localities
-#endif
                     );
                 }
                 else {

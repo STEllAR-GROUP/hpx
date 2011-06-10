@@ -223,6 +223,7 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+#if HPX_AGAS_VERSION <= 0x10
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
@@ -246,6 +247,23 @@ namespace hpx
             result = func();
         return threads::thread_state(threads::terminated);
     }
+#else
+
+    void pre_main();
+
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    threads::thread_state 
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
+        boost::function<runtime::hpx_main_function_type> func, int& result)
+    {
+        ::hpx::pre_main();
+
+        // now, execute the user supplied thread function
+        if (!func.empty()) 
+            result = func();
+        return threads::thread_state(threads::terminated);
+    }
+#endif
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
