@@ -130,6 +130,10 @@ namespace hpx
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
 
+#if HPX_AGAS_VERSION <= 0x10
+        typedef void hpx_premain_function_type();
+#endif
+
         ///
         typedef void hpx_errorsink_function_type(
             boost::uint32_t, std::string const&);
