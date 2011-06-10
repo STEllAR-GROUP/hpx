@@ -7,5 +7,6 @@ add_hpx_component(barrier
   MODULE core
   SOURCES component_module.cpp
           barrier.cpp
-  ESSENTIAL)
+  ESSENTIAL
+  NOLIBS)
 
