@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace detail
 
         bool alloc(T** result, std::size_t count = 1)
         {
-#if !defined(DEBUG)
+#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
             scoped_lock l(this);
 #else
             scoped_lock l(mtx_);
@@ -171,7 +171,7 @@ namespace hpx { namespace components { namespace detail
         {
             BOOST_ASSERT(did_alloc(p));
 
-#if !defined(DEBUG)
+#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
             scoped_lock l(this);
 #else
             scoped_lock l(mtx_);
@@ -216,7 +216,7 @@ namespace hpx { namespace components { namespace detail
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
-#if !defined(DEBUG)
+#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
                 scoped_lock l(this);
 #else
                 scoped_lock l(mtx_);
@@ -245,7 +245,7 @@ namespace hpx { namespace components { namespace detail
 
         void set_gid(naming::gid_type const& g)
         {
-#if !defined(DEBUG)
+#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
                 scoped_lock l(this);
 #else
                 scoped_lock l(mtx_);
@@ -387,7 +387,7 @@ namespace hpx { namespace components { namespace detail
         // managed_component heap
         naming::gid_type base_gid_;
 
-#if defined(DEBUG)
+#if defined(DEBUG) || HPX_AGAS_VERSION > 0x10
         mutable mutex_type mtx_;
 #endif
 
