@@ -385,9 +385,9 @@ void notify_console(notification_header const& header)
 
     // set up the future pools
     naming::resolver_client::allocate_response_pool_type&
-        allocate_pool = agas_client.get_allocate_response_pool();
+        allocate_pool = agas_client.hosted->allocate_response_pool_;
     naming::resolver_client::bind_response_pool_type&
-        bind_pool = agas_client.get_bind_response_pool();
+        bind_pool = agas_client.hosted->bind_response_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
@@ -542,9 +542,9 @@ void notify_worker(notification_header const& header)
 
     // set up the future pools
     naming::resolver_client::allocate_response_pool_type&
-        allocate_pool = agas_client.get_allocate_response_pool();
+        allocate_pool = agas_client.hosted->allocate_response_pool_;
     naming::resolver_client::bind_response_pool_type&
-        bind_pool = agas_client.get_bind_response_pool();
+        bind_pool = agas_client.hosted->bind_response_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
