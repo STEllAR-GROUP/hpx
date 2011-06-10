@@ -47,6 +47,7 @@ namespace hpx { namespace components { namespace server
             hpl_solve=5,
             hpl_swap=6,
             hpl_gmain=7,
+            hpl_search=8,
             hpl_check=9
         };
 
@@ -62,6 +63,7 @@ namespace hpx { namespace components { namespace server
     void allocate();
     int assign(int row, int offset, bool complete, int seed);
     void pivot();
+    int search_pivots(const int row);
     int swap(const int brow, const int bcol);
     void LU_gauss_manager();
     void LU_gauss_corner(const int iter);
@@ -93,10 +95,9 @@ namespace hpx { namespace components { namespace server
     double* solution;     //for storing the solution
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
+    int* tempivotarr;     //temporary copy of pivotarr
     lcos::mutex mtex;     //mutex
 
-    ptime starttime;      //used for measurements
-    ptime endtime;        //used for measurements
     public:
     //here we define the actions that will be used
     //the construct function
@@ -112,6 +113,9 @@ namespace hpx { namespace components { namespace server
     //the solve function
     typedef actions::result_action0<HPLMatreX, double, hpl_solve,
         &HPLMatreX::LUsolve> solve_action;
+    //the search_pivots function
+    typedef actions::result_action1<HPLMatreX, int, hpl_search, int,
+        &HPLMatreX::search_pivots> search_action;
     //the swap function
     typedef actions::result_action2<HPLMatreX, int, hpl_swap, int,
         int, &HPLMatreX::swap> swap_action;
@@ -128,18 +132,16 @@ namespace hpx { namespace components { namespace server
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
     typedef lcos::eager_future<server::HPLMatreX::assign_action> assign_future;
-
+    //the search pivots future
+    typedef lcos::eager_future<server::HPLMatreX::search_action> search_future;
     //Here is the swap future, which works the same way as the assign future
     typedef lcos::eager_future<server::HPLMatreX::swap_action> swap_future;
-
     //This future corresponds to the Gaussian elimination functions
     typedef lcos::eager_future<server::HPLMatreX::gmain_action> gmain_future;
-
     //the backsubst future is used to make sure all computations are complete
     //before returning from LUsolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
     typedef lcos::eager_future<server::HPLMatreX::partbsub_action> partbsub_future;
-
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
     typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
@@ -184,7 +186,7 @@ namespace hpx { namespace components { namespace server
     assign_future future(gid,(int)0,offset,false,gen());
 
     //initialize the pivot array
-    for(i=0;i<rows;i++){pivotarr[i]=i;}
+    for(i=0;i<rows;i++){pivotarr[i]=tempivotarr[i]=i;}
     future.get();
     return 1;
     }
@@ -196,6 +198,7 @@ namespace hpx { namespace components { namespace server
     transData = (double**) std::malloc(columns*sizeof(double*));
     trueData = (double**) std::malloc(rows*sizeof(double*));
     pivotarr = (int*) std::malloc(rows*sizeof(int));
+    tempivotarr = (int*) std::malloc(rows*sizeof(int));
     for(int i = 0;i < rows;i++){
         trueData[i] = (double*) std::malloc(columns*sizeof(double));
         transData[i] = (double*) std::malloc(rows*sizeof(double));
@@ -271,9 +274,9 @@ namespace hpx { namespace components { namespace server
         free(datablock[i]);
     }
     free(datablock);
+    free(pivotarr);
     free(factorData);
     free(trueData);
-    free(pivotarr);
     free(solution);
     }
 
@@ -297,7 +300,7 @@ namespace hpx { namespace components { namespace server
         }
         std::cout<<std::endl;
     }
-    std::cout<<std::endl;
+/*    std::cout<<std::endl;
     for(int i = 0;i < columns; i++){
         for(int j = 0;j < rows; j++){
         std::cout<<transData[i][j]<<" ";
@@ -305,13 +308,13 @@ namespace hpx { namespace components { namespace server
         std::cout<<std::endl;
     }
     std::cout<<std::endl;
-    }
+*/    }
 //END DEBUGGING FUNCTIONS/////////////////////////////////////////////
 
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double HPLMatreX::LUsolve(){
     //first perform partial pivoting
-    starttime = ptime(microsec_clock::local_time());
+    ptime starttime = ptime(microsec_clock::local_time());
     pivot();
     ptime temp = ptime(microsec_clock::local_time());
     std::cout<<"pivoting over "<<temp-starttime<<std::endl;
@@ -341,35 +344,61 @@ namespace hpx { namespace components { namespace server
     //pivot elements are found before any swapping takes place so that
     //the swapping is simplified
     void HPLMatreX::pivot(){
-    double max;
-    int max_row;
-    int temp_piv;
-    double temp;
-    int outer;
+    double max, temp;
+    int maxRow, temp_piv, outer;
     int i=0,j;
+    bool good;
+    int guessedPivots[rows];
     std::vector<swap_future> futures;
+    std::vector<search_future> searches;
 
     for(outer=0;outer<=brows;outer++){
-        //This first section of the pivot() function finds all of the pivot
-        //values to compute the final pivot array
+        if(outer > 0 && outer <= brows/2){
+            searches[outer-1].get();
+            temp = (outer-1)*blocksize;
+            for(j=(int)temp;j<rows;j++){
+                guessedPivots[j] = tempivotarr[j];
+                tempivotarr[j] = pivotarr[j];
+            }
+        }
+        if(outer < (brows/2)){
+            searches.push_back(search_future(_gid,(outer+1)*blocksize));
+        }
         for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
-            max_row = i;
-            max = fabs(transData[i][pivotarr[i]]);
-            temp_piv = pivotarr[i];
-            for(j=i+1;j<rows;j++){
-            temp = fabs(transData[i][pivotarr[j]]);
-            if(temp > max){
-                max = temp;
-                max_row = j;
-            }   }
-            pivotarr[i] = pivotarr[max_row];
-            pivotarr[max_row] = temp_piv;
+            good = true;
+            if(outer > 0 && outer <= brows/2){
+                for(j=i-blocksize;j<i;j++){
+                    if(pivotarr[j] == guessedPivots[i]){
+                        good = false;
+                        break;
+            }   }   }
+            else{good = false;}
+            if(good){
+                temp_piv = pivotarr[i];
+                pivotarr[i] = guessedPivots[i];
+                for(j=i-blocksize+1;j<rows;j++){
+                    if(pivotarr[j] == pivotarr[i]){
+                        pivotarr[j] = temp_piv;
+                        break;
+            }   }   }
+            else{
+                maxRow = i;
+                max = fabs(transData[i][pivotarr[i]]);
+                temp_piv = pivotarr[i];
+                for(j=i+1;j<rows;j++){
+                    temp = fabs(transData[i][pivotarr[j]]);
+                    if(temp > max){
+                        max = temp;
+                        maxRow = j;
+                }   }
+                pivotarr[i] = pivotarr[maxRow];
+                pivotarr[maxRow] = temp_piv;
+            }
         }
         //here we begin swapping portions of the matrix we have finished
         //finding the pivot values for
-        if(outer<brows){
-            futures.push_back(swap_future(_gid,outer,0));
-        }
+        if(outer<brows-1){futures.push_back(swap_future(_gid,outer,0));}
+        else if(outer==brows){futures.push_back(swap_future(_gid,outer-1,0));}
     }
     //transData is no longer needed so free the memory and allocate
     //space for factorData
@@ -384,6 +413,28 @@ namespace hpx { namespace components { namespace server
     BOOST_FOREACH(swap_future sf, futures){
         sf.get();
     }
+    free(tempivotarr);
+    }
+
+    //search_pivots guesses where pivots will be
+    int HPLMatreX::search_pivots(const int row){
+    int i, j, maxRow, temp_piv;
+    double max, temp;
+
+    for(i=row;i<std::min(row+blocksize,rows);i++){
+        maxRow = i-blocksize;
+        max = fabs(transData[i][tempivotarr[i-blocksize]]);
+        temp_piv = tempivotarr[i];
+        for(j=i-blocksize+1;j<rows;j++){
+            temp = fabs(transData[i][tempivotarr[j]]);
+            if(temp > max){
+                max = temp;
+                maxRow = j;
+        }   }
+        tempivotarr[i] = tempivotarr[maxRow];
+        tempivotarr[maxRow] = temp_piv;
+    }
+    return 1;
     }
 
     //swap() creates the datablocks and reorders the original

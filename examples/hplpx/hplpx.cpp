@@ -178,42 +178,43 @@ int main(int argc, char* argv[]){
         hpx::runtime_mode mode = hpx::runtime_mode_console;
 
         // extract IP address/port arguments
-            if(vm.count("agas"))
-                    split_ip_address(vm["agas"].as<std::string>(), agas_host, agas_port);
+        if(vm.count("agas"))
+            split_ip_address(vm["agas"].as<std::string>(), agas_host, agas_port);
 
-            if(vm.count("hpx"))
-                split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+        if(vm.count("hpx"))
+            split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
-            if(vm.count("localities"))
-                num_localities = vm["localities"].as<int>();
+        if(vm.count("localities"))
+            num_localities = vm["localities"].as<int>();
 
-            if(vm.count("threads"))
-                num_threads = vm["threads"].as<int>();
+        if(vm.count("threads"))
+            num_threads = vm["threads"].as<int>();
 
-            if(vm.count("queueing"))
-                queueing = vm["queueing"].as<std::string>();
+        if(vm.count("queueing"))
+            queueing = vm["queueing"].as<std::string>();
 
-            if(vm.count("size")){
+        if(vm.count("size")){
             if(vm["size"].as<int>() > 0){
-                    SIZE = vm["size"].as<int>();
+                SIZE = vm["size"].as<int>();
             }
             else{
-            std::cerr<<"warning: --size option ignored, input value is invalid"
-                ", using default\n";
+                std::cerr<<"warning: --size option ignored, input value is "
+                    "invalid, using default\n";
             }
         }
 
-            if(vm.count("worker")){
-                mode = hpx::runtime_mode_worker;
-                if(vm.count("config")){
-                    std::cerr<<"warning: --config option ignored, used for console "
-                            "instance only\n";
-                }
+        if(vm.count("worker")){
+            mode = hpx::runtime_mode_worker;
+            if(vm.count("config")){
+                std::cerr<<"warning: --config option ignored, used for console "
+                    "instance only\n";
             }
+        }
 
         if(vm.count("blocksize")){
-            if((vm["blocksize"].as<int>() > 0) && (vm["blocksize"].as<int>() <= SIZE)){
-            BSIZE = vm["blocksize"].as<int>();
+            if((vm["blocksize"].as<int>() > 0) &&
+               (vm["blocksize"].as<int>() <= (int)SIZE)){
+                BSIZE = vm["blocksize"].as<int>();
             }
             else{
             std::cerr<<"warning: --blocksize option ignored, input value is "
@@ -222,7 +223,8 @@ int main(int argc, char* argv[]){
         }
 
                 if(vm.count("allocblock")){
-                    if((vm["allocblock"].as<int>() > 0) && (vm["allocblock"].as<int>() <= SIZE)){
+                    if((vm["allocblock"].as<int>() > 0) &&
+                       (vm["allocblock"].as<int>() <= (int)SIZE)){
                         ABSIZE = vm["allocblock"].as<int>();
                     }
                     else{

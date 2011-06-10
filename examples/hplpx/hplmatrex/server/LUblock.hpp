@@ -38,7 +38,7 @@ LUblock::LUblock(unsigned int h, unsigned int w){
 //    columns = ((int*) workSpace) + 1;
     rows = h;
     columns = w;
-    for(int i = 0;i < h; i++){
+    for(int i = 0;i < (int)h; i++){
         data[i] = workSpace + 8 + i*w;
     }
 }
