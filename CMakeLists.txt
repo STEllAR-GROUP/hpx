@@ -138,6 +138,12 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
+# Compiler configuration code
+################################################################################
+include(HPX_GCCVersion)
+include(HPX_CompilerFlags)
+
+################################################################################
 # installation configuration
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
@@ -169,7 +175,6 @@ if(NOT MSVC)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
-
 
 ################################################################################
 # RPATH configuration

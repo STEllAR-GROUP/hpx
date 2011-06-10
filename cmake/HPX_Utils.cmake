@@ -18,8 +18,6 @@ hpx_include(Message
             AddExecutable
             AddTest
             AddConfigTest
-            GCCVersion
-            CompilerFlags
             AddPseudoDependencies
             AddPseudoTarget
             AddLibrarySources
