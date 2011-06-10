@@ -191,7 +191,7 @@ else()
       ${hpx_SOURCE_DIR}/hpx/lcos/base_lco.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/condition.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/contin.hpp
-      ${hpx_SOURCE_DIR}/hpx/lcos/counting_semaphore.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/local_counting_semaphore.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/dataflow_variable.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/eager_future.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors.hpp

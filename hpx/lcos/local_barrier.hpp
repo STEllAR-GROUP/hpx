@@ -130,7 +130,7 @@ namespace hpx { namespace lcos
 
                 if (e.aborted_waiting_) {
                     HPX_THROW_EXCEPTION(no_success, "local_barrier::wait",
-                        "aborted wait on counting_semaphore");
+                        "aborted wait on local_barrier");
                     return;
                 }
             }

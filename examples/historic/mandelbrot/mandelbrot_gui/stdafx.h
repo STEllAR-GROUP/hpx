@@ -59,5 +59,5 @@
 #endif
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 

@@ -24,7 +24,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/namespace/component.hpp>
@@ -176,10 +176,10 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
 
         console_cache_type console_cache_;
 
-        hpx::lcos::counting_semaphore allocate_response_sema_;
+        hpx::lcos::local_counting_semaphore allocate_response_sema_;
         allocate_response_pool_type allocate_response_pool_;
 
-        hpx::lcos::counting_semaphore bind_response_sema_;
+        hpx::lcos::local_counting_semaphore bind_response_sema_;
         bind_response_pool_type bind_response_pool_;
 
         naming::address primary_ns_addr_;

@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/mutex.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -141,9 +141,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         bool is_called_;                              // is one of the 'main' stencils
         threads::thread_id_type driver_thread_;
 
-        std::vector<boost::shared_ptr<lcos::counting_semaphore> > sem_in_;
-        std::vector<boost::shared_ptr<lcos::counting_semaphore> > sem_out_;
-        lcos::counting_semaphore sem_result_;
+        std::vector<boost::shared_ptr<lcos::local_counting_semaphore> > sem_in_;
+        std::vector<boost::shared_ptr<lcos::local_counting_semaphore> > sem_out_;
+        lcos::local_counting_semaphore sem_result_;
 
         std::vector<boost::shared_ptr<in_adaptor_type> > in_;   // adaptors used to gather input
         std::vector<naming::id_type> out_;                      // adaptors used to provide result

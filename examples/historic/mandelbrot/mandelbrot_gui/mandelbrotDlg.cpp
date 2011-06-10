@@ -211,7 +211,7 @@ HCURSOR CMandelbrotDlg::OnQueryDragIcon()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void CMandelbrotDlg::mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
+void CMandelbrotDlg::mandelbrot_callback(hpx::lcos::local_counting_semaphore& sem,
     mandelbrot::result const& result)
 {
 //     std::cout << result.x_ << "," << result.y_ << "," << result.iterations_ 
@@ -261,7 +261,7 @@ void calculate_mandelbrot_set(int sizex, int sizey, CMandelbrotDlg* dlg)
     util::high_resolution_timer t;
 
     // initialize the worker threads, one for each of the pixels
-    lcos::counting_semaphore sem;
+    lcos::local_counting_semaphore sem;
 
     boost::scoped_ptr<mandelbrot::server::callback> cb(
         new mandelbrot::server::callback(

@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -16,7 +16,7 @@ using namespace hpx;
 namespace po = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-void mandelbrot_callback(lcos::counting_semaphore& sem,
+void mandelbrot_callback(lcos::local_counting_semaphore& sem,
     mandelbrot::result const& result)
 {
 //     std::cout << result.x_ << "," << result.y_ << "," << result.iterations_ 
@@ -43,7 +43,7 @@ int hpx_main(int sizex, int sizey, int iterations)
     util::high_resolution_timer t;
 
     // initialize the worker threads, one for each of the pixels
-    lcos::counting_semaphore sem;
+    lcos::local_counting_semaphore sem;
 
     boost::scoped_ptr<mandelbrot::server::callback> cb(
         new mandelbrot::server::callback(

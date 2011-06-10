@@ -46,7 +46,7 @@ public:
 
     void OnDoneRendering();
     void error_sink(boost::uint32_t, std::string const&);
-    void mandelbrot_callback(hpx::lcos::counting_semaphore& sem,
+    void mandelbrot_callback(hpx::lcos::local_counting_semaphore& sem,
         mandelbrot::result const& result);
 
     void InvalidateBitmap(BOOL erase = FALSE);

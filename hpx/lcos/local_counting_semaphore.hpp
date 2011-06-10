@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
-    /// \class counting_semaphore counting_semaphore hpx/lcos/counting_semaphore.hpp
+    /// \class local_counting_semaphore local_counting_semaphore hpx/lcos/local_counting_semaphore.hpp
     ///
     /// A semaphore is a protected variable (an entity storing a value) or 
     /// abstract data type (an entity grouping several variables that may or 
@@ -38,16 +38,11 @@ namespace hpx { namespace lcos
     /// well: one thread waiting for several other threads to touch (signal) 
     /// the semaphore, or several threads waiting for one other thread to touch 
     /// this semaphore.
-    class counting_semaphore
+    class local_counting_semaphore
     {
     private:
-#if HPX_AGAS_VERSION <= 0x10
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
-#else
-        typedef hpx::lcos::mutex mutex_type;
-        mutex_type mtx_;
-#endif
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -86,21 +81,18 @@ namespace hpx { namespace lcos
         ///                 are equivalent to the same number of signals pre-
         ///                 set, and negative values are equivalent to the
         ///                 same number of waits pre-set.
-        counting_semaphore(long value = 0)
+        local_counting_semaphore(std::size_t value = 0)
           : value_(value)
         {}
 
-        ~counting_semaphore()
+        ~local_counting_semaphore()
         {
             if (!queue_.empty()) {
-                LERR_(fatal) << "lcos::counting_semaphore::~counting_semaphore:"
-                                " queue is not empty, aborting threads";
+                LERR_(fatal)
+                    << "lcos::local_counting_semaphore::~local_counting_semaphore:"
+                       " queue is not empty, aborting threads";
 
-#if HPX_AGAS_VERSION <= 0x10
                 mutex_type::scoped_lock l(this);
-#else
-                mutex_type::scoped_lock l(mtx_);
-#endif
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
@@ -110,7 +102,7 @@ namespace hpx { namespace lcos
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
                     LERR_(fatal)
-                            << "lcos::counting_semaphore::~counting_semaphore:"
+                            << "lcos::local_counting_semaphore::~local_counting_semaphore:"
                             << " pending thread: " 
                             << get_thread_state_name(thrd->get_state()) 
                             << "(" << id << "): " << thrd->get_description();
@@ -121,7 +113,7 @@ namespace hpx { namespace lcos
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
                         LERR_(fatal)
-                            << "lcos::counting_semaphore::~counting_semaphore:"
+                            << "lcos::local_counting_semaphore::~local_counting_semaphore:"
                             << " could not abort thread: "
                             << get_thread_state_name(thrd->get_state()) 
                             << "(" << id << "): " << thrd->get_description();
@@ -136,13 +128,9 @@ namespace hpx { namespace lcos
         ///                 be decremented. At the same time this is the minimum 
         ///                 value of the lock count at which the thread is not 
         ///                 yielded.
-        void wait(long count = 1)
+        void wait(std::size_t count = 1)
         {
-#if HPX_AGAS_VERSION <= 0x10
             mutex_type::scoped_lock l(this);
-#else
-            mutex_type::scoped_lock l(mtx_);
-#endif
 
             while (value_ < count) {
                 // we need to get the self anew for each round as it might
@@ -150,7 +138,7 @@ namespace hpx { namespace lcos
                 threads::thread_self& self = threads::get_self();
                 threads::thread_id_type id = self.get_thread_id();
 
-                threads::set_thread_lco_description(id, "lcos::counting_semaphore");
+                threads::set_thread_lco_description(id, "lcos::local_counting_semaphore");
 
                 queue_entry e(id);
                 queue_.push_back(e);
@@ -163,7 +151,7 @@ namespace hpx { namespace lcos
                         hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, "lcos::counting_semaphore::wait",
+                        HPX_THROW_EXCEPTION(no_success, "lcos::local_counting_semaphore::wait",
                             hpx::util::osstream_get_string(strm));
                         return;
                     }
@@ -173,8 +161,8 @@ namespace hpx { namespace lcos
                     queue_.erase(last);     // remove entry from queue
 
                 if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, "lcos::counting_semaphore::wait",
-                        "aborted wait on counting_semaphore");
+                    HPX_THROW_EXCEPTION(no_success, "lcos::local_counting_semaphore::wait",
+                        "aborted wait on local_counting_semaphore");
                     return;
                 }
             }
@@ -185,13 +173,9 @@ namespace hpx { namespace lcos
         /// \brief Signal the semaphore
         ///
         /// 
-        void signal(long count = 1)
+        void signal(std::size_t count = 1)
         {
-#if HPX_AGAS_VERSION <= 0x10
             mutex_type::scoped_lock l(this);
-#else
-            mutex_type::scoped_lock l(mtx_);
-#endif
 
             value_ += count;
             if (value_ >= 0) {
@@ -225,7 +209,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        long value_;
+        std::size_t value_;
         queue_type queue_;
     };
 

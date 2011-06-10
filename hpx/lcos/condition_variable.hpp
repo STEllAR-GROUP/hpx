@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <hpx/util/mutex.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -27,8 +27,8 @@ namespace hpx { namespace util
         class basic_cv_list_entry
         {
         private:
-            lcos::counting_semaphore semaphore;
-            lcos::counting_semaphore wake_sem;
+            lcos::local_counting_semaphore semaphore;
+            lcos::local_counting_semaphore wake_sem;
             long waiters;
             bool notified;
             long references;

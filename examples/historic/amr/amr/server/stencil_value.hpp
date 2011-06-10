@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/counting_semaphore.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/mutex.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -28,9 +28,9 @@ namespace hpx { namespace components { namespace amr { namespace server
     namespace detail
     {
         // same as counting semaphore, but initialized to 1
-        struct initialized_semaphore : lcos::counting_semaphore
+        struct initialized_semaphore : lcos::local_counting_semaphore
         {
-            initialized_semaphore() : lcos::counting_semaphore(1) {}
+            initialized_semaphore() : lcos::local_counting_semaphore(1) {}
         };
     }
 
@@ -136,8 +136,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         threads::thread_id_type driver_thread_;
 
         detail::initialized_semaphore sem_in_[N];
-        lcos::counting_semaphore sem_out_[N];
-        lcos::counting_semaphore sem_result_;
+        lcos::local_counting_semaphore sem_out_[N];
+        lcos::local_counting_semaphore sem_result_;
 
         boost::scoped_ptr<in_adaptor_type> in_[N];    // adaptors used to gather input
         boost::scoped_ptr<out_adaptor_type> out_[N];  // adaptors used to provide result
