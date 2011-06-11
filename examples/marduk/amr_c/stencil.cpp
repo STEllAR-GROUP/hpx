@@ -83,6 +83,170 @@ namespace hpx { namespace components { namespace amr
       }
     }
 
+    inline double_type
+    stencil::interp_linear(double_type y1, double_type y2,
+                           double_type x, double_type x1, double_type x2) {
+      double_type xx1 = x - x1;
+      double_type xx2 = x - x2;
+      double_type result = xx2*y1/( (x1-x2) ) + xx1*y2/( (x2-x1) );
+
+      return result;
+    }
+
+    // interp3d {{{
+    void stencil::interp3d(double_type &x,double_type &y, double_type &z,
+                           double_type minx, double_type miny,double_type minz,
+                           double_type h, int nx, int ny, int nz,
+                           access_memory_block<stencil_data> &val, 
+                           nodedata &result, parameter const& par) {
+      // set up index bounds
+      int ii = (int) ( (x-minx)/h );
+      int jj = (int) ( (y-miny)/h );
+      int kk = (int) ( (z-minz)/h );
+
+      int num_eqns = HPX_SMP_AMR3D_NUM_EQUATIONS;
+
+      bool no_interp_x = false;
+      bool no_interp_y = false;
+      bool no_interp_z = false;
+      if ( floatcmp(h*ii + minx,x) ) {
+        no_interp_x = true;
+      }
+      if ( floatcmp(h*jj+miny,y) ) {
+        no_interp_y = true;
+      }
+      if ( floatcmp(h*kk+minz,z) ) {
+        no_interp_z = true;
+      }
+
+      if ( no_interp_x && no_interp_y && no_interp_z ) {
+        // no interp needed
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
+        }
+        return;
+      }
+
+      // Quick sanity check to be sure we have bracketed the point we wish to interpolate
+      if ( !no_interp_x ) {
+        BOOST_ASSERT(floatcmp_le(h*ii+minx,x) && floatcmp_ge(h*(ii+1)+minx,x) );
+      }
+      if ( !no_interp_y ) {
+        BOOST_ASSERT(floatcmp_le(h*jj+miny,y) && floatcmp_ge(h*(jj+1)+miny,y) );
+      }
+      if ( !no_interp_z ) {
+        BOOST_ASSERT(floatcmp_le(h*kk+minz,z) && floatcmp_ge(h*(kk+1)+minz,z) );
+      }
+
+      double_type tmp2[2][2][num_eqns];
+      double_type tmp3[2][num_eqns];
+
+      // interpolate in x {{{
+      if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk;k<kk+2;++k) {
+          for (int j=jj;j<jj+2;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
+              tmp2[j-jj][k-kk][ll] = interp_linear(val->value_[ii   +nx*(j+ny*k)].phi[0][ll],
+                                                   val->value_[ii+1 +nx*(j+ny*k)].phi[0][ll],
+                                                   x,
+                                                   h*ii+minx,h*(ii+1)+minx);
+            }
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
+        for (int k=kk;k<kk+2;++k) {
+          for (int j=jj;j<jj+2;++j) {
+            for (int ll=0;ll<num_eqns;++ll) {
+              tmp2[j-jj][k-kk][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
+            }
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk;k<kk+2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[0][k-kk][ll] = interp_linear(val->value_[ii  +nx*(jj+ny*k)].phi[0][ll],
+                                              val->value_[ii+1+nx*(jj+ny*k)].phi[0][ll],
+                                              x,
+                                              h*ii+minx,h*(ii+1)+minx);
+          }
+        }
+      } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj;j<jj+2;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[j-jj][0][ll] = interp_linear(val->value_[ii  +nx*(j+ny*kk)].phi[0][ll],
+                                              val->value_[ii+1+nx*(j+ny*kk)].phi[0][ll],
+                                              x,
+                                              h*ii+minx,h*(ii+1)+minx);
+          }
+        }
+      } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
+        for (int k=kk;k<kk+2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[0][k-kk][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
+          }
+        }
+      } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
+        for (int j=jj;j<jj+2;++j) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp2[j-jj][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
+          }
+        }
+      } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(val->value_[ii  +nx*(jj+ny*kk)].phi[0][ll],
+                                            val->value_[ii+1+nx*(jj+ny*kk)].phi[0][ll],
+                                            x,
+                                            h*ii+minx,h*(ii+1)+minx);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in y {{{
+      if ( !no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
+                                         h*jj+miny,h*(jj+1)+miny);
+          }
+        }
+      } else if ( no_interp_y && !no_interp_z ) {
+        for (int k=0;k<2;++k) {
+          for (int ll=0;ll<num_eqns;++ll) {
+            tmp3[k][ll] = tmp2[0][k][ll];
+          }
+        }
+      } else if ( !no_interp_y && no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
+                                                              h*jj+miny,h*(jj+1)+miny);
+        }
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      // interpolate in z {{{
+      if ( !no_interp_z ) {
+        for (int ll=0;ll<num_eqns;++ll) {
+          result.phi[0][ll] = interp_linear(tmp3[0][ll],tmp3[1][ll],
+                                                              z,
+                                                              h*kk+minz,h*(kk+1)+minz);
+        } 
+        return;
+      } else {
+        BOOST_ASSERT(false);
+      }
+      // }}}
+
+      return;
+    }
+    // }}}
+
+
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
@@ -224,11 +388,14 @@ namespace hpx { namespace components { namespace amr
               int ny0 = par->gr_ny[par->item2gi[item]];
               int nz0 = par->gr_nz[par->item2gi[item]];
 
+              bool complete = false;
+              std::vector<int> vindex(nx0*ny0*nz0,-1);
+
               val->max_index_ = maxitems;
               val->index_ = item;
               val->timestep_ = 0;
               val->value_.resize(nx0*ny0*nz0);
-              for (int step=0;step<par->prev_gi.size();step++) {
+              for (std::size_t step=0;step<par->prev_gi.size();step++) {
                 // see if the new gi is the same as the old
                 int gi = par->prev_gi[step];
                 if ( floatcmp(minx,par->gr_minx[gi]) && 
@@ -248,6 +415,7 @@ namespace hpx { namespace components { namespace amr
                   val->max_index_ = maxitems;
                   val->index_ = item;
                   val->timestep_ = 0;
+                  complete = true;
                   break;
                 } else if (
                   intersection(minx,maxx,
@@ -299,10 +467,90 @@ namespace hpx { namespace components { namespace amr
                     BOOST_ASSERT(i+nx0*(j+ny0*k) < val->value_.size());
                     BOOST_ASSERT(si+lnx*(sj+lny*sk) < prev_val->value_.size());
                     val->value_[i+nx0*(j+ny0*k)] = prev_val->value_[si+lnx*(sj+lny*sk)];
+
+                    // record that the value at this index doesn't need interpolation
+                    vindex[i+nx0*(j+ny0*k)] = 1;
                   } } }
 
+                  // record what indices in the dst were filled in
+                  complete = false;
                 }
               }
+
+              if ( complete == false ) {
+                // some interpolation from a lower resolution mesh is required
+                // fill in the blanks
+
+                // initialize ogi to possibly save a for loop
+                int ogi = par->prev_gi[0];
+                bool proceed = false;;
+                for (int kk=0;kk<nz0;kk++) {
+                  double z = minz + kk*h;
+                for (int jj=0;jj<ny0;jj++) {
+                  double y = miny + jj*h;
+                for (int ii=0;ii<nx0;ii++) {
+                  double x = minx + ii*h;
+
+                  // is this a point that needs interpolation?
+                  if ( vindex[ii+nx0*(jj+ny0*kk)] == -1 ) {
+                    // interp needed -- 
+                    proceed = false;
+                    // try to aviod the inner loop
+                    if (floatcmp(h,par->refine_factor*par->gr_h[ogi]) &&
+                         x >= par->gr_minx[ogi] &&
+                         x <= par->gr_maxx[ogi] &&
+                         y >= par->gr_miny[ogi] &&
+                         y <= par->gr_maxy[ogi] &&
+                         z >= par->gr_minz[ogi] &&
+                         z <= par->gr_maxz[ogi] )
+                    {
+                      proceed = true;
+                    } else {
+                      for (std::size_t step=0;step<par->prev_gi.size();step++) {
+                        int gi = par->prev_gi[step];
+                        if (floatcmp(par->refine_factor*h,par->gr_h[gi]) &&
+                             x >= par->gr_minx[gi] &&
+                             x <= par->gr_maxx[gi] &&
+                             y >= par->gr_miny[gi] &&
+                             y <= par->gr_maxy[gi] &&
+                             z >= par->gr_minz[gi] &&
+                             z <= par->gr_maxz[gi] ) 
+                        {
+                          ogi = gi;
+                          proceed = true;
+                          break;
+                        }
+                      }
+                    }
+
+                    if ( proceed ) {
+                      access_memory_block<stencil_data> prev_val(
+                                 components::stubs::memory_block::checkout(
+                                          interp_src_data[par->prev_gi2item[ogi]]));
+                      // interpolate
+                      interp3d(x,y,z,
+                               par->gr_minx[ogi],par->gr_miny[ogi],par->gr_minz[ogi],
+                               par->gr_h[ogi],par->gr_nx[ogi],par->gr_ny[ogi],par->gr_nz[ogi],
+                               prev_val,val->value_[ii+nx0*(jj+ny0*kk)],par);
+                    } else {
+                      std::cout << " interp anchor not found! PROBLEM " << std::endl;
+                      std::cout << " Looking for point x " << x << " y " << y << " z " << z << std::endl;
+                      std::cout << " Here's what we have to choose from " << std::endl;
+                      for (std::size_t step=0;step<par->prev_gi.size();step++) {
+                        int gi = par->prev_gi[step];
+                        std::cout << " bbox: " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
+                        std::cout << "       " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
+                        std::cout << "       " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
+                        std::cout << "  h    " << par->gr_h[gi] << " our level h " << h << " *2 " << par->refine_factor*par->gr_h[gi] << " diff " << h - par->refine_factor*par->gr_h[gi] << std::endl;
+                      }
+                      BOOST_ASSERT(false);
+                    }
+
+                  } 
+                } } }
+
+              }
+
               //std::cout << " TEST bbox in gen init data " << xmin << " " << xmax << std::endl;
               //std::cout << "                            " << ymin << " " << ymax << std::endl;
               //std::cout << "                            " << zmin << " " << zmax << std::endl;

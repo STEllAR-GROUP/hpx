@@ -65,67 +65,14 @@ namespace hpx { namespace components { namespace amr
         static bool floatcmp_le(double_type const& x1,double_type const& x2);
         static bool floatcmp_ge(double_type const& x1,double_type const& x2);
    
-        static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, parameter const& par);
-
-
         void interp3d(double_type &x,double_type &y, double_type &z,
-                                      access_memory_block<stencil_data> &val,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp3d(double_type &x,double_type &y, double_type &z,double_type &dx,
-                                      access_memory_block<stencil_data> &val0,
-                                      access_memory_block<stencil_data> &val1,
-                                      access_memory_block<stencil_data> &val2,
-                                      access_memory_block<stencil_data> &val3,
-                                      access_memory_block<stencil_data> &val4,
-                                      access_memory_block<stencil_data> &val5,
-                                      access_memory_block<stencil_data> &val6,
-                                      access_memory_block<stencil_data> &val7,
-                                      nodedata &result, parameter const& par);
-
-         static int findindex(double_type &x,double_type &y, double_type &z,
-                       access_memory_block<stencil_data> &val,
-                       int &xindex,int &yindex,int&zindex,int n);
+                      double_type minx, double_type miny,double_type minz,
+                      double_type h, int nx, int ny, int nz,
+                      access_memory_block<stencil_data> &val,
+                      nodedata &result, parameter const& par);
 
         double_type interp_linear(double_type y1, double_type y2,
-                                           double_type x, double_type x1, double_type x2);
-
-        void special_interp2d_xy(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      access_memory_block<stencil_data> &val2,
-                                      access_memory_block<stencil_data> &val3,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp2d_xz(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      access_memory_block<stencil_data> &val2,
-                                      access_memory_block<stencil_data> &val3,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp2d_yz(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      access_memory_block<stencil_data> &val2,
-                                      access_memory_block<stencil_data> &val3,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp1d_x(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp1d_y(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      nodedata &result, parameter const& par);
-
-        void special_interp1d_z(double_type &xt,double_type &yt,double_type &zt,double_type &dx,
-                                      access_memory_block<stencil_data> &val0, 
-                                      access_memory_block<stencil_data> &val1,
-                                      nodedata &result, parameter const& par);
-
+                                  double_type x, double_type x1, double_type x2);
 
     private:
         std::vector<std::vector<nodedata*> > vecval;
