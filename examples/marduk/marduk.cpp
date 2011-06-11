@@ -830,6 +830,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
     } else {
+#if 0
       // TEST
       for (int k=0;k<nz0;k++) {
         double z = minz0 + k*h;
@@ -845,7 +846,8 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         double Phi = exp(A) + exp(B);
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
-#if 0
+#endif
+//#if 0
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
@@ -861,7 +863,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
              nz0 == par->gr_nz[gi] 
            ) {
           hpx::components::access_memory_block<hpx::components::amr::stencil_data>
-              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[i]]) );
+              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
           for (int k=0;k<nz0;k++) {
           for (int j=0;j<ny0;j++) {
           for (int i=0;i<nx0;i++) {
@@ -939,7 +941,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
 
         }
       }
-#endif
+//#endif
     }
 
     return 0;

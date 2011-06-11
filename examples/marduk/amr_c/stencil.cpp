@@ -124,6 +124,7 @@ namespace hpx { namespace components { namespace amr
         for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = val->value_[ii+nx*(jj+ny*kk)].phi[0][ll];
         }
+        result.error = val->value_[ii+nx*(jj+ny*kk)].error;
         return;
       }
 
@@ -140,6 +141,8 @@ namespace hpx { namespace components { namespace amr
 
       double_type tmp2[2][2][num_eqns];
       double_type tmp3[2][num_eqns];
+      double_type tmp2_r[2][2];
+      double_type tmp3_r[2];
 
       // interpolate in x {{{
       if ( !no_interp_x && !no_interp_y && !no_interp_z ) {
@@ -151,6 +154,10 @@ namespace hpx { namespace components { namespace amr
                                                    x,
                                                    h*ii+minx,h*(ii+1)+minx);
             }
+            tmp2_r[j-jj][k-kk] = interp_linear(val->value_[ii   +nx*(j+ny*k)].error,
+                                               val->value_[ii+1 +nx*(j+ny*k)].error,
+                                               x,
+                                               h*ii+minx,h*(ii+1)+minx);
           }
         }
       } else if ( no_interp_x && !no_interp_y && !no_interp_z ) {
@@ -159,6 +166,7 @@ namespace hpx { namespace components { namespace amr
             for (int ll=0;ll<num_eqns;++ll) {
               tmp2[j-jj][k-kk][ll] = val->value_[ii+nx*(j+ny*k)].phi[0][ll];
             }
+            tmp2_r[j-jj][k-kk] = val->value_[ii+nx*(j+ny*k)].error;
           }
         }
       } else if ( !no_interp_x && no_interp_y && !no_interp_z ) {
@@ -169,6 +177,10 @@ namespace hpx { namespace components { namespace amr
                                               x,
                                               h*ii+minx,h*(ii+1)+minx);
           }
+          tmp2_r[0][k-kk] = interp_linear(val->value_[ii  +nx*(jj+ny*k)].error,
+                                          val->value_[ii+1+nx*(jj+ny*k)].error,
+                                          x,
+                                          h*ii+minx,h*(ii+1)+minx);
         }
       } else if ( !no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj;j<jj+2;++j) {
@@ -178,18 +190,24 @@ namespace hpx { namespace components { namespace amr
                                               x,
                                               h*ii+minx,h*(ii+1)+minx);
           }
+          tmp2_r[j-jj][0] = interp_linear(val->value_[ii  +nx*(j+ny*kk)].error,
+                                          val->value_[ii+1+nx*(j+ny*kk)].error,
+                                          x,
+                                          h*ii+minx,h*(ii+1)+minx);
         }
       } else if ( no_interp_x && no_interp_y && !no_interp_z ) {
         for (int k=kk;k<kk+2;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
             tmp2[0][k-kk][ll] = val->value_[ii+nx*(jj+ny*k)].phi[0][ll];
           }
+          tmp2_r[0][k-kk] = val->value_[ii+nx*(jj+ny*k)].error;
         }
       } else if ( no_interp_x && !no_interp_y && no_interp_z ) {
         for (int j=jj;j<jj+2;++j) {
           for (int ll=0;ll<num_eqns;++ll) {
             tmp2[j-jj][0][ll] = val->value_[ii+nx*(j+ny*kk)].phi[0][ll];
           }
+          tmp2_r[j-jj][0] = val->value_[ii+nx*(j+ny*kk)].error;
         }
       } else if ( !no_interp_x && no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;++ll) {
@@ -198,6 +216,10 @@ namespace hpx { namespace components { namespace amr
                                             x,
                                             h*ii+minx,h*(ii+1)+minx);
         }
+        result.error = interp_linear(val->value_[ii  +nx*(jj+ny*kk)].error,
+                                     val->value_[ii+1+nx*(jj+ny*kk)].error,
+                                     x,
+                                     h*ii+minx,h*(ii+1)+minx);
         return;
       } else {
         BOOST_ASSERT(false);
@@ -211,18 +233,23 @@ namespace hpx { namespace components { namespace amr
             tmp3[k][ll] = interp_linear(tmp2[0][k][ll],tmp2[1][k][ll],y,
                                          h*jj+miny,h*(jj+1)+miny);
           }
+          tmp3_r[k] = interp_linear(tmp2_r[0][k],tmp2_r[1][k],y,
+                                     h*jj+miny,h*(jj+1)+miny);
         }
       } else if ( no_interp_y && !no_interp_z ) {
         for (int k=0;k<2;++k) {
           for (int ll=0;ll<num_eqns;++ll) {
             tmp3[k][ll] = tmp2[0][k][ll];
           }
+          tmp3_r[k] = tmp2_r[0][k];
         }
       } else if ( !no_interp_y && no_interp_z ) {
         for (int ll=0;ll<num_eqns;++ll) {
           result.phi[0][ll] = interp_linear(tmp2[0][0][ll],tmp2[1][0][ll],y,
                                                               h*jj+miny,h*(jj+1)+miny);
         }
+        result.error = interp_linear(tmp2_r[0][0],tmp2_r[1][0],y,
+                                     h*jj+miny,h*(jj+1)+miny);
         return;
       } else {
         BOOST_ASSERT(false);
@@ -236,6 +263,9 @@ namespace hpx { namespace components { namespace amr
                                                               z,
                                                               h*kk+minz,h*(kk+1)+minz);
         } 
+        result.error = interp_linear(tmp3_r[0],tmp3_r[1],
+                                     z,
+                                     h*kk+minz,h*(kk+1)+minz);
         return;
       } else {
         BOOST_ASSERT(false);
@@ -556,7 +586,7 @@ namespace hpx { namespace components { namespace amr
               //std::cout << "                            " << zmin << " " << zmax << std::endl;
 
               // TEST
-              generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+              //generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
                
             }
 
