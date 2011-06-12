@@ -5,7 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs 
-    distributing_factory)
+    distributing_factory
+    iostreams)
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})

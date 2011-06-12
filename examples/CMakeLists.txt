@@ -27,7 +27,8 @@ if(NOT MSVC)
       quickstart
       smp_amr3d)
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    set(subdirs ${subdirs} agas)
+    set(subdirs ${subdirs} agas
+                           iostreams)
   endif()
   if(CMAKE_Fortran_COMPILER)
     set(subdirs ${subdirs} marduk)
