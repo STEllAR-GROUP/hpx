@@ -564,7 +564,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         naming::gid_type id = gid;
         naming::strip_credit_from_gid(id); 
 
-        if (HPX_UNLIKELY(credits <= HPX_INITIAL_GLOBALCREDIT))
+        if (HPX_UNLIKELY(credits > HPX_INITIAL_GLOBALCREDIT))
         {
             HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                 "cannot decrement more than "
@@ -588,6 +588,10 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                     "bogus credit encountered while decrement global reference "
                     "count");
+                return response_type(primary_ns_decrement
+                                   , 0
+                                   , components::component_invalid
+                                   , bad_parameter);
             }
 
             count_type cnt = (it->second -= credits);
@@ -645,9 +649,14 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                 }
 
                 // If we didn't find anything, we've got a problem
+                // TODO: Use a better error code + throw message.
                 HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
-                    "unknown component type encountered while decrement global "
+                    "unregistered GID encountered while decrementing global "
                     "reference count");
+                return response_type(primary_ns_decrement
+                                   , 0
+                                   , components::component_invalid
+                                   , bad_parameter);
             }
 
             else
@@ -656,38 +665,109 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
                                    , components::component_invalid);
         }
         
+        // If the id isn't in the refcnt table and the credit count is
+        // HPX_INITIAL_GLOBALCREDIT, then it needs to be destroyed. 
+        else if (HPX_INITIAL_GLOBALCREDIT == credits)
+        {
+            // Load the GVA table 
+            typename gva_table_type::map_type& gva_table = gvas_.get();
+
+            typename gva_table_type::map_type::iterator
+                git = gva_table.lower_bound(id),
+                gbegin = gva_table.begin(),
+                gend = gva_table.end();
+
+            if (git != gend)
+            {
+                // Did we get an exact match?
+                if (git->first == id)
+                    return response_type(primary_ns_decrement
+                                       , 0
+                                       , git->second.type);
+
+                // Check if we can safely decrement the iterator.
+                else if (git != gbegin)
+                {
+                    --git;
+
+                    // See if the previous range covers this GID
+                    if ((git->first + git->second.count) > id)
+                    {
+                        // Make sure that the msbs match
+                        if (id.get_msb() == git->first.get_msb())
+                            return response_type(primary_ns_decrement
+                                               , 0
+                                               , git->second.type);
+                    } 
+                }
+            }
+            
+            else if (HPX_LIKELY(!gva_table.empty()))
+            {
+                --git;
+
+                // See if the previous range covers this GID
+                if ((git->first + git->second.count) > id)
+                {
+                    // Make sure that the msbs match
+                    if (id.get_msb() == git->first.get_msb())
+                        return response_type(primary_ns_decrement
+                                           , 0
+                                           , git->second.type);
+                } 
+            }
+
+            // If we didn't find anything, we've got a problem
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                "unknown component type encountered while decrement global "
+                "reference count");
+            return response_type(primary_ns_decrement
+                               , 0
+                               , components::component_invalid
+                               , bad_parameter);
+        }
+
         // We need to insert a new reference count entry. We assume that
         // binding has already created a first reference + credits.
-        BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
-
-        std::pair<typename refcnt_table_type::map_type::iterator, bool>
-            p = refcnt_table.insert(typename
-                refcnt_table_type::map_type::value_type
-                    (id, HPX_INITIAL_GLOBALCREDIT));
-
-        if (HPX_UNLIKELY(!p.second))
+        else 
         {
-            HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                "insertion failed due to memory corruption or a locking "
-                "error");
+            BOOST_ASSERT(credits < HPX_INITIAL_GLOBALCREDIT);
+
+            std::pair<typename refcnt_table_type::map_type::iterator, bool>
+                p = refcnt_table.insert(typename
+                    refcnt_table_type::map_type::value_type
+                        (id, HPX_INITIAL_GLOBALCREDIT));
+    
+            if (HPX_UNLIKELY(!p.second))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    "insertion failed due to memory corruption or a locking "
+                    "error");
+                return response_type(primary_ns_decrement
+                                   , 0
+                                   , components::component_invalid
+                                   , internal_server_error);
+            }
+            
+            it = p.first;
+            
+            if (HPX_UNLIKELY(it->second < credits))
+            {
+                HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                    "bogus credit encountered while decrement global reference "
+                    "count");
+                return response_type(primary_ns_decrement
+                                   , 0
+                                   , components::component_invalid
+                                   , bad_parameter);
+            }
+            
+            count_type cnt = (it->second -= credits);
+
+            return response_type(primary_ns_decrement
+                               , cnt
+                               , components::component_invalid);
         }
-        
-        it = p.first;
-        
-        if (HPX_UNLIKELY(it->second < credits))
-        {
-            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
-                "bogus credit encountered while decrement global reference "
-                "count");
-        }
-        
-        count_type cnt = (it->second -= credits);
-        
-        BOOST_ASSERT(0 != cnt);
- 
-        return response_type(primary_ns_decrement
-                           , cnt
-                           , components::component_invalid);
     } // }}}
  
     response_type localities()
