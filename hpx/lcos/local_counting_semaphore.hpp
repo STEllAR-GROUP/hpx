@@ -14,6 +14,7 @@
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/intrusive/slist.hpp>
 
@@ -81,7 +82,7 @@ namespace hpx { namespace lcos
         ///                 are equivalent to the same number of signals pre-
         ///                 set, and negative values are equivalent to the
         ///                 same number of waits pre-set.
-        local_counting_semaphore(std::size_t value = 0)
+        local_counting_semaphore(boost::int64_t value = 0)
           : value_(value)
         {}
 
@@ -128,7 +129,7 @@ namespace hpx { namespace lcos
         ///                 be decremented. At the same time this is the minimum 
         ///                 value of the lock count at which the thread is not 
         ///                 yielded.
-        void wait(std::size_t count = 1)
+        void wait(boost::int64_t count = 1)
         {
             mutex_type::scoped_lock l(this);
 
@@ -173,7 +174,7 @@ namespace hpx { namespace lcos
         /// \brief Signal the semaphore
         ///
         /// 
-        void signal(std::size_t count = 1)
+        void signal(boost::int64_t count = 1)
         {
             mutex_type::scoped_lock l(this);
 
@@ -209,7 +210,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        std::size_t value_;
+        boost::int64_t value_;
         queue_type queue_;
     };
 
