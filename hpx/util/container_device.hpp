@@ -19,8 +19,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
 {
-    /// this is a Boost.IoStreams source device usable to create an [io]stream 
-    /// on top of a random access container (i.e. vector<>)
+    /// this is a Boost.IoStreams SeekableDevice that can be used to create
+    /// an [io]stream on top of a random access container (i.e. vector<>)
     template<typename Container>
     class container_device 
     {
