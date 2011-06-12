@@ -82,8 +82,13 @@ namespace hpx
             std::vector<std::string> const& cmdline_ini_defs) 
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
+#if HPX_AGAS_VERSION <= 0x10
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
+#else
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"), 
+#endif
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -125,8 +130,13 @@ namespace hpx
             std::vector<std::string> const& cmdline_ini_defs) 
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
+#if HPX_AGAS_VERSION <= 0x10
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
+#else
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"), 
+#endif
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -167,8 +177,13 @@ namespace hpx
             std::vector<std::string> const& cmdline_ini_defs) 
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
+#if HPX_AGAS_VERSION <= 0x10
         agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
+#else
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
+            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"), 
+#endif
         parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -209,8 +224,11 @@ namespace hpx
         // stop all services
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
+#if HPX_AGAS_VERSION <= 0x10
         agas_pool_.stop();
-
+#else
+        io_pool_.stop();
+#endif
         // unload libraries
         runtime_support_.tidy();
 
@@ -296,6 +314,10 @@ namespace hpx
         #if HPX_AGAS_VERSION <= 0x10
             parcel_port_.run(false);            // starts parcel_pool_ as well
             LRT_(info) << "runtime_impl: started parcelport";
+        #endif
+
+        #if HPX_AGAS_VERSION > 0x10
+            io_pool_.run(false); // start io pool
         #endif
 
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well

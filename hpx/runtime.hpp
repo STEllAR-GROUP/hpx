@@ -241,6 +241,10 @@ namespace hpx
             #endif
         }
 
+        #if HPX_AGAS_VERSION > 0x10
+            virtual util::io_service_pool& get_io_pool() = 0; 
+        #endif
+
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
@@ -564,6 +568,13 @@ namespace hpx
             return thread_manager_.get_executed_threads(num);
         }
 
+        #if HPX_AGAS_VERSION > 0x10
+            util::io_service_pool& get_io_pool()
+            {
+                return io_pool_;
+            } 
+        #endif
+
         hpx::uintptr_t get_runtime_support_lva() const
         {
             return (hpx::uintptr_t) &runtime_support_;
@@ -581,7 +592,11 @@ namespace hpx
     private:
         runtime_mode mode_;
         int result_;
-        util::io_service_pool agas_pool_; 
+        #if HPX_AGAS_VERSION <= 0x10
+            util::io_service_pool agas_pool_; 
+        #else
+            util::io_service_pool io_pool_; 
+        #endif
         util::io_service_pool parcel_pool_; 
         util::io_service_pool timer_pool_; 
         parcelset::parcelport parcel_port_;
