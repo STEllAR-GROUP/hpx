@@ -219,9 +219,6 @@ namespace hpx
         return error_code(success, "success", mode);
     }
 
-    //  predefined error_code object used as "throw on error" tag
-    HPX_EXCEPTION_EXPORT extern error_code throws;
-
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
     {

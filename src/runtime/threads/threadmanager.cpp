@@ -9,11 +9,11 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/include/performance_counters.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/time_logger.hpp>
-#include <hpx/util/performance_counters.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/stringstream.hpp>
 
@@ -635,7 +635,7 @@ namespace hpx { namespace threads
         {
             if (performance_counters::status_invalid_data != status_) {
                 error_code ec;
-                util::remove_counter_type(info_, ec);   // ignore errors
+                performance_counters::remove_counter_type(info_, ec);   // ignore errors
             }
         }
 
@@ -646,7 +646,7 @@ namespace hpx { namespace threads
             BOOST_ASSERT(performance_counters::status_invalid_data == status_);
             info_.fullname_ = name;
             info_.type_ = type;
-            status_ = util::add_counter_type(info_, ec);
+            status_ = performance_counters::add_counter_type(info_, ec);
             return status_;
         }
 
@@ -782,14 +782,14 @@ namespace hpx { namespace threads
         {
             BOOST_ASSERT(!counter_);
             info_.fullname_ = name;
-            return util::add_counter(info_, f, counter_, ec);
+            return performance_counters::add_counter(info_, f, counter_, ec);
         }
 
         void uninstall()
         {
             if (counter_) {
                 error_code ec;
-                util::remove_counter(info_, counter_, ec);
+                performance_counters::remove_counter(info_, counter_, ec);
                 counter_ = naming::invalid_id;
             }
         }

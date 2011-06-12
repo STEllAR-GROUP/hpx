@@ -97,18 +97,6 @@ namespace hpx { namespace performance_counters
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    enum counter_status
-    {
-        status_valid_data,      ///< No error occurred, data is valid
-        status_new_data,        ///< Data is valid and different from last call
-        status_invalid_data,    ///< Some error occurred, data is not value
-        status_already_defined, ///< The type or instance already has been defined
-        status_counter_unknown, ///< The counter instance is unknown
-        status_counter_type_unknown,  ///< The counter type is unknown
-        status_generic_error,   ///< A unknown error occurred
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     /// A counter_type_path_elements holds the elements of a full name for a 
     /// counter type. Generally, a full name of a counter type has the 
     /// structure:

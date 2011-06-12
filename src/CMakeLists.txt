@@ -444,7 +444,6 @@ else()
       ${hpx_SOURCE_DIR}/hpx/util/locking_helpers.hpp
       ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
       ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/performance_counters.hpp
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_archive.hpp
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_iarchive.hpp
       ${hpx_SOURCE_DIR}/hpx/util/portable_binary_oarchive.hpp
