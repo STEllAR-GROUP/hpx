@@ -2,7 +2,8 @@
 nx0         = 39
 ny0         = 39
 nz0         = 39
-timesteps   = 10
+timesteps   = 100
+refine_every = 10
 
 maxx0       =  15.0
 minx0       = -15.0
@@ -19,11 +20,10 @@ refine_factor = 2
 minefficiency = 0.9
 clusterstyle  = 0
 mindim        = 6
-refine_every   = 0
 
 num_px_threads = 40
 
-lambda      = 0.03
+lambda      = 0.025
 
 ethreshold  = 0.01
 
