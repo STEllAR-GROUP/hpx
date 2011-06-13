@@ -74,6 +74,9 @@ namespace hpx { namespace components { namespace amr
         double_type interp_linear(double_type y1, double_type y2,
                                   double_type x, double_type x1, double_type x2);
 
+        void write_sdf(int gi,double datatime,int locality,
+                       std::vector<nodedata> &value,parameter const& par );
+
     private:
         std::vector<std::vector<nodedata*> > vecval;
         std::size_t numsteps_;
