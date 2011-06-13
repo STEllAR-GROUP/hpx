@@ -34,6 +34,7 @@ void serialize(Archive &ar, hpx::components::amr::detail::parameter& par,
     ar & par.output_level;
 
     ar & par.nt0;
+    ar & par.refine_every;
     ar & par.nx0;
     ar & par.ny0;
     ar & par.nz0;

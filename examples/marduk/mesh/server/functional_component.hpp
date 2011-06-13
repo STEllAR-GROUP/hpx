@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // functional component derived from this class
         virtual int eval(naming::id_type const&, 
             std::vector<naming::id_type> const&, std::size_t, std::size_t,
-            parameter const&)
+            double,parameter const&)
         {
             // This shouldn't ever be called. If you're seeing this assertion 
             // you probably forgot to overload this function in your stencil 
@@ -89,9 +89,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// steps.
         int eval_nonvirt(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t row, 
-            std::size_t column, parameter const& par)
+            std::size_t column,double cycle_time, parameter const& par)
         {
-            return eval(result, gids, row, column,par);
+            return eval(result, gids, row, column,cycle_time,par);
         }
 
         naming::id_type alloc_data_nonvirt(int item, int maxitems, int row,
@@ -122,10 +122,10 @@ namespace hpx { namespace components { namespace amr { namespace server
             &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
-        typedef hpx::actions::result_action5<
+        typedef hpx::actions::result_action6<
             functional_component, int, functional_component_eval, 
             naming::id_type const&, std::vector<naming::id_type> const&, 
-            std::size_t, std::size_t,parameter const&,
+            std::size_t, std::size_t,double,parameter const&,
             &functional_component::eval_nonvirt
         > eval_action;
 

@@ -282,7 +282,7 @@ namespace hpx { namespace components { namespace amr
     // Compute the result value for the current time step
     int stencil::eval(naming::id_type const& result, 
         std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
-        parameter const& par)
+        double cycle_time, parameter const& par)
     {
         // make sure all the gids are looking valid
         if (result == naming::invalid_id)
@@ -317,67 +317,70 @@ namespace hpx { namespace components { namespace amr
           resultval->timestep_ = val[0]->timestep_;
         } else {
           resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,int(val[0]->level_));
-        }
 
 #if defined(RNPL_FOUND)
-        // Output
-        if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
-          std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;   
-          applier::applier& appl = applier::get_applier();
-          naming::id_type this_prefix = appl.get_runtime_support_gid();
-          int locality = get_prefix_from_id( this_prefix );
-          double datatime;
+          // Output
+          if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
+            std::vector<double> x,y,z,phi,d1phi,d2phi,d3phi,d4phi;   
+            applier::applier& appl = applier::get_applier();
+            naming::id_type this_prefix = appl.get_runtime_support_gid();
+            int locality = get_prefix_from_id( this_prefix );
+            double datatime;
 
-          int gi = par->item2gi[column];
-          int nx = par->gr_nx[gi];
-          int ny = par->gr_ny[gi];
-          int nz = par->gr_nz[gi];
-          for (int i=0;i<nx;i++) {
-            x.push_back(par->gr_minx[gi] + par->gr_h[gi]*i);
-          }
-          for (int i=0;i<ny;i++) {
-            x.push_back(par->gr_miny[gi] + par->gr_h[gi]*i);
-          }
-          for (int i=0;i<nz;i++) {
-            x.push_back(par->gr_minz[gi] + par->gr_h[gi]*i);
-          }
+            int gi = par->item2gi[column];
+            int nx = par->gr_nx[gi];
+            int ny = par->gr_ny[gi];
+            int nz = par->gr_nz[gi];
+            for (int i=0;i<nx;i++) {
+              x.push_back(par->gr_minx[gi] + par->gr_h[gi]*i);
+            }
+            for (int i=0;i<ny;i++) {
+              x.push_back(par->gr_miny[gi] + par->gr_h[gi]*i);
+            }
+            for (int i=0;i<nz;i++) {
+              x.push_back(par->gr_minz[gi] + par->gr_h[gi]*i);
+            }
 
-          //datatime = resultval->timestep_*par->gr_h[gi]*par->lambda;
-          datatime = resultval->timestep_;
-          for (int k=0;k<nz;k++) {
-          for (int j=0;j<ny;j++) {
-          for (int i=0;i<nx;i++) {
-            phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][0]);
-            d1phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][1]);
-            d2phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][2]);
-            d3phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][3]);
-            d4phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][4]);
-          } } }
-          int shape[3];
-          char cnames[80] = { "x|y|z" };
-          char phi_name[80];
-          sprintf(phi_name,"%dphi",locality);
-          char phi1_name[80];
-          sprintf(phi1_name,"%dd1phi",locality);
-          char phi2_name[80];
-          sprintf(phi2_name,"%dd2phi",locality);
-          char phi3_name[80];
-          sprintf(phi3_name,"%dd3phi",locality);
-          char phi4_name[80];
-          sprintf(phi4_name,"%dd4phi",locality);
-          shape[0] = nx;
-          shape[1] = ny;
-          shape[2] = nz;
-          gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
-          gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
-          gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
-          gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
-          gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
-        }
+            datatime = resultval->timestep_*par->h*par->lambda + cycle_time;
+            //datatime = resultval->timestep_;
+
+            //std::cout << " TEST datatime " << datatime << " nx " << nx << " ny " << ny << " nz " << nz << " minx " << par->gr_minx[gi] << " miny " << par->gr_miny[gi] << " minz " << par->gr_minz[gi] << " maxx " << par->gr_maxx[gi] << " maxy " << par->gr_maxy[gi] << " maxz " << par->gr_maxz[gi] << std::endl;
+
+            for (int k=0;k<nz;k++) {
+            for (int j=0;j<ny;j++) {
+            for (int i=0;i<nx;i++) {
+              phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][0]);
+              d1phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][1]);
+              d2phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][2]);
+              d3phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][3]);
+              d4phi.push_back(resultval->value_[i+nx*(j+ny*k)].phi[0][4]);
+            } } }
+            int shape[3];
+            char cnames[80] = { "x|y|z" };
+            char phi_name[80];
+            sprintf(phi_name,"%dphi",locality);
+            char phi1_name[80];
+            sprintf(phi1_name,"%dd1phi",locality);
+            char phi2_name[80];
+            sprintf(phi2_name,"%dd2phi",locality);
+            char phi3_name[80];
+            sprintf(phi3_name,"%dd3phi",locality);
+            char phi4_name[80];
+            sprintf(phi4_name,"%dd4phi",locality);
+            shape[0] = nx;
+            shape[1] = ny;
+            shape[2] = nz;
+            gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
+            gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+            gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+            gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+            gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+          }
 #endif
+        }
 
         //std::cout << " TEST row " << row << " column " << column << " timestep " << resultval->timestep_ << std::endl;
-        if ( val[0]->timestep_ >= par->nt0-2 ) {
+        if ( val[0]->timestep_ >= par->refine_every-2 ) {
           return 0;
         }
         return 1;
@@ -536,20 +539,23 @@ namespace hpx { namespace components { namespace amr
                     {
                       proceed = true;
                     } else {
-                      for (std::size_t step=0;step<par->prev_gi.size();step++) {
-                        int gi = par->prev_gi[step];
-                        if (floatcmp(par->refine_factor*h,par->gr_h[gi]) &&
-                             x >= par->gr_minx[gi] &&
-                             x <= par->gr_maxx[gi] &&
-                             y >= par->gr_miny[gi] &&
-                             y <= par->gr_maxy[gi] &&
-                             z >= par->gr_minz[gi] &&
-                             z <= par->gr_maxz[gi] ) 
-                        {
-                          ogi = gi;
-                          proceed = true;
-                          break;
+                      for (std::size_t cycle=1;cycle <= val->level_;cycle++) {
+                        for (std::size_t step=0;step<par->prev_gi.size();step++) {
+                          int gi = par->prev_gi[step];
+                          if (floatcmp(pow(par->refine_factor,cycle)*h,par->gr_h[gi]) &&
+                               x >= par->gr_minx[gi] &&
+                               x <= par->gr_maxx[gi] &&
+                               y >= par->gr_miny[gi] &&
+                               y <= par->gr_maxy[gi] &&
+                               z >= par->gr_minz[gi] &&
+                               z <= par->gr_maxz[gi] ) 
+                          {
+                            ogi = gi;
+                            proceed = true;
+                            break;
+                          }
                         }
+                        if (proceed) break;
                       }
                     }
 
@@ -571,7 +577,7 @@ namespace hpx { namespace components { namespace amr
                         std::cout << " bbox: " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
                         std::cout << "       " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
                         std::cout << "       " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
-                        std::cout << "  h    " << par->gr_h[gi] << " our level h " << h << " *2 " << par->refine_factor*par->gr_h[gi] << " diff " << h - par->refine_factor*par->gr_h[gi] << std::endl;
+                        std::cout << "  h    " << par->gr_h[gi] << " our level h " << h << " *2 " << par->refine_factor*h << std::endl;
                       }
                       BOOST_ASSERT(false);
                     }

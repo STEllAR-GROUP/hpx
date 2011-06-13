@@ -99,7 +99,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             distributed_iterator_range_type const& stencils,
             distributed_iterator_range_type const& functions, int static_step, 
             array3d &dst_port,array3d &dst_src,array3d &dst_step,
-            array3d &dst_size,array3d &src_size,parameter const& par);
+            array3d &dst_size,array3d &src_size,double cycle_time,parameter const& par);
 
         static void get_output_ports(
             distributed_iterator_range_type const& stencils,
@@ -123,7 +123,6 @@ namespace hpx { namespace components { namespace amr { namespace server
                                     std::vector<std::size_t> &each_row,
                                     parameter const& par);
 
-        static std::size_t findlevel3D(std::size_t step, std::size_t item, std::size_t &a, std::size_t &b, std::size_t &c, parameter const& par);
         static bool intersection(double_type xmin,double_type xmax,
                                     double_type ymin,double_type ymax,
                                     double_type zmin,double_type zmax,

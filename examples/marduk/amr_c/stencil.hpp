@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace amr
         /// previous time step.
         int eval(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
-            parameter const& par);
+            double cycle_time,parameter const& par);
 
         /// The alloc function is supposed to create a new memory block instance 
         /// suitable for storing all data needed for a single time step. 

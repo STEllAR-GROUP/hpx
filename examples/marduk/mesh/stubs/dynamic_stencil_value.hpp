@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::dynamic_stencil_value::call_action action_type;
-            return lcos::eager_future<action_type>(targetgid, initial);
+            return lcos::eager_future<action_type>(targetgid,initial);
         }
 
         static naming::id_type call(naming::id_type const& targetgid, 
@@ -94,21 +94,21 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static lcos::future_value<void> 
         set_functional_component_async(naming::id_type const& gid, 
             naming::id_type const& functiongid, int row, int column,
-            int instencilsize, int outstencilsize, parameter const& par)
+            int instencilsize, int outstencilsize, double cycle_time,parameter const& par)
         {
             typedef
                 amr::server::dynamic_stencil_value::set_functional_component_action 
             action_type;
             return lcos::eager_future<action_type, void>(gid, functiongid, row, 
-                column, instencilsize, outstencilsize, par);
+                column, instencilsize, outstencilsize,cycle_time, par);
         }
 
         static void set_functional_component(naming::id_type const& gid, 
             naming::id_type const& functiongid, int row, int column,
-            int instencilsize, int outstencilsize, parameter const& par)
+            int instencilsize, int outstencilsize, double cycle_time,parameter const& par)
         {
             set_functional_component_async(gid, functiongid, row, 
-                column, instencilsize, outstencilsize, par).get();
+                column, instencilsize, outstencilsize,cycle_time, par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

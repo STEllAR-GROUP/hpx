@@ -118,7 +118,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     void unigrid_mesh::init_stencils(distributed_iterator_range_type const& stencils,
         distributed_iterator_range_type const& functions, int static_step, 
         array3d &dst_port,array3d &dst_src,array3d &dst_step,
-        array3d &dst_size,array3d &src_size, parameter const& par)
+        array3d &dst_size,array3d &src_size, double cycle_time, parameter const& par)
     {
         components::distributing_factory::iterator_type stencil = stencils.first;
         components::distributing_factory::iterator_type function = functions.first;
@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 stubs::dynamic_stencil_value::set_functional_component_async(
                     *stencil, *function, static_step, column, 
                     dst_size(static_step, column, 0), 
-                    src_size(static_step, column, 0), par));
+                    src_size(static_step, column, 0), cycle_time,par));
         }
         //BOOST_ASSERT(function == functions.second);
 
@@ -391,7 +391,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i) 
             init_stencils(locality_results(stencils[i]), locality_results(functions), i,
-                          dst_port,dst_src,dst_step,dst_size,src_size, par);
+                          dst_port,dst_src,dst_step,dst_size,src_size,time,par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(num_rows);

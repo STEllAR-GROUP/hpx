@@ -26,14 +26,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         template <typename Adaptor>
         static int
         call(naming::id_type const& gid, naming::id_type const& value_gid, 
-            int row, int column, Adaptor &in, parameter const& par)
+            int row, int column, Adaptor &in, double cycle_time, parameter const& par)
         {
             std::vector<naming::id_type> input_gids(in.size());
             for (std::size_t i = 0; i < in.size(); ++i) 
                 input_gids[i] = in[i]->get();
 
             return components::amr::stubs::functional_component::eval(
-                gid, value_gid, input_gids, row, column, par);
+                gid, value_gid, input_gids, row, column,cycle_time, par);
         }
     };
 
@@ -163,7 +163,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             // The eval action returns an integer allowing to finish 
             // computation (>0: still to go, 0: last step, <0: overdone)
             timesteps_to_go = eval_helper::call(functional_gid_, 
-                value_gids_[0], row_, column_, in_, par_);
+                value_gids_[0], row_, column_, in_,cycle_time_, par_);
 
             // Wait for all output threads to have read the current value.
             // On the first time step the semaphore is preset to allow 
@@ -265,7 +265,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     inline util::unused_type 
     dynamic_stencil_value::set_functional_component(naming::id_type const& gid,
         int row, int column, int instencilsize, int outstencilsize,
-        parameter const& par)
+        double cycle_time,parameter const& par)
     {
         // store gid of functional component
         functional_gid_ = gid;
@@ -273,6 +273,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         column_ = column;
         instencilsize_ = instencilsize;
         outstencilsize_ = outstencilsize;
+        cycle_time_ = cycle_time;
         par_ = par;
 
         sem_in_.resize(outstencilsize);

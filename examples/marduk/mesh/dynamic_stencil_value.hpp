@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2009-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,10 +80,10 @@ namespace hpx { namespace components { namespace amr
         /// functionality
         void set_functional_component(naming::id_type const& functiongid,
             int row, int column, int instencilsize, int outstencilsize,
-            parameter const& par)
+            double cycle_time,parameter const& par)
         {
             this->base_type::set_functional_component(this->gid_, functiongid, 
-                row, column, instencilsize, outstencilsize, par);
+                row, column, instencilsize, outstencilsize, cycle_time,par);
         }
         
         ///////////////////////////////////////////////////////////////////////

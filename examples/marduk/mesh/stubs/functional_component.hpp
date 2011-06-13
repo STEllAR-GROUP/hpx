@@ -31,22 +31,22 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         static lcos::future_value<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
-            parameter const& par)
+            double cycle_time,parameter const& par)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
-            return lcos::eager_future<action_type>(gid, result, gids, row, column,par);
+            return lcos::eager_future<action_type>(gid, result, gids, row, column,cycle_time,par);
         }
 
         static int eval(naming::id_type const& gid, 
             naming::id_type const& result, std::vector<naming::id_type> const& gids,
-            int row, int column, parameter const& par)
+            int row, int column,double cycle_time, parameter const& par)
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future
-            return eval_async(gid, result, gids, row, column,par).get();
+            return eval_async(gid, result, gids, row, column,cycle_time,par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

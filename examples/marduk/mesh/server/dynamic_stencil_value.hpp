@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         util::unused_type 
         set_functional_component(naming::id_type const& gid, int row, 
             int column, int instencilsize, int outstencilsize, 
-            parameter const& par);
+            double cycle_time,parameter const& par);
 
         util::unused_type start();
 
@@ -125,10 +125,10 @@ namespace hpx { namespace components { namespace amr { namespace server
             &dynamic_stencil_value::connect_input_ports
         > connect_input_ports_action;
 
-        typedef hpx::actions::result_action6<
+        typedef hpx::actions::result_action7<
             dynamic_stencil_value, util::unused_type,
             dynamic_stencil_value_set_functional_component, 
-            naming::id_type const&, int, int, int, int, parameter const&,
+            naming::id_type const&, int, int, int, int,double, parameter const&,
             &dynamic_stencil_value::set_functional_component
         > set_functional_component_action;
 
@@ -156,6 +156,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t instencilsize_;
         std::size_t outstencilsize_;
         parameter par_;
+        double cycle_time_;
 
         typedef lcos::mutex mutex_type;
         mutex_type mtx_;

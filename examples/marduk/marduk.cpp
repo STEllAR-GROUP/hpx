@@ -169,6 +169,7 @@ int hpx_main(variables_map& vm)
     par->allowedl       = 0;
     par->lambda         = 0.15;
     par->nt0            = 10;
+    par->refine_every   = 10;
     par->minx0          = -4.0;
     par->maxx0          =  4.0;
     par->miny0          = -4.0;
@@ -185,7 +186,6 @@ int hpx_main(variables_map& vm)
     par->mindim         = 6;
 
     par->num_px_threads = 40;
-    par->refine_every   = 0;
 
     for (std::size_t i = 0; i < HPX_SMP_AMR3D_MAX_LEVELS; i++)
         par->refine_level[i] = 1.0;
@@ -209,6 +209,7 @@ int hpx_main(variables_map& vm)
         appconfig_option<std::size_t>("ny0", pars, par->ny0);
         appconfig_option<std::size_t>("nz0", pars, par->nz0);
         appconfig_option<std::size_t>("timesteps", pars, par->nt0);
+        appconfig_option<std::size_t>("refine_every", pars, par->refine_every);
         appconfig_option<double>("maxx0", pars, par->maxx0);
         appconfig_option<double>("minx0", pars, par->minx0);
         appconfig_option<double>("maxy0", pars, par->maxy0);
@@ -219,7 +220,6 @@ int hpx_main(variables_map& vm)
         appconfig_option<std::size_t>("ghostwidth", pars, par->ghostwidth);
         appconfig_option<std::size_t>("bound_width", pars, par->bound_width);
         appconfig_option<std::size_t>("num_px_threads", pars, par->num_px_threads);
-        appconfig_option<std::size_t>("refine_every", pars, par->refine_every);
         appconfig_option<double>("minefficiency", pars, par->minefficiency);
         appconfig_option<std::size_t>("mindim", pars, par->mindim);
         appconfig_option<std::size_t>("shadow", pars, par->shadow);
@@ -248,6 +248,29 @@ int hpx_main(variables_map& vm)
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     } 
 
+    if ( par->refine_every < 1 ) {
+      // fixed mesh -- no AMR
+      par->refine_every = par->nt0;
+    }
+
+    if ( (par->refine_every % 2) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "refine_every needs to be even: (%1%) "
+            ) % par->refine_every);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    } 
+
+    if ( (par->nt0 % par->refine_every ) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "nt0 (%1%) needs to be evenly divisible by refine_every (%2%) "
+            ) % par->nt0 % par->refine_every);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    } 
+
+    std::size_t time_grain_size = par->nt0/par->refine_every;
+
     std::cout << " Parameters    : " << std::endl;
     std::cout << " lambda        : " << par->lambda << std::endl;
     std::cout << " allowedl      : " << par->allowedl << std::endl;
@@ -255,6 +278,7 @@ int hpx_main(variables_map& vm)
     std::cout << " ny0           : " << par->ny0 << std::endl;
     std::cout << " nz0           : " << par->nz0 << std::endl;
     std::cout << " timesteps     : " << par->nt0 << std::endl;
+    std::cout << " refine_every  : " << par->refine_every << std::endl;
     std::cout << " minx0         : " << par->minx0 << std::endl;
     std::cout << " maxx0         : " << par->maxx0 << std::endl;
     std::cout << " miny0         : " << par->miny0 << std::endl;
@@ -267,7 +291,6 @@ int hpx_main(variables_map& vm)
     std::cout << " ghostwidth    : " << par->ghostwidth << std::endl;
     std::cout << " bound_width   : " << par->bound_width << std::endl;
     std::cout << " num_px_threads: " << par->num_px_threads << std::endl;
-    std::cout << " refine_every  : " << par->refine_every << std::endl;
     std::cout << " minefficiency : " << par->minefficiency << std::endl;
     std::cout << " mindim        : " << par->mindim << std::endl;
     std::cout << " shadow        : " << par->shadow << std::endl;
@@ -336,18 +359,18 @@ int hpx_main(variables_map& vm)
 
         unigrid_mesh um;
         um.create(here);
-        int numsteps = par->nt0/2;
+        int numsteps = par->refine_every/2;
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
 
-        for (int j=0;j<9;j++) {
-          double time = j*par->nt0*par->lambda*par->h;
+        for (std::size_t j=0;j<time_grain_size;j++) {
+          double time = j*par->refine_every*par->lambda*par->h;
 
           result_data = um.init_execute(*result_data,time,function_type, 
                                         par->rowsize[0], numsteps,
                                 par->loglevel ? logging_type : component_invalid, par);
 
           // Regrid
-          time = (j+1)*par->nt0*par->lambda*par->h;
+          time = (j+1)*par->refine_every*par->lambda*par->h;
 
           // grab the gi's associated with the steps just completed
           par->prev_gi.resize(0);
@@ -830,7 +853,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
     } else {
-#if 0
+//#if 0
       // TEST
       for (int k=0;k<nz0;k++) {
         double z = minz0 + k*h;
@@ -846,8 +869,8 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         double Phi = exp(A) + exp(B);
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
-#endif
-//#if 0
+//#endif
+#if 0
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
@@ -941,7 +964,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
 
         }
       }
-//#endif
+#endif
     }
 
     return 0;

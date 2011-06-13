@@ -37,6 +37,7 @@ struct HPX_COMPONENT_EXPORT parameter
     std::size_t output_stdout;
     std::size_t output_level;
     std::size_t nt0;
+    std::size_t refine_every;
     std::size_t nx0;
     std::size_t ny0;
     std::size_t nz0;
@@ -52,7 +53,6 @@ struct HPX_COMPONENT_EXPORT parameter
     double_type ethreshold;
     double_type minefficiency;
     std::size_t num_px_threads;
-    std::size_t refine_every;
     std::size_t ghostwidth;
     std::size_t bound_width;
     std::size_t clusterstyle;
