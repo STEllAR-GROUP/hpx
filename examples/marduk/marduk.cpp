@@ -337,7 +337,7 @@ int hpx_main(variables_map& vm)
     }  
 
     // Output error
-    write_sdf(initial_time,placeholder,par);
+    //write_sdf(initial_time,placeholder,par);
 
     //std::vector<int> comm_list[maxgids];
     //std::vector<int> prolong_list[maxgids];
@@ -371,6 +371,7 @@ int hpx_main(variables_map& vm)
 
           // Regrid
           time = (j+1)*par->refine_every*par->lambda*par->h;
+          std::cout << " Completed time: " << time << std::endl;
 
           // grab the gi's associated with the steps just completed
           par->prev_gi.resize(0);
@@ -389,14 +390,13 @@ int hpx_main(variables_map& vm)
           }  
   
           // Output error
-          write_sdf(time,result_data,par);
-  
-          std::cout << " PRE TEST rowsize " << par->rowsize[0] << std::endl;
+          //write_sdf(time,result_data,par);
+          //std::cout << " PRE TEST rowsize " << par->rowsize[0] << std::endl;
   
           // re-compute rowsize information
           rc = compute_rowsize(par);
   
-          std::cout << " TEST rowsize " << par->rowsize[0] << std::endl;
+          //std::cout << " TEST rowsize " << par->rowsize[0] << std::endl;
         }
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
@@ -629,7 +629,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
                            &ghostwidth,&refine_factor,&mindim,
                            &bound_width);
 
-    std::cout << " numbox post DD " << numbox << std::endl;
+    //std::cout << " numbox post DD " << numbox << std::endl;
     for (int i=0;i<numbox;i++) {
       if (i == numbox-1 ) {
         par->gr_sibling.push_back(-1);
@@ -784,7 +784,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
                          &ghostwidth,&refine_factor,&mindim,
                          &bound_width);
 
-  std::cout << " numbox post DD " << numbox << std::endl;
+  //std::cout << " numbox post DD " << numbox << std::endl;
   int prev_tgi = 0;
   int tgi = 0;
   for (int i=0;i<numbox;i++) {
@@ -853,7 +853,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
     } else {
-//#if 0
+#if 0
       // TEST
       for (int k=0;k<nz0;k++) {
         double z = minz0 + k*h;
@@ -869,8 +869,8 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
         double Phi = exp(A) + exp(B);
         error[i+nx0*(j+ny0*k)] = Phi;
       } } }
-//#endif
-#if 0
+#endif
+//#if 0
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
@@ -964,7 +964,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
 
         }
       }
-#endif
+//#endif
     }
 
     return 0;

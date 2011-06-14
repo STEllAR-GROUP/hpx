@@ -357,15 +357,50 @@ namespace hpx { namespace components { namespace amr
         // lock all user defined data elements, will be unlocked at function exit
         scoped_values_lock<lcos::mutex> l(resultval, val); 
 
-        resultval.get() = val[0].get();
-        resultval->level_ = val[0]->level_;
-
         // Check if this is a prolongation/restriction step
         if ( (row+5)%3 == 0 || ( par->allowedl == 0 && row == 0 ) ) {
           // This is a prolongation/restriction step
-          resultval->timestep_ = val[0]->timestep_;
+          resultval.get() = val[0].get();
         } else {
+          //resultval->level_ = val[0]->level_;
+          // Find the gi we are updating  
+          int update = -1;
+          for (std::size_t i=0;i<val.size();i++) {
+             if ( val[i]->index_ == column ) {
+               // found it
+               update = i;
+               break;
+             }
+          }
+          BOOST_ASSERT(update >= 0);
+
+          resultval.get() = val[update].get();
           resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,int(val[0]->level_));
+          // TEST
+          double t = resultval->timestep_*par->h*par->lambda + cycle_time;
+          int gi = par->item2gi[column];
+          int nx0 = par->gr_nx[gi];
+          int ny0 = par->gr_ny[gi];
+          int nz0 = par->gr_nz[gi];
+          double h = par->gr_h[gi];
+          double minx0 = par->gr_minx[gi];
+          double miny0 = par->gr_miny[gi];
+          double minz0 = par->gr_minz[gi];
+          for (int k=0;k<nz0;k++) {
+            double z = minz0 + k*h;
+          for (int j=0;j<ny0;j++) {
+            double y = miny0 + j*h;
+          for (int i=0;i<nx0;i++) {
+            double x = minx0 + i*h;
+
+            // Provide initial error
+            double d = 11.0;
+            double A = -(x-0.5*d*cos(t))*(x-0.5*d*cos(t)) - (y+0.5*d*sin(t))*(y+0.5*d*sin(t)) - z*z;        
+            double B = -(x+0.5*d*cos(t))*(x+0.5*d*cos(t)) - (y-0.5*d*sin(t))*(y-0.5*d*sin(t)) - z*z;        
+            double Phi = exp(A) + exp(B);
+            resultval->value_[i+nx0*(j+ny0*k)].error = Phi;
+            resultval->value_[i+nx0*(j+ny0*k)].phi[0][0] = Phi;
+          } } }
 
 #if defined(RNPL_FOUND)
           // Output

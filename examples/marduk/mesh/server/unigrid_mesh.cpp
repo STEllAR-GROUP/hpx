@@ -578,6 +578,25 @@ namespace hpx { namespace components { namespace amr { namespace server
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
             counter++;
+
+            // Find out who else on this level intersects with this gi
+            int gi = par->levelp[level];
+            int gi2 = par->item2gi[i];
+            while ( gi >=0 && gi < par->gr_minx.size() ) {
+              if ( intersection(par->gr_minx[gi],par->gr_maxx[gi],
+                                par->gr_miny[gi],par->gr_maxy[gi],
+                                par->gr_minz[gi],par->gr_maxz[gi],
+                                par->gr_minx[gi2],par->gr_maxx[gi2],
+                                par->gr_miny[gi2],par->gr_maxy[gi2],
+                                par->gr_minz[gi2],par->gr_maxz[gi2]) &&
+                    gi2 != gi ) 
+              {     
+                j = par->gi2item[gi];
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              }
+              gi = par->gr_sibling[gi];
+            }
           } else {
             j = i;
             vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);

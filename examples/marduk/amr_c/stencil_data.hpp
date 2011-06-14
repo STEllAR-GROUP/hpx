@@ -72,9 +72,6 @@ struct stencil_data
     double_type timestep_;    // current time step
     std::size_t level_;    // refinement level
     std::vector<nodedata> value_;            // current value
-    std::vector<double_type> x_;      // x coordinate value
-    std::vector<double_type> y_;      // y coordinate value
-    std::vector<double_type> z_;      // z coordinate value
 
 private:
     // serialization support
@@ -84,7 +81,6 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & max_index_ & index_ & timestep_ & level_ & value_;
-        ar & x_ & y_ & z_;
     }
 };
 
