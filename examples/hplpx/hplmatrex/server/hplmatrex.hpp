@@ -370,17 +370,16 @@ namespace hpx { namespace components { namespace server
     std::vector<search_future> searches;
 
     for(outer=0;outer<=brows;outer++){
+        if(outer < (brows/2)){
+            searches.push_back(search_future(_gid,(outer+1)*blocksize));
+        }
         if(outer > 0 && outer <= brows/2){
             searches[outer-1].get();
             temp = (outer-1)*blocksize;
             for(j=(int)temp;j<rows;j++){
                 guessedPivots[j] = tempivotarr[j];
                 tempivotarr[j] = pivotarr[j];
-            }
-        }
-        if(outer < (brows/2)){
-            searches.push_back(search_future(_gid,(outer+1)*blocksize));
-        }
+        }   }
         for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
             good = true;
             if(outer > 0 && outer <= brows/2){
@@ -480,9 +479,12 @@ namespace hpx { namespace components { namespace server
 
     LU_gauss_corner(0);
     for(i = 0; i < brows-1; i++){
+//LU_gauss_main(i+1,i,i,3);
+//LU_gauss_main(i,i+1,i,2);
         main_futures[i+1][i][i] = new gmain_future(_gid,i+1,i,i,3);
         main_futures[i][i+1][i] = new gmain_future(_gid,i,i+1,i,2);
         for(j = 1; i+j < brows; j++){
+//LU_gauss_main(i+j,i+j,i,1);
             main_futures[i+j][i+j][i] = new gmain_future(_gid,i+j,i+j,i,1);
         }
         main_futures[i+1][i+1][i]->get();
@@ -495,31 +497,35 @@ namespace hpx { namespace components { namespace server
     int HPLMatreX::LU_gauss_main(const int brow,const int bcol,const int iter,
         const int type){
     if(iter > 0){
-//        while(main_futures[brow][bcol][iter-1]==NULL){sleep(1);}
+        while(main_futures[brow][bcol][iter-1]==NULL){sleep(1);}
         main_futures[brow][bcol][iter-1]->get();
         if(type == 1){
-//            while(main_futures[brow][iter][iter]==NULL){sleep(1);}
+            while(main_futures[brow][iter][iter]==NULL){sleep(1);}
             main_futures[brow][iter][iter]->get();
-//            while(main_futures[iter][bcol][iter]==NULL){sleep(1);}
+            while(main_futures[iter][bcol][iter]==NULL){sleep(1);}
             main_futures[iter][bcol][iter]->get();
     }   }
     if(type == 1){
         if(brow >= bcol && brow < brows - 1)
+//LU_gauss_main(brow+1,bcol,iter,1);
             main_futures[brow+1][bcol][iter] =
                 new gmain_future(_gid,brow+1,bcol,iter,1);
         if(brow <= bcol && bcol < brows - 1)
+//LU_gauss_main(brow,bcol+1,iter,1);
             main_futures[brow][bcol+1][iter] =
                 new gmain_future(_gid,brow,bcol+1,iter,1);
         LU_gauss_trail(brow,bcol,iter);
     }
     else if(type == 2){
        if(bcol < brows - 1)
+//LU_gauss_main(brow,bcol+1,iter,2);
            main_futures[brow][bcol+1][iter] =
                new gmain_future(_gid,brow,bcol+1,iter,2);
        LU_gauss_top(iter,bcol);
     }
     else{
         if(brow < brows - 1)
+//LU_gauss_main(brow+1,bcol,iter,3);
             main_futures[brow+1][bcol][iter] =
                 new gmain_future(_gid,brow+1,bcol,iter,3);
         LU_gauss_left(brow,iter);
