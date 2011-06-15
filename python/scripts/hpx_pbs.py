@@ -320,6 +320,10 @@ parser.add_option("--dry-run",
 
 (options, cmd) = parser.parse_args()
 
+if 0 == len(cmd):
+  report("No command specified.")
+  exit(1) 
+
 # {{{ known hosts
 known_hosts = expanduser(options.known_hosts)
   
@@ -390,11 +394,11 @@ else:
 # {{{ scheduler loop
 for node in nodes.iterkeys():
   local_cmd = cmd  
-  local_cmd += ' "-t%d" "-a%s:%d" "-x%s:%d"' % ( nodes[node] # number of cpus
-                                               , agas[0]     # agas host
-                                               , agas[1]     # agas port
-                                               , node        # local host
-                                               , 7911)       # local port
+  local_cmd += ' "-t%d"'                  % nodes[node]
+  local_cmd += ' "-Ihpx.agas.address=%s"' % agas[0]
+  local_cmd += ' "-Ihpx.agas.port=%d"'    % agas[1]
+  local_cmd += ' "-l%d"'                  % len(nodes)
+  local_cmd += ' "-x%s:%d"'               % (node, 7911) 
 
   if agas[0] == node:
     local_cmd += ' "-r"'
