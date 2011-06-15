@@ -296,13 +296,17 @@ parser.add_option("--ssh-known-hosts",
                   default="~/.ssh/known_hosts", 
                   help="SSH known hosts file")
 
-parser.add_option("--agas",
+parser.add_option("--hpx-agas",
                   action="store", type="string",
-                  dest="agas", help="Address of the AGAS locality")
+                  dest="agas", help="Address of the HPX AGAS locality")
 
-parser.add_option("--console",
+parser.add_option("--hpx-console",
                   action="store", type="string",
-                  dest="console", help="Address of the console locality")
+                  dest="console", help="Address of the HPX console locality")
+
+parser.add_option("--hpx-port",
+                  action="store", type="int", dest="hpx_port",
+                  default=7910, help="Default HPX IP port")
 
 parser.add_option("--nodes",
                   action="store", type="string",
@@ -363,10 +367,10 @@ key = expanduser(options.ssh_key)
 # }}}
 
 # {{{ agas
-agas = (nodes.items()[0][0], 7910)
+agas = (nodes.items()[0][0], options.hpx_port)
 
 if not None == options.agas:
-  agas = parse_ip(options.agas, 7910)
+  agas = parse_ip(options.agas, options.hpx_port)
 
   if not nodes.has_key(agas[0]):
     report("AGAS locality %s is not available for this job." % agas[0])
@@ -374,10 +378,10 @@ if not None == options.agas:
 # }}}
 
 # {{{ console
-console = (nodes.items()[0][0], 7910)
+console = (nodes.items()[0][0], options.hpx_port)
 
 if not None == options.console:
-  console = parse_ip(options.console, 7910)
+  console = parse_ip(options.console, options.hpx_port)
 
   if not nodes.has_key(console[0]):
     report("Console locality %s is not available for this job." % console[0])
@@ -398,10 +402,16 @@ for node in nodes.iterkeys():
   local_cmd += ' "-Ihpx.agas.address=%s"' % agas[0]
   local_cmd += ' "-Ihpx.agas.port=%d"'    % agas[1]
   local_cmd += ' "-l%d"'                  % len(nodes)
-  local_cmd += ' "-x%s:%d"'               % (node, 7911) 
 
   if agas[0] == node:
     local_cmd += ' "-r"'
+    local_cmd += ' "-x%s:%d"' % (agas[0], agas[1]) 
+  elif console[0] == node:
+    local_cmd += ' "-x%s:%d"' % (console[0], console[1]) 
+  else:
+    local_cmd += ' "-x%s:%d"' % (node, options.hpx_port) 
+
+  if agas[0] == node:
 
   if not console[0] == node:
     local_cmd += ' "-w"' 
