@@ -53,9 +53,9 @@ macro(add_hpx_python_config_test name variable)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_paramiko variable)
-  add_hpx_python_config_test("paramiko" ${variable} 
-    SOURCE cmake/tests/paramiko.py ${ARGN})
+macro(hpx_check_for_python_paramiko variable)
+  add_hpx_python_config_test("python_paramiko" ${variable} 
+    SOURCE cmake/tests/python_paramiko.py ${ARGN})
 endmacro()
 
 macro(hpx_check_for_python_optparse variable)

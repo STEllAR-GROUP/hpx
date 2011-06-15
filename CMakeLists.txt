@@ -27,6 +27,16 @@ set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 ################################################################################
+# Python detection (part 1)
+################################################################################
+include(FindPythonInterp)
+
+################################################################################
+# Fortran detection (part 1)
+################################################################################
+include(CMakeDetermineFortranCompiler)
+
+################################################################################
 # cmake configuration
 ################################################################################
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
@@ -44,15 +54,42 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 ################################################################################
-# F90 detection
+# Python detection (part 2)
 ################################################################################
-include(CMakeDetermineFortranCompiler)
+if(PYTHONINTERP_FOUND)
+  hpx_info("python" "Found a Python interpreter")
+else()
+  hpx_warn("python" "Couldn't find a Python interpreter")
+endif()
 
+# SSH
+hpx_check_for_python_paramiko(HPX_PYTHON_PARAMIKO
+    DEFINITIONS HPX_HAVE_PYTHON_PARAMIKO) 
+
+# Command-line parsing
+hpx_check_for_python_optparse(HPX_PYTHON_OPTPARSE
+    DEFINITIONS HPX_HAVE_PYTHON_OPTPARSE)
+
+# Async networking
+hpx_check_for_python_threading(HPX_PYTHON_THREADING
+    DEFINITIONS HPX_HAVE_PYTHON_THREADING)
+
+# RAII
+hpx_check_for_python_with_statement(HPX_PYTHON_WITH_STATEMENT
+    DEFINITIONS HPX_HAVE_PYTHON_WITH_STATEMENT)
+
+# Process control
+hpx_check_for_python_subprocess(HPX_PYTHON_SUBPROCESS
+    DEFINITIONS HPX_HAVE_PYTHON_SUBPROCESS)
+
+################################################################################
+# Fortran detection (part 2)
+################################################################################
 if(CMAKE_Fortran_COMPILER)
-  hpx_info("f90" "Found a F90 compiler")
+  hpx_info("fortran" "Found a Fortran compiler")
   enable_language(Fortran)
 else()
-  hpx_warn("f90" "Couldn't find a F90 compiler")
+  hpx_warn("fortran" "Couldn't find a Fortran compiler")
 endif()
 
 ################################################################################
