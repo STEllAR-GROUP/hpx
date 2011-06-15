@@ -12,6 +12,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/lockfree/fifo.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
@@ -36,6 +37,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
+    boost::lockfree::fifo<boost::function<void()>* > thunks;
+
     void spin();
 
   public:
@@ -53,6 +56,15 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     void wait();
 
     void notify();
+
+    // no-op on non-bootstrap localities 
+    void trigger(); 
+
+    void add_thunk(
+        boost::function<void()>* f
+    ) {
+        thunks.enqueue(f);
+    }
 };
 
 HPX_EXPORT void create_big_boot_barrier(

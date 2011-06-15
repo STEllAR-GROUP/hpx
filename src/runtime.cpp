@@ -19,6 +19,10 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
+#if HPX_AGAS_VERSION > 0x10
+    #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
+#endif
+ 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
 // system signals
@@ -367,6 +371,9 @@ namespace hpx
                     "timed out while waiting for other localities");
             }
         }
+        #else
+        // invoke the AGAS v2 notifications, waking up the other localities
+        agas::get_big_boot_barrier().trigger();  
         #endif
 
         #if HPX_AGAS_VERSION <= 0x10

@@ -330,7 +330,13 @@ void register_console(registration_header const& header)
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
 
-    get_big_boot_barrier().apply(naming::address(header.locality), p);
+    boost::function<void()>* thunk = new boost::function<void()>
+        (boost::bind(&big_boot_barrier::apply
+                   , boost::ref(get_big_boot_barrier())
+                   , naming::address(header.locality)
+                   , p)); 
+
+    get_big_boot_barrier().add_thunk(thunk);
 
     get_big_boot_barrier().notify();
 }
@@ -488,7 +494,13 @@ void register_worker(registration_header const& header)
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
 
-    get_big_boot_barrier().apply(naming::address(header.locality), p);
+    boost::function<void()>* thunk = new boost::function<void()>
+        (boost::bind(&big_boot_barrier::apply
+                   , boost::ref(get_big_boot_barrier())
+                   , naming::address(header.locality)
+                   , p)); 
+
+    get_big_boot_barrier().add_thunk(thunk);
 
     get_big_boot_barrier().notify();
 }
@@ -738,6 +750,20 @@ void big_boot_barrier::notify()
     boost::mutex::scoped_lock lk(mtx);
     --connected;
     cond.notify_all();
+}
+
+// This is triggered in runtime_impl::start, after the early action handler
+// has been replaced by the parcelhandler. We have to delay the notifications
+// until this point so that the AGAS locality can come up.
+void big_boot_barrier::trigger()
+{
+    if (router_mode_bootstrap == router_type)
+    {
+        boost::function<void()>* p;
+
+        while (thunks.dequeue(&p))
+            (*p)(); 
+    }
 }
 
 struct bbb_tag;
