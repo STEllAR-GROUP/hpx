@@ -411,8 +411,6 @@ for node in nodes.iterkeys():
   else:
     local_cmd += ' "-x%s:%d"' % (node, options.hpx_port) 
 
-  if agas[0] == node:
-
   if not console[0] == node:
     local_cmd += ' "-w"' 
 
