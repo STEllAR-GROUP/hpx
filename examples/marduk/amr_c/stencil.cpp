@@ -23,14 +23,14 @@
 #include <sdf.h>
 #endif
 
-bool intersection(double xmin,double xmax,
+HPX_EXPORT bool intersection(double xmin,double xmax,
                   double ymin,double ymax,
                   double zmin,double zmax,
                   double xmin2,double xmax2,
                   double ymin2,double ymax2,
                   double zmin2,double zmax2);
-double max(double,double);
-double min(double,double);
+HPX_EXPORT double max(double,double);
+HPX_EXPORT double min(double,double);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 

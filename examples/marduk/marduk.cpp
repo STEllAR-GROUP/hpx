@@ -120,7 +120,7 @@ int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
                                  double &minz, double &maxz, parameter &par);
 
-bool intersection(double xmin,double xmax,
+HPX_EXPORT bool intersection(double xmin,double xmax,
                   double ymin,double ymax,
                   double zmin,double zmax,
                   double xmin2,double xmax2,
@@ -128,8 +128,8 @@ bool intersection(double xmin,double xmax,
                   double zmin2,double zmax2);
 bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
-double max(double,double);
-double min(double,double);
+HPX_EXPORT double max(double,double);
+HPX_EXPORT double min(double,double);
 int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
