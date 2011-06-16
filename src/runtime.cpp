@@ -12,6 +12,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/io/ios_state.hpp>
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
@@ -643,6 +644,7 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
         boost::uint32_t src, std::string const& msg)
     {
+        boost::io::ios_all_saver ifs(std::cerr); 
         std::cerr << "locality (" << std::hex << std::setw(4) 
                   << std::setfill('0') << src << "):" << std::endl
                   << msg << std::endl;
