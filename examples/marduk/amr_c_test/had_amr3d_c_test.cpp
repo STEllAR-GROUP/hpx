@@ -41,6 +41,117 @@ double_type phi_analytic(double_type x,double_type y,double_type z,double_type t
   return Phi;
 }
 
+inline void calcrhsA(struct nodedata * rhs,std::vector<access_memory_block<stencil_data> > const&val,
+                     std::vector<int> &src, std::vector<int> &vsrc,
+                     int lnx,int lny,int lnz,
+                     double_type const& dx,double_type const t,
+                     double_type const x, double_type const y, double_type const z,
+                     int const i, int const j, int const k)
+{
+  // initial separation
+  double_type d = 11.0;
+  double eps = 1.e-10;
+  double uxx = (phi_analytic(x+eps,y,z,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x-eps,y,z,t,d) )/(eps*eps); 
+  double uyy = (phi_analytic(x,y+eps,z,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y-eps,z,t,d) )/(eps*eps); 
+  double uzz = (phi_analytic(x,y,z+eps,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y,z-eps,t,d) )/(eps*eps); 
+  double utt = (phi_analytic(x,y,z,t+eps,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y,z,t-eps,d) )/(eps*eps); 
+  double f = utt - uxx - uyy - uzz;
+
+  BOOST_ASSERT( i + lnx*(j+lny*k) < vsrc.size() && i + lnx*(j+lny*k) < src.size() );
+  if ( vsrc[i + lnx*(j+lny*k)] != -1 && src[i + lnx*(j+lny*k)] != -1 &&
+       vsrc[i-1 + lnx*(j+lny*k)] != -1 && src[i-1 + lnx*(j+lny*k)] != -1 &&
+       vsrc[i+1 + lnx*(j+lny*k)] != -1 && src[i+1 + lnx*(j+lny*k)] != -1 &&
+       vsrc[i + lnx*(j-1+lny*k)] != -1 && src[i + lnx*(j-1+lny*k)] != -1 &&
+       vsrc[i + lnx*(j+1+lny*k)] != -1 && src[i + lnx*(j+1+lny*k)] != -1 &&
+       vsrc[i + lnx*(j+lny*(k-1))] != -1 && src[i + lnx*(j+lny*(k-1))] != -1 &&
+       vsrc[i + lnx*(j+lny*(k+1))] != -1 && src[i + lnx*(j+lny*(k+1))] != -1 
+     ) {
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*k)] < val.size() && 
+                  src[i + lnx*(j+lny*k)] < val[vsrc[i + lnx*(j+lny*k)] ]->value_.size() );
+    rhs->phi[0][0] = val[vsrc[i + lnx*(j+lny*k)] ]->value_[ src[i + lnx*(j+lny*k)] ].phi[0][4];
+
+    BOOST_ASSERT( vsrc[i+1 + lnx*(j+lny*k)] < val.size() && 
+                  src[i+1 + lnx*(j+lny*k)] < val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i-1 + lnx*(j+lny*k)] < val.size() && 
+                  src[i-1 + lnx*(j+lny*k)] < val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_.size() );
+    rhs->phi[0][1] = - 0.5*(
+                      val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_[ src[i+1 + lnx*(j+lny*k)] ].phi[0][4]
+                    - val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_[ src[i-1 + lnx*(j+lny*k)] ].phi[0][4]
+                           )/dx;
+
+    BOOST_ASSERT( vsrc[i + lnx*(j+1+lny*k)] < val.size() && 
+                   src[i + lnx*(j+1+lny*k)] < val[vsrc[i + lnx*(j+1+lny*k)] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i + lnx*(j-1+lny*k)] < val.size() && 
+                   src[i + lnx*(j-1+lny*k)] < val[vsrc[i + lnx*(j-1+lny*k)] ]->value_.size() );
+    rhs->phi[0][2] = - 0.5*(
+                       val[vsrc[i + lnx*(j+1+lny*k)] ]->value_[ src[i + lnx*(j+1+lny*k)] ].phi[0][4]
+                     - val[vsrc[i + lnx*(j-1+lny*k)] ]->value_[ src[i + lnx*(j-1+lny*k)] ].phi[0][4]
+                           )/dx;
+  
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k+1))] < val.size() && 
+                   src[i + lnx*(j+lny*(k+1))] < val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k-1))] < val.size() && 
+                   src[i + lnx*(j+lny*(k-1))] < val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_.size() );
+    rhs->phi[0][3] = - 0.5*(
+                       val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_[ src[i + lnx*(j+lny*(k+1))] ].phi[0][4]
+                     - val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_[ src[i + lnx*(j+lny*(k-1))] ].phi[0][4]
+                           )/dx;
+
+    rhs->phi[0][4] = - 0.5*(
+                      val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_[ src[i+1 + lnx*(j+lny*k)] ].phi[0][1]
+                    - val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_[ src[i-1 + lnx*(j+lny*k)] ].phi[0][1]
+                            )/dx
+                      - 0.5*(
+                       val[vsrc[i + lnx*(j+1+lny*k)] ]->value_[ src[i + lnx*(j+1+lny*k)] ].phi[0][2]
+                     - val[vsrc[i + lnx*(j-1+lny*k)] ]->value_[ src[i + lnx*(j-1+lny*k)] ].phi[0][2]
+                            )/dx
+                      - 0.5*(
+                       val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_[ src[i + lnx*(j+lny*(k+1))] ].phi[0][3]
+                     - val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_[ src[i + lnx*(j+lny*(k-1))] ].phi[0][3]
+                            )/dx
+                     + f;
+ 
+  } else {
+    rhs->phi[0][0] = 0.0;
+    rhs->phi[0][1] = 0.0;
+    rhs->phi[0][2] = 0.0;
+    rhs->phi[0][3] = 0.0;
+    rhs->phi[0][4] = 0.0;
+  }
+  return;
+}
+
+inline void calcrhsB(struct nodedata * rhs, boost::scoped_array<nodedata> const& work,
+                     int lnx,int lny,int lnz,
+                     double_type const& dx,double_type const t,
+                     double_type const x, double_type const y, double_type const z,
+                     int const i, int const j, int const k)
+{
+  // initial separation
+  double_type d = 11.0;
+  double eps = 1.e-10;
+  double uxx = (phi_analytic(x+eps,y,z,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x-eps,y,z,t,d) )/(eps*eps); 
+  double uyy = (phi_analytic(x,y+eps,z,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y-eps,z,t,d) )/(eps*eps); 
+  double uzz = (phi_analytic(x,y,z+eps,t,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y,z-eps,t,d) )/(eps*eps); 
+  double utt = (phi_analytic(x,y,z,t+eps,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y,z,t-eps,d) )/(eps*eps); 
+  double f = utt - uxx - uyy - uzz;
+
+  rhs->phi[0][0] = work[i+lnx*(j+lny*k)].phi[1][4];
+
+  rhs->phi[0][1] = - 0.5*( work[i+1 + lnx*(j+lny*k)].phi[1][4]   - work[i-1 + lnx*(j+lny*k)].phi[1][4])/dx;
+
+  rhs->phi[0][2] = - 0.5*( work[i + lnx*(j+1+lny*k)].phi[1][4]   - work[i + lnx*(j-1+lny*k)].phi[1][4])/dx;
+
+  rhs->phi[0][3] = - 0.5*( work[i + lnx*(j+lny*(k+1))].phi[1][4] - work[i + lnx*(j+lny*(k-1))].phi[1][4])/dx;
+
+  rhs->phi[0][4] = - 0.5*( work[i+1 + lnx*(j+lny*k)].phi[1][1]   - work[i-1 + lnx*(j+lny*k)].phi[1][1])/dx
+                   - 0.5*( work[i + lnx*(j+1+lny*k)].phi[1][2]   - work[i + lnx*(j-1+lny*k)].phi[1][2])/dx
+                   - 0.5*( work[i + lnx*(j+lny*(k+1))].phi[1][3] - work[i + lnx*(j+lny*(k-1))].phi[1][3])/dx
+                     + f;
+ 
+  return;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     detail::parameter const& par)
@@ -63,7 +174,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     int nz = par.gr_nz[gi];
 
     bool found = false;
-    int level;
+    int level = 0;
     for (int ii=par.allowedl;ii>=0;ii--) {
       if ( item < par.rowsize[ii]) {
         level = ii;
@@ -92,9 +203,9 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       double_type x = minx + i*h;
 
       node.phi[0][0] = phi_analytic(x,y,z,t,d);
-      node.phi[0][1] = 0.5*( phi_analytic(x+dx,y,z,t,d) - phi_analytic(x-dx,y,z,t,d) );
-      node.phi[0][2] = 0.5*( phi_analytic(x,y+dx,z,t,d) - phi_analytic(x,y-dx,z,t,d) );
-      node.phi[0][3] = 0.5*( phi_analytic(x,y,z+dx,t,d) - phi_analytic(x,y,z-dx,t,d) );
+      node.phi[0][1] = -0.5*( phi_analytic(x+dx,y,z,t,d) - phi_analytic(x-dx,y,z,t,d) );
+      node.phi[0][2] = -0.5*( phi_analytic(x,y+dx,z,t,d) - phi_analytic(x,y-dx,z,t,d) );
+      node.phi[0][3] = -0.5*( phi_analytic(x,y,z+dx,t,d) - phi_analytic(x,y,z-dx,t,d) );
       node.phi[0][4] = 0.5*( phi_analytic(x,y,z,t-dx,d) - phi_analytic(x,y,z,t+dx,d) );
 
       // initial error estimate (for driving refinement)
@@ -106,22 +217,90 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(std::vector<nodedata*> const& vecval, stencil_data* result, 
-  bool boundary,
-  int *bbox, int compute_index, 
-  double_type const& dt, double_type const& dx, double_type const& tstep,
-  int level, detail::parameter const& par)
+int rkupdate(std::vector<access_memory_block<stencil_data> > const&val, 
+             stencil_data* result, 
+             std::vector<int> &src, std::vector<int> &vsrc,double dt,double dx,double t,
+             int nx0, int ny0, int nz0,
+             double minx0, double miny0, double minz0,
+             detail::parameter const& par)
 {
     // allocate some temporary arrays for calculating the rhs
-//     nodedata rhs;
-    boost::scoped_array<nodedata> work(new nodedata[vecval.size()]);
-    boost::scoped_array<nodedata> work2(new nodedata[vecval.size()]);
-    boost::scoped_array<nodedata> work3(new nodedata[vecval.size()]);
+    nodedata rhs;
+    int lnx = nx0 + 6;
+    int lny = ny0 + 6;
+    int lnz = nz0 + 6;
+    boost::scoped_array<nodedata> work(new nodedata[lnx*lny*lnz]);
+    boost::scoped_array<nodedata> work2(new nodedata[lnx*lny*lnz]);
+
+    int num_eqns = HPX_SMP_AMR3D_NUM_EQUATIONS;
 
     static double_type const c_0_75 = 0.75;
     static double_type const c_0_25 = 0.25;
     static double_type const c_2_3 = double_type(2.)/double_type(3.);
     static double_type const c_1_3 = double_type(1.)/double_type(3.);
+
+    double x,y,z;
+
+    // -------------------------------------------------------------------------
+    // iter 0
+    for (int k=1; k<lnz-1;k++) {
+      z = minz0 + (k-3)*dx;
+    for (int j=1; j<lny-1;j++) {
+      y = miny0 + (j-3)*dx;
+    for (int i=1; i<lnx-1;i++) {
+      x = minx0 + (i-3)*dx;
+      calcrhsA(&rhs,val,src,vsrc,lnx,lny,lnz,dx,t,x,y,z,i,j,k);
+  
+      nodedata& nd = work[i+lnx*(j+lny*k)]; 
+      if ( vsrc[i + lnx*(j+lny*k)] != -1 && src[i + lnx*(j+lny*k)] != -1 ) {
+        nodedata const & ndvecval = val[ vsrc[i + lnx*(j+lny*k)] ]->value_[ src[i + lnx*(j+lny*k)] ];
+        for (int ll=0;ll<num_eqns;ll++) { 
+          nd.phi[0][ll] = ndvecval.phi[0][ll];
+          nd.phi[1][ll] = ndvecval.phi[0][ll] + rhs.phi[0][ll]*dt;
+        }
+      } else {
+        for (int ll=0;ll<num_eqns;ll++) { 
+          nd.phi[0][ll] = 0.0;
+          nd.phi[1][ll] = 0.0;
+        }
+      }
+    }}}
+
+    // -------------------------------------------------------------------------
+    // iter 1
+    for (int k=2; k<lnz-2;k++) {
+      z = minz0 + (k-3)*dx;
+    for (int j=2; j<lny-2;j++) {
+      y = miny0 + (j-3)*dx;
+    for (int i=2; i<lnx-2;i++) {
+      x = minx0 + (i-3)*dx;
+      calcrhsB(&rhs,work,lnx,lny,lnz,dx,t+dt,x,y,z,i,j,k);
+      nodedata& nd = work[i+lnx*(j+lny*k)];
+      nodedata& nd2 = work2[i+lnx*(j+lny*k)];
+      for (int ll=0;ll<num_eqns;ll++) {
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] +
+                         c_0_25*nd.phi[1][ll] + c_0_25*rhs.phi[0][ll]*dt;
+      }
+    }}}
+
+    // -------------------------------------------------------------------------
+    // iter 2
+    for (int k=3; k<lnz-3;k++) {
+      z = minz0 + (k-3)*dx;
+    for (int j=3; j<lny-3;j++) {
+      y = miny0 + (j-3)*dx;
+    for (int i=3; i<lnx-3;i++) {
+      x = minx0 + (i-3)*dx;
+      calcrhsB(&rhs,work2,lnx,lny,lnz,dx,t+0.5*dt,x,y,z,i,j,k);
+
+      nodedata& nd = work[i+lnx*(j+lny*k)];
+      nodedata& nd2 = work2[i+lnx*(j+lny*k)];
+      nodedata& ndresult = result->value_[i-3+nx0*(j-3+ny0*(k-3))];
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        ndresult.phi[0][ll] = c_1_3*nd.phi[0][ll] + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
+      }
+    }}}
 
     return 1;
 }

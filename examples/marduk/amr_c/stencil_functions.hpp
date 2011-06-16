@@ -22,11 +22,11 @@ HPX_COMPONENT_EXPORT int generate_initial_data(
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int rkupdate(std::vector<nodedata*> const& val, 
-    stencil_data* result,  
-    bool boundary, int *bbox, int compute_index, 
-    double_type const&, double_type const&, double_type const&,
-    int level, detail::parameter const& par);
+HPX_COMPONENT_EXPORT int rkupdate(std::vector<access_memory_block<stencil_data> > const&val, 
+    stencil_data *result,  
+    std::vector<int> &src, std::vector<int> &vsrc,double dt,double dx,double t,
+    int nx0, int ny0, int nz0,
+    double minx0, double miny0, double minz0,detail::parameter const& par);
 
 }}}
 

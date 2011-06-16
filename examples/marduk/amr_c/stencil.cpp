@@ -364,10 +364,11 @@ namespace hpx { namespace components { namespace amr
         if ( (row+5)%3 == 0 || ( par->allowedl == 0 && row == 0 ) ) {
           // This is a prolongation/restriction step
           resultval.get() = val[0].get();
+          BOOST_ASSERT(val.size() == 1);
         } else {
           //resultval->level_ = val[0]->level_;
           // Find the gi we are updating  
-          int update = -1;
+          std::size_t update = 365;
           for (std::size_t i=0;i<val.size();i++) {
              if ( val[i]->index_ == column ) {
                // found it
@@ -375,12 +376,13 @@ namespace hpx { namespace components { namespace amr
                break;
              }
           }
-          BOOST_ASSERT(update >= 0);
+          BOOST_ASSERT(update != 365);
 
-          resultval.get() = val[update].get();
-          resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,int(val[0]->level_));
-          // TEST
-          double t = resultval->timestep_*par->h*par->lambda + cycle_time;
+          resultval->max_index_ = val[update]->max_index_;
+          resultval->index_ = val[update]->index_;
+          resultval->level_ = val[update]->level_;
+          resultval->value_.resize(val[update]->value_.size());
+
           int gi = par->item2gi[column];
           int nx0 = par->gr_nx[gi];
           int ny0 = par->gr_ny[gi];
@@ -389,6 +391,89 @@ namespace hpx { namespace components { namespace amr
           double minx0 = par->gr_minx[gi];
           double miny0 = par->gr_miny[gi];
           double minz0 = par->gr_minz[gi];
+          double t = val[0]->timestep_*par->h*par->lambda + cycle_time;
+
+#if 0      
+          // local array ( to help with book-keeping )
+          int lnx = nx0+6;
+          int lny = ny0+6;
+          int lnz = nz0+6;
+          std::vector<int> src(lnx*lny*lnz,-1);
+          std::vector<int> vsrc(lnx*lny*lnz,-1);
+
+          std::size_t oii = 0;
+          int ogi = par->item2gi[ val[oii]->index_ ];
+          bool proceed;
+          for (int k=0;k<lnz;k++) {
+            double z = minz0 + (k-3)*h;
+          for (int j=0;j<lny;j++) {
+            double y = miny0 + (j-3)*h;
+          for (int i=0;i<lnx;i++) {
+            double x = minx0 + (i-3)*h;
+            if ( i >= 3 && i < nx0 + 3 &&
+                 j >= 3 && j < ny0 + 3 &&
+                 k >= 3 && k < nz0 + 3 ) {
+              //src[i + lnx*(j+lny*k)] = val[update]->value_[i-3 + nx0*(j-3 + ny0*(k-3))];
+              src[i + lnx*(j+lny*k)] = i-3 + nx0*(j-3 + ny0*(k-3));
+                // TEST
+                if ( src[i + lnx*(j+lny*k)] < 0 ) {
+                  std::cout << " src PROBLEM A: " << src[i + lnx*(j+lny*k)] << " vsrc " << oii << std::endl;
+                  BOOST_ASSERT(false);
+                }
+                // END TEST
+              vsrc[i + lnx*(j+lny*k)] = update;
+            } else {
+              // this data point comes from the communicated neighbors
+              // but you have to figure out which
+
+              proceed = false;
+              if ( x <= par->gr_maxx[ogi] && x >= par->gr_minx[ogi] &&
+                   y <= par->gr_maxy[ogi] && y >= par->gr_miny[ogi] &&
+                   z <= par->gr_maxz[ogi] && z >= par->gr_minz[ogi]
+                 ) {
+                proceed = true;
+              } else {
+                for (std::size_t ii=0;ii<val.size();ii++) {
+                  if ( ii != update ) {
+                    int gi2 = par->item2gi[ val[ii]->index_ ];
+                    // check if x,y,z is in this mesh
+                    if ( x <= par->gr_maxx[gi2] && x >= par->gr_minx[gi2] &&
+                         y <= par->gr_maxy[gi2] && y >= par->gr_miny[gi2] &&
+                         z <= par->gr_maxz[gi2] && z >= par->gr_minz[gi2] ) {
+                      // found
+                      ogi = gi2;
+                      oii = ii;
+                      proceed = true;
+                      break;
+                    }
+                  }
+                }
+              }
+              if ( proceed ) {
+                // find the index
+                double llh = par->gr_h[ogi];
+                int llnx = par->gr_nx[ogi];
+                int llny = par->gr_ny[ogi];
+                int ii = (int) ( (x - par->gr_minx[ogi])/llh ); 
+                int jj = (int) ( (y - par->gr_miny[ogi])/llh ); 
+                int kk = (int) ( (z - par->gr_minz[ogi])/llh ); 
+               // src[i + lnx*(j+lny*k)] = val[ oii ]->value_[ii + llnx*(jj + llny*kk)];
+                src[i + lnx*(j+lny*k)] = ii + llnx*(jj + llny*kk);
+                BOOST_ASSERT(src[i + lnx*(j+lny*k)] >= 0 );
+                vsrc[i + lnx*(j+lny*k)] = oii;
+              }
+            }
+          } } }
+
+          // call rk update
+          rkupdate(val,resultval.get_ptr(),src,vsrc,par->lambda*h,h,t,
+                   nx0,ny0,nz0,minx0,miny0,minz0,*par.p); 
+#endif
+
+          resultval->timestep_ = val[0]->timestep_ + 1.0/pow(2.0,int(val[0]->level_));
+//#if 0
+          // TEST
+          t = resultval->timestep_*par->h*par->lambda + cycle_time;
           for (int k=0;k<nz0;k++) {
             double z = minz0 + k*h;
           for (int j=0;j<ny0;j++) {
@@ -404,7 +489,7 @@ namespace hpx { namespace components { namespace amr
             resultval->value_[i+nx0*(j+ny0*k)].error = Phi;
             resultval->value_[i+nx0*(j+ny0*k)].phi[0][0] = Phi;
           } } }
-
+//#endif
 #if defined(RNPL_FOUND)
           // Output
           if (par->loglevel > 1 && fmod(resultval->timestep_, par->output) < 1.e-6) {
@@ -413,7 +498,6 @@ namespace hpx { namespace components { namespace amr
             naming::id_type this_prefix = appl.get_runtime_support_gid();
             int locality = get_prefix_from_id( this_prefix );
             double datatime = resultval->timestep_*par->h*par->lambda + cycle_time;
-            int gi = par->item2gi[column];
             write_sdf(gi,datatime,locality,resultval->value_,par);
           }
 #endif
