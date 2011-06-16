@@ -123,7 +123,7 @@ namespace hpx { namespace components
 
 #if HPX_AGAS_VERSION <= 0x10
     // stub function allowing to apply the console_logging action
-    void console_logging(naming::id_type const& prefix, 
+    inline void console_logging(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
     {
         // do logging only if applier is still valid
