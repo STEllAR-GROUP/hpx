@@ -12,7 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
-#include <hpx/runtime/components/server/console_logging.hpp>
+#include <hpx/runtime/components/console_logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
