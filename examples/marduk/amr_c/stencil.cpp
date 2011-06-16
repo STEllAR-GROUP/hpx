@@ -8,6 +8,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <boost/foreach.hpp>
 
 #include <math.h>
@@ -426,6 +429,15 @@ namespace hpx { namespace components { namespace amr
     hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
         hpx::actions::manage_object_action<stencil_data>();
 
+}}}
+
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::actions::manage_object_action<hpx::components::amr::stencil_data>,
+    manage_object_action_stencil_data)
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace amr 
+{
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
                            std::vector<naming::id_type> const& interp_src_data,
