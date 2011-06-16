@@ -38,7 +38,8 @@ namespace hpx { namespace parcelset
         }
         catch (std::exception const& e) {
             hpx::util::osstream strm;
-            strm << "parcelport: parcel serialization failed: " << e.what();
+            strm << "parcelport: parcel serialization failed: " << e.what()
+                 << " parcel(" << p << ")";
             HPX_THROW_EXCEPTION(no_success, 
                 "parcelport_connection::set_parcel", 
                 hpx::util::osstream_get_string(strm));
