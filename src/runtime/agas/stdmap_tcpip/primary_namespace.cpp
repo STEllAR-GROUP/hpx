@@ -20,42 +20,42 @@
 #include <hpx/runtime/agas/network/backend/tcpip.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 
-using hpx::components::component_agas_symbol_namespace;
+using hpx::components::component_agas_primary_namespace;
 
 typedef hpx::agas::server::primary_namespace<
     hpx::agas::tag::database::stdmap
   , hpx::agas::tag::network::tcpip
-> agas_component;
+> primary_namespace_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::fixed_component<agas_component>,
+    hpx::components::fixed_component<primary_namespace_type>,
     stdmap_tcpip_primary_namespace);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component, component_agas_primary_namespace);
+    primary_namespace_type, component_agas_primary_namespace);
 
 HPX_REGISTER_ACTION_EX(
-    agas_component::bind_locality_action,
+    primary_namespace_type::bind_locality_action,
     stdmap_tcpip_primary_namespace_bind_locality_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::bind_gid_action,
+    primary_namespace_type::bind_gid_action,
     stdmap_tcpip_primary_namespace_bind_gid_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::resolve_locality_action,
+    primary_namespace_type::resolve_locality_action,
     stdmap_tcpip_primary_namespace_resolve_locality_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::resolve_gid_action,
+    primary_namespace_type::resolve_gid_action,
     stdmap_tcpip_primary_namespace_resolve_gid_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::unbind_action,
+    primary_namespace_type::unbind_action,
     stdmap_tcpip_primary_namespace_unbind_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::localities_action,
+    primary_namespace_type::localities_action,
     stdmap_tcpip_primary_namespace_localities_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::increment_action,
+    primary_namespace_type::increment_action,
     stdmap_tcpip_primary_namespace_increment_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::decrement_action,
+    primary_namespace_type::decrement_action,
     stdmap_tcpip_primary_namespace_decrement_action);
 

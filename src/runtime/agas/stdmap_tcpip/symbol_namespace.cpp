@@ -23,25 +23,25 @@ using hpx::components::component_agas_symbol_namespace;
 typedef hpx::agas::server::symbol_namespace<
     hpx::agas::tag::database::stdmap
   , hpx::agas::tag::network::tcpip
-> agas_component;
+> symbol_namespace_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::fixed_component<agas_component>,
+    hpx::components::fixed_component<symbol_namespace_type>,
     stdmap_symbol_namespace);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    agas_component, component_agas_symbol_namespace);
+    symbol_namespace_type, component_agas_symbol_namespace);
 
 HPX_REGISTER_ACTION_EX(
-    agas_component::bind_action,
+    symbol_namespace_type::bind_action,
     stdmap_symbol_namespace_bind_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::rebind_action,
+    symbol_namespace_type::rebind_action,
     stdmap_symbol_namespace_rebind_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::resolve_action,
+    symbol_namespace_type::resolve_action,
     stdmap_symbol_namespace_resolve_action);
 HPX_REGISTER_ACTION_EX(
-    agas_component::unbind_action,
+    symbol_namespace_type::unbind_action,
     stdmap_symbol_namespace_unbind_action);
 
