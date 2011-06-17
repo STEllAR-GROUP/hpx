@@ -126,7 +126,7 @@ struct HPX_COMPONENT_EXPORT symbol_namespace :
         if (it == end)
             return response_type(symbol_ns_unbind, no_success);
 
-        gid_table.erase(key);
+        gid_table.erase(it);
         return response_type(symbol_ns_unbind);
     } // }}} 
 
