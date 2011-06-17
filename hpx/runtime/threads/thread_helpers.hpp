@@ -109,8 +109,7 @@ namespace hpx { namespace threads
     /// allows to query the description of one of the threads known to the 
     /// threadmanager.
     ///
-    /// \param id         [in] The thread id of the thread the state should 
-    ///                   be modified for.
+    /// \param id         [in] The thread id of the thread being queried.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -134,8 +133,7 @@ namespace hpx { namespace threads
     /// allows to query the GID of one of the threads known to the 
     /// threadmanager.
     ///
-    /// \param id         [in] The thread id of the thread the state should 
-    ///                   be modified for.
+    /// \param id         [in] The thread id of the thread being queried.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
