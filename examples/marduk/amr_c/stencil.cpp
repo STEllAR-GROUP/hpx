@@ -517,7 +517,7 @@ namespace hpx { namespace components { namespace amr
 
 HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::actions::manage_object_action<hpx::components::amr::stencil_data>,
-    manage_object_action_stencil_data)
+    marduk_manage_object_action_stencil_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 

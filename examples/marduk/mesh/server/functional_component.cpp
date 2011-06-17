@@ -15,15 +15,15 @@
 #include "functional_component.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::functional_component functional_component_type;
+typedef hpx::components::amr::server::functional_component marduk_functional_component_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(functional_component_type::alloc_data_action, 
-    had_functional_component_alloc_data_action);
-HPX_REGISTER_ACTION_EX(functional_component_type::eval_action, 
-    had_functional_component_eval_action);
-HPX_REGISTER_ACTION_EX(functional_component_type::init_action, 
-    had_functional_component_init_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(functional_component_type);
+HPX_REGISTER_ACTION_EX(marduk_functional_component_type::alloc_data_action, 
+    marduk_functional_component_alloc_data_action);
+HPX_REGISTER_ACTION_EX(marduk_functional_component_type::eval_action, 
+    marduk_functional_component_eval_action);
+HPX_REGISTER_ACTION_EX(marduk_functional_component_type::init_action, 
+    marduk_functional_component_init_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(marduk_functional_component_type);
 

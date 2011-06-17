@@ -24,25 +24,25 @@
 #include "unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::amr::server::unigrid_mesh had_unigrid_mesh_type;
+typedef hpx::components::amr::server::unigrid_mesh marduk_unigrid_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::init_execute_action, 
-    had_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(had_unigrid_mesh_type::execute_action, 
-    had_unigrid_mesh_execute_action);
+HPX_REGISTER_ACTION_EX(marduk_unigrid_mesh_type::init_execute_action, 
+    marduk_unigrid_mesh_init_execute_action);
+HPX_REGISTER_ACTION_EX(marduk_unigrid_mesh_type::execute_action, 
+    marduk_unigrid_mesh_execute_action);
 
 typedef hpx::lcos::base_lco_with_value<
-    boost::shared_ptr<std::vector<hpx::naming::id_type> > > lco_gid_vector_ptr;
+    boost::shared_ptr<std::vector<hpx::naming::id_type> > > marduk_lco_gid_vector_ptr;
 
-HPX_REGISTER_ACTION_EX(lco_gid_vector_ptr::set_result_action,
-    set_result_action_gid_vector_ptr);
-HPX_DEFINE_GET_COMPONENT_TYPE(lco_gid_vector_ptr);
+HPX_REGISTER_ACTION_EX(marduk_lco_gid_vector_ptr::set_result_action,
+    marduk_set_result_action_gid_vector_ptr);
+HPX_DEFINE_GET_COMPONENT_TYPE(marduk_lco_gid_vector_ptr);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<had_unigrid_mesh_type>, had_unigrid_mesh3d);
-HPX_DEFINE_GET_COMPONENT_TYPE(had_unigrid_mesh_type);
+    hpx::components::simple_component<marduk_unigrid_mesh_type>, marduk_unigrid_mesh3d);
+HPX_DEFINE_GET_COMPONENT_TYPE(marduk_unigrid_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server 
