@@ -124,7 +124,8 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
-        try {
+        try
+        {
             parcel p;
             {
                 // create a special io stream on top of in_buffer_
@@ -143,11 +144,43 @@ namespace hpx { namespace parcelset
             // add parcel to incoming parcel queue
             parcels_.add_parcel(p);
         }
-        catch (hpx::exception const& e) {
+
+        catch (hpx::exception const& e)
+        {
             LPT_(error) 
-                << "Unhandled exception while executing decode_parcel: "
+                << "decode_parcel: caught hpx::exception: "
                 << e.what();
+            hpx::report_error(boost::current_exception());
         }
+
+        catch (boost::system::system_error const& e)
+        {
+            LPT_(error) 
+                << "decode_parcel: caught boost::system::error: "
+                << e.what();
+            hpx::report_error(boost::current_exception());
+            return;
+        }
+
+        catch (std::exception const& e)
+        {
+            LPT_(error) 
+                << "decode_parcel: caught std::exception: "
+                << e.what();
+            hpx::report_error(boost::current_exception());
+            return;
+        }
+
+        // Prevent exceptions from boiling up into the threadmanager.
+        catch (...)
+        {
+            LPT_(error) 
+                << "decode_parcel: caught unknown exception: "
+                << e.what();
+            hpx::report_error(boost::current_exception());
+            return;
+        }
+
         return threads::thread_state(threads::terminated);
     }
         

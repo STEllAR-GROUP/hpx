@@ -279,6 +279,15 @@ namespace hpx
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
 
+    HPX_API_EXPORT void report_error(
+        std::size_t num_thread
+      , boost::exception_ptr const& e
+    );
+
+    HPX_API_EXPORT void report_error(
+        boost::exception_ptr const& e
+    );
+
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
 

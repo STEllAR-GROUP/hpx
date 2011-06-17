@@ -710,6 +710,19 @@ namespace hpx
     naming::locality const& get_locality()
     { return get_runtime().here(); }
 
+    void report_error(
+        std::size_t num_thread
+      , boost::exception_ptr const& e
+    ) {
+        get_runtime().report_error(num_thread, e);
+    }
+
+    void report_error(
+        boost::exception_ptr const& e
+    ) {
+        get_runtime().report_error(num_thread, e);
+    }
+
     bool register_on_exit(boost::function<void()> f)
     {
         runtime* rt = get_runtime_ptr();

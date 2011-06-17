@@ -255,6 +255,11 @@ namespace hpx
 
         virtual hpx::uintptr_t get_memory_lva() const = 0;
 
+        virtual void report_error(std::size_t num_thread, 
+            boost::exception_ptr const& e) = 0;
+
+        virtual void report_error(boost::exception_ptr const& e) = 0;
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -452,6 +457,9 @@ namespace hpx
         ///                   exception which lead to this function call.
         void report_error(std::size_t num_thread, 
             boost::exception_ptr const& e);
+
+        void report_error(boost::exception_ptr const& e)
+        { report_error(-1, e); }
 
         /// \brief Run the HPX runtime system, use the given function for the 
         ///        main \a thread and block waiting for all threads to 
