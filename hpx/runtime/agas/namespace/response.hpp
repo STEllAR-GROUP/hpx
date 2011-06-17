@@ -420,7 +420,7 @@ struct response
                     = other.data.locality_binding.upper.lsb;
                 data.locality_binding.prefix
                     = other.data.locality_binding.prefix;
-                return;
+                break;
             }
 
             case primary_ns_increment: {
