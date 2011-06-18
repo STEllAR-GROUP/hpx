@@ -609,7 +609,7 @@ namespace hpx { namespace components { namespace amr
 
                   int lnx = par->gr_nx[gi]; 
                   int lny = par->gr_ny[gi]; 
-                  int lnz = par->gr_nz[gi]; 
+//                  int lnz = par->gr_nz[gi]; 
 
                   int istart_dst = (int) ( (x1 - minx)/h );
                   int jstart_dst = (int) ( (y1 - miny)/h );
@@ -630,8 +630,8 @@ namespace hpx { namespace components { namespace amr
                     int si = ii + istart_src;
                     int sj = jj + jstart_src;
                     int sk = kk + kstart_src;
-                    BOOST_ASSERT(i+nx0*(j+ny0*k) < val->value_.size());
-                    BOOST_ASSERT(si+lnx*(sj+lny*sk) < prev_val->value_.size());
+                    BOOST_ASSERT(i+nx0*(j+ny0*k) < int(val->value_.size()));
+                    BOOST_ASSERT(si+lnx*(sj+lny*sk) < int(prev_val->value_.size()));
                     val->value_[i+nx0*(j+ny0*k)] = prev_val->value_[si+lnx*(sj+lny*sk)];
 
                     // record that the value at this index doesn't need interpolation
