@@ -542,7 +542,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
           }
           if ( !found ) {
-            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "Problem in prep_ports"); 
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "marduk: Problem in prep_ports"); 
           }
 
           dst = step;
