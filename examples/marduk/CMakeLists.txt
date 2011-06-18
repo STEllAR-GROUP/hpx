@@ -30,7 +30,8 @@ set(dependencies
     marduk_mesh_component 
     ssmp_amr3d_c_component 
     ssmp_amr3d_c_test_lib
-    distributing_factory_component)
+    distributing_factory_component
+    gfortran)
 
 if(RNPL_FOUND)
   # add RNPL as a dependency
@@ -41,7 +42,7 @@ endif()
 
 source_group("Source Files" FILES ${sources})
 
-set(hpx_LIBRARIES ${hpx_LIBRARIES} gfortran)
+#set(hpx_LIBRARIES ${hpx_LIBRARIES} gfortran)
 
 add_hpx_executable(marduk 
   MODULE ssmp_amr3d
