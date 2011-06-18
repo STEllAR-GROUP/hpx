@@ -16,22 +16,21 @@ if(NOT MSVC)
       accumulator
       balancing
       generic
-      had_amr3d
       hplpx
-      nbody
       nqueen
-      parcelset
       pxgl
       random_mem_access
       queue
-      quickstart
-      smp_amr3d)
+      quickstart)
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} iostreams)
   endif()
-  if(CMAKE_Fortran_COMPILER)
-    set(subdirs ${subdirs} marduk)
-  endif()
+
+# Disabled by wash until Matt can fix this to not break other HPX code
+#  if(CMAKE_Fortran_COMPILER)
+#    set(subdirs ${subdirs} marduk)
+#  endif()
+
   if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
     set(subdirs ${subdirs} hpxi)
   endif() 
@@ -48,12 +47,8 @@ foreach(subdir ${subdirs})
   add_hpx_pseudo_dependencies(examples examples.${subdir})
 endforeach()
 
-add_hpx_pseudo_target(chirag)
 add_hpx_pseudo_target(dylan)
-add_hpx_pseudo_target(matt)
-add_hpx_pseudo_target(wash)
-add_hpx_pseudo_dependencies(chirag examples.nbody)
+#add_hpx_pseudo_target(matt)
 add_hpx_pseudo_dependencies(dylan examples.pxgl examples.quickstart.fibonacci1)
-add_hpx_pseudo_dependencies(matt examples.had_amr3d)
-add_hpx_pseudo_dependencies(wash examples.smp_amr3d)
+#add_hpx_pseudo_dependencies(matt examples.marduk)
 
