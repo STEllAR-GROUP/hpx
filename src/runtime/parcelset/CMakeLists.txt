@@ -14,5 +14,4 @@ else()
   add_hpx_library_sources(hpx parcelhandler_v1.cpp)
 endif()
 
-add_subdirectory(server)
 

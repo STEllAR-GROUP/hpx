@@ -16,7 +16,7 @@ if(UNIX)
   add_hpx_library_sources(hpx
     exception.cpp
     exception_list.cpp
-    hpx_init.cpp
+    pre_main.cpp
     runtime.cpp)
 
   add_subdirectory(lcos)

@@ -19,6 +19,7 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
     #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
@@ -105,7 +106,8 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
+                       , new parcelset::policies::global_parcelhandler_queue),
 #if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
 #endif
@@ -152,7 +154,8 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
+                       , new parcelset::policies::global_parcelhandler_queue),
 #if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
 #endif
@@ -199,7 +202,8 @@ namespace hpx
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
+                       , new parcelset::policies::global_parcelhandler_queue),
 #if HPX_AGAS_VERSION <= 0x10
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
 #endif
@@ -271,7 +275,6 @@ namespace hpx
         return threads::thread_state(threads::terminated);
     }
 #else
-
     void pre_main();
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
@@ -720,7 +723,7 @@ namespace hpx
     void report_error(
         boost::exception_ptr const& e
     ) {
-        get_runtime().report_error(num_thread, e);
+        get_runtime().report_error(e);
     }
 
     bool register_on_exit(boost::function<void()> f)

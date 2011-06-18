@@ -13,7 +13,6 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-//#include <hpx/runtime/naming/detail/resolver_do_undo.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
@@ -142,7 +141,7 @@ namespace hpx { namespace parcelset
             }
 
             // add parcel to incoming parcel queue
-            parcels_.add_parcel(p);
+            parcels_->add_parcel(p);
         }
 
         catch (hpx::exception const& e)
@@ -159,7 +158,6 @@ namespace hpx { namespace parcelset
                 << "decode_parcel: caught boost::system::error: "
                 << e.what();
             hpx::report_error(boost::current_exception());
-            return;
         }
 
         catch (std::exception const& e)
@@ -168,39 +166,43 @@ namespace hpx { namespace parcelset
                 << "decode_parcel: caught std::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
-            return;
         }
 
         // Prevent exceptions from boiling up into the threadmanager.
         catch (...)
         {
             LPT_(error) 
-                << "decode_parcel: caught unknown exception: "
-                << e.what();
+                << "decode_parcel: caught unknown exception.";                
             hpx::report_error(boost::current_exception());
-            return;
         }
 
         return threads::thread_state(threads::terminated);
     }
         
-    parcelhandler::parcelhandler(naming::resolver_client& resolver, parcelport& pp,
-            threads::threadmanager_base* tm) 
-      : resolver_(resolver), pp_(pp), tm_(tm), parcels_(This()),
-        startup_time_(util::high_resolution_timer::now()), timer_()
+    parcelhandler::parcelhandler(
+        naming::resolver_client& resolver
+      , parcelport& pp
+      , threads::threadmanager_base* tm
+      , parcelhandler_queue_base* policy
+    )
+        : resolver_(resolver)
+        , pp_(pp)
+        , tm_(tm)
+        , parcels_(policy)
+        , startup_time_(util::high_resolution_timer::now())
+        , timer_()
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            // retrieve the prefix to be used for this site
-            resolver_.get_prefix(pp.here(), prefix_);    // throws on error
-        #else
-            // AGAS v2 registers itself in the client before the parcelhandler
-            // is booted.
-            prefix_ = resolver_.local_prefix();
-        #endif
+        BOOST_ASSERT(parcels_);
+
+        // AGAS v2 registers itself in the client before the parcelhandler
+        // is booted.
+        prefix_ = resolver_.local_prefix();
+
+        parcels_->set_parcelhandler(this);
 
         // register our callback function with the parcelport
-        pp_.register_event_handler(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
+        pp_.register_event_handler
+            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
     }
         
     naming::resolver_client& parcelhandler::get_resolver()

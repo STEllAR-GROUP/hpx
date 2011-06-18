@@ -139,7 +139,7 @@ namespace hpx { namespace parcelset
             }
 
             // add parcel to incoming parcel queue
-            parcels_.add_parcel(p);
+            parcels_->add_parcel(p);
         }
         catch (hpx::exception const& e) {
             LPT_(error) 
