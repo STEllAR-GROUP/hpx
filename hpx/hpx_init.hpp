@@ -30,10 +30,6 @@ int hpx_main(boost::program_options::variables_map& vm) HPX_EXPORT;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    #if HPX_AGAS_VERSION > 0x10
-        void pre_main() HPX_EXPORT;
-    #endif
- 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
     inline naming::id_type find_here()

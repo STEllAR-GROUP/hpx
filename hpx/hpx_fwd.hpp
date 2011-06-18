@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +29,8 @@
 /// functions and variables are defined inside this namespace.
 namespace hpx
 {
+    HPX_EXPORT void pre_main() HPX_EXPORT;
+ 
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
@@ -95,7 +98,15 @@ namespace hpx
         {
             class parcelport_queue;
             class parcelport_server_connection;
-            class parcelhandler_queue;
+
+            struct parcelhandler_queue_base;
+
+            namespace policies
+            {
+                struct global_parcelhandler_queue;
+
+                typedef global_parcelhandler_queue parcelhandler_queue;
+            }
         }
     }
 
