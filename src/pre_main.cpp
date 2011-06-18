@@ -7,8 +7,8 @@
 
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/hpx.hpp>
 #include <hpx/lcos/barrier.hpp>
-#include <hpx/hpx_init.hpp>
 
 namespace hpx
 {
