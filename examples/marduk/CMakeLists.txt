@@ -30,8 +30,7 @@ set(dependencies
     marduk_mesh_component 
     ssmp_amr3d_c_component 
     ssmp_amr3d_c_test_lib
-    distributing_factory_component
-    gfortran)
+    distributing_factory_component)
 
 if(RNPL_FOUND)
   # add RNPL as a dependency
@@ -48,6 +47,8 @@ add_hpx_executable(marduk
   MODULE ssmp_amr3d
   SOURCES ${sources}
   DEPENDENCIES ${dependencies})
+
+target_link_libraries(marduk_exe gfortran)
 
 # add a dependency to the pseudo-target  
 add_hpx_pseudo_dependencies(examples.marduk marduk_exe) 
