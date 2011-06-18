@@ -13,7 +13,6 @@
 #include <boost/serialization/export.hpp>
 
 #include "../../pxgl/pxgl.hpp"
-#include "../../pxgl/util/apply.hpp"
 #include "../../pxgl/util/futures.hpp"
 
 #include "../../pxgl/xua/range.hpp"
