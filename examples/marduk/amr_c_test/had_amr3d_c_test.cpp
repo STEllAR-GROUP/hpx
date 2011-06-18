@@ -57,7 +57,7 @@ inline void calcrhsA(struct nodedata * rhs,std::vector<access_memory_block<stenc
   double utt = (phi_analytic(x,y,z,t+eps,d) -2*phi_analytic(x,y,z,t,d) + phi_analytic(x,y,z,t-eps,d) )/(eps*eps); 
   double f = utt - uxx - uyy - uzz;
 
-  BOOST_ASSERT( i + lnx*(j+lny*k) < vsrc.size() && i + lnx*(j+lny*k) < src.size() );
+  BOOST_ASSERT( i + lnx*(j+lny*k) < int(vsrc.size()) && i + lnx*(j+lny*k) < int(src.size()) );
   if ( vsrc[i + lnx*(j+lny*k)] != -1 && src[i + lnx*(j+lny*k)] != -1 &&
        vsrc[i-1 + lnx*(j+lny*k)] != -1 && src[i-1 + lnx*(j+lny*k)] != -1 &&
        vsrc[i+1 + lnx*(j+lny*k)] != -1 && src[i+1 + lnx*(j+lny*k)] != -1 &&
@@ -66,32 +66,32 @@ inline void calcrhsA(struct nodedata * rhs,std::vector<access_memory_block<stenc
        vsrc[i + lnx*(j+lny*(k-1))] != -1 && src[i + lnx*(j+lny*(k-1))] != -1 &&
        vsrc[i + lnx*(j+lny*(k+1))] != -1 && src[i + lnx*(j+lny*(k+1))] != -1 
      ) {
-    BOOST_ASSERT( vsrc[i + lnx*(j+lny*k)] < val.size() && 
-                  src[i + lnx*(j+lny*k)] < val[vsrc[i + lnx*(j+lny*k)] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*k)] < int(val.size()) && 
+                  src[i + lnx*(j+lny*k)] < int(val[vsrc[i + lnx*(j+lny*k)] ]->value_.size()) );
     rhs->phi[0][0] = val[vsrc[i + lnx*(j+lny*k)] ]->value_[ src[i + lnx*(j+lny*k)] ].phi[0][4];
 
-    BOOST_ASSERT( vsrc[i+1 + lnx*(j+lny*k)] < val.size() && 
-                  src[i+1 + lnx*(j+lny*k)] < val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_.size() );
-    BOOST_ASSERT( vsrc[i-1 + lnx*(j+lny*k)] < val.size() && 
-                  src[i-1 + lnx*(j+lny*k)] < val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i+1 + lnx*(j+lny*k)] < int(val.size()) && 
+                  src[i+1 + lnx*(j+lny*k)] < int(val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_.size()) );
+    BOOST_ASSERT( vsrc[i-1 + lnx*(j+lny*k)] < int(val.size()) && 
+                  src[i-1 + lnx*(j+lny*k)] < int(val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_.size()) );
     rhs->phi[0][1] = - 0.5*(
                       val[vsrc[i+1 + lnx*(j+lny*k)] ]->value_[ src[i+1 + lnx*(j+lny*k)] ].phi[0][4]
                     - val[vsrc[i-1 + lnx*(j+lny*k)] ]->value_[ src[i-1 + lnx*(j+lny*k)] ].phi[0][4]
                            )/dx;
 
-    BOOST_ASSERT( vsrc[i + lnx*(j+1+lny*k)] < val.size() && 
-                   src[i + lnx*(j+1+lny*k)] < val[vsrc[i + lnx*(j+1+lny*k)] ]->value_.size() );
-    BOOST_ASSERT( vsrc[i + lnx*(j-1+lny*k)] < val.size() && 
-                   src[i + lnx*(j-1+lny*k)] < val[vsrc[i + lnx*(j-1+lny*k)] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i + lnx*(j+1+lny*k)] < int(val.size()) && 
+                   src[i + lnx*(j+1+lny*k)] < int(val[vsrc[i + lnx*(j+1+lny*k)] ]->value_.size()) );
+    BOOST_ASSERT( vsrc[i + lnx*(j-1+lny*k)] < int(val.size()) && 
+                   src[i + lnx*(j-1+lny*k)] < int(val[vsrc[i + lnx*(j-1+lny*k)] ]->value_.size()) );
     rhs->phi[0][2] = - 0.5*(
                        val[vsrc[i + lnx*(j+1+lny*k)] ]->value_[ src[i + lnx*(j+1+lny*k)] ].phi[0][4]
                      - val[vsrc[i + lnx*(j-1+lny*k)] ]->value_[ src[i + lnx*(j-1+lny*k)] ].phi[0][4]
                            )/dx;
   
-    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k+1))] < val.size() && 
-                   src[i + lnx*(j+lny*(k+1))] < val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_.size() );
-    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k-1))] < val.size() && 
-                   src[i + lnx*(j+lny*(k-1))] < val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_.size() );
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k+1))] < int(val.size()) && 
+                   src[i + lnx*(j+lny*(k+1))] < int(val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_.size()) );
+    BOOST_ASSERT( vsrc[i + lnx*(j+lny*(k-1))] < int(val.size()) && 
+                   src[i + lnx*(j+lny*(k-1))] < int(val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_.size()) );
     rhs->phi[0][3] = - 0.5*(
                        val[vsrc[i + lnx*(j+lny*(k+1))] ]->value_[ src[i + lnx*(j+lny*(k+1))] ].phi[0][4]
                      - val[vsrc[i + lnx*(j+lny*(k-1))] ]->value_[ src[i + lnx*(j+lny*(k-1))] ].phi[0][4]
@@ -176,14 +176,14 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     bool found = false;
     int level = 0;
     for (int ii=par.allowedl;ii>=0;ii--) {
-      if ( item < par.rowsize[ii]) {
+      if ( item < int(par.rowsize[ii])) {
         level = ii;
         found = true;
         break;
       }
     }
     if ( !found ) {
-      HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "Problem in prep_ports");
+      HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "marduk: Problem in prep_ports");
     }
 
     val->level_ = level;
