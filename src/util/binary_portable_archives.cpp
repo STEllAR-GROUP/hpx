@@ -27,8 +27,6 @@
 #include <boost/config/auto_link.hpp>
 #endif  // auto-linking disabled
 
-#include <hpx/hpx_fwd.hpp>
-
 #include <boost/serialization/serialization.hpp>
 #include <hpx/util/binary_portable_iarchive.hpp>
 #include <hpx/util/binary_portable_oarchive.hpp>
