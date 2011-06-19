@@ -17,8 +17,9 @@ if(NOT MSVC)
       balancing
       generic
       hplpx
+      math
       nqueen
-      pxgl
+      object_semaphore
       random_mem_access
       queue
       quickstart)
@@ -38,6 +39,7 @@ else()
   set(subdirs
       accumulator
       quickstart
+      math
       nqueen)
 endif()
 
