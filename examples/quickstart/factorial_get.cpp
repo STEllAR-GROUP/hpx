@@ -20,7 +20,8 @@
 using namespace hpx;
 namespace po = boost::program_options;
 
-typedef hpx::lcos::detail::dataflow_variable<int, int> detail_dataflow_type;
+typedef hpx::lcos::detail::local_dataflow_variable<int, int>
+    detail_dataflow_type;
 HPX_DEFINE_GET_COMPONENT_TYPE(detail_dataflow_type);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,7 @@ void factorial_get(int n, naming::id_type k, naming::id_type h)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::lcos::dataflow_variable<int,int> dataflow_int_type;
+typedef hpx::lcos::local_dataflow_variable<int,int> dataflow_int_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(po::variables_map &vm)

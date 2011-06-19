@@ -51,11 +51,11 @@ struct object_semaphore : components::stubs::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::dataflow_variable<ValueType>
+    static lcos::local_dataflow_variable<ValueType>
     wait_async(naming::id_type const& gid)
     {
         typedef typename server_type::add_lco_action action_type; 
-        lcos::dataflow_variable<ValueType> data;
+        lcos::local_dataflow_variable<ValueType> data;
         hpx::applier::apply<action_type>(gid, data.get_gid());
         return data;
     }

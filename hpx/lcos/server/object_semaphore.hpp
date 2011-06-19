@@ -18,7 +18,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
-#include <hpx/lcos/dataflow_variable.hpp>
+#include <hpx/lcos/local_dataflow_variable.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/get_result.hpp>
 
@@ -223,7 +223,7 @@ struct object_semaphore
     // forwarder
     value_type get_value()
     {
-        dataflow_variable<ValueType> data;
+        local_dataflow_variable<ValueType> data;
         naming::id_type lco = data.get_gid();
 
         add_lco(lco);

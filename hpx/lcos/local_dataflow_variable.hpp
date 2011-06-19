@@ -43,14 +43,14 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A dataflow_variable is a declarative variable. Attempting to read
+    /// A local_dataflow_variable is a declarative variable. Attempting to read
     /// an uninitialized variable will cause the thread to suspend until
     /// a value is bound to that variable.
     ///
     /// Note: we do not support partial values nor unification, so a
     /// variable should only be set once.
     template <typename Value, typename RemoteValue>
-    class dataflow_variable : public lcos::base_lco_with_value<Value,RemoteValue>
+    class local_dataflow_variable : public lcos::base_lco_with_value<Value,RemoteValue>
     {
     protected:
         typedef Value value_type;
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos { namespace detail
     public:
         enum { value = components::component_dataflow_variable };
 
-        dataflow_variable() {}
+        local_dataflow_variable() {}
 
         /// Get the value bound to the dataflow variable. The calling
         /// thread is suspended if the variable is uninitialized. When the
@@ -136,14 +136,14 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A dataflow_variable is a declarative variable. Attempting to read
+    /// A local_dataflow_variable is a declarative variable. Attempting to read
     /// an uninitialized variable will cause the thread to suspend until
     /// a value is bound to that variable.
     ///
     /// Note: we do not support partial values nor unification, so a
     /// variable should only be set once.
     template<>
-    class dataflow_variable<naming::id_type, naming::gid_type>
+    class local_dataflow_variable<naming::id_type, naming::gid_type>
       : public lcos::base_lco_with_value<naming::id_type, naming::gid_type>
     {
     protected:
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::variant<value_type, error_type> data_type;
 
     public:
-        dataflow_variable() {}
+        local_dataflow_variable() {}
 
         /// Get the value bound to the dataflow variable. The calling
         /// thread is suspended if the variable is uninitialized. When the
@@ -232,28 +232,29 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class dataflow_variable dataflow_variable.hpp 
-    ///     hpx/lcos/dataflow_variable.hpp
+    /// \class local_dataflow_variable local_dataflow_variable.hpp 
+    ///     hpx/lcos/local_dataflow_variable.hpp
     ///
-    /// A dataflow_variable can be used to synchronize multiple threads on 
+    /// A local_dataflow_variable can be used to synchronize multiple threads on 
     /// the availability of a value. 
     ///
     /// \tparam Value   The template parameter \a Value defines the type this 
-    ///                  dataflow_variable is expected to be bound with
+    ///                 local_dataflow_variable is expected to be bound with
     template <typename Value>
-    struct dataflow_variable_remote_value
+    struct local_dataflow_variable_remote_value
       : boost::mpl::identity<Value>
     {};
 
     template <typename Value, typename RemoteValue>
-    class dataflow_variable
+    class local_dataflow_variable
     {
     protected:
-        typedef detail::dataflow_variable<Value, RemoteValue> wrapped_type;
+        typedef detail::local_dataflow_variable<Value, RemoteValue>
+            wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
     public:
-        dataflow_variable()
+        local_dataflow_variable()
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
@@ -266,14 +267,15 @@ namespace hpx { namespace lcos
     public:
         typedef Value value_type;
 
-        ~dataflow_variable()
+        ~local_dataflow_variable()
         {}
 
     public:
-        /// Get the value of the dataflow_variable. This call blocks (yields 
-        /// control) if the value is not ready. As soon as the value has been 
-        /// bound and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a dataflow_variable#get will return.
+        /// Get the value of the local_dataflow_variable. This call blocks
+        /// (yields control) if the value is not ready. As soon as the value has
+        /// been bound and the waiting thread has been re-scheduled by the
+        /// thread manager the function \a local_dataflow_variable#get will
+        /// return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the value. 
@@ -294,20 +296,21 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct dataflow_variable_remote_value<void>
+    struct local_dataflow_variable_remote_value<void>
       : boost::mpl::identity<util::unused_type>
     {};
 
     template<>
-    class dataflow_variable<void, util::unused_type>
+    class local_dataflow_variable<void, util::unused_type>
     {
     protected:
-        typedef detail::dataflow_variable<util::unused_type, util::unused_type> 
-            wrapped_type;
+        typedef detail::local_dataflow_variable<
+            util::unused_type, util::unused_type
+        > wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
     public:
-        dataflow_variable()
+        local_dataflow_variable()
           : impl_(new wrapping_type(new wrapped_type()))
         {}
 
@@ -320,13 +323,14 @@ namespace hpx { namespace lcos
     public:
         typedef util::unused_type value_type;
 
-        ~dataflow_variable()
+        ~local_dataflow_variable()
         {}
 
-        /// Get the value of the dataflow_variable. This call blocks (yields 
-        /// control) if the value is not ready. As soon as the value has been 
-        /// bound and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a dataflow_variable#get will return.
+        /// Get the value of the local_dataflow_variable. This call blocks
+        /// (yields control) if the value is not ready. As soon as the value
+        /// has been bound and the waiting thread has been re-scheduled by the
+        /// thread manager the function \a local_dataflow_variable#get will
+        /// return.
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the value. 

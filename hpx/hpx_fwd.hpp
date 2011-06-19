@@ -376,7 +376,7 @@ namespace hpx
         class future_value;
 
         template <typename Value, typename RemoteValue = Value>
-        class dataflow_variable;
+        class local_dataflow_variable;
  
         template <typename Action, 
             typename Result = typename future_value_local_result<
