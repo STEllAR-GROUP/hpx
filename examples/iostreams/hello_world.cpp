@@ -46,13 +46,13 @@ using hpx::iostreams::server::output_stream;
 
 typedef managed_component<output_stream> ostream_type;
 
-void hello_world(id_type cout_gid)
+void hello_world(id_type const& cout_gid)
 {
     lazy_ostream hpx_cout(cout_gid);
     hpx_cout << "[L" << get_prefix_id() << "]: hello world!" << endl;
 }
 
-typedef plain_action1<id_type, hello_world> hello_world_action;
+typedef plain_action1<id_type const&, hello_world> hello_world_action;
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_action);
 
