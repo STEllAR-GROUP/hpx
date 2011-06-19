@@ -158,6 +158,7 @@ add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
+add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 
 ################################################################################
 # search path configuration
@@ -165,12 +166,14 @@ add_definitions(-DBOOST_LOG_NO_TS)
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/move)
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
+include_directories(${hpx_SOURCE_DIR}/external/bigint)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
+include_directories(${hpx_SOURCE_DIR}/external/bigint)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
@@ -241,6 +244,15 @@ find_package(HPX_Phxpr)
 # SDF output 
 ################################################################################
 find_package(HPX_RNPL)
+
+################################################################################
+# Arbitrary precision math 
+################################################################################
+find_package(HPX_GMP)
+
+#if(GMP_FOUND)
+#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
+#endif()
 
 ################################################################################
 # hardware support
