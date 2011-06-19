@@ -12,7 +12,7 @@ if(NOT MSVC)
       basic_example
       distributed_test
       distributed_amrtest
-      random_mem_access
+      non_atomic_rma
       factorial
       factorial_get
       fibonacci1
@@ -23,13 +23,11 @@ else()
       basic_example
       distributed_test
       distributed_amrtest
-      random_mem_access
+      non_atomic_rma
       factorial
       factorial_get
       fibonacci1
-      fibonacci2
-      fibonacci4
-      fibonacci4_phased)
+      fibonacci2)
 endif()
 
 foreach(example_program ${example_programs})
