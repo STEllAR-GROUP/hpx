@@ -54,6 +54,7 @@ namespace hpx
         bad_response_type = 23,
         unknown_locality = 24,
         unknown_gid = 25,
+        deadlock = 26,
         last_error
     };
 
@@ -82,6 +83,10 @@ namespace hpx
         "no_registered_console",
         "startup_timed_out",
         "uninitialized_value",
+        "bad_response_type",
+        "unknown_locality",
+        "unknown_gid",
+        "deadlock",
         ""
     };
 
