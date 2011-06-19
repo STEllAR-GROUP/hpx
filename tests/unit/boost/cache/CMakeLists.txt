@@ -11,7 +11,7 @@ set(testcases
     local_statistics)
 
 foreach(testcase ${testcases})
-  add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp)
+  add_hpx_test(${group}.${testcase} SOURCES ${testcase}.cpp NOLIBS)
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${group}.${testcase}_test)
