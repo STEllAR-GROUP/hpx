@@ -1,4 +1,5 @@
 //  Copyright (c) 2010-2011 Dylan Stark
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -78,9 +79,24 @@ namespace hpx { namespace lcos { namespace detail
             data_type d;
             data_.read(d);
 
+            if (1 == d.which())
+            {
+                // an error has been reported in the meantime, throw 
+                error_type e = boost::get<error_type>(d);
+                boost::rethrow_exception(e);
+                // never reached
+            }
+
             // Continue execution
             return boost::get<value_type>(d);
         };
+
+        // trigger the variable with the given error condition
+        void set_error(boost::exception_ptr const& e)
+        {
+            // store the error code
+            data_.set(data_type(e));
+        }
 
         /// Bind the variable with a value.
         ///
@@ -155,9 +171,24 @@ namespace hpx { namespace lcos { namespace detail
             data_type d;
             data_.read(d);
 
+            if (1 == d.which())
+            {
+                // an error has been reported in the meantime, throw 
+                error_type e = boost::get<error_type>(d);
+                boost::rethrow_exception(e);
+                // never reached
+            }
+
             // Continue execution
             return boost::get<naming::id_type>(d);
         };
+
+        // trigger the variable with the given error condition
+        void set_error(boost::exception_ptr const& e)
+        {
+            // store the error code
+            data_.set(data_type(e));
+        }
 
         /// Bind the variable with a value.
         ///
