@@ -10,17 +10,22 @@
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
+#include <boost/atomic.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/static.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
+
+using boost::lockfree::caching_freelist;
 
 using hpx::naming::id_type;
 
@@ -34,9 +39,30 @@ using hpx::lcos::eager_future;
 using hpx::lcos::future_value;
 
 using hpx::util::high_resolution_timer;
+using hpx::util::static_;
 
 using hpx::init;
 using hpx::finalize;
+
+///////////////////////////////////////////////////////////////////////////////
+typedef future_value<boost::uint64_t> future_value_type;
+typedef caching_freelist<future_value<boost::uint64_t> > freelist_type;
+
+struct freelist_tag {};
+
+freelist_type& get_freelist()
+{
+    static_<freelist_type, freelist_tag> fl;
+    return fl.get();
+}
+
+struct completion_tag {};
+
+boost::atomic<bool>& get_completion_flag()
+{
+    static_<boost::atomic<bool>, completion_tag> f;
+    return f.get();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef eager_future<base_lco_with_value<boost::uint64_t>::get_value_action> 
@@ -117,9 +143,12 @@ boost::uint64_t ackermann_peter_subtract(
     id_type const& x 
   , boost::uint64_t c
 ) {
-    std::cout << "ackermann_peter_subtract(" << x << ", " << c << ")" << std::endl;
-    ackermann_peter_value_future xf(x);
-    return xf.get() - c;
+    if (get_completion_flag().load())
+        return -1;
+
+    future_value_type* xf = get_freelist().allocate();
+    new (xf) ackermann_peter_value_future(x);
+    return xf->get() - c;
 }     
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,7 +157,8 @@ boost::uint64_t ackermann_peter(
   , boost::uint64_t m
   , boost::uint64_t n
 ) {
-    std::cout << "ackermann_peter(" << prefix << ", " << m << ", " << n << ")" << std::endl;
+    if (get_completion_flag().load())
+        return -1;
 
     if (HPX_UNLIKELY(m == 0))
         return n + 1;
@@ -142,9 +172,14 @@ boost::uint64_t ackermann_peter(
         {
             // No need to start m2 early in this function, as we don't have
             // to wait on m or n.
-            ackermann_peter_future m2(prefix, prefix, m, n - 1);
-            ackermann_peter_promised_n_future m1(prefix, prefix, m - 1, m2.get_gid());
-            return m1.get();
+            future_value_type* m2 = get_freelist().allocate();
+            new (m2) ackermann_peter_future(prefix, prefix, m, n - 1);
+
+            future_value_type* m1 = get_freelist().allocate();
+            new (m1) ackermann_peter_promised_n_future
+                (prefix, prefix, m - 1, m2->get_gid());
+
+            return m1->get();
         }
     } 
 }
@@ -155,32 +190,41 @@ boost::uint64_t ackermann_peter_promised_n(
   , boost::uint64_t m
   , id_type const& n 
 ) {
-    std::cout << "ackermann_peter_promised_n(" << prefix << ", " << m << ", " << n << ")" << std::endl;
+    if (get_completion_flag().load())
+        return -1;
 
     if (HPX_UNLIKELY(m == 0))
     {
-        ackermann_peter_value_future nf(n);
-        return nf.get() + 1;
+        future_value_type* nf = get_freelist().allocate();
+        new (nf) ackermann_peter_value_future(n);
+        return nf->get() + 1;
     }
 
     else
     {
+        // get n
+        future_value_type* nf = get_freelist().allocate();
+        new (nf) ackermann_peter_value_future(n);
+
         // We have to wait on n. n == 0 is the less frequent case, so start 
         // the future for m2 (and dependencies) now, allowing it to execute
         // while we wait for n.
-        ackermann_peter_subtract_future n1(prefix, n, 1);
-        ackermann_peter_promised_n_future m2(prefix, prefix, m, n1.get_gid());
+        future_value_type* n1 = get_freelist().allocate();
+        new (n1) ackermann_peter_subtract_future(prefix, n, 1);
 
-        // get n
-        ackermann_peter_value_future nf(n);
-        if (HPX_UNLIKELY(nf.get() == 0))
+        future_value_type* m2 = get_freelist().allocate();
+        new (m2) ackermann_peter_promised_n_future
+            (prefix, prefix, m, n1->get_gid());
+
+        if (HPX_UNLIKELY(nf->get() == 0))
             return ackermann_peter(prefix, m - 1, 1);
 
         else
         {
-            ackermann_peter_promised_n_future
-                m1(prefix, prefix, m - 1, m2.get_gid());
-            return m1.get();
+            future_value_type* m1 = get_freelist().allocate();
+            new (m1) ackermann_peter_promised_n_future
+                (prefix, prefix, m - 1, m2->get_gid());
+            return m1->get();
         }
     } 
 }
@@ -194,6 +238,8 @@ int hpx_main(variables_map& vm)
 
         const id_type prefix = get_applier().get_runtime_support_gid();
 
+        get_completion_flag().store(false);
+
         high_resolution_timer t;
 
         ackermann_peter_future f(prefix, prefix, m, n);
@@ -202,10 +248,22 @@ int hpx_main(variables_map& vm)
 
         double elapsed = t.elapsed();
 
+        get_completion_flag().store(true);
+
         std::cout
             << ( boost::format("ackermann_peter(%1%, %2%) == %3%\n"
                                "elapsed time == %4%\n")
                % m % n % r % elapsed);
+
+        freelist_type& fl = get_freelist();
+        future_value_type* fv = 0;
+
+        while ((fv = fl.get()))
+        {
+            fv->get();
+            fv->~future_value_type();
+            fl.deallocate(fv);
+        }
     }
 
     finalize();
