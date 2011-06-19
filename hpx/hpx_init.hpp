@@ -33,7 +33,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
     inline naming::id_type find_here()
-    { return get_runtime().get_process().here(); }
+    {
+        return naming::id_type(applier::get_applier().get_prefix()
+                             , naming::id_type::unmanaged);
+    }
 
     template <typename T>
     inline void 
