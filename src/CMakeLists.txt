@@ -73,7 +73,9 @@ if(UNIX)
     OUTPUT_NAME hpx_serialization)
 
   target_link_libraries(hpx_serialization
-    ${hpx_MALLOC_LIBRARY} ${BOOST_serialization_LIBRARY})
+    ${hpx_MALLOC_LIBRARY}
+    ${BOOST_serialization_LIBRARY}
+    ${BOOST_system_LIBRARY})
 
   get_target_property(path hpx_serialization LOCATION)
   get_filename_component(name "${path}" NAME)
