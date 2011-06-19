@@ -375,6 +375,9 @@ namespace hpx
             int N = 1> 
         class future_value;
 
+        template <typename Value, typename RemoteValue = Value>
+        class dataflow_variable;
+ 
         template <typename Action, 
             typename Result = typename future_value_local_result<
                 typename Action::result_type>::type,
@@ -395,6 +398,21 @@ namespace hpx
 
         template <typename Thunk>
         class thunk_client;
+
+        template <typename ValueType, typename RemoteType = ValueType>
+        struct object_semaphore;
+
+        namespace stubs
+        {
+            template <typename ValueType, typename RemoteType = ValueType>
+            struct object_semaphore;
+        }
+
+        namespace server
+        {
+            template <typename ValueType, typename RemoteType = ValueType>
+            struct object_semaphore;
+        }
     }
 
     /// \namespace util
