@@ -8,6 +8,7 @@ set(group unit.boost)
 
 set(subdirs 
     atomic
+    bigint
     cache
     lockfree
     move)
