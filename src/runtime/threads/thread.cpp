@@ -10,7 +10,6 @@
 #include <hpx/runtime/threads/thread.hpp>
 
 #include <boost/coroutine/detail/coroutine_impl_impl.hpp>
-#include <boost/pool/singleton_pool.hpp>
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
