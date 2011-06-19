@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/atomic.hpp>

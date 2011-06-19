@@ -8,16 +8,19 @@
 #include <iostream>
 
 #include <boost/cstdint.hpp>
+#include <boost/bigint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
-boost::uint64_t ackermann_peter(boost::uint64_t m, boost::uint64_t n)
+using boost::bigint;
+
+bigint ackermann_peter(boost::uint64_t m, bigint const& n)
 {
     if (0 == m)
         return n + 1;
     else
     {
-        if (0 == n)
+        if (n == 0)
             return ackermann_peter(m - 1, 1);
         else
             return ackermann_peter(m - 1, ackermann_peter(m, n - 1));
@@ -28,7 +31,7 @@ int main(int argc, char** argv)
 {
     try
     {
-        if (3 != argc)
+        if (argc != 3)
             throw std::exception();
 
         const boost::uint64_t m = boost::lexical_cast<boost::uint64_t>(argv[1]);
@@ -36,7 +39,7 @@ int main(int argc, char** argv)
 
         std::cout
             << ( boost::format("ackermann_peter(%1%, %2%) == %3%\n")
-               % m % n % ackermann_peter(m, n));
+               % m % n % ackermann_peter(m, bigint(n)));
     }
 
     catch (std::exception&)

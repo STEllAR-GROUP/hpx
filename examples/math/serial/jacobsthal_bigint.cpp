@@ -8,40 +8,39 @@
 #include <iostream>
 
 #include <boost/cstdint.hpp>
+#include <boost/bigint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
-boost::uint64_t ackermann_peter(boost::uint64_t m, boost::uint64_t n)
+using boost::bigint;
+
+bigint jacobsthal(boost::uint64_t n)
 {
-    if (0 == m)
-        return n + 1;
+    if (0 == n)
+        return 0; 
+    else if (1 == n)
+        return 1;
     else
-    {
-        if (0 == n)
-            return ackermann_peter(m - 1, 1);
-        else
-            return ackermann_peter(m - 1, ackermann_peter(m, n - 1));
-    } 
+        return jacobsthal(n - 1) + (jacobsthal(n - 2) * 2);
 }
 
 int main(int argc, char** argv)
 {
     try
     {
-        if (3 != argc)
+        if (2 != argc)
             throw std::exception();
 
-        const boost::uint64_t m = boost::lexical_cast<boost::uint64_t>(argv[1]);
-        const boost::uint64_t n = boost::lexical_cast<boost::uint64_t>(argv[2]);
+        const boost::uint64_t n = boost::lexical_cast<boost::uint64_t>(argv[1]);
 
         std::cout
-            << ( boost::format("ackermann_peter(%1%, %2%) == %3%\n")
-               % m % n % ackermann_peter(m, n));
+            << ( boost::format("jacobsthal(%1%) == %2%\n")
+               % n % jacobsthal(n));
     }
 
     catch (std::exception&)
     {
-        std::cerr << (boost::format("usage: %1% M N\n") % argv[0]);
+        std::cerr << (boost::format("usage: %1% N\n") % argv[0]);
         return 1;
     }  
 }

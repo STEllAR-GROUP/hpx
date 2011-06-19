@@ -10,7 +10,6 @@
 #include <iostream>
 
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
 #include <hpx/hpx.hpp>

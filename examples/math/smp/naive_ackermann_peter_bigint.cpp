@@ -5,11 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with eager_futures.
+// Naive SMP version implemented with eager_futures and arbitrary size integers.
 
 #include <iostream>
 
 #include <boost/cstdint.hpp>
+#include <boost/bigint.hpp>
+#include <boost/bigint/serialize.hpp>
 #include <boost/format.hpp>
 
 #include <hpx/hpx.hpp>
@@ -23,11 +25,13 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
+using boost::bigint;
+
 using hpx::naming::id_type;
 
 using hpx::applier::get_applier;
 
-using hpx::actions::plain_result_action2;
+using hpx::actions::plain_result_action3;
 
 using hpx::lcos::eager_future;
 
@@ -37,64 +41,74 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t lucas_jacobsthal(
+bigint ackermann_peter(
     id_type const& prefix 
   , boost::uint64_t m
+  , bigint const& n
 );
 
-typedef plain_result_action2<
+typedef plain_result_action3<
     // result type
-    boost::uint64_t
+    bigint
     // arguments
   , id_type const&  
   , boost::uint64_t
+  , bigint const& 
     // function
-  , lucas_jacobsthal
-> lucas_jacobsthal_action;
+  , ackermann_peter
+> ackermann_peter_action;
 
-HPX_REGISTER_PLAIN_ACTION(lucas_jacobsthal_action);
+HPX_REGISTER_PLAIN_ACTION(ackermann_peter_action);
 
-typedef eager_future<lucas_jacobsthal_action> lucas_jacobsthal_future;
+typedef eager_future<ackermann_peter_action> ackermann_peter_future;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t lucas_jacobsthal(
-    id_type const& prefix
-  , boost::uint64_t n
+bigint ackermann_peter(
+    id_type const& prefix 
+  , boost::uint64_t m
+  , bigint const& n
 ) {
-    if (0 == n)
-        return 2;
-
-    else if (1 == n)
-        return 1;
+    if (0 == m)
+        return n + 1;
 
     else
     {
-        lucas_jacobsthal_future n1(prefix, prefix, n - 1);
-        lucas_jacobsthal_future n2(prefix, prefix, n - 2);
-        return n1.get() + 2 * n2.get(); 
-    }
+        if (n == 0)
+        {
+            ackermann_peter_future m1(prefix, prefix, m - 1, 1); 
+            return m1.get();
+        }
+
+        else
+        {
+            ackermann_peter_future m2(prefix, prefix, m, n - 1);
+            ackermann_peter_future m1(prefix, prefix, m - 1, m2.get());
+            return m1.get();
+        }
+    } 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
     {
-        boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+        boost::uint64_t m = vm["m-value"].as<boost::uint64_t>()
+                      , n = vm["n-value"].as<boost::uint64_t>();
 
         const id_type prefix = get_applier().get_runtime_support_gid();
 
         high_resolution_timer t;
 
-        lucas_jacobsthal_future f(prefix, prefix, n);
+        ackermann_peter_future f(prefix, prefix, m, bigint(n));
 
-        boost::uint64_t r = f.get();
+        bigint r = f.get();
 
         double elapsed = t.elapsed();
 
         std::cout
-            << ( boost::format("lucas_jacobsthal(%1%) == %2%\n"
-                               "elapsed time == %3%\n")
-               % n % r % elapsed);
+            << ( boost::format("ackermann_peter(%1%, %2%) == %3%\n"
+                               "elapsed time == %4%\n")
+               % m % n % r % elapsed);
     }
 
     finalize();
@@ -110,9 +124,13 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
+        ( "m-value"
+        , value<boost::uint64_t>()->default_value(2)
+        , "m value for Ackermann-Peter function") 
+
         ( "n-value"
-        , value<boost::uint64_t>()->default_value(10)
-        , "n value for the Lucas-Jacobsthal function") 
+        , value<boost::uint64_t>()->default_value(2)
+        , "n value for the Ackermann-Peter function") 
         ;
 
     // Initialize and run HPX

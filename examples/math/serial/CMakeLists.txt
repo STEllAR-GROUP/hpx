@@ -9,14 +9,16 @@ set(group examples.math)
 
 set(examples
     ackermann_peter
+    ackermann_peter_bigint
     binomial_distribution
     jacobsthal
+    jacobsthal_bigint
     lanczos_gamma
     lucas_jacobsthal)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}
-    MODULE ${group}
+    MODULE math
     SOURCES ${example}.cpp
     NOLIBS)
 
