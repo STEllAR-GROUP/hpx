@@ -24,9 +24,18 @@ namespace hpx { namespace components
         // do logging only if the system is still up. 
         if (system_is_running())
         {
-            lcos::eager_future<server::console_error_sink_action> f
-                (dst, naming::get_prefix_from_gid(src), e);
-            f.get();
+            if (threads::get_self_ptr())
+            {
+                lcos::eager_future<server::console_error_sink_action> f
+                    (dst, naming::get_prefix_from_gid(src), e);
+                f.get();
+            }
+
+            else
+            {
+                applier::apply<server::console_error_sink_action>
+                    (dst, naming::get_prefix_from_gid(src), e);
+            }
         }
     }
 }}
