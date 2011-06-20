@@ -120,8 +120,13 @@ namespace hpx
                 case lock_error:
                 case duplicate_console:
                 case no_registered_console:
-                case uninitialized_value:
                 case startup_timed_out:
+                case uninitialized_value:
+                case bad_response_type:
+                case startup_timed_out:
+                case unknown_locality:
+                case unknown_gid:
+                case deadlock:
                     return std::string("HPX(") + error_names[value] + ")";
 
                 default:
