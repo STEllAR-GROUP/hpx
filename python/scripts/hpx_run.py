@@ -12,6 +12,8 @@ from copy import copy
 import os
 import sys
 
+from socket import gethostbyname
+
 import subprocess
 
 from optparse import OptionParser
@@ -101,11 +103,7 @@ class System(dict):
       self[node_name].num_cores += 1
      
     for node_name in self:
-      command = "grep %s /etc/hosts | awk '//{print $1}'" % node_name
-      process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-      (stdout, stderr) = process.communicate()
-
-      ip = stdout.strip()
+      ip = gethostbyname(node_name)
       if len(ip) > 0:
         self[node_name].ip = ip
       else:
