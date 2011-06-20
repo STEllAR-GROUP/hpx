@@ -399,18 +399,18 @@ namespace hpx
         template <typename Thunk>
         class thunk_client;
 
-        template <typename ValueType, typename RemoteType = ValueType>
+        template <typename ValueType>
         struct object_semaphore;
 
         namespace stubs
         {
-            template <typename ValueType, typename RemoteType = ValueType>
+            template <typename ValueType>
             struct object_semaphore;
         }
 
         namespace server
         {
-            template <typename ValueType, typename RemoteType = ValueType>
+            template <typename ValueType>
             struct object_semaphore;
         }
     }

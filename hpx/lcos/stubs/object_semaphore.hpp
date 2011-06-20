@@ -10,19 +10,17 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/local_dataflow_variable.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 
 namespace hpx { namespace lcos { namespace stubs 
 {
 
-template <typename ValueType, typename RemoteType>
+template <typename ValueType>
 struct object_semaphore : components::stubs::stub_base<
-  lcos::server::object_semaphore<ValueType, RemoteType>
+  lcos::server::object_semaphore<ValueType>
 > {
-    typedef lcos::server::object_semaphore<ValueType, RemoteType> server_type;
-
-    typedef typename server_type::value_type value_type;
-    typedef typename server_type::remote_type remote_type;
+    typedef lcos::server::object_semaphore<ValueType> server_type;
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<void> signal_async(
@@ -30,8 +28,8 @@ struct object_semaphore : components::stubs::stub_base<
       , ValueType const& val
       , boost::uint64_t count
     ) {
-        typedef typename server_type::set_result_action action_type; 
-        return lcos::eager_future<action_type>(gid, remote_type(val, count));
+        typedef typename server_type::signal_action action_type; 
+        return lcos::eager_future<action_type>(gid, val, count);
     }
 
     static void signal_sync(
@@ -52,32 +50,65 @@ struct object_semaphore : components::stubs::stub_base<
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::local_dataflow_variable<ValueType>
-    wait_async(naming::id_type const& gid)
+    get_async(naming::id_type const& gid)
     {
-        typedef typename server_type::add_lco_action action_type; 
-        lcos::local_dataflow_variable<ValueType> data;
-        hpx::applier::apply<action_type>(gid, data.get_gid());
-        return data;
+        typedef typename server_type::get_action action_type; 
+        lcos::local_dataflow_variable<ValueType> lco;
+        applier::apply<action_type>(gid, lco.get_gid());
+        return lco;
     }
 
-    static ValueType wait_sync(naming::id_type const& gid)
+    static ValueType get_sync(naming::id_type const& gid)
     {
-        return wait_async(gid).get();
+        return get_async(gid).get();
     }
 
-    static ValueType wait(naming::id_type const& gid)
+    static ValueType get(naming::id_type const& gid)
     {
-        return wait_async(gid).get();
+        return get_async(gid).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static void 
-    abort_pending(
+    static lcos::future_value<void> abort_pending_async(
         naming::id_type const& gid
-      , boost::exception_ptr const& e
+      , error ec
     ) {
-        typedef lcos::base_lco::set_error_action action_type;
-        hpx::applier::apply<action_type>(gid, e);
+        typedef typename server_type::abort_pending_action action_type; 
+        return lcos::eager_future<action_type>(gid, ec);
+    }
+
+    static void abort_pending_sync(
+        naming::id_type const& gid
+      , error ec
+    ) {
+        abort_pending_async(gid, ec).get();
+    }
+
+    static void abort_pending(
+        naming::id_type const& gid
+      , error ec
+    ) {
+        abort_pending_async(gid, ec).get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    static lcos::future_value<void> wait_async(
+        naming::id_type const& gid
+    ) {
+        typedef typename server_type::wait_action action_type; 
+        return lcos::eager_future<action_type>(gid);
+    }
+
+    static void wait_sync(
+        naming::id_type const& gid
+    ) {
+        wait_async(gid).get();
+    }
+
+    static void wait(
+        naming::id_type const& gid
+    ) {
+        wait(gid).get();
     }
 };
 

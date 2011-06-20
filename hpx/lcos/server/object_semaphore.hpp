@@ -8,8 +8,6 @@
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/at_c.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock_pool.hpp>
@@ -18,32 +16,25 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
-#include <hpx/lcos/local_dataflow_variable.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/get_result.hpp>
 
 namespace hpx { namespace lcos { namespace server 
 {
 
-template <typename ValueType, typename RemoteType>
+template <typename ValueType>
 struct object_semaphore 
-  : lcos::base_lco_with_value<
-        boost::fusion::vector2<ValueType, boost::uint64_t>
-      , boost::fusion::vector2<RemoteType, boost::uint64_t>
-    >
-  , components::managed_component_base<
-        object_semaphore<ValueType, RemoteType>
+  : components::managed_component_base<
+        object_semaphore<ValueType>
     > 
 {
     enum action
     {
-        object_semaphore_add_lco = 4
+        object_semaphore_signal,
+        object_semaphore_get,
+        object_semaphore_abort_pending,
+        object_semaphore_wait
     };
-
-    typedef boost::fusion::vector2<ValueType, boost::uint64_t> value_type;
-    typedef boost::fusion::vector2<RemoteType, boost::uint64_t> remote_type;
-     
-    typedef lcos::base_lco_with_value<value_type, remote_type> base_type_holder;
 
     typedef components::managed_component_base<object_semaphore> base_type;
 
@@ -84,9 +75,8 @@ struct object_semaphore
             boost::intrusive::link_mode<boost::intrusive::normal_link>
         > hook_type;
 
-        queue_value_entry(value_type const& val)
-          : val_(boost::fusion::at_c<0>(val))
-          , count_(boost::fusion::at_c<1>(val)) {}
+        queue_value_entry(ValueType const& val, boost::uint64_t count)
+          : val_(val), count_(count) {}
 
         ValueType val_;
         boost::uint64_t count_;
@@ -107,7 +97,7 @@ struct object_semaphore
   private:
     // assumes that this thread has acquired l
     void resume(typename mutex_type::scoped_lock& l)
-    {       
+    { // {{{ 
         // resume as many waiting LCOs as possible 
         while (!thread_queue_.empty() && !value_queue_.empty())
         {
@@ -135,47 +125,22 @@ struct object_semaphore
                 applier::trigger<ValueType>(id, value);  
             }
         }
-    }
+    } // }}}
 
   public:
     object_semaphore() {}
 
     ~object_semaphore()
-    {
+    { // {{{
         if (HPX_UNLIKELY(!thread_queue_.empty()))
-        {
-            try
-            {
-                HPX_THROW_EXCEPTION(deadlock, "~object_semaphore",
-                    "semaphore is being destroyed with active LCOs");
-            }
+            abort_pending(deadlock);
+    } // }}}
 
-            catch (...)
-            {
-                set_error(boost::current_exception());
-            }
-        }
-    }
-
-    // disambiguate base classes
-    using base_type::finalize;
-    typedef typename base_type::wrapping_type wrapping_type;
-
-    static components::component_type get_component_type()
-    {
-        return components::get_component_type<object_semaphore>();
-    }
-    static void set_component_type(components::component_type type) 
-    {
-        components::set_component_type<object_semaphore>(type);
-    }
-
-    void set_result(remote_type const& result)
-    {
+    void signal(ValueType const& val, boost::uint64_t count)
+    { // {{{
         // push back the new value onto the queue
         std::auto_ptr<queue_value_entry> node
-            (new queue_value_entry
-                (get_result<value_type, remote_type>::call(result)));
+            (new queue_value_entry(val, count));
 
         typename mutex_type::scoped_lock l(this);
         value_queue_.push_back(*node);
@@ -183,56 +148,10 @@ struct object_semaphore
         node.release();
 
         resume(l);
-    }
+    } // }}}
 
-    void set_error(boost::exception_ptr const& e)
-    {
-        typename mutex_type::scoped_lock l(this);
-
-        LERR_(fatal)
-            << "object_semaphore::set_error: thread_queue is not empty, "
-               "aborting threads";
-
-        while (!thread_queue_.empty())
-        {
-            naming::id_type id = thread_queue_.front().id_;
-            thread_queue_.front().id_ = naming::invalid_id;
-            thread_queue_.front().aborted_waiting_ = true;
-            thread_queue_.pop_front();
-
-            LERR_(fatal)
-                << "object_semaphore::set_error: pending thread " << id; 
-
-            // try to abort the thread, do not throw
-            try
-            {
-                applier::trigger_error(id, e);
-            }
-
-            catch (...)
-            {
-                LERR_(fatal)
-                    << "object_semaphore::set_error: "
-                    << "could not abort thread " << id;
-            }
-        }
-
-        BOOST_ASSERT(thread_queue_.empty());
-    }
-
-    // forwarder
-    value_type get_value()
-    {
-        local_dataflow_variable<ValueType> data;
-        naming::id_type lco = data.get_gid();
-
-        add_lco(lco);
-
-        return value_type(data.get(), 1);
-    } 
-
-    void add_lco(naming::id_type const& lco)
-    {
+    void get(naming::id_type const& lco)
+    { // {{{
         // push the LCO's GID onto the queue
         std::auto_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
         
@@ -243,14 +162,109 @@ struct object_semaphore
         node.release();
 
         resume(l);
-    }
+    } // }}}
 
-    typedef hpx::actions::direct_action1<
-        object_semaphore<ValueType, RemoteType>
-      , object_semaphore_add_lco
+    void abort_pending(error ec)
+    { // {{{
+        typename mutex_type::scoped_lock l(this);
+
+        LLCO_(info)
+            << "object_semaphore::abort_pending: thread_queue is not empty, "
+               "aborting threads";
+
+        while (!thread_queue_.empty())
+        {
+            naming::id_type id = thread_queue_.front().id_;
+            thread_queue_.front().id_ = naming::invalid_id;
+            thread_queue_.front().aborted_waiting_ = true;
+            thread_queue_.pop_front();
+
+            LLCO_(info)
+                << "object_semaphore::abort_pending: pending thread " << id; 
+
+            // try to abort the thread, do not throw
+            try
+            {
+                try
+                {
+                    HPX_THROW_EXCEPTION(ec, "object_semaphore::abort_pending",
+                        "aborting pending thread");
+                }
+
+                catch (hpx::exception& e)
+                { 
+                    applier::trigger_error(id, boost::current_exception());
+                }
+            }
+
+            catch (...)
+            {
+                LLCO_(warning)
+                    << "object_semaphore::abort_pending: could not abort "
+                       "thread " << id;
+            }
+        }
+
+        BOOST_ASSERT(thread_queue_.empty());
+    } // }}}
+
+    void wait()
+    { // {{{
+        typedef typename 
+            lcos::template base_lco_with_value<ValueType>::get_value_action 
+        action_type;
+
+        typename mutex_type::scoped_lock l(this);
+
+        typename thread_queue_type::const_iterator it = thread_queue_.begin()
+                                                 , end = thread_queue_.end(); 
+
+        for (; it != end; ++it)
+        {
+            naming::id_type id = it->id_; 
+
+            LLCO_(info) << "object_semapohre::wait: waiting for " << id;
+
+            try
+            {
+                applier::apply<action_type>(id);
+            }
+
+            catch (...)
+            {
+                LLCO_(warning) << "object_semapohre::wait: " << id
+                               << " threw an exception";
+            }
+        }
+    } // }}}
+
+    typedef hpx::actions::action2<
+        object_semaphore<ValueType>
+      , object_semaphore_signal
+      , ValueType const&
+      , boost::uint64_t
+      , &object_semaphore<ValueType>::signal
+    > signal_action;
+
+    typedef hpx::actions::action1<
+        object_semaphore<ValueType>
+      , object_semaphore_get
       , naming::id_type const& // lco
-      , &object_semaphore<ValueType, RemoteType>::add_lco
-    > add_lco_action;
+      , &object_semaphore<ValueType>::get
+    > get_action;
+
+    typedef hpx::actions::action1<
+        object_semaphore<ValueType>
+      , object_semaphore_abort_pending
+      , error
+      , &object_semaphore<ValueType>::abort_pending
+    > abort_pending_action;
+
+    typedef hpx::actions::action0<
+        object_semaphore<ValueType>
+      , object_semaphore_wait
+      , &object_semaphore<ValueType>::wait
+    > wait_action;
 
   private:
     value_queue_type value_queue_;

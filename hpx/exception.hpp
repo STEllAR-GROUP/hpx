@@ -123,7 +123,6 @@ namespace hpx
                 case startup_timed_out:
                 case uninitialized_value:
                 case bad_response_type:
-                case startup_timed_out:
                 case unknown_locality:
                 case unknown_gid:
                 case deadlock:

@@ -13,16 +13,16 @@
 namespace hpx { namespace lcos 
 {
 
-template <typename ValueType, typename RemoteType>
+template <typename ValueType>
 struct object_semaphore 
   : components::client_base<
-        object_semaphore<ValueType, RemoteType>, 
-        lcos::stubs::object_semaphore<ValueType, RemoteType>
+        object_semaphore<ValueType>, 
+        lcos::stubs::object_semaphore<ValueType>
     >
 {
     typedef components::client_base<
         object_semaphore,
-        lcos::stubs::object_semaphore<ValueType, RemoteType>
+        lcos::stubs::object_semaphore<ValueType>
     > base_type;
 
     object_semaphore() {}
@@ -54,38 +54,52 @@ struct object_semaphore
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<ValueType> wait_async()
+    lcos::local_dataflow_variable<ValueType> get_async()
     {
         BOOST_ASSERT(this->gid_);
-        return this->base_type::wait_async(this->gid_);
+        return this->base_type::get_async(this->gid_);
     }
 
-    ValueType wait_sync()
+    ValueType get_sync()
     {
         BOOST_ASSERT(this->gid_);
-        return this->base_type::wait_sync(this->gid_);
+        return this->base_type::get_sync(this->gid_);
     }
 
-    ValueType wait()
-    { return wait_sync(); }
+    ValueType get()
+    { return get_sync(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    void abort_pending()
+    void abort_pending_async(error ec = no_success)
     {
         BOOST_ASSERT(this->gid_);
-
-        try
-        {
-            HPX_THROW_EXCEPTION(no_success, "object_semaphore::abort_pending", 
-                "interrupt all pending requests");
-        }
-
-        catch (...)
-        {
-            this->base_type::abort_pending
-                (this->gid_, boost::current_exception());
-        }
+        this->base_type::abort_pending_sync(this->gid_, ec);
     }
+
+    void abort_pending_sync(error ec = no_success)
+    {
+        BOOST_ASSERT(this->gid_);
+        this->base_type::abort_pending_sync(this->gid_, ec);
+    }
+
+    void abort_pending(error ec = no_success)
+    { abort_pending_sync(ec); }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void wait_async()
+    {
+        BOOST_ASSERT(this->gid_);
+        this->base_type::wait_sync(this->gid_);
+    }
+
+    void wait_sync()
+    {
+        BOOST_ASSERT(this->gid_);
+        this->base_type::wait_sync(this->gid_);
+    }
+
+    void wait()
+    { wait_sync(); }
 };
 
 }}
