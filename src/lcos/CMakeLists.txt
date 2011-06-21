@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_library_sources(hpx
-  base_lco.cpp)
+  base_lco.cpp
+  local_counting_semaphore.cpp)
 
 add_subdirectory(barrier)
 
