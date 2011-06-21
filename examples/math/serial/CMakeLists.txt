@@ -11,6 +11,8 @@ set(examples
     ackermann_peter
     ackermann_peter_bigint
     binomial_distribution
+    factorial
+    factorial_bigint
     jacobsthal
     jacobsthal_bigint
     lanczos_gamma
@@ -20,6 +22,7 @@ foreach(example ${examples})
   add_hpx_executable(${type}_${example}
     MODULE math
     SOURCES ${example}.cpp
+    DEPENDENCIES rt
     NOLIBS)
 
   # depend on the executable

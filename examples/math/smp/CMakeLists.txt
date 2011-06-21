@@ -11,6 +11,8 @@ set(examples
     naive_ackermann_peter
     predicting_ackermann_peter
     naive_binomial_distribution
+    naive_factorial
+    naive_fibonacci
     naive_jacobsthal
     naive_lucas_jacobsthal)
 
@@ -24,7 +26,10 @@ foreach(example ${examples})
 endforeach()
 
 set(examples
-    naive_ackermann_peter_bigint)
+    naive_ackermann_peter_bigint
+    naive_factorial_bigint
+    naive_fibonacci_bigint
+    naive_jacobsthal_bigint)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}

@@ -8,6 +8,7 @@
 #include <boost/bigint.hpp>
 #include <boost/bigint/serialize.hpp>
 #include <boost/serialization/version.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 
 #include <hpx/hpx.hpp>
@@ -34,4 +35,14 @@ HPX_REGISTER_ACTION_EX(
         boost::bigint
     >::set_result_action,
     base_lco_with_value_set_result_bigint);
+
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    base_lco_with_value<boost::shared_ptr<bigint> >,
+    component_base_lco_with_value);
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<
+        boost::shared_ptr<boost::bigint>
+    >::set_result_action,
+    base_lco_with_value_set_result_bigint_shared_ptr);
 
