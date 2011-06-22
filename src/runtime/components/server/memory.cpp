@@ -34,10 +34,18 @@ HPX_REGISTER_ACTION_EX(hpx::components::server::memory::load64_action, load64_ac
 
 ///////////////////////////////////////////////////////////////////////////////
 // make sure all needed action::get_action_name() functions get defined
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint8_t>::set_result_action);
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint16_t>::set_result_action);
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint32_t>::set_result_action);
-HPX_DEFINE_GET_ACTION_NAME(hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<boost::uint8_t>::set_result_action,
+    set_result_action_uint8_t);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<boost::uint16_t>::set_result_action,
+    set_result_action_uint16_t);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<boost::uint32_t>::set_result_action,
+    set_result_action_uint32_t);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action,
+    set_result_action_uint64_t);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<boost::uint8_t>,
