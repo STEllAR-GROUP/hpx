@@ -28,7 +28,7 @@ void output_stream::call_write(
 
 void output_stream::write(std::deque<char> const& in)
 { // {{{
-    mutex_type::scoped_lock(mtx);
+    mutex_type::scoped_lock l(mtx);
 
     // REVIEW: Should we confirm that the old thread_id has terminated
     // before we reset it?

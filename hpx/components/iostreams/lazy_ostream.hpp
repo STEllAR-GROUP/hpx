@@ -43,26 +43,14 @@ struct lazy_ostream
     mutex_type mtx;
     std::deque<char> out_buffer;
     stream_type stream;
-    std::deque<lcos::future_value<void> > flush_queue;
 
     // Performs a lazy, asynchronous streaming operation.
     template <typename T>
     lazy_ostream& streaming_operator_lazy(T const& subject)
     { // {{{
         mutex_type::scoped_lock(mtx);
-
         // apply the subject to the local stream
         stream << subject;
-
-        // If the buffer isn't empty, prepare a lazy future that will send it
-        // to the destination
-        if (!out_buffer.empty())
-        {
-            flush_queue.push_back
-                (this->base_type::write_lazy(gid_, out_buffer));
-            out_buffer.clear();
-        }
-
         return *this;
     } // }}}
 
@@ -71,13 +59,6 @@ struct lazy_ostream
     lazy_ostream& streaming_operator_sync(T const& subject)
     { // {{{
         mutex_type::scoped_lock(mtx);
-
-        // complete any pending async operations
-        while (!flush_queue.empty())
-        {
-            flush_queue.front().get();
-            flush_queue.pop_front();
-        } 
 
         // apply the subject to the local stream
         stream << subject;
