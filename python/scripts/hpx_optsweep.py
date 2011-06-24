@@ -15,7 +15,6 @@ from re import compile
 from types import *
 from operator import *
 from datetime import datetime
-from signal import SIGKILL
 from pickle import dump
  
 if os.path.exists(os.path.join(sys.path[0], "../hpx")):
@@ -74,9 +73,8 @@ def next(ixd, opts, optv):
 
 # run the application and optionally capture its output and error streams
 def run(cmd, outfl = None, timeout = 360):
-    proc = process(cmd)
-
     start = datetime.now() 
+    proc = process(cmd)
     (timed_out, returncode) = proc.wait(timeout)
     now = datetime.now()
 
