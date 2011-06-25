@@ -340,6 +340,8 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::tidy()
     {
+        mutex_type::scoped_lock l(mtx_);
+
         // Only after releasing the components we are allowed to release 
         // the modules. This is done in reverse order of loading.
         component_map_type::iterator end = components_.end();
