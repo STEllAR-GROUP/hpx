@@ -239,7 +239,7 @@ namespace hpx
         io_pool_.stop();
 #endif
         // unload libraries
-        runtime_support_.tidy();
+        //runtime_support_.tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
     }
@@ -750,6 +750,12 @@ namespace hpx
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
         return get_runtime().get_config().get_entry(key, dflt);
+    }
+
+    bool is_system_running()
+    {
+        return (NULL != applier::get_applier_ptr()) 
+            && applier::get_applier_ptr()->get_thread_manager().is_running();
     }
 }
 
