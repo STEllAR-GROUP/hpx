@@ -398,7 +398,11 @@ namespace hpx { namespace threads
         void stop (bool blocking = true);
 
         /// \brief Return whether the thread manager is still running
-        bool is_running() const { return thread_count_ != 0 || running_; }
+        bool is_running() const
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            return /*thread_count_ != 0 ||*/ running_;
+        }
 
         /// \brief return the number of PX-threads with the given state
         ///
