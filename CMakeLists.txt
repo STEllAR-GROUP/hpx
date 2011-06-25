@@ -197,14 +197,14 @@ endif()
 
 if(NOT CMAKE_INSTALL_PREFIX)
   if(UNIX)
-    set(CMAKE_INSTALL_PREFIX "/opt/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
   else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
   endif()
 endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
-  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx.${HPX_VERSION} for POSIX, C:/Program Files/hpx.${HPX_VERSION} for Windows)." FORCE)
+  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
