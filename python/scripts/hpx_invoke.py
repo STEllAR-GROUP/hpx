@@ -43,20 +43,6 @@ def run(cmd, timeout=3600):
 
   return (returncode, output, timed_out)
 
-def quote_command(cmd, quote = '"'):
-  exclude = letters + digits + '-+='
-  s = ''
-  for e in cmd:
-    if type(e) is not StringType:
-      e = str(e)
-    for c in e:
-      if c not in exclude:
-        s += ' ' + quote + e + quote
-        break
-      else:
-        s += ' ' + e
-  return s
-
 def rstrip_last(s, chars):
   if s[-1] in chars:
     return s[:-1]
@@ -64,28 +50,27 @@ def rstrip_last(s, chars):
     return s
 
 # {{{ main
-usage = "usage: %prog [options] program [program-arguments]" 
+usage = "usage: %prog [options]" 
 
 parser = OptionParser(usage=usage)
-
-parser.add_option("--verbatim",
-                  action="store_true",
-                  dest="verbatim", default=False,
-                  help="Don't quote program arguments")
 
 parser.add_option("--timeout",
                   action="store", type="int",
                   dest="timeout", default=3600,
                   help="Program timeout (seconds)")
 
+parser.add_option("--program",
+                  action="store", type="string",
+                  dest="program",
+                  help="Program to invoke") 
+
 (options, cmd) = parser.parse_args()
 
-if options.verbatim:
-  cmd = cmd[0] + quote_command(cmd[1:], '')
-else:
-  cmd = cmd[0] + quote_command(cmd[1:])
+if None == options.program:
+  print "No program specified"
+  exit(1)
 
-(returncode, output, timed_out) = run(cmd, options.timeout)
+(returncode, output, timed_out) = run(options.program, options.timeout)
 
 if not 0 == len(output):
   print rstrip_last(output, '\n')
