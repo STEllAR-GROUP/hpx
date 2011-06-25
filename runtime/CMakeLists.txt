@@ -5,6 +5,5 @@
 
 add_hpx_executable(hpx_runtime
   MODULE core
-  SOURCES hpx_runtime.cpp
-  ESSENTIAL)
+  SOURCES hpx_runtime.cpp)
 
