@@ -22,7 +22,7 @@ namespace hpx { namespace components
         naming::gid_type const& src, boost::exception_ptr const& e)
     {
         // do logging only if the system is still up. 
-        if (system_is_running())
+        if (is_system_running())
         {
             if (threads::get_self_ptr())
             {

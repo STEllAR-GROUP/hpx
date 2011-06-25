@@ -19,18 +19,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    inline bool system_is_running() {
-        return (NULL != applier::get_applier_ptr()) 
-            && applier::get_applier_ptr()->get_thread_manager().is_running();
-    }
-
-
     inline void 
     console_logging_locked(naming::id_type const& prefix, 
         server::logging_destination dest, int level, std::string const& msg)
     {
         try {
-            if (system_is_running()) 
+            if (is_system_running()) 
                 applier::apply_p<server::console_logging_action<> >
                     (prefix, threads::thread_priority_low, dest, level, msg);
         }
@@ -128,7 +122,7 @@ namespace hpx { namespace components
     {
         // do logging only if applier is still valid
         util::static_<pending_logs, pending_logs_tag> logs;
-        if (system_is_running()) {
+        if (is_system_running()) {
             if (logs.get().sending_logs_) {
                 logs.get().add_pending(msg);
             }

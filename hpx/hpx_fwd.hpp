@@ -29,8 +29,10 @@
 /// functions and variables are defined inside this namespace.
 namespace hpx
 {
-    HPX_EXPORT void pre_main() HPX_EXPORT;
- 
+    HPX_API_EXPORT void pre_main();
+
+    HPX_API_EXPORT bool is_system_running();
+
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
