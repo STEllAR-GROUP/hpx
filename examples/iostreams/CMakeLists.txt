@@ -6,7 +6,8 @@
 ################################################################################
 
 set(example_programs
-    hello_world)
+    hello_world
+    hello_world_cout)
 
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)

@@ -9,6 +9,7 @@ if("${HPX_AGAS_VERSION}" STREQUAL "2")
     MODULE core
     SOURCES component_module.cpp
             manipulators.cpp
+            standard_streams.cpp
             server/output_stream.cpp 
     HEADERS ${headers})
 endif()
