@@ -45,8 +45,10 @@ namespace hpx { namespace parcelset
     template<class Archive>
     void parcel::load(Archive & ar, const unsigned int version)
     {
-        if (version > HPX_PARCEL_VERSION) {
-            throw exception(version_too_new, 
+        if (version > HPX_PARCEL_VERSION)
+        {
+            HPX_THROW_EXCEPTION(version_too_new, 
+                "parcel::load",
                 "trying to load parcel with unknown version");
         }
 
