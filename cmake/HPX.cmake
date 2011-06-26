@@ -15,6 +15,16 @@ set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 ################################################################################
+# Python detection (part 1)
+################################################################################
+include(FindPythonInterp)
+
+################################################################################
+# Fortran detection (part 1)
+################################################################################
+include(CMakeDetermineFortranCompiler)
+
+################################################################################
 # cmake configuration
 ################################################################################
 if(NOT HPX_ROOT)
@@ -33,6 +43,45 @@ hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. 
 # be pedantic and annoying by default
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+################################################################################
+# Python detection (part 2)
+################################################################################
+if(PYTHONINTERP_FOUND)
+  hpx_info("python" "Found a Python interpreter")
+else()
+  hpx_warn("python" "Couldn't find a Python interpreter")
+endif()
+
+# SSH
+hpx_check_for_python_paramiko(HPX_PYTHON_PARAMIKO
+    DEFINITIONS HPX_HAVE_PYTHON_PARAMIKO) 
+
+# Command-line parsing
+hpx_check_for_python_optparse(HPX_PYTHON_OPTPARSE
+    DEFINITIONS HPX_HAVE_PYTHON_OPTPARSE)
+
+# Async networking
+hpx_check_for_python_threading(HPX_PYTHON_THREADING
+    DEFINITIONS HPX_HAVE_PYTHON_THREADING)
+
+# RAII
+hpx_check_for_python_with_statement(HPX_PYTHON_WITH_STATEMENT
+    DEFINITIONS HPX_HAVE_PYTHON_WITH_STATEMENT)
+
+# Process control
+hpx_check_for_python_subprocess(HPX_PYTHON_SUBPROCESS
+    DEFINITIONS HPX_HAVE_PYTHON_SUBPROCESS)
+
+################################################################################
+# Fortran detection (part 2)
+################################################################################
+if(CMAKE_Fortran_COMPILER)
+  hpx_info("fortran" "Found a Fortran compiler")
+  enable_language(Fortran)
+else()
+  hpx_warn("fortran" "Couldn't find a Fortran compiler")
 endif()
 
 ################################################################################
@@ -75,7 +124,6 @@ if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
                       regex
                       serialization
                       system
-                      signals
                       thread)
 else()
   set(BOOST_LIBRARIES date_time
@@ -84,10 +132,10 @@ else()
                       regex
                       serialization
                       system
-                      signals
                       thread)
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
+  include_directories(${hpx_SOURCE_DIR}/external/chrono)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -100,13 +148,32 @@ link_directories(${BOOST_LIBRARY_DIR})
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+add_definitions(-DBOOST_LOG_NO_TSS)
+add_definitions(-DBOOST_LOG_NO_TS)
+add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 
 ################################################################################
 # search path configuration
 ################################################################################
-include_directories(${HPX_ROOT}/include)
-link_directories(${HPX_ROOT}/lib)
-link_directories(${HPX_ROOT}/lib/hpx)
+include_directories(${hpx_SOURCE_DIR})
+include_directories(${hpx_SOURCE_DIR}/external/move)
+include_directories(${hpx_SOURCE_DIR}/external/atomic)
+include_directories(${hpx_SOURCE_DIR}/external/bigint)
+include_directories(${hpx_SOURCE_DIR}/external/cache)
+include_directories(${hpx_SOURCE_DIR}/external/coroutine)
+include_directories(${hpx_SOURCE_DIR}/external/endian)
+include_directories(${hpx_SOURCE_DIR}/external/logging)
+include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+include_directories(${hpx_SOURCE_DIR}/external/plugin)
+include_directories(${hpx_SOURCE_DIR}/external/bigint)
+link_directories(${CMAKE_BINARY_DIR}/lib)
+link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+
+################################################################################
+# Compiler configuration code
+################################################################################
+include(HPX_GCCVersion)
+include(HPX_CompilerFlags)
 
 ################################################################################
 # installation configuration
@@ -122,38 +189,24 @@ endif()
 
 if(NOT CMAKE_INSTALL_PREFIX)
   if(UNIX)
-    set(CMAKE_INSTALL_PREFIX "/opt/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
   else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx.${HPX_VERSION}" CACHE PATH "Prefix prepended to install directories.")
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
   endif()
 endif()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
-  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx.${HPX_VERSION} for POSIX, C:/Program Files/hpx.${HPX_VERSION} for Windows)." FORCE)
+  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
-hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}")
+hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
-add_definitions(-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+add_definitions("-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib)
+if(NOT MSVC)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
 
 ################################################################################
 # RPATH configuration
@@ -162,6 +215,36 @@ set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib:${CMAKE_BINARY_DIR}/lib/hpx")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+################################################################################
+# AGAS configuration
+################################################################################
+set(HPX_AGAS_VERSION "1" CACHE STRING "AGAS subsystem version")
+
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
+  add_definitions(-DHPX_AGAS_VERSION=0x20)
+else()
+  add_definitions(-DHPX_AGAS_VERSION=0x10)
+endif()
+
+################################################################################
+# LISP bindings 
+################################################################################
+find_package(HPX_Phxpr)
+
+################################################################################
+# SDF output 
+################################################################################
+find_package(HPX_RNPL)
+
+################################################################################
+# Arbitrary precision math 
+################################################################################
+find_package(HPX_GMP)
+
+#if(GMP_FOUND)
+#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
+#endif()
 
 ################################################################################
 # Warning configuration
@@ -211,14 +294,35 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG"
-    CACHE STRING "Debug flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG"
-    CACHE STRING "MinSizeRel flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG"
-    CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG"
-    CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+  # clear CMake defaults
+  set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Release flags (C++)" FORCE)
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    hpx_use_flag_if_available(g)
+    hpx_use_flag_if_available(fno-omit-frame-pointer)
+    hpx_use_flag_if_available(fno-inline)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    add_definitions(-DDEBUG)
+    hpx_use_flag_if_available(g)
+    hpx_use_flag_if_available(O3)
+    hpx_use_flag_if_available(fno-omit-frame-pointer)
+    hpx_use_flag_if_available(fno-inline)
+    hpx_use_flag_if_available(fno-optimize-sibling-calls)
+    hpx_use_flag_if_available(fno-web)
+    hpx_use_flag_if_available(fno-rename-registers)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    add_definitions(-DNDEBUG)
+    hpx_use_flag_if_available(Os)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    add_definitions(-DNDEBUG)
+    hpx_use_flag_if_available(O3)
+  else()
+    hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+  endif()
 
   if(NOT HPX_DISABLE_WARNINGS)
     hpx_use_flag_if_available(Wall)
@@ -230,24 +334,28 @@ else()
   # GNU specific configuration
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
+
     # Show the flags that toggle each warning
     hpx_use_flag_if_available(fdiagnostics-show-option)
 
     # I'm aware that __sync_fetch_and_nand changed semantics
     hpx_use_flag_if_gcc_version(Wno-sync-nand 040400)
 
-    if(0404 GREATER ${GCC_VERSION}) 
+    if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
       hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
     else()
       option(HPX_ELF_HIDDEN_VISIBILITY
-        "Use -fvisibility=hidden for Release, MinSizeRel and RelWithDebInfo builds (default: ON)" ON)
+        "Use -fvisibility=hidden for Release, MinSizeRel builds (default: ON)" ON)
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
-        add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-        add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-        add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-        set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fvisibility=hidden")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fvisibility=hidden")
+        if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+           "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+          add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
+          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+          add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+          hpx_append_flag(-fvisibility=hidden)
+        endif()
       endif()
     endif()
   ##############################################################################
@@ -269,8 +377,15 @@ else()
     # warning #1125: virtual function override intended 
     add_definitions(-diag-disable 1125) 
 
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ipo")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ipo")
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+      hpx_use_flag_if_available(ipo)
+    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+      hpx_use_flag_if_available(ipo)
+    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+      hpx_use_flag_if_available(ipo)
+    else()
+      hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+    endif()
   endif()
 
   ##############################################################################
@@ -285,7 +400,7 @@ else()
     DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
   
   if(HPX_COMPILER_AUTO_TUNE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    hpx_append_flag("-march=native")
   endif() 
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
@@ -298,7 +413,7 @@ else()
                 BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
 
   if(HPX_GNU_MCX16)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
+    hpx_append_flag("-mcx16")
   endif() 
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
@@ -326,7 +441,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
   
   if(HPX_SSE2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+    hpx_append_flag("-msse2")
   endif() 
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -344,7 +459,7 @@ else()
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
   add_definitions(-D_GNU_SOURCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  hpx_append_flag(-pthread)
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
@@ -370,25 +485,23 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-cfree")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-pvalloc")
         add_definitions(-DHPX_JEMALLOC)
       endif()
  
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-malloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-free")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-calloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-realloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-valloc")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-memalign")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-builtin-posix_memalign")
+      hpx_use_flag_if_available(fno-builtin-cfree)
+      hpx_use_flag_if_available(fno-builtin-pvalloc)
+      hpx_use_flag_if_available(fno-builtin-malloc)
+      hpx_use_flag_if_available(fno-builtin-free)
+      hpx_use_flag_if_available(fno-builtin-calloc)
+      hpx_use_flag_if_available(fno-builtin-realloc)
+      hpx_use_flag_if_available(fno-builtin-valloc)
+      hpx_use_flag_if_available(fno-builtin-memalign)
+      hpx_use_flag_if_available(fno-builtin-posix_memalign)
     else()
       hpx_info("malloc" "Using system allocator.")
       hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
@@ -407,8 +520,10 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 endif()
 
 if(MSVC)
+  set(hpx_CORE hpx hpx_serialization)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 else()
+  set(hpx_CORE hpx hpx_serialization hpx_ini)
   set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_ini)
 endif()
 

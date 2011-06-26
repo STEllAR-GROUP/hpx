@@ -255,22 +255,6 @@ find_package(HPX_GMP)
 #endif()
 
 ################################################################################
-# hardware support
-################################################################################
-option(HPX_HW_ACCELERATION "Compile in support for hardware acceleration (default: off)." OFF)
-
-if(HPX_HW_ACCELERATION)
-  find_package(HPX_PXACCEL)
-
-  if(PXACCEL_FOUND)
-    add_definitions(-DHPX_ACCEL_QUEUING)
-    include_directories(${PXACCEL_INCLUDE_DIR})
-    link_directories(${PXACCEL_LIBRARY_DIR})
-    set(pxaccel_LIBRARIES pciutil pciaccess)
-  endif()
-endif()
-
-################################################################################
 # warning configuration
 ################################################################################
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
@@ -401,7 +385,15 @@ else()
     # warning #1125: virtual function override intended 
     add_definitions(-diag-disable 1125) 
 
-    hpx_use_flag_if_available(ipo)
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+      hpx_use_flag_if_available(ipo)
+    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+      hpx_use_flag_if_available(ipo)
+    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+      hpx_use_flag_if_available(ipo)
+    else()
+      hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+    endif()
   endif()
 
   ##############################################################################
