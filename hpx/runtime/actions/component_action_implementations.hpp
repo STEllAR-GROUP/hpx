@@ -51,11 +51,10 @@
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
-    private:
+    public:
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, arguments_type, Derived, Priority> base_type;
 
-    public:
         explicit BOOST_PP_CAT(base_result_action, N)(threads::thread_priority priority = Priority)
           : base_type(priority) 
         {}
@@ -285,6 +284,37 @@
             data.priority = this->priority_;
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva, 
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -394,6 +424,37 @@
             return data;
         }
 
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         base_action::action_type get_action_type() const 
@@ -414,11 +475,10 @@
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
-    private:
+    public:
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, arguments_type, Derived, Priority> base_type;
 
-    public:
         explicit BOOST_PP_CAT(base_action, N)(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -644,6 +704,37 @@
             data.priority = this->priority_;
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -752,6 +843,37 @@
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_;
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;

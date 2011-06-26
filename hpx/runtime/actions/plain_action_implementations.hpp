@@ -53,14 +53,13 @@
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
-    private:
+    public:
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
             arguments_type, Derived, Priority> base_type;
 
-    public:
         BOOST_PP_CAT(plain_base_result_action, N)(
                 threads::thread_priority priority = Priority)
           : base_type(priority)
@@ -288,6 +287,39 @@
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -403,6 +435,39 @@
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,7 +483,7 @@
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
-    private:
+    public:
         typedef 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> 
         arguments_type;
@@ -427,7 +492,6 @@
             BOOST_PP_CAT(function_action_arg, N), 
             arguments_type, Derived, Priority> base_type;
 
-    public:
         BOOST_PP_CAT(plain_base_action, N)(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -648,6 +712,39 @@
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -761,6 +858,39 @@
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const& arg)
+        {
+            data.lva = lva;
+            data.func = this->construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_phase = this->parent_phase_;
+            data.parent_prefix = this->parent_locality_;
+            data.priority = this->priority_; 
+            return data;
+        }
     };
 
 #undef HPX_REMOVE_QUALIFIERS
@@ -769,3 +899,4 @@
 #undef N
 
 #endif
+

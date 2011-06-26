@@ -42,11 +42,11 @@ namespace hpx { namespace actions
     class base_result_action0 
       : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
     {
+    public:
         typedef boost::fusion::vector<> arguments_type;
         typedef action<Component, Action, arguments_type, Derived, Priority> 
             base_type;
 
-    public:
         explicit base_result_action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -227,6 +227,23 @@ namespace hpx { namespace actions
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(lva, data);
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(cont, lva, data);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -317,6 +334,23 @@ namespace hpx { namespace actions
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(lva, data);
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(cont, lva, data);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -326,12 +360,11 @@ namespace hpx { namespace actions
     class base_action0 
       : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
     {
-    private:
+    public:
         typedef boost::fusion::vector<> arguments_type;
         typedef action<Component, Action, arguments_type, Derived, Priority> 
             base_type;
 
-    public:
         explicit base_action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -504,6 +537,23 @@ namespace hpx { namespace actions
             data.priority = this->priority_; 
             return data;
         }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(lva, data);
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(cont, lva, data);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -592,6 +642,23 @@ namespace hpx { namespace actions
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_; 
             return data;
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(lva, data);
+        }
+
+        threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, 
+            threads::thread_init_data& data,
+            typename base_type::arguments_type const&)
+        {
+            return this->get_thread_init_data(cont, lva, data);
         }
     };
 

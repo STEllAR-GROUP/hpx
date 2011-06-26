@@ -230,6 +230,17 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             arguments_type const& args) const = 0;
 
+        virtual threads::thread_init_data& 
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            arguments_type const& args) = 0;
+
+        virtual threads::thread_init_data& 
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva,
+            threads::thread_init_data& data,
+            arguments_type const& args) = 0;
+
     public:
         /// serialization support
         static void register_base()
