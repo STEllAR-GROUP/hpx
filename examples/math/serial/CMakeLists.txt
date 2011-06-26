@@ -16,7 +16,8 @@ set(examples
     jacobsthal
     jacobsthal_bigint
     lanczos_gamma
-    lucas_jacobsthal)
+    lucas_jacobsthal
+    numerical_integration)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}

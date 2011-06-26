@@ -15,6 +15,7 @@ if(NOT MSVC)
   set(subdirs
       accumulator
       balancing
+      function
       generic
       hplpx
       math
