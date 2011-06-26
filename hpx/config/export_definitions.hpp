@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,11 +7,7 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
-// For symbol import/export macros, we bother for C++ only
-#if defined(__cplusplus)
-#include <boost/config.hpp>
-
-#if defined(BOOST_WINDOWS)
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)
 # define HPX_SYMBOL_INTERNAL    /* empty */
@@ -22,7 +19,6 @@
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
 # define HPX_APISYMBOL_EXPORT   __attribute__((visibility("default")))
 # define HPX_APISYMBOL_IMPORT   __attribute__((visibility("default")))
-#endif
 #endif
 
 // make sure we have reasonable defaults
