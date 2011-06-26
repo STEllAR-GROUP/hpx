@@ -262,6 +262,15 @@ namespace hpx { namespace naming
         id.set_msb(strip_credit_from_gid(id.get_msb()));
     }
 
+    inline gid_type strip_credit_from_gid(gid_type const& id) HPX_PURE;
+
+    inline gid_type strip_credit_from_gid(gid_type const& id)
+    {
+        const boost::uint64_t msb = strip_credit_from_gid(id.get_msb());
+        const boost::uint64_t lsb = id.get_lsb();
+        return gid_type(msb, lsb);
+    }
+
     inline void set_credit_for_gid(gid_type& id, boost::uint16_t credit)
     {
         BOOST_ASSERT(0 == (credit & ~0xffff));
