@@ -18,7 +18,7 @@ from re import compile
 
 from optparse import OptionParser
 
-from socket import socket, gethostbyname  
+from socket import socket, gethostbyname, error 
 from socket import AF_INET, SOCK_STREAM 
 
 from paramiko import Agent, RSAKey, DSSKey, Transport
@@ -139,7 +139,7 @@ class channel_raii:
     if not None == self.channel:
       self.channel.close()
 
-def execute_function(username, hostname, port, keys, key, cmd, callback):
+def execute_function(user, hostname, port, keys, key, cmd, callback, timeout):
   with transport_raii(hostname, port) as transport:
     if None == transport:
       return  
@@ -153,36 +153,41 @@ def execute_function(username, hostname, port, keys, key, cmd, callback):
       report("Host key has changed.")
       return 
   
-    agent_auth(transport, username)
+    agent_auth(transport, user)
   
     if not transport.is_authenticated():
-      key_auth(transport, username, key)
+      key_auth(transport, user, key)
   
     if not transport.is_authenticated():
       report("Authentication failed.")
       return 
+
+    try:  
+      with channel_raii(transport) as channel:  
+        channel.set_combine_stderr(True)
+        channel.settimeout(float(timeout))
+        channel.exec_command(cmd)
   
-    with channel_raii(transport) as channel:  
-      channel.set_combine_stderr(True)
-      channel.exec_command(cmd)
+        output = ''
+  
+        while True:
+          output_buffer = channel.recv(256)
+  
+          if not output_buffer:
+            break
+  
+          output += output_buffer
+  
+        r = channel.recv_exit_status()
+  
+        callback(r, output)
 
-      output = ''
+    except error:
+      callback(1, 'Socket timeout')
 
-      while True:
-        output_buffer = channel.recv(256)
-
-        if not output_buffer:
-          break
-
-        output += output_buffer
-
-      r = channel.recv_exit_status()
-
-      callback(r, output)
-
-def remote_execute(username, hostname, port, keys, key, cmd, callback):
+def remote_execute(user, hostname, port, keys, key, cmd, callback, timeout):
   worker = Thread(target=execute_function
-                , args=(username, hostname, port, keys, key, cmd, callback))
+         , args=(user, hostname, port, keys, key, cmd, callback, timeout))
   worker.start()
   return worker
 
@@ -431,9 +436,7 @@ bindir = join(location, 'bin')
 
 cmd = join(bindir, 'hpx_invoke.py')
 
-if not None == options.timeout:
-  cmd += ' --timeout=%d' % options.timeout
-
+cmd += ' --timeout=%d' % options.timeout
 cmd += ' --program=\'' + join(bindir, bin)
 
 if len(args):
@@ -467,7 +470,8 @@ for node in nodes.iterkeys():
     print '%s:%d == %s' % (node[0], node[1], local_cmd)
   else:
     cb = io_callback(mutex, node)
-    cmds.append((user, node[0], port, keys, key, local_cmd, cb))
+    timeout = options.timeout
+    cmds.append((user, node[0], port, keys, key, local_cmd, cb, timeout))
     print '%s:%d == %s' % (node[0], node[1], local_cmd)
 # }}}
 
