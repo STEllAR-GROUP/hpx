@@ -107,6 +107,11 @@ namespace hpx { namespace components
             return gid_;
         }
 
+        naming::gid_type const& get_raw_gid() const
+        {
+            return gid_.get_gid();
+        }
+
         naming::id_type detach() 
         {
             naming::id_type g;
