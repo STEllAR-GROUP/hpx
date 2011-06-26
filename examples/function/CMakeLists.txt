@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    nullary)
+    nullary
+    trigonometry)
 
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)

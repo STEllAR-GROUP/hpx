@@ -75,7 +75,7 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
     function(function const& other)
     {
         if (other.f)
-            f = boost::make_shared<action_type>(*other.f);
+            f = other.f;
     }
 
     function& operator=(action_type* f_)
@@ -99,7 +99,7 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
     function& operator=(function const& other)
     {
         if (other.f)
-            f = boost::make_shared<action_type>(*other.f);
+            f = other.f;
         else
             clear();
         return *this;
