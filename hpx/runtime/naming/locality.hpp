@@ -158,8 +158,10 @@ namespace hpx { namespace naming
         template<class Archive>
         void load(Archive & ar, const unsigned int version)
         {
-            if (version > HPX_LOCALITY_VERSION) {
-                throw exception(version_too_new, 
+            if (version > HPX_LOCALITY_VERSION)
+            {
+                HPX_THROW_EXCEPTION(version_too_new, 
+                    "locality::load",
                     "trying to load locality with unknown version");
             }
 
