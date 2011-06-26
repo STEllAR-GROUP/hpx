@@ -379,7 +379,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult, int N>
     class future_value 
     {
-    protected:
+    public:
         typedef detail::future_value<Result, RemoteResult, N> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
@@ -407,7 +407,6 @@ namespace hpx { namespace lcos
 //             return impl_->get_full_address(fa);
 //         }
 
-    public:
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
@@ -426,7 +425,6 @@ namespace hpx { namespace lcos
         ~future_value()
         {}
 
-    public:
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
@@ -463,7 +461,7 @@ namespace hpx { namespace lcos
     template <int N>
     class future_value<void, util::unused_type, N>
     {
-    protected:
+    public:
         typedef detail::future_value<util::unused_type, util::unused_type, N> 
             wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
@@ -492,7 +490,6 @@ namespace hpx { namespace lcos
 //             return impl_->get_full_address(fa);
 //         }
 
-    public:
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
