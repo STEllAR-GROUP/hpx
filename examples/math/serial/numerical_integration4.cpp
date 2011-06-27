@@ -13,9 +13,10 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <boost/function.hpp>
 #include <boost/phoenix/core.hpp>
+#include <boost/phoenix/bind.hpp>
+#include <boost/phoenix/scope.hpp>
 #include <boost/phoenix/function.hpp>
 #include <boost/phoenix/operator.hpp>
 
@@ -43,8 +44,10 @@ using boost::io::group;
 
 using boost::function;
 
-using boost::math::constants::pi;
-
+using boost::phoenix::bind;
+using boost::phoenix::val;
+using boost::phoenix::lambda;
+using boost::phoenix::local_names::_a;
 using boost::phoenix::placeholders::_1;
 
 using hpx::util::high_resolution_timer;
@@ -55,8 +58,14 @@ enum
     ld_precision = numeric_limits<long double>::digits10 + 1
 };
 
-BOOST_PHOENIX_ADAPT_FUNCTION(long double, sine, std::sin, 1)
-BOOST_PHOENIX_ADAPT_FUNCTION(long double, ln, std::log, 1)
+inline bool equal(long double x1, long double x2, long double epsilon) 
+{
+    // the numbers are close enough
+    if (x1 + epsilon >= x2 && x1 - epsilon <= x2)
+        return true;
+    else
+        return false;
+}
 
 long double integrate_fastpath(
     boost::function<long double(long double)> const& f
@@ -76,25 +85,35 @@ long double integrate_fastpath(
 
         // If we're smaller than or equal to the minimum_increment, don't refine
         // any further.
-        if (minimum_increment >= increment)
-            total_area += fi * increment; 
+        //if (minimum_increment >= increment)
+        //    total_area += fi * increment; 
 
         // When the difference between the function value at the middle of the
         // increment and the start of the increment is too larger than the
         // tolerance, regrid this interval. The increment of the regrid is
         // the current increment divided by the refinement rate.
-        else if ((abs(f(i + (increment / 2.0L)) - fi)) > tolerance)
+        /*else*/ if ((abs(f(i + (increment / 2.0L)) - fi)) > tolerance)
         {
             long double next_increment = increment / refinement_rate;
 
-            // Correct the increment for inprecision division.
-            //const long double iterations = (next_i - i) / next_increment;
-            //const long double excess = iterations - floor(iterations);
-            //next_increment += excess / iterations;             
+            // Figure out how many iterations can be done with the next
+            // increment. Round it down, and call integrate recursively to
+            // integrate that block. 
+            const long double iterations = (next_i - i) / next_increment;
+            const long double end = increment * std::floor(iterations);
 
             total_area += integrate_fastpath
-                ( f, i, next_i, tolerance, next_increment
+                ( f, i, end, tolerance, next_increment
                 , refinement_rate, minimum_increment);
+
+            // If the difference between the end of the block handled by the
+            // recursive call and the end of the current iteration is greater
+            // than 1.0e-8L, make another recursive call to handle the leftover
+            // region. 
+            if (!equal(end, next_i, 1.0e-8L))
+                total_area += integrate_fastpath
+                    ( f, end, next_i, tolerance, next_i - end
+                    , refinement_rate, minimum_increment); 
         }
 
         else
@@ -105,6 +124,9 @@ long double integrate_fastpath(
 
     return total_area;
 }
+
+BOOST_PHOENIX_ADAPT_FUNCTION
+    (long double, integrate_fastpath_, integrate_fastpath, 7)
 
 long double integrate_slowpath(
     boost::function<long double(long double)> const& f
@@ -114,11 +136,15 @@ long double integrate_slowpath(
   , long double increment
   , long double refinement_rate
   , long double minimum_increment
+  , char const* name
 ) {
     long double total_area = 0.0L;
 
-    cout << ( format("integrate f(x) dx from %1% to %2% with increment %3%\n")
-            % lower_bound % upper_bound % increment);
+    cout << ( format("%1% from %2% to %3% with increment %4%\n")
+            % name
+            % group(setprecision(ld_precision), lower_bound)
+            % group(setprecision(ld_precision), upper_bound)
+            % group(setprecision(ld_precision), increment));
 
     for (long double i = lower_bound; i < upper_bound;)
     {
@@ -127,25 +153,35 @@ long double integrate_slowpath(
 
         // If we're smaller than or equal to the minimum_increment, don't refine
         // any further.
-        if (minimum_increment >= increment)
-            total_area += fi * increment; 
+        //if (minimum_increment >= increment)
+        //    total_area += fi * increment; 
 
         // When the difference between the function value at the middle of the
         // increment and the start of the increment is too larger than the
         // tolerance, regrid this interval. The increment of the regrid is
         // the current increment divided by the refinement rate.
-        else if ((abs(f(i + (increment / 2.0L)) - fi)) > tolerance)
+        /*else*/ if ((abs(f(i + (increment / 2.0L)) - fi)) > tolerance)
         {
             long double next_increment = increment / refinement_rate;
 
-            // Correct the increment for inprecision division.
-            //const long double iterations = (next_i - i) / next_increment;
-            //const long double excess = iterations - floor(iterations);
-            //next_increment += excess / iterations;             
+            // Figure out how many iterations can be done with the next
+            // increment. Round it down, and call integrate recursively to
+            // integrate that block. 
+            const long double iterations = (next_i - i) / next_increment;
+            const long double end = increment * std::floor(iterations);
 
             total_area += integrate_slowpath
-                ( f, i, next_i, tolerance, next_increment
-                , refinement_rate, minimum_increment);
+                ( f, i, end, tolerance, next_increment
+                , refinement_rate, minimum_increment, name);
+
+            // If the difference between the end of the block handled by the
+            // recursive call and the end of the current iteration is greater
+            // than 1.0e-8L, make another recursive call to handle the leftover
+            // region. 
+            if (!equal(end, next_i, 1.0e-8L))
+                total_area += integrate_slowpath
+                    ( f, end, next_i, tolerance, next_i - end
+                    , refinement_rate, minimum_increment, name); 
         }
 
         else
@@ -156,6 +192,9 @@ long double integrate_slowpath(
 
     return total_area;
 }
+
+BOOST_PHOENIX_ADAPT_FUNCTION
+    (long double, integrate_slowpath_, integrate_slowpath, 8)
 
 enum implementation
 {
@@ -170,11 +209,11 @@ int main(int argc, char** argv)
     options_description
         desc_cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
    
-    const long double pi_ = pi<long double>();
-
     long double tolerance(0.0L)
-              , lower_bound(0.0L)
-              , upper_bound(0.0L)
+              , x_lower_bound(0.0L)
+              , x_upper_bound(0.0L)
+              , y_lower_bound(0.0L)
+              , y_upper_bound(0.0L)
               , increment(0.0L)
               , refinement_rate(0.0L)
               , minimum_increment(0.0L);
@@ -187,16 +226,24 @@ int main(int argc, char** argv)
         , value<long double>(&tolerance)->default_value(1e-6, "1e-6") 
         , "resolution tolerance")
 
-        ( "lower-bound"
-        , value<long double>(&lower_bound)->default_value(1e-15, "1e-15") 
-        , "lower bound of integration")
+        ( "x-lower-bound"
+        , value<long double>(&x_lower_bound)->default_value(11, "11") 
+        , "lower bound of integration with respect to x")
 
-        ( "upper-bound"
-        , value<long double>(&upper_bound)->default_value(64.0L * pi_, "64*pi")
-        , "upper bound of integration")
+        ( "x-upper-bound"
+        , value<long double>(&x_upper_bound)->default_value(14, "14")
+        , "upper bound of integration with respect to x")
+
+        ( "y-lower-bound"
+        , value<long double>(&y_lower_bound)->default_value(7, "7") 
+        , "lower bound of integration with respect to y")
+
+        ( "y-upper-bound"
+        , value<long double>(&y_upper_bound)->default_value(10, "10")
+        , "upper bound of integration with respect to y")
 
         ( "increment"
-        , value<long double>(&increment)->default_value(0.64 * pi_, "0.64*pi") 
+        , value<long double>(&increment)->default_value(0.1, "0.1") 
         , "initial integration increment")
 
         ( "refinement-rate"
@@ -246,13 +293,24 @@ int main(int argc, char** argv)
     {
         high_resolution_timer t;
 
-        r = integrate_fastpath(sine(ln(_1)) + 1
-                             , lower_bound
-                             , upper_bound
-                             , tolerance
-                             , increment
-                             , refinement_rate
-                             , minimum_increment);
+        r = integrate_fastpath(
+              integrate_fastpath_(
+                   lambda(_a = val(_1))
+                   [
+                       _a * _a + val(4) * _1
+                   ]
+                 , val(y_lower_bound)
+                 , val(y_upper_bound)
+                 , val(tolerance)
+                 , val(increment)
+                 , val(refinement_rate)
+                 , val(minimum_increment))
+            , x_lower_bound
+            , x_upper_bound
+            , tolerance
+            , increment
+            , refinement_rate
+            , minimum_increment);
 
         elapsed = t.elapsed();
     }
@@ -261,22 +319,40 @@ int main(int argc, char** argv)
     {
         high_resolution_timer t;
 
-        r = integrate_slowpath(sine(ln(_1)) + 1
-                             , lower_bound
-                             , upper_bound
-                             , tolerance
-                             , increment
-                             , refinement_rate
-                             , minimum_increment);
+        r = integrate_slowpath(
+              integrate_slowpath_(
+                   lambda(_a = val(_1))
+                   [
+                       _a * _a + val(4) * _1
+                   ]
+                 , val(y_lower_bound)
+                 , val(y_upper_bound)
+                 , val(tolerance)
+                 , val(increment)
+                 , val(refinement_rate)
+                 , val(minimum_increment)
+                 , val("dy"))
+            , x_lower_bound
+            , x_upper_bound
+            , tolerance
+            , increment
+            , refinement_rate
+            , minimum_increment
+            , "dx");
 
         elapsed = t.elapsed();
     }
 
-    cout << ( format("%1% integral of sin(log(x)) + 1 from %2% to %3% is %4%\n"
-                     "computation took %5% seconds\n")
+    cout << ( format("%1% integral x^2 + 4y with\n"
+                     "  x from %2% to %3%\n"
+                     "  y from %4% to %5%\n"
+                     "is %6%\n"
+                     "computation took %7% seconds\n")
             % ((fastpath == impl) ? "fastpath" : "slowpath")
-            % group(setprecision(ld_precision), lower_bound)
-            % group(setprecision(ld_precision), upper_bound)
+            % group(setprecision(ld_precision), x_lower_bound)
+            % group(setprecision(ld_precision), x_upper_bound)
+            % group(setprecision(ld_precision), y_lower_bound)
+            % group(setprecision(ld_precision), y_upper_bound)
             % group(setprecision(ld_precision), r)
             % group(setprecision(d_precision), elapsed));
 }

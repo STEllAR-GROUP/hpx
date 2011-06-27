@@ -32,7 +32,9 @@ endforeach()
 set(examples
     numerical_integration1
     numerical_integration2
-    numerical_integration3)
+    numerical_integration3
+    numerical_integration4
+    numerical_integration5)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}
