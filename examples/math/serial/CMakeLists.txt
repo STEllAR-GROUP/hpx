@@ -16,14 +16,29 @@ set(examples
     jacobsthal
     jacobsthal_bigint
     lanczos_gamma
-    lucas_jacobsthal
-    numerical_integration)
+    lucas_jacobsthal)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}
     MODULE math
     SOURCES ${example}.cpp
     DEPENDENCIES rt
+    NOLIBS)
+
+  # depend on the executable
+  add_hpx_pseudo_dependencies(${group} ${type}_${example}_exe)
+endforeach()
+
+set(examples
+    numerical_integration1
+    numerical_integration2
+    numerical_integration3)
+
+foreach(example ${examples})
+  add_hpx_executable(${type}_${example}
+    MODULE math
+    SOURCES ${example}.cpp
+    DEPENDENCIES rt ${BOOST_program_options_LIBRARY}
     NOLIBS)
 
   # depend on the executable
