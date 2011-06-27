@@ -10,11 +10,14 @@ set(group examples.math)
 set(examples
     scheduler)
 
+add_subdirectory(discovery)
+
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}
     MODULE math
     SOURCES ${example}.cpp
-    DEPENDENCIES iostreams_component)
+    DEPENDENCIES iostreams_component
+                 discovery_component)
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${type}_${example}_exe)

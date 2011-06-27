@@ -18,6 +18,8 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <examples/math/distributed/discovery/discovery.hpp>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -28,53 +30,22 @@ using hpx::naming::get_prefix_from_gid;
 
 using hpx::applier::get_applier;
 
-using hpx::actions::plain_result_action0;
-using hpx::actions::plain_action3;
+using hpx::components::get_component_type;
 
 using hpx::lcos::eager_future;
 using hpx::lcos::future_value;
 
+using hpx::balancing::discovery;
+using hpx::balancing::topology_map;
+
 using hpx::get_runtime;
 using hpx::init;
 using hpx::finalize;
+using hpx::find_here;
 
 using hpx::cout;
 using hpx::cerr;
 using hpx::flush;
-
-///////////////////////////////////////////////////////////////////////////////
-std::size_t report_shepherd_count();
-
-typedef plain_result_action0<
-    // result type
-    std::size_t 
-    // function
-  , report_shepherd_count
-> report_shepherd_count_action;
-
-HPX_REGISTER_PLAIN_ACTION(report_shepherd_count_action);
-
-typedef eager_future<report_shepherd_count_action> report_shepherd_count_future;
-
-///////////////////////////////////////////////////////////////////////////////
-std::size_t report_shepherd_count()
-{ return get_runtime().get_process().get_num_os_threads(); }
-
-///////////////////////////////////////////////////////////////////////////////
-void work_function(std::size_t begin, std::size_t end, double tolerance);
-
-typedef plain_action3<std::size_t, std::size_t, double, work_function>
-    work_function_action;
-
-HPX_REGISTER_PLAIN_ACTION(work_function_action);
-
-typedef eager_future<work_function_action> work_function_future;
-
-///////////////////////////////////////////////////////////////////////////////
-void work_function(std::size_t begin, std::size_t end, double tolerance)
-{
-    // IMPLEMENT
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool equal(double a, double b)
@@ -88,39 +59,55 @@ int master(variables_map& vm)
 
     const std::size_t points = vm["points"].as<std::size_t>();
 
-    // {{{ machine discovery 
-    std::vector<gid_type> localities;
-    get_applier().get_agas_client().get_prefixes(localities);
+    // {{{ machine discovery  
+    // Handle for the root discovery component. 
+    discovery root;
 
-    std::vector<future_value<std::size_t> > results;
-    BOOST_FOREACH(gid_type const& locality, localities)
-    { results.push_back(report_shepherd_count_future(locality)); }
+    // Create the first discovery component on this locality.
+    root.create(find_here());
+
+    cout() << "deploying discovery infrastructure\n";
+
+    // Deploy the scheduling infrastructure.
+    std::vector<id_type> network = root.deploy_sync(); 
+
+    // Get this localities topology map LVA
+    topology_map* topology_ptr
+        = reinterpret_cast<topology_map*>(root.topology_lva());
+
+    topology_map& topology = *topology_ptr;
 
     std::size_t total_shepherds = 0;
-    std::map<gid_type, std::size_t> topology;
-
-    for (std::size_t i = 0; i < results.size(); ++i)
+    BOOST_FOREACH(topology_map::value_type const& v, topology)
     {
-        const std::size_t shepherds = results[i].get();
-
         cout() << ( boost::format("locality %1% has %2% shepherds\n")
-                  % get_prefix_from_gid(localities[i])
-                  % shepherds);
-
-        topology[localities[i]] = shepherds;
-        total_shepherds += shepherds;
+                  % get_prefix_from_gid(v.first)
+                  % v.second);
+        total_shepherds += v.second;
     }
 
+    std::vector<gid_type> localities;
+    get_applier().get_agas_client().get_prefixes
+        (localities, get_component_type<hpx::balancing::server::discovery>());
+
+    if (topologies.size() != localities.size())
+    {
+        cout() << flush;
+        cerr() << "error: AGAS bug, mismatched locality lists encountered"
+               << endl; 
+        return 1;
+    } 
+    
     cout() << ( boost::format("%1% localities, %2% shepherds total\n")
-              % localities.size()
+              % topology.size()
               % total_shepherds);
     // }}}
 
     // In this case, just do it in serial
     if (points < total_shepherds)
     {
-        work_function(0, points - 1, 1.0);
-        cout() << flush;
+        // IMPLEMENT 
+        cout() << "job is small, running locally" << endl;
         return 0;
     } 
 
