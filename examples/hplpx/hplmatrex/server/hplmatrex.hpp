@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace server
     double** factorData;  //stores factors for computations
     double** trueData;    //the original unaltered data
     double** transData;   //transpose of the original data(speeds up pivoting)
-    double* solution;     //for storing the solution
+    double** solution;     //for storing the solution
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
     int* tempivotarr;     //temporary copy of pivotarr
@@ -145,10 +145,6 @@ namespace hpx { namespace components { namespace server
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
     typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
-
-    gmain_future**** main_futures; //A 3D array of pointers to gaussian
-                                   //elimination futures declared here
-                                   //after gmain_future is defined
     };
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -211,14 +207,6 @@ namespace hpx { namespace components { namespace server
     for(int i = 0;i < brows;i++){
         datablock[i] = (LUblock**)std::malloc(brows*sizeof(LUblock*));
     }
-    main_futures = (gmain_future****) 
-        std::malloc(brows*sizeof(gmain_future***));
-    for(int i = 0; i < brows; i++){
-        main_futures[i] = (gmain_future***) std::malloc(brows*sizeof(gmain_future**));
-        for(int j = 0; j < brows; j++){
-            main_futures[i][j] = (gmain_future**) 
-                std::malloc(std::min(i+1,j+1)*sizeof(gmain_future*));
-    }   }
     }
 
     /*assign gives values to the empty elements of the array.
@@ -278,21 +266,16 @@ namespace hpx { namespace components { namespace server
     int i;
     for(i=0;i<rows;i++){
         free(trueData[i]);
+        free(solution[i]);
     }
     for(i=0;i<brows;i++){
         for(int j=0;j<brows;j++){
-            for(int k=0;k<std::min(i+1,j+1);k++)
-                delete main_futures[i][j][k];
             delete datablock[i][j];
-            free(main_futures[i][j]);
         }
-        free(main_futures[i]);
         free(datablock[i]);
     }
-    free(main_futures);
     free(datablock);
     free(pivotarr);
-    free(factorData);
     free(trueData);
     free(solution);
     }
@@ -342,7 +325,13 @@ namespace hpx { namespace components { namespace server
     std::cout<<"finished gaussian "<<temp2 - temp<<std::endl;
 
     //allocate memory space to store the solution
-    solution = (double*) std::malloc(rows*sizeof(double));
+    solution = (double**) std::malloc(rows*sizeof(double*));
+    for(int i = 0; i < rows; i++){
+        free(factorData[i]);
+        solution[i] = (double*) std::malloc((brows+1)*sizeof(double));
+    }
+    free(factorData);
+
     //perform back substitution
     LUbacksubst();
     ptime endtime = ptime(microsec_clock::local_time());
@@ -352,7 +341,6 @@ namespace hpx { namespace components { namespace server
     int h = (int)std::ceil(((float)rows)*.5);
     int offset = 1;
     while(offset < h){offset *= 2;}
-    //create a future to check the accuracy of the generated solution
     check_future chk(_gid,0,offset,false);
     return chk.get();
     }
@@ -409,8 +397,7 @@ namespace hpx { namespace components { namespace server
                 }   }
                 pivotarr[i] = pivotarr[maxRow];
                 pivotarr[maxRow] = temp_piv;
-            }
-        }
+        }   }
         //here we begin swapping portions of the matrix we have finished
         //finding the pivot values for
         if(outer<brows-1){futures.push_back(swap_future(_gid,outer,0));}
@@ -475,20 +462,55 @@ namespace hpx { namespace components { namespace server
 
     //LU_gauss_manager creates futures as old futures finish their computations
     void HPLMatreX::LU_gauss_manager(){
-    int i,j;
+    int iter = 0, i, j;
+    int startElement, beginElement, endElement, nextElement;
+    std::vector<gmain_future> futures;
 
+    //the first iteration works different because we do not need to wait for
+    //any futures to complete before creating new futures
     LU_gauss_corner(0);
-    for(i = 0; i < brows-1; i++){
-//LU_gauss_main(i+1,i,i,3);
-//LU_gauss_main(i,i+1,i,2);
-        main_futures[i+1][i][i] = new gmain_future(_gid,i+1,i,i,3);
-        main_futures[i][i+1][i] = new gmain_future(_gid,i,i+1,i,2);
-        for(j = 1; i+j < brows; j++){
-//LU_gauss_main(i+j,i+j,i,1);
-            main_futures[i+j][i+j][i] = new gmain_future(_gid,i+j,i+j,i,1);
+    for(i = 1; i < brows; i++){
+        futures.push_back(gmain_future(_gid,i,0,0,3));
+    }
+    endElement = futures.size()-1;
+    for(i = 1; i < brows; i++){
+        futures.push_back(gmain_future(_gid,0,i,0,2));
+    }
+    beginElement = futures.size();
+    for(i = 0; i <= endElement; i++){
+        futures[i].get();
+    }
+    for(i = 1; i < brows; i++){
+        futures[endElement+i].get();
+        for(j = 1; j < brows; j++){
+            futures.push_back(gmain_future(_gid,j,i,0,1));
+    }   }
+    //from here on we need to wait for the previous iteration to partially
+    //complete before launching new futures
+    for(iter = 1; iter < brows; iter++){
+        startElement = futures.size();
+        futures[beginElement].get();
+        LU_gauss_corner(iter);
+        for(i = iter+1; i < brows; i++){
+            futures[beginElement+i-iter].get();
+            futures.push_back(gmain_future(_gid,i,iter,iter,3));
         }
-        main_futures[i+1][i+1][i]->get();
-        LU_gauss_corner(i+1);
+        endElement = futures.size()-1;
+        for(i = iter+1; i < brows; i++){
+            futures[beginElement+(brows-iter)*(i-iter)].get();
+            futures.push_back(gmain_future(_gid,iter,i,iter,2));
+        }
+        nextElement = futures.size();
+        for(i = startElement; i <= endElement; i++){
+            futures[i].get();
+        }
+        for(i = iter+1; i < brows; i++){
+            futures[endElement+i-iter].get();
+            for(j = iter+1; j < brows; j++){
+                futures[beginElement+(brows-iter)*(i-iter)+j-iter].get();
+                futures.push_back(gmain_future(_gid,j,i,iter,1));
+        }   }
+        beginElement = nextElement;
     }
     }
 
@@ -496,38 +518,13 @@ namespace hpx { namespace components { namespace server
     //action is needed instead of four types of actions
     int HPLMatreX::LU_gauss_main(const int brow,const int bcol,const int iter,
         const int type){
-    if(iter > 0){
-        while(main_futures[brow][bcol][iter-1]==NULL){sleep(1);}
-        main_futures[brow][bcol][iter-1]->get();
-        if(type == 1){
-            while(main_futures[brow][iter][iter]==NULL){sleep(1);}
-            main_futures[brow][iter][iter]->get();
-            while(main_futures[iter][bcol][iter]==NULL){sleep(1);}
-            main_futures[iter][bcol][iter]->get();
-    }   }
     if(type == 1){
-        if(brow >= bcol && brow < brows - 1)
-//LU_gauss_main(brow+1,bcol,iter,1);
-            main_futures[brow+1][bcol][iter] =
-                new gmain_future(_gid,brow+1,bcol,iter,1);
-        if(brow <= bcol && bcol < brows - 1)
-//LU_gauss_main(brow,bcol+1,iter,1);
-            main_futures[brow][bcol+1][iter] =
-                new gmain_future(_gid,brow,bcol+1,iter,1);
         LU_gauss_trail(brow,bcol,iter);
     }
     else if(type == 2){
-       if(bcol < brows - 1)
-//LU_gauss_main(brow,bcol+1,iter,2);
-           main_futures[brow][bcol+1][iter] =
-               new gmain_future(_gid,brow,bcol+1,iter,2);
-       LU_gauss_top(iter,bcol);
+        LU_gauss_top(iter,bcol);
     }
     else{
-        if(brow < brows - 1)
-//LU_gauss_main(brow+1,bcol,iter,3);
-            main_futures[brow+1][bcol][iter] =
-                new gmain_future(_gid,brow+1,bcol,iter,3);
         LU_gauss_left(brow,iter);
     }
     return 1;
@@ -625,27 +622,6 @@ namespace hpx { namespace components { namespace server
     }   }   }
     }}
 
-/*    int HPLMatreX::LU_mini_trail(const int srow,const int erow,const int scol,
-                                 const int ecol,const int iter){
-    const int brow = std::min(srow/blocksize,brows-1);
-    const int bcol = std::min(scol/blocksize,brows-1);
-    const int startrow = srow-brow*blocksize;
-    const int endrow = erow-brow*blocksize;
-    const int startcol = scol-bcol*blocksize;
-    const int endcol = ecol-bcol*blocksize;
-    int i, j, k;
-    double factor;
-
-    for(j=startrow;j<endrow;j++){
-        for(i=0;i<blocksize;i++){
-            factor = factorData[j+srow][i+scol];
-            for(k=startcol;k<endcol;k++){
-                datablock[brow][bcol]->data[j][k] -=
-                    factor*datablock[iter][bcol]->data[i][k];
-    }   }   }
-    return 1;
-    }
-*/
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure
     int HPLMatreX::LUbacksubst(){
@@ -656,7 +632,8 @@ namespace hpx { namespace components { namespace server
     for(i=0;i<brows;i++){
         temp = i*blocksize;
         for(k=0;k<datablock[i][0]->rows;k++){
-            solution[temp+k] = 
+            for(l=0;l<brows;l++){solution[temp+k][l] = 0;}
+            solution[temp+k][brows] = 
             datablock[i][brows-1]->data[k][datablock[i][brows-1]->columns-1];
     }   }
 
@@ -664,9 +641,9 @@ namespace hpx { namespace components { namespace server
     row = i*blocksize;
     for(k=datablock[i][i]->columns-2;k>=0;k--){
         temp = row+k;
-        solution[temp]/=datablock[i][i]->data[k][k];
+        solution[temp][brows]/=datablock[i][i]->data[k][k];
         for(l=k-1;l>=0;l--){
-            solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
+            solution[row+l][brows] -= datablock[i][i]->data[l][k]*solution[temp][brows];
     }   }
     neededFuture[0] = futures.size();
     for(k=brows-2;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
@@ -676,11 +653,15 @@ namespace hpx { namespace components { namespace server
             futures[neededFuture[k]].get();
             neededFuture[k]+=1;
         }
+        for(k=row;k<row+blocksize;k++){
+            for(l=i;l<brows;l++){
+                solution[k][brows] += solution[k][l];
+        }   }
         for(k=blocksize-1;k>=0;k--){
             temp = row+k;
-            solution[temp]/=datablock[i][i]->data[k][k];
+            solution[temp][brows]/=datablock[i][i]->data[k][k];
             for(l=k-1;l>=0;l--){
-                solution[row+l] -= datablock[i][i]->data[l][k]*solution[temp];
+                solution[row+l][brows] -= datablock[i][i]->data[l][k]*solution[temp][brows];
         }   }
         neededFuture[brows-i-1] = futures.size();
         for(k=i-1;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
@@ -699,9 +680,11 @@ namespace hpx { namespace components { namespace server
 
         for(i=0;i<blocksize;i++){
             for(j=0;j<cols;j++){
-                solution[row+i]-=datablock[brow][bcol]->data[i][j]*solution[col+j];
-        }   }
-        return 1;
+                solution[row+i][bcol] -= 
+                    datablock[brow][bcol]->data[i][j]*solution[col+j][brows];
+            }
+        }
+        return bcol;
     }
 
     //finally, this function checks the accuracy of the LU computation a few
@@ -724,8 +707,8 @@ namespace hpx { namespace components { namespace server
             }
             else{
                 if(row + offset < rows){
-            futures.push_back(check_future(_gid,row+offset,
-                (int)(offset*.5),false));
+                    futures.push_back(check_future(_gid,row+offset,
+                        (int)(offset*.5),false));
                 }
                 offset = (int)(offset*.5);
             }
@@ -736,16 +719,16 @@ namespace hpx { namespace components { namespace server
         int i,j;
         double sum;
         for(i=0;i<temp;i++){
-        sum = 0;
+            sum = 0;
             for(j=0;j<rows;j++){
-                sum += trueData[pivotarr[row+i]][j] * solution[j];
+                sum += trueData[pivotarr[row+i]][j] * solution[j][brows];
             }
-        toterror += std::fabs(sum-trueData[pivotarr[row+i]][rows]);
+            toterror += std::fabs(sum-trueData[pivotarr[row+i]][rows]);
         }
 
         //collect the results and add them up
         BOOST_FOREACH(check_future cf, futures){
-                toterror += cf.get();
+            toterror += cf.get();
         }
         return toterror;
     }
