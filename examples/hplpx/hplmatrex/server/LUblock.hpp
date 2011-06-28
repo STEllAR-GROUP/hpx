@@ -8,8 +8,7 @@
 #define _LUBLOCK_SERVER_HPP
 
 /*This is the LUblock class implementation header file.
-This is mostly just for storing data, but I hope to move
-the Gaussian elimination functions here eventually.
+This is to store data semi-contiguously.
 */
 
 class LUblock
@@ -20,9 +19,7 @@ class LUblock
     LUblock(unsigned int h, unsigned int w);
     ~LUblock();
 
-    //functions for assignment and data access
-
-//    private://data members
+    //data members
     int rows;
     int columns;
     double* workSpace;
@@ -34,8 +31,6 @@ class LUblock
 LUblock::LUblock(unsigned int h, unsigned int w){
     workSpace = (double*) std::malloc((8+h*w)*sizeof(double));
     data = (double**) std::malloc(h*sizeof(double*));
-//    rows = (int*) workSpace;
-//    columns = ((int*) workSpace) + 1;
     rows = h;
     columns = w;
     for(int i = 0;i < (int)h; i++){
