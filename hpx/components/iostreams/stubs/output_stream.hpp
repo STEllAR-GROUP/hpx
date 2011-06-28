@@ -38,6 +38,11 @@ struct output_stream : components::stub_base<server::output_stream>
         naming::id_type const& gid
       , std::deque<char> const& in
     ) { write_async(gid, in).get(); }
+
+    static void write(
+        naming::id_type const& gid
+      , std::deque<char> const& in
+    ) { write_async(gid, in).get(); }
 };
 
 }}}
