@@ -346,8 +346,10 @@ namespace hpx { namespace components { namespace server
     }
 
     //pivot() finds the pivot element of each column and stores it. All
-    //pivot elements are found before any swapping takes place so that
-    //the swapping is simplified
+    //pivot elements for a number of rows equal to blocksize are found
+    //before swapping takes place for those rows.  The swapping is done in
+    //parallel, and while one group of columns are being searched for pivot
+    //points other likely pivot points are identified in parallel as well.
     void HPLMatreX::pivot(){
     double max, temp;
     int maxRow, temp_piv, outer;
@@ -357,7 +359,13 @@ namespace hpx { namespace components { namespace server
     std::vector<swap_future> futures;
     std::vector<search_future> searches;
 
+    //each iteration finds pivot points for a blocksize number of rows.
+    //The prediction of future pivot points only is performed for the first
+    //half of the columns because later searches take less time than earlier
+    //searches and eventually overhead takes up more time than is saved
+    //from correct predictions.
     for(outer=0;outer<=brows;outer++){
+//******involved in predictions**********************************************//
         if(outer < (brows/2)){
             searches.push_back(search_future(_gid,(outer+1)*blocksize));
         }
@@ -368,7 +376,9 @@ namespace hpx { namespace components { namespace server
                 guessedPivots[j] = tempivotarr[j];
                 tempivotarr[j] = pivotarr[j];
         }   }
+//***************************************************************************//
         for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
+//**********involved in predictions******************************************//
             good = true;
             if(outer > 0 && outer <= brows/2){
                 for(j=i-blocksize;j<i;j++){
@@ -385,6 +395,9 @@ namespace hpx { namespace components { namespace server
                         pivotarr[j] = temp_piv;
                         break;
             }   }   }
+//***************************************************************************//
+            //This else statement is where the code for a normal pivot search
+            //is contained
             else{
                 maxRow = i;
                 max = fabs(transData[i][pivotarr[i]]);
@@ -399,7 +412,9 @@ namespace hpx { namespace components { namespace server
                 pivotarr[maxRow] = temp_piv;
         }   }
         //here we begin swapping portions of the matrix we have finished
-        //finding the pivot values for
+        //finding the pivot values for.  Due to how the LUblocks are used
+        //to represent the entire dataset, the second to last iteration
+        //does not create a new swap future.
         if(outer<brows-1){futures.push_back(swap_future(_gid,outer,0));}
         else if(outer==brows){futures.push_back(swap_future(_gid,outer-1,0));}
     }
@@ -419,7 +434,8 @@ namespace hpx { namespace components { namespace server
     free(tempivotarr);
     }
 
-    //search_pivots guesses where pivots will be
+    //search_pivots guesses where pivots will be to speed up the average
+    //search time in the pivot() function
     int HPLMatreX::search_pivots(const int row){
     int i, j, maxRow, temp_piv;
     double max, temp;
@@ -453,7 +469,7 @@ namespace hpx { namespace components { namespace server
     datablock[brow][k] = new LUblock(numrows,numcols);
     for(i=0;i<numrows;i++){
         for(j=0;j<numcols;j++){
-        datablock[brow][k]->data[i][j] =
+            datablock[brow][k]->data[i][j] =
             trueData[pivotarr[brow*blocksize+i]][k*blocksize+j];
     }   }
     }
@@ -461,6 +477,9 @@ namespace hpx { namespace components { namespace server
     }
 
     //LU_gauss_manager creates futures as old futures finish their computations
+    //Though not the perfect way of generating futures(a small amount of
+    //starvation occurs), the manager ensures that the computation is done in
+    //order with as many datablocks being operated on simultaneously as possible
     void HPLMatreX::LU_gauss_manager(){
     int iter = 0, i, j;
     int startElement, beginElement, endElement, nextElement;
@@ -515,7 +534,7 @@ namespace hpx { namespace components { namespace server
     }
 
     //LUgaussmain is a wrapper function which is used so that only one type of
-    //action is needed instead of four types of actions
+    //action is needed instead of three types of actions
     int HPLMatreX::LU_gauss_main(const int brow,const int bcol,const int iter,
         const int type){
     if(type == 1){
@@ -535,7 +554,7 @@ namespace hpx { namespace components { namespace server
     //computations. Once complete, this block will need no further computations
     void HPLMatreX::LU_gauss_corner(const int iter){
     int i, j, k;
-    const int offset = iter*blocksize;        //factorData index offset
+    const int offset = iter*blocksize;
     double fFactor;
     double factor;
 
@@ -558,7 +577,7 @@ namespace hpx { namespace components { namespace server
     //Once complete, these blocks will no longer need further computations
     void HPLMatreX::LU_gauss_top(const int iter, const int bcol){
     int i,j,k;
-    const int offset = iter*blocksize;        //factorData index offset
+    const int offset = iter*blocksize;
     double factor;
 
     for(i=0;i<datablock[iter][bcol]->rows;i++){
@@ -576,10 +595,13 @@ namespace hpx { namespace components { namespace server
     void HPLMatreX::LU_gauss_left(const int brow, const int iter){
     int i,j,k;
     const int offset = brow*blocksize;
-    const int offsetCol = iter*blocksize;    //factorData offset
+    const int offsetCol = iter*blocksize;
     double fFactor[datablock[brow][iter]->columns];
     double factor;
 
+    //this first block of code finds all necessary factors early on
+    //and allows for more efficient cache accesses for the second
+    //block, which is where the majority of work is performed
     for(i=0;i<datablock[brow][iter]->columns;i++){
         fFactor[i] = 1/datablock[iter][iter]->data[i][i];
         factor = fFactor[i]*datablock[brow][iter]->data[0][i];
@@ -604,8 +626,8 @@ namespace hpx { namespace components { namespace server
     //computations to be performed in future iterations.
     void HPLMatreX::LU_gauss_trail(const int brow,const int bcol,const int iter){
     int i,j,k,jj;
-    const int offset = brow*blocksize;    //factorData row offset
-    const int offsetCol = iter*blocksize;    //factorData column offset
+    const int offset = brow*blocksize;
+    const int offsetCol = iter*blocksize;
     double factor,temp;
 
     //outermost loop: iterates over the fFactors of the most recent corner 
@@ -623,12 +645,16 @@ namespace hpx { namespace components { namespace server
     }}
 
     //this is an implementation of back substitution modified for use on
-    //multiple datablocks instead of a single large data structure
+    //multiple datablocks instead of a single large data structure.
+    //Additionally, a large amount of the work is performed in parallel. This
+    //requires a significant amount of overhead, but the speedup is well worth
+    //the additional work.
     int HPLMatreX::LUbacksubst(){
     int i,k,l,row,temp;
     int neededFuture[brows-1];
     std::vector<partbsub_future> futures;
 
+    //first the solution values are initialized
     for(i=0;i<brows;i++){
         temp = i*blocksize;
         for(k=0;k<datablock[i][0]->rows;k++){
@@ -637,16 +663,20 @@ namespace hpx { namespace components { namespace server
             datablock[i][brows-1]->data[k][datablock[i][brows-1]->columns-1];
     }   }
 
+    //next the first iteration is completed(we don't wait for futures here)
     i = brows-1;
     row = i*blocksize;
     for(k=datablock[i][i]->columns-2;k>=0;k--){
         temp = row+k;
         solution[temp][brows]/=datablock[i][i]->data[k][k];
         for(l=k-1;l>=0;l--){
-            solution[row+l][brows] -= datablock[i][i]->data[l][k]*solution[temp][brows];
+            solution[row+l][brows] -= 
+                datablock[i][i]->data[l][k]*solution[temp][brows];
     }   }
     neededFuture[0] = futures.size();
     for(k=brows-2;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
+
+    //the remaining iterations are performed in this block of code
     for(i=brows-2;i>=0;i--){
         row = i*blocksize;
         for(k=0;k<brows-i-1;k++){
@@ -671,7 +701,7 @@ namespace hpx { namespace components { namespace server
 
     //part_bsub performs backsubstitution on a single block of data
     //the function is designed to both take advantage of cache locality
-    //and to allow fine grained parallelism of the back substitution
+    //and to allow fine grained parallelism during back substitution
     int HPLMatreX::part_bsub(const int brow, const int bcol){
         const int row = brow*blocksize, col = bcol*blocksize;
         int cols, i, j;
