@@ -61,7 +61,7 @@ struct HPX_COMPONENT_EXPORT integrator
         std::list<lcos::future_value<naming::id_type, naming::gid_type> >
             results0; 
     
-        BOOST_FOREACH(naming::gid_type const& node, discovery_network)
+        BOOST_FOREACH(naming::id_type const& node, discovery_network)
         {
             results0.push_back
                 (components::stubs::runtime_support::create_component_async
@@ -70,7 +70,9 @@ struct HPX_COMPONENT_EXPORT integrator
     
         std::vector<naming::id_type> integrator_network;
 
-        integrator_network.push_back(this->get_gid(this));
+        // REVIEW: Should naming::id_type::managed be used here instead?
+        integrator_network.push_back
+            (naming::id_type(this->get_base_gid(), naming::id_type::unmanaged));
     
         typedef lcos::future_value<naming::id_type, naming::gid_type>
             gid_future;
