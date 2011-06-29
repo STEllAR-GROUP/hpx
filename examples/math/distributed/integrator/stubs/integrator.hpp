@@ -59,34 +59,34 @@ struct integrator : components::stub_base<server::integrator<T> >
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<void> deploy_async(
         naming::id_type const& gid
-      , naming::id_type const& discovery
+      , naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         typedef typename server::integrator<T>::deploy_action action_type;
         return lcos::eager_future<action_type>
-            (gid, discovery, f, tolerance, regrid_segs);
+            (gid, discovery_gid, f, tolerance, regrid_segs);
     }
 
     static void deploy_sync(
         naming::id_type const& gid
-      , naming::id_type const& discovery
+      , naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        deploy_async(gid, discovery, f, tolerance, regrid_segs).get();
+        deploy_async(gid, discovery_gid, f, tolerance, regrid_segs).get();
     }
 
     static void deploy(
         naming::id_type const& gid
-      , naming::id_type const& discovery
+      , naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        deploy_async(gid, discovery, f, tolerance, regrid_segs).get();
+        deploy_async(gid, discovery_gid, f, tolerance, regrid_segs).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////

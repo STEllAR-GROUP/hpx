@@ -65,12 +65,12 @@ struct HPX_COMPONENT_EXPORT integrator
         {
             results0.push_back
                 (components::stubs::runtime_support::create_component_async
-                    (locality, components::get_component_type<integrator>()));
+                    (node, components::get_component_type<integrator>()));
         }
     
         std::vector<naming::id_type> integrator_network;
 
-        network.push_back(this->get_gid(this));
+        integrator_network.push_back(this->get_gid(this));
     
         typedef lcos::future_value<naming::id_type, naming::gid_type>
             gid_future;
@@ -98,7 +98,7 @@ struct HPX_COMPONENT_EXPORT integrator
     }
 
     void deploy(
-        naming::id_type const& discovery
+        naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
       , T const& regrid_segs 
@@ -106,7 +106,7 @@ struct HPX_COMPONENT_EXPORT integrator
         BOOST_ASSERT(applier::get_prefix_id() ==
                      naming::get_prefix_from_gid(discovery));
 
-        discovery disc_client(discovery);
+        discovery disc_client(discovery_gid);
 
         // DMA shortcut to reduce scheduling overhead.
         topology_ = reinterpret_cast<topology_map const*>

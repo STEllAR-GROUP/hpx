@@ -60,33 +60,33 @@ struct integrator
 
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<void> deploy_async(
-        naming::id_type const& discovery
+        naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return this->base_type::deploy_async
-            (this->gid_, discovery, f, tolerance, regrid_segs);
+            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
     }
 
     void deploy_sync(
-        naming::id_type const& discovery
+        naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         this->base_type::deploy_sync
-            (this->gid_, discovery, f, tolerance, regrid_segs);
+            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
     }
 
     void deploy(
-        naming::id_type const& discovery
+        naming::id_type const& discovery_gid
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         this->base_type::deploy
-            (this->gid_, discovery, f, tolerance, regrid_segs);
+            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
