@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <list>
+#include <algorithm>
 
 #include <boost/foreach.hpp>
 #include <boost/serialization/map.hpp>
@@ -77,8 +78,10 @@ boost::uint32_t discovery::report_shepherd_count()
 std::vector<naming::id_type> discovery::build_network()
 {
     std::vector<naming::gid_type> localities;
-    applier::get_applier().get_agas_client().get_prefixes
-        (localities, components::get_component_type<discovery>());
+    applier::get_applier().get_agas_client().get_prefixes(localities);
+
+    // Ensure that the prefixes returned are ordered.    
+    std::sort(localities.begin(), localities.end());
 
     std::vector<lcos::future_value<boost::uint32_t> > results0;
 
@@ -86,7 +89,7 @@ std::vector<naming::id_type> discovery::build_network()
     { results0.push_back(report_shepherd_count_future(locality)); }
 
     for (std::size_t i = 0; i < results0.size(); ++i)
-        topology_[localities[i]] = results0[i].get();
+        topology_.push_back(results0[i].get());
 
     std::list<lcos::future_value<naming::id_type, naming::gid_type> > results1; 
 

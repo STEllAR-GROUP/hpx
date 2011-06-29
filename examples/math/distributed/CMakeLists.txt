@@ -11,13 +11,15 @@ set(examples
     solver)
 
 add_subdirectory(discovery)
+add_subdirectory(integrator)
 
 foreach(example ${examples})
   add_hpx_executable(${type}_${example}
     MODULE math
     SOURCES ${example}.cpp
     DEPENDENCIES iostreams_component
-                 discovery_component)
+                 discovery_component
+                 rational64_integrator_component)
 
   # depend on the executable
   add_hpx_pseudo_dependencies(${group} ${type}_${example}_exe)

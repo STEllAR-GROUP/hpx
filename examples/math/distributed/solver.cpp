@@ -11,19 +11,16 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/rational.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_free.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
+#include <hpx/util/serialize_rational.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 #include <examples/math/distributed/discovery/discovery.hpp>
 #include <examples/math/distributed/integrator/integrator.hpp>
 
@@ -38,7 +35,9 @@ using hpx::naming::get_prefix_from_gid;
 using hpx::applier::get_applier;
 
 using hpx::components::get_component_type;
-using hpx::components::stubs::runtime_support::create_component;
+
+using hpx::actions::plain_result_action1;
+using hpx::actions::function;
 
 using hpx::lcos::eager_future;
 using hpx::lcos::future_value;
@@ -57,147 +56,118 @@ using hpx::cerr;
 using hpx::flush;
 using hpx::endl;
 
-namespace boost { namespace serialization
-{
-
-template <typename Archive, typename T>
-void save(Archive& ar, boost::rational<T> const& r, const unsigned int)
-{
-    T num = r.numerator(), den = r.denominator(); 
-    ar & num;
-    ar & den;
-}
-
-template <typename Archive, typename T>
-void load(Archive& ar, boost::rational<T>& r, const unsigned int)
-{
-    T num(0), den(0):
-    ar & num;
-    ar & den;
-    r.assign(num, den);
-}
-
-template <typename Archive, typename T>
-void serialize(Archive& ar, boost::rational<T>& r, const unsigned int version)
-{ split_free(ar, r, version); }
-
-}}
+using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef boost::rational<boost::uint64_t> rational;
-
-HPX_REGISTER_COMPONENT_MODULE();
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<rational>,
-    component_base_lco_with_value);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<
-        rational
-    >::set_result_action,
-    base_lco_with_value_set_result_rational);
+typedef boost::rational<boost::int64_t> rational64;
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Iterator, typename Container>
-inline Iterator& circular_next(Iterator& it, Container const& c)
-{
-    if (HPX_UNLIKELY(c.end() == it))
-        it = c.begin();
-    else
-        ++it;
-    return it; 
-}
-
-///////////////////////////////////////////////////////////////////////////////
-rational math_function (rational const& r)
+rational64 math_function (rational64 const& r)
 {
     // IMPLEMENT
-    return rational(0); 
+    return rational64(0); 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-typedef hpx::balancing::server::integrator<math_function, rational> 
-    integrator_type;
+typedef plain_result_action1<
+    // result type
+    rational64 
+    // arguments
+  , rational64 const&  
+    // function
+  , math_function
+> math_function_action;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::managed_component<
-        integrator_type
-    >, 
-    integrator_math_function_factory);
-
-HPX_REGISTER_ACTION_EX(
-    integrator_type::build_network_action,
-    integrator_math_function_build_network_action);
-
-HPX_REGISTER_ACTION_EX(
-    integrator_type::deploy_action,
-    integrator_math_function_deploy_action);
-
-HPX_REGISTER_ACTION_EX(
-    integrator_type::solve_action,
-    integrator_math_function_solve_action);
-
-HPX_REGISTER_ACTION_EX(
-    integrator_type::regrid_action,
-    integrator_math_function_regrid_action);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(integrator_type);
+HPX_REGISTER_PLAIN_ACTION(math_function_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int master(variables_map& vm)
 {
-    cout() << std::setprecision(12);
-    cerr() << std::setprecision(12);
-
     // Get options.
-    const rational lower_bound = vm["lower-bound"].as<rational>();
-    const rational upper_bound = vm["upper-bound"].as<rational>();
-    const rational tolerance = vm["tolerance"].as<rational>();
-    const rational top_segs = vm["top-segments"].as<rational>();
-    const rational regrid_segs = vm["regrid-segments"].as<rational>();
+    const rational64 lower_bound = vm["lower-bound"].as<rational64>();
+    const rational64 upper_bound = vm["upper-bound"].as<rational64>();
+    const rational64 tolerance = vm["tolerance"].as<rational64>();
+    const rational64 top_segs = vm["top-segments"].as<rational64>();
+    const rational64 regrid_segs = vm["regrid-segments"].as<rational64>();
 
     // Handle for the root discovery component. 
-    discovery root;
+    discovery disc_root;
 
     // Create the first discovery component on this locality.
-    root.create(find_here());
+    disc_root.create(find_here());
 
-    cout() << "deploying discovery infrastructure\n";
+    cout() << "deploying discovery infrastructure" << endl;
 
     // Deploy the scheduling infrastructure.
-    std::vector<id_type> network = root.build_network_sync(); 
+    std::vector<id_type> discovery_network = disc_root.build_network_sync(); 
 
     // Get this localities topology map LVA.
     topology_map const* topology_ptr
-        = reinterpret_cast<topology_map const*>(root.topology_lva_sync());
+        = reinterpret_cast<topology_map const*>(disc_root.topology_lva_sync());
 
     topology_map const& topology = *topology_ptr;
 
+    // Print out the system topology.
     boost::uint32_t total_shepherds = 0;
-    BOOST_FOREACH(topology_map::value_type const& v, topology)
+    for (std::size_t i = 0; i < topology.size(); ++i)
     {
-        cout() << ( boost::format("locality %1% has %2% shepherds\n")
-                  % v.first
-                  % v.second);
-        total_shepherds += v.second;
+        cout() << ( boost::format("locality %1% has %2% shepherds")
+                  % i 
+                  % topology[i])
+               << endl;
+        total_shepherds += topology[i]; 
     }
-    
-    cout() << ( boost::format("%1% localities, %2% shepherds total\n")
+
+    cout() << ( boost::format("%1% localities, %2% shepherds total")
               % topology.size()
-              % total_shepherds);
+              % total_shepherds)
+           << endl;
 
-    integrator<math_function, rational> client;
+    // Create the function that we're integrating.
+    function<rational64(rational64 const&)> f(new math_function_action);
 
-    client.create(find_here());
+    // Handle for the root integrator component. 
+    integrator<rational64> integ_root;
 
-    client.build_network_sync(network, tolerance, regrid_segs); 
+    // Create the initial integrator component on this locality. 
+    integ_root.create(find_here());
 
+    cout() << "deploying integration infrastructure" << endl;
+
+    // Now, build the integration infrastructure on all nodes.
+    std::vector<id_type> integrator_network =
+        integ_root.build_network_sync
+            (discovery_network, f, tolerance, regrid_segs); 
+
+    // Print out the GIDs of the discovery and integrator servers.
+    for (std::size_t i = 0; i < integrator_network.size(); ++i;)
+    {
+        // These vectors are sorted from lowest prefix to highest prefix.
+        cout() << ( boost::format("locality %1% infrastructure\n"
+                                  "  discovery server at %2%\n" 
+                                  "  integration server at %2%")
+                  % i
+                  % discovery_network[i]
+                  % integrator_network[i])
+               << endl; 
+    }
+
+    // Start the timer.
     high_resolution_timer t;
 
-    rational r = client.solve_sync(lower_bound, upper_bound, top_segs);
+    // Solve the integral using an adaptive trapezoid algorithm.
+    rational64 r = integ_root.solve_sync(lower_bound, upper_bound, top_segs);
 
     double elapsed = t.elapsed();
+
+    cout() << ( boost::format("integral from %1% to %2% is %3%\n"
+                              "computation took %4% seconds")
+              % boost::rational_cast<long double>(lower_bound)
+              % boost::rational_cast<long double>(upper_bound)
+              % boost::rational_cast<long double>(r)
+              % elapsed)
+           << endl;
+
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,23 +187,23 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "lower-bound"
-        , value<rational>()->default_value(rational(0), "0") 
+        , value<rational64>()->default_value(rational64(0), "0") 
         , "lower bound of integration")
 
         ( "upper-bound"
-        , value<rational>()->default_value(rational(2815, 7), "64*pi")
+        , value<rational64>()->default_value(rational64(2815, 7), "64*pi")
         , "upper bound of integration")
 
         ( "tolerance"
-        , value<rational>()->default_value(rational(0, 10), "0.1") 
+        , value<rational64>()->default_value(rational64(0, 10), "0.1") 
         , "resolution tolerance")
 
         ( "top-segments"
-        , value<rational>()->default_value(rational(4096), "4096") 
+        , value<rational64>()->default_value(rational64(4096), "4096") 
         , "number of top-level segments")
 
         ( "regrid-segments"
-        , value<rational>()->default_value(rational(128), "128") 
+        , value<rational64>()->default_value(rational64(128), "128") 
         , "number of segment per regrid")
         ;
 

@@ -16,67 +16,77 @@
 namespace hpx { namespace balancing { namespace stubs
 {
 
-template <typename F>
-struct integrator : components::stub_base<server::integrator<F, T> >
+template <typename T> 
+struct integrator : components::stub_base<server::integrator<T> >
 {
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<std::vector<naming::id_type> >
     build_network_async(
         naming::id_type const& gid
       , std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        typedef typename server::integrator<F, T>::build_network_action
+        typedef typename server::integrator<T>::build_network_action
             action_type;
         return lcos::eager_future<action_type>
-            (gid, discovery_network, tolerance, regrid_segs);
+            (gid, discovery_network, f, tolerance, regrid_segs);
     }
 
     static std::vector<naming::id_type> build_network_sync(
         naming::id_type const& gid
       , std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return build_network_async
-            (gid, discovery_network, tolerance, regrid_segs).get();
+            (gid, discovery_network, f, tolerance, regrid_segs).get();
     }
 
     static std::vector<naming::id_type> build_network(
         naming::id_type const& gid
       , std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return build_network_async
-            (gid, discovery_network, tolerance, regrid_segs).get();
+            (gid, discovery_network, f, tolerance, regrid_segs).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<void> deploy_async(
         naming::id_type const& gid
+      , naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        typedef typename server::integrator<F, T>::deploy_action action_type;
-        return lcos::eager_future<action_type>(gid, tolerance, regrid_segs);
+        typedef typename server::integrator<T>::deploy_action action_type;
+        return lcos::eager_future<action_type>
+            (gid, discovery, f, tolerance, regrid_segs);
     }
 
     static void deploy_sync(
         naming::id_type const& gid
+      , naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        deploy_async(gid, tolerance, regrid_segs).get();
+        deploy_async(gid, discovery, f, tolerance, regrid_segs).get();
     }
 
     static void deploy(
         naming::id_type const& gid
+      , naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
-        deploy_async(gid, tolerance, regrid_segs).get();
+        deploy_async(gid, discovery, f, tolerance, regrid_segs).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,7 +97,7 @@ struct integrator : components::stub_base<server::integrator<F, T> >
       , T const& upper_bound
       , T const& segments
     ) {
-        typedef typename server::integrator<F, T>::solve_action
+        typedef typename server::integrator<T>::solve_action
             action_type;
         return lcos::eager_future<action_type>
             (gid, lower_bound, upper_bound, segments);
@@ -121,7 +131,7 @@ struct integrator : components::stub_base<server::integrator<F, T> >
       , T const& upper_bound
       , T const& segments
     ) {
-        typedef typename server::integrator<F, T>::regrid_action
+        typedef typename server::integrator<T>::regrid_action
             action_type;
         return lcos::eager_future<action_type>(gid, lower_bound, upper_bound);
     }

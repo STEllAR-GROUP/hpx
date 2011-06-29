@@ -16,11 +16,11 @@
 namespace hpx { namespace balancing 
 {
 
-template <typename F, typename T> 
+template <typename T> 
 struct integrator
-    : components::client_base<integrator<F, T>, stubs::integrator<F, T> >
+    : components::client_base<integrator<T>, stubs::integrator<T> >
 {
-    typedef components::client_base<integrator<F, T>, stubs::integrator<F, T> >
+    typedef components::client_base<integrator<T>, stubs::integrator<T> >
         base_type;
 
   public:
@@ -30,52 +30,63 @@ struct integrator
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<std::vector<naming::id_type> > build_network_async(
         std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return this->base_type::build_network_async
-            (this->gid_, discovery_network, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs);
     }
 
     std::vector<naming::id_type> build_network_sync(
         std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return this->base_type::build_network_sync
-            (this->gid_, discovery_network, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs);
     }
 
     std::vector<naming::id_type> build_network(
         std::vector<naming::id_type> const& discovery_network
+      , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
     ) {
         return this->base_type::build_network
-            (this->gid_, discovery_network, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<void> deploy_async(
-        T const& tolerance
+        naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
+      , T const& tolerance
       , T const& regrid_segs 
     ) {
         return this->base_type::deploy_async
-            (this->gid_, tolerance, regrids_segs);
+            (this->gid_, discovery, f, tolerance, regrid_segs);
     }
 
     void deploy_sync(
-        T const& tolerance
+        naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
+      , T const& tolerance
       , T const& regrid_segs 
     ) {
-        this->base_type::deploy_sync(this->gid_, tolerance, regrid_segs);
+        this->base_type::deploy_sync
+            (this->gid_, discovery, f, tolerance, regrid_segs);
     }
 
     void deploy(
-        T const& tolerance
+        naming::id_type const& discovery
+      , actions::function<T(T const&)> const& f
+      , T const& tolerance
       , T const& regrid_segs 
     ) {
-        this->base_type::deploy(this->gid_, tolerance, regrid_segs);
+        this->base_type::deploy
+            (this->gid_, discovery, f, tolerance, regrid_segs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
