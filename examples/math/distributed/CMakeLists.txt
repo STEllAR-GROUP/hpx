@@ -8,7 +8,7 @@ set(type distributed)
 set(group examples.math)
 
 set(examples
-    scheduler)
+    solver)
 
 add_subdirectory(discovery)
 

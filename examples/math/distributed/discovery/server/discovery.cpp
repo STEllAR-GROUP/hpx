@@ -53,7 +53,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(discovery);
 
 typedef hpx::actions::plain_result_action0<
     // result type
-    std::size_t 
+    boost::uint32_t 
     // function
   , hpx::balancing::server::discovery::report_shepherd_count
 > report_shepherd_count_action;
@@ -71,7 +71,7 @@ typedef hpx::lcos::eager_future<
 namespace hpx { namespace balancing { namespace server
 {
 
-std::size_t discovery::report_shepherd_count()
+boost::uint32_t discovery::report_shepherd_count()
 { return get_runtime().get_process().get_num_os_threads(); }
 
 std::vector<naming::id_type> discovery::build_network()
@@ -80,7 +80,7 @@ std::vector<naming::id_type> discovery::build_network()
     applier::get_applier().get_agas_client().get_prefixes
         (localities, components::get_component_type<discovery>());
 
-    std::vector<lcos::future_value<std::size_t> > results0;
+    std::vector<lcos::future_value<boost::uint32_t> > results0;
 
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     { results0.push_back(report_shepherd_count_future(locality)); }
@@ -98,6 +98,10 @@ std::vector<naming::id_type> discovery::build_network()
     }
 
     std::vector<naming::id_type> network;
+
+    // REVIEW: Should naming::id_type::managed be used here instead?
+    network.push_back(naming::id_type(this->get_base_gid()
+                                    , naming::id_type::unmanaged));
 
     typedef lcos::future_value<naming::id_type, naming::gid_type> gid_future;
     BOOST_FOREACH(gid_future const& f, results1)

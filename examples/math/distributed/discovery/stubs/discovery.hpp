@@ -13,7 +13,7 @@
 
 #include <examples/math/distributed/discovery/server/discovery.hpp>
 
-namespace hpx { namespace discovery { namespace stubs
+namespace hpx { namespace balancing { namespace stubs
 {
 
 struct discovery : components::stub_base<server::discovery>
@@ -33,12 +33,12 @@ struct discovery : components::stub_base<server::discovery>
 
     static std::vector<naming::id_type> build_network(
         naming::id_type const& gid
-    ) { return build_network(gid).get(); }
+    ) { return build_network_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<void> deploy_async(
         naming::id_type const& gid
-      , std::map<naming::gid_type, std::size_t> const& m
+      , std::vector<boost::uint32_t> const& m
     ) {
         typedef server::discovery::deploy_action action_type;
         return lcos::eager_future<action_type>(gid, m);
@@ -46,13 +46,13 @@ struct discovery : components::stub_base<server::discovery>
 
     static void deploy_sync(
         naming::id_type const& gid
-      , std::map<naming::gid_type, std::size_t> const& m
+      , std::vector<boost::uint32_t> const& m
     ) { deploy_async(gid,m ).get(); }
 
     static void deploy(
         naming::id_type const& gid
-      , std::map<naming::gid_type, std::size_t> const& m
-    ) { deploy(gid, m).get(); }
+      , std::vector<boost::uint32_t> const& m
+    ) { deploy_async(gid, m).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<hpx::uintptr_t> topology_lva_async(
@@ -68,7 +68,7 @@ struct discovery : components::stub_base<server::discovery>
 
     static hpx::uintptr_t topology_lva(
         naming::id_type const& gid
-    ) { return topology_lva(gid).get(); }
+    ) { return topology_lva_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<bool> empty_async(
@@ -84,7 +84,7 @@ struct discovery : components::stub_base<server::discovery>
 
     static bool empty(
         naming::id_type const& gid
-    ) { return empty(gid).get(); }
+    ) { return empty_async(gid).get(); }
 };
 
 }}}

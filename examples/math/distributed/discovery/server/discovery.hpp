@@ -9,11 +9,9 @@
 #define HPX_17581FEA_9F85_45E9_8CB1_36AF08A4809B
 
 #include <vector>
-#include <map>
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_shared_mutex.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -26,12 +24,11 @@ struct HPX_COMPONENT_EXPORT discovery
     : components::simple_component_base<discovery> 
 {
     typedef components::simple_component_base<discovery> base_type; 
-    // }}}
     
-    static std::size_t report_shepherd_count();
+    static boost::uint32_t report_shepherd_count();
 
   private:
-    std::map<naming::gid_type, std::size_t> topology_;
+    std::vector<boost::uint32_t> topology_;
 
   public:
     enum actions
@@ -44,17 +41,23 @@ struct HPX_COMPONENT_EXPORT discovery
 
     std::vector<naming::id_type> build_network();
 
-    void deploy(std::map<naming::gid_type, std::size_t> const& m)
+    void deploy(std::vector<boost::uint32_t> const& m)
     { topology_ = m; }
 
     hpx::uintptr_t topology_lva()
     { return reinterpret_cast<hpx::uintptr_t>(&topology_); } 
 
     bool empty() 
-    { return topology.empty(); } 
+    { return topology_.empty(); } 
+    
+    boost::uint32_t operator[] (naming::id_type const& gid) 
+    { return topology_[naming::get_prefix_from_gid(gid.get_gid())]; } 
 
-    std::size_t operator[] (naming::gid_type const& gid) 
-    { return topology[gid]; } 
+    boost::uint32_t operator[] (naming::gid_type const& gid) 
+    { return topology_[naming::get_prefix_from_gid(gid)]; } 
+
+    boost::uint32_t operator[] (boost::uint32_t const& prefix) 
+    { return topology_[prefix]; } 
 
     typedef actions::result_action0<
         discovery
@@ -66,7 +69,7 @@ struct HPX_COMPONENT_EXPORT discovery
     typedef actions::action1<
         discovery
       , discovery_deploy
-      , std::map<naming::gid_type, std::size_t> const&
+      , std::vector<boost::uint32_t> const&
       , &discovery::deploy
     > deploy_action;
     

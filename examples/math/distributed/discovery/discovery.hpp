@@ -16,7 +16,7 @@
 namespace hpx { namespace balancing 
 {
 
-typedef std::map<naming::gid_type, std::size_t> topology_map;
+typedef std::vector<boost::uint32_t> topology_map;
 
 struct discovery : components::client_base<discovery, stubs::discovery>
 {
@@ -38,17 +38,14 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::build_network(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<void> deploy_async(
-        std::map<naming::gid_type, std::size_t> const& m
-    ) { return this->base_type::deploy_async(this->gid_, m); }
+    lcos::future_value<void> deploy_async(std::vector<boost::uint32_t> const& m)
+    { return this->base_type::deploy_async(this->gid_, m); }
 
-    void deploy_sync(
-        std::map<naming::gid_type, std::size_t> const& m
-    ) { this->base_type::deploy_sync(this->gid_, m); }
+    void deploy_sync(std::vector<boost::uint32_t> const& m)
+    { this->base_type::deploy_sync(this->gid_, m); }
 
-    void deploy(
-        std::map<naming::gid_type, std::size_t> const& m
-    ) { this->base_type::deploy(this->gid_, m); }
+    void deploy(std::vector<boost::uint32_t> const& m)
+    { this->base_type::deploy(this->gid_, m); }
 
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<hpx::uintptr_t> topology_lva_async()
