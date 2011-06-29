@@ -33,6 +33,8 @@ namespace hpx
 
     HPX_API_EXPORT bool is_system_running();
 
+    HPX_API_EXPORT naming::id_type find_here();
+
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the

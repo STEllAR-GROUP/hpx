@@ -30,14 +30,6 @@ int hpx_main(boost::program_options::variables_map& vm) HPX_EXPORT;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Helpers
-    inline naming::id_type find_here()
-    {
-        return naming::id_type(applier::get_applier().get_prefix()
-                             , naming::id_type::unmanaged);
-    }
-
     template <typename T>
     inline void 
     get_option(boost::program_options::variables_map& vm,
