@@ -104,9 +104,9 @@ struct HPX_COMPONENT_EXPORT integrator
       , T const& regrid_segs 
     ) {
         BOOST_ASSERT(applier::get_prefix_id() ==
-                     naming::get_prefix_from_gid(discovery));
+                     naming::get_prefix_from_gid(discovery_gid));
 
-        discovery disc_client(discovery_gid);
+        balancing::discovery disc_client(discovery_gid);
 
         // DMA shortcut to reduce scheduling overhead.
         topology_ = reinterpret_cast<topology_map const*>
