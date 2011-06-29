@@ -14,6 +14,7 @@
 #include <boost/serialization/tracking.hpp>
 
 #include <hpx/exception.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/future_value.hpp>

@@ -27,6 +27,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/void_cast.hpp>
 #include <boost/serialization/access.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
