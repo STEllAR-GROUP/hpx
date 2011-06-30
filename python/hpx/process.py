@@ -12,14 +12,16 @@ from threading import Thread
 try:
   from subprocess import Popen, STDOUT, PIPE
   from types import StringType
-    
+  from shlex import split
+ 
   class process:
     _proc = None
     _exec = None
         
     def __init__(self, cmd):
-      self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE,
-        shell = (False, True)[type(cmd) == StringType])
+      if StringType == type(cmd):
+        cmd = split(cmd)
+      self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE, shell = False) 
 
     def poll(self):
       return self._proc.poll()

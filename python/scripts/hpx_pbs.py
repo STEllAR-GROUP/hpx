@@ -165,7 +165,9 @@ def execute_function(user, hostname, port, keys, key, cmd, callback, timeout):
     try:  
       with channel_raii(transport) as channel:  
         channel.set_combine_stderr(True)
-        channel.settimeout(float(timeout))
+        # We add 30 seconds to the timeout to give hpx_invoke time to kill the
+        # process on the remote end.
+        channel.settimeout(float(timeout) + 30.0)
         channel.exec_command(cmd)
   
         output = ''
