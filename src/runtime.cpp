@@ -49,8 +49,27 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 
 #else
 
+#include <iostream>
 #include <pthread.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#if defined(HPX_STACKTRACES)
+    #include <boost/backtrace.hpp>
+#endif
+
+extern "C" void hpx_termination_handler(int signum)
+{
+    char* c = strsignal(signum); 
+    std::cerr << "Received " << (c ? c : "unknown signal")
+    #if defined(HPX_STACKTRACES)
+              << ", " << boost::trace() 
+    #else
+              << "."
+    #endif
+              << std::endl;
+    ::abort();
+}
 
 #endif
 
