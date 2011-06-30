@@ -6,11 +6,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <iomanip>
+#include <cmath>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/rational.hpp>
+#include <boost/integer_traits.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -64,8 +66,7 @@ typedef boost::rational<boost::int64_t> rational64;
 ///////////////////////////////////////////////////////////////////////////////
 rational64 math_function (rational64 const& r)
 {
-    // IMPLEMENT
-    return rational64(0); 
+    return rational64(sqrt(r.numerator()), sqrt(r.denominator())); 
 }
 
 typedef plain_result_action1<
@@ -133,10 +134,12 @@ int master(variables_map& vm)
 
     cout() << "deploying integration infrastructure" << endl;
 
+    const rational64 eps(1, boost::integer_traits<boost::int64_t>::const_min);
+
     // Now, build the integration infrastructure on all nodes.
     std::vector<id_type> integrator_network =
         integ_root.build_network_sync
-            (discovery_network, f, tolerance, regrid_segs); 
+            (discovery_network, f, tolerance, regrid_segs, eps); 
 
     // Print out the GIDs of the discovery and integrator servers.
     for (std::size_t i = 0; i < integrator_network.size(); ++i)
@@ -187,10 +190,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "lower-bound"
-        , value<rational64>()->default_value(rational64(0), "0") 
+//        , value<rational64>()->default_value(rational64(0), "0") 
         , "lower bound of integration")
 
         ( "upper-bound"
+//        , value<rational64>()->default_value(rational64(2815, 7), "64*pi")
         , value<rational64>()->default_value(rational64(2815, 7), "64*pi")
         , "upper bound of integration")
 

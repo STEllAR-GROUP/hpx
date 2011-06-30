@@ -51,12 +51,12 @@ HPX_REGISTER_ACTION_EX(
     integrator_rational64_deploy_action);
 
 HPX_REGISTER_ACTION_EX(
-    integrator_type::solve_action,
-    integrator_rational64_solve_action);
+    integrator_type::solve_iteration_action,
+    integrator_rational64_solve_iteration_action);
 
 HPX_REGISTER_ACTION_EX(
-    integrator_type::regrid_action,
-    integrator_rational64_regrid_action);
+    integrator_type::solve_action,
+    integrator_rational64_solve_action);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(integrator_type);
 

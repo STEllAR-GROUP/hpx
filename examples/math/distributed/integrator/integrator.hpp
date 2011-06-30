@@ -33,9 +33,10 @@ struct integrator
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         return this->base_type::build_network_async
-            (this->gid_, discovery_network, f, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs, eps);
     }
 
     std::vector<naming::id_type> build_network_sync(
@@ -43,9 +44,10 @@ struct integrator
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         return this->base_type::build_network_sync
-            (this->gid_, discovery_network, f, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs, eps);
     }
 
     std::vector<naming::id_type> build_network(
@@ -53,40 +55,10 @@ struct integrator
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         return this->base_type::build_network
-            (this->gid_, discovery_network, f, tolerance, regrid_segs);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<void> deploy_async(
-        naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        return this->base_type::deploy_async
-            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
-    }
-
-    void deploy_sync(
-        naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        this->base_type::deploy_sync
-            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
-    }
-
-    void deploy(
-        naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        this->base_type::deploy
-            (this->gid_, discovery_gid, f, tolerance, regrid_segs);
+            (this->gid_, discovery_network, f, tolerance, regrid_segs, eps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,7 +68,7 @@ struct integrator
       , T const& segments
     ) {
         return this->base_type::solve_async
-            (this->gid_, lower_bound, upper_bound, segments);
+            (this->gid_, lower_bound, upper_bound, segments, 0);
     }
 
     T solve_sync(
@@ -105,7 +77,7 @@ struct integrator
       , T const& segments
     ) {
         return this->base_type::solve_sync
-            (this->gid_, lower_bound, upper_bound, segments);
+            (this->gid_, lower_bound, upper_bound, segments, 0);
     }
 
     T solve(
@@ -114,31 +86,7 @@ struct integrator
       , T const& segments
     ) {
         return this->base_type::solve
-            (this->gid_, lower_bound, upper_bound, segments);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<T> regrid_async(
-        T const& lower_bound
-      , T const& upper_bound
-    ) {
-        return this->base_type::regrid_async
-            (this->gid_, lower_bound, upper_bound);
-    }
-
-    T regrid_sync(
-        T const& lower_bound
-      , T const& upper_bound
-    ) {
-        return this->base_type::regrid_sync
-            (this->gid_, lower_bound, upper_bound);
-    }
-
-    T regrid(
-        T const& lower_bound
-      , T const& upper_bound
-    ) {
-        return this->base_type::regrid(this->gid_, lower_bound, upper_bound);
+            (this->gid_, lower_bound, upper_bound, segments, 0);
     }
 };
 

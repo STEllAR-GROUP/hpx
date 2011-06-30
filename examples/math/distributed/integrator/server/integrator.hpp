@@ -45,8 +45,11 @@ struct HPX_COMPONENT_EXPORT integrator
     topology_map const* topology_;
     boost::atomic<current_shepherd> current_;
     actions::function<T(T const&)> f_;
+    std::vector<naming::id_type> network_;
     T tolerance_;
     T regrid_segs_;
+    T epsilon_;
+    const boost::uint32_t here_;
 
     current_shepherd round_robin()
     {
@@ -79,15 +82,18 @@ struct HPX_COMPONENT_EXPORT integrator
     {
         integrator_build_network,
         integrator_deploy,
+        integrator_solve_iteration,
         integrator_solve,
-        integrator_regrid
     };
+
+    integrator() : here_(applier::get_prefix_id()) {} 
 
     std::vector<naming::id_type> build_network(
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& epsilon 
     ) {
         std::list<lcos::future_value<naming::id_type, naming::gid_type> >
             results0; 
@@ -117,9 +123,11 @@ struct HPX_COMPONENT_EXPORT integrator
             typedef lcos::eager_future<deploy_action> deploy_future; 
             results1.push_back(deploy_future(integrator_network[i]
                                            , discovery_network[i]
+                                           , integrator_network
                                            , f
                                            , tolerance
-                                           , regrid_segs));
+                                           , regrid_segs
+                                           , epsilon));
         }
     
         BOOST_FOREACH(lcos::future_value<void> const& r, results1)
@@ -130,12 +138,13 @@ struct HPX_COMPONENT_EXPORT integrator
 
     void deploy(
         naming::id_type const& discovery_gid
+      , std::vector<naming::id_type> const& network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
-      , T const& regrid_segs 
+      , T const& regrid_segs
+      , T const& epsilon 
     ) {
-        BOOST_ASSERT(applier::get_prefix_id() ==
-                     naming::get_prefix_from_id(discovery_gid));
+        BOOST_ASSERT(here_ == naming::get_prefix_from_id(discovery_gid));
 
         balancing::discovery disc_client(discovery_gid);
 
@@ -143,31 +152,104 @@ struct HPX_COMPONENT_EXPORT integrator
         topology_ = reinterpret_cast<topology_map const*>
             (disc_client.topology_lva_sync());
 
+        network_ = network;
+
+        BOOST_ASSERT(topology_->size() == network_.size());
+
         f_ = f;
         tolerance_ = tolerance;
         regrid_segs_ = regrid_segs; 
+        epsilon_ = epsilon;
 
-        current_.store(current_shepherd(applier::get_prefix_id(), 0)); 
+        current_.store(current_shepherd(here_, 0)); 
+    }
+
+    T solve_iteration(
+        T const& i
+      , T const& increment
+      , boost::uint32_t depth
+    ) {
+        const T f_i = f_(i);
+
+        // solve() checks the increment size and ensures that the increment we
+        // get isn't too small.
+        if (abs(f_(i + (increment / 2) - f_i) < tolerance))
+            // If we're under the tolerance, then we just compute the area.
+            return f_i * increment;
+
+        // Regrid.
+        else
+        {
+            lcos::eager_future<solve_action> r(network_[round_robin()]
+                                             , i
+                                             , i + increment
+                                             , regrid_segs_
+                                             , 1 + depth);
+            return r.get();
+        }
+    }
+
+    T solve_first(
+        T const& f_lower 
+      , T const& lower_bound
+      , T const& increment
+      , boost::uint32_t depth
+    ) {
+        // solve() checks the increment size and ensures that the increment we
+        // get isn't too small.
+        if (abs(f_(i + (increment / 2) - f_lower) < tolerance))
+            // If we're under the tolerance, then we just compute the area.
+            return f_lower * increment;
+
+        // Regrid.
+        else
+        {
+            lcos::eager_future<solve_action> r(network_[round_robin()]
+                                             , lower_bound
+                                             , lower_bound + increment
+                                             , regrid_segs_
+                                             , 1 + depth);
+            return r.get();
+        }
     }
 
     T solve(
         T const& lower_bound
       , T const& upper_bound
       , T const& segments
+      , boost::uint32_t depth
     ) {
-        // IMPLEMENT
-        return T(0);
+        std::list<future_value<T> > results;
+
+        const T length = (upper_bound - lower_bound);
+        const T f_lower = f_(lower_bound);
+
+        // Make sure the range isn't too small. We need 2 * segments values;
+        // we have to be able to divide each increment by two to check if we're
+        // under the tolerance. If the range is too small, we can't refine any
+        // further and our answer is just f_(lower_bound) * length.
+        if (length <= (segments * eps * 2))
+            return f_lower * length; 
+
+        T increment = length / segments;
+
+        BOOST_ASSERT((lower_bound + increment) < upper_bound);
+
+        for (T i = lower_bound + increment; i < upper_bound; i += increment)
+            results.push_back(lcos::eager_future<solve_iteration_action>
+                (this->get_gid(), i, increment, depth)); 
+
+        // Avoid computing f_(lower_bound) another time in the for loop.
+        T total_area = solve_first(f_lower, lower_bound, increment, depth);  
+ 
+        // Accumulate final result. TODO: Check for overflow.
+        BOOST_FOREACH(future_value<T> const& r, total_area)
+        { total_area += r.get(); }
+ 
+        return total_area;
     }
 
-    T regrid(
-        T const& lower_bound
-      , T const& upper_bound
-    ) {
-        // IMPLEMENT
-        return T(0);
-    }
-
-    typedef actions::result_action4<
+    typedef actions::result_action5<
         // class
         integrator<T>
         // result
@@ -179,23 +261,41 @@ struct HPX_COMPONENT_EXPORT integrator
       , actions::function<T(T const&)> const&
       , T const& 
       , T const& 
+      , T const& 
         // function
       , &integrator<T>::build_network
     > build_network_action;
 
-    typedef actions::action4<
+    typedef actions::action6<
         // class
         integrator<T>
         // action value type
       , integrator_deploy
         // arguments 
       , naming::id_type const&
+      , std::vector<naming::id_type> const&
       , actions::function<T(T const&)> const&
+      , T const& 
       , T const& 
       , T const& 
         // function
       , &integrator<T>::deploy
     > deploy_action;
+
+    typedef actions::result_action2<
+        // class
+        integrator<T>
+        // result
+      , T 
+        // action value type
+      , integrator_solve_iteration
+        // arguments 
+      , T const& 
+      , T const& 
+      , boost::uint32_t 
+        // function
+      , &integrator<T>::solve_iteration
+    > solve_iteration_action;
     
     typedef actions::result_action3<
         // class
@@ -208,23 +308,10 @@ struct HPX_COMPONENT_EXPORT integrator
       , T const& 
       , T const& 
       , T const& 
+      , boost::uint32_t 
         // function
       , &integrator<T>::solve
     > solve_action;
-
-    typedef actions::result_action2<
-        // class
-        integrator<T>
-        // result
-      , T 
-        // action value type
-      , integrator_regrid
-        // arguments 
-      , T const& 
-      , T const& 
-        // function
-      , &integrator<T>::regrid
-    > regrid_action;
 };
 
 }}}

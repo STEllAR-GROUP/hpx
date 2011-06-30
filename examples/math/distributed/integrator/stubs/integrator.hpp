@@ -27,11 +27,12 @@ struct integrator : components::stub_base<server::integrator<T> >
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         typedef typename server::integrator<T>::build_network_action
             action_type;
         return lcos::eager_future<action_type>
-            (gid, discovery_network, f, tolerance, regrid_segs);
+            (gid, discovery_network, f, tolerance, regrid_segs, eps);
     }
 
     static std::vector<naming::id_type> build_network_sync(
@@ -40,9 +41,10 @@ struct integrator : components::stub_base<server::integrator<T> >
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         return build_network_async
-            (gid, discovery_network, f, tolerance, regrid_segs).get();
+            (gid, discovery_network, f, tolerance, regrid_segs, eps).get();
     }
 
     static std::vector<naming::id_type> build_network(
@@ -51,42 +53,10 @@ struct integrator : components::stub_base<server::integrator<T> >
       , actions::function<T(T const&)> const& f
       , T const& tolerance
       , T const& regrid_segs 
+      , T const& eps 
     ) {
         return build_network_async
-            (gid, discovery_network, f, tolerance, regrid_segs).get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<void> deploy_async(
-        naming::id_type const& gid
-      , naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        typedef typename server::integrator<T>::deploy_action action_type;
-        return lcos::eager_future<action_type>
-            (gid, discovery_gid, f, tolerance, regrid_segs);
-    }
-
-    static void deploy_sync(
-        naming::id_type const& gid
-      , naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        deploy_async(gid, discovery_gid, f, tolerance, regrid_segs).get();
-    }
-
-    static void deploy(
-        naming::id_type const& gid
-      , naming::id_type const& discovery_gid
-      , actions::function<T(T const&)> const& f
-      , T const& tolerance
-      , T const& regrid_segs 
-    ) {
-        deploy_async(gid, discovery_gid, f, tolerance, regrid_segs).get();
+            (gid, discovery_network, f, tolerance, regrid_segs, eps).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -100,7 +70,7 @@ struct integrator : components::stub_base<server::integrator<T> >
         typedef typename server::integrator<T>::solve_action
             action_type;
         return lcos::eager_future<action_type>
-            (gid, lower_bound, upper_bound, segments);
+            (gid, lower_bound, upper_bound, segments, 0);
     }
 
     static T solve_sync(
@@ -110,7 +80,7 @@ struct integrator : components::stub_base<server::integrator<T> >
       , T const& segments
     ) {
         return solve_async
-            (gid, lower_bound, upper_bound, segments).get();
+            (gid, lower_bound, upper_bound, segments, 0).get();
     }
 
     static T solve(
@@ -120,37 +90,7 @@ struct integrator : components::stub_base<server::integrator<T> >
       , T const& segments
     ) {
         return solve_async
-            (gid, lower_bound, upper_bound, segments).get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<T>
-    regrid_async(
-        naming::id_type const& gid
-      , T const& lower_bound
-      , T const& upper_bound
-      , T const& segments
-    ) {
-        typedef typename server::integrator<T>::regrid_action
-            action_type;
-        return lcos::eager_future<action_type>(gid, lower_bound, upper_bound);
-    }
-
-    static T regrid_sync(
-        naming::id_type const& gid
-      , T const& lower_bound
-      , T const& upper_bound
-      , T const& segments
-    ) {
-        return regrid_async(gid, lower_bound, upper_bound).get();
-    }
-
-    static T regrid(
-        naming::id_type const& gid
-      , T const& lower_bound
-      , T const& upper_bound
-    ) {
-        return regrid_async(gid, lower_bound, upper_bound).get();
+            (gid, lower_bound, upper_bound, segments, 0).get();
     }
 };
 

@@ -36,25 +36,6 @@ struct discovery : components::stub_base<server::discovery>
     ) { return build_network_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<void> deploy_async(
-        naming::id_type const& gid
-      , std::vector<boost::uint32_t> const& m
-    ) {
-        typedef server::discovery::deploy_action action_type;
-        return lcos::eager_future<action_type>(gid, m);
-    }
-
-    static void deploy_sync(
-        naming::id_type const& gid
-      , std::vector<boost::uint32_t> const& m
-    ) { deploy_async(gid,m ).get(); }
-
-    static void deploy(
-        naming::id_type const& gid
-      , std::vector<boost::uint32_t> const& m
-    ) { deploy_async(gid, m).get(); }
-
-    ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<hpx::uintptr_t> topology_lva_async(
         naming::id_type const& gid
     ) {
