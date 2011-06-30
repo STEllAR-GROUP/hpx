@@ -96,6 +96,11 @@ namespace hpx { namespace components
             return gid_;
         }
 
+        // Forwarder for interface compatibility 
+        // REVIEW: I'm 99.9% sure this should be unmanaged.
+        naming::id_type get_gid() const
+        { return naming::id_type(get_base_gid(), naming::id_type::unmanaged); }
+
         /// \brief Create a new GID (if called for the first time), assign this 
         ///        GID to this instance of a component and register this gid 
         ///        with the AGAS service
