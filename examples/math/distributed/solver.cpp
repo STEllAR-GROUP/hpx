@@ -139,12 +139,12 @@ int master(variables_map& vm)
             (discovery_network, f, tolerance, regrid_segs); 
 
     // Print out the GIDs of the discovery and integrator servers.
-    for (std::size_t i = 0; i < integrator_network.size(); ++i;)
+    for (std::size_t i = 0; i < integrator_network.size(); ++i)
     {
         // These vectors are sorted from lowest prefix to highest prefix.
         cout() << ( boost::format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
-                                  "  integration server at %2%")
+                                  "  integration server at %3%")
                   % i
                   % discovery_network[i]
                   % integrator_network[i])

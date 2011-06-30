@@ -102,10 +102,6 @@ std::vector<naming::id_type> discovery::build_network()
 
     std::vector<naming::id_type> network;
 
-    // REVIEW: Should naming::id_type::managed be used here instead?
-    network.push_back(naming::id_type(this->get_base_gid()
-                                    , naming::id_type::unmanaged));
-
     typedef lcos::future_value<naming::id_type, naming::gid_type> gid_future;
     BOOST_FOREACH(gid_future const& f, results1)
     { network.push_back(f.get()); }

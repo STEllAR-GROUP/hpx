@@ -63,17 +63,15 @@ struct HPX_COMPONENT_EXPORT integrator
     
         BOOST_FOREACH(naming::id_type const& node, discovery_network)
         {
+            naming::gid_type prefix = naming::get_gid_from_prefix
+                (naming::get_prefix_from_id(node));
             results0.push_back
                 (components::stubs::runtime_support::create_component_async
-                    (node, components::get_component_type<integrator>()));
+                    (prefix, components::get_component_type<integrator>()));
         }
     
         std::vector<naming::id_type> integrator_network;
 
-        // REVIEW: Should naming::id_type::managed be used here instead?
-        integrator_network.push_back
-            (naming::id_type(this->get_base_gid(), naming::id_type::unmanaged));
-    
         typedef lcos::future_value<naming::id_type, naming::gid_type>
             gid_future;
         BOOST_FOREACH(gid_future const& r, results0)
@@ -85,7 +83,7 @@ struct HPX_COMPONENT_EXPORT integrator
    
         for (std::size_t i = 0; i < integrator_network.size(); ++i)
         {
-            typedef lcos::future_value<deploy_action> deploy_future; 
+            typedef lcos::eager_future<deploy_action> deploy_future; 
             results1.push_back(deploy_future(integrator_network[i]
                                            , discovery_network[i]
                                            , f
@@ -106,7 +104,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , T const& regrid_segs 
     ) {
         BOOST_ASSERT(applier::get_prefix_id() ==
-                     naming::get_prefix_from_gid(discovery_gid));
+                     naming::get_prefix_from_id(discovery_gid));
 
         balancing::discovery disc_client(discovery_gid);
 

@@ -31,7 +31,7 @@ HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<
         boost::rational<boost::int64_t>
     >::set_result_action,
-    base_lco_with_value_set_result_rational);
+    base_lco_with_value_set_result_rational64);
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::balancing::server::integrator<rational64> integrator_type;
