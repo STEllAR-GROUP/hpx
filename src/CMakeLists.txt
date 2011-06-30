@@ -29,6 +29,12 @@ if(UNIX)
     add_hpx_library_sources(hpx
       ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
   endif()
+ 
+  # Add Boost.Backtrace sources if stack traces are enabled 
+  if(HPX_STACKTRACES)
+    add_hpx_library_sources(hpx
+      ${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp)
+  endif()
 
   if(NOT HPX_DISABLE_WARNINGS)
     hpx_use_flag_if_available(Wextra)
@@ -618,6 +624,12 @@ else()
   if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     set(hpxlib_SOURCES ${hpxlib_SOURCES} 
       ${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp)
+  endif()
+
+  # Add Boost.Backtrace sources if stack traces are enabled 
+  if(HPX_STACKTRACES)
+    set(hpxlib_SOURCES ${hpxlib_SOURCES} 
+      ${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp)
   endif()
 
   set(hpxserializationlib_HEADERS

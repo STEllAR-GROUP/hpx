@@ -174,6 +174,7 @@ include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
 include_directories(${hpx_SOURCE_DIR}/external/bigint)
+include_directories(${hpx_SOURCE_DIR}/external/backtrace)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
@@ -255,9 +256,19 @@ find_package(HPX_GMP)
 #endif()
 
 ################################################################################
-# warning configuration
+# Warning configuration
 ################################################################################
 option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
+
+################################################################################
+# Backtrace configuration 
+################################################################################
+option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
+
+if(HPX_STACKTRACES)
+  hpx_info("stacktraces" "Stack traces are enabled.")
+  add_definitions(-DHPX_STACKTRACES)
+endif()
 
 ################################################################################
 # Windows specific configuration 
@@ -302,6 +313,10 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
+  if(HPX_STACKTRACES)
+    hpx_use_flag_if_available(rdynamic)
+  endif()
+
   # clear CMake defaults
   set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (C++)" FORCE)

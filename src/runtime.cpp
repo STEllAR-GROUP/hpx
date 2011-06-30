@@ -608,9 +608,10 @@ namespace hpx
         naming::gid_type console_prefix;
         if (agas_client_.get_console_prefix(console_prefix))
         {
-            components::console_error_sink(
-                naming::id_type(console_prefix, naming::id_type::unmanaged), 
-                parcel_handler_.get_prefix(), e);
+            if (parcel_handler_.get_prefix() != console_prefix)
+                components::console_error_sink(
+                    naming::id_type(console_prefix, naming::id_type::unmanaged), 
+                    parcel_handler_.get_prefix(), e);
         }
 
         // stop all services

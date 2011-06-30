@@ -4,8 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#if defined(HPX_STACKTRACES)
+    #include <boost/backtrace.hpp>
+#endif
 #include <stdexcept>
 
 namespace hpx { namespace detail
@@ -19,6 +23,9 @@ namespace hpx { namespace detail
             threads::thread_id_type id = self->get_thread_id();
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
+#if defined(HPX_STACKTRACES)
+                    << throw_stacktrace(boost::trace())
+#endif
                     << boost::throw_function(func) 
                     << throw_thread_name(threads::get_thread_description(id))
                     << throw_file(file) << throw_line(line));
@@ -26,6 +33,9 @@ namespace hpx { namespace detail
         else {
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
+#if defined(HPX_STACKTRACES)
+                    << throw_stacktrace(boost::trace())
+#endif
                     << boost::throw_function(func) 
                     << throw_file(file) << throw_line(line));
         }
@@ -44,6 +54,9 @@ namespace hpx { namespace detail
             threads::thread_id_type id = self->get_thread_id();
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
+#if defined(HPX_STACKTRACES)
+                    << throw_stacktrace(boost::trace())
+#endif
                     << throw_function(func) 
                     << throw_thread_name(threads::get_thread_description(id))
                     << throw_file(file) << throw_line(line));
@@ -51,6 +64,7 @@ namespace hpx { namespace detail
         else {
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
+                    << throw_stacktrace(boost::trace())
                     << throw_function(func) 
                     << throw_file(file) << throw_line(line));
         }

@@ -272,11 +272,13 @@ namespace hpx
     {
         struct tag_throw_function {};
         struct tag_throw_thread_name {};
+        struct tag_throw_stacktrace {};
         struct tag_throw_file {};
         struct tag_throw_line {};
 
         typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
         typedef boost::error_info<struct tag_throw_thread_name, std::string> throw_thread_name;
+        typedef boost::error_info<struct tag_throw_stacktrace, std::string> throw_stacktrace;
         typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
 
