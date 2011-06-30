@@ -112,7 +112,7 @@ namespace boost {
 
         std::string get_symbols(void *const *addresses,int size)
         {
-            std::string res = boost::lexical_cast<std::string>(size) + " frames:";
+            std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(int i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
@@ -124,7 +124,7 @@ namespace boost {
         }
         void write_symbols(void *const *addresses,int size,std::ostream &out)
         {
-            out << size << " frames:";
+            out << size << ((1==size)?" frame:":" frames:");
             for(int i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
@@ -158,7 +158,7 @@ namespace boost {
             try {
                 if(ptr==0)
                     return std::string();
-                std::string res = boost::lexical_cast<std::string>(size) + " frames:";
+                std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
                 for(int i=0;i<size;i++) {
                     res+='\n';
                     res+=ptr[i];
@@ -177,7 +177,7 @@ namespace boost {
         void write_symbols(void *const *addresses,int size,std::ostream &out)
         {
             char ** ptr = backtrace_symbols(addresses,size);
-            out << size << " frames:";
+            out << size << ((1==size)?" frame:":" frames:");
             try {
                 if(ptr==0)
                     return;
@@ -244,7 +244,7 @@ namespace boost {
 
         std::string get_symbols(void *const *addresses,int size)
         {
-            std::string res = boost::lexical_cast<std::string>(size) + " frames:";
+            std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(int i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
@@ -256,7 +256,7 @@ namespace boost {
         }
         void write_symbols(void *const *addresses,int size,std::ostream &out)
         {
-            out << size << " frames:";
+            out << size << ((1==size)?" frame:":" frames:");
             for(int i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
@@ -290,7 +290,7 @@ namespace boost {
 
         void write_symbols(void *const *addresses,int size,std::ostream &out)
         {
-            out << size << " frames:";
+            out << size << ((1==size)?" frame:":" frames:");
             for(int i=0;i<size;i++) {
                 if(addresses[i]!=0)
                     out << '\n' << std::left << std::setw(sizeof(void*)*2) << std::setfill(' ') << addresses[i];
