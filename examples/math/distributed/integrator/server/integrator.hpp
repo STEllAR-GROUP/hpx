@@ -32,6 +32,11 @@ struct HPX_COMPONENT_EXPORT integrator
    
     struct current_shepherd
     {
+        current_shepherd() : prefix(0), shepherd(0) {}
+
+        current_shepherd(boost::uint32_t prefix_, boost::uint32_t shepherd_)
+            : prefix(prefix_), shepherd(shepherd_) {}
+
         boost::uint32_t prefix;
         boost::uint32_t shepherd;
     };
@@ -42,6 +47,32 @@ struct HPX_COMPONENT_EXPORT integrator
     actions::function<T(T const&)> f_;
     T tolerance_;
     T regrid_segs_;
+
+    current_shepherd round_robin()
+    {
+        current_shepherd expected = current_.load(), desired;
+
+        do {
+            // Check if we need to go to the next locality.
+            if ((*topology_)[expected.prefix] == (expected.shepherd + 1))
+            {
+                // Check if we're on the last locality.
+                if (topology_->size() == (expected.prefix + 1))
+                    desired.prefix = 0;
+                else
+                    desired.prefix = expected.prefix + 1;
+
+                // Reset the shepherd count.
+                desired.shepherd = 0;
+            }
+            
+            // Otherwise, just increase the shepherd count.
+            else
+                desired.shepherd = expected.prefix + 1; 
+        } while (current_.compare_exchange_weak(expected, desired));
+
+        return expected;
+    }
 
   public:
     enum actions
@@ -116,7 +147,7 @@ struct HPX_COMPONENT_EXPORT integrator
         tolerance_ = tolerance;
         regrid_segs_ = regrid_segs; 
 
-        // IMPLEMENT: set current
+        current_.store(current_shepherd(applier::get_prefix_id(), 0)); 
     }
 
     T solve(
