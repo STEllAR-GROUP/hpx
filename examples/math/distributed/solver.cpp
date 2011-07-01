@@ -160,7 +160,7 @@ int master(variables_map& vm)
         cout() << ( boost::format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
                                   "  integration server at %3%")
-                  % i
+                  % i + 1
                   % discovery_network[i]
                   % integrator_network[i])
                << endl; 
