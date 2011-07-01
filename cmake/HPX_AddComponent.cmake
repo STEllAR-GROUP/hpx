@@ -43,6 +43,9 @@ macro(add_hpx_component name)
 
   if(NOT ${name}_NOLIBS)
     set(libs ${hpx_LIBRARIES}) 
+    set_property(TARGET ${name}_component APPEND
+                 PROPERTY COMPILE_DEFINITIONS
+                 "BOOST_ENABLE_ASSERT_HANDLER")
   endif()
 
   if(NOT MSVC)

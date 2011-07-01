@@ -144,6 +144,7 @@ if(UNIX)
     "HPX_LIBRARY=\"${name}\""
     "HPX_COMPONENT_NAME=hpx"
     "HPX_EXPORTS"
+    "BOOST_ENABLE_ASSERT_HANDLER"
     "BOOST_COROUTINE_EXPORTS")
 
   foreach(lib ${hpx_CORE})
@@ -689,6 +690,7 @@ else()
     "HPX_LIBRARY=\"${name}\""
     "HPX_COMPONENT_NAME=hpx"
     "HPX_EXPORTS"
+    "BOOST_ENABLE_ASSERT_HANDLER"
     "BOOST_COROUTINE_EXPORTS")
 
   install(TARGETS hpx

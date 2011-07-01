@@ -37,6 +37,9 @@ macro(add_hpx_test name)
         ${hpx_LIBRARIES}
         ${BOOST_FOUND_LIBRARIES}
         ${pxaccel_LIBRARIES})
+      set_property(TARGET ${name}_test APPEND
+                   PROPERTY COMPILE_DEFINITIONS
+                   "BOOST_ENABLE_ASSERT_HANDLER")
     else()
       target_link_libraries(${name}_test
         ${${name}_DEPENDENCIES})

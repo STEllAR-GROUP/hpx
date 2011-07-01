@@ -57,6 +57,9 @@ macro(add_hpx_executable name)
       ${hpx_LIBRARIES}
       ${libs}
       ${pxaccel_LIBRARIES})
+    set_property(TARGET ${name}_exe APPEND
+                 PROPERTY COMPILE_DEFINITIONS
+                 "BOOST_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES})

@@ -55,6 +55,7 @@ namespace hpx
         unknown_locality = 24,
         unknown_gid = 25,
         deadlock = 26,
+        assertion_failed = 27,
         last_error
     };
 
@@ -293,8 +294,28 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace system
+namespace boost {
+
+// BOOST_ASSERT handler
+HPX_EXPORT void assertion_failed(
+    char const* expr
+  , char const* function
+  , char const* file
+  , long line
+);
+
+// BOOST_ASSERT_MSG handler
+HPX_EXPORT void assertion_failed_msg(
+    char const* msg
+  , char const* expr
+  , char const* function
+  , char const* file
+  , long line
+);
+
+namespace system
 {
+
     // make sure our errors get recognized by the Boost.System library
     template<> struct is_error_code_enum<hpx::error>
     {
@@ -312,16 +333,9 @@ namespace boost { namespace system
 // exception
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
-        std::string __s;                                                      \
-        boost::filesystem::path __p(hpx::util::create_path(__FILE__));        \
-        if (LHPX_ENABLED(debug))                                              \
-        {                                                                     \
-            __s = hpx::util::leaf(__p);                                       \
-            __s += std::string("(") + BOOST_PP_STRINGIZE(__LINE__) + "): ";   \
-        }                                                                     \
-        __s += msg;                                                           \
-        hpx::detail::throw_exception(except((hpx::error)errcode, __s, mode),  \
-            func, __p.string(), __LINE__);                                    \
+        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
+        hpx::detail::throw_exception(except((hpx::error)errcode, msg, mode),  \
+            func, p.string(), __LINE__);                                      \
     }                                                                         \
     /**/
 

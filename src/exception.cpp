@@ -12,6 +12,34 @@
 #endif
 #include <stdexcept>
 
+namespace boost
+{
+
+HPX_EXPORT void assertion_failed(
+    char const* expr
+  , char const* function
+  , char const* file
+  , long line
+) {
+    boost::filesystem::path p(hpx::util::create_path(file));
+    hpx::exception e(hpx::assertion_failed, expr);
+    hpx::detail::throw_exception(e, function, p.string(), line);
+}
+
+HPX_EXPORT void assertion_failed_msg(
+    char const* msg
+  , char const* expr
+  , char const* function
+  , char const* file
+  , long line
+) {
+    boost::filesystem::path p(hpx::util::create_path(file));
+    hpx::exception e(hpx::assertion_failed, msg);
+    hpx::detail::throw_exception(e, function, p.string(), line);
+}
+
+}
+
 namespace hpx { namespace detail
 {
     template <typename Exception>

@@ -44,6 +44,9 @@ macro(add_hpx_library name)
     if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+      set_property(TARGET ${name}_lib APPEND
+                   PROPERTY COMPILE_DEFINITIONS
+                   "BOOST_ENABLE_ASSERT_HANDLER")
     else()
       target_link_libraries(${name}_lib ${${name}_DEPENDENCIES})
     endif()
