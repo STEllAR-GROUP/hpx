@@ -77,6 +77,10 @@ boost::uint32_t discovery::report_shepherd_count()
 
 std::vector<naming::id_type> discovery::build_network()
 {
+    // Get the prefix that the root component is on.
+    const boost::uint32_t root_prefix
+        = naming::get_prefix_from_gid(this->get_base_gid());
+
     std::vector<naming::gid_type> localities;
     applier::get_applier().get_agas_client().get_prefixes(localities);
 
@@ -88,23 +92,39 @@ std::vector<naming::id_type> discovery::build_network()
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     { results0.push_back(report_shepherd_count_future(locality)); }
 
-    for (std::size_t i = 0; i < results0.size(); ++i)
-        topology_.push_back(results0[i].get());
+    BOOST_FOREACH(naming::gid_type const& locality, localities)
+    {
+        const boost::uint32_t current_prefix
+            = naming::get_prefix_from_gid(locality);
 
-    std::list<lcos::future_value<naming::id_type, naming::gid_type> > results1; 
+        BOOST_ASSERT(!topology_.count(current_prefix));
+
+        topology_[current_prefix] = results0[current_prefix - 1].get();
+    }
+
+    std::vector<lcos::future_value<naming::id_type, naming::gid_type> >
+        results1; 
 
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     {
-        results1.push_back
-            (components::stubs::runtime_support::create_component_async
-                (locality, components::get_component_type<discovery>()));
+        const boost::uint32_t current_prefix
+            = naming::get_prefix_from_gid(locality);
+
+        if (root_prefix != current_prefix)
+            results1.push_back
+                (components::stubs::runtime_support::create_component_async
+                    (locality, components::get_component_type<discovery>()));
     }
 
     std::vector<naming::id_type> network;
 
-    typedef lcos::future_value<naming::id_type, naming::gid_type> gid_future;
-    BOOST_FOREACH(gid_future const& f, results1)
-    { network.push_back(f.get()); }
+    for (std::size_t i = 0; i < localities.size(); ++i)
+    {
+        if ((i + 1) == root_prefix)
+            network.push_back(this->get_gid());
+        else
+            network.push_back(results1[i].get());
+    }
 
     std::list<lcos::future_value<void> > results2;
 

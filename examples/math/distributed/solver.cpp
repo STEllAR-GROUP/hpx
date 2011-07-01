@@ -87,8 +87,12 @@ int master(variables_map& vm)
     const rational64 lower_bound = vm["lower-bound"].as<rational64>();
     const rational64 upper_bound = vm["upper-bound"].as<rational64>();
     const rational64 tolerance = vm["tolerance"].as<rational64>();
-    const rational64 top_segs = vm["top-segments"].as<rational64>();
-    const rational64 regrid_segs = vm["regrid-segments"].as<rational64>();
+
+    const boost::uint64_t top_segs
+        = vm["top-segments"].as<boost::uint64_t>();
+
+    const boost::uint64_t regrid_segs
+        = vm["regrid-segments"].as<boost::uint64_t>();
 
     // Handle for the root discovery component. 
     discovery disc_root;
@@ -101,15 +105,19 @@ int master(variables_map& vm)
     // Deploy the scheduling infrastructure.
     std::vector<id_type> discovery_network = disc_root.build_network_sync(); 
 
-    // Get this localities topology map LVA.
-    topology_map const* topology_ptr
-        = reinterpret_cast<topology_map const*>(disc_root.topology_lva_sync());
+    cout() << ( boost::format("root discovery server is at %1%")
+              % disc_root.get_gid())
+           << endl;
 
-    topology_map const& topology = *topology_ptr;
+    // Get this localities topology map LVA.
+    topology_map* topology_ptr
+        = reinterpret_cast<topology_map*>(disc_root.topology_lva_sync());
+
+    topology_map& topology = *topology_ptr;
 
     // Print out the system topology.
     boost::uint32_t total_shepherds = 0;
-    for (std::size_t i = 0; i < topology.size(); ++i)
+    for (std::size_t i = 1; i <= topology.size(); ++i)
     {
         cout() << ( boost::format("locality %1% has %2% shepherds")
                   % i 
@@ -134,12 +142,16 @@ int master(variables_map& vm)
 
     cout() << "deploying integration infrastructure" << endl;
 
-    const rational64 eps(1, boost::integer_traits<boost::int64_t>::const_min);
+    const rational64 eps(1, boost::integer_traits<boost::int64_t>::const_max);
 
     // Now, build the integration infrastructure on all nodes.
     std::vector<id_type> integrator_network =
         integ_root.build_network_sync
             (discovery_network, f, tolerance, regrid_segs, eps); 
+
+    cout() << ( boost::format("root integration server is at %1%")
+              % integ_root.get_gid())
+           << endl;
 
     // Print out the GIDs of the discovery and integrator servers.
     for (std::size_t i = 0; i < integrator_network.size(); ++i)
@@ -190,12 +202,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "lower-bound"
-//        , value<rational64>()->default_value(rational64(0), "0") 
+        , value<rational64>()->default_value(rational64(0), "0") 
         , "lower bound of integration")
 
         ( "upper-bound"
-//        , value<rational64>()->default_value(rational64(2815, 7), "64*pi")
-        , value<rational64>()->default_value(rational64(2815, 7), "64*pi")
+        , value<rational64>()->default_value(rational64(128), "128")
         , "upper bound of integration")
 
         ( "tolerance"
@@ -203,11 +214,11 @@ int main(int argc, char* argv[])
         , "resolution tolerance")
 
         ( "top-segments"
-        , value<rational64>()->default_value(rational64(4096), "4096") 
+        , value<boost::uint64_t>()->default_value(4096) 
         , "number of top-level segments")
 
         ( "regrid-segments"
-        , value<rational64>()->default_value(rational64(128), "128") 
+        , value<boost::uint64_t>()->default_value(128) 
         , "number of segment per regrid")
         ;
 

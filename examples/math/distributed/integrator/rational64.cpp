@@ -37,7 +37,7 @@ HPX_REGISTER_ACTION_EX(
 typedef hpx::balancing::server::integrator<rational64> integrator_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::managed_component<
+    hpx::components::simple_component<
         integrator_type
     >, 
     integrator_rational64_factory);

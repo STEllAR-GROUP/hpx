@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -26,9 +26,9 @@ namespace hpx { namespace balancing { namespace server
 
 template <typename T> 
 struct HPX_COMPONENT_EXPORT integrator
-    : components::managed_component_base<integrator<T> > 
+    : components::simple_component_base<integrator<T> > 
 {
-    typedef components::managed_component_base<integrator> base_type; 
+    typedef components::simple_component_base<integrator> base_type; 
    
     struct current_shepherd
     {
@@ -42,12 +42,12 @@ struct HPX_COMPONENT_EXPORT integrator
     };
      
   private:
-    topology_map const* topology_;
+    topology_map* topology_;
     boost::atomic<current_shepherd> current_;
     actions::function<T(T const&)> f_;
     std::vector<naming::id_type> network_;
     T tolerance_;
-    T regrid_segs_;
+    boost::uint64_t regrid_segs_;
     T epsilon_;
     const boost::uint32_t here_;
 
@@ -60,8 +60,8 @@ struct HPX_COMPONENT_EXPORT integrator
             if ((*topology_)[expected.prefix] == (expected.shepherd + 1))
             {
                 // Check if we're on the last locality.
-                if (topology_->size() == (expected.prefix + 1))
-                    desired.prefix = 0;
+                if (topology_->size() == expected.prefix)
+                    desired.prefix = 1;
                 else
                     desired.prefix = expected.prefix + 1;
 
@@ -71,10 +71,13 @@ struct HPX_COMPONENT_EXPORT integrator
             
             // Otherwise, just increase the shepherd count.
             else
-                desired.shepherd = expected.prefix + 1; 
-        } while (current_.compare_exchange_weak(expected, desired));
+            {
+                desired.prefix = expected.prefix;
+                desired.shepherd = expected.shepherd + 1; 
+            }
+        } while (!current_.compare_exchange_weak(expected, desired));
 
-        return expected;
+        return desired;
     }
 
   public:
@@ -92,27 +95,37 @@ struct HPX_COMPONENT_EXPORT integrator
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
-      , T const& regrid_segs 
+      , boost::uint64_t regrid_segs 
       , T const& epsilon 
     ) {
-        std::list<lcos::future_value<naming::id_type, naming::gid_type> >
+        BOOST_ASSERT(f);
+
+        std::vector<lcos::future_value<naming::id_type, naming::gid_type> >
             results0; 
+
+        const boost::uint32_t root_prefix
+            = naming::get_prefix_from_gid(this->get_base_gid());
     
         BOOST_FOREACH(naming::id_type const& node, discovery_network)
         {
-            naming::gid_type prefix = naming::get_gid_from_prefix
-                (naming::get_prefix_from_id(node));
-            results0.push_back
-                (components::stubs::runtime_support::create_component_async
-                    (prefix, components::get_component_type<integrator>()));
+            boost::uint32_t current_prefix = naming::get_prefix_from_id(node);
+           
+            if (root_prefix != current_prefix) 
+                results0.push_back
+                    (components::stubs::runtime_support::create_component_async
+                        ( naming::get_gid_from_prefix(current_prefix)
+                        , components::get_component_type<integrator>()));
         }
     
         std::vector<naming::id_type> integrator_network;
 
-        typedef lcos::future_value<naming::id_type, naming::gid_type>
-            gid_future;
-        BOOST_FOREACH(gid_future const& r, results0)
-        { integrator_network.push_back(r.get()); }
+        for (std::size_t i = 0; i < discovery_network.size(); ++i)
+        {
+            if ((i + 1) == root_prefix)
+                integrator_network.push_back(this->get_gid());
+            else
+                integrator_network.push_back(results0[i].get());
+        }
 
         BOOST_ASSERT(integrator_network.size() == discovery_network.size());
     
@@ -141,15 +154,17 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const& network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
-      , T const& regrid_segs
+      , boost::uint64_t regrid_segs
       , T const& epsilon 
     ) {
+        BOOST_ASSERT(f);
+
         BOOST_ASSERT(here_ == naming::get_prefix_from_id(discovery_gid));
 
         balancing::discovery disc_client(discovery_gid);
 
         // DMA shortcut to reduce scheduling overhead.
-        topology_ = reinterpret_cast<topology_map const*>
+        topology_ = reinterpret_cast<topology_map*>
             (disc_client.topology_lva_sync());
 
         network_ = network;
@@ -173,18 +188,16 @@ struct HPX_COMPONENT_EXPORT integrator
 
         // solve() checks the increment size and ensures that the increment we
         // get isn't too small.
-        if (abs(f_(i + (increment / 2) - f_i) < tolerance))
+        if (abs(f_(i + (increment / 2) - f_i) < tolerance_))
             // If we're under the tolerance, then we just compute the area.
             return f_i * increment;
 
         // Regrid.
         else
         {
-            lcos::eager_future<solve_action> r(network_[round_robin()]
-                                             , i
-                                             , i + increment
-                                             , regrid_segs_
-                                             , 1 + depth);
+            lcos::eager_future<solve_action> r
+                ( network_[round_robin().prefix - 1], i, i + increment
+                , regrid_segs_, 1 + depth);
             return r.get();
         }
     }
@@ -197,18 +210,16 @@ struct HPX_COMPONENT_EXPORT integrator
     ) {
         // solve() checks the increment size and ensures that the increment we
         // get isn't too small.
-        if (abs(f_(i + (increment / 2) - f_lower) < tolerance))
+        if (abs(f_(lower_bound + (increment / 2) - f_lower) < tolerance_))
             // If we're under the tolerance, then we just compute the area.
             return f_lower * increment;
 
         // Regrid.
         else
         {
-            lcos::eager_future<solve_action> r(network_[round_robin()]
-                                             , lower_bound
-                                             , lower_bound + increment
-                                             , regrid_segs_
-                                             , 1 + depth);
+            lcos::eager_future<solve_action> r
+                ( network_[round_robin().prefix - 1], lower_bound
+                , lower_bound + increment, regrid_segs_, 1 + depth);
             return r.get();
         }
     }
@@ -216,11 +227,9 @@ struct HPX_COMPONENT_EXPORT integrator
     T solve(
         T const& lower_bound
       , T const& upper_bound
-      , T const& segments
+      , boost::uint64_t segments
       , boost::uint32_t depth
     ) {
-        std::list<future_value<T> > results;
-
         const T length = (upper_bound - lower_bound);
         const T f_lower = f_(lower_bound);
 
@@ -228,22 +237,26 @@ struct HPX_COMPONENT_EXPORT integrator
         // we have to be able to divide each increment by two to check if we're
         // under the tolerance. If the range is too small, we can't refine any
         // further and our answer is just f_(lower_bound) * length.
-        if (length <= (segments * eps * 2))
+        if (length <= (segments * epsilon_ * 2))
             return f_lower * length; 
+
+        std::list<lcos::future_value<T> > results;
 
         T increment = length / segments;
 
         BOOST_ASSERT((lower_bound + increment) < upper_bound);
 
         for (T i = lower_bound + increment; i < upper_bound; i += increment)
+        {
             results.push_back(lcos::eager_future<solve_iteration_action>
                 (this->get_gid(), i, increment, depth)); 
+        }
 
         // Avoid computing f_(lower_bound) another time in the for loop.
         T total_area = solve_first(f_lower, lower_bound, increment, depth);  
  
         // Accumulate final result. TODO: Check for overflow.
-        BOOST_FOREACH(future_value<T> const& r, total_area)
+        BOOST_FOREACH(lcos::future_value<T> const& r, results)
         { total_area += r.get(); }
  
         return total_area;
@@ -260,7 +273,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const&
       , actions::function<T(T const&)> const&
       , T const& 
-      , T const& 
+      , boost::uint64_t 
       , T const& 
         // function
       , &integrator<T>::build_network
@@ -276,13 +289,13 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const&
       , actions::function<T(T const&)> const&
       , T const& 
-      , T const& 
+      , boost::uint64_t 
       , T const& 
         // function
       , &integrator<T>::deploy
     > deploy_action;
 
-    typedef actions::result_action2<
+    typedef actions::result_action3<
         // class
         integrator<T>
         // result
@@ -297,7 +310,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , &integrator<T>::solve_iteration
     > solve_iteration_action;
     
-    typedef actions::result_action3<
+    typedef actions::result_action4<
         // class
         integrator<T>
         // result
@@ -307,7 +320,7 @@ struct HPX_COMPONENT_EXPORT integrator
         // arguments 
       , T const& 
       , T const& 
-      , T const& 
+      , boost::uint64_t 
       , boost::uint32_t 
         // function
       , &integrator<T>::solve

@@ -17,7 +17,12 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/uintptr_t.hpp>
 
-namespace hpx { namespace balancing { namespace server
+namespace hpx { namespace balancing
+{
+
+typedef std::map<boost::uint32_t, boost::uint32_t> topology_map;
+
+namespace server
 {
 
 struct HPX_COMPONENT_EXPORT discovery
@@ -28,7 +33,7 @@ struct HPX_COMPONENT_EXPORT discovery
     static boost::uint32_t report_shepherd_count();
 
   private:
-    std::vector<boost::uint32_t> topology_;
+    topology_map topology_;
 
   public:
     enum actions
@@ -41,7 +46,7 @@ struct HPX_COMPONENT_EXPORT discovery
 
     std::vector<naming::id_type> build_network();
 
-    void deploy(std::vector<boost::uint32_t> const& m)
+    void deploy(topology_map const& m)
     { topology_ = m; }
 
     hpx::uintptr_t topology_lva()
@@ -69,7 +74,7 @@ struct HPX_COMPONENT_EXPORT discovery
     typedef actions::action1<
         discovery
       , discovery_deploy
-      , std::vector<boost::uint32_t> const&
+      , topology_map const& 
       , &discovery::deploy
     > deploy_action;
     

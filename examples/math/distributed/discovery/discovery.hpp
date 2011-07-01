@@ -16,8 +16,6 @@
 namespace hpx { namespace balancing 
 {
 
-typedef std::vector<boost::uint32_t> topology_map;
-
 struct discovery : components::client_base<discovery, stubs::discovery>
 {
     typedef components::client_base<discovery, stubs::discovery>

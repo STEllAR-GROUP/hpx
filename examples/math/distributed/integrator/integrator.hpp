@@ -32,7 +32,7 @@ struct integrator
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , T const& regrid_segs 
+      , boost::uint64_t regrid_segs 
       , T const& eps 
     ) {
         return this->base_type::build_network_async
@@ -43,7 +43,7 @@ struct integrator
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , T const& regrid_segs 
+      , boost::uint64_t regrid_segs 
       , T const& eps 
     ) {
         return this->base_type::build_network_sync
@@ -54,7 +54,7 @@ struct integrator
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , T const& regrid_segs 
+      , boost::uint64_t regrid_segs 
       , T const& eps 
     ) {
         return this->base_type::build_network
@@ -65,28 +65,28 @@ struct integrator
     lcos::future_value<T> solve_async(
         T const& lower_bound
       , T const& upper_bound
-      , T const& segments
+      , boost::uint64_t segments
     ) {
         return this->base_type::solve_async
-            (this->gid_, lower_bound, upper_bound, segments, 0);
+            (this->gid_, lower_bound, upper_bound, segments);
     }
 
     T solve_sync(
         T const& lower_bound
       , T const& upper_bound
-      , T const& segments
+      , boost::uint64_t segments
     ) {
         return this->base_type::solve_sync
-            (this->gid_, lower_bound, upper_bound, segments, 0);
+            (this->gid_, lower_bound, upper_bound, segments);
     }
 
     T solve(
         T const& lower_bound
       , T const& upper_bound
-      , T const& segments
+      , boost::uint64_t segments
     ) {
         return this->base_type::solve
-            (this->gid_, lower_bound, upper_bound, segments, 0);
+            (this->gid_, lower_bound, upper_bound, segments);
     }
 };
 
