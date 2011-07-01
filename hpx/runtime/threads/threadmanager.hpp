@@ -400,8 +400,7 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         bool is_running() const
         {
-            mutex_type::scoped_lock lk(mtx_);
-            return /*thread_count_ != 0 ||*/ running_;
+            return running_.load();
         }
 
         /// \brief return the number of PX-threads with the given state
@@ -612,7 +611,7 @@ namespace hpx { namespace threads
         std::vector<std::size_t> executed_threads_;
         boost::atomic<long> thread_count_;
 
-        bool running_;                      ///< thread manager has been started
+        boost::atomic<bool> running_;       ///< thread manager state 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
