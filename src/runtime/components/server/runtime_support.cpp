@@ -301,28 +301,31 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_prefixes(prefixes);
 
         // shut down all localities except the the local one
-        std::vector<lcos::future_value<int> > lazy_actions;
+//        std::vector<lcos::future_value<int> > lazy_actions;
         std::vector<naming::gid_type>::iterator end = prefixes.end();
+
+        boost::uint32_t prefix = applier::get_prefix_id();
+
         for (std::vector<naming::gid_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
-            if (naming::get_prefix_from_gid(appl.get_prefix()) !=
-                naming::get_prefix_from_gid(*it))
+            if (prefix != naming::get_prefix_from_gid(*it))
             {
                 naming::id_type id(*it, naming::id_type::unmanaged);
-                lazy_actions.push_back(
-                    components::stubs::runtime_support::shutdown_async(
-                        id, timeout));
+//                lazy_actions.push_back(
+//                    components::stubs::runtime_support::shutdown_async(
+//                        id, timeout));
+                applier::apply<shutdown_action>(id, timeout);
             }
         }
 
         // wait for all localities to be stopped
-        std::vector<lcos::future_value<int> >::iterator lend = lazy_actions.end();
-        for (std::vector<lcos::future_value<int> >::iterator lit = lazy_actions.begin();
-             lit != lend; ++lit)
-        {
-            (*lit).get();
-        }
+//        std::vector<lcos::future_value<int> >::iterator lend = lazy_actions.end();
+//        for (std::vector<lcos::future_value<int> >::iterator lit = lazy_actions.begin();
+//             lit != lend; ++lit)
+//        {
+//            (*lit).get();
+//        }
 
         // now make sure the local locality gets shut down as well.
         stop(timeout);
