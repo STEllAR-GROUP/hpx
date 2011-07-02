@@ -7,14 +7,15 @@
 #if !defined(HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM)
 #define HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM
 
+#include <boost/foreach.hpp>
+
+#include <hpx/state.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/util/static.hpp>
-
-#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -24,7 +25,7 @@ namespace hpx { namespace components
         server::logging_destination dest, int level, std::string const& msg)
     {
         try {
-            if (is_system_running()) 
+            if (threads::threadmanager_is(running)) 
                 applier::apply_p<server::console_logging_action<> >
                     (prefix, threads::thread_priority_low, dest, level, msg);
         }
@@ -122,7 +123,7 @@ namespace hpx { namespace components
     {
         // do logging only if applier is still valid
         util::static_<pending_logs, pending_logs_tag> logs;
-        if (is_system_running()) {
+        if (threads::threadmanager_is(running)) {
             if (logs.get().sending_logs_) {
                 logs.get().add_pending(msg);
             }

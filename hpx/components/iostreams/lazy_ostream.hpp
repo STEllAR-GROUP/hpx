@@ -15,6 +15,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/move/move.hpp>
 
+#include <hpx/state.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
@@ -96,7 +97,7 @@ struct lazy_ostream
 
     ~lazy_ostream()
     {
-        if (is_system_running())
+        if (threads::threadmanager_is(running))
         {
             mutex_type::scoped_lock l(mtx);
             if (data)   

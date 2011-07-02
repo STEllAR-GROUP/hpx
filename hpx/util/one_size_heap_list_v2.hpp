@@ -15,6 +15,7 @@
 #include <boost/atomic.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/config.hpp>
 #include <hpx/lcos/local_shared_mutex.hpp>
 
@@ -191,7 +192,7 @@ class one_size_heap_list
 
     void free(void* p, std::size_t count = 1)
     {
-        if (NULL == p && is_system_running())
+        if (NULL == p && threads::threadmanager_is(running))
             return;
 
         shared_lock_type guard (mtx_);

@@ -9,6 +9,7 @@
 
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 
@@ -24,7 +25,7 @@ void console_logging(
     util::static_<pending_logs, pending_logs_tag> logs;
 
     // do logging only if applier is valid
-    if (is_system_running() && threads::get_self_ptr())
+    if (threads::threadmanager_is(running) && threads::get_self_ptr())
     {
         if (logs.get().sending_logs_)
             logs.get().add_pending(msg);
