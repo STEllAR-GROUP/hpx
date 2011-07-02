@@ -75,7 +75,7 @@ namespace hpx { namespace threads
             notification_policy_type& notifier)
       : startup_(NULL),
         thread_count_(0),
-        running_(false),
+        state_(starting),
         timer_pool_(timer_pool), 
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
@@ -91,7 +91,7 @@ namespace hpx { namespace threads
     {
         //LTM_(debug) << "~threadmanager_impl";
         if (!threads_.empty()) {
-            if (running_) 
+            if (state_.load() == running) 
                 stop();
             threads_.clear();
         }
@@ -141,7 +141,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify state
-        if (thread_count_ == 0 && !running_) 
+        if (thread_count_ == 0 && !(state_.load() == running)) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -220,7 +220,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify state
-        if (thread_count_ == 0 && !running_) 
+        if (thread_count_ == 0 && !(state_.load() == running)) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -1002,7 +1002,7 @@ namespace hpx { namespace threads
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
-            if (scheduler_.get_next_thread(num_thread, running_, idle_loop_count, &thrd)) {
+            if (scheduler_.get_next_thread(num_thread, state_.load() == running, idle_loop_count, &thrd)) {
                 idle_loop_count = 0;
                 tl1.tick();
 
@@ -1091,7 +1091,7 @@ namespace hpx { namespace threads
             }
 
             // if nothing else has to be done either wait or terminate
-            else if (scheduler_.wait_or_add_new(num_thread, running_, idle_loop_count))
+            else if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
             {
                 // if we need to terminate, unregister the counter first
 #if HPX_AGAS_VERSION <= 0x10
@@ -1122,13 +1122,12 @@ namespace hpx { namespace threads
         }
 
         mutex_type::scoped_lock lk(mtx_);
-        if (!threads_.empty() || running_) 
+        if (!threads_.empty() || (state_.load() == running)) 
             return true;    // do nothing if already running
 
         LTM_(info) << "run: running timer pool"; 
         timer_pool_.run(false);
 
-        running_ = false;
         executed_threads_.reserve(num_threads);
 
         try {
@@ -1136,7 +1135,7 @@ namespace hpx { namespace threads
             BOOST_ASSERT (NULL == startup_);
             startup_ = new boost::barrier(num_threads+1);
 
-            running_ = true;
+            state_.store(running); 
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
@@ -1173,7 +1172,7 @@ namespace hpx { namespace threads
         }
 
         LTM_(info) << "run: running"; 
-        return running_;
+        return true;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1186,9 +1185,8 @@ namespace hpx { namespace threads
 
         mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {
-            if (running_) {
-                LTM_(info) << "stop: set running_ = false"; 
-                running_ = false;
+            if (state_.load() == running) {
+                state_.store(stopping);
                 do_some_work();         // make sure we're not waiting
             }
 

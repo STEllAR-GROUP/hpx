@@ -21,6 +21,7 @@
 #include <boost/atomic.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -54,7 +55,7 @@ namespace hpx { namespace threads
         virtual ~threadmanager_base() {}
 
         /// \brief Return whether the thread manager is still running
-        virtual bool is_running() const = 0;
+        virtual state status() const = 0;
 
         /// \brief return the number of PX-threads with the given state
         virtual boost::uint64_t get_thread_count(
@@ -398,9 +399,9 @@ namespace hpx { namespace threads
         void stop (bool blocking = true);
 
         /// \brief Return whether the thread manager is still running
-        bool is_running() const
+        state status() const
         {
-            return running_.load();
+            return state_.load();
         }
 
         /// \brief return the number of PX-threads with the given state
@@ -421,9 +422,13 @@ namespace hpx { namespace threads
 
         /// \brief Return the number of OS threads running in this threadmanager
         ///
-        /// This function will return correct results only if is_running() 
-        /// would return true.
-        std::size_t get_num_os_threads() const { return threads_.size(); }
+        /// This function will return correct results only if the threadmanager 
+        /// is running.
+        std::size_t get_num_os_threads() const
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            return threads_.size();
+        }
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this 
@@ -611,7 +616,7 @@ namespace hpx { namespace threads
         std::vector<std::size_t> executed_threads_;
         boost::atomic<long> thread_count_;
 
-        boost::atomic<bool> running_;       ///< thread manager state 
+        atomic_state state_;                ///< thread manager state 
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
