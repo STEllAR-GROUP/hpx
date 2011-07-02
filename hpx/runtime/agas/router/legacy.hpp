@@ -23,6 +23,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -193,7 +194,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
 
-    boost::atomic<router_state> state_;
+    atomic_state state_;
     naming::gid_type prefix_;
 
     legacy_router(
@@ -212,15 +213,15 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
       , util::runtime_configuration const& ini_
     );
 
-    router_state state() const
+    state status() const
     {
         if (!hosted && !bootstrap)
-            return router_state_terminated;
+            return stopping;
         else
             return state_.load();
     }
     
-    void state(router_state new_state) 
+    void status(state new_state) 
     { state_.store(new_state); }
 
     naming::gid_type const& local_prefix() const
