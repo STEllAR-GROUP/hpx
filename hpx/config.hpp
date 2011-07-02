@@ -88,7 +88,7 @@
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
 #if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 65536
+#  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 256
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
