@@ -349,7 +349,7 @@ void notify_console(notification_header const& header)
 {
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
-    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
+    if (HPX_UNLIKELY(agas_client.status() != starting))
     {
         hpx::util::osstream strm;
         strm << "locality "
@@ -512,6 +512,7 @@ void notify_worker(notification_header const& header)
 {
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
+/*
     if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
     {
         hpx::util::osstream strm;
@@ -522,6 +523,7 @@ void notify_worker(notification_header const& header)
             "agas::notify_worker", 
             hpx::util::osstream_get_string(strm));
     }
+*/
 
     // set our prefix
     agas_client.local_prefix(header.prefix);

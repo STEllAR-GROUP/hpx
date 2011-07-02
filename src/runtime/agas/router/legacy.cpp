@@ -20,7 +20,7 @@ legacy_router::legacy_router(
 ):
     router_type(ini_.get_agas_router_mode())
   , runtime_type(runtime_type_)
-  , state_(router_state_launching)
+  , state_(starting)
   , prefix_()
 { // {{{
     // boot the parcel port
@@ -76,7 +76,7 @@ void legacy_router::launch_bootstrap(
 
     get_big_boot_barrier().wait();
 
-    state_.store(router_state_active);
+    state_.store(running);
 } // }}}
 
 void legacy_router::launch_hosted(
@@ -90,7 +90,7 @@ void legacy_router::launch_hosted(
 
     get_big_boot_barrier().wait();
 
-    state_.store(router_state_active);
+    state_.store(running);
 } // }}}
 
 bool legacy_router::get_prefix(
@@ -192,7 +192,7 @@ bool legacy_router::get_console_prefix(
   , bool try_cache
   , error_code& ec
 ) { // {{{
-    if (state() != router_state_active)
+    if (status() != running)
         return false;
 
     if (try_cache && !is_bootstrap())
