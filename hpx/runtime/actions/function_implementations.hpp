@@ -127,8 +127,7 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
         continuation_type c = boost::make_shared<continuation>(r.get_gid()); 
         arguments_type a(BOOST_PP_ENUM_PARAMS(N, arg));
 
-        if (base_action::direct_action == f->get_action_type()
-            || !is_system_running())
+        if (base_action::direct_action == f->get_action_type())
             f->get_thread_function(c, 0, a)
                 (threads::thread_state_ex(threads::wait_signaled));
 

@@ -13,6 +13,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 
+#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -114,8 +115,7 @@ struct function<Result()>
         async_result_type r;
         continuation_type c = boost::make_shared<continuation>(r.get_gid()); 
 
-        if (base_action::direct_action == f->get_action_type()
-            || !is_system_running())
+        if (base_action::direct_action == f->get_action_type())
             f->get_thread_function(c, 0, arguments_type())
                 (threads::thread_state_ex(threads::wait_signaled));
 
