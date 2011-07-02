@@ -774,12 +774,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
-    bool is_system_running()
-    {
-        return (NULL != applier::get_applier_ptr()) 
-            && applier::get_applier_ptr()->get_thread_manager().is_running();
-    }
-
     naming::id_type find_here()
     {
         return naming::id_type(applier::get_applier().get_prefix()
