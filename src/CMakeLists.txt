@@ -17,6 +17,7 @@ if(UNIX)
     exception.cpp
     exception_list.cpp
     pre_main.cpp
+    state.cpp
     runtime.cpp)
 
   add_subdirectory(lcos)
@@ -495,6 +496,8 @@ else()
       ${hpx_SOURCE_DIR}/src/exception.cpp
       ${hpx_SOURCE_DIR}/src/exception_list.cpp
       ${hpx_SOURCE_DIR}/src/hpx_init.cpp
+      ${hpx_SOURCE_DIR}/src/pre_main.cpp
+      ${hpx_SOURCE_DIR}/src/state.cpp
       ${hpx_SOURCE_DIR}/src/runtime.cpp)
   source_group("Source Files" 
       FILES ${hpxlib_global_SOURCES})
