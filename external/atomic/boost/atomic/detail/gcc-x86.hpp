@@ -7,6 +7,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/memory_order.hpp>
 #include <boost/atomic/detail/base.hpp>
 #include <boost/atomic/detail/builder.hpp>
 
