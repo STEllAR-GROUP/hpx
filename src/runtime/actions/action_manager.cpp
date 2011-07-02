@@ -4,9 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/thread.hpp>
 #include <boost/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 
+#include <hpx/state.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -25,6 +27,14 @@ namespace hpx { namespace actions
         parcelset::parcel p;
         if (parcel_handler.get_parcel(p))  // if new parcel is found
         {
+            while (threads::threadmanager_is(starting))
+                boost::this_thread::sleep(boost::get_system_time() + 
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+
+            // Give up if we're shutting down.
+//            if (threads::threadmanager_is(stopping))
+//                return;
+
         // write this parcel to the log
             LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
@@ -43,12 +53,21 @@ namespace hpx { namespace actions
 
         // make sure the component_type of the action matches the component
         // type in the destination address
-            BOOST_ASSERT(components::types_are_compatible(
-                dest.type_, act->get_component_type()));
+            if (HPX_UNLIKELY(!components::types_are_compatible(
+                dest.type_, act->get_component_type())))
+            {
+                hpx::util::osstream strm;
+                strm << " types are not compatible: destination_type("
+                     << dest.type_ << ") action_type("
+                     << act->get_component_type()
+                     << ") parcel ("  << p << ")";
+                HPX_THROW_EXCEPTION(bad_component_type, 
+                    "action_manager::fetch_parcel", 
+                    hpx::util::osstream_get_string(strm));
+            }
 
         // either directly execute the action or create a new thread
-            if (actions::base_action::direct_action == act->get_action_type() ||
-                !appl_.get_thread_manager().is_running()) 
+            if (actions::base_action::direct_action == act->get_action_type())
             {
             // direct execution of the action
                 if (!cont) {
