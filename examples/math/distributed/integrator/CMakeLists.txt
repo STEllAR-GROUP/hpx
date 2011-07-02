@@ -5,5 +5,11 @@
 
 add_hpx_component(rational64_integrator
   MODULE math
-  SOURCES rational64.cpp)
+  SOURCES rational64.cpp
+  DEPENDENCIES iostreams_component)
+
+add_hpx_component(double_integrator
+  MODULE math
+  SOURCES double.cpp
+  DEPENDENCIES iostreams_component)
 

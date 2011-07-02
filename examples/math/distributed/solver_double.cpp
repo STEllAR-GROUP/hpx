@@ -7,11 +7,11 @@
 
 #include <iomanip>
 #include <cmath>
+#include <cfloat>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/rational.hpp>
 #include <boost/integer_traits.hpp>
 
 #include <hpx/hpx.hpp>
@@ -21,7 +21,6 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/serialize_rational.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <examples/math/distributed/discovery/discovery.hpp>
 #include <examples/math/distributed/integrator/integrator.hpp>
@@ -61,19 +60,16 @@ using hpx::endl;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef boost::rational<boost::int64_t> rational64;
-
-///////////////////////////////////////////////////////////////////////////////
-rational64 math_function (rational64 const& r)
+double math_function (double const& r)
 {
-    return rational64(sqrt(r.numerator()), sqrt(r.denominator())); 
+    return sqrt(r); 
 }
 
 typedef plain_result_action1<
     // result type
-    rational64 
+    double 
     // arguments
-  , rational64 const&  
+  , double const&  
     // function
   , math_function
 > math_function_action;
@@ -84,9 +80,9 @@ HPX_REGISTER_PLAIN_ACTION(math_function_action);
 int master(variables_map& vm)
 {
     // Get options.
-    const rational64 lower_bound = vm["lower-bound"].as<rational64>();
-    const rational64 upper_bound = vm["upper-bound"].as<rational64>();
-    const rational64 tolerance = vm["tolerance"].as<rational64>();
+    const double lower_bound = vm["lower-bound"].as<double>();
+    const double upper_bound = vm["upper-bound"].as<double>();
+    const double tolerance = vm["tolerance"].as<double>();
 
     const boost::uint64_t top_segs
         = vm["top-segments"].as<boost::uint64_t>();
@@ -132,17 +128,17 @@ int master(variables_map& vm)
            << endl;
 
     // Create the function that we're integrating.
-    function<rational64(rational64 const&)> f(new math_function_action);
+    function<double(double const&)> f(new math_function_action);
 
     // Handle for the root integrator component. 
-    integrator<rational64> integ_root;
+    integrator<double> integ_root;
 
     // Create the initial integrator component on this locality. 
     integ_root.create(find_here());
 
     cout() << "deploying integration infrastructure" << endl;
 
-    const rational64 eps(1, boost::integer_traits<boost::int64_t>::const_max);
+    const double eps(DBL_EPSILON);
 
     // Now, build the integration infrastructure on all nodes.
     std::vector<id_type> integrator_network =
@@ -160,7 +156,7 @@ int master(variables_map& vm)
         cout() << ( boost::format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
                                   "  integration server at %3%")
-                  % i + 1
+                  % (i + 1)
                   % discovery_network[i]
                   % integrator_network[i])
                << endl; 
@@ -170,15 +166,15 @@ int master(variables_map& vm)
     high_resolution_timer t;
 
     // Solve the integral using an adaptive trapezoid algorithm.
-    rational64 r = integ_root.solve_sync(lower_bound, upper_bound, top_segs);
+    double r = integ_root.solve_sync(lower_bound, upper_bound, top_segs);
 
     double elapsed = t.elapsed();
 
-    cout() << ( boost::format("integral from %1% to %2% is %3%\n"
-                              "computation took %4% seconds")
-              % boost::rational_cast<long double>(lower_bound)
-              % boost::rational_cast<long double>(upper_bound)
-              % boost::rational_cast<long double>(r)
+    cout() << ( boost::format("integral from %.12f to %.12f is %.12f\n"
+                              "computation took %f seconds")
+              % lower_bound
+              % upper_bound
+              % r
               % elapsed)
            << endl;
 
@@ -202,15 +198,15 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "lower-bound"
-        , value<rational64>()->default_value(rational64(0), "0") 
+        , value<double>()->default_value(0, "0") 
         , "lower bound of integration")
 
         ( "upper-bound"
-        , value<rational64>()->default_value(rational64(128), "128")
+        , value<double>()->default_value(128, "128")
         , "upper bound of integration")
 
         ( "tolerance"
-        , value<rational64>()->default_value(rational64(0, 10), "0.1") 
+        , value<double>()->default_value(0.1, "0.1") 
         , "resolution tolerance")
 
         ( "top-segments"

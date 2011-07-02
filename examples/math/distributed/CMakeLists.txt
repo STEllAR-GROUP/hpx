@@ -7,21 +7,21 @@ set(type distributed)
 
 set(group examples.math)
 
-set(examples
-    solver)
-
 add_subdirectory(discovery)
 add_subdirectory(integrator)
 
+set(examples
+    rational64
+    double)
+
 foreach(example ${examples})
-  add_hpx_executable(${type}_${example}
+  add_hpx_executable(${type}_solver_${example}
     MODULE math
-    SOURCES ${example}.cpp
-    DEPENDENCIES iostreams_component
-                 discovery_component
-                 rational64_integrator_component)
+    SOURCES solver_${example}.cpp
+    DEPENDENCIES discovery_component
+                 ${example}_integrator_component)
 
   # depend on the executable
-  add_hpx_pseudo_dependencies(${group} ${type}_${example}_exe)
+  add_hpx_pseudo_dependencies(${group} ${type}_solver_${example}_exe)
 endforeach()
 

@@ -122,6 +122,8 @@ std::vector<naming::id_type> discovery::build_network()
     {
         if ((i + 1) == root_prefix)
             network.push_back(this->get_gid());
+        else if ((i + 1) > root_prefix)
+            network.push_back(results1[i - 1].get());
         else
             network.push_back(results1[i].get());
     }

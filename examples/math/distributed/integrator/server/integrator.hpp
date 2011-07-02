@@ -9,6 +9,9 @@
 #define HPX_1438B63A_BA4C_4DB3_B835_C8CDBD79B436
 
 #include <list>
+#include <cmath>
+
+#include <boost/format.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -18,11 +21,22 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/include/iostreams.hpp>
 
 #include <examples/math/distributed/discovery/discovery.hpp>
 
 namespace hpx { namespace balancing { namespace server
 {
+
+template <typename T>
+inline T absolute_value(T const& t)
+{
+    if (t < 0)
+        return -t;
+    else
+        return t;
+}
 
 template <typename T> 
 struct HPX_COMPONENT_EXPORT integrator
@@ -123,6 +137,8 @@ struct HPX_COMPONENT_EXPORT integrator
         {
             if ((i + 1) == root_prefix)
                 integrator_network.push_back(this->get_gid());
+            else if ((i + 1) > root_prefix)
+                integrator_network.push_back(results0[i - 1].get());
             else
                 integrator_network.push_back(results0[i].get());
         }
@@ -188,7 +204,7 @@ struct HPX_COMPONENT_EXPORT integrator
 
         // solve() checks the increment size and ensures that the increment we
         // get isn't too small.
-        if (abs(f_(i + (increment / 2) - f_i) < tolerance_))
+        if (absolute_value(f_(i + (increment / 2)) - f_i) < tolerance_)
             // If we're under the tolerance, then we just compute the area.
             return f_i * increment;
 
@@ -203,23 +219,23 @@ struct HPX_COMPONENT_EXPORT integrator
     }
 
     T solve_first(
-        T const& f_lower 
-      , T const& lower_bound
+        T const& f_i 
+      , T const& i
       , T const& increment
       , boost::uint32_t depth
     ) {
         // solve() checks the increment size and ensures that the increment we
         // get isn't too small.
-        if (abs(f_(lower_bound + (increment / 2) - f_lower) < tolerance_))
+        if (absolute_value(f_(i + (increment / 2)) - f_i) < tolerance_)
             // If we're under the tolerance, then we just compute the area.
-            return f_lower * increment;
+            return f_i * increment;
 
         // Regrid.
         else
         {
             lcos::eager_future<solve_action> r
-                ( network_[round_robin().prefix - 1], lower_bound
-                , lower_bound + increment, regrid_segs_, 1 + depth);
+                ( network_[round_robin().prefix - 1], i, i + increment
+                , regrid_segs_, 1 + depth);
             return r.get();
         }
     }
@@ -246,19 +262,57 @@ struct HPX_COMPONENT_EXPORT integrator
 
         BOOST_ASSERT((lower_bound + increment) < upper_bound);
 
-        for (T i = lower_bound + increment; i < upper_bound; i += increment)
+        util::high_resolution_timer t;
+
+        for (boost::uint64_t i = 1; i < segments; ++i)
         {
+            if (0 == depth)
+                hpx::cout() <<
+                    ( boost::format("[%.12f/%.12f] started segment %d at %f")
+                    % (lower_bound + (increment * i))
+                    % upper_bound
+                    % i
+                    % t.elapsed()) << hpx::endl;
+
+            const T point = lower_bound + (increment * i);
             results.push_back(lcos::eager_future<solve_iteration_action>
-                (this->get_gid(), i, increment, depth)); 
+                (this->get_gid(), point, increment, depth)); 
         }
 
         // Avoid computing f_(lower_bound) another time in the for loop.
+        if (0 == depth)
+            hpx::cout() <<
+                ( boost::format("[%.12f/%.12f] started segment 0 at %f")
+                % lower_bound
+                % upper_bound
+                % t.elapsed()) << hpx::endl;
+
         T total_area = solve_first(f_lower, lower_bound, increment, depth);  
+
+        if (0 == depth)
+            hpx::cout() <<
+                ( boost::format("[%.12f/%.12f] completed segment 0 at %f")
+                % lower_bound
+                % upper_bound
+                % t.elapsed()) << hpx::endl;
+
+        typedef typename std::list<lcos::future_value<T> >::iterator iterator;
+
+        iterator it = results.begin(), end = results.end();
  
         // Accumulate final result. TODO: Check for overflow.
-        BOOST_FOREACH(lcos::future_value<T> const& r, results)
-        { total_area += r.get(); }
- 
+        for (boost::uint64_t i = 1; i < segments; ++i, ++it)
+        {        
+            total_area += it->get();
+            if (0 == depth)
+                hpx::cout() <<
+                    ( boost::format("[%.12f/%.12f] completed segment %d at %f")
+                    % (lower_bound + (increment * i))
+                    % upper_bound
+                    % i
+                    % t.elapsed()) << hpx::endl;
+        }
+
         return total_area;
     }
 
