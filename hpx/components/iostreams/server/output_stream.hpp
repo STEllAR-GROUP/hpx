@@ -12,7 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
 // TODO: Error handling?
@@ -21,10 +21,10 @@ namespace hpx { namespace iostreams { namespace server
 {
 
 struct HPX_COMPONENT_EXPORT output_stream
-    : components::managed_component_base<output_stream> 
+    : components::simple_component_base<output_stream> 
 {
     // {{{ types
-    typedef components::managed_component_base<output_stream> base_type; 
+    typedef components::simple_component_base<output_stream> base_type; 
 
     typedef lcos::mutex mutex_type;
     // }}}

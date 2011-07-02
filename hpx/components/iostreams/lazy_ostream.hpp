@@ -88,11 +88,17 @@ struct lazy_ostream
 
     lazy_ostream(BOOST_RV_REF(lazy_ostream) other)
     {
-        BOOST_VERIFY(other.mtx.try_lock());
-        BOOST_VERIFY(other.data);
-        data = other.data;
-        other.data = 0;
-        other.mtx.unlock();
+        if (other.mtx.try_lock())
+        {
+            BOOST_VERIFY(other.data);
+            data = other.data;
+            other.data = 0;
+            other.mtx.unlock();
+        }
+
+        else
+            HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
+                              , "couldn't acquire lock in move constructor");
     }
 
     ~lazy_ostream()
@@ -102,7 +108,7 @@ struct lazy_ostream
             mutex_type::scoped_lock l(mtx);
             if (data)   
             {
-                streaming_operator_sync(hpx::flush);
+                /*streaming_operator_sync(hpx::flush);*/
                 delete data;
                 data = 0;
             }
