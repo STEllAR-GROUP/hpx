@@ -19,7 +19,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 typedef hpx::iostreams::server::output_stream ostream_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<ostream_type>, 
+    hpx::components::managed_component<ostream_type>, 
     output_stream_factory);
 
 HPX_REGISTER_ACTION_EX(

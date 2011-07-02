@@ -90,7 +90,9 @@ struct lazy_ostream
     {
         if (other.mtx.try_lock())
         {
-            BOOST_VERIFY(other.data);
+            if (!other.data)
+                HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
+                                  , "acquired dead rvalue");
             data = other.data;
             other.data = 0;
             other.mtx.unlock();
