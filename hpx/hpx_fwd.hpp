@@ -31,8 +31,6 @@ namespace hpx
 {
     HPX_API_EXPORT void pre_main();
 
-    HPX_API_EXPORT bool is_system_running();
-
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
@@ -259,14 +257,6 @@ namespace hpx
             router_mode_invalid = -1,
             router_mode_bootstrap = 0,
             router_mode_hosted = 1,
-        };
-
-        enum router_state
-        {
-            router_state_invalid = -1,     
-            router_state_launching = 0,  
-            router_state_active = 1,
-            router_state_terminated = 2
         };
     }
  
