@@ -58,7 +58,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
     #include <boost/backtrace.hpp>
 #endif
 
-extern "C" void hpx_termination_handler(int signum)
+void hpx_termination_handler(int signum)
 {
     char* c = strsignal(signum); 
     std::cerr << "Received " << (c ? c : "unknown signal")

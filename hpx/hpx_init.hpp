@@ -25,9 +25,6 @@
 
 #if !defined(BOOST_WINDOWS)
     #include <signal.h>
-
-    // Print stack trace and exit.
-    HPX_EXPORT extern "C" void hpx_termination_handler(int signum);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
