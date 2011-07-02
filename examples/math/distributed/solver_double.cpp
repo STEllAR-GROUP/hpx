@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
         , "upper bound of integration")
 
         ( "tolerance"
-        , value<double>()->default_value(0.1, "0.1") 
+        , value<double>()->default_value(0.001, "0.001") 
         , "resolution tolerance")
 
         ( "top-segments"
