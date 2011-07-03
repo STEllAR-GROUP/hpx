@@ -57,6 +57,11 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     void notify();
 
+    void lock()
+    {
+        mtx.lock();
+    } 
+
     // no-op on non-bootstrap localities 
     void trigger(); 
 

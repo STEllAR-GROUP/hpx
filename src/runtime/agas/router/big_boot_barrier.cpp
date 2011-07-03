@@ -248,6 +248,8 @@ typedef actions::plain_action1<
 // TODO: merge with register_worker which is all but identical
 void register_console(registration_header const& header)
 {
+    get_big_boot_barrier().lock();
+
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
 /*
@@ -347,6 +349,8 @@ void register_console(registration_header const& header)
 // AGAS callback to client
 void notify_console(notification_header const& header)
 {
+    get_big_boot_barrier().lock();
+
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.status() != starting))
@@ -414,6 +418,8 @@ void notify_console(notification_header const& header)
 // remote call to AGAS
 void register_worker(registration_header const& header)
 {
+    get_big_boot_barrier().lock();
+
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
 /*
@@ -510,6 +516,8 @@ void register_worker(registration_header const& header)
 // AGAS callback to client
 void notify_worker(notification_header const& header)
 {
+    get_big_boot_barrier().lock();
+
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
 /*
@@ -749,7 +757,7 @@ void big_boot_barrier::wait()
 
 void big_boot_barrier::notify()
 {
-    boost::mutex::scoped_lock lk(mtx);
+    boost::mutex::scoped_lock lk(mtx, boost::adopt_lock);
     --connected;
     cond.notify_all();
 }
