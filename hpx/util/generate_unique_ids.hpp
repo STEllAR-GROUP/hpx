@@ -8,6 +8,7 @@
 #define HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/assert.hpp>
@@ -15,9 +16,9 @@
 
 namespace hpx { namespace util
 {
-    /// The unique_ids class is a type responsible for generating 
+    /// The unique_id_ranges class is a type responsible for generating 
     /// unique ids for components, parcels, threads etc.
-    class HPX_EXPORT unique_ids 
+    class HPX_EXPORT unique_id_ranges 
     {
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
@@ -27,7 +28,7 @@ namespace hpx { namespace util
         enum { range_delta = 16384 };
 
     public:
-        unique_ids()
+        unique_id_ranges()
           : lower_(0), upper_(0)
         {}
 
@@ -35,6 +36,7 @@ namespace hpx { namespace util
         naming::gid_type get_id(naming::locality const& here,
             naming::resolver_client& resolver, std::size_t count = 1);
 
+        /// Not thread-safe
         void set_range(
             naming::gid_type const& lower
           , naming::gid_type const& upper
@@ -47,6 +49,51 @@ namespace hpx { namespace util
         /// The range of available ids for components
         naming::gid_type lower_;
         naming::gid_type upper_;
+    };
+
+    /// The unique_ids class is a restricted form of unique_id_ranges, which
+    /// only allocates one gid at a time. 
+    struct HPX_EXPORT unique_ids 
+    {
+        struct tag {};
+        typedef hpx::util::spinlock_pool<tag> mutex_type;
+
+      private:
+        naming::gid_type current_lower;
+        naming::gid_type current_i;
+        naming::gid_type current_upper;
+        naming::gid_type next_lower;
+        naming::gid_type next_upper;
+        const std::size_t step;
+        const std::size_t leapfrog;
+
+      public:
+        unique_ids(
+            std::size_t step_ = HPX_INITIAL_GID_RANGE
+          , std::size_t leapfrog_ = 4
+        ) : current_lower(0)
+          , current_i(0)
+          , current_upper(0)
+          , next_lower(0)
+          , next_upper(0)
+          , step(step_)
+          , leapfrog(leapfrog_) 
+        { BOOST_ASSERT(leapfrog_ != 0); }
+
+        /// Generate next unique id
+        naming::gid_type get_id(
+            naming::locality const& here,
+            naming::resolver_client& resolver
+        );
+
+        /// Not thread-safe
+        void set_range(
+            naming::gid_type const& lower
+          , naming::gid_type const& upper
+        ) {
+            current_lower = lower;
+            current_upper = upper; 
+        }
     };
 }}
 

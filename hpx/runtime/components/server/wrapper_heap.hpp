@@ -210,7 +210,7 @@ namespace hpx { namespace components { namespace detail
         /// \note  The pointer given by the parameter \a p must have been 
         ///        allocated by this instance of a \a wrapper_heap
         naming::gid_type 
-        get_gid(util::unique_ids& ids, void* p) 
+        get_gid(util::unique_id_ranges& ids, void* p) 
         {
             BOOST_ASSERT(did_alloc(p));
 

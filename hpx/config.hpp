@@ -225,8 +225,8 @@
   #define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
 
-#if !defined(HPX_INITIAL_PARCELPORT_GID_RANGE)
-  #define HPX_INITIAL_PARCELPORT_GID_RANGE 0xFFFFU
+#if !defined(HPX_INITIAL_GID_RANGE)
+  #define HPX_INITIAL_GID_RANGE 0xFFFFU
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

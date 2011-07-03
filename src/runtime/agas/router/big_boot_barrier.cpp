@@ -724,7 +724,7 @@ void big_boot_barrier::wait()
             apply(bootstrap_agas, new register_console_action(
                 registration_header
                     (get_runtime().here(),
-                     HPX_INITIAL_PARCELPORT_GID_RANGE,
+                     HPX_INITIAL_GID_RANGE,
                      (boost::uint64_t) response_heap_type::block_type::heap_step,
                      p->get_address(),
                      (boost::uint64_t) response_heap_type::block_type::heap_size,
@@ -743,7 +743,7 @@ void big_boot_barrier::wait()
             apply(bootstrap_agas, new register_worker_action(
                 registration_header
                     (get_runtime().here(),
-                     HPX_INITIAL_PARCELPORT_GID_RANGE,
+                     HPX_INITIAL_GID_RANGE,
                      (boost::uint64_t) response_heap_type::block_type::heap_step,
                      p->get_address(),
                      (boost::uint64_t) response_heap_type::block_type::heap_size,

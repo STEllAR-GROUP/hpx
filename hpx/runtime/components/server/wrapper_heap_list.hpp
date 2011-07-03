@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace detail
         }
 
     private:
-        util::unique_ids id_range_;
+        util::unique_id_ranges id_range_;
     };
 
 }}} // namespace hpx::components::detail
