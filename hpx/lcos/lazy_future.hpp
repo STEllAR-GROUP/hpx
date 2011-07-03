@@ -73,7 +73,11 @@ namespace hpx { namespace lcos
         /// called.
         lazy_future()
           : apply_logger_("lazy_future::apply"), closure_(0)
-        {}
+        {
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ") args(0)";
+        }
 
         /// Get the result of the requested action. This call invokes the 
         /// action and yields control if the result is not ready. As soon as 
@@ -147,11 +151,24 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future::apply"),
             closure_(boost::bind(&lazy_future::invoke, this_(), 
                      naming::id_type(gid, naming::id_type::unmanaged)))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", " 
+                        << gid
+                        << ") args(0)";
+        }
+
         lazy_future(naming::id_type const& gid)
           : apply_logger_("lazy_future::apply"),
             closure_(boost::bind(&lazy_future::invoke, this_(), gid))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", " 
+                        << gid
+                        << ") args(0)";
+        }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -207,12 +224,25 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future::apply"),
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this_(), 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", " 
+                        << gid
+                        << ") args(1)";
+        }
+
         template <typename Arg0>
         lazy_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("lazy_future::apply"),
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this_(), gid, arg0))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", " 
+                        << gid
+                        << ") args(1)";
+        }
 
         // pull in remaining constructors
         #include <hpx/lcos/lazy_future_constructors.hpp>
@@ -237,7 +267,11 @@ namespace hpx { namespace lcos
         /// called.
         lazy_future()
           : apply_logger_("lazy_future_direct::apply")
-        {}
+        {
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ") args(0)";
+        }
 
         /// Get the result of the requested action. This call invokes the 
         /// action and yields control if the result is not ready. As soon as 
@@ -274,7 +308,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0, 
-                    Action::execute_function(addr.address_));
+                    Action::execute_function_nonvirt(addr.address_));
             }
             else {
                 // remote execution
@@ -316,11 +350,24 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future_direct::apply"),
             closure_(boost::bind(&lazy_future::invoke, 
                 naming::id_type(gid, naming::id_type::unmanaged)))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+        }
+
         lazy_future(naming::id_type const& gid)
           : apply_logger_("lazy_future_direct::apply"),
             closure_(boost::bind(&lazy_future::invoke, this, gid))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+        }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -341,7 +388,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function(addr.address_, arg0));
+                    0, Action::execute_function_nonvirt(addr.address_, arg0));
             }
             else {
                 // remote execution
@@ -390,12 +437,25 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future_direct::apply"),
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this, 
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+        }
+
         template <typename Arg0>
         lazy_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("lazy_future_direct::apply"),
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this, gid, arg0))
-        { }
+        { 
+            LLCO_(info) << "lazy_future::lazy_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+        }
 
         // pull in remaining constructors
         #include <hpx/lcos/lazy_future_constructors_direct.hpp>

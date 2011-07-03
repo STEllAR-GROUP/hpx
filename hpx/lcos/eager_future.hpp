@@ -73,7 +73,11 @@ namespace hpx { namespace lcos
         /// called.
         eager_future()
           : apply_logger_("eager_future::apply")
-        {}
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ") args(0)";
+        }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -104,11 +108,21 @@ namespace hpx { namespace lcos
         eager_future(naming::gid_type const& gid)
           : apply_logger_("eager_future::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
         eager_future(naming::id_type const& gid)
           : apply_logger_("eager_future::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
             apply(gid);
         }
 
@@ -147,12 +161,22 @@ namespace hpx { namespace lcos
         eager_future(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
             apply(gid, arg0);
         }
 
@@ -178,7 +202,11 @@ namespace hpx { namespace lcos
         /// called.
         eager_future()
           : apply_logger_("eager_future_direct::apply")
-        {}
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ") args(0)";
+        }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -196,7 +224,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0, 
-                    Action::execute_function(addr.address_));
+                    Action::execute_function_nonvirt(addr.address_));
             }
             else {
                 // remote execution
@@ -222,11 +250,21 @@ namespace hpx { namespace lcos
         eager_future(naming::gid_type const& gid)
           : apply_logger_("eager_future_direct::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
         eager_future(naming::id_type const& gid)
           : apply_logger_("eager_future_direct::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
             apply(gid);
         }
 
@@ -249,7 +287,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function(addr.address_, arg0));
+                    0, Action::execute_function_nonvirt(addr.address_, arg0));
             }
             else {
                 // remote execution
@@ -278,12 +316,22 @@ namespace hpx { namespace lcos
         eager_future(naming::gid_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future_direct::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, Arg0 const& arg0)
           : apply_logger_("eager_future_direct::apply")
         {
+            LLCO_(info) << "eager_future::eager_future("
+                        << actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
             apply(gid, arg0);
         }
 

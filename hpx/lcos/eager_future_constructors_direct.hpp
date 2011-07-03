@@ -41,7 +41,7 @@
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(0, Action::execute_function(
+            (*this->impl_)->set_data(0, Action::execute_function_nonvirt(
                 addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {
@@ -56,6 +56,11 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("eager_future_direct::apply")
     {
+        LLCO_(info) << "eager_future::eager_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
         apply(naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
@@ -64,6 +69,11 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("eager_future_direct::apply")
     {
+        LLCO_(info) << "eager_future::eager_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
         apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

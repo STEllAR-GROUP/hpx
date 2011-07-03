@@ -59,7 +59,14 @@ public:
           &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
             this_(), naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { }
+    { 
+        LLCO_(info) << "lazy_future::lazy_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+    }
+
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lazy_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
@@ -68,7 +75,13 @@ public:
           &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
             this_(), gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { }
+    { 
+        LLCO_(info) << "lazy_future::lazy_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+    }
 
 #undef N
 

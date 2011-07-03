@@ -41,7 +41,7 @@
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_, 
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(0, Action::execute_function(
+            (*this->impl_)->set_data(0, Action::execute_function_nonvirt(
                 addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {
@@ -71,7 +71,14 @@ public:
             &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, naming::id_type(gid, naming::id_type::unmanaged), 
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { }
+    { 
+        LLCO_(info) << "lazy_future::lazy_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+    }
+
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lazy_future(naming::id_type const& gid, 
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
@@ -80,7 +87,13 @@ public:
             &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>, 
             this, gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { }
+    { 
+        LLCO_(info) << "lazy_future::lazy_future("
+                    << actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+    }
 
 #undef N
 
