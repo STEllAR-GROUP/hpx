@@ -70,6 +70,10 @@ void legacy_router::launch_bootstrap(
     bootstrap->primary_ns_server.bind_gid
         (symbol_namespace_server_type::fixed_gid(), symbol_gva);
 
+    naming::gid_type lower, upper;
+    get_id_range(l, HPX_INITIAL_GID_RANGE, lower, upper);
+    get_runtime().get_parcel_port().set_range(lower, upper);
+
     if (runtime_type == runtime_mode_console)
         bootstrap->symbol_ns_server.bind("/locality(console)",
             naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)); 
