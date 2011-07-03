@@ -390,7 +390,7 @@ struct thread_deque
                               std::size_t& added)
     {
         if (0 == work_items_count_) {
-            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;
 
@@ -426,7 +426,7 @@ struct thread_deque
                                 std::size_t& added, thread_deque* addfrom)
     {
         if (0 == work_items_count_) {
-            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;
 

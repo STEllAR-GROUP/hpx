@@ -484,7 +484,7 @@ namespace hpx { namespace threads { namespace policies
         // thread-map and deleting all terminated threads
         if (Global && 0 == num_thread) {
             // first clean up terminated threads
-            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (lk) {
                 // no point in having a thread waiting on the lock 
                 // while another thread is doing the maintenance
@@ -508,7 +508,7 @@ namespace hpx { namespace threads { namespace policies
             // just falls through to the wait below (no work is available)
             // in which case the current thread (which failed to acquire 
             // the lock) will just retry to enter this loop.
-            detail::try_lock_wrapper<mutex_type> lk(mtx_);
+            util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 break;            // avoid long wait on lock
 

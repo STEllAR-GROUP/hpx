@@ -9,9 +9,8 @@
 #if !defined(HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE)
 #define HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE
 
-#include <boost/thread.hpp>
-
 #include <hpx/config.hpp>
+#include <hpx/util/try_lock_wrapper.hpp>
 #include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,28 +22,6 @@ struct add_new_tag {};
 ///////////////////////////////////////////////////////////////////////////
 namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////
-    // This try_lock_wrapper is essentially equivalent to the template 
-    // boost::thread::detail::try_lock_wrapper with the one exception, that
-    // the lock() function always calls base::try_lock(). This allows us to 
-    // skip lock acquisition while exiting the condition variable.
-    template<typename Mutex>
-    class try_lock_wrapper
-      : public boost::detail::try_lock_wrapper<Mutex>
-    {
-        typedef boost::detail::try_lock_wrapper<Mutex> base;
-
-    public:
-        explicit try_lock_wrapper(Mutex& m):
-            base(m, boost::try_to_lock)
-        {}
-
-        void lock()
-        {
-            base::try_lock();       // this is different
-        }
-    };
-
     ///////////////////////////////////////////////////////////////////////
     // debug helper function, logs all suspended threads
     // this returns true if all threads in the map are currently suspended
