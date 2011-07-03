@@ -196,13 +196,20 @@ else()
   # lcos
   set(hpxlib_lcos_HEADERS
       ${hpx_SOURCE_DIR}/hpx/lcos/barrier.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/queue.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/object_semaphore.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/stubs/barrier.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/stubs/queue.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/stubs/object_semaphore.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/server/barrier.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/server/queue.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/server/object_semaphore.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/base_lco.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/condition.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/contin.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/local_counting_semaphore.hpp
-      ${hpx_SOURCE_DIR}/hpx/lcos/dataflow_variable.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/local_dataflow_variable.hpp
+      ${hpx_SOURCE_DIR}/hpx/lcos/local_shared_mutex.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/eager_future.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors.hpp
       ${hpx_SOURCE_DIR}/hpx/lcos/eager_future_constructors_direct.hpp
@@ -399,9 +406,10 @@ else()
   set(hpxlib_parcelset_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcel.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelhandler.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelhandler_queue_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelport.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/parcelport_connection.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelhandler_queue.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelport_queue.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/parcelset/server/parcelport_server_connection.hpp)
   source_group("Header Files\\Parcelset" 
@@ -495,7 +503,6 @@ else()
   set(hpxlib_global_SOURCES
       ${hpx_SOURCE_DIR}/src/exception.cpp
       ${hpx_SOURCE_DIR}/src/exception_list.cpp
-      ${hpx_SOURCE_DIR}/src/hpx_init.cpp
       ${hpx_SOURCE_DIR}/src/pre_main.cpp
       ${hpx_SOURCE_DIR}/src/state.cpp
       ${hpx_SOURCE_DIR}/src/runtime.cpp)
@@ -581,10 +588,17 @@ else()
   # parcelset
   set(hpxlib_parcelset_SOURCES
       ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcel.cpp
-      ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelhandler.cpp
       ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport.cpp
-      ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport_connection.cpp
-      ${hpx_SOURCE_DIR}/src/runtime/parcelset/server/parcelhandler_queue.cpp)
+      ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelport_connection.cpp)
+
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    set(hpxlib_parcelset_SOURCES ${hpxlib_parcelset_SOURCES}
+        ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelhandler_v2.cpp)
+  else()
+    set(hpxlib_parcelset_SOURCES ${hpxlib_parcelset_SOURCES}
+        ${hpx_SOURCE_DIR}/src/runtime/parcelset/parcelhandler_v1.cpp)
+  endif()    
+
   source_group("Source Files\\Runtime\\Parcelset" 
       FILES ${hpxlib_parcelset_SOURCES})
   
