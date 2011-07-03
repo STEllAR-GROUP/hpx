@@ -66,10 +66,23 @@ namespace hpx { namespace components { namespace server
         }
 
     public:
-       template <typename Arg1, typename Arg2, typename Arg3>
-       static util::unused_type
+       util::unused_type
        execute_function(naming::address::address_type lva, 
-           Arg1 const& dest, Arg2 const& level, Arg3 const& msg)
+           logging_destination dest, int level, std::string const& msg)
+       {
+            try {
+                // call the function, ignoring the return value
+                console_logging(dest, level, msg);
+            }
+            catch (hpx::exception const& /*e*/) {
+                /***/;      // no logging!
+            }
+            return util::unused;
+       }
+
+       static util::unused_type
+       execute_function_nonvirt(naming::address::address_type lva, 
+           logging_destination dest, int level, std::string const& msg)
        {
             try {
                 // call the function, ignoring the return value

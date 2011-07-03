@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -216,11 +217,18 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Arguments>
-    class base_argument_action : public base_action
+    template <typename Result, typename Arguments>
+    struct signature;
+
+    template <typename Result>
+    struct signature<Result, boost::fusion::vector<> > : base_action
     {
-    public:
-        typedef Arguments arguments_type;
+        typedef boost::fusion::vector<> arguments_type;
+        typedef Result result_type;
+
+        virtual result_type execute_function(
+            naming::address::address_type lva
+        ) const = 0; 
 
         virtual boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
@@ -247,9 +255,11 @@ namespace hpx { namespace actions
         static void register_base()
         {
             using namespace boost::serialization;
-            void_cast_register<base_argument_action, base_action>();
+            void_cast_register<signature, base_action>();
         }
     };
+
+    #include <hpx/runtime/actions/signature_implementations.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -284,18 +294,23 @@ namespace hpx { namespace actions
         };
     }
 
-    template <typename Component, int Action, typename Arguments, 
-        typename Derived, threads::thread_priority Priority>
-    class action : public base_argument_action<Arguments>
+    template <typename Component                // Component type
+            , int Action                        // Action code
+            , typename Result                   // Return type
+            , typename Arguments                // Arguments (fusion vector) 
+            , typename Derived                  // Derived action class
+            , threads::thread_priority Priority /* Default priority */>
+    class action : public signature<Result, Arguments>
     {
     public:
         typedef Component component_type;
         typedef Derived derived_type;
-        typedef util::unused_type result_type;
+        typedef Result result_type;
         typedef Arguments arguments_type;
 
         /// Enumerate all GIDs which stored as arguments
-        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
+        typedef boost::function<void(naming::id_type const&)>
+            enum_gid_handler_type;
 
         // This is the action code (id) of this action. It is exposed to allow 
         // generic handling of actions.
@@ -453,8 +468,8 @@ namespace hpx { namespace actions
         static void register_base()
         {
             using namespace boost::serialization;
-            void_cast_register<action, base_argument_action<Arguments> >();
-            base_argument_action<Arguments>::register_base();
+            void_cast_register<action, signature<Result, Arguments> >();
+            signature<Result, Arguments>::register_base();
         }
 
     private:
@@ -536,12 +551,12 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <int N, typename Component, int Action, typename Arguments, 
-      typename Derived, threads::thread_priority Priority>
+    template <int N, typename Component, int Action, typename Result,
+      typename Arguments, typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Arguments, Derived, Priority>::arguments_type const, N
+        typename action<Component, Action, Result, Arguments, Derived, Priority>::arguments_type const, N
     >::type 
-    get(action<Component, Action, Arguments, Derived, Priority> const& args) 
+    get(action<Component, Action, Result, Arguments, Derived, Priority> const& args) 
     { 
         return args.get<N>(); 
     }
@@ -601,3 +616,4 @@ namespace hpx { namespace actions
 #define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
 
 #endif
+

@@ -71,7 +71,7 @@ namespace hpx { namespace applier { namespace detail
         call (naming::address::address_type lva, 
             threads::thread_priority /*priority*/)
         {
-            Action::execute_function(lva);
+            Action::execute_function_nonvirt(lva);
         }
 
         static typename Action::result_type 
@@ -79,7 +79,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority /*priority*/)
         {
             try {
-                return c->trigger(Action::execute_function(lva));
+                return c->trigger(Action::execute_function_nonvirt(lva));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -127,7 +127,7 @@ namespace hpx { namespace applier { namespace detail
         call (naming::address::address_type lva,
             threads::thread_priority priority, Arg0 const& arg0)
         {
-            Action::execute_function(lva, arg0);
+            Action::execute_function_nonvirt(lva, arg0);
         }
 
         static typename Action::result_type  
@@ -135,7 +135,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, Arg0 const& arg0)
         {
             try {
-                return c->trigger(Action::execute_function(lva, arg0));
+                return c->trigger(Action::execute_function_nonvirt(lva, arg0));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

@@ -37,6 +37,14 @@
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
+#define HPX_PARAM_TYPES(z, n, data)                                           \
+        BOOST_PP_COMMA_IF(n)                                                  \
+        BOOST_PP_CAT(data, n) const&                                          \
+        BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
+    /**/
+#define HPX_PARAM_ARGUMENT(z, n, data)                                       \
+        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
+    /**/
 
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
@@ -50,14 +58,16 @@
       : public action<
             components::server::plain_function<Derived>, 
             BOOST_PP_CAT(function_result_action_arg, N), 
+            Result,
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
     public:
+        typedef Result result_type;
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
-            BOOST_PP_CAT(function_result_action_arg, N), 
+            BOOST_PP_CAT(function_result_action_arg, N), result_type, 
             arguments_type, Derived, Priority> base_type;
 
         BOOST_PP_CAT(plain_base_result_action, N)(
@@ -104,7 +114,6 @@
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef Result result_type;
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
@@ -238,6 +247,28 @@
           : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
 
+        Result execute_function(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) const {
+            LTM_(debug)
+                << "plain_base_result_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<derived_type>() << ")";
+            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+        }
+
+        static Result execute_function_nonvirt(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) {
+            LTM_(debug)
+                << "plain_base_result_action" << N
+                << "::execute_function_nonvirt name("
+                << detail::get_action_name<derived_type>() << ")";
+            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+        }
+
         /// serialization support
         static void register_base()
         {
@@ -366,16 +397,26 @@
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        ///
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static Result execute_function(
+        Result execute_function(
             naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        {
-            LTM_(debug) << "Executing direct action "
-                        << detail::get_action_name<derived_type>()
-                        << ".";
-            return F(BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) const {
+            LTM_(debug)
+                << "plain_base_result_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<derived_type>() << ")";
+            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+        }
+
+        static Result execute_function_nonvirt(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) {
+            LTM_(debug)
+                << "plain_base_result_action" << N
+                << "::execute_function_nonvirt name("
+                << detail::get_action_name<derived_type>() << ")";
+            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
         }
 
         /// serialization support
@@ -479,17 +520,19 @@
     class BOOST_PP_CAT(plain_base_action, N)
       : public action<
             components::server::plain_function<Derived>,
-            BOOST_PP_CAT(function_action_arg, N), 
+            BOOST_PP_CAT(function_action_arg, N),
+            util::unused_type, 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
     public:
+        typedef util::unused_type result_type;
         typedef 
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> 
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, 
-            BOOST_PP_CAT(function_action_arg, N), 
+            BOOST_PP_CAT(function_action_arg, N), result_type, 
             arguments_type, Derived, Priority> base_type;
 
         BOOST_PP_CAT(plain_base_action, N)(threads::thread_priority priority = Priority)
@@ -535,7 +578,6 @@
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef util::unused_type result_type;
 
         // This static construct_thread_function allows to construct 
         // a proper thread function for a thread without having to 
@@ -662,6 +704,30 @@
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
           : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
         {}
+
+        util::unused_type execute_function(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) const {
+            LTM_(debug)
+                << "plain_base_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<derived_type>() << ")";
+            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return util::unused;
+        }
+
+        static util::unused_type execute_function_nonvirt(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) {
+            LTM_(debug)
+                << "plain_base_action" << N
+                << "::execute_function_nonvirt name("
+                << detail::get_action_name<derived_type>() << ")";
+            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return util::unused;
+        }
 
         /// serialization support
         static void register_base()
@@ -790,15 +856,27 @@
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        ///
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static util::unused_type execute_function(naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        {
-            LTM_(debug) << "Executing direct action " 
-                        << detail::get_action_name<derived_type>()
-                        << ".";
-            F(BOOST_PP_ENUM_PARAMS(N, arg));
+        util::unused_type execute_function(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) const {
+            LTM_(debug)
+                << "plain_base_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<derived_type>() << ")";
+            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return util::unused;
+        }
+
+        static util::unused_type execute_function_nonvirt(
+            naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+        ) {
+            LTM_(debug)
+                << "plain_base_action" << N
+                << "::execute_function_nonvirt name("
+                << detail::get_action_name<derived_type>() << ")";
+            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
         }
 
@@ -893,6 +971,8 @@
         }
     };
 
+#undef HPX_PARAM_ARGUMENT
+#undef HPX_PARAM_TYPES
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 #undef HPX_ACTION_ARGUMENT

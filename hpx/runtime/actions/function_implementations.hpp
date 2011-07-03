@@ -39,20 +39,23 @@
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
+#define HPX_PARAM_TYPES(z, n, data)                                           \
+        BOOST_PP_COMMA_IF(n)                                                  \
+        typename boost::call_traits<BOOST_PP_CAT(data, n)>::param_type        \
+        BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
+    /**/
+#define HPX_PARAM_ARGUMENT(z, n, data)                                       \
+        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
+    /**/
 
 template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T)>
 struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
 {
+    typedef Result result_type;
     typedef boost::fusion::vector<
         BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _) 
     > arguments_type;
-
-    typedef base_argument_action<arguments_type> action_type;
-
-    typedef Result result_type;
-
-    typedef Result sync_result_type;
-    typedef lcos::future_value<Result> async_result_type;
+    typedef signature<result_type, arguments_type> action_type;
 
     BOOST_PP_REPEAT(N, HPX_ARG_TYPES, _)
 
@@ -120,38 +123,17 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
     bool operator!() const
     { return !f; }
 
-    async_result_type eval_async(
-        BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& arg)
+    result_type operator()(
+        BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
     ) const {
-        async_result_type r;
-        continuation_type c = boost::make_shared<continuation>(r.get_gid()); 
-        arguments_type a(BOOST_PP_ENUM_PARAMS(N, arg));
-
-        if (base_action::direct_action == f->get_action_type())
-            f->get_thread_function(c, 0, a)
-                (threads::thread_state_ex(threads::wait_signaled));
-
-        else
+        if (HPX_UNLIKELY(!f))
         {
-            threads::thread_init_data data;
-            applier::get_applier().get_thread_manager().register_work
-                ( f->get_thread_init_data(c, 0, data, a)
-                , threads::thread_state(threads::pending));
+            HPX_THROW_EXCEPTION(invalid_status,
+                "function::operator()", "empty action was called");
         }
 
-        return r;
-    }
-
-    sync_result_type eval_sync(
-        BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& arg)
-    ) const {
-        return eval_async(BOOST_PP_ENUM_PARAMS(N, arg)).get();
-    }
-
-    sync_result_type operator()(
-        BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& arg)
-    ) const { 
-        return eval_async(BOOST_PP_ENUM_PARAMS(N, arg)).get();
+        return f->execute_function
+            (0, BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
     }
 
   private:
@@ -187,6 +169,8 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
+#undef HPX_PARAM_ARGUMENT
+#undef HPX_PARAM_TYPES
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ARG_TYPES
 #undef N

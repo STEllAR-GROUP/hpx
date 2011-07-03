@@ -13,6 +13,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -32,13 +33,9 @@ struct function;
 template <typename Result>
 struct function<Result()>
 {
-    typedef boost::fusion::vector<> arguments_type;
-    typedef base_argument_action<arguments_type> action_type;
-
     typedef Result result_type;
-
-    typedef Result sync_result_type;
-    typedef lcos::future_value<Result> async_result_type;
+    typedef boost::fusion::vector<> arguments_type;
+    typedef signature<result_type, arguments_type> action_type;
 
     enum { arity = 0 };
 
@@ -104,37 +101,16 @@ struct function<Result()>
     bool operator!() const
     { return !f; }
 
-    async_result_type eval_async() const
+    result_type operator()() const
     {
-        if (!f)
+        if (HPX_UNLIKELY(!f))
         {
             HPX_THROW_EXCEPTION(invalid_status,
-                "function::eval", "eval called on an empty function");
+                "function::operator()", "empty action was called");
         }
 
-        async_result_type r;
-        continuation_type c = boost::make_shared<continuation>(r.get_gid()); 
-
-        if (base_action::direct_action == f->get_action_type())
-            f->get_thread_function(c, 0, arguments_type())
-                (threads::thread_state_ex(threads::wait_signaled));
-
-        else
-        {
-            threads::thread_init_data data;
-            applier::get_applier().get_thread_manager().register_work
-                ( f->get_thread_init_data(c, 0, data, arguments_type())
-                , threads::thread_state(threads::pending));
-        }
-
-        return r;
+        return f->execute_function(0); 
     }
-
-    sync_result_type eval_sync() const
-    { return eval_async().get(); }
-
-    sync_result_type operator()() const
-    { return eval_async().get(); }
 
   private:
     boost::shared_ptr<action_type> f;

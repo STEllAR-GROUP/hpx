@@ -40,11 +40,14 @@ namespace hpx { namespace actions
         Result (Component::*F)(), typename Derived, 
         threads::thread_priority Priority = threads::thread_priority_default>
     class base_result_action0 
-      : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
+      : public action<Component, Action, Result, boost::fusion::vector<>,
+                      Derived, Priority>
     {
     public:
+        typedef Result result_type;
         typedef boost::fusion::vector<> arguments_type;
-        typedef action<Component, Action, arguments_type, Derived, Priority> 
+        typedef action<Component, Action, result_type, arguments_type, 
+                       Derived, Priority> 
             base_type;
 
         explicit base_result_action0(threads::thread_priority priority = Priority)
@@ -77,7 +80,6 @@ namespace hpx { namespace actions
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef Result result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
@@ -182,6 +184,24 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
+        Result execute_function(
+            naming::address::address_type lva
+        ) const {
+            LTM_(debug) << "base_result_action0::execute_function: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            return (get_lva<Component>::call(lva)->*F)();
+        }
+
+        static Result execute_function_nonvirt(
+            naming::address::address_type lva
+        ) {
+            LTM_(debug) << "base_result_action0::execute_function_nonvirt: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            return (get_lva<Component>::call(lva)->*F)();
+        }
+
         /// serialization support
         static void register_base()
         {
@@ -275,10 +295,21 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        ///
-        static Result execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug) << "Executing direct component action with result.";
+        Result execute_function(
+            naming::address::address_type lva
+        ) const {
+            LTM_(debug) << "base_result_action0::execute_function: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            return (get_lva<Component>::call(lva)->*F)();
+        }
+
+        static Result execute_function_nonvirt(
+            naming::address::address_type lva
+        ) {
+            LTM_(debug) << "base_result_action0::execute_function_nonvirt: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -358,11 +389,14 @@ namespace hpx { namespace actions
     template <typename Component, int Action, void (Component::*F)(), typename Derived, 
       threads::thread_priority Priority = threads::thread_priority_default>
     class base_action0 
-      : public action<Component, Action, boost::fusion::vector<>, Derived, Priority>
+      : public action<Component, Action, util::unused_type,
+                      boost::fusion::vector<>, Derived, Priority>
     {
     public:
+        typedef util::unused_type result_type;
         typedef boost::fusion::vector<> arguments_type;
-        typedef action<Component, Action, arguments_type, Derived, Priority> 
+        typedef action<Component, Action, result_type, arguments_type,
+                       Derived, Priority> 
             base_type;
 
         explicit base_action0(threads::thread_priority priority = Priority)
@@ -395,7 +429,6 @@ namespace hpx { namespace actions
 
     public:
         typedef boost::mpl::false_ direct_execution;
-        typedef util::unused_type result_type;
 
         /// \brief This static \a construct_thread_function allows to construct 
         /// a proper thread function for a \a thread without having to 
@@ -492,6 +525,26 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
+        virtual util::unused_type execute_function(
+            naming::address::address_type lva
+        ) const {
+            LTM_(debug) << "base_action0::execute_function: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            (get_lva<Component>::call(lva)->*F)();
+            return util::unused;
+        }
+
+        static util::unused_type execute_function_nonvirt(
+            naming::address::address_type lva
+        ) {
+            LTM_(debug) << "base_action0::execute_function_nonvirt: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            (get_lva<Component>::call(lva)->*F)();
+            return util::unused;
+        }
+
         /// serialization support
         static void register_base()
         {
@@ -582,11 +635,22 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        ///
-        static util::unused_type execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug) << "Executing direct component action("
-                        << detail::get_action_name<derived_type>() << ")";
+        virtual util::unused_type execute_function(
+            naming::address::address_type lva
+        ) const {
+            LTM_(debug) << "base_action0::execute_function: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
+            (get_lva<Component>::call(lva)->*F)();
+            return util::unused;
+        }
+
+        static util::unused_type execute_function_nonvirt(
+            naming::address::address_type lva
+        ) {
+            LTM_(debug) << "base_action0::execute_function_nonvirt: name(" 
+                        << detail::get_action_name<derived_type>()
+                        << ") lva(" << lva << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }

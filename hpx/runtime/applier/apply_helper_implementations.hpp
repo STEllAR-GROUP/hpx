@@ -74,7 +74,7 @@
             threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            Action::execute_function(lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            Action::execute_function_nonvirt(lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         static typename Action::result_type  
@@ -83,7 +83,7 @@
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
-                return c->trigger(Action::execute_function(
+                return c->trigger(Action::execute_function_nonvirt(
                     lva, BOOST_PP_ENUM_PARAMS(N, arg)));
             }
             catch (hpx::exception const& e) {
