@@ -56,6 +56,7 @@ namespace hpx
         unknown_gid = 25,
         deadlock = 26,
         assertion_failed = 27,
+        null_thread_id = 28,
         last_error
     };
 
@@ -88,6 +89,8 @@ namespace hpx
         "unknown_locality",
         "unknown_gid",
         "deadlock",
+        "assertion_failed",
+        "null_thread_id",
         ""
     };
 
