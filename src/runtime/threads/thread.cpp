@@ -97,7 +97,12 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()
     {
-        return *thread_self::impl_type/*::super_type*/::get_self();
+        thread_self* p = get_self_ptr();
+        if (HPX_UNLIKELY(!p))
+            HPX_THROW_EXCEPTION(null_thread_id
+                              , "threads::get_self"
+                              , "NULL thread id encountered");
+        return *get_self_ptr();
     }
 
     thread_self* get_self_ptr()
