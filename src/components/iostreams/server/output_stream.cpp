@@ -19,8 +19,6 @@ namespace hpx { namespace iostreams { namespace server
 void output_stream::call_write(
     std::deque<char> const& in
 ) {
-//    std::cout << "trying lock" << std::endl;
-
     mutex_type::scoped_lock l(this);
 
     // Perform the IO operation.
@@ -29,8 +27,6 @@ void output_stream::call_write(
 
 void output_stream::write(std::deque<char> const& in)
 { // {{{
-//    std::cout << "got " << in.size() << std::endl;
-
     // Perform the IO in another OS thread. 
     get_runtime().get_io_pool().get_io_service().post(boost::bind
         (&output_stream::call_write, this, in));
