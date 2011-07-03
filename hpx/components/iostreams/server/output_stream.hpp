@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -26,19 +26,16 @@ struct HPX_COMPONENT_EXPORT output_stream
     // {{{ types
     typedef components::managed_component_base<output_stream> base_type; 
 
-    typedef lcos::mutex mutex_type;
+    struct tag {};
+    typedef hpx::util::spinlock_pool<output_stream::tag> mutex_type;
     // }}}
 
   private:
-    mutex_type mtx;
     write_function_type write_f;
 
     // Executed in an io_pool_ thread to prevent io from blocking an HPX
     // shepherd thread.
-    void call_write(
-        std::deque<char> const& in
-      , threads::thread_id_type id
-    );
+    void call_write(std::deque<char> const& in);
 
   public:
     explicit output_stream(write_function_type write_f_ = write_function_type())

@@ -11,6 +11,7 @@
 #include <iterator>
 #include <ios>
 
+#include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/move/move.hpp>
@@ -73,8 +74,22 @@ struct lazy_ostream
         // If the buffer isn't empty, send it to the destination.
         if (!data->out_buffer.empty())
         {
-            this->base_type::write_sync(gid_, data->out_buffer);
-            data->out_buffer.clear();
+            // Create the next buffer/stream.
+            data_type* next = new data_type;
+
+            // Swap the current buffer for the next one.
+            boost::swap(next, data);
+
+            // Perform the write operation, then destroy the old buffer and
+            // stream. 
+            this->base_type::write_sync(gid_, next->out_buffer);
+
+            // Unlock the mutex as we're about to suspend for a synchronous
+            // IO operation.
+            mtx.unlock();
+
+            delete next;
+            next = 0;
         }
 
         return *this;
@@ -107,10 +122,9 @@ struct lazy_ostream
     {
         if (threads::threadmanager_is(running))
         {
-            mutex_type::scoped_lock l(mtx);
-            if (data)   
+            if (mtx.try_lock() && data)   
             {
-                /*streaming_operator_sync(hpx::flush);*/
+                streaming_operator_sync(hpx::flush);
                 delete data;
                 data = 0;
             }
@@ -120,14 +134,14 @@ struct lazy_ostream
     // hpx::flush manipulator
     lazy_ostream& operator<<(hpx::iostreams::flush_type const& m)
     {
-        mutex_type::scoped_lock l(mtx);
+        mtx.lock(); 
         return streaming_operator_sync(m);
     }
 
     // hpx::endl manipulator
     lazy_ostream& operator<<(hpx::iostreams::endl_type const& m)
     {
-        mutex_type::scoped_lock l(mtx);
+        mtx.lock(); 
         return streaming_operator_sync(m);
     }
 
