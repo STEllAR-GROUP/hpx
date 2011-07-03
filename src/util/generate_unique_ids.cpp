@@ -46,7 +46,7 @@ namespace hpx { namespace util
         naming::locality const& here
       , naming::resolver_client& resolver
     ) {
-        mutex_type::scoped_lock l(this);
+        allocation_mutex_type::scoped_lock al(this);
           
         const std::size_t leap_at = step / leapfrog;
 
@@ -55,21 +55,30 @@ namespace hpx { namespace util
         // Get the next range of ids at the "leapfrog" point. TODO: This should
         // probably be scheduled in a new thread so that we can return to the
         // caller immediately.
-        if ((current_lower + leap_at) == current_i)
+        if (HPX_UNLIKELY((current_lower + leap_at) == current_i))
         {
-            naming::gid_type lower, upper;
+            leapfrog_lock_type ll(leapfrog_mtx);
 
+            if (ll) 
             {
-                unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                resolver.get_id_range(here, step, lower, upper);
+                naming::gid_type lower, upper;
+
+                {
+                    unlock_the_lock<allocation_mutex_type::scoped_lock> ul(al);
+                    resolver.get_id_range(here, step, lower, upper);
+                }
+
+                next_lower = lower;
+                next_upper = upper;
             }
 
-            next_lower = lower;
-            next_upper = upper;
+            naming::gid_type result = current_i;
+            ++current_i;
+            return result;
         }
 
         // Check for range exhaustion.
-        if ((current_i + 1) > current_upper) 
+        if (HPX_UNLIKELY((current_i + 1) > current_upper)) 
         {
             // Sanity checks.
             BOOST_ASSERT(next_lower);
@@ -88,6 +97,4 @@ namespace hpx { namespace util
         return result;
     }
 }}
-
-
 
