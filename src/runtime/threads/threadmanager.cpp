@@ -296,6 +296,11 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::set_active_state",
+              "NULL thread id encountered");  
+
         // just retry, set_state will create new thread if target is still active
         error_code ec;      // do not throw
         set_state(id, newstate, newstate_ex, priority, ec);
@@ -311,6 +316,10 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROWS_IF(ec, null_thread_id,
+              "threadmanager_impl::set_state", "NULL thread id encountered");  
+
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 
         // set_state can't be used to force a thread into active state
@@ -420,6 +429,11 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_description(thread_id_type id, char const* desc)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::set_description",
+              "NULL thread id encountered");  
+
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         if (thrd->get()) 
@@ -439,6 +453,11 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_lco_description(thread_id_type id, char const* desc)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::set_lco_description",
+              "NULL thread id encountered");  
+
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         if (thrd->get()) 
@@ -449,11 +468,25 @@ namespace hpx { namespace threads
     /// the required action.
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        wake_timer_thread (thread_id_type id, 
+        wake_timer_thread(thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
             thread_priority priority, thread_id_type timer_id, 
             boost::shared_ptr<boost::atomic<bool> > triggered) 
     {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::ake_timer_thread",
+                "NULL thread id encountered (id)");  
+        }
+
+        else if (HPX_UNLIKELY(!timer_id))
+        {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::ake_timer_thread",
+                "NULL thread id encountered (timer_id)");
+        }
+
         bool oldvalue = false;
         if (triggered->compare_exchange_strong(oldvalue, true))
         {
@@ -472,10 +505,15 @@ namespace hpx { namespace threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     template <typename TimeType>
     thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        at_timer (TimeType const& expire, thread_id_type id, 
+        at_timer(TimeType const& expire, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
             thread_priority priority)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::at_timer",
+              "NULL thread id encountered");  
+
         // create a new thread in suspended state, which will execute the 
         // requested set_state when timer fires and will re-awaken this thread, 
         // allowing the deadline_timer to go out of scope gracefully
@@ -519,10 +557,15 @@ namespace hpx { namespace threads
     /// new value after it expired (at the given time)
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state (time_type const& expire_at, thread_id_type id, 
+        set_state(time_type const& expire_at, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::set_state",
+              "NULL thread id encountered");  
+
         // this creates a new thread which creates the timer and handles the
         // requested actions
         thread_state_enum (threadmanager_impl::*f)(time_type const&, 
@@ -540,10 +583,15 @@ namespace hpx { namespace threads
     /// new value after it expired (after the given duration)
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state (duration_type const& from_now, thread_id_type id, 
+        set_state(duration_type const& from_now, thread_id_type id, 
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
+        if (HPX_UNLIKELY(!id))
+           HPX_THROW_EXCEPTION(null_thread_id,
+              "threadmanager_impl::set_state",
+              "NULL thread id encountered");  
+
         // this creates a new thread which creates the timer and handles the
         // requested actions
         thread_state_enum (threadmanager_impl::*f)(duration_type const&, 
