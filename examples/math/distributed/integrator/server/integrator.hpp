@@ -264,7 +264,7 @@ struct HPX_COMPONENT_EXPORT integrator
 
         util::high_resolution_timer t;
 
-        for (boost::uint64_t i = 1; i < segments; ++i)
+        for (boost::uint64_t i = 0; i < segments; ++i)
         {
             if (0 == depth)
                 hpx::cout() <<
@@ -276,9 +276,10 @@ struct HPX_COMPONENT_EXPORT integrator
 
             const T point = lower_bound + (increment * i);
             results.push_back(lcos::eager_future<solve_iteration_action>
-                (this->get_gid(), point, increment, depth)); 
+                (network_[round_robin().prefix - 1], point, increment, depth)); 
         }
 
+/*
         // Avoid computing f_(lower_bound) another time in the for loop.
         if (0 == depth)
             hpx::cout() <<
@@ -295,15 +296,18 @@ struct HPX_COMPONENT_EXPORT integrator
                 % lower_bound
                 % upper_bound
                 % t.elapsed()) << hpx::endl;
+*/
 
         typedef typename std::list<lcos::future_value<T> >::iterator iterator;
 
         iterator it = results.begin(), end = results.end();
  
         // Accumulate final result. TODO: Check for overflow.
-        for (boost::uint64_t i = 1; i < segments; ++i, ++it)
+        T total_area(0);
+        for (boost::uint64_t i = 0; i < segments; ++i, ++it)
         {        
             total_area += it->get();
+
             if (0 == depth)
                 hpx::cout() <<
                     ( boost::format("[%.12f/%.12f] completed segment %d at %f")
