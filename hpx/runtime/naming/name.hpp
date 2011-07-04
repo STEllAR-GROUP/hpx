@@ -55,11 +55,15 @@ namespace hpx { namespace naming
             return *this;
         }
 
+        operator util::safe_bool<gid_type>::result_type() const 
+        { 
+            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_); 
+        }
+
+        // We support increment, decrement, addition and subtraction 
         gid_type& operator++()       // pre-increment
         {
-            if (boost::uint64_t(~0x0) == id_lsb_) 
-                ++id_msb_;
-            ++id_lsb_;
+            *this += 1;
             return *this;
         }
         gid_type operator++(int)     // post-increment
@@ -69,12 +73,19 @@ namespace hpx { namespace naming
             return t;
         }
 
-        operator util::safe_bool<gid_type>::result_type() const 
-        { 
-            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_); 
+        gid_type& operator--()       // pre-decrement
+        {
+            *this -= 1;
+            return *this;
+        }
+        gid_type operator--(int)     // post-decrement
+        {
+            gid_type t(*this);
+            ++(*this);
+            return t;
         }
 
-        // we support increment and addition as operators
+        // GID + GID
         friend gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
@@ -84,31 +95,31 @@ namespace hpx { namespace naming
             return gid_type(msb, lsb);
         }
         gid_type operator+= (gid_type const& rhs)
-        {
-            boost::uint64_t lsb = id_lsb_ + rhs.id_lsb_;
-            id_msb_ += rhs.id_msb_;
-            if (lsb < id_lsb_ || lsb < rhs.id_lsb_)
-                ++id_msb_;
-            id_lsb_ = lsb;
-            return *this;
-        }
+        { return (*this = *this + rhs); }
 
+        // GID + boost::uint64_t
         friend gid_type operator+ (gid_type const& lhs, boost::uint64_t rhs)
+        { return lhs + gid_type(0, rhs); }
+        gid_type operator+= (boost::uint64_t rhs)
+        { return (*this = *this + rhs); }
+
+        // GID - GID 
+        friend gid_type operator- (gid_type const& lhs, gid_type const& rhs)
         {
-            boost::uint64_t lsb = lhs.id_lsb_ + rhs;
-            boost::uint64_t msb = lhs.id_msb_;
-            if (lsb < lhs.id_lsb_ || lsb < rhs)
-                ++msb;
+            boost::uint64_t lsb = rhs.id_lsb_ - lhs.id_lsb_;
+            boost::uint64_t msb = rhs.id_msb_ - lhs.id_msb_;
+            if (lsb > lhs.id_lsb_ || lsb > rhs.id_lsb_)
+                --msb;
             return gid_type(msb, lsb);
         }
-        gid_type operator+= (boost::uint64_t rhs)
-        {
-            boost::uint64_t lsb = id_lsb_ + rhs;
-            if (lsb < id_lsb_ || lsb < rhs)
-                ++id_msb_;
-            id_lsb_ = lsb;
-            return *this;
-        }
+        gid_type operator-= (gid_type const& rhs)
+        { return (*this = *this - rhs); }
+
+        // GID - boost::uint64_t
+        friend gid_type operator- (gid_type const& lhs, boost::uint64_t rhs)
+        { return lhs - gid_type(0, rhs); }
+        gid_type operator-= (boost::uint64_t rhs)
+        { return (*this = *this - rhs); }
 
         friend gid_type operator& (gid_type const& lhs, boost::uint64_t rhs)
         {
@@ -333,6 +344,7 @@ namespace hpx { namespace naming
             {
                 if (!is_local_cached() && !resolve())
                     return false;
+                gid_type::mutex_type::scoped_lock l(this);
                 addr = address_;
                 return true;
             }
@@ -341,6 +353,7 @@ namespace hpx { namespace naming
             {
                 if (!is_cached())
                     return false;
+                gid_type::mutex_type::scoped_lock l(this);
                 addr = address_;
                 return true;
             }
