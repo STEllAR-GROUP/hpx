@@ -57,7 +57,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\CVS\hpx\hpx\build\VS2010\marduk\marduk_client_lib\x64\Debug;C:\Program Files %28x86%29\Intel\ComposerXE-2011\compiler\lib\intel64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\CVS\hpx\hpx\build\VS2010\marduk\marduk_client_lib\x64\Debug;C:\Program Files (x86)\Intel\Composer XE 2011 SP1\compiler\lib\intel64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>marduk_client_libd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

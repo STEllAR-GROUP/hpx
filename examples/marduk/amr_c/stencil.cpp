@@ -26,14 +26,92 @@
 #include <sdf.h>
 #endif
 
-HPX_EXPORT bool intersection(double xmin,double xmax,
+// floatcmp_le {{{
+HPX_COMPONENT_EXPORT bool floatcmp_le(double const& x1, double const& x2) {
+  // compare two floating point numbers
+  static double const epsilon = 1.e-8;
+
+  if ( x1 < x2 ) return true;
+
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return true;
+  } else {
+    return false;
+  }
+}
+// }}}
+ 
+// floatcmp {{{
+HPX_COMPONENT_EXPORT int floatcmp(double const& x1, double const& x2) {
+  // compare two floating point numbers
+  static double const epsilon = 1.e-8;
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return true;
+  } else {
+    return false;
+  }
+}
+// }}}
+
+// intersection {{{
+HPX_COMPONENT_EXPORT bool intersection(double xmin,double xmax,
                   double ymin,double ymax,
                   double zmin,double zmax,
                   double xmin2,double xmax2,
                   double ymin2,double ymax2,
-                  double zmin2,double zmax2);
-HPX_EXPORT double max(double,double);
-HPX_EXPORT double min(double,double);
+                  double zmin2,double zmax2)
+{
+  double pa[3],ea[3];
+  static double const half = 0.5;
+  pa[0] = half*(xmax + xmin);
+  pa[1] = half*(ymax + ymin);
+  pa[2] = half*(zmax + zmin);
+
+  ea[0] = xmax - pa[0];
+  ea[1] = ymax - pa[1];
+  ea[2] = zmax - pa[2];
+
+  double pb[3],eb[3];
+  pb[0] = half*(xmax2 + xmin2);
+  pb[1] = half*(ymax2 + ymin2);
+  pb[2] = half*(zmax2 + zmin2);
+
+  eb[0] = xmax2 - pb[0];
+  eb[1] = ymax2 - pb[1];
+  eb[2] = zmax2 - pb[2];
+
+  double T[3];
+  T[0] = pb[0] - pa[0];
+  T[1] = pb[1] - pa[1];
+  T[2] = pb[2] - pa[2];
+
+  if ( floatcmp_le(fabs(T[0]),ea[0] + eb[0]) &&
+       floatcmp_le(fabs(T[1]),ea[1] + eb[1]) &&
+       floatcmp_le(fabs(T[2]),ea[2] + eb[2]) ) {
+    return true;
+  } else {
+    return false;
+  }
+
+}
+// }}}
+
+// max {{{
+HPX_COMPONENT_EXPORT double (max)(double x1, double x2) {
+  if ( x1 > x2 ) return x1;
+  else return x2;
+}
+// }}}
+
+// min {{{
+HPX_COMPONENT_EXPORT double (min)(double x1, double x2) {
+  if ( x1 < x2 ) return x1;
+  else return x2;
+}
+// }}}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -107,7 +185,7 @@ namespace hpx { namespace components { namespace amr
       int jj = (int) ( (y-miny)/h );
       int kk = (int) ( (z-minz)/h );
 
-      int num_eqns = HPX_SMP_AMR3D_NUM_EQUATIONS;
+      const int num_eqns = HPX_SMP_AMR3D_NUM_EQUATIONS;
 
       bool no_interp_x = false;
       bool no_interp_y = false;
@@ -142,8 +220,8 @@ namespace hpx { namespace components { namespace amr
         BOOST_ASSERT(floatcmp_le(h*kk+minz,z) && floatcmp_ge(h*(kk+1)+minz,z) );
       }
 
-      double_type tmp2[2][2][num_eqns];
-      double_type tmp3[2][num_eqns];
+      double_type tmp2[2][2][HPX_SMP_AMR3D_NUM_EQUATIONS];
+      double_type tmp3[2][HPX_SMP_AMR3D_NUM_EQUATIONS];
       double_type tmp2_r[2][2];
       double_type tmp3_r[2];
 
@@ -279,6 +357,7 @@ namespace hpx { namespace components { namespace amr
     }
     // }}}
 
+#if defined(SDF_FOUND)
     // write_sdf {{{
     void stencil::write_sdf(int gi,double datatime,int locality,
                             std::vector<nodedata> &value,parameter const& par ) {
@@ -328,6 +407,7 @@ namespace hpx { namespace components { namespace amr
       gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
     }
     // }}}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
@@ -596,12 +676,12 @@ namespace hpx { namespace components { namespace amr
                   access_memory_block<stencil_data> prev_val(
                     components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
                   // find the intersection index
-                  double x1 = max(minx,par->gr_minx[gi]); 
-                  double x2 = min(maxx,par->gr_maxx[gi]); 
-                  double y1 = max(miny,par->gr_miny[gi]); 
-                  double y2 = min(maxy,par->gr_maxy[gi]); 
-                  double z1 = max(minz,par->gr_minz[gi]); 
-                  double z2 = min(maxz,par->gr_maxz[gi]);
+                  double x1 = (std::max)(minx,par->gr_minx[gi]); 
+                  double x2 = (std::min)(maxx,par->gr_maxx[gi]); 
+                  double y1 = (std::max)(miny,par->gr_miny[gi]); 
+                  double y2 = (std::min)(maxy,par->gr_maxy[gi]); 
+                  double z1 = (std::max)(minz,par->gr_minz[gi]); 
+                  double z2 = (std::min)(maxz,par->gr_maxz[gi]);
 
                   int isize = (int) ( (x2-x1)/h );
                   int jsize = (int) ( (y2-y1)/h );
@@ -661,7 +741,7 @@ namespace hpx { namespace components { namespace amr
                   if ( vindex[ii+nx0*(jj+ny0*kk)] == -1 ) {
                     // interp needed -- 
                     proceed = false;
-                    // try to aviod the inner loop
+                    // try to avoid the inner loop
                     if (floatcmp(h,par->refine_factor*par->gr_h[ogi]) &&
                          x >= par->gr_minx[ogi] &&
                          x <= par->gr_maxx[ogi] &&
@@ -675,7 +755,7 @@ namespace hpx { namespace components { namespace amr
                       for (std::size_t cycle=1;cycle <= val->level_;cycle++) {
                         for (std::size_t step=0;step<par->prev_gi.size();step++) {
                           int gi = par->prev_gi[step];
-                          if (floatcmp(pow(par->refine_factor,cycle)*h,par->gr_h[gi]) &&
+                          if (floatcmp(pow((double)par->refine_factor,(int)cycle)*h,par->gr_h[gi]) &&
                                x >= par->gr_minx[gi] &&
                                x <= par->gr_maxx[gi] &&
                                y >= par->gr_miny[gi] &&

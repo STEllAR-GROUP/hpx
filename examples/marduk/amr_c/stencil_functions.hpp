@@ -30,5 +30,16 @@ HPX_COMPONENT_EXPORT int rkupdate(std::vector<access_memory_block<stencil_data> 
 
 }}}
 
+HPX_COMPONENT_EXPORT bool intersection(double xmin,double xmax,
+                  double ymin,double ymax,
+                  double zmin,double zmax,
+                  double xmin2,double xmax2,
+                  double ymin2,double ymax2,
+                  double zmin2,double zmax2);
+HPX_COMPONENT_EXPORT bool floatcmp_le(double const& x1, double const& x2);
+HPX_COMPONENT_EXPORT int floatcmp(double const& x1, double const& x2);
+HPX_COMPONENT_EXPORT double (max)(double,double);
+HPX_COMPONENT_EXPORT double (min)(double,double);
+
 #endif
 

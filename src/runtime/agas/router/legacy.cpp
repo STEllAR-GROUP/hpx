@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#if HPX_AGAS_VERSION > 0x10
+
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -649,4 +651,6 @@ bool legacy_router::queryid(
 } // }}}
 
 }}
+
+#endif // HPX_AGAS_VERSION > 0x10
 

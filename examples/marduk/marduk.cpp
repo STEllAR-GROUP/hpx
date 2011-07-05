@@ -13,6 +13,7 @@
 #include <examples/marduk/mesh/unigrid_mesh.hpp>
 #include <examples/marduk/amr_c/stencil.hpp>
 #include <examples/marduk/amr_c/stencil_data.hpp>
+#include <examples/marduk/amr_c/stencil_functions.hpp>
 #include <examples/marduk/amr_c/logging.hpp>
 #include "fname.h"
 #if defined(RNPL_FOUND)
@@ -120,16 +121,6 @@ int level_find_bounds(int level, double &minx, double &maxx,
                                  double &miny, double &maxy,
                                  double &minz, double &maxz, parameter &par);
 
-HPX_EXPORT bool intersection(double xmin,double xmax,
-                  double ymin,double ymax,
-                  double zmin,double zmax,
-                  double xmin2,double xmax2,
-                  double ymin2,double ymax2,
-                  double zmin2,double zmax2);
-bool floatcmp_le(double const& x1, double const& x2);
-int floatcmp(double const& x1, double const& x2);
-HPX_EXPORT double max(double,double);
-HPX_EXPORT double min(double,double);
 int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double);
 int level_mkall_dead(int level,parameter &par);
 int level_return_start(int level,parameter &par);
@@ -833,7 +824,7 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
                                 double maxx0,double maxy0,double maxz0,
                                 double h,double t,
                                 int gi,
-				boost::shared_ptr<std::vector<id_type> > &result_data,
+                boost::shared_ptr<std::vector<id_type> > &result_data,
                                 parameter &par)
 {
     // initialize some positive error
@@ -904,12 +895,12 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
               result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
 
           // find the intersection index
-          double x1 = max(minx0,par->gr_minx[gi]); 
-          double x2 = min(maxx0,par->gr_maxx[gi]); 
-          double y1 = max(miny0,par->gr_miny[gi]); 
-          double y2 = min(maxy0,par->gr_maxy[gi]); 
-          double z1 = max(minz0,par->gr_minz[gi]); 
-          double z2 = min(maxz0,par->gr_maxz[gi]); 
+          double x1 = (std::max)(minx0,par->gr_minx[gi]); 
+          double x2 = (std::min)(maxx0,par->gr_maxx[gi]); 
+          double y1 = (std::max)(miny0,par->gr_miny[gi]); 
+          double y2 = (std::min)(maxy0,par->gr_maxy[gi]); 
+          double z1 = (std::max)(minz0,par->gr_minz[gi]); 
+          double z2 = (std::min)(maxz0,par->gr_maxz[gi]); 
 
           //std::cout << " x TEST " << minx0 << " " << maxx0 << std::endl;
           //std::cout << " y TEST " << miny0 << " " << maxy0 << std::endl;
@@ -971,49 +962,6 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
 }
 // }}}
 
-// intersection {{{
-bool intersection(double xmin,double xmax,
-                  double ymin,double ymax,
-                  double zmin,double zmax,
-                  double xmin2,double xmax2,
-                  double ymin2,double ymax2,
-                  double zmin2,double zmax2)
-{
-  double pa[3],ea[3];
-  static double const half = 0.5;
-  pa[0] = half*(xmax + xmin);
-  pa[1] = half*(ymax + ymin);
-  pa[2] = half*(zmax + zmin);
-
-  ea[0] = xmax - pa[0];
-  ea[1] = ymax - pa[1];
-  ea[2] = zmax - pa[2];
-
-  double pb[3],eb[3];
-  pb[0] = half*(xmax2 + xmin2);
-  pb[1] = half*(ymax2 + ymin2);
-  pb[2] = half*(zmax2 + zmin2);
-
-  eb[0] = xmax2 - pb[0];
-  eb[1] = ymax2 - pb[1];
-  eb[2] = zmax2 - pb[2];
-
-  double T[3];
-  T[0] = pb[0] - pa[0];
-  T[1] = pb[1] - pa[1];
-  T[2] = pb[2] - pa[2];
-
-  if ( floatcmp_le(fabs(T[0]),ea[0] + eb[0]) &&
-       floatcmp_le(fabs(T[1]),ea[1] + eb[1]) &&
-       floatcmp_le(fabs(T[2]),ea[2] + eb[2]) ) {
-    return true;
-  } else {
-    return false;
-  }
-
-}
-// }}}
-
 // level_combine {{{
 int level_combine(std::vector<double> &error, std::vector<double> &localerror,
                   int mini,int minj,int mink,
@@ -1034,49 +982,6 @@ int level_combine(std::vector<double> &error, std::vector<double> &localerror,
   } } }
 
   return 0;
-}
-// }}}
-
-// floatcmp_le {{{
-bool floatcmp_le(double const& x1, double const& x2) {
-  // compare two floating point numbers
-  static double const epsilon = 1.e-8;
-
-  if ( x1 < x2 ) return true;
-
-  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
-    // the numbers are close enough for coordinate comparison
-    return true;
-  } else {
-    return false;
-  }
-}
-// }}}
- 
-// floatcmp {{{
-int floatcmp(double const& x1, double const& x2) {
-  // compare two floating point numbers
-  static double const epsilon = 1.e-8;
-  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
-    // the numbers are close enough for coordinate comparison
-    return true;
-  } else {
-    return false;
-  }
-}
-// }}}
-
-// max {{{
-double max(double x1, double x2) {
-  if ( x1 > x2 ) return x1;
-  else return x2;
-}
-// }}}
-
-// min {{{
-double min(double x1, double x2) {
-  if ( x1 < x2 ) return x1;
-  else return x2;
 }
 // }}}
 

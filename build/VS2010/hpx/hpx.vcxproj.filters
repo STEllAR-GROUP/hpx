@@ -338,6 +338,12 @@
     <ClCompile Include="..\..\..\src\pre_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp">
+      <Filter>Source Files\Runtime\AGAS\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp">
+      <Filter>Source Files\LCOs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -404,9 +410,6 @@
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\condition.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\counting_semaphore.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\eager_future.hpp">
@@ -963,6 +966,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp">
       <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp">
+      <Filter>Header Files\LCOs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

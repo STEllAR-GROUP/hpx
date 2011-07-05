@@ -29,7 +29,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // this function has to be implemented by the user
-HPX_EXPORT int hpx_main(boost::program_options::variables_map& vm); 
+int hpx_main(boost::program_options::variables_map& vm); 
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -384,15 +384,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
-                if (vm.count("exit"))
+                if (vm.count("exit")) {
                     result = 0;
-                // Run this runtime instance.
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
-                    result = rt->run(boost::bind
-                        (hpx_main, vm), num_threads, num_localities
-                    );
-                else 
-                  result = rt->run(num_threads, num_localities);
+                }
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                    // Run this runtime instance using the given hpx_main
+                    result = rt->run(boost::bind(hpx_main, vm), 
+                        num_threads, num_localities);
+                }
+                else {
+                    // Run this runtime instance using an empty hpx_main
+                    result = rt->run(num_threads, num_localities);
+                }
             }
             else if ((0 == std::string("local").find(queueing)))
             {
@@ -422,15 +425,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
-                if (vm.count("exit"))
+                if (vm.count("exit")) {
                     result = 0;
-                // Run this runtime instance.
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker)
-                    result = rt->run(boost::bind
-                        (hpx_main, vm), num_threads, num_localities
-                    );
-                else
-                  result = rt->run(num_threads, num_localities);
+                }
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                    // Run this runtime instance using the given hpx_main
+                    result = rt->run(boost::bind(hpx_main, vm), num_threads, 
+                        num_localities);
+                }
+                else {
+                    // Run this runtime instance using an empty hpx_main
+                    result = rt->run(num_threads, num_localities);
+                }
             }
             else if ((0 == std::string("priority_local").find(queueing)))
             {
@@ -459,16 +465,17 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
-                if (vm.count("exit"))
+                if (vm.count("exit")) {
                     result = 0;
-                // Run this runtime instance
+                }
                 else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
-                    result = rt->run(boost::bind 
-                        (hpx_main, vm), num_threads, num_localities
-                    );
+                    // Run this runtime instance using the given hpx_main
+                    result = rt->run(boost::bind(hpx_main, vm), num_threads, 
+                        num_localities);
                 }
                 else {
-                  result = rt->run(num_threads, num_localities);
+                    // Run this runtime instance using an empty hpx_main
+                    result = rt->run(num_threads, num_localities);
                 }
             }
             else if ((0 == std::string("abp").find(queueing)))
@@ -498,16 +505,17 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
-                if (vm.count("exit"))
+                if (vm.count("exit")) {
                     result = 0;
-                // Run this runtime instance
-                if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
-                    result = rt->run(boost::bind 
-                        (hpx_main, vm), num_threads, num_localities
-                    );
+                }
+                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                    // Run this runtime instance using the given hpx_main
+                    result = rt->run(boost::bind(hpx_main, vm), num_threads, 
+                        num_localities);
                 }
                 else {
-                  result = rt->run(num_threads, num_localities);
+                    // Run this runtime instance using an empty hpx_main
+                    result = rt->run(num_threads, num_localities);
                 }
             }
             else {
