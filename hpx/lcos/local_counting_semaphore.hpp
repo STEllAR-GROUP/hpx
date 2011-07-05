@@ -7,12 +7,12 @@
 #if !defined(HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM)
 #define HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock_pool.hpp>
-
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/intrusive/slist.hpp>
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/spinlock.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
@@ -37,12 +37,9 @@ namespace hpx { namespace lcos
     /// this semaphore.
     class HPX_EXPORT local_counting_semaphore
     {
+        typedef util::spinlock mutex_type;
+
     private:
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-
-        typedef mutex_type::scoped_lock scoped_lock;
-
         // define data structures needed for intrusive slist container used for
         // the queues
         struct queue_entry
@@ -81,8 +78,7 @@ namespace hpx { namespace lcos
         ///                 set, and negative values are equivalent to the
         ///                 same number of waits pre-set.
         local_counting_semaphore(boost::int64_t value = 0)
-          : value_(value)
-        {}
+          : value_(value) {}
 
         ~local_counting_semaphore();
 
@@ -99,24 +95,22 @@ namespace hpx { namespace lcos
         /// 
         void signal(boost::int64_t count = 1)
         {
-            scoped_lock l(this);
-            signal_locked(count, l);
+            mtx_.lock(); 
+            signal_locked(count);
         }
 
         boost::int64_t signal_all()
         {
-            scoped_lock l(this);
+            mtx_.lock();
             boost::int64_t count = queue_.size();
-            signal_locked(count, l);
+            signal_locked(count);
             return count;
         }
 
     private:
-        void signal_locked(
-            boost::int64_t count
-          , scoped_lock& l
-        );
+        void signal_locked(boost::int64_t count);
 
+        mutex_type mtx_;
         boost::int64_t value_;
         queue_type queue_;
     };

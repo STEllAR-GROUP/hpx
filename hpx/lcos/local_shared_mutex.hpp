@@ -124,7 +124,7 @@ class local_shared_mutex
 
         else
         {
-            state.exclusive=true;
+            state.exclusive = true;
             return true;
         }
             

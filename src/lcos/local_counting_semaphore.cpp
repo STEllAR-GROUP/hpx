@@ -16,13 +16,16 @@ namespace hpx { namespace lcos
 
 local_counting_semaphore::~local_counting_semaphore()
 {
-    if (!queue_.empty()) {
+    mutex_type::scoped_lock l(mtx_);
+
+    if (!queue_.empty())
+    {
         LERR_(fatal)
             << "lcos::local_counting_semaphore::~local_counting_semaphore:"
                " queue is not empty, aborting threads";
 
-        scoped_lock l(this);
-        while (!queue_.empty()) {
+        while (!queue_.empty())
+        {
             threads::thread_id_type id = queue_.front().id_;
             queue_.front().id_ = 0;
             queue_.front().aborted_waiting_ = true;
@@ -40,7 +43,8 @@ local_counting_semaphore::~local_counting_semaphore()
             error_code ec;
             threads::set_thread_state(id, threads::pending, 
                 threads::wait_abort, threads::thread_priority_normal, ec);
-            if (ec) {
+            if (ec)
+            {
                 LERR_(fatal)
                     << "lcos::local_counting_semaphore::~local_counting_semaphore:"
                     << " could not abort thread: "
@@ -53,9 +57,10 @@ local_counting_semaphore::~local_counting_semaphore()
 
 void local_counting_semaphore::wait(boost::int64_t count)
 {
-    scoped_lock l(this);
+    mutex_type::scoped_lock l(mtx_);
 
-    while (value_ < count) {
+    while (value_ < count)
+    {
         // we need to get the self anew for each round as it might
         // get executed in a different thread from the previous one
         threads::thread_self& self = threads::get_self();
@@ -68,7 +73,7 @@ void local_counting_semaphore::wait(boost::int64_t count)
         queue_type::const_iterator last = queue_.last();
 
         {
-            util::unlock_the_lock<scoped_lock> ul(l);
+            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
             threads::thread_state_ex_enum statex = self.yield(threads::suspended);
             if (statex == threads::wait_abort) {
                 hpx::util::osstream strm;
@@ -83,7 +88,8 @@ void local_counting_semaphore::wait(boost::int64_t count)
         if (e.id_)
             queue_.erase(last);     // remove entry from queue
 
-        if (e.aborted_waiting_) {
+        if (e.aborted_waiting_)
+        {
             HPX_THROW_EXCEPTION(no_success, "lcos::local_counting_semaphore::wait",
                 "aborted wait on local_counting_semaphore");
             return;
@@ -95,15 +101,16 @@ void local_counting_semaphore::wait(boost::int64_t count)
 
 void local_counting_semaphore::signal_locked(
     boost::int64_t count
-  , scoped_lock& l
 ) {
     value_ += count;
-    if (value_ >= 0) {
+    if (value_ >= 0)
+    {
         // release all threads, they will figure out between themselves
         // which one gets released from wait above
 #if BOOST_VERSION < 103600
         // slist::swap has a bug in Boost 1.35.0
-        while (!queue_.empty()) {
+        while (!queue_.empty())
+        {
             threads::thread_id_type id = queue_.front().id_;
             queue_.front().id_ = 0;
             queue_.pop_front();
@@ -114,11 +121,16 @@ void local_counting_semaphore::signal_locked(
         // swap the list
         queue_type queue;
         queue.swap(queue_);
-        l.unlock();
+        mtx_.unlock();
 
         // release the threads
-        while (!queue.empty()) {
+        while (!queue.empty())
+        {
             threads::thread_id_type id = queue.front().id_;
+            if (HPX_UNLIKELY(!id))
+                HPX_THROW_EXCEPTION(null_thread_id
+                                  , "local_counting_semaphore::signal_locked"
+                                  , "NULL thread id encountered"); 
             queue.front().id_ = 0;
             queue.pop_front();
             threads::set_thread_lco_description(id);
@@ -129,5 +141,4 @@ void local_counting_semaphore::signal_locked(
 }
 
 }}
-
 
