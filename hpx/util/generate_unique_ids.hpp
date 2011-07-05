@@ -14,7 +14,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/try_lock_wrapper.hpp>
+#include <hpx/util/spinlock.hpp>
 
 namespace hpx { namespace util
 {
@@ -57,21 +57,18 @@ namespace hpx { namespace util
     /// only allocates one gid at a time. 
     struct HPX_EXPORT unique_ids 
     {
-        struct allocation_tag {};
-        typedef hpx::util::spinlock_pool<allocation_tag> allocation_mutex_type;
-
-        typedef boost::detail::spinlock leapfrog_mutex_type;
-
-        typedef util::try_lock_wrapper<leapfrog_mutex_type> leapfrog_lock_type; 
+        typedef hpx::util::spinlock mutex_type;
 
       private:
-        leapfrog_mutex_type leapfrog_mtx;
+        mutex_type leapfrog_mtx;
+        mutex_type allocation_mtx;
 
         naming::gid_type current_lower;
         naming::gid_type current_i;
         naming::gid_type current_upper;
         naming::gid_type next_lower;
         naming::gid_type next_upper;
+        bool requested_range;
         const std::size_t step;
         const std::size_t leapfrog;
 
@@ -84,13 +81,10 @@ namespace hpx { namespace util
           , current_upper(0)
           , next_lower(0)
           , next_upper(0)
+          , requested_range(false)
           , step(step_)
           , leapfrog(leapfrog_) 
-        {
-            BOOST_ASSERT(leapfrog_ != 0);
-            leapfrog_mutex_type l = BOOST_DETAIL_SPINLOCK_INIT;
-            leapfrog_mtx = l;
-        }
+        { BOOST_ASSERT(leapfrog_ != 0); }
 
         /// Generate next unique id
         naming::gid_type get_id(

@@ -6,11 +6,14 @@
 
 #include <boost/assert.hpp>
 #include <boost/swap.hpp>
+#include <boost/format.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/logging.hpp>
 
 namespace hpx { namespace util
 {
@@ -46,7 +49,7 @@ namespace hpx { namespace util
         naming::locality const& here
       , naming::resolver_client& resolver
     ) {
-        allocation_mutex_type::scoped_lock al(this);
+        mutex_type::scoped_lock al(allocation_mtx);
           
         const std::size_t leap_at = step / leapfrog;
 
@@ -54,22 +57,32 @@ namespace hpx { namespace util
 
         // Get the next range of ids at the "leapfrog" point. TODO: This should
         // probably be scheduled in a new thread so that we can return to the
-        // caller immediately.
+        // caller immediately. 
+        const naming::gid_type saved_i = current_i;
         if (HPX_UNLIKELY((current_lower + leap_at) == current_i))
         {
-            leapfrog_lock_type ll(leapfrog_mtx);
+            mutex_type::scoped_lock ll(leapfrog_mtx);
 
-            if (ll) 
+            // Make sure someone hasn't already gotten a new range.
+            if (((current_lower + leap_at) == saved_i) && !requested_range) 
             {
+                requested_range = true;
+
                 naming::gid_type lower, upper;
 
+                next_lower = naming::invalid_gid;
+                next_upper = naming::invalid_gid;
+
                 {
-                    unlock_the_lock<allocation_mutex_type::scoped_lock> ul(al);
+                    unlock_the_lock<mutex_type::scoped_lock> ul0(al);
+                    unlock_the_lock<mutex_type::scoped_lock> ul1(ll);
                     resolver.get_id_range(here, step, lower, upper);
                 }
 
                 next_lower = lower;
                 next_upper = upper;
+
+                requested_range = false;
             }
 
             naming::gid_type result = current_i;
@@ -80,11 +93,40 @@ namespace hpx { namespace util
         // Check for range exhaustion.
         if (HPX_UNLIKELY((current_i + 1) > current_upper)) 
         {
+            mutex_type::scoped_lock ll(leapfrog_mtx);
+
             // Sanity checks.
-            BOOST_ASSERT(next_lower);
-            BOOST_ASSERT(next_upper);
-            // FIXME: Doesn't work as GID subtraction isn't implemented.
-            //BOOST_ASSERT((next_upper - next_lower) == step);
+            if (threads::get_self_ptr())
+            {
+                while (HPX_UNLIKELY(!next_lower && !next_upper))
+                {
+                    LAUX_(info) << "unique_ids::get_id: ran out of GIDs too "
+                                   "quickly, possibly livelocked";
+
+                    // Give the TM time to process the incoming response from
+                    // AGAS.
+                    {
+                        unlock_the_lock<mutex_type::scoped_lock> ul0(al);
+                        unlock_the_lock<mutex_type::scoped_lock> ul1(ll);
+                        threads::get_self_ptr()->yield(threads::pending);
+                    }
+                }
+            }
+
+            else if (HPX_UNLIKELY(!next_lower && !next_upper))
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "unique_ids::get_id",
+                    "ran out of GIDs too quickly, definitely livelocked");
+            }
+
+            LAUX_(info) << (boost::format(
+                           "unique_ids::get_id: exhausted range(%1%, %2%), "
+                           "switching to new range(%3%, %4%)")
+                           % current_lower
+                           % (current_upper - current_lower).get_lsb()
+                           % next_lower
+                           % (next_upper - next_lower).get_lsb());
 
             // Switch to the next range.
             boost::swap(current_lower, next_lower);
