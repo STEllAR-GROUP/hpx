@@ -266,6 +266,7 @@ struct HPX_COMPONENT_EXPORT integrator
 
         for (boost::uint64_t i = 0; i < segments; ++i)
         {
+
             if (0 == depth)
                 hpx::cout() <<
                     ( boost::format("[%.12f/%.12f] started segment %d at %f")
@@ -308,6 +309,7 @@ struct HPX_COMPONENT_EXPORT integrator
         {        
             total_area += it->get();
 
+
             if (0 == depth)
                 hpx::cout() <<
                     ( boost::format("[%.12f/%.12f] completed segment %d at %f")
@@ -315,6 +317,7 @@ struct HPX_COMPONENT_EXPORT integrator
                     % upper_bound
                     % i
                     % t.elapsed()) << hpx::endl;
+
         }
 
         return total_area;
