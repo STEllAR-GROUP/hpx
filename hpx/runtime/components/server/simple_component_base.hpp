@@ -80,7 +80,7 @@ namespace hpx { namespace components
                 naming::address addr(appl.here(), 
                     components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
-                gid_ = appl.get_parcel_handler().get_next_id();
+                gid_ = get_next_id();
                 if (!applier::bind_gid(gid_, addr))
                 {
                     hpx::util::osstream strm;

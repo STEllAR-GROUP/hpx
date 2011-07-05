@@ -72,7 +72,7 @@ void legacy_router::launch_bootstrap(
 
     naming::gid_type lower, upper;
     get_id_range(l, HPX_INITIAL_GID_RANGE, lower, upper);
-    get_runtime().get_parcel_port().set_range(lower, upper);
+    get_runtime().get_id_pool().set_range(lower, upper);
 
     if (runtime_type == runtime_mode_console)
         bootstrap->symbol_ns_server.bind("/locality(console)",

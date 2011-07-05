@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace detail
         ///
         naming::gid_type get_gid(void* p)
         {
-            typename base_type::shared_lock_type guard (this->mtx_);
+            typename base_type::shared_lock_type guard(this->mtx_);
 
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace detail
             naming::gid_type const& lower
           , naming::gid_type const& upper
         ) {
-            typename base_type::shared_lock_type guard (this->mtx_);
+            typename base_type::shared_lock_type guard(this->mtx_);
             id_range_.set_range(lower, upper); 
         }
 

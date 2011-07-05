@@ -93,6 +93,8 @@ namespace hpx
 
     HPX_API_EXPORT naming::id_type find_here();
 
+    HPX_API_EXPORT naming::gid_type get_next_id();
+
     /// \namespace parcelset
     namespace parcelset
     {

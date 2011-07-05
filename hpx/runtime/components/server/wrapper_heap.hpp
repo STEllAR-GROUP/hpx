@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace detail
         };
 
     public:
-        explicit wrapper_heap(char const* class_name, bool, bool, 
+        explicit wrapper_heap(char const* class_name, 
                 std::size_t count, std::size_t step = static_cast<std::size_t>(-1))
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid), 
@@ -441,9 +441,8 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
-                bool f1 = false, bool f2 = false, int count = 0, 
-                std::size_t step = (std::size_t)-1)
-          : base_type(class_name, f1, f2, count, step) 
+                std::size_t count = 0, std::size_t step = (std::size_t)-1)
+          : base_type(class_name, count, step) 
         {}
     };
 

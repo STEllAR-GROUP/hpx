@@ -702,6 +702,13 @@ namespace hpx
         this->runtime::deinit_tss();
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    naming::gid_type
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
+    {
+        return id_pool.get_id(parcel_port_.here(), agas_client_);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     boost::thread_specific_ptr<runtime *> runtime::runtime_;
 
@@ -780,6 +787,10 @@ namespace hpx
                              , naming::id_type::unmanaged);
     }
 
+    naming::gid_type get_next_id()
+    {
+        return get_runtime().get_next_id();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

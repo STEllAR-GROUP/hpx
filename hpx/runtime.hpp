@@ -27,6 +27,7 @@
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/thread/tss.hpp>
@@ -259,6 +260,10 @@ namespace hpx
             boost::exception_ptr const& e) = 0;
 
         virtual void report_error(boost::exception_ptr const& e) = 0;
+
+        virtual naming::gid_type get_next_id() = 0;
+
+        virtual util::unique_ids& get_id_pool() = 0;
 
     protected:
         void init_tss();
@@ -593,6 +598,13 @@ namespace hpx
             return (hpx::uintptr_t) &memory_;
         }
 
+        naming::gid_type get_next_id();
+ 
+        util::unique_ids& get_id_pool()
+        {
+            return id_pool;
+        }
+
     private:
         void init_tss();
         void deinit_tss();
@@ -626,6 +638,7 @@ namespace hpx
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         boost::signals2::scoped_connection default_error_sink_;
+        util::unique_ids id_pool;
     };
 
 }   // namespace hpx
