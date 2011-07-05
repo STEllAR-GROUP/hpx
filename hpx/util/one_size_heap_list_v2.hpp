@@ -13,17 +13,19 @@
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
+#include <boost/format.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/local_shared_mutex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
 {
 
-template<typename Heap>
+template <typename Heap>
 class one_size_heap_list 
 {
   public:
@@ -70,31 +72,38 @@ class one_size_heap_list
 
     ~one_size_heap_list()
     {
-        LOSH_(info) 
-            << "one_size_heap_list (" 
-            << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-            << "): releasing heap_list: max count: " << max_alloc_count_ 
-            << " (in " << heap_count_ << " heaps), alloc count: " 
-            << alloc_count_ << ", free count: " << free_count_ << ".";
+        LOSH_(info)
+            << (boost::format(
+               "%1%::~%1%: size(%2%), max_count(%3%), alloc_count(%4%), "
+               "free_count(%5%)")
+               % name()
+               % heap_count_
+               % max_alloc_count_
+               % alloc_count_
+               % free_count_);
 
         if (alloc_count_ != free_count_) 
         {
             LOSH_(warning) 
-                << "one_size_heap_list (" 
-                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << "): releasing heap_list with " << alloc_count_-free_count_ 
-                << " allocated object(s)!";
+                << (boost::format(
+                   "%1%::~%1%: releasing %2% allocated objects") 
+                   % name()
+                   % (alloc_count_.load() - free_count_.load()));
         }
     }
 
     // operations
     value_type* alloc(std::size_t count = 1)
     {
-        if (0 == count)
-            throw std::bad_alloc();   // this doesn't make sense for us
+        if (HPX_UNLIKELY(0 == count))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                name() + "::alloc", 
+                "cannot allocate 0 objects");
+        }
 
         std::size_t size = 0; 
-        value_type *p = NULL;
+        value_type* p = NULL;
         {
             shared_lock_type guard(mtx_);
 
@@ -102,130 +111,141 @@ class one_size_heap_list
 
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
             {
-                if ((*it)->alloc(&p, count)) {
-                    // update statistics
-                    alloc_count_ += (int)count;
-                    if (alloc_count_-free_count_ > max_alloc_count_)
-                        max_alloc_count_.store(alloc_count_-free_count_);
+                if ((*it)->alloc(&p, count))
+                {
+                    // Allocation succeeded, update statistics.
+                    alloc_count_ += count;
+
+                    if (alloc_count_ - free_count_ > max_alloc_count_)
+                        max_alloc_count_.store(alloc_count_- free_count_);
 
                     return p;
                 }
-                else {
+
+                else
+                {
                     LOSH_(info) 
-                        << "one_size_heap_list (" 
-                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << "): failed to allocate from heap (" << (*it)->heap_count_ 
-                        << "), allocated: " << (*it)->size() << ", free'd: " 
-                        << (*it)->free_size() << ".";
+                        << (boost::format(
+                           "%1%::alloc: failed to allocate from heap[%2%] "
+                           "(heap[%2%] has allocated %3% objects and has "
+                           "space for %4% more objects)")
+                           % name()
+                           % (*it)->heap_count_
+                           % (*it)->size()
+                           % (*it)->free_size());
                 }
             }
         }
 
+        // Create new heap.
         bool did_create = false;
-        // create new heap
         {
-            // REVIEW: should we acquire upgrade ownership, and then upgrade to
-            // unique if necessary?
-
-            // acquire exclusive access
+            // Acquire exclusive access.
             unique_lock_type ul(mtx_); 
 
             if (size == heap_list_.size())
             {
                 iterator itnew = heap_list_.insert(heap_list_.begin(),
-                    typename list_type::value_type(
-                        new heap_type(class_name_.c_str(), false, true, 
-                                heap_count_+1, heap_step
-                            )
-                    ));
+                    typename list_type::value_type(new heap_type
+                        (class_name_.c_str(), heap_count_ + 1, heap_step)));
     
-                if (itnew == heap_list_.end())
-                    throw std::bad_alloc();   // insert failed
+                if (HPX_UNLIKELY(itnew == heap_list_.end()))
+                    HPX_THROW_EXCEPTION(out_of_memory, 
+                        name() + "::alloc", 
+                        "new heap could not be added");
     
                 bool result = (*itnew)->alloc(&p, count);
-                if (!result || NULL == p)
-                    throw std::bad_alloc();   // snh 
 
+                // REVIEW: What does "snh" mean? That was the only comment 
+                // explaining this branch.
+                if (HPX_UNLIKELY(!result || NULL == p))
+                {
+                    HPX_THROW_EXCEPTION(out_of_memory, 
+                        name() + "::alloc", 
+                        boost::str(boost::format(
+                            "new heap failed to allocate %1% objects")
+                            % count));
+                }
+
+                ++heap_count_;
+                LOSH_(info)
+                    << (boost::format(
+                       "%1%::alloc: creating new heap[%2%], size is now %3%")
+                       % name()
+                       % heap_count_
+                       % heap_list_.size()); 
                 did_create = true;
             }
         }
 
         if (did_create)
-        {
-            ++heap_count_;
-            LOSH_(info) 
-                << "one_size_heap_list (" 
-                << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << "): creating new heap (" << heap_count_ 
-                << "), size of heap_list: " << heap_list_.size() << ".";
             return p;
-        }
 
-        // try again, we just got a new heap, so we should be good.
+        // Try again, we just got a new heap, so we should be good.
         else
             return alloc(count);
     }
 
     heap_type* alloc_heap()
     {
-        return new heap_type(class_name_.c_str(),
-            false, true, 0, heap_step);
+        return new heap_type(class_name_.c_str(), 0, heap_step);
     }
 
     void add_heap(heap_type* p)
     {
-        BOOST_ASSERT(p);
+        if (HPX_UNLIKELY(!p))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                name() + "::add_heap", "encountered NULL heap");
+        }
 
-        // acquire exclusive access
-        unique_lock_type ul (mtx_); 
+        // Acquire exclusive access.
+        unique_lock_type ul(mtx_); 
 
         p->heap_count_ = heap_count_; 
 
         iterator it = heap_list_.insert(heap_list_.begin(),
             typename list_type::value_type(p));
 
-        if (it == heap_list_.end())
-            throw std::bad_alloc();   // insert failed
+        // Check for insertion failure.
+        if (HPX_UNLIKELY(it == heap_list_.end()))
+        {
+            HPX_THROW_EXCEPTION(out_of_memory, 
+                name() + "::add_heap", 
+                boost::str(boost::format("heap %1% could not be added") % p));
+        }
 
         ++heap_count_;
     }
 
     void free(void* p, std::size_t count = 1)
     {
-        if (NULL == p && threads::threadmanager_is(running))
+        if (NULL == p || !threads::threadmanager_is(running))
             return;
 
-        shared_lock_type guard (mtx_);
+        shared_lock_type guard(mtx_);
 
-        // find heap which allocated this pointer
-        iterator it = heap_list_.begin();
-        for (/**/; it != heap_list_.end(); ++it) {
-            if ((*it)->did_alloc(p)) {
+        // Find the heap which allocated this pointer.
+        for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
+        {
+            if ((*it)->did_alloc(p))
+            {
                 (*it)->free(p, count);
-
-                free_count_ += (int)count;
-
-                if ((*it)->is_empty()) {
-                    LOSH_(info) 
-                        << "one_size_heap_list (" 
-                        << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << "): freeing empty heap (" << (*it)->heap_count_ << ").";
-
-                    // acquire exclusive access
-                    guard.unlock();
-
-                    unique_lock_type ul (mtx_); 
-                    heap_list_.erase (it);
-                }
+                free_count_ += count;
                 return;
             }
         }
-        BOOST_ASSERT(false);   // no heap found
+
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            name() + "::free", 
+            boost::str(boost::format(   
+                "pointer %1% was not allocated by this %2%")
+                % p % name()));
     }
 
     bool did_alloc(void* p) const
     {
-        shared_lock_type guard (mtx_);
+        shared_lock_type guard(mtx_);
         for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
         {
             if ((*it)->did_alloc(p)) 
@@ -234,16 +254,26 @@ class one_size_heap_list
         return false;
     }
 
+    std::string name() const
+    {
+        if (class_name_.empty())
+            return std::string("one_size_heap_list(unknown)");
+        else
+            return std::string("one_size_heap_list(") + class_name_ + ")";
+    }
+
   protected:
     mutex_type mtx_;
     list_type heap_list_;
 
-  public:
+  private:
     std::string const class_name_;
-    boost::atomic<unsigned long> alloc_count_;
-    boost::atomic<unsigned long> free_count_;
-    boost::atomic<unsigned long> heap_count_;
-    boost::atomic<unsigned long> max_alloc_count_;
+
+  public:
+    boost::atomic<std::size_t> alloc_count_;
+    boost::atomic<std::size_t> free_count_;
+    boost::atomic<std::size_t> heap_count_;
+    boost::atomic<std::size_t> max_alloc_count_;
 };
 
 }} // namespace hpx::util

@@ -123,7 +123,7 @@ namespace hpx { namespace util
 
                 iterator itnew = heap_list_.insert(heap_list_.begin(),
                     typename list_type::value_type(
-                        new heap_type(class_name_.c_str(), false, true, 
+                        new heap_type(class_name_.c_str()
                                 heap_count_+1, heap_step
                             )
                     ));
@@ -148,8 +148,7 @@ namespace hpx { namespace util
 
         heap_type* alloc_heap()
         {
-            return new heap_type(class_name_.c_str(),
-                false, true, 0, heap_step);
+            return new heap_type(class_name_.c_str(), 0, heap_step);
         }
 
         void add_heap(heap_type* p)
