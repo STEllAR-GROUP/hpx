@@ -610,6 +610,7 @@ namespace hpx
         void deinit_tss();
 
     private:
+        util::unique_ids id_pool;
         runtime_mode mode_;
         int result_;
         #if HPX_AGAS_VERSION <= 0x10
@@ -638,7 +639,6 @@ namespace hpx
         actions::action_manager action_manager_;
         components::server::runtime_support runtime_support_;
         boost::signals2::scoped_connection default_error_sink_;
-        util::unique_ids id_pool;
     };
 
 }   // namespace hpx
