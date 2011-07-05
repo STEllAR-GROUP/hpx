@@ -57,7 +57,7 @@
       : apply_logger_("eager_future_direct::apply")
     {
         LLCO_(info) << "eager_future::eager_future("
-                    << actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -70,7 +70,7 @@
       : apply_logger_("eager_future_direct::apply")
     {
         LLCO_(info) << "eager_future::eager_future("
-                    << actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";

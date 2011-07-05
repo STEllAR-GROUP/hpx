@@ -114,9 +114,6 @@
     <Filter Include="Source Files\Runtime\Parcelset">
       <UniqueIdentifier>{26c64f12-fa35-4421-b73f-db2f78d379e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\Parcelset\Server">
-      <UniqueIdentifier>{4f749c39-355d-4357-ae38-06c7418e3664}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Runtime\Threads">
       <UniqueIdentifier>{5f21e1d1-a7bf-4731-8b6b-29c8bc7d3953}</UniqueIdentifier>
     </Filter>
@@ -278,9 +275,6 @@
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport_connection.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\parcelset\server\parcelhandler_queue.cpp">
-      <Filter>Source Files\Runtime\Parcelset\Server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\threads\thread.cpp">
       <Filter>Source Files\Runtime\Threads</Filter>
     </ClCompile>
@@ -320,9 +314,6 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp">
       <Filter>Source Files\Runtime\Threads</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp">
-      <Filter>Source Files\Runtime\AGAS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
@@ -337,6 +328,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
       <Filter>Source Files\Runtime\AGAS\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
+      <Filter>Source Files\Runtime\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\pre_main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -961,6 +961,9 @@
     <ClInclude Include="..\..\..\hpx\util\uintptr_t.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp">
+      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -993,9 +996,6 @@
     </None>
     <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt">
       <Filter>Source Files\Runtime\Parcelset</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\parcelset\server\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Parcelset\Server</Filter>
     </None>
     <None Include="..\..\..\src\runtime\threads\CMakeLists.txt">
       <Filter>Source Files\Runtime\Threads</Filter>

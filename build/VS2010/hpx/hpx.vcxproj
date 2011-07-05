@@ -97,15 +97,20 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
+    <ClCompile Include="..\..\..\src\pre_main.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\agas\common_actions.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp" />
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
+    <ClCompile Include="..\..\..\src\state.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
     <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
@@ -128,7 +133,6 @@
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport_connection.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\parcelset\server\parcelhandler_queue.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\thread.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\threadmanager.cpp" />
     <ClCompile Include="..\..\..\src\runtime\applier\applier.cpp" />
@@ -179,6 +183,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp" />
@@ -375,7 +380,6 @@
     <None Include="..\..\..\src\runtime\naming\detail\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\naming\server\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\parcelset\server\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\threads\CMakeLists.txt" />
     <None Include="..\..\..\src\util\CMakeLists.txt" />
     <None Include="hpx.def" />

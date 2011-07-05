@@ -75,7 +75,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
 
@@ -109,7 +109,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -119,7 +119,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -173,7 +173,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -204,7 +204,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
 
@@ -251,7 +251,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -261,7 +261,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -317,7 +317,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -328,7 +328,7 @@ namespace hpx { namespace lcos
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";

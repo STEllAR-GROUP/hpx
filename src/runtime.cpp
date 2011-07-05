@@ -321,15 +321,15 @@ namespace hpx
         _isatty(0);
 #endif
         // {{{ early startup code
-        #if HPX_AGAS_VERSION <= 0x10
-            // init TSS for the main thread, this enables logging, time logging, etc.
-            init_tss();
-        #else
-            // in AGAS v2, the runtime pointer (accessible through get_runtime
-            // and get_runtime_ptr) is already initialized at this point.
-            applier_.init_tss();
-        #endif
-        
+#if HPX_AGAS_VERSION <= 0x10
+        // init TSS for the main thread, this enables logging, time logging, etc.
+        init_tss();
+#else
+        // in AGAS v2, the runtime pointer (accessible through get_runtime
+        // and get_runtime_ptr) is already initialized at this point.
+        applier_.init_tss();
+#endif
+
         LRT_(info) << "runtime_impl: beginning startup sequence";
 
         LRT_(info) << "runtime_impl: starting services";
@@ -338,40 +338,40 @@ namespace hpx
         LRT_(info) << "runtime_impl: started runtime_support component";
 
         // AGAS v2 starts the parcel port itself
-        #if HPX_AGAS_VERSION <= 0x10
-            parcel_port_.run(false);            // starts parcel_pool_ as well
-            LRT_(info) << "runtime_impl: started parcelport";
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        parcel_port_.run(false);            // starts parcel_pool_ as well
+        LRT_(info) << "runtime_impl: started parcelport";
+#endif
 
-        #if HPX_AGAS_VERSION > 0x10
-            io_pool_.run(false); // start io pool
-        #endif
+#if HPX_AGAS_VERSION > 0x10
+        io_pool_.run(false); // start io pool
+#endif
 
         thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
         LRT_(info) << "runtime_impl: started threadmanager";
         // }}}
 
         // AGAS v2 handles this in the client
-        #if HPX_AGAS_VERSION <= 0x10
-            // {{{ exiting bootstrap mode 
-            LRT_(info) << "runtime_impl: registering runtime_support and memory components";
-            // register the runtime_support and memory instances with the AGAS 
-            agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
-                naming::address(parcel_port_.here(), 
-                    components::get_component_type<components::server::runtime_support>(), 
-                    &runtime_support_));
+#if HPX_AGAS_VERSION <= 0x10
+        // {{{ exiting bootstrap mode 
+        LRT_(info) << "runtime_impl: registering runtime_support and memory components";
+        // register the runtime_support and memory instances with the AGAS 
+        agas_client_.bind(applier_.get_runtime_support_raw_gid(), 
+            naming::address(parcel_port_.here(), 
+                components::get_component_type<components::server::runtime_support>(), 
+                &runtime_support_));
 
-            agas_client_.bind(applier_.get_memory_raw_gid(), 
-                naming::address(parcel_port_.here(), 
-                    components::get_component_type<components::server::memory>(), 
-                    &memory_));
-        #endif
+        agas_client_.bind(applier_.get_memory_raw_gid(), 
+            naming::address(parcel_port_.here(), 
+                components::get_component_type<components::server::memory>(), 
+                &memory_));
+#endif
         // }}}
 
         // {{{ late startup - distributed
         // if there are more than one localities involved, wait for all
         // to get registered
-        #if HPX_AGAS_VERSION <= 0x10
+#if HPX_AGAS_VERSION <= 0x10
         if (num_localities > 1) {
             bool foundall = false;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i) {
@@ -394,12 +394,12 @@ namespace hpx
                     "timed out while waiting for other localities");
             }
         }
-        #else
+#else
         // invoke the AGAS v2 notifications, waking up the other localities
         agas::get_big_boot_barrier().trigger();  
-        #endif
+#endif
 
-        #if HPX_AGAS_VERSION <= 0x10
+#if HPX_AGAS_VERSION <= 0x10
         LRT_(info) << "runtime_impl: setting initial locality prefixes";
         // Set localities prefixes once per runtime instance. This should
         // work fine until we support adding and removing localities.
@@ -436,9 +436,9 @@ namespace hpx
             this->process_.set_num_os_threads(num_threads);
             this->process_.set_localities(here_lid, prefixes);
         }
-        #else
+#else
         this->process_.set_num_os_threads(num_threads);
-        #endif
+#endif
         // }}}
 
         // {{{ launch main 

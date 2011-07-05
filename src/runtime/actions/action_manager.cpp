@@ -4,11 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/thread.hpp>
 #include <boost/config.hpp>
 
 #include <hpx/state.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>

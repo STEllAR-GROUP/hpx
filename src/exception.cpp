@@ -92,7 +92,9 @@ namespace hpx { namespace detail
         else {
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
+#if defined(HPX_STACKTRACES)
                     << throw_stacktrace(boost::trace())
+#endif
                     << throw_function(func) 
                     << throw_file(file) << throw_line(line));
         }

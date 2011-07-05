@@ -424,7 +424,7 @@ namespace hpx
         class runtime_configuration;
     }
 
-    struct error_code;
+    class error_code;
 
     // predefined error_code object used as "throw on error" tag
     HPX_EXCEPTION_EXPORT extern error_code throws;

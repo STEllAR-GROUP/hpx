@@ -75,7 +75,7 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future::apply"), closure_(0)
         {
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
 
@@ -153,7 +153,7 @@ namespace hpx { namespace lcos
                      naming::id_type(gid, naming::id_type::unmanaged)))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", " 
                         << gid
                         << ") args(0)";
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos
             closure_(boost::bind(&lazy_future::invoke, this_(), gid))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", " 
                         << gid
                         << ") args(0)";
@@ -226,7 +226,7 @@ namespace hpx { namespace lcos
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", " 
                         << gid
                         << ") args(1)";
@@ -238,7 +238,7 @@ namespace hpx { namespace lcos
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this_(), gid, arg0))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", " 
                         << gid
                         << ") args(1)";
@@ -269,7 +269,7 @@ namespace hpx { namespace lcos
           : apply_logger_("lazy_future_direct::apply")
         {
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
 
@@ -352,7 +352,7 @@ namespace hpx { namespace lcos
                 naming::id_type(gid, naming::id_type::unmanaged)))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -363,7 +363,7 @@ namespace hpx { namespace lcos
             closure_(boost::bind(&lazy_future::invoke, this, gid))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -439,7 +439,7 @@ namespace hpx { namespace lcos
                 naming::id_type(gid, naming::id_type::unmanaged), arg0))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -451,7 +451,7 @@ namespace hpx { namespace lcos
             closure_(boost::bind(&lazy_future::template invoke1<Arg0>, this, gid, arg0))
         { 
             LLCO_(info) << "lazy_future::lazy_future("
-                        << actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(1)";
