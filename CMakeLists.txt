@@ -323,6 +323,9 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Release flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
 
+  # non-standard C++ extensions that we forbid
+  hpx_use_flag_if_available(Werror=vla NAME Werror_vla)
+
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
     hpx_use_flag_if_available(g)
