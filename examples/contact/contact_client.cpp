@@ -13,6 +13,9 @@
 #include <time.h>
 
 #include "contact/contact.hpp"
+#include "boost/geometry/geometry.hpp"
+#include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/multi/multi.hpp>
 
 inline void 
 init(hpx::components::server::distributing_factory::iterator_range_type r,
@@ -27,11 +30,18 @@ init(hpx::components::server::distributing_factory::iterator_range_type r,
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    std::size_t iterations = 1;
+    // these quantities will come in when contact is started
+    // they are from the current mesh
+    // here are some numbers from a simple mesh
+    std::size_t num_objects = 2;
+    std::vector<std::size_t> object_size;
+    object_size.resize(num_objects);
     std::size_t num_vertices = 0;
-    std::size_t iterations = 0;
-
-    if (vm.count("num-vertices"))
-        num_vertices = vm["num-vertices"].as<std::size_t>();
+    for (std::size_t i=0;i<num_objects;i++) {
+      object_size[i] = 4;
+      num_vertices += object_size[i];
+    } 
 
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
@@ -58,12 +68,29 @@ int hpx_main(boost::program_options::variables_map& vm)
         init(locality_results(mem_blocks), accu);
 
         // initialize the system
-        for (std::size_t i=0;i<num_vertices;i++) {
-          accu[i].init(i); 
+        std::size_t vertex_id = 0;
+        for (std::size_t i=0;i<num_objects;i++) {
+          for (std::size_t j=0;j<object_size[i];j++) {
+            accu[i].init(vertex_id); 
+            vertex_id++;
+          }
         }
 
-        std::vector<hpx::lcos::future_value<void> > barrier;
+        // now that all the vertices are created as components
+        // we need the create the physical objects.
+        // we use boost::geometry and create a client class
+        // so that boost::geometry has a global understanding
+        // of the geometry of every object even though the vertices
+        // are distributed using distributing factory
 
+        //std::vector<boost::geometry::polygon_2d> element;
+        //element.resize(num_objects);
+
+        //for (std::size_t i=0;i<num_objects;i++) {
+        //  boost::geometry::assign(element[i],);
+        //}
+
+        std::vector<hpx::lcos::future_value<void> > barrier;
         for (std::size_t i=0;i<num_vertices;i++) {
           barrier.push_back(accu[i].contactsearch_async());
         }
@@ -93,8 +120,6 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("num-vertices", value<std::size_t>()->default_value(8), 
-            "the number of vertices this contact problem works over")
         ("iterations", value<std::size_t>()->default_value(1), 
             "the number of contact enforcement iterations") 
         ;
