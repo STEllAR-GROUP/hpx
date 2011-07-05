@@ -83,21 +83,24 @@ namespace hpx { namespace parcelset
         bool& finished_;
     };
 
-    parcel_id parcelhandler::sync_put_parcel(parcel& p)
+    void parcelhandler::sync_put_parcel(parcel& p)
     {
         wait_for_put_parcel::mutex_type mtx;
         wait_for_put_parcel::condition_type cond;
         boost::system::error_code saved_error;
         bool waiting = false, finished = false;
 
-        wait_for_put_parcel wfp (mtx, cond, saved_error, waiting, finished);
-        parcel_id id = put_parcel(p, wfp);  // schedule parcel send
-        if (!wfp.wait())                    // wait for the parcel being sent
-            throw exception(network_error, "timeout");
+        wait_for_put_parcel wfp(mtx, cond, saved_error, waiting, finished);
+        put_parcel(p, wfp);  // schedule parcel send
+        if (!wfp.wait())     // wait for the parcel being sent
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , "synchronous parcel send timed out");
 
         if (saved_error) 
-            throw exception(network_error, saved_error.message());
-        return id;
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , saved_error.message()); 
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
@@ -240,7 +243,7 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
     }
 
-    parcel_id parcelhandler::put_parcel(parcel& p, handler_type f)
+    void parcelhandler::put_parcel(parcel& p, handler_type f)
     {
         // properly initialize parcel
         init_parcel(p);
@@ -280,7 +283,7 @@ namespace hpx { namespace parcelset
 
         // send the parcel to its destination, return parcel id of the 
         // parcel being sent
-        return pp_.put_parcel(p, boost::bind(&release_do_undo, _1, _2, f, do_undo));
+        pp_.put_parcel(p, boost::bind(&release_do_undo, _1, _2, f, do_undo));
     }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,6 @@ namespace hpx { namespace parcelset
     template<class Archive>
     void parcel::save(Archive & ar, const unsigned int version) const
     {
-        ar << tag_;
         ar << destination_id_;    // don't increment global refcnt
         ar << destination_addr_;
         bool has_source_id = source_id_;
@@ -54,7 +53,6 @@ namespace hpx { namespace parcelset
 
         bool has_continuation = false;
         bool has_source_id = false;
-        ar >> tag_;
 
         ar >> destination_id_;
         ar >> destination_addr_;
@@ -91,19 +89,12 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-        os << "parcelid" << p.tag_;
-        os << ", destination(gid" << p.destination_id_;
-        os << ", address" << p.destination_addr_ << ")";
-//         os << source_id_;
-        os << ", action(" << p.action_->get_action_name() << ")";
-//         bool has_continuations = continuation_ && !continuation_->empty();
-//         os << has_continuations;
-//         if (has_continuations)
-//             os << continuation_;
-//         os << start_time_;
-//         os << creation_time_;
+        os << "(" << p.destination_id_
+           << ":" << p.destination_addr_
+           << ":" << p.action_->get_action_name() << ")";
         return os;
     }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
+

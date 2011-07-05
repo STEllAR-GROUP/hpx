@@ -96,13 +96,10 @@ namespace hpx { namespace parcelset
               void(boost::system::error_code const&, std::size_t)
         > handler_type;
     
-        parcel_id put_parcel(parcel& p, handler_type f)
+        void put_parcel(parcel& p, handler_type f)
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
-
-            // return parcel id of the parcel being sent
-            return p.get_parcel_id();
         }
 
         // The get_parcel command returns a parcel, or if the parcel set is 

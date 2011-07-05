@@ -84,21 +84,24 @@ namespace hpx { namespace parcelset
         bool& finished_;
     };
 
-    parcel_id parcelhandler::sync_put_parcel(parcel& p)
+    void parcelhandler::sync_put_parcel(parcel& p)
     {
         wait_for_put_parcel::mutex_type mtx;
         wait_for_put_parcel::condition_type cond;
         boost::system::error_code saved_error;
         bool waiting = false, finished = false;
 
-        wait_for_put_parcel wfp (mtx, cond, saved_error, waiting, finished);
-        parcel_id id = put_parcel(p, wfp);  // schedule parcel send
-        if (!wfp.wait())                    // wait for the parcel being sent
-            throw exception(network_error, "timeout");
+        wait_for_put_parcel wfp(mtx, cond, saved_error, waiting, finished);
+        put_parcel(p, wfp);  // schedule parcel send
+        if (!wfp.wait())     // wait for the parcel being sent
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , "synchronous parcel send timed out");
 
         if (saved_error) 
-            throw exception(network_error, saved_error.message());
-        return id;
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , saved_error.message()); 
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
@@ -292,7 +295,7 @@ namespace hpx { namespace parcelset
               
     void noop_handler (boost::system::error_code const&, std::size_t) { }
 
-    parcel_id parcelhandler::put_parcel(parcel& p, handler_type f)
+    void parcelhandler::put_parcel(parcel& p, handler_type f)
     {
         // properly initialize parcel
         init_parcel(p);
@@ -300,29 +303,34 @@ namespace hpx { namespace parcelset
         if (!p.get_destination_addr())
         { 
             naming::address addr;
-            if (!resolver_.resolve_cached(p.get_destination(), addr)) {
+
+            if (!resolver_.resolve_cached(p.get_destination(), addr))
+            {
                 // resolve the remote address
                 resolver_.resolve(p.get_destination(), addr);
                 p.set_destination_addr(addr);
             }
-            else {
+
+            else
                 p.set_destination_addr(addr);
-            }
         }
 
         // prepare all additional AGAS related operations for this parcel
         error_code ec;
         prepare_parcel(resolver_, p, ec);
-        if (ec) {
+
+        if (ec)
+        {
             // parcel preparation failed
             HPX_THROW_EXCEPTION(no_success, 
                 "parcelhandler::put_parcel", ec.get_message());
         }
 
-        return pp_.put_parcel(p, noop_handler);
+        pp_.put_parcel(p, noop_handler);
     }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
 
 #endif // HPX_AGAS_VERSION
+

@@ -22,17 +22,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //  parcel serialization format version
-#define HPX_PARCEL_VERSION 0x50
+#define HPX_PARCEL_VERSION 0x60
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    ///////////////////////////////////////////////////////////////////////////
-    typedef naming::gid_type parcel_id;
-
-    parcel_id const no_parcel_id = parcel_id();
-    parcel_id const invalid_parcel_id = naming::invalid_gid;
-    
     ///////////////////////////////////////////////////////////////////////////
     /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
     ///
@@ -41,36 +35,36 @@ namespace hpx { namespace parcelset
     {
     public:
         parcel() 
-          : tag_(0), destination_id_(), source_id_(), action_(), 
+          : destination_id_(), source_id_(), action_(), 
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::gid_type apply_to)
-          : tag_(0), destination_id_(apply_to), source_id_(), action_(), 
+          : destination_id_(apply_to), source_id_(), action_(), 
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
         parcel(naming::gid_type apply_to, actions::base_action* act)
-          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
+          : destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(), start_time_(0), creation_time_(0)
         {}
 
         parcel(naming::gid_type apply_to, actions::base_action* act, 
                actions::continuation* do_after) 
-          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
+          : destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
         {}
 
         parcel(naming::gid_type apply_to, actions::base_action* act, 
                actions::continuation_type do_after) 
-          : tag_(0), destination_id_(apply_to), source_id_(), action_(act), 
+          : destination_id_(apply_to), source_id_(), action_(act), 
             continuation_(do_after), start_time_(0), creation_time_(0)
         {}
         
         parcel(naming::address addr, actions::base_action* act) 
-          : tag_(0), destination_id_(), destination_addr_(addr), source_id_(),
+          : destination_id_(), destination_addr_(addr), source_id_(),
             action_(act), continuation_(), start_time_(0),
             creation_time_(0)
         {}
@@ -89,16 +83,6 @@ namespace hpx { namespace parcelset
         actions::continuation_type get_continuation() const 
         {
             return continuation_;
-        }
-
-        /// get and set the parcel id
-        parcel_id const& get_parcel_id() const 
-        {
-            return tag_;
-        }
-        void set_parcel_id(parcel_id const& id) 
-        {
-            tag_ = id;
         }
 
         /// get and set the source locality/component id
@@ -162,7 +146,6 @@ namespace hpx { namespace parcelset
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
-        parcel_id tag_;   
         naming::gid_type destination_id_;
         naming::address destination_addr_;
         naming::id_type source_id_;

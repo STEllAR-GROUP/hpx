@@ -49,10 +49,6 @@ namespace hpx { namespace parcelset
         // make sure the parcel has been properly initialized        
         void init_parcel(parcel& p)
         {
-            // ensure parcel id is set
-            if (!p.get_parcel_id())
-                p.set_parcel_id(get_next_id());
-
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
                 p.set_source(naming::id_type(prefix_, naming::id_type::unmanaged));
@@ -188,7 +184,7 @@ namespace hpx { namespace parcelset
         ///                 transmitted. The parcel \a p will be modified in 
         ///                 place, as it will get set the resolved destination
         ///                 address and parcel id (if not already set).
-        parcel_id sync_put_parcel(parcel& p);
+        void sync_put_parcel(parcel& p);
         
         /// A parcel is submitted for transport at the source locality site to 
         /// the parcel set of the locality with the put-parcel command
@@ -212,7 +208,7 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully 
         ///                              transferred bytes.
-        parcel_id put_parcel(parcel& p, handler_type f);
+        void put_parcel(parcel& p, handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no 
         /// callback functor is provided by the user. 
@@ -223,10 +219,8 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will 
         ///                 get set the resolved destination address and parcel 
         ///                 id (if not already set).
-        parcel_id put_parcel(parcel& p)
-        {
-            return put_parcel(p, &parcelhandler::default_write_handler);
-        }
+        void put_parcel(parcel& p)
+        { put_parcel(p, &parcelhandler::default_write_handler); }
 
         /// The function \a get_parcel returns the next available parcel
         ///
@@ -320,12 +314,6 @@ namespace hpx { namespace parcelset
         naming::locality const& here() const
         {
             return pp_.here();
-        }
-
-        /// generate next unique id
-        parcel_id get_next_id()
-        {
-            return pp_.get_id_range().get_id(pp_.here(), resolver_);
         }
 
     private:
