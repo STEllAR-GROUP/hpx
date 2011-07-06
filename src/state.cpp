@@ -22,8 +22,7 @@ bool threadmanager_is(boost::uint8_t mask)
 {
     if (NULL == applier::get_applier_ptr())
         return false; 
-    else 
-        return applier::get_applier_ptr()->get_thread_manager().status() & mask;
+    return (applier::get_applier_ptr()->get_thread_manager().status() & mask) ? true : false;
 }
 
 }
@@ -36,8 +35,7 @@ bool threadmanager_is(boost::uint8_t mask)
     {
         if (NULL == get_runtime_ptr()) 
             return false;
-        else 
-            return get_runtime_ptr()->get_agas_client().status() & mask;
+        return (get_runtime_ptr()->get_agas_client().status() & mask) ? true : false;
     }
 
     } 

@@ -1,0 +1,37 @@
+# Copyright (c) 2007-2011 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+###############################################################################
+set(component_sources
+    point.cpp)
+
+###############################################################################
+set(client_headers
+    point.hpp)
+
+set(stubs_headers
+    stubs/point.hpp)
+
+set(server_headers
+    server/point.hpp)
+
+###############################################################################
+set(headers
+    ${client_headers}
+    ${stubs_headers}
+    ${server_headers})
+
+###############################################################################
+source_group("Source Files\\Component" FILES ${component_sources})
+source_group("Header Files\\Client" FILES ${client_headers})
+source_group("Header Files\\Stubs"  FILES ${stubs_headers})
+source_group("Header Files\\Server" FILES ${server_headers})
+
+###############################################################################
+add_hpx_component(point_geometry
+  MODULE point_geometry
+  SOURCES ${component_sources} 
+  HEADERS ${headers})
+

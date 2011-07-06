@@ -111,6 +111,11 @@ namespace hpx { namespace components
     template <typename Component, typename Enable>
     component_type component_type_database<Component, Enable>::value = component_invalid;
 
+    template <typename Component, typename Enable>
+    struct component_type_database<Component const, Enable>
+      : component_type_database<Component, Enable>
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     inline component_type get_component_type()
