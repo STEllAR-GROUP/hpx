@@ -1,0 +1,212 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+ no time accumulated
+
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  Ts/call  Ts/call  name    
+  0.00      0.00     0.00     4984     0.00     0.00  double square<double>(double const&)
+  0.00      0.00     0.00      252     0.00     0.00  chroner(timeval&, timeval&)
+  0.00      0.00     0.00      250     0.00     0.00  IntrTreeNode::treeNodeInsert(TreeLeaf*, double)
+  0.00      0.00     0.00      250     0.00     0.00  TreeLeaf::forceCalcRe(TreeNode const*, double)
+  0.00      0.00     0.00      250     0.00     0.00  TreeLeaf::moveParticles()
+  0.00      0.00     0.00      250     0.00     0.00  TreeLeaf::calculateForce(IntrTreeNode const*, double)
+  0.00      0.00     0.00       98     0.00     0.00  IntrTreeNode::newNode(double const*)
+  0.00      0.00     0.00       50     0.00     0.00  computeRootPos(int, double&, double*)
+  0.00      0.00     0.00       50     0.00     0.00  IntrTreeNode::calculateCM(int&)
+  0.00      0.00     0.00       50     0.00     0.00  IntrTreeNode::treeReuse()
+  0.00      0.00     0.00       10     0.00     0.00  TreeLeaf::TreeLeaf()
+  0.00      0.00     0.00       10     0.00     0.00  TreeNode::TreeNode()
+  0.00      0.00     0.00        2     0.00     0.00  global constructors keyed to IntrTreeNode::tree_head
+  0.00      0.00     0.00        2     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+  0.00      0.00     0.00        2     0.00     0.00  processInput(std::string)
+  0.00      0.00     0.00        2     0.00     0.00  bool std::operator==<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) no time propagated
+
+index % time    self  children    called     name
+                0.00    0.00       4/4984        processInput(std::string) [20]
+                0.00    0.00    4980/4984        TreeLeaf::forceCalcRe(TreeNode const*, double) [9]
+[6]      0.0    0.00    0.00    4984         double square<double>(double const&) [6]
+-----------------------------------------------
+                0.00    0.00     252/252         main [5]
+[7]      0.0    0.00    0.00     252         chroner(timeval&, timeval&) [7]
+-----------------------------------------------
+                                  96             IntrTreeNode::treeNodeInsert(TreeLeaf*, double) [8]
+                0.00    0.00     250/250         main [5]
+[8]      0.0    0.00    0.00     250+96      IntrTreeNode::treeNodeInsert(TreeLeaf*, double) [8]
+                0.00    0.00      48/98          IntrTreeNode::newNode(double const*) [12]
+                                  96             IntrTreeNode::treeNodeInsert(TreeLeaf*, double) [8]
+-----------------------------------------------
+                                1410             TreeLeaf::forceCalcRe(TreeNode const*, double) [9]
+                0.00    0.00     250/250         TreeLeaf::calculateForce(IntrTreeNode const*, double) [11]
+[9]      0.0    0.00    0.00     250+1410    TreeLeaf::forceCalcRe(TreeNode const*, double) [9]
+                0.00    0.00    4980/4984        double square<double>(double const&) [6]
+                                1410             TreeLeaf::forceCalcRe(TreeNode const*, double) [9]
+-----------------------------------------------
+                0.00    0.00     250/250         main [5]
+[10]     0.0    0.00    0.00     250         TreeLeaf::moveParticles() [10]
+-----------------------------------------------
+                0.00    0.00     250/250         main [5]
+[11]     0.0    0.00    0.00     250         TreeLeaf::calculateForce(IntrTreeNode const*, double) [11]
+                0.00    0.00     250/250         TreeLeaf::forceCalcRe(TreeNode const*, double) [9]
+-----------------------------------------------
+                0.00    0.00      48/98          IntrTreeNode::treeNodeInsert(TreeLeaf*, double) [8]
+                0.00    0.00      50/98          main [5]
+[12]     0.0    0.00    0.00      98         IntrTreeNode::newNode(double const*) [12]
+-----------------------------------------------
+                0.00    0.00      50/50          main [5]
+[13]     0.0    0.00    0.00      50         computeRootPos(int, double&, double*) [13]
+-----------------------------------------------
+                                  48             IntrTreeNode::calculateCM(int&) [14]
+                0.00    0.00      50/50          main [5]
+[14]     0.0    0.00    0.00      50+48      IntrTreeNode::calculateCM(int&) [14]
+                                  48             IntrTreeNode::calculateCM(int&) [14]
+-----------------------------------------------
+                0.00    0.00      50/50          main [5]
+[15]     0.0    0.00    0.00      50         IntrTreeNode::treeReuse() [15]
+-----------------------------------------------
+                0.00    0.00      10/10          processInput(std::string) [20]
+[16]     0.0    0.00    0.00      10         TreeLeaf::TreeLeaf() [16]
+                0.00    0.00      10/10          TreeNode::TreeNode() [17]
+-----------------------------------------------
+                0.00    0.00      10/10          TreeLeaf::TreeLeaf() [16]
+[17]     0.0    0.00    0.00      10         TreeNode::TreeNode() [17]
+-----------------------------------------------
+                0.00    0.00       2/2           __do_global_ctors_aux [22]
+[18]     0.0    0.00    0.00       2         global constructors keyed to IntrTreeNode::tree_head [18]
+                0.00    0.00       2/2           __static_initialization_and_destruction_0(int, int) [19]
+-----------------------------------------------
+                0.00    0.00       2/2           global constructors keyed to IntrTreeNode::tree_head [18]
+[19]     0.0    0.00    0.00       2         __static_initialization_and_destruction_0(int, int) [19]
+-----------------------------------------------
+                0.00    0.00       2/2           main [5]
+[20]     0.0    0.00    0.00       2         processInput(std::string) [20]
+                0.00    0.00      10/10          TreeLeaf::TreeLeaf() [16]
+                0.00    0.00       4/4984        double square<double>(double const&) [6]
+-----------------------------------------------
+                0.00    0.00       2/2           main [5]
+[21]     0.0    0.00    0.00       2         bool std::operator==<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [21]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+  [18] global constructors keyed to IntrTreeNode::tree_head [14] IntrTreeNode::calculateCM(int&) [11] TreeLeaf::calculateForce(IntrTreeNode const*, double)
+  [19] __static_initialization_and_destruction_0(int, int) [8] IntrTreeNode::treeNodeInsert(TreeLeaf*, double) [16] TreeLeaf::TreeLeaf()
+   [6] double square<double>(double const&) [12] IntrTreeNode::newNode(double const*) [17] TreeNode::TreeNode()
+   [7] chroner(timeval&, timeval&) [15] IntrTreeNode::treeReuse() [21] bool std::operator==<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+  [20] processInput(std::string) [9] TreeLeaf::forceCalcRe(TreeNode const*, double)
+  [13] computeRootPos(int, double&, double*) [10] TreeLeaf::moveParticles()

@@ -1,0 +1,3 @@
+./bh -i 25_file > 25_out.out
+./mkmovie.csh 25_out.out
+rm -rf tmp*

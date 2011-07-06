@@ -1,0 +1,3 @@
+./ompbh -i 10_file > 10_out.out
+./mkmovie.csh 10_out.out
+rm -rf tmp*

@@ -1,0 +1,3 @@
+./ompbh -i 50_file > 50_out.out
+./mkmovie.csh 50_out.out
+rm -rf tmp*

@@ -1,0 +1,3 @@
+./bh -i 10000_file > 10000_out.out
+./mkmovie.csh 10000_out.out
+rm -rf tmp*
