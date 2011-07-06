@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
-#include "server/point.hpp"
+#include "../server/point.hpp"
 
 namespace hpx { namespace geometry { namespace stubs
 {

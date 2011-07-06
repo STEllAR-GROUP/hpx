@@ -1,24 +1,36 @@
-# Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2011      Matt Anderson
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-source_group("Source Files\\Server" FILES point_geometry/point_geometry.cpp)
-source_group("Source Files" FILES point_geometry_client.cpp)
+# just recurse into all components subdirectories and execute the scripts there
+set(subdirs 
+    point_geometry)
 
-add_hpx_component(point_geometry
-                  MODULE point_geometry
-                  SOURCES point_geometry/point_geometry.cpp)
+# for all targets specified above
+foreach(subdir ${subdirs})
+  add_subdirectory(${subdir})
 
-add_hpx_executable(point_geometry_client
-                    MODULE queue
-                    SOURCES point_geometry_client.cpp
-                    DEPENDENCIES point_geometry_component)
+  set(sources
+      ${subdir}_client.cpp)
 
-add_hpx_pseudo_target(examples.geometry.point_geometry)
+  source_group("Source Files" FILES ${sources})
 
-add_hpx_pseudo_dependencies(examples.geometry examples.geometry.point_geometry)
+  # add example executable
+  add_hpx_executable(${subdir}_client 
+    MODULE point_geometry
+    SOURCES ${sources} 
+    DEPENDENCIES ${subdir}_component ${dependencies})
 
-add_hpx_pseudo_dependencies(examples.geometry.point_geometry
-                            point_geometry_client_exe) 
+  # add a custom target for this example 
+  add_hpx_pseudo_target(examples.geometry.${subdir})
+
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(examples.geometry
+                              examples.geometry.${subdir})
+
+  # add dependencies to pseudo-target 
+  add_hpx_pseudo_dependencies(examples.geometry.${subdir}
+                              ${subdir}_client_exe) 
+endforeach()
 
