@@ -44,6 +44,33 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
     }
 
+    {
+        namespace bg = boost::geometry;
+
+        typedef bg::model::d2::point_xy<double> point_type;
+        typedef bg::model::polygon<point_type> polygon_type;
+
+        point_type pt1(1, 1);
+        point_type pt2(2, 2);
+        point_type pt3(1, 2);
+
+        double d = bg::distance(pt1, pt2);
+
+        std::cout << "Distance: " << d << std::endl;
+
+        polygon_type p;
+        p.outer().push_back(pt1);
+        p.outer().push_back(pt2);
+        p.outer().push_back(pt3);
+        p.outer().push_back(pt1);
+        bg::correct(p);
+
+        point_type pt4(1.5, 1.25);
+        bool inside = bg::within(pt4, p);
+
+        std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
+    }
+
     hpx::finalize();
     return 0;
 }
