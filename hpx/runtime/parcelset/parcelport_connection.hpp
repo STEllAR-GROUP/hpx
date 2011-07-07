@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +13,7 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/util/connection_cache.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read.hpp>
@@ -34,11 +36,16 @@ namespace hpx { namespace parcelset
         private boost::noncopyable
     {
     public:
+        
+
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& l, 
-                util::connection_cache<parcelport_connection>& cache)
-          : socket_(io_service), there_(l), connection_cache_(cache)
+                util::connection_cache<parcelport_connection>& cache,
+                boost::atomic<std::size_t>& started,
+                boost::atomic<std::size_t>& completed)
+          : socket_(io_service), there_(l), connection_cache_(cache),
+            sends_started_(started), sends_completed_(completed)
         {
         }
 
@@ -51,6 +58,9 @@ namespace hpx { namespace parcelset
         template <typename Handler>
         void async_write(Handler handler)
         {
+            // After data structure is written, increment reference to total sends started
+            ++sends_started_;
+
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
@@ -70,6 +80,7 @@ namespace hpx { namespace parcelset
                     boost::make_tuple(handler)));
         }
 
+ 
     protected:
         /// handle completed write operation
         template <typename Handler>
@@ -93,6 +104,7 @@ namespace hpx { namespace parcelset
             out_buffer_.clear();
             out_size_ = 0;
             connection_cache_.add(there_, shared_from_this());
+            ++sends_completed_;
         }
 
     private:
@@ -108,6 +120,9 @@ namespace hpx { namespace parcelset
 
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection>& connection_cache_;
+
+        boost::atomic<std::size_t>& sends_started_;
+        boost::atomic<std::size_t>& sends_completed_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,7 +32,16 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
+#if HPX_AGAS_VERSION > 0x10
+namespace hpx { namespace agas
+{
+
+struct HPX_EXPORT big_boot_barrier;
+
+} 
+#endif
+
+namespace parcelset
 {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
@@ -44,6 +53,10 @@ namespace hpx { namespace parcelset
         parcelport& This() { return *this; }
 
     public:
+#if HPX_AGAS_VERSION > 0x10
+        friend class agas::big_boot_barrier;
+#endif
+
         /// Construct the parcelport server to listen to the endpoint given by 
         /// the locality and serve up requests to the parcelport.
         ///
@@ -51,8 +64,8 @@ namespace hpx { namespace parcelset
         ///                 [in] The pool of networking threads to use to serve 
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        parcelport(util::io_service_pool& io_service_pool, 
-            naming::locality here);
+        parcelport(util::io_service_pool& io_service_pool
+          , naming::locality here);
 
         ~parcelport();
 
@@ -175,6 +188,20 @@ namespace hpx { namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
+
+        /// return sends started
+
+        std::size_t total_sends_started() const
+        {
+            return sends_started_.load();
+        }
+
+        /// return sends completed
+        std::size_t total_sends_completed()
+        {
+            return sends_completed_.load();
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -203,6 +230,11 @@ namespace hpx { namespace parcelset
 
         /// The local locality
         naming::locality here_;
+
+        boost::atomic<std::size_t> sends_started_;
+        boost::atomic<std::size_t> sends_completed_;
+
+
     };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
+//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,7 +31,9 @@ namespace hpx { namespace parcelset
         acceptor_(NULL),
         parcels_(This()),
         connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
-        here_(here)
+        here_(here),
+        sends_started_(0),
+        sends_completed_(0)
     {}
 
     parcelport::~parcelport()
@@ -152,7 +155,9 @@ namespace hpx { namespace parcelset
         // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
                     io_service_pool_.get_io_service(), addr.locality_, 
-                    connection_cache_)); 
+                    connection_cache_, sends_started_,
+                    sends_completed_)); 
+
             client_connection->set_parcel(p);
 
         // connect to the target locality, retry if needed
