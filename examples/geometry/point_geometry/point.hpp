@@ -95,7 +95,7 @@ namespace hpx { namespace geometry
         lcos::future_value<void> set_Y_async(double y) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::set_X_async(gid_, y);
+            return this->base_type::set_Y_async(gid_, y);
         }
 
         void set_X(double x) 
