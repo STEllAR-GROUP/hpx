@@ -16,6 +16,10 @@ foreach(subdir ${subdirs})
 
   source_group("Source Files" FILES ${sources})
 
+  set(dependencies
+      distributing_factory_component)
+
+
   # add example executable
   add_hpx_executable(${subdir}_client 
     MODULE point_geometry

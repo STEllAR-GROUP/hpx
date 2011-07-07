@@ -20,7 +20,7 @@ namespace hpx { namespace geometry
     /// The \a stubs#point class is the client side representation of all
     /// \a server#point components
     class point 
-        : components::client_base<point, stubs::point>
+        : public components::client_base<point, stubs::point>
     {
         typedef components::client_base<point, stubs::point> 
             base_type;
