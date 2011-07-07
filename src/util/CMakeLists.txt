@@ -14,11 +14,16 @@ add_hpx_library_sources(hpx_ini
 add_hpx_library_sources(hpx
   init_ini_data.cpp
   itt_notify.cpp
-  generate_unique_ids.cpp
   logging.cpp
   performance_counters.cpp
   runtime_configuration.cpp
   asio_util.cpp
   io_service_pool.cpp
   serialize_exception.cpp)
+
+if("${HPX_AGAS_VERSION}" STREQUAL "2")
+  add_hpx_library_sources(hpx generate_unique_ids_v2.cpp)
+else()
+  add_hpx_library_sources(hpx generate_unique_ids_v1.cpp)
+endif()
 
