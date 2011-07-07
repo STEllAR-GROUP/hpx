@@ -247,6 +247,9 @@ namespace hpx { namespace threads { namespace policies
         // FIXME: seg faults at shutdown on Linux.
         bool cleanup_terminated_locked()
         {
+            if (thread_map_.empty())
+                return true;
+
             {
                 long delete_count = max_delete_count;   // delete only this many threads
                 thread_id_type todelete;
