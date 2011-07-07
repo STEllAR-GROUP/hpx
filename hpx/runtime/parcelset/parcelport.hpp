@@ -32,9 +32,9 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { 
 #if HPX_AGAS_VERSION > 0x10
-namespace hpx { namespace agas
-{
+namespace agas {
 
 struct HPX_EXPORT big_boot_barrier;
 
