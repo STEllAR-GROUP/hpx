@@ -174,7 +174,6 @@ namespace hpx { namespace naming
     void id_type::save(Archive& ar, const unsigned int version) const
     {
         gid_type const& g = *gid_;
-        ar << mm_;
         ar << g;
     }
 
@@ -188,11 +187,9 @@ namespace hpx { namespace naming
                 "trying to load id_type with unknown version");
         }
 
-        memory_model mm;
         gid_type g;
-        ar >> mm;
         ar >> g;
-        gid_.reset(new detail::id_type_impl(g), get_deleter(mm));
+        gid_.reset(new detail::id_type_impl(g), get_deleter(managed));
     }
 
     ///////////////////////////////////////////////////////////////////////////
