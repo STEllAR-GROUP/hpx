@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,6 +33,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE(point_geometry_type::wrapped_type);
 HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::init_action,
     point_geometry_init_action);
+HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::search_action,
+    point_geometry_search_action);
 HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::get_X_action,
     point_geometry_get_X_action);

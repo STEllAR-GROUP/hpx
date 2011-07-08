@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,7 +32,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 {
     {
 
-        std::size_t array_size = 4;
+        std::size_t array_size = 8;
 
         namespace bg = boost::geometry;
 
@@ -50,22 +51,18 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         init(locality_results(blocks), accu);
 
-        accu[0].init(0,0);
-        accu[1].init(0,1);
-        accu[2].init(1,1);
-        accu[3].init(1,0);
+        std::vector<hpx::lcos::future_value<void> > initial_phase;
+        initial_phase.push_back(accu[0].init_async(0,0));
+        initial_phase.push_back(accu[1].init_async(0,1));
+        initial_phase.push_back(accu[2].init_async(1,1));
+        initial_phase.push_back(accu[3].init_async(1,0));
 
-        //hpx::geometry::point pt1(hpx::find_here(), 0, 0);
-        //hpx::geometry::point pt2(hpx::find_here(), 0, 1);
-        //hpx::geometry::point pt3(hpx::find_here(), 1, 1);
-        //hpx::geometry::point pt4(hpx::find_here(), 1, 0);
+        initial_phase.push_back(accu[4].init_async(0.5,0.5));
+        initial_phase.push_back(accu[5].init_async(0,1.5));
+        initial_phase.push_back(accu[6].init_async(0.5,2));
+        initial_phase.push_back(accu[7].init_async(1,1.5));
 
-//         bg::assign_values(pt1, 1, 1);
-//         bg::assign_values(pt2, 2, 2);
-
-        //double d = bg::distance(pt1, pt2);
-
-        //std::cout << "Distance: " << d << std::endl;
+        hpx::components::wait(initial_phase);
 
         hpx::geometry::polygon_2d p;
         p.outer().push_back(accu[0]);
@@ -75,45 +72,23 @@ int hpx_main(boost::program_options::variables_map &vm)
         p.outer().push_back(accu[0]);
         bg::correct(p);
 
-        //p.outer().push_back(pt1);
-        //p.outer().push_back(pt2);
-        //p.outer().push_back(pt3);
-        //p.outer().push_back(pt4);
-        //p.outer().push_back(pt1);
-        //bg::correct(p);
+        hpx::geometry::polygon_2d q;
+        q.outer().push_back(accu[4]);
+        q.outer().push_back(accu[5]);
+        q.outer().push_back(accu[6]);
+        q.outer().push_back(accu[7]);
+        q.outer().push_back(accu[4]);
+        bg::correct(q);
+
+        std::vector<hpx::lcos::future_value<void> > search_phase;
+        search_phase.push_back(accu[4].search_async(p));
+
+        hpx::components::wait(search_phase);
 
         hpx::geometry::point pt5(hpx::find_here(), 0.5, 0.5);
         bool inside = bg::within(pt5, p);
-
         std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
     }
-#if 0
-    {
-        namespace bg = boost::geometry;
-
-        typedef bg::model::d2::point_xy<double> point_type;
-        typedef bg::model::polygon<point_type> polygon_type;
-
-        point_type pt1(0, 0);
-        point_type pt2(0, 2);
-        point_type pt3(2, 0);
-
-        double d = bg::distance(pt1, pt2);
-
-        std::cout << "Distance: " << d << std::endl;
-
-        polygon_type p;
-        p.outer().push_back(pt1);
-        p.outer().push_back(pt2);
-        p.outer().push_back(pt3);
-        bg::correct(p);
-
-        point_type pt5(0.5, 0.5);
-        bool inside = bg::within(pt5, p);
-
-        std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
-    }
-#endif
 
     hpx::finalize();
     return 0;

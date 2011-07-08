@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,6 +35,20 @@ namespace hpx { namespace geometry { namespace stubs
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
             init_async(gid, x, y).get();
+        }
+
+        static lcos::future_value<void> 
+        search_async(naming::id_type gid, hpx::geometry::polygon_2d p) 
+        {
+            typedef server::point::search_action action_type;
+            return lcos::eager_future<action_type>(gid, p);
+        }
+
+        static void search(naming::id_type const& gid, hpx::geometry::polygon_2d p) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the future_value
+            search_async(gid, p).get();
         }
 
         /// Query the current coordinate values of the server#point 

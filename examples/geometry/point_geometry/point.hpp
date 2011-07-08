@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -59,6 +60,19 @@ namespace hpx { namespace geometry
         {
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_, x, y);
+        }
+
+        /// Initialize the server#point instance with the given \a gid
+        lcos::future_value<void> search_async(hpx_geometry::polygon_2d p) 
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::search_async(gid_,p);
+        }
+
+        void search(hpx_geometry::polygon_2d p) 
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::search_async(gid_,p);
         }
 
         /// Query the current coordinate values of the server#point 

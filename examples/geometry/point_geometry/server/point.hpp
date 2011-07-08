@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2011 Matthew Anderson
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +13,14 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+
+#include <boost/geometry/geometries/polygon.hpp>
+
+namespace hpx { namespace geometry
+{
+    typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d;
+}}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
@@ -28,7 +37,8 @@ namespace hpx { namespace geometry { namespace server
             point_get_X = 1,
             point_get_Y = 2,
             point_set_X = 3,
-            point_set_Y = 4
+            point_set_Y = 4,
+            point_search = 5
         };
 
         // constructor: initialize accumulator value
@@ -44,6 +54,13 @@ namespace hpx { namespace geometry { namespace server
         {
             x_ = x;
             y_ = y;
+        }
+
+        /// search for contact
+        void search(hpx::geometry::polygon_2d p) 
+        {
+          point_type pt1(x_,y_);
+          boost::geometry::within(pt1,p);          
         }
 
         /// retrieve the X coordinate of this point
