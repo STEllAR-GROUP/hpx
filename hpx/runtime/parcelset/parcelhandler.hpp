@@ -260,8 +260,8 @@ namespace hpx { namespace parcelset
         ///                 function object instance is invoked by, and \a dest
         ///                 is the local destination address of the parcel.
         bool register_event_handler(
-            parcelhandler_queue_base::callback_type const& sink
-        ) {
+            parcelhandler_queue_base::callback_type const& sink)
+        {
             return parcels_->register_event_handler(sink);
         }
 
@@ -290,8 +290,8 @@ namespace hpx { namespace parcelset
         ///                 instance goes out of scope.
         bool register_event_handler(
             parcelhandler_queue_base::callback_type const& sink
-          , parcelhandler_queue_base::connection_type& conn
-        ) {
+          , parcelhandler_queue_base::connection_type& conn)
+        {
             return parcels_->register_event_handler(sink, conn);
         }
 
