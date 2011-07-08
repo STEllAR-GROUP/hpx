@@ -15,6 +15,17 @@ namespace hpx { namespace geometry
     typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d; 
 }}
 
+inline void
+init(hpx::components::server::distributing_factory::iterator_range_type r,
+    std::vector<hpx::geometry::point>& accu)
+{
+    BOOST_FOREACH(hpx::naming::id_type const& id, r)
+    {
+        accu.push_back(hpx::geometry::point(id));
+    }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
 {
@@ -35,32 +46,48 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::distributing_factory::result_type blocks =
             factory.create_components(block_type, array_size);
 
-        hpx::geometry::point pt1(hpx::find_here(), 0, 0);
-        hpx::geometry::point pt2(hpx::find_here(), 0, 1);
-        hpx::geometry::point pt3(hpx::find_here(), 1, 1);
-        hpx::geometry::point pt4(hpx::find_here(), 1, 0);
+        std::vector<hpx::geometry::point> accu;
+
+        init(locality_results(blocks), accu);
+
+        accu[0].init(0,0);
+        accu[1].init(0,1);
+        accu[2].init(1,1);
+        accu[3].init(1,0);
+
+        //hpx::geometry::point pt1(hpx::find_here(), 0, 0);
+        //hpx::geometry::point pt2(hpx::find_here(), 0, 1);
+        //hpx::geometry::point pt3(hpx::find_here(), 1, 1);
+        //hpx::geometry::point pt4(hpx::find_here(), 1, 0);
 
 //         bg::assign_values(pt1, 1, 1);
 //         bg::assign_values(pt2, 2, 2);
 
-        double d = bg::distance(pt1, pt2);
+        //double d = bg::distance(pt1, pt2);
 
-        std::cout << "Distance: " << d << std::endl;
+        //std::cout << "Distance: " << d << std::endl;
 
         hpx::geometry::polygon_2d p;
-        p.outer().push_back(pt1);
-        p.outer().push_back(pt2);
-        p.outer().push_back(pt3);
-        p.outer().push_back(pt4);
-        p.outer().push_back(pt1);
+        p.outer().push_back(accu[0]);
+        p.outer().push_back(accu[1]);
+        p.outer().push_back(accu[2]);
+        p.outer().push_back(accu[3]);
+        p.outer().push_back(accu[0]);
         bg::correct(p);
+
+        //p.outer().push_back(pt1);
+        //p.outer().push_back(pt2);
+        //p.outer().push_back(pt3);
+        //p.outer().push_back(pt4);
+        //p.outer().push_back(pt1);
+        //bg::correct(p);
 
         hpx::geometry::point pt5(hpx::find_here(), 0.5, 0.5);
         bool inside = bg::within(pt5, p);
 
         std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
     }
-
+#if 0
     {
         namespace bg = boost::geometry;
 
@@ -68,9 +95,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         typedef bg::model::polygon<point_type> polygon_type;
 
         point_type pt1(0, 0);
-        point_type pt2(0, 1);
-        point_type pt3(1, 1);
-        point_type pt4(1, 0);
+        point_type pt2(0, 2);
+        point_type pt3(2, 0);
 
         double d = bg::distance(pt1, pt2);
 
@@ -80,7 +106,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         p.outer().push_back(pt1);
         p.outer().push_back(pt2);
         p.outer().push_back(pt3);
-        p.outer().push_back(pt4);
         bg::correct(p);
 
         point_type pt5(0.5, 0.5);
@@ -88,6 +113,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
     }
+#endif
 
     hpx::finalize();
     return 0;
