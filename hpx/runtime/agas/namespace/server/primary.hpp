@@ -476,7 +476,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
         }
 
         return response_type(primary_ns_resolve_gid
-                           , naming::invalid_gid
+                           , gva_type() 
                            , unknown_gid);
     } // }}}
 
@@ -512,7 +512,7 @@ struct HPX_COMPONENT_EXPORT primary_namespace :
 
         else
             return response_type(primary_ns_unbind
-                               , endpoint_type()
+                               , gva_type()
                                , unknown_gid);
     } // }}}
 
