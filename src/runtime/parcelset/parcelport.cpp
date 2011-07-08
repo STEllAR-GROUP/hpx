@@ -33,7 +33,9 @@ namespace hpx { namespace parcelset
         connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
         here_(here),
         sends_started_(0),
-        sends_completed_(0)
+        sends_completed_(0),
+        receives_started_(0),
+        receives_completed_(0)
     {}
 
     parcelport::~parcelport()
@@ -112,6 +114,9 @@ namespace hpx { namespace parcelset
         server::parcelport_connection_ptr conn)
     {
         if (!e) {
+        // increment number of parcels received
+            ++receives_started_;           
+  
         // handle this incoming parcel
             server::parcelport_connection_ptr c(conn);    // hold on to conn
 
@@ -133,6 +138,9 @@ namespace hpx { namespace parcelset
     /// Handle completion of a read operation.
     void parcelport::handle_read_completion(boost::system::error_code const& e)
     {
+        // increment number of parcels read
+        ++receives_completed_;
+
         if (e && e != boost::asio::error::operation_aborted)
         {
             LPT_(error) << "handle read operation completion: error: " 

@@ -20,6 +20,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -91,6 +92,7 @@ namespace parcelset
         /// operation or on any error.
         ///
         /// \param p        [in, out] A reference to the parcel to send. The 
+        ///                 parcel \a p will be modified in place, as it will 
         ///                 parcel \a p will be modified in place, as it will 
         ///                 get set the resolved destination address and parcel 
         ///                 id (if not already set).
@@ -184,13 +186,12 @@ namespace parcelset
         void set_range(
             naming::gid_type const& lower
           , naming::gid_type const& upper
-        ) {
+        ) { 
             id_range_.set_range(lower, upper);
         }
 
 
         /// return sends started
-
         std::size_t total_sends_started() const
         {
             return sends_started_.load();
@@ -200,6 +201,18 @@ namespace parcelset
         std::size_t total_sends_completed()
         {
             return sends_completed_.load();
+        }
+
+        /// return receives started
+        std::size_t total_receives_started()
+        { 
+            return receives_started_.load();
+        }
+
+        /// return receives completed
+        std::size_t total_receives_completed()
+        {
+            return receives_completed_.load();
         }
 
     protected:
@@ -234,7 +247,8 @@ namespace parcelset
         boost::atomic<std::size_t> sends_started_;
         boost::atomic<std::size_t> sends_completed_;
 
-
+        boost::atomic<std::size_t> receives_started_;
+        boost::atomic<std::size_t> receives_completed_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
