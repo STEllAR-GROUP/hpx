@@ -42,7 +42,8 @@ namespace hpx { namespace naming
                 components::component_type t = components::component_invalid;
                 if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
                 {
-                    components::stubs::runtime_support::free_component_sync((components::component_type)t, *p);
+                    components::stubs::runtime_support::free_component_sync
+                        ((components::component_type)t, *p);
                 }
             }
             catch (hpx::exception const& e) {
@@ -170,23 +171,28 @@ namespace hpx { namespace naming
     }   // detail
 
     template <class Archive>
-    void id_type::save(Archive & ar, const unsigned int version) const
+    void id_type::save(Archive& ar, const unsigned int version) const
     {
         gid_type const& g = *gid_;
+        ar << mm_;
         ar << g;
     }
 
     template <class Archive>
-    void id_type::load(Archive & ar, const unsigned int version)
+    void id_type::load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_IDTYPE_VERSION) {
-            throw exception(version_too_new, 
+        if (version > HPX_IDTYPE_VERSION)
+        {
+            HPX_THROW_EXCEPTION(version_too_new, 
+                "id_type::load",
                 "trying to load id_type with unknown version");
         }
 
+        memory_model mm;
         gid_type g;
+        ar >> mm;
         ar >> g;
-        gid_.reset(new detail::id_type_impl(g), get_deleter(id_type::managed));
+        gid_.reset(new detail::id_type_impl(g), get_deleter(mm));
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Version of id_type
-#define HPX_IDTYPE_VERSION  0x10
+#define HPX_IDTYPE_VERSION  0x20
 #define HPX_GIDTYPE_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,12 +374,16 @@ namespace hpx { namespace naming
     // the local gid is actually just a wrapper around the real thing
     struct HPX_EXPORT id_type
     {
-        enum type { managed, unmanaged };
+        enum memory_model
+        {
+            unmanaged = 0
+          , managed = 1
+        };
 
     private:
         typedef void (*deleter_type)(detail::id_type_impl*);
 
-        static deleter_type get_deleter(type t)
+        static deleter_type get_deleter(memory_model t)
         {
             return (t == managed) ? &detail::gid_managed_deleter : 
                 &detail::gid_unmanaged_deleter;
@@ -388,43 +392,34 @@ namespace hpx { namespace naming
     public:
         id_type() {}
 
-        explicit id_type(boost::uint64_t lsb_id, type t/* = unmanaged*/) 
-          : gid_(new detail::id_type_impl(0, lsb_id), get_deleter(t))
+        explicit id_type(boost::uint64_t lsb_id, memory_model t/* = unmanaged*/) 
+          : mm_(t), gid_(new detail::id_type_impl(0, lsb_id), get_deleter(t))
         {}
 
-        explicit id_type(gid_type const& gid, type t/* = unmanaged*/) 
-          : gid_(new detail::id_type_impl(gid), get_deleter(t))
+        explicit id_type(gid_type const& gid, memory_model t/* = unmanaged*/) 
+          : mm_(t), gid_(new detail::id_type_impl(gid), get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
-        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, type t/* = unmanaged*/) 
-          : gid_(new detail::id_type_impl(msb_id, lsb_id), get_deleter(t))
+        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id
+                       , memory_model t/* = unmanaged*/) 
+          : mm_(t), gid_(new detail::id_type_impl(msb_id, lsb_id), get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, 
               locality const& l, naming::address::component_type type_, 
-              naming::address::address_type a, type t/* = unmanaged*/) 
-          : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a), 
-                      get_deleter(t))
+              naming::address::address_type a, memory_model t/* = unmanaged*/) 
+          : mm_(t), gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a), 
+                         get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
-//         explicit id_type(::gid const& rhs) 
-//           : gid_(reinterpret_cast<detail::id_type_impl*>(rhs.gid_)->shared_from_this())
-//         {}
-
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
-
-//         id_type& operator=(::gid const& rhs)
-//         {
-//             gid_ = reinterpret_cast<detail::id_type_impl*>(rhs.gid_)->shared_from_this();
-//             return *this;
-//         }
 
         id_type& operator++()       // pre-increment
         {
@@ -560,6 +555,7 @@ namespace hpx { namespace naming
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
+        memory_model mm_; 
         boost::shared_ptr<detail::id_type_impl> gid_;
     };
 
