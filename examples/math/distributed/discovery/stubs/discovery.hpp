@@ -52,6 +52,22 @@ struct discovery : components::stub_base<server::discovery>
     ) { return topology_lva_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
+    static lcos::future_value<boost::uint32_t> total_shepherds_async(
+        naming::id_type const& gid
+    ) {
+        typedef server::discovery::total_shepherds_action action_type;
+        return lcos::eager_future<action_type>(gid);
+    }
+
+    static boost::uint32_t total_shepherds_sync(
+        naming::id_type const& gid
+    ) { return total_shepherds_async(gid).get(); }
+
+    static boost::uint32_t total_shepherds(
+        naming::id_type const& gid
+    ) { return total_shepherds_async(gid).get(); }
+
+    ///////////////////////////////////////////////////////////////////////////
     static lcos::future_value<bool> empty_async(
         naming::id_type const& gid
     ) {

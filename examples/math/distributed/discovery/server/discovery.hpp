@@ -34,6 +34,7 @@ struct HPX_COMPONENT_EXPORT discovery
 
   private:
     topology_map topology_;
+    boost::uint32_t total_shepherds_;
 
   public:
     enum actions
@@ -41,16 +42,23 @@ struct HPX_COMPONENT_EXPORT discovery
         discovery_build_network,
         discovery_deploy,
         discovery_topology_lva,
+        discovery_total_shepherds,
         discovery_empty
     };
 
     std::vector<naming::id_type> build_network();
 
-    void deploy(topology_map const& m)
-    { topology_ = m; }
+    void deploy(topology_map const& m, boost::uint32_t total_shepherds)
+    {
+        topology_ = m;
+        total_shepherds_ = total_shepherds;
+    }
 
     hpx::uintptr_t topology_lva()
     { return reinterpret_cast<hpx::uintptr_t>(&topology_); } 
+
+    boost::uint32_t total_shepherds()
+    { return total_shepherds_; }
 
     bool empty() 
     { return topology_.empty(); } 
@@ -71,10 +79,11 @@ struct HPX_COMPONENT_EXPORT discovery
       , &discovery::build_network
     > build_network_action;
 
-    typedef actions::action1<
+    typedef actions::action2<
         discovery
       , discovery_deploy
       , topology_map const& 
+      , boost::uint32_t 
       , &discovery::deploy
     > deploy_action;
     
@@ -84,6 +93,13 @@ struct HPX_COMPONENT_EXPORT discovery
       , discovery_topology_lva
       , &discovery::topology_lva
     > topology_lva_action;
+
+    typedef actions::result_action0<
+        discovery
+      , boost::uint32_t 
+      , discovery_total_shepherds
+      , &discovery::total_shepherds
+    > total_shepherds_action;
 
     typedef actions::result_action0<
         discovery

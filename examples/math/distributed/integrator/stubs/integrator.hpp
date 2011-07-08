@@ -26,7 +26,7 @@ struct integrator : components::stub_base<server::integrator<T> >
       , std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , boost::uint64_t regrid_segs 
+      , boost::uint32_t regrid_segs 
       , T const& eps 
     ) {
         typedef typename server::integrator<T>::build_network_action
@@ -40,7 +40,7 @@ struct integrator : components::stub_base<server::integrator<T> >
       , std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , boost::uint64_t regrid_segs 
+      , boost::uint32_t regrid_segs 
       , T const& eps 
     ) {
         return build_network_async
@@ -52,7 +52,7 @@ struct integrator : components::stub_base<server::integrator<T> >
       , std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f
       , T const& tolerance
-      , boost::uint64_t regrid_segs 
+      , boost::uint32_t regrid_segs 
       , T const& eps 
     ) {
         return build_network_async
@@ -65,7 +65,7 @@ struct integrator : components::stub_base<server::integrator<T> >
         naming::id_type const& gid
       , T const& lower_bound
       , T const& upper_bound
-      , boost::uint64_t segments
+      , boost::uint32_t segments
     ) {
         typedef typename server::integrator<T>::solve_action
             action_type;
@@ -77,7 +77,7 @@ struct integrator : components::stub_base<server::integrator<T> >
         naming::id_type const& gid
       , T const& lower_bound
       , T const& upper_bound
-      , boost::uint64_t segments
+      , boost::uint32_t segments
     ) {
         return solve_async(gid, lower_bound, upper_bound, segments).get();
     }
@@ -86,7 +86,7 @@ struct integrator : components::stub_base<server::integrator<T> >
         naming::id_type const& gid
       , T const& lower_bound
       , T const& upper_bound
-      , boost::uint64_t segments
+      , boost::uint32_t segments
     ) {
         return solve_async(gid, lower_bound, upper_bound, segments).get();
     }

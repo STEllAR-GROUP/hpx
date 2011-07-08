@@ -12,6 +12,8 @@
 #include <cmath>
 
 #include <boost/format.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -57,14 +59,16 @@ struct HPX_COMPONENT_EXPORT integrator
      
   private:
     topology_map* topology_;
+    boost::uint32_t total_shepherds_;
     boost::atomic<current_shepherd> current_;
     actions::function<T(T const&)> f_;
     std::vector<naming::id_type> network_;
     T tolerance_;
-    boost::uint64_t regrid_segs_;
+    boost::uint32_t regrid_segs_;
     T epsilon_;
     const boost::uint32_t here_;
 
+/*
     current_shepherd round_robin()
     {
         current_shepherd expected = current_.load(), desired;
@@ -93,6 +97,64 @@ struct HPX_COMPONENT_EXPORT integrator
 
         return desired;
     }
+*/
+
+    boost::uint32_t round_robin(
+        current_shepherd& cs
+      , boost::uint32_t max_shepherds
+    ) {
+        boost::uint32_t shepherds = 0;
+        current_shepherd expected = current_.load(), desired;
+
+        do {
+            // Check if we need to go to the next locality.
+            if ((*topology_)[expected.prefix] == expected.shepherd)
+            {
+                // Check if we're on the last locality.
+                if (topology_->size() == expected.prefix)
+                    desired.prefix = 1;
+                else
+                    desired.prefix = expected.prefix + 1;
+
+                const boost::uint32_t remaining = (*topology_)[desired.prefix];
+
+                if (remaining >= max_shepherds)
+                {
+                    shepherds = max_shepherds;
+                    desired.shepherd = max_shepherds;
+                }
+ 
+                else
+                {
+                    shepherds = remaining;
+                    desired.shepherd = remaining; 
+                }
+            }
+            
+            else
+            {
+                desired.prefix = expected.prefix;
+
+                const boost::uint32_t remaining =
+                    (*topology_)[expected.prefix] - expected.shepherd;
+
+                if (remaining >= max_shepherds)
+                {
+                    shepherds = max_shepherds;
+                    desired.shepherd = expected.shepherd + max_shepherds;
+                }
+ 
+                else
+                {
+                    shepherds = remaining;
+                    desired.shepherd = expected.shepherd + remaining; 
+                }
+            }
+        } while (!current_.compare_exchange_weak(expected, desired));
+
+        cs = desired;
+        return shepherds;
+    }
 
   public:
     enum actions
@@ -109,7 +171,7 @@ struct HPX_COMPONENT_EXPORT integrator
         std::vector<naming::id_type> const& discovery_network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
-      , boost::uint64_t regrid_segs 
+      , boost::uint32_t regrid_segs 
       , T const& epsilon 
     ) {
         BOOST_ASSERT(f);
@@ -170,7 +232,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const& network
       , actions::function<T(T const&)> const& f 
       , T const& tolerance
-      , boost::uint64_t regrid_segs
+      , boost::uint32_t regrid_segs
       , T const& epsilon 
     ) {
         BOOST_ASSERT(f);
@@ -182,6 +244,8 @@ struct HPX_COMPONENT_EXPORT integrator
         // DMA shortcut to reduce scheduling overhead.
         topology_ = reinterpret_cast<topology_map*>
             (disc_client.topology_lva_sync());
+
+        total_shepherds_ = disc_client.total_shepherds_sync();
 
         network_ = network;
 
@@ -211,10 +275,11 @@ struct HPX_COMPONENT_EXPORT integrator
         // Regrid.
         else
         {
-            lcos::eager_future<solve_action> r
-                ( network_[round_robin().prefix - 1], i, i + increment
-                , regrid_segs_, 1 + depth);
-            return r.get();
+//            lcos::eager_future<solve_action> r
+//                ( network_[round_robin().prefix - 1], i, i + increment
+//                , regrid_segs_, 1 + depth);
+//            return r.get();
+            return solve(i, i + increment, regrid_segs_, 1 + depth);
         }
     }
 
@@ -233,17 +298,18 @@ struct HPX_COMPONENT_EXPORT integrator
         // Regrid.
         else
         {
-            lcos::eager_future<solve_action> r
-                ( network_[round_robin().prefix - 1], i, i + increment
-                , regrid_segs_, 1 + depth);
-            return r.get();
+//            lcos::eager_future<solve_action> r
+//                ( network_[round_robin().prefix - 1], i, i + increment
+//                , regrid_segs_, 1 + depth);
+//            return r.get();
+            return solve(i, i + increment, regrid_segs_, 1 + depth);
         }
     }
 
     T solve(
         T const& lower_bound
       , T const& upper_bound
-      , boost::uint64_t segments
+      , boost::uint32_t segments
       , boost::uint32_t depth
     ) {
         const T length = (upper_bound - lower_bound);
@@ -256,28 +322,104 @@ struct HPX_COMPONENT_EXPORT integrator
         if (length <= (segments * epsilon_ * 2))
             return f_lower * length; 
 
-        std::list<lcos::future_value<T> > results;
+        typedef boost::fusion::vector2<
+            lcos::future_value<T>
+          , current_shepherd
+        > result_type; 
+
+        std::list<result_type> results;
 
         T increment = length / segments;
 
         BOOST_ASSERT((lower_bound + increment) < upper_bound);
 
-        util::high_resolution_timer t;
+        util::high_resolution_timer* t;
 
-        for (boost::uint64_t i = 0; i < segments; ++i)
+        if (0 == depth)
+            t = new util::high_resolution_timer;
+
+        boost::uint32_t first_round = 0;
+
+        topology_map::iterator top_it = topology_->begin()
+                             , top_end = topology_->end();
+
+        for (; top_it != top_end; ++top_it)
         {
+            const double node_ratio
+                = double(top_it->second) / double(total_shepherds_);
+
+            const boost::uint32_t points
+                = boost::uint32_t(std::floor(node_ratio * segments)) - 1;
 
             if (0 == depth)
-                hpx::cout() <<
-                    ( boost::format("[%.12f/%.12f] started segment %d at %f")
-                    % (lower_bound + (increment * i))
-                    % upper_bound
-                    % i
-                    % t.elapsed()) << hpx::endl;
+            {
+                if (1 == points)
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] started segment %d at %f on L%d")
+                        % (lower_bound + (increment * first_round))
+                        % upper_bound
+                        % first_round
+                        % t->elapsed()
+                        % top_it->first) << hpx::endl;
+                else 
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] started segments %d-%d at %f on L%d")
+                        % (lower_bound + (increment * first_round))
+                        % upper_bound
+                        % first_round
+                        % (first_round + points - 1)
+                        % t->elapsed()
+                        % top_it->first) << hpx::endl;
+            }
+
+            const T point = lower_bound + (increment * first_round);
+            results.push_back(result_type
+                (lcos::eager_future<solve_iteration_action>
+                    (network_[top_it->first - 1]
+                    , point, increment * points, depth)
+                , current_shepherd(top_it->first, points))); 
+
+            first_round += points;
+        }
+
+        for (boost::uint32_t i = first_round; i < segments;)
+        {
+            const boost::uint32_t max_shepherds = segments - i;
+ 
+            current_shepherd cs; 
+            const boost::uint32_t shepherds = round_robin(cs, max_shepherds);
+
+            BOOST_ASSERT(shepherds);
+
+            if (0 == depth)
+            {
+                if (1 == shepherds)
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] started segment %d at %f on L%d")
+                        % (lower_bound + (increment * i))
+                        % upper_bound
+                        % i
+                        % t->elapsed()
+                        % cs.prefix) << hpx::endl;
+                else 
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] started segments %d-%d at %f on L%d")
+                        % (lower_bound + (increment * i))
+                        % upper_bound
+                        % i
+                        % (i + shepherds - 1)
+                        % t->elapsed()
+                        % cs.prefix) << hpx::endl;
+            }
 
             const T point = lower_bound + (increment * i);
-            results.push_back(lcos::eager_future<solve_iteration_action>
-                (network_[round_robin().prefix - 1], point, increment, depth)); 
+            results.push_back(result_type
+                (lcos::eager_future<solve_iteration_action>
+                    (network_[cs.prefix - 1]
+                    , point, increment * shepherds, depth)
+                , current_shepherd(cs.prefix, shepherds))); 
+
+            i += shepherds;
         }
 
 /*
@@ -299,26 +441,44 @@ struct HPX_COMPONENT_EXPORT integrator
                 % t.elapsed()) << hpx::endl;
 */
 
-        typedef typename std::list<lcos::future_value<T> >::iterator iterator;
+        typedef typename std::list<result_type>::iterator iterator;
 
         iterator it = results.begin(), end = results.end();
  
         // Accumulate final result. TODO: Check for overflow.
         T total_area(0);
-        for (boost::uint64_t i = 0; i < segments; ++i, ++it)
+        for (boost::uint32_t i = 0; it != end; ++it)
         {        
-            total_area += it->get();
+            using boost::fusion::at_c;
 
+            total_area += at_c<0>(*it).get();
 
             if (0 == depth)
-                hpx::cout() <<
-                    ( boost::format("[%.12f/%.12f] completed segment %d at %f")
-                    % (lower_bound + (increment * i))
-                    % upper_bound
-                    % i
-                    % t.elapsed()) << hpx::endl;
+            {
+                if (1 == at_c<1>(*it).shepherd)
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] segment %d on L%d completed at %f")
+                        % (lower_bound + (increment * i))
+                        % upper_bound
+                        % i
+                        % at_c<1>(*it).prefix  
+                        % t->elapsed()) << hpx::endl;
+                else
+                    hpx::cout() << (boost::format(
+                        "[%.12f/%.12f] segments %d-%d on L%d completed at %f")
+                        % (lower_bound + (increment * i))
+                        % upper_bound
+                        % i
+                        % (i + at_c<1>(*it).shepherd - 1)
+                        % at_c<1>(*it).prefix 
+                        % t->elapsed()) << hpx::endl;
+            }
 
+            i += at_c<1>(*it).shepherd;
         }
+
+        if (0 == depth)
+            delete t;
 
         return total_area;
     }
@@ -334,7 +494,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const&
       , actions::function<T(T const&)> const&
       , T const& 
-      , boost::uint64_t 
+      , boost::uint32_t 
       , T const& 
         // function
       , &integrator<T>::build_network
@@ -350,7 +510,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , std::vector<naming::id_type> const&
       , actions::function<T(T const&)> const&
       , T const& 
-      , boost::uint64_t 
+      , boost::uint32_t 
       , T const& 
         // function
       , &integrator<T>::deploy
@@ -381,7 +541,7 @@ struct HPX_COMPONENT_EXPORT integrator
         // arguments 
       , T const& 
       , T const& 
-      , boost::uint64_t 
+      , boost::uint32_t 
       , boost::uint32_t 
         // function
       , &integrator<T>::solve

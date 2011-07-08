@@ -47,6 +47,10 @@ HPX_REGISTER_ACTION_EX(
     discovery_topology_lva_action);
 
 HPX_REGISTER_ACTION_EX(
+    discovery::total_shepherds_action,
+    discovery_total_shepherds_action);
+
+HPX_REGISTER_ACTION_EX(
     discovery::empty_action,
     discovery_empty_action);
 
@@ -92,6 +96,7 @@ std::vector<naming::id_type> discovery::build_network()
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     { results0.push_back(report_shepherd_count_future(locality)); }
 
+    total_shepherds_ = 0; 
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     {
         const boost::uint32_t current_prefix
@@ -100,6 +105,7 @@ std::vector<naming::id_type> discovery::build_network()
         BOOST_ASSERT(!topology_.count(current_prefix));
 
         topology_[current_prefix] = results0[current_prefix - 1].get();
+        total_shepherds_ += topology_[current_prefix]; 
     }
 
     std::vector<lcos::future_value<naming::id_type, naming::gid_type> >
@@ -131,7 +137,7 @@ std::vector<naming::id_type> discovery::build_network()
     std::list<lcos::future_value<void> > results2;
 
     BOOST_FOREACH(naming::id_type const& node, network)
-    { results2.push_back(deploy_future(node, topology_)); }
+    { results2.push_back(deploy_future(node, topology_, total_shepherds_)); }
 
     BOOST_FOREACH(lcos::future_value<void> const& f, results2)
     { f.get(); }

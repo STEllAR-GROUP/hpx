@@ -46,6 +46,16 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::topology_lva(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
+    lcos::future_value<boost::uint32_t> total_shepherds_async()
+    { return this->base_type::total_shepherds_async(this->gid_); }
+
+    boost::uint32_t total_shepherds_sync()
+    { return this->base_type::total_shepherds_sync(this->gid_); }
+
+    boost::uint32_t total_shepherds()
+    { return this->base_type::total_shepherds(this->gid_); }
+
+    ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<bool> empty_async()
     { return this->base_type::empty_async(this->gid_); }
 

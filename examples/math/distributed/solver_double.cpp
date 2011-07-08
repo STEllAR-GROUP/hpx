@@ -84,11 +84,11 @@ int master(variables_map& vm)
     const double upper_bound = vm["upper-bound"].as<double>();
     const double tolerance = vm["tolerance"].as<double>();
 
-    const boost::uint64_t top_segs
-        = vm["top-segments"].as<boost::uint64_t>();
+    const boost::uint32_t top_segs
+        = vm["top-segments"].as<boost::uint32_t>();
 
-    const boost::uint64_t regrid_segs
-        = vm["regrid-segments"].as<boost::uint64_t>();
+    const boost::uint32_t regrid_segs
+        = vm["regrid-segments"].as<boost::uint32_t>();
 
     // Handle for the root discovery component. 
     discovery disc_root;
@@ -210,11 +210,11 @@ int main(int argc, char* argv[])
         , "resolution tolerance")
 
         ( "top-segments"
-        , value<boost::uint64_t>()->default_value(4096) 
+        , value<boost::uint32_t>()->default_value(4096) 
         , "number of top-level segments")
 
         ( "regrid-segments"
-        , value<boost::uint64_t>()->default_value(128) 
+        , value<boost::uint32_t>()->default_value(128) 
         , "number of segment per regrid")
         ;
 
