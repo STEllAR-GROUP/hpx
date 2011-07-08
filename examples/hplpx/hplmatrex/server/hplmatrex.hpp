@@ -70,8 +70,6 @@ namespace hpx { namespace components { namespace server
     void LU_gauss_top(const int iter, const int bcol);
     void LU_gauss_left(const int brow, const int iter);
     void LU_gauss_trail(const int brow, const int bcol, const int iter);
-//    int LU_mini_trail(const int srow, const int erow,
-//                      const int scol, const int ecol, const int iter);
     int LU_gauss_main(const int brow, const int bcol,
                       const int iter, const int type);
     int LUbacksubst();
@@ -141,7 +139,8 @@ namespace hpx { namespace components { namespace server
     //the backsubst future is used to make sure all computations are complete
     //before returning from LUsolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
-    typedef lcos::eager_future<server::HPLMatreX::partbsub_action> partbsub_future;
+    typedef
+        lcos::eager_future<server::HPLMatreX::partbsub_action> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
     typedef lcos::eager_future<server::HPLMatreX::check_action> check_future;
@@ -251,7 +250,8 @@ namespace hpx { namespace components { namespace server
     for(int i=0;i<temp;i++){
         location = row+i;
         for(int j=0;j<columns;j++){
-            transData[j][location] = trueData[location][j] = (double) (gen() % 1000);
+            transData[j][location] = trueData[location][j]
+                                   = (double) (gen() % 1000);
         }
     }
     //once all spun off futures are complete we are done
@@ -355,7 +355,7 @@ namespace hpx { namespace components { namespace server
     int maxRow, temp_piv, outer;
     int i=0,j;
     bool good;
-    int guessedPivots[rows];
+    int* guessedPivots = (int*) std::malloc(rows*sizeof(int));
     std::vector<swap_future> futures;
     std::vector<search_future> searches;
 
@@ -596,7 +596,8 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     const int offset = brow*blocksize;
     const int offsetCol = iter*blocksize;
-    double fFactor[datablock[brow][iter]->columns];
+    double* fFactor = (double*) std::malloc(datablock[brow][iter]->columns*
+                                                                sizeof(double));
     double factor;
 
     //this first block of code finds all necessary factors early on
@@ -624,7 +625,8 @@ namespace hpx { namespace components { namespace server
     //the blocks operated on during the current iteration of the Gaussian
     //elimination computations. These blocks will still require further 
     //computations to be performed in future iterations.
-    void HPLMatreX::LU_gauss_trail(const int brow,const int bcol,const int iter){
+    void HPLMatreX::LU_gauss_trail(const int brow, const int bcol,
+        const int iter){
     int i,j,k,jj;
     const int offset = brow*blocksize;
     const int offsetCol = iter*blocksize;
@@ -651,7 +653,7 @@ namespace hpx { namespace components { namespace server
     //the additional work.
     int HPLMatreX::LUbacksubst(){
     int i,k,l,row,temp;
-    int neededFuture[brows-1];
+    int* neededFuture = (int*)std::malloc((brows-1)*sizeof(int));
     std::vector<partbsub_future> futures;
 
     //first the solution values are initialized
@@ -691,7 +693,8 @@ namespace hpx { namespace components { namespace server
             temp = row+k;
             solution[temp][brows]/=datablock[i][i]->data[k][k];
             for(l=k-1;l>=0;l--){
-                solution[row+l][brows] -= datablock[i][i]->data[l][k]*solution[temp][brows];
+                solution[row+l][brows] -=
+                    datablock[i][i]->data[l][k]*solution[temp][brows];
         }   }
         neededFuture[brows-i-1] = futures.size();
         for(k=i-1;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}

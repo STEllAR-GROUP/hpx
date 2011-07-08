@@ -39,7 +39,6 @@ statistical printout.*/
 //function is called
 int hpx_main(){
 //    int i,j,t=0;
-
     std::vector<naming::id_type> prefixes;
     applier::applier& appl = applier::get_applier();
     naming::id_type prefix;
@@ -52,10 +51,8 @@ int hpx_main(){
 
     using hpx::components::HPLMatreX;
     HPLMatreX dat;
-
     dat.create(prefix);
     dat.construct(SIZE,MSIZE,ABSIZE,BSIZE);
-
     ERROR = dat.LUsolve();
     dat.destruct();
     dat.free();
@@ -69,34 +66,33 @@ bool parse_commandline(int argc, char *argv[], po::variables_map& vm)
     try {
         po::options_description desc_cmdline ("Usage: hplpx [options]");
         desc_cmdline.add_options()
-            ("help,h", "print out program usage (this message)")
-
-            ("run_agas_server,r", "run AGAS server as part of this runtime instance")
-            ("worker,w", "run this instance in worker (non-console) mode")
-            ("config", po::value<std::string>(),
-                "load the specified file as an application configuration file")
-            ("agas,a", po::value<std::string>(),
-                "the IP address the AGAS server is running on (default taken "
-                "from hpx.ini), expected format: 192.168.1.1:7912")
-            ("hpx,x", po::value<std::string>(),
-                "the IP address the HPX parcelport is listening on (default "
-                "is localhost:7910), expected format: 192.168.1.1:7913")
-            ("localities,l", po::value<int>(),
-                "the number of localities to wait for at application startup"
-                "(default is 1)")
-            ("threads,t", po::value<int>(),
-                "the number of operating system threads to spawn for this"
-                "HPX locality")
-            ("queueing,q", po::value<std::string>(),
-                "the queue scheduling policy to use, options are 'global' "
-                "and 'local' (default is 'global')")
-            ("size,S", po::value<int>(),
-                "the height of the n x n+1 matrix generated, where n is the height "
-        "and the minimum size value is 3(default is 2048)")
-            ("csv,s", "generate statistics of the run in comma separated format")
-            ("blocksize,b", po::value<int>(),
-                "blocksize correlates to the amount of work performed by each "
-        "thread during gaussian elimination (default is 250)")
+        ("help,h", "print out program usage (this message)")
+        ("run_agas_server,r", "run AGAS server as part of this runtime instance")
+        ("worker,w", "run this instance in worker (non-console) mode")
+        ("config", po::value<std::string>(),
+            "load the specified file as an application configuration file")
+        ("agas,a", po::value<std::string>(),
+            "the IP address the AGAS server is running on (default taken "
+            "from hpx.ini), expected format: 192.168.1.1:7912")
+        ("hpx,x", po::value<std::string>(),
+            "the IP address the HPX parcelport is listening on (default "
+            "is localhost:7910), expected format: 192.168.1.1:7913")
+        ("localities,l", po::value<int>(),
+            "the number of localities to wait for at application startup"
+            "(default is 1)")
+        ("threads,t", po::value<int>(),
+            "the number of operating system threads to spawn for this"
+            "HPX locality")
+        ("queueing,q", po::value<std::string>(),
+            "the queue scheduling policy to use, options are 'global' "
+            "and 'local' (default is 'global')")
+        ("size,S", po::value<int>(),
+            "the height of the n x n+1 matrix generated, where n is the height "
+            "and the minimum size value is 3(default is 2048)")
+        ("csv,s", "generate statistics of the run in comma separated format")
+        ("blocksize,b", po::value<int>(),
+            "blocksize correlates to the amount of work performed by each "
+            "thread during gaussian elimination (default is 250)")
         ("mini-block,m", po::value<int>(), "affects cache behavior for GE"
         "through blocking. Changing this parameter usually has little effect"
         "except when running on a single core")
@@ -174,7 +170,7 @@ int main(int argc, char* argv[]){
         boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
         int num_threads = 1;
         int num_localities = 1;
-        std::string queueing = "local";
+        std::string queueing = "global";
         hpx::runtime_mode mode = hpx::runtime_mode_console;
 
         // extract IP address/port arguments
@@ -222,22 +218,21 @@ int main(int argc, char* argv[]){
             }
         }
 
-                if(vm.count("allocblock")){
-                    if((vm["allocblock"].as<int>() > 0) &&
-                       (vm["allocblock"].as<int>() <= (int)SIZE)){
-                        ABSIZE = vm["allocblock"].as<int>();
-                    }
-                    else{
-                        std::cerr<<"warning: --allocblock option ignored, input value is "
-                                "invalid, using default\n";
-                    }
-                }
+        if(vm.count("allocblock")){
+            if((vm["allocblock"].as<int>() > 0) &&
+                (vm["allocblock"].as<int>() <= (int)SIZE)){
+                ABSIZE = vm["allocblock"].as<int>();
+            }
+            else{
+                std::cerr<<"warning: --allocblock option ignored, input value is "
+                    "invalid, using default\n";
+            }
+        }
 
         if(vm.count("mini-block")){MSIZE = vm["mini-block"].as<int>();}
         //now that the parameters have been set, we get a start time for the timing
         //of the application
         ptime start(microsec_clock::local_time());
-
         //initialize AGAS and start the HPX runtime
         std::auto_ptr<agas_server_helper> agas_server;
         if(vm.count("run_agas_server"))
@@ -245,44 +240,41 @@ int main(int argc, char* argv[]){
         //define the runtime type
         if(queueing == "global"){
             typedef hpx::runtime_impl<hpx::threads::policies::global_queue_scheduler>
-                runtime_type;
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
-                    if(mode == hpx::runtime_mode_worker){
-                        rt.run(num_threads, num_localities);
-                    }
-                    else{
-                        // if we've got a configuration file (as console) we read it in,
-                        // otherwise this information will be automatically pulled from
-                        // the console
-                        if(vm.count("config")){
-                            std::string config(vm["config"].as<std::string>());
-                            rt.get_config().load_application_configuration(config.c_str());
-                        }
-
-                        rt.run(hpx_main, num_threads, num_localities);
-                    }
+                global_runtime_type;
+            global_runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode);
+            if(mode == hpx::runtime_mode_worker){
+                rt.run(num_threads, num_localities);
+            }
+            else{
+                // if we've got a configuration file (as console) we read it in,
+                // otherwise this information will be automatically pulled from
+                // the console
+                if(vm.count("config")){
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+                rt.run(hpx_main, num_threads, num_localities);
+            }
         }
         else if(queueing == "local"){
             typedef hpx::runtime_impl<hpx::threads::policies::local_queue_scheduler>
                 runtime_type;
             hpx::threads::policies::local_queue_scheduler::init_parameter_type
                 init(num_threads, 1000);
-
-                        runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
-                        if(mode == hpx::runtime_mode_worker){
-                            rt.run(num_threads, num_localities);
-                        }
-                        else{
-                            // if we've got a configuration file (as console) we read it in,
-                            // otherwise this information will be automatically pulled from
-                            // the console
-                            if(vm.count("config")){
-                                std::string config(vm["config"].as<std::string>());
-                                rt.get_config().load_application_configuration(config.c_str());
-                            }
-
-                            rt.run(hpx_main, num_threads, num_localities);
-                        }
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, init);
+            if(mode == hpx::runtime_mode_worker){
+               rt.run(num_threads, num_localities);
+            }
+            else{
+                // if we've got a configuration file (as console) we read it in,
+                // otherwise this information will be automatically pulled from
+                // the console
+                if(vm.count("config")){
+                    std::string config(vm["config"].as<std::string>());
+                    rt.get_config().load_application_configuration(config.c_str());
+                }
+                rt.run(hpx_main, num_threads, num_localities);
+            }
         }
         else{BOOST_ASSERT(false);}
             //output the results
