@@ -762,7 +762,7 @@ namespace hpx { namespace threads
         scheduler_.on_start_thread(num_thread);
 
         {
-        #if HPX_AGAS_VERSION <= 0x10
+#if HPX_AGAS_VERSION <= 0x10
             manage_counter_type counter_type;
             if (0 == num_thread) {
                 // register counter types
@@ -774,7 +774,7 @@ namespace hpx { namespace threads
                         "counter type '/queue/length': " << ec.get_message();
                 }
             }
-        #endif
+#endif
 
             LTM_(info) << "tfunc(" << num_thread << "): start";
             try {

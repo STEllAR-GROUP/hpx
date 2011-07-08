@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/version.hpp>
+
 #if HPX_AGAS_VERSION > 0x10
 
 #include <hpx/hpx.hpp>

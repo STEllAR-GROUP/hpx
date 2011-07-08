@@ -7,6 +7,8 @@
 #if !defined(HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM)
 #define HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM
 
+#include <hpx/version.hpp>
+
 #if HPX_AGAS_VERSION <= 0x10
 
 #define HPX_USE_AGAS_CACHE 1

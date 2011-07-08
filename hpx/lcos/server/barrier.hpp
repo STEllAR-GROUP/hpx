@@ -6,6 +6,8 @@
 #if !defined(HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM)
 #define HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 

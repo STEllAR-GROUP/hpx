@@ -35,10 +35,9 @@ namespace hpx { namespace util
         naming::gid_type get_id(naming::locality const& here,
             naming::resolver_client& resolver, std::size_t count = 1);
 
-        void set_range(
-            naming::gid_type const& lower
-          , naming::gid_type const& upper
-        ) {
+        void set_range(naming::gid_type const& lower, 
+            naming::gid_type const& upper) 
+        {
             lower_ = lower;
             upper_ = upper;
         }

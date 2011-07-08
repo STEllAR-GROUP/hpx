@@ -4,12 +4,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/assert.hpp>
+#include <hpx/version.hpp>
 
+#if HPX_AGAS_VERSION <= 0x10
+
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
+
+#include <boost/assert.hpp>
 
 namespace hpx { namespace util
 {
@@ -42,5 +47,4 @@ namespace hpx { namespace util
     }
 }}
 
-
-
+#endif

@@ -10,7 +10,6 @@
 #include <vector>
 #include <string>
 
-#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/ini.hpp>

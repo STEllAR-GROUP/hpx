@@ -13,15 +13,15 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
+#include <hpx/util/asio_util.hpp>
+
 #if HPX_AGAS_VERSION > 0x10
     #include <boost/assign/std/vector.hpp>
     #include <hpx/runtime/components/runtime_support.hpp>
     #include <hpx/runtime/applier/applier.hpp>
 #endif
-
-#include <hpx/hpx.hpp>
-#include <hpx/config.hpp>
-#include <hpx/util/asio_util.hpp>
 
 #if !defined(BOOST_WINDOWS)
     #include <signal.h>

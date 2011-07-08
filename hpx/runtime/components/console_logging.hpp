@@ -9,8 +9,8 @@
 
 #include <boost/foreach.hpp>
 
-#include <hpx/state.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

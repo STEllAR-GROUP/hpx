@@ -9,6 +9,7 @@
 
 #include <boost/bind.hpp>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
