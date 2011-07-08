@@ -15,6 +15,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/lcos/local_counting_semaphore.hpp>
 
 #include <string>
 #include <algorithm>
@@ -41,67 +42,29 @@ namespace hpx { namespace parcelset
 
     struct wait_for_put_parcel
     {
-        typedef boost::mutex mutex_type;
-        typedef boost::condition condition_type;
+        wait_for_put_parcel() : sema_(new lcos::local_counting_semaphore) {}
 
-        wait_for_put_parcel(mutex_type& mtx, condition_type& cond,
-              boost::system::error_code& saved_error, 
-              bool& waiting, bool& finished)
-          : mtx_(mtx), cond_(cond), saved_error_(saved_error),
-            waiting_(waiting), finished_(finished)
-        {}
+        wait_for_put_parcel(wait_for_put_parcel const& other)
+            : sema_(other.sema_) {}
 
-        void operator()(boost::system::error_code const& e, std::size_t size)
+        void operator()(boost::system::error_code const&, std::size_t)
         {
-            mutex_type::scoped_lock l(mtx_);
-            if (e) 
-                saved_error_ = e;
-
-            if (waiting_)
-                cond_.notify_one();
-            finished_ = true;
+            sema_->signal();
         }
 
-        bool wait()
+        void wait()
         {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (finished_) 
-                return true;
-
-            boost::xtime xt;
-            boost::xtime_get(&xt, boost::TIME_UTC);
-            xt.sec += 5;        // wait for max. 5sec
-
-            waiting_ = true;
-            return cond_.timed_wait(l, xt);
+            sema_->wait();
         }
 
-        mutex_type& mtx_;
-        condition_type& cond_;
-        boost::system::error_code& saved_error_;
-        bool& waiting_;
-        bool& finished_;
+        boost::shared_ptr<lcos::local_counting_semaphore> sema_;
     };
 
     void parcelhandler::sync_put_parcel(parcel& p)
     {
-        wait_for_put_parcel::mutex_type mtx;
-        wait_for_put_parcel::condition_type cond;
-        boost::system::error_code saved_error;
-        bool waiting = false, finished = false;
-
-        wait_for_put_parcel wfp(mtx, cond, saved_error, waiting, finished);
+        wait_for_put_parcel wfp;
         put_parcel(p, wfp);  // schedule parcel send
-        if (!wfp.wait())     // wait for the parcel being sent
-            HPX_THROW_EXCEPTION(network_error
-              , "parcelhandler::sync_put_parcel"
-              , "synchronous parcel send timed out");
-
-        if (saved_error) 
-            HPX_THROW_EXCEPTION(network_error
-              , "parcelhandler::sync_put_parcel"
-              , saved_error.message()); 
+        wfp.wait();          // wait for the parcel to be sent
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
@@ -293,8 +256,6 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
     }
               
-    void noop_handler (boost::system::error_code const&, std::size_t) { }
-
     void parcelhandler::put_parcel(parcel& p, handler_type f)
     {
         // properly initialize parcel
@@ -326,7 +287,7 @@ namespace hpx { namespace parcelset
                 "parcelhandler::put_parcel", ec.get_message());
         }
 
-        pp_.put_parcel(p, noop_handler);
+        pp_.put_parcel(p, f);
     }
 
 ///////////////////////////////////////////////////////////////////////////////
