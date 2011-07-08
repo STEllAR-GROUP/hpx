@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -249,10 +250,10 @@
 
         Result execute_function(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) const {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        {
             LTM_(debug)
-                << "plain_base_result_action" << N
+                << "plain_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
@@ -260,10 +261,10 @@
 
         static Result execute_function_nonvirt(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+        {
             LTM_(debug)
-                << "plain_base_result_action" << N
+                << "plain_result_action" << N
                 << "::execute_function_nonvirt name("
                 << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
@@ -399,10 +400,10 @@
 
         Result execute_function(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) const {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        {
             LTM_(debug)
-                << "plain_base_result_action" << N
+                << "plain_direct_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
@@ -410,10 +411,10 @@
 
         static Result execute_function_nonvirt(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+        {
             LTM_(debug)
-                << "plain_base_result_action" << N
+                << "plain_direct_result_action" << N
                 << "::execute_function_nonvirt name("
                 << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
@@ -707,10 +708,10 @@
 
         util::unused_type execute_function(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) const {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        {
             LTM_(debug)
-                << "plain_base_action" << N
+                << "plain_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
             F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
@@ -719,10 +720,10 @@
 
         static util::unused_type execute_function_nonvirt(
             naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) {
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+        {
             LTM_(debug)
-                << "plain_base_action" << N
+                << "plain_action" << N
                 << "::execute_function_nonvirt name("
                 << detail::get_action_name<derived_type>() << ")";
             F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
