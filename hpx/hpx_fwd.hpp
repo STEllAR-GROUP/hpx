@@ -30,7 +30,7 @@
 
 #if !defined(BOOST_WINDOWS)
     // Print stack trace and exit.
-    HPX_EXPORT void hpx_termination_handler(int signum);
+    HPX_API_EXPORT void hpx_termination_handler(int signum);
 #endif
 
 namespace hpx
