@@ -315,7 +315,16 @@ namespace hpx { namespace components { namespace server
 //                lazy_actions.push_back(
 //                    components::stubs::runtime_support::shutdown_async(
 //                        id, timeout));
-                applier::apply<shutdown_action>(id, timeout);
+                naming::resolver_client& agas_
+                    = applier::get_applier().get_agas_client(); 
+                naming::address addr;
+                agas_.resolve(*it, addr, true);
+                
+                parcelset::parcel p(*it, new shutdown_action(timeout));
+                p.set_destination_addr(addr);
+
+                applier::get_applier().get_parcel_handler().sync_put_parcel(p);
+//                applier::apply<shutdown_action>(id, timeout);
             }
         }
 
