@@ -183,10 +183,8 @@ namespace parcelset
             return id_range_;
         }
 
-        void set_range(
-            naming::gid_type const& lower
-          , naming::gid_type const& upper
-        ) { 
+        void set_range(naming::gid_type const& lower, naming::gid_type const& upper) 
+        { 
             id_range_.set_range(lower, upper);
         }
 
