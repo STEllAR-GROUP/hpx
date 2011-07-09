@@ -511,6 +511,7 @@ else()
   
   # lcos
   set(hpxlib_lcos_SOURCES
+      ${hpx_SOURCE_DIR}/src/lcos/local_counting_semaphore.cpp
       ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
   source_group("Source Files\\LCOs" 
       FILES ${hpxlib_lcos_SOURCES})
