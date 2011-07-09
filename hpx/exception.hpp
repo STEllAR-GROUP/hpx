@@ -293,43 +293,49 @@ namespace hpx
         template <typename Exception>
         HPX_EXPORT void throw_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line);
+
+        // BOOST_ASSERT handler
+        HPX_EXPORT void assertion_failed(char const* expr, char const* function,
+            char const* file, long line);
+
+        // BOOST_ASSERT_MSG handler
+        HPX_EXPORT void assertion_failed_msg(char const* msg, char const* expr,
+            char const* function, char const* file, long line);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost {
-
-// BOOST_ASSERT handler
-HPX_EXPORT void assertion_failed(
-    char const* expr
-  , char const* function
-  , char const* file
-  , long line
-);
-
-// BOOST_ASSERT_MSG handler
-HPX_EXPORT void assertion_failed_msg(
-    char const* msg
-  , char const* expr
-  , char const* function
-  , char const* file
-  , long line
-);
-
-namespace system
+namespace boost
 {
-
-    // make sure our errors get recognized by the Boost.System library
-    template<> struct is_error_code_enum<hpx::error>
+    // forwarder 
+    inline void assertion_failed(char const* expr, char const* function,
+        char const* file, long line)
     {
-        static const bool value = true;
-    };
+        hpx::detail::assertion_failed(expr, function, file, line);
+    }
 
-    template<> struct is_error_condition_enum<hpx::error>
-    { 
-        static const bool value = true; 
-    };
-}}
+    // forwarder 
+    inline void assertion_failed_msg(char const* msg, char const* expr,
+        char const* function, char const* file, long line)
+    {
+        hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
+    }
+
+    namespace system
+    {
+
+        // make sure our errors get recognized by the Boost.System library
+        template<> struct is_error_code_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
+
+        template<> struct is_error_condition_enum<hpx::error>
+        { 
+            static const bool value = true; 
+        };
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated 
