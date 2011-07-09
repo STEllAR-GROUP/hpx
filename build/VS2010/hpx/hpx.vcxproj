@@ -114,7 +114,8 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\state.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v1.cpp" />
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v2.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
@@ -144,7 +145,10 @@
     <ClCompile Include="..\..\..\src\runtime\components\server\console_logging.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\memory.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\base_lco.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -227,6 +231,8 @@
     <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp" />
     <ClInclude Include="..\..\..\hpx\util\default_vector.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />

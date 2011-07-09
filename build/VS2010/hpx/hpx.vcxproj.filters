@@ -320,9 +320,6 @@
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
       <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
@@ -343,6 +340,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp">
       <Filter>Source Files\LCOs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v1.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v2.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -969,6 +972,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp">
       <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

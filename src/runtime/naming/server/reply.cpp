@@ -6,6 +6,9 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <hpx/runtime/naming/server/reply.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -152,3 +155,5 @@ namespace hpx { namespace naming { namespace server
     }
 
 }}}
+
+#endif

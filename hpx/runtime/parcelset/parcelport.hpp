@@ -55,7 +55,7 @@ namespace parcelset
 
     public:
 #if HPX_AGAS_VERSION > 0x10
-        friend class agas::big_boot_barrier;
+        friend struct agas::big_boot_barrier;
 #endif
 
         /// Construct the parcelport server to listen to the endpoint given by 

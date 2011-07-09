@@ -9,6 +9,7 @@
 
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/console_logging.hpp>

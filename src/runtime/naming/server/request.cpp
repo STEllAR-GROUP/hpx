@@ -6,6 +6,9 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 
@@ -123,3 +126,4 @@ namespace hpx { namespace naming { namespace server
 
 }}}
 
+#endif

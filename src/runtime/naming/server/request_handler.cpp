@@ -7,6 +7,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <boost/fusion/include/at.hpp>
@@ -1058,3 +1060,5 @@ namespace hpx { namespace naming { namespace server
 template class hpx::naming::server::request_handler<boost::mutex>;
 // template hpx::naming::server::request_handler<hpx::lcos::mutex>;
 template class hpx::naming::server::request_handler<boost::detail::spinlock>;
+
+#endif

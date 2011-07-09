@@ -7,6 +7,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -175,3 +177,5 @@ namespace hpx { namespace naming
 
 ///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::naming
+
+#endif

@@ -840,8 +840,9 @@ namespace hpx { namespace naming
 namespace hpx { namespace naming
 {
 
-struct resolver_client : hpx::agas::legacy_router
+class HPX_EXPORT resolver_client : public hpx::agas::legacy_router
 {
+public:
     typedef hpx::agas::legacy_router base_type;
 
     resolver_client(
