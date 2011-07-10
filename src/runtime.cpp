@@ -709,6 +709,22 @@ namespace hpx
         return id_pool.get_id(parcel_port_.here(), agas_client_);
     }
 
+#if HPX_AGAS_VERSION > 0x10
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::add_startup_function(
+        boost::function<void()> const& f)
+    {
+        runtime_support_.add_startup_function(f);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::add_shutdown_function(
+        boost::function<void()> const& f)
+    {
+        runtime_support_.add_shutdown_function(f);
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     boost::thread_specific_ptr<runtime *> runtime::runtime_;
 

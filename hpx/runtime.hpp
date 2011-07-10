@@ -265,6 +265,11 @@ namespace hpx
 
         virtual util::unique_ids& get_id_pool() = 0;
 
+        #if HPX_AGAS_VERSION > 0x10
+        virtual void add_startup_function(boost::function<void()> const& f) = 0;
+        virtual void add_shutdown_function(boost::function<void()> const& f) = 0;
+        #endif
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -604,6 +609,11 @@ namespace hpx
         {
             return id_pool;
         }
+
+        #if HPX_AGAS_VERSION > 0x10
+        void add_startup_function(boost::function<void()> const& f);
+        void add_shutdown_function(boost::function<void()> const& f);
+        #endif
 
     private:
         void init_tss();
