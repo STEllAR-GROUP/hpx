@@ -5,8 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/include/iostreams.hpp>
 #include <hpx/hpx_init.hpp>
+
+#include <hpx/include/iostreams.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/lcos/eager_future.hpp>
@@ -47,13 +48,7 @@ int main(int argc, char* argv[])
     options_description
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    std::vector<boost::function<void()> > startup_functions, shutdown_functions;
-
-    startup_functions.push_back(boost::function<void()>(startup_));
-    shutdown_functions.push_back(boost::function<void()>(shutdown_));
-
     // Initialize and run HPX
-    return init
-        (desc_commandline, argc, argv, startup_functions, shutdown_functions);
+    return init(desc_commandline, argc, argv, startup_, shutdown_);
 }
 

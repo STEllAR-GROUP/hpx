@@ -97,11 +97,20 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
+    <ClCompile Include="..\..\..\src\hpx_init.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
     <ClCompile Include="..\..\..\src\pre_main.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\symbol_namespace.cpp" />
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
@@ -169,14 +178,12 @@
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_init.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
@@ -336,7 +343,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\stubs\memory_block.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\stubs\runtime_support.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\stubs\stub_base.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\base_lco.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\condition.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\eager_future.hpp" />
@@ -380,8 +386,16 @@
     <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept" />
     <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept" />
     <None Include="..\..\..\src\CMakeLists.txt" />
+    <None Include="..\..\..\src\lcos\barrier\CMakeLists.txt" />
+    <None Include="..\..\..\src\lcos\CMakeLists.txt" />
+    <None Include="..\..\..\src\performance_counters\CMakeLists.txt" />
+    <None Include="..\..\..\src\performance_counters\server\CMakeLists.txt" />
+    <None Include="..\..\..\src\performance_counters\stubs\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\actions\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\agas\router\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\agas\stdmap_tcpip\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\applier\CMakeLists.txt" />
+    <None Include="..\..\..\src\runtime\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\components\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\components\server\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\naming\CMakeLists.txt" />

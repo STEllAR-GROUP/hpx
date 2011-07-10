@@ -11,20 +11,19 @@
 #include <hpx/config.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp> 
 
-namespace hpx { namespace iostreams
-{
+namespace hpx 
+{ 
+    namespace iostreams
+    {
+        HPX_COMPONENT_EXPORT void create_cout();
+        HPX_COMPONENT_EXPORT void create_cerr();
 
-HPX_EXPORT void create_cout();
-HPX_EXPORT void create_cerr();
+        HPX_COMPONENT_EXPORT lazy_ostream& cout();
+        HPX_COMPONENT_EXPORT lazy_ostream& cerr();
+    }
 
-HPX_EXPORT lazy_ostream& cout();
-HPX_EXPORT lazy_ostream& cerr();
-
-}
-
-using iostreams::cout;
-using iostreams::cerr;
-
+    using iostreams::cout;
+    using iostreams::cerr;
 }
 
 #endif // HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057

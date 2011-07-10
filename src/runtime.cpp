@@ -41,7 +41,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
     case CTRL_SHUTDOWN_EVENT:
         console_ctrl_function();
         return TRUE;
-        
+
     default:
         return FALSE;
     }
@@ -62,13 +62,13 @@ void hpx_termination_handler(int signum)
 {
     char* c = strsignal(signum); 
     std::cerr << "Received " << (c ? c : "unknown signal")
-    #if defined(HPX_STACKTRACES)
+#if defined(HPX_STACKTRACES)
               << ", " << boost::trace() 
-    #else
+#else
               << "."
-    #endif
+#endif
               << std::endl;
-    ::abort();
+    std::terminate();
 }
 
 #endif
@@ -108,7 +108,7 @@ namespace hpx
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
 #if HPX_AGAS_VERSION <= 0x10
-        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
 #else
         io_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -120,7 +120,7 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, naming::locality(address, port)),
 #if HPX_AGAS_VERSION <= 0x10
-        agas_client_(agas_pool_, naming::locality(agas_address, agas_port),
+        agas_client_(io_pool_, naming::locality(agas_address, agas_port),
                      ini_, mode_ == runtime_mode_console),
 #else
         agas_client_(parcel_port_, ini_, mode_),
@@ -157,7 +157,7 @@ namespace hpx
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
 #if HPX_AGAS_VERSION <= 0x10
-        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
 #else
         io_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -169,7 +169,7 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, address),
 #if HPX_AGAS_VERSION <= 0x10
-        agas_client_(agas_pool_, agas_address, ini_, mode_ == runtime_mode_console),
+        agas_client_(io_pool_, agas_address, ini_, mode_ == runtime_mode_console),
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
@@ -205,7 +205,7 @@ namespace hpx
       : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
         mode_(locality_mode), result_(0), 
 #if HPX_AGAS_VERSION <= 0x10
-        agas_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "agas_client_pool"), 
 #else
         io_pool_(boost::bind(&runtime_impl::init_tss, This()),
@@ -217,7 +217,7 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, address),
 #if HPX_AGAS_VERSION <= 0x10
-        agas_client_(agas_pool_, ini_, mode_ == runtime_mode_console),
+        agas_client_(io_pool_, ini_, mode_ == runtime_mode_console),
 #else
         agas_client_(parcel_port_, ini_, mode_),
 #endif
@@ -253,7 +253,7 @@ namespace hpx
         parcel_port_.stop();      // stops parcel_pool_ as well
         thread_manager_.stop();   // stops timer_pool_ as well
 #if HPX_AGAS_VERSION <= 0x10
-        agas_pool_.stop();
+        io_pool_.stop();
 #else
         io_pool_.stop();
 #endif

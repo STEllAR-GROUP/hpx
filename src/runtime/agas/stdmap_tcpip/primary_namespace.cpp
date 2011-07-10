@@ -5,6 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/version.hpp>
+
+#if HPX_AGAS_VERSION > 0x10
+
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/optional.hpp>
@@ -59,3 +63,4 @@ HPX_REGISTER_ACTION_EX(
     primary_namespace_type::decrement_action,
     stdmap_tcpip_primary_namespace_decrement_action);
 
+#endif

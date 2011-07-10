@@ -67,13 +67,13 @@ struct HPX_COMPONENT_EXPORT output_stream
         output_stream_write_sync
     };
 
-    typedef actions::action1<
+    typedef hpx::actions::action1<
         output_stream, output_stream_write_async,
         boost::shared_ptr<std::deque<char> > const&, 
         &output_stream::write_async
     > write_async_action;
 
-    typedef actions::action1<
+    typedef hpx::actions::action1<
         output_stream, output_stream_write_sync,
         boost::shared_ptr<std::deque<char> > const&, 
         &output_stream::write_sync

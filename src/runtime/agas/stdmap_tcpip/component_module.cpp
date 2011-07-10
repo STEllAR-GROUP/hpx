@@ -5,6 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/version.hpp>
+
+#if HPX_AGAS_VERSION > 0x10
+
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/optional.hpp>
@@ -28,7 +32,10 @@ typedef hpx::agas::response<
     hpx::agas::tag::network::tcpip
 > response_type;
 
-HPX_REGISTER_COMPONENT_MODULE();
+// on windows AGAS v2 lives in the main library
+// #if !defined(BOOST_WINDOWS)
+//     HPX_REGISTER_COMPONENT_MODULE();
+// #endif
 
 HPX_REGISTER_ACTION_EX(
     base_lco_with_value<response_type>::set_result_action,
@@ -37,3 +44,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     base_lco_with_value<response_type>,
     component_base_lco_with_value);
 
+#endif

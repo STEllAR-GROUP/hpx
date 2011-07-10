@@ -16,40 +16,40 @@
 
 namespace hpx
 {
+    enum state
+    {
+        starting = BOOST_BINARY_U(001),
+        running  = BOOST_BINARY_U(010),
+        stopping = BOOST_BINARY_U(100)
+    };
 
-enum state
-{
-    starting = BOOST_BINARY_U(001),
-    running  = BOOST_BINARY_U(010),
-    stopping = BOOST_BINARY_U(100)
-};
+    typedef boost::atomic<state> atomic_state;
 
-typedef boost::atomic<state> atomic_state;
+    namespace threads
+    {
+        // return whether thread manager is in the state described by 'mask'
+        HPX_EXPORT bool threadmanager_is(boost::uint8_t mask);
 
-namespace threads
-{
-
-HPX_EXPORT bool threadmanager_is(boost::uint8_t mask);
-
-// Forwarder
-inline bool threadmanager_is(state mask)
-{ return threadmanager_is(boost::uint8_t(mask)); }
-
-}
+        // Forwarder
+        inline bool threadmanager_is(state mask)
+        { 
+            return threadmanager_is(boost::uint8_t(mask)); 
+        }
+    }
 
 #if HPX_AGAS_VERSION > 0x10
     namespace agas
     {
+        // return whether resolver client is in state described by 'mask'
+        HPX_EXPORT bool router_is(boost::uint8_t mask);
 
-    HPX_EXPORT bool router_is(boost::uint8_t mask);
-
-    // Forwarder
-    inline bool router_is(state mask)
-    { return router_is(boost::uint8_t(mask)); }
-
+        // Forwarder
+        inline bool router_is(state mask)
+        { 
+            return router_is(boost::uint8_t(mask)); 
+        }
     } 
 #endif
-
 }
 
 #endif // HPX_703646B3_0567_484E_AD34_A752B8163B30

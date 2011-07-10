@@ -12,34 +12,33 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 
-namespace hpx
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx 
 {
-
-namespace threads
-{
-
-bool threadmanager_is(boost::uint8_t mask)
-{
-    if (NULL == applier::get_applier_ptr())
-        return false; 
-    return (applier::get_applier_ptr()->get_thread_manager().status() & mask) ? true : false;
-}
-
-}
+    namespace threads
+    {
+        // return whether thread manager is in the state described by 'mask'
+        bool threadmanager_is(boost::uint8_t mask)
+        {
+            hpx::applier::applier* p = applier::get_applier_ptr();
+            if (NULL == p)
+                return false; 
+            return (p->get_thread_manager().status() & mask) ? true : false;
+        }
+    }
 
 #if HPX_AGAS_VERSION > 0x10
     namespace agas
     {
-
-    bool router_is(boost::uint8_t mask)
-    {
-        if (NULL == get_runtime_ptr()) 
-            return false;
-        return (get_runtime_ptr()->get_agas_client().status() & mask) ? true : false;
-    }
-
+        // return whether resolver client is in state described by 'mask'
+        bool router_is(boost::uint8_t mask)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (NULL == rt) 
+                return false;
+            return (rt->get_agas_client().status() & mask) ? true : false;
+        }
     } 
 #endif
-
 }
 

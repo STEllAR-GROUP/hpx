@@ -14,6 +14,7 @@ if(UNIX)
   endforeach()
 
   add_hpx_library_sources(hpx
+    hpx_init.cpp
     exception.cpp
     exception_list.cpp
     pre_main.cpp

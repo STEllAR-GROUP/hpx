@@ -106,10 +106,10 @@ namespace hpx
 
             std::string message(int value) const
             {
-                if (value < last_error)
+                if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")";
-                else 
-                    return "HPX(unknown_error)";
+
+                return "HPX(unknown_error)";
             }
         };
 
@@ -250,15 +250,18 @@ namespace hpx
     {
         struct tag_throw_function {};
         struct tag_throw_thread_name {};
-        struct tag_throw_stacktrace {};
         struct tag_throw_file {};
         struct tag_throw_line {};
 
         typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
         typedef boost::error_info<struct tag_throw_thread_name, std::string> throw_thread_name;
-        typedef boost::error_info<struct tag_throw_stacktrace, std::string> throw_stacktrace;
         typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
+
+#if defined(HPX_STACKTRACES)
+        struct tag_throw_stacktrace {};
+        typedef boost::error_info<struct tag_throw_stacktrace, std::string> throw_stacktrace;
+#endif
 
         template <typename Exception>
         HPX_EXPORT void throw_exception(Exception const& e, char const* func, 

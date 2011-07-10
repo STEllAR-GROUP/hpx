@@ -32,7 +32,7 @@ namespace hpx { namespace agas { namespace server
 {
 
 template <typename Database, typename Protocol>
-struct HPX_COMPONENT_EXPORT primary_namespace : 
+struct primary_namespace : 
   components::fixed_component_base<
     HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
     primary_namespace<Database, Protocol>

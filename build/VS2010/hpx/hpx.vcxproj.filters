@@ -120,12 +120,6 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{d64417e9-daa7-4385-b1cc-d42ab22789b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\LCOs\Server">
-      <UniqueIdentifier>{219b401f-f977-46f9-bc59-dfe6dbfef93c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\LCOs\Stubs">
-      <UniqueIdentifier>{2c3a4904-4cd2-451b-afd6-333031b29bad}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Runtime\Threads\Detail">
       <UniqueIdentifier>{5ad0b7af-2e50-473a-8e1f-4314cc4a2a87}</UniqueIdentifier>
     </Filter>
@@ -170,6 +164,18 @@
     </Filter>
     <Filter Include="Source Files\Runtime\AGAS\Router">
       <UniqueIdentifier>{be39e8bb-c075-4144-8aae-40c166ef0c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\AGAS\stdmap_tcpip">
+      <UniqueIdentifier>{6768df38-3f64-4ccf-a453-15d2ca54008d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LCOs\Server">
+      <UniqueIdentifier>{5a50fc87-5817-41d7-9026-94f9c3cec668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LCOs\Stubs">
+      <UniqueIdentifier>{f50b97e8-5f42-463b-9975-ea2a53884e33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LCOs\Barrier">
+      <UniqueIdentifier>{e127cc68-84c5-4169-9b70-153a7cdbe060}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -320,9 +326,6 @@
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
-      <Filter>Source Files\Runtime\AGAS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
       <Filter>Source Files\Runtime\AGAS\Router</Filter>
     </ClCompile>
@@ -346,6 +349,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\generate_unique_ids_v2.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\symbol_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\hpx_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp">
+      <Filter>Source Files\LCOs\Barrier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -405,9 +429,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\include\util.hpp">
       <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp">
-      <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\base_lco.hpp">
       <Filter>Header Files\LCOs</Filter>
@@ -763,12 +784,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp">
-      <Filter>Header Files\LCOs\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp">
-      <Filter>Header Files\LCOs\Stubs</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp">
       <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
@@ -821,15 +836,6 @@
       <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp">
-      <Filter>Header Files\LCOs\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp">
-      <Filter>Header Files\LCOs\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\allocator.hpp">
@@ -979,6 +985,15 @@
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp">
+      <Filter>Header Files\LCOs\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -1026,6 +1041,30 @@
     </None>
     <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept">
       <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
+    </None>
+    <None Include="..\..\..\src\runtime\agas\stdmap_tcpip\CMakeLists.txt">
+      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
+    </None>
+    <None Include="..\..\..\src\runtime\agas\router\CMakeLists.txt">
+      <Filter>Source Files\Runtime\AGAS\Router</Filter>
+    </None>
+    <None Include="..\..\..\src\lcos\CMakeLists.txt">
+      <Filter>Source Files\LCOs</Filter>
+    </None>
+    <None Include="..\..\..\src\performance_counters\CMakeLists.txt">
+      <Filter>Source Files\Performance Counters</Filter>
+    </None>
+    <None Include="..\..\..\src\performance_counters\server\CMakeLists.txt">
+      <Filter>Source Files\Performance Counters\Server</Filter>
+    </None>
+    <None Include="..\..\..\src\performance_counters\stubs\CMakeLists.txt">
+      <Filter>Source Files\Performance Counters\Stubs</Filter>
+    </None>
+    <None Include="..\..\..\src\runtime\CMakeLists.txt">
+      <Filter>Source Files\Runtime</Filter>
+    </None>
+    <None Include="..\..\..\src\lcos\barrier\CMakeLists.txt">
+      <Filter>Source Files\LCOs\Barrier</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

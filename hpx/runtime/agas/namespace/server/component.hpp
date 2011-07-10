@@ -26,7 +26,7 @@ namespace hpx { namespace agas { namespace server
 {
 
 template <typename Database, typename Protocol>
-struct HPX_COMPONENT_EXPORT component_namespace :
+struct component_namespace :
   components::fixed_component_base<
     HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB, // constant GID
     component_namespace<Database, Protocol>

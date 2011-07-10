@@ -87,9 +87,9 @@ namespace hpx { namespace components { namespace server
             applier::applier& applier)
       : stopped_(false), terminated_(false), ini_(ini)
     {
-        #if HPX_AGAS_VERSION <= 0x10
-            load_components(ini, prefix, agas_client);
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        load_components(ini, prefix, agas_client);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -341,7 +341,7 @@ namespace hpx { namespace components { namespace server
                     = applier::get_applier().get_agas_client(); 
                 naming::address addr;
                 agas_.resolve(*it, addr, true);
-    
+
                 parcelset::parcel p(*it, new shutdown_action(timeout));
                 p.set_destination_addr(addr);
 

@@ -5,6 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/version.hpp>
+
+#if HPX_AGAS_VERSION > 0x10
+
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
@@ -48,3 +52,4 @@ HPX_REGISTER_ACTION_EX(
     component_namespace_type::unbind_action,
     stdmap_component_namespace_unbind_action);
 
+#endif

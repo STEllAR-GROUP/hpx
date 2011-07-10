@@ -24,14 +24,14 @@ struct async_endl_type { };
 struct local_flush_type { };
 struct local_endl_type { };
 
-HPX_EXPORT extern sync_flush_type sync_flush; 
-HPX_EXPORT extern sync_endl_type sync_endl; 
-HPX_EXPORT extern flush_type flush; // alias for hpx::sync_flush 
-HPX_EXPORT extern endl_type endl; // alias for hpx::sync_endl
-HPX_EXPORT extern async_flush_type async_flush; 
-HPX_EXPORT extern async_endl_type async_endl; 
-HPX_EXPORT extern local_flush_type local_flush; 
-HPX_EXPORT extern local_endl_type local_endl; 
+HPX_COMPONENT_EXPORT extern sync_flush_type sync_flush; 
+HPX_COMPONENT_EXPORT extern sync_endl_type sync_endl; 
+HPX_COMPONENT_EXPORT extern flush_type flush; // alias for hpx::sync_flush 
+HPX_COMPONENT_EXPORT extern endl_type endl; // alias for hpx::sync_endl
+HPX_COMPONENT_EXPORT extern async_flush_type async_flush; 
+HPX_COMPONENT_EXPORT extern async_endl_type async_endl; 
+HPX_COMPONENT_EXPORT extern local_flush_type local_flush; 
+HPX_COMPONENT_EXPORT extern local_endl_type local_endl; 
 
 inline std::ostream& operator<< (std::ostream& os, sync_flush_type const&)
 { return os << std::flush; }
