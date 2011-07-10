@@ -11,6 +11,7 @@
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
 #include <boost/serialization/deque.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
@@ -23,8 +24,12 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     output_stream_factory);
 
 HPX_REGISTER_ACTION_EX(
-    ostream_type::write_action,
-    output_stream_write_action);
+    ostream_type::write_async_action,
+    output_stream_write_async_action);
+
+HPX_REGISTER_ACTION_EX(
+    ostream_type::write_sync_action,
+    output_stream_write_sync_action);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type);
 

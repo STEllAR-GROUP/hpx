@@ -18,31 +18,21 @@ namespace hpx { namespace iostreams { namespace stubs
 
 struct output_stream : components::stub_base<server::output_stream>
 {
-    static lcos::future_value<void> write_async(
-        naming::id_type const& gid
-      , std::deque<char> const& in
-    ) {
-        typedef server::output_stream::write_action action_type;
-        return lcos::eager_future<action_type>(gid, in);
-    }
-
-    static lcos::future_value<void> write_lazy(
-        naming::id_type const& gid
-      , std::deque<char> const& in
-    ) {
-        typedef server::output_stream::write_action action_type;
-        return lcos::lazy_future<action_type>(gid, in);
-    }
-
     static void write_sync(
         naming::id_type const& gid
-      , std::deque<char> const& in
-    ) { write_async(gid, in).get(); }
+      , boost::shared_ptr<std::deque<char> > const& in
+    ) {
+        typedef server::output_stream::write_sync_action action_type;
+        lcos::eager_future<action_type>(gid, in).get();
+    }
 
-    static void write(
+    static void write_async(
         naming::id_type const& gid
-      , std::deque<char> const& in
-    ) { write_async(gid, in).get(); }
+      , boost::shared_ptr<std::deque<char> > const& in
+    ) {
+        typedef server::output_stream::write_async_action action_type;
+        lcos::eager_future<action_type>(gid, in).get();
+    }
 };
 
 }}}

@@ -46,11 +46,12 @@ struct lazy_ostream
 
     struct data_type
     {
-        std::deque<char> out_buffer;
+        boost::shared_ptr<std::deque<char> > out_buffer;
         stream_type stream;
 
         data_type()
-            : out_buffer(), stream(iterator_type(out_buffer)) {}
+            : out_buffer(new std::deque<char>)
+            , stream(iterator_type(*out_buffer)) {}
     };
 
     data_type* data;
@@ -64,6 +65,36 @@ struct lazy_ostream
         return *this;
     } // }}}
 
+    // Performs an asynchronous streaming operation.
+    template <typename T>
+    lazy_ostream& streaming_operator_async(T const& subject)
+    { // {{{
+        // apply the subject to the local stream
+        data->stream << subject;
+
+        // If the buffer isn't empty, send it to the destination.
+        if (!data->out_buffer->empty())
+        {
+            // Create the next buffer/stream.
+            data_type* next = new data_type;
+
+            // Swap the current buffer for the next one.
+            boost::swap(next, data);
+
+            // Perform the write operation, then destroy the old buffer and
+            // stream. 
+            this->base_type::write_async(gid_, next->out_buffer);
+
+            // Unlock the mutex before we cleanup.
+            mtx.unlock();
+
+            delete next;
+            next = 0;
+        }
+
+        return *this;
+    } // }}}
+
     // Performs a synchronous streaming operation.
     template <typename T>
     lazy_ostream& streaming_operator_sync(T const& subject)
@@ -72,7 +103,7 @@ struct lazy_ostream
         data->stream << subject;
 
         // If the buffer isn't empty, send it to the destination.
-        if (!data->out_buffer.empty())
+        if (!data->out_buffer->empty())
         {
             // Create the next buffer/stream.
             data_type* next = new data_type;
@@ -84,8 +115,7 @@ struct lazy_ostream
             // stream. 
             this->base_type::write_sync(gid_, next->out_buffer);
 
-            // Unlock the mutex as we're about to suspend for a synchronous
-            // IO operation.
+            // Unlock the mutex before we cleanup.
             mtx.unlock();
 
             delete next;
@@ -124,25 +154,53 @@ struct lazy_ostream
         {
             if (mtx.try_lock() && data)   
             {
-                streaming_operator_sync(hpx::flush);
+                streaming_operator_sync(hpx::sync_flush);
                 delete data;
                 data = 0;
             }
         }
     }
 
-    // hpx::flush manipulator
+    // hpx::flush manipulator (alias for hpx::sync_flush)
     lazy_ostream& operator<<(hpx::iostreams::flush_type const& m)
     {
         mtx.lock(); 
         return streaming_operator_sync(m);
     }
 
-    // hpx::endl manipulator
+    // hpx::endl manipulator (alias for hpx::sync_endl)
     lazy_ostream& operator<<(hpx::iostreams::endl_type const& m)
     {
         mtx.lock(); 
         return streaming_operator_sync(m);
+    }
+
+    // hpx::sync_flush manipulator
+    lazy_ostream& operator<<(hpx::iostreams::sync_flush_type const& m)
+    {
+        mtx.lock(); 
+        return streaming_operator_sync(m);
+    }
+
+    // hpx::sync_endl manipulator
+    lazy_ostream& operator<<(hpx::iostreams::sync_endl_type const& m)
+    {
+        mtx.lock(); 
+        return streaming_operator_sync(m);
+    }
+
+    // hpx::async_flush manipulator
+    lazy_ostream& operator<<(hpx::iostreams::async_flush_type const& m)
+    {
+        mtx.lock(); 
+        return streaming_operator_async(m);
+    }
+
+    // hpx::async_endl manipulator
+    lazy_ostream& operator<<(hpx::iostreams::async_endl_type const& m)
+    {
+        mtx.lock(); 
+        return streaming_operator_async(m);
     }
 
     template <typename T>

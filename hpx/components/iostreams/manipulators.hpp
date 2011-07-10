@@ -15,20 +15,34 @@
 namespace hpx { namespace iostreams
 {
 
-struct flush_type { };
-struct endl_type { };
+struct sync_flush_type { };
+struct sync_endl_type { };
+struct flush_type : sync_flush_type { };
+struct endl_type : sync_endl_type { };
+struct async_flush_type { };
+struct async_endl_type { };
 struct local_flush_type { };
 struct local_endl_type { };
 
-HPX_EXPORT extern flush_type flush; 
-HPX_EXPORT extern endl_type endl; 
+HPX_EXPORT extern sync_flush_type sync_flush; 
+HPX_EXPORT extern sync_endl_type sync_endl; 
+HPX_EXPORT extern flush_type flush; // alias for hpx::sync_flush 
+HPX_EXPORT extern endl_type endl; // alias for hpx::sync_endl
+HPX_EXPORT extern async_flush_type async_flush; 
+HPX_EXPORT extern async_endl_type async_endl; 
 HPX_EXPORT extern local_flush_type local_flush; 
 HPX_EXPORT extern local_endl_type local_endl; 
 
-inline std::ostream& operator<< (std::ostream& os, flush_type const&)
+inline std::ostream& operator<< (std::ostream& os, sync_flush_type const&)
 { return os << std::flush; }
 
-inline std::ostream& operator<< (std::ostream& os, endl_type const&)
+inline std::ostream& operator<< (std::ostream& os, sync_endl_type const&)
+{ return os << std::endl; }
+
+inline std::ostream& operator<< (std::ostream& os, async_flush_type const&)
+{ return os << std::flush; }
+
+inline std::ostream& operator<< (std::ostream& os, async_endl_type const&)
 { return os << std::endl; }
 
 inline std::ostream& operator<< (std::ostream& os, local_flush_type const&)
@@ -39,8 +53,12 @@ inline std::ostream& operator<< (std::ostream& os, local_endl_type const&)
 
 }
 
+using iostreams::sync_flush;
+using iostreams::sync_endl;
 using iostreams::flush;
 using iostreams::endl;
+using iostreams::async_flush;
+using iostreams::async_endl;
 using iostreams::local_flush;
 using iostreams::local_endl;
 
