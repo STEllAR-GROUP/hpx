@@ -18,6 +18,6 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv, true);
+    return hpx::init(desc_commandline, argc, argv);
 }
 
