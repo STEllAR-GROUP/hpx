@@ -101,7 +101,9 @@ namespace hpx { namespace detail
         char const* file, long line)
     {
         boost::filesystem::path p(hpx::util::create_path(file));
-        hpx::exception e(hpx::assertion_failed, expr);
+        hpx::exception e(hpx::assertion_failed, std::string("assertion '")
+                                              + expr
+                                              + "' failed");
         hpx::detail::throw_exception(e, function, p.string(), line);
     }
     
@@ -109,7 +111,9 @@ namespace hpx { namespace detail
         char const* function, char const* file, long line)
     {
         boost::filesystem::path p(hpx::util::create_path(file));
-        hpx::exception e(hpx::assertion_failed, msg);
+        hpx::exception e(hpx::assertion_failed, std::string("assertion '")
+                                              + msg
+                                              + "' failed");
         hpx::detail::throw_exception(e, function, p.string(), line);
     }
 }}
