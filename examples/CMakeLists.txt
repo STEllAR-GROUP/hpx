@@ -18,6 +18,7 @@ if(NOT MSVC)
       function
       geometry
       generic
+      globals
       hplpx
       math
       nqueen
