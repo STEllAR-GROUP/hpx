@@ -12,6 +12,7 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
+      serialize_polygon_2d.cpp 
       ${subdir}_client.cpp)
 
   source_group("Source Files" FILES ${sources})
