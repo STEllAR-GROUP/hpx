@@ -10,6 +10,7 @@
 #if HPX_AGAS_VERSION > 0x10
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/lcos/barrier.hpp>
 
 namespace hpx
@@ -70,6 +71,9 @@ void pre_main()
 
         hpx::lcos::stubs::barrier::wait(id);
     }
+
+    hpx::components::stubs::runtime_support::call_startup_functions
+        (hpx::find_here());
 }
 
 }
