@@ -96,8 +96,7 @@ namespace hpx
         // parse the command line
         command_line_result parse_commandline(
             boost::program_options::options_description& app_options, 
-            int argc, char *argv[], boost::program_options::variables_map& vm,
-            bool is_hpx_runtime = false)
+            int argc, char *argv[], boost::program_options::variables_map& vm)
         {
             using boost::program_options::options_description;
             using boost::program_options::value;
@@ -114,12 +113,7 @@ namespace hpx
                      "run AGAS server as part of this runtime instance")
                 ;
 
-                if (!is_hpx_runtime)
-                  hpx_options.add_options()
-                    ("worker,w", "run this instance in worker mode")
-                  ;
-                else
-                  hpx_options.add_options()
+                hpx_options.add_options()
                     ("console", "run this instance in console mode")
 #if HPX_AGAS_VERSION <= 0x10
                     ("run-agas-server-only", "run only the AGAS server")
@@ -231,7 +225,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     int init(boost::program_options::options_description& desc_cmdline, 
-             int argc, char* argv[], bool is_hpx_runtime = false)
+             int argc, char* argv[],
+             std::vector<boost::function<void()> > const& startup_functions =
+                std::vector<boost::function<void()> >(),
+             std::vector<boost::function<void()> > const& shutdown_functions =
+                std::vector<boost::function<void()> >())
     {
         int result = 0;
 
@@ -256,8 +254,7 @@ namespace hpx
             // Analyze the command line.
             variables_map vm;
 
-            switch (detail::parse_commandline
-                        (desc_cmdline, argc, argv, vm, is_hpx_runtime))
+            switch (detail::parse_commandline(desc_cmdline, argc, argv, vm))
             {
                 case detail::error:
                     return 1;
@@ -273,17 +270,12 @@ namespace hpx
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
             std::string queueing = "local";
-            hpx::runtime_mode mode;
+            hpx::runtime_mode mode = hpx::runtime_mode_console;
 
             std::vector<std::string> ini_config;
  
             if (vm.count("ini"))
                 ini_config = vm["ini"].as<std::vector<std::string> >();
-
-            if (!is_hpx_runtime)
-                mode = hpx::runtime_mode_console;
-            else
-                mode = hpx::runtime_mode_worker;
 
             if (vm.count("random-ports")
                 && !vm.count("agas") && !vm.count("hpx"))
@@ -318,9 +310,9 @@ namespace hpx
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
 
-            if (!is_hpx_runtime && vm.count("worker"))
+            if (vm.count("worker"))
                 mode = hpx::runtime_mode_worker;
-            else if (is_hpx_runtime && vm.count("console"))
+            else if (vm.count("console"))
                 mode = hpx::runtime_mode_console;
 
             #if HPX_AGAS_VERSION <= 0x10
@@ -384,10 +376,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
+#if HPX_AGAS_VERSION > 0x10
+                BOOST_FOREACH(boost::function<void()> const& f, startup_functions)
+                { rt->add_startup_function(f); }
+
+                BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions)
+                { rt->add_shutdown_function(f); }
+#endif
+
                 if (vm.count("exit")) {
                     result = 0;
                 }
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                else if (mode != hpx::runtime_mode_worker) {
                     // Run this runtime instance using the given hpx_main
                     result = rt->run(boost::bind(hpx_main, vm), 
                         num_threads, num_localities);
@@ -425,10 +425,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
+#if HPX_AGAS_VERSION > 0x10
+                BOOST_FOREACH(boost::function<void()> const& f, startup_functions)
+                { rt->add_startup_function(f); }
+
+                BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions)
+                { rt->add_shutdown_function(f); }
+#endif
+
                 if (vm.count("exit")) {
                     result = 0;
                 }
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                else if (mode != hpx::runtime_mode_worker) {
                     // Run this runtime instance using the given hpx_main
                     result = rt->run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
@@ -465,10 +473,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
+#if HPX_AGAS_VERSION > 0x10
+                BOOST_FOREACH(boost::function<void()> const& f, startup_functions)
+                { rt->add_startup_function(f); }
+
+                BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions)
+                { rt->add_shutdown_function(f); }
+#endif
+
                 if (vm.count("exit")) {
                     result = 0;
                 }
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                else if (mode != hpx::runtime_mode_worker) {
                     // Run this runtime instance using the given hpx_main
                     result = rt->run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
@@ -505,10 +521,18 @@ namespace hpx
                 if (vm.count("dump-config"))
                     rt->get_config().dump();
 
+#if HPX_AGAS_VERSION > 0x10
+                BOOST_FOREACH(boost::function<void()> const& f, startup_functions)
+                { rt->add_startup_function(f); }
+
+                BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions)
+                { rt->add_shutdown_function(f); }
+#endif
+
                 if (vm.count("exit")) {
                     result = 0;
                 }
-                else if (!is_hpx_runtime && mode != hpx::runtime_mode_worker) {
+                else if (mode != hpx::runtime_mode_worker) {
                     // Run this runtime instance using the given hpx_main
                     result = rt->run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
