@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_STUBS_point)
-#define HPX_COMPONENTS_STUBS_point
+#if !defined(HPX_COMPONENTS_STUBS_POINT)
+#define HPX_COMPONENTS_STUBS_POINT
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -37,18 +37,18 @@ namespace hpx { namespace geometry { namespace stubs
             init_async(gid, x, y).get();
         }
 
-        static lcos::future_value<void> 
-        search_async(naming::id_type gid, hpx::geometry::polygon_2d p) 
+        static lcos::future_value<bool> 
+        search_async(naming::id_type gid, plain_polygon_type const& p) 
         {
             typedef server::point::search_action action_type;
             return lcos::eager_future<action_type>(gid, p);
         }
 
-        static void search(naming::id_type const& gid, hpx::geometry::polygon_2d p) 
+        static bool search(naming::id_type const& gid, plain_polygon_type const& p) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            search_async(gid, p).get();
+            return search_async(gid, p).get();
         }
 
         /// Query the current coordinate values of the server#point 
@@ -105,7 +105,6 @@ namespace hpx { namespace geometry { namespace stubs
             typedef server::point::set_Y_action action_type;
             return lcos::eager_future<action_type>(gid, y);
         }
-
 
         static void set_X(naming::id_type const& gid, double x) 
         {

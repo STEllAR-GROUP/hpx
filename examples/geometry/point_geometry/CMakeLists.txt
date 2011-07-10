@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011 Matt Anderson
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
@@ -6,9 +6,13 @@
 
 ###############################################################################
 set(client_sources
-    point.cpp)
+    point.cpp
+    serialize_geometry.cpp)
 
 ###############################################################################
+set(common_headers
+    serialize_geometry.hpp)
+
 set(client_headers
     point.hpp)
 
@@ -20,6 +24,7 @@ set(server_headers
 
 ###############################################################################
 set(headers
+    ${common_headers}
     ${client_headers}
     ${stubs_headers}
     ${server_headers})
@@ -29,10 +34,11 @@ source_group("Source Files\\Client" FILES ${client_sources})
 source_group("Header Files\\Client" FILES ${client_headers})
 source_group("Header Files\\Stubs"  FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
+source_group("Header Files" FILES ${common_headers})
 
 ###############################################################################
 add_hpx_component(point_geometry 
-  MODULE point_geometry
-  SOURCES ${client_sources} 
-  HEADERS ${headers})
+    MODULE point_geometry
+    SOURCES ${client_sources} 
+    HEADERS ${headers})
 

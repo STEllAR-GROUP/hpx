@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CLIENT_point)
-#define HPX_COMPONENTS_CLIENT_point
+#if !defined(HPX_COMPONENTS_CLIENT_POINT)
+#define HPX_COMPONENTS_CLIENT_POINT
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -63,16 +63,16 @@ namespace hpx { namespace geometry
         }
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::future_value<void> search_async(hpx_geometry::polygon_2d p) 
+        lcos::future_value<bool> search_async(plain_polygon_type const& p) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::search_async(gid_,p);
+            return this->base_type::search_async(gid_, p);
         }
 
-        void search(hpx_geometry::polygon_2d p) 
+        bool search(plain_polygon_type const& p) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::search_async(gid_,p);
+            return this->base_type::search(gid_, p);
         }
 
         /// Query the current coordinate values of the server#point 

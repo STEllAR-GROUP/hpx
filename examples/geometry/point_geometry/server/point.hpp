@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_point)
-#define HPX_COMPONENTS_SERVER_point
+#if !defined(HPX_COMPONENTS_SERVER_POINT)
+#define HPX_COMPONENTS_SERVER_POINT
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -14,17 +14,12 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#include <boost/geometry/geometries/polygon.hpp>
-
-namespace hpx { namespace geometry
-{
-    typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d;
-}}
-
+#include "../serialize_geometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
 {
+    ///////////////////////////////////////////////////////////////////////////
     class point
       : public components::detail::managed_component_base<point> 
     {
@@ -43,7 +38,6 @@ namespace hpx { namespace geometry { namespace server
 
         // constructor: initialize accumulator value
         point()
-          : x_(0), y_(0)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -52,39 +46,38 @@ namespace hpx { namespace geometry { namespace server
         /// Initialize the accumulator
         void init(double x, double y) 
         {
-            x_ = x;
-            y_ = y;
+            pt_.x(x);
+            pt_.y(y);
         }
 
         /// search for contact
-        void search(hpx::geometry::polygon_2d p) 
+        bool search(plain_polygon_type const& p) const
         {
-          point_type pt1(x_,y_);
-          boost::geometry::within(pt1,p);          
+            return boost::geometry::within(pt_, p);
         }
 
         /// retrieve the X coordinate of this point
         double get_X() const
         {
-            return x_;
+            return pt_.x();
         }
 
         /// retrieve the Y coordinate of this point
         double get_Y() const
         {
-            return y_;
+            return pt_.y();
         }
 
         /// modify the X coordinate of this point
         void set_X(double x) 
         {
-            x_ = x;
+            pt_.x(x);
         }
 
         /// modify the Y coordinate of this point
         void set_Y(double y) 
         {
-            y_ = y;
+            pt_.y(y);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -111,8 +104,13 @@ namespace hpx { namespace geometry { namespace server
             point, point_set_Y, double, &point::set_Y
         > set_Y_action;
 
+        typedef hpx::actions::direct_result_action1<
+            point const, bool, point_search, plain_polygon_type const&, 
+            &point::search
+        > search_action;
+
     private:
-        double x_, y_;
+        plain_point_type pt_;
     };
 
 }}}

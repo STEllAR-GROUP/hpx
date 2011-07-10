@@ -80,8 +80,14 @@ int hpx_main(boost::program_options::variables_map &vm)
         q.outer().push_back(accu[4]);
         bg::correct(q);
 
-        std::vector<hpx::lcos::future_value<void> > search_phase;
-        search_phase.push_back(accu[4].search_async(p));
+        hpx::geometry::plain_polygon_type plain_p;
+
+        // should be: boost::geometry::assign(plain_p, p));, but boost::geometry
+        // has a bug preventing this from compiling
+        boost::geometry::assign(plain_p.outer(), p.outer());
+
+        std::vector<hpx::lcos::future_value<bool> > search_phase;
+        search_phase.push_back(accu[4].search_async(plain_p));
 
         hpx::components::wait(search_phase);
 
