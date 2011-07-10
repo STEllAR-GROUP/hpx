@@ -106,36 +106,10 @@ namespace hpx
 
             std::string message(int value) const
             {
-                switch (value) {
-                case success:
-                case no_success:
-                case not_implemented:
-                case out_of_memory:
-                case bad_action_code:
-                case bad_component_type:
-                case network_error:
-                case version_too_new:
-                case version_too_old:
-                case unknown_component_address:
-                case duplicate_component_address:
-                case invalid_status:
-                case bad_parameter:
-                case repeated_request:
-                case lock_error:
-                case duplicate_console:
-                case no_registered_console:
-                case startup_timed_out:
-                case uninitialized_value:
-                case bad_response_type:
-                case unknown_locality:
-                case unknown_gid:
-                case deadlock:
+                if (value < last_error)
                     return std::string("HPX(") + error_names[value] + ")";
-
-                default:
-                    break;
-                }
-                return "HPX(Unknown error)";
+                else 
+                    return "HPX(unknown_error)";
             }
         };
 
