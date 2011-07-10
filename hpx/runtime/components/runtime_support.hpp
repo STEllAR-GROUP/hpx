@@ -111,6 +111,26 @@ namespace hpx { namespace components
         {
             this->base_type::load_components(gid_);
         }
+
+        lcos::future_value<void> call_startup_functions_async()
+        {
+            return this->base_type::call_startup_functions_async(gid_);
+        }
+
+        void call_startup_functions()
+        {
+            this->base_type::call_startup_functions(gid_);
+        }
+
+        lcos::future_value<void> call_shutdown_functions_async()
+        {
+            return this->base_type::call_shutdown_functions_async(gid_);
+        }
+
+        void call_shutdown_functions()
+        {
+            this->base_type::call_shutdown_functions(gid_);
+        }
 #endif
 
         /// Destroy an existing component

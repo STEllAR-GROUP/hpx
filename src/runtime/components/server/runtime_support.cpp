@@ -53,6 +53,12 @@ HPX_REGISTER_ACTION_EX(
     HPX_REGISTER_ACTION_EX(
         hpx::components::server::runtime_support::load_components_action,
         load_components_action);
+    HPX_REGISTER_ACTION_EX(
+        hpx::components::server::runtime_support::call_startup_functions_action,
+        call_startup_functions_action);
+    HPX_REGISTER_ACTION_EX(
+        hpx::components::server::runtime_support::call_shutdown_functions_action,
+        call_shutdown_functions_action);
 #endif
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::free_component_action,
@@ -301,40 +307,47 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_prefixes(prefixes);
 
         // shut down all localities except the the local one
-//        std::vector<lcos::future_value<int> > lazy_actions;
         std::vector<naming::gid_type>::iterator end = prefixes.end();
 
         boost::uint32_t prefix = applier::get_prefix_id();
 
+#if HPX_AGAS_VERSION > 0x10
+        {
+            std::vector<lcos::future_value<void> > lazy_actions;
+
+            for (std::vector<naming::gid_type>::iterator it = prefixes.begin(); 
+                 it != end; ++it)
+            {
+                naming::id_type id(*it, naming::id_type::unmanaged);
+                lazy_actions.push_back(
+                    components::stubs::runtime_support::
+                        call_shutdown_functions_async(id));
+            }
+
+            std::vector<lcos::future_value<void> >::iterator lend = lazy_actions.end();
+            for (std::vector<lcos::future_value<void> >::iterator lit = lazy_actions.begin();
+                 lit != lend; ++lit)
+                (*lit).get();
+        }
+#endif
+
+        // wait for all localities to be stopped
         for (std::vector<naming::gid_type>::iterator it = prefixes.begin(); 
              it != end; ++it)
         {
             if (prefix != naming::get_prefix_from_gid(*it))
             {
-                naming::id_type id(*it, naming::id_type::unmanaged);
-//                lazy_actions.push_back(
-//                    components::stubs::runtime_support::shutdown_async(
-//                        id, timeout));
                 naming::resolver_client& agas_
                     = applier::get_applier().get_agas_client(); 
                 naming::address addr;
                 agas_.resolve(*it, addr, true);
-                
+    
                 parcelset::parcel p(*it, new shutdown_action(timeout));
                 p.set_destination_addr(addr);
 
                 applier::get_applier().get_parcel_handler().sync_put_parcel(p);
-//                applier::apply<shutdown_action>(id, timeout);
             }
         }
-
-        // wait for all localities to be stopped
-//        std::vector<lcos::future_value<int> >::iterator lend = lazy_actions.end();
-//        for (std::vector<lcos::future_value<int> >::iterator lit = lazy_actions.begin();
-//             lit != lend; ++lit)
-//        {
-//            (*lit).get();
-//        }
 
         // now make sure the local locality gets shut down as well.
         stop(timeout);
@@ -472,6 +485,20 @@ namespace hpx { namespace components { namespace server
         load_components(get_runtime().get_config()
                       , get_runtime().get_agas_client().local_prefix()
                       , get_runtime().get_agas_client());
+    }
+
+    void runtime_support::call_startup_functions()
+    {
+        mutex_type::scoped_lock l(globals_mtx_);
+        BOOST_FOREACH(boost::function<void()> const& f, startup_functions_)
+        { f(); } 
+    }
+
+    void runtime_support::call_shutdown_functions()
+    {
+        mutex_type::scoped_lock l(globals_mtx_);
+        BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
+        { f(); } 
     }
 #endif
 

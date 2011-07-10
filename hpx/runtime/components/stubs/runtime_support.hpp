@@ -225,6 +225,30 @@ namespace hpx { namespace components { namespace stubs
         {
             load_components_async(gid).get();
         }
+
+        static lcos::future_value<void>
+        call_startup_functions_async(naming::id_type const& gid)
+        {
+            typedef server::runtime_support::call_startup_functions_action action_type;
+            return lcos::eager_future<action_type, void>(gid.get_gid());
+        }
+
+        static void call_startup_functions(naming::id_type const& gid)
+        {
+            call_startup_functions_async(gid).get();
+        }
+
+        static lcos::future_value<void>
+        call_shutdown_functions_async(naming::id_type const& gid)
+        {
+            typedef server::runtime_support::call_shutdown_functions_action action_type;
+            return lcos::eager_future<action_type, void>(gid.get_gid());
+        }
+
+        static void call_shutdown_functions(naming::id_type const& gid)
+        {
+            call_shutdown_functions_async(gid).get();
+        }
 #endif
 
         /// Destroy an existing component

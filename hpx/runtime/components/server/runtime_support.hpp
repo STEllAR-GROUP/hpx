@@ -55,6 +55,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_create_memory_block = 7,   ///< create new memory block
 #if HPX_AGAS_VERSION > 0x10
             runtime_support_load_components = 8,
+            runtime_support_call_startup_functions = 9,
+            runtime_support_call_shutdown_functions = 10,
 #endif
         };
 
@@ -121,6 +123,9 @@ namespace hpx { namespace components { namespace server
 
 #if HPX_AGAS_VERSION > 0x10
         void load_components();
+
+        void call_startup_functions();
+        void call_shutdown_functions();
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -184,6 +189,16 @@ namespace hpx { namespace components { namespace server
             runtime_support, runtime_support_load_components, 
             &runtime_support::load_components
         > load_components_action;
+
+        typedef hpx::actions::action0<
+            runtime_support, runtime_support_call_startup_functions, 
+            &runtime_support::call_startup_functions
+        > call_startup_functions_action;
+
+        typedef hpx::actions::action0<
+            runtime_support, runtime_support_call_shutdown_functions, 
+            &runtime_support::call_shutdown_functions
+        > call_shutdown_functions_action;
 #endif
 
         typedef hpx::actions::direct_action2<
@@ -234,6 +249,20 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
+#if HPX_AGAS_VERSION > 0x10
+        void add_startup_function(boost::function<void()> const& f)
+        {
+            mutex_type::scoped_lock l(globals_mtx_);
+            startup_functions_.push_back(f);
+        }
+
+        void add_shutdown_function(boost::function<void()> const& f)
+        {
+            mutex_type::scoped_lock l(globals_mtx_);
+            shutdown_functions_.push_back(f);
+        }
+#endif
+
     protected:
         // Load all components from the ini files found in the configuration
         void load_components(util::section& ini, naming::gid_type const& prefix, 
@@ -252,6 +281,10 @@ namespace hpx { namespace components { namespace server
 
         component_map_type components_;
         util::section& ini_;
+
+        mutex_type globals_mtx_;
+        std::vector<boost::function<void()> > startup_functions_;
+        std::vector<boost::function<void()> > shutdown_functions_;
     };
 
 }}}
