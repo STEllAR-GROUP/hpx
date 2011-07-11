@@ -43,16 +43,17 @@ namespace hpx { namespace components
 }}
 
 #define HPX_REGISTER_GLOBAL_COMPONENT_FACTORY_ONE(type, starts, stops, name)  \
+        typedef HPX_FUNCTION_LIST(starts) BOOST_PP_CAT(name, _start_list);    \
+        typedef HPX_FUNCTION_LIST(stops) BOOST_PP_CAT(name, _stop_list);      \
+        typedef hpx::components::global_component_factory_one<type,           \
+            BOOST_PP_CAT(name, _start_list), BOOST_PP_CAT(name, _stop_list)   \
+        > BOOST_PP_CAT(name, _component_type);                                \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::global_component_factory_one<                    \
-                type, starts, stops>,                                         \
-            name);                                                            \
+            BOOST_PP_CAT(name, _component_type), name);                       \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::global_component_factory_one<                    \
-                type, starts, stops>,                                         \
-            name)                                                             \
-        template struct hpx::components::global_component_factory_one<        \
-            type, starts, stops>;                                             \
+            BOOST_PP_CAT(name, _component_type), name)                        \
+        template struct hpx::components::global_component_factory_one<type,   \
+            BOOST_PP_CAT(name, _start_list), BOOST_PP_CAT(name, _stop_list)>; \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(type, name)                   \
     /**/
 

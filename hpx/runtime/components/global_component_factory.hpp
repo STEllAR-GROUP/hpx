@@ -7,6 +7,10 @@
 #if !defined(HPX_65762D5B_C8F6_41DC_98AD_804B77311AA7)
 #define HPX_65762D5B_C8F6_41DC_98AD_804B77311AA7
 
+#include <boost/preprocessor/seq/for_each_i.hpp>
+#include <boost/preprocessor/seq/size.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/for_each.hpp>
 
 #include <hpx/runtime/components/component_factory.hpp>
@@ -50,17 +54,26 @@ namespace hpx { namespace components
     };
 }}
 
+#define HPX_FUNCTION_ELEM(r, data, i, elem) BOOST_PP_COMMA_IF(i) elem
+
+#define HPX_FUNCTION_LIST(data)                                               \
+        BOOST_PP_CAT(boost::mpl::vector, BOOST_PP_SEQ_SIZE(data))<            \
+            BOOST_PP_SEQ_FOR_EACH_I(HPX_FUNCTION_ELEM, _, data)               \
+        >                                                                     \
+    /**/
+
 #define HPX_REGISTER_GLOBAL_COMPONENT_FACTORY(type, starts, stops, name)      \
+        typedef HPX_FUNCTION_LIST(starts) BOOST_PP_CAT(name, _start_list);    \
+        typedef HPX_FUNCTION_LIST(stops) BOOST_PP_CAT(name, _stop_list);      \
+        typedef hpx::components::global_component_factory<type,               \
+            BOOST_PP_CAT(name, _start_list), BOOST_PP_CAT(name, _stop_list)   \
+        > BOOST_PP_CAT(name, _component_type);                                \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::global_component_factory<                        \
-                type, starts, stops>,                                         \
-            name);                                                            \
+            BOOST_PP_CAT(name, _component_type), name);                       \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::global_component_factory<                        \
-                type, starts, stops>,                                         \
-            name)                                                             \
-        template struct hpx::components::global_component_factory<            \
-            type, starts, stops>;                                             \
+            BOOST_PP_CAT(name, _component_type), name)                        \
+        template struct hpx::components::global_component_factory<type,       \
+            BOOST_PP_CAT(name, _start_list), BOOST_PP_CAT(name, _stop_list)>; \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(type, name)                   \
     /**/
 
