@@ -13,19 +13,20 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/util/connection_cache.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/placeholders.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/asio/placeholders.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <boost/atomic.hpp>
 #include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset 
@@ -42,8 +43,8 @@ namespace hpx { namespace parcelset
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& l, 
                 util::connection_cache<parcelport_connection>& cache,
-                boost::atomic<std::size_t>& started,
-                boost::atomic<std::size_t>& completed)
+                boost::atomic<boost::int64_t>& started,
+                boost::atomic<boost::int64_t>& completed)
           : socket_(io_service), there_(l), connection_cache_(cache),
             sends_started_(started), sends_completed_(completed)
         {
@@ -121,8 +122,8 @@ namespace hpx { namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection>& connection_cache_;
 
-        boost::atomic<std::size_t>& sends_started_;
-        boost::atomic<std::size_t>& sends_completed_;
+        boost::atomic<boost::int64_t>& sends_started_;
+        boost::atomic<boost::int64_t>& sends_completed_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;

@@ -190,25 +190,25 @@ namespace parcelset
 
 
         /// return sends started
-        std::size_t total_sends_started() const
+        boost::int64_t total_sends_started() const
         {
             return sends_started_.load();
         }
 
         /// return sends completed
-        std::size_t total_sends_completed()
+        boost::int64_t total_sends_completed() const
         {
             return sends_completed_.load();
         }
 
         /// return receives started
-        std::size_t total_receives_started()
+        boost::int64_t total_receives_started() const
         { 
             return receives_started_.load();
         }
 
         /// return receives completed
-        std::size_t total_receives_completed()
+        boost::int64_t total_receives_completed() const
         {
             return receives_completed_.load();
         }
@@ -242,11 +242,11 @@ namespace parcelset
         /// The local locality
         naming::locality here_;
 
-        boost::atomic<std::size_t> sends_started_;
-        boost::atomic<std::size_t> sends_completed_;
+        boost::atomic<boost::int64_t> sends_started_;
+        boost::atomic<boost::int64_t> sends_completed_;
 
-        boost::atomic<std::size_t> receives_started_;
-        boost::atomic<std::size_t> receives_completed_;
+        boost::atomic<boost::int64_t> receives_started_;
+        boost::atomic<boost::int64_t> receives_completed_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

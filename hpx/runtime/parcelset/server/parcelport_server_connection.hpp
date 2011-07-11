@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset { namespace server
     public:
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-            parcelport_queue& handler, boost::atomic<std::size_t>& receives_started)
+            parcelport_queue& handler, boost::atomic<boost::int64_t>& receives_started)
           : socket_(io_service), in_size_(0), 
             in_buffer_(new std::vector<char>()), parcels_(handler),
             receives_started_(receives_started)
@@ -139,7 +139,7 @@ namespace hpx { namespace parcelset { namespace server
 
         /// The handler used to process the incoming request.
         parcelport_queue& parcels_;
-        boost::atomic<std::size_t>& receives_started_;
+        boost::atomic<boost::int64_t>& receives_started_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
