@@ -58,7 +58,12 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE) "}",
             "connection_cache_size = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE) "}",
-            "smp_mode = ${HPX_AGAS_SMP_MODE:0}"
+            "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
+
+            "[hpx.components.barrier]",
+            "name = hpx",
+            "path = $[hpx.location]/lib/" HPX_LIBRARY
+
         ;
         // don't overload user overrides
         ini.parse("static defaults", lines);
