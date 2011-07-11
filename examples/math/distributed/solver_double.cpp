@@ -59,10 +59,14 @@ using hpx::endl;
 
 using hpx::util::high_resolution_timer;
 
+using std::abs;
+using std::log;
+using std::pow;
+
 ///////////////////////////////////////////////////////////////////////////////
 double math_function (double const& r)
 {
-    return sqrt(r); 
+    return abs(sin(pow(r, 0.25L)) / (log(r) * log(r))); 
 }
 
 typedef plain_result_action1<
@@ -202,15 +206,15 @@ int main(int argc, char* argv[])
         , "lower bound of integration")
 
         ( "upper-bound"
-        , value<double>()->default_value(128, "128")
+        , value<double>()->default_value(1 << 20, "2^20")
         , "upper bound of integration")
 
         ( "tolerance"
-        , value<double>()->default_value(0.001, "0.001") 
+        , value<double>()->default_value(0.0001, "0.0001") 
         , "resolution tolerance")
 
         ( "top-segments"
-        , value<boost::uint32_t>()->default_value(4096) 
+        , value<boost::uint32_t>()->default_value(1 << 10, "2^10") 
         , "number of top-level segments")
 
         ( "regrid-segments"

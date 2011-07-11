@@ -37,8 +37,8 @@ HPX_REGISTER_ACTION_EX(
     integrator_double_deploy_action);
 
 HPX_REGISTER_ACTION_EX(
-    integrator_type::solve_iteration_action,
-    integrator_double_solve_iteration_action);
+    integrator_type::solve_iterations_action,
+    integrator_double_solve_iterations_action);
 
 HPX_REGISTER_ACTION_EX(
     integrator_type::solve_action,

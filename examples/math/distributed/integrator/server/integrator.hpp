@@ -161,7 +161,7 @@ struct HPX_COMPONENT_EXPORT integrator
     {
         integrator_build_network,
         integrator_deploy,
-        integrator_solve_iteration,
+        integrator_solve_iterations,
         integrator_solve,
     };
 
@@ -259,51 +259,42 @@ struct HPX_COMPONENT_EXPORT integrator
         current_.store(current_shepherd(here_, 0)); 
     }
 
-    T solve_iteration(
-        T const& i
+    T solve_iterations(
+        T const& lower_bound
       , T const& increment
+      , boost::uint32_t iterations
       , boost::uint32_t depth
     ) {
-        const T f_i = f_(i);
+        T area(0);
 
-        // solve() checks the increment size and ensures that the increment we
-        // get isn't too small.
-        if (absolute_value(f_(i + (increment / 2)) - f_i) < tolerance_)
-            // If we're under the tolerance, then we just compute the area.
-            return f_i * increment;
+        std::list<lcos::future_value<T> > results;
 
-        // Regrid.
-        else
-        {
-//            lcos::eager_future<solve_action> r
-//                ( network_[round_robin().prefix - 1], i, i + increment
-//                , regrid_segs_, 1 + depth);
-//            return r.get();
-            return solve(i, i + increment, regrid_segs_, 1 + depth);
+        for (boost::uint32_t iteration = 0; iteration < iterations; ++iteration)
+        { 
+            const T i = lower_bound + (increment * iteration);
+            const T f_i = f_(i);
+
+            // solve() checks the increment size and ensures that the increment
+            // we get isn't too small.
+            if (absolute_value(f_(i + (increment / 2)) - f_i) < tolerance_)
+                // If we're under the tolerance, then we just compute the area.
+                area += f_i * increment;
+
+            // Regrid.
+            else
+            {
+//                area += solve(i, i + increment, regrid_segs_, 1 + depth);
+                results.push_back(
+                    lcos::eager_future<solve_action>
+                        ( network_[here_ - 1], i, i + increment
+                        , regrid_segs_, 1 + depth));
+            }
         }
-    }
 
-    T solve_first(
-        T const& f_i 
-      , T const& i
-      , T const& increment
-      , boost::uint32_t depth
-    ) {
-        // solve() checks the increment size and ensures that the increment we
-        // get isn't too small.
-        if (absolute_value(f_(i + (increment / 2)) - f_i) < tolerance_)
-            // If we're under the tolerance, then we just compute the area.
-            return f_i * increment;
+        BOOST_FOREACH(lcos::future_value<T> const& r, results)
+        { area += r.get(); }
 
-        // Regrid.
-        else
-        {
-//            lcos::eager_future<solve_action> r
-//                ( network_[round_robin().prefix - 1], i, i + increment
-//                , regrid_segs_, 1 + depth);
-//            return r.get();
-            return solve(i, i + increment, regrid_segs_, 1 + depth);
-        }
+        return area;
     }
 
     T solve(
@@ -329,13 +320,13 @@ struct HPX_COMPONENT_EXPORT integrator
 
         std::list<result_type> results;
 
-        T increment = length / segments;
+        const T increment = length / segments;
 
         BOOST_ASSERT((lower_bound + increment) < upper_bound);
 
-        util::high_resolution_timer* t;
+        util::high_resolution_timer* t = 0;
 
-        if (0 == depth)
+        if (0 >= depth)
             t = new util::high_resolution_timer;
 
         boost::uint32_t first_round = 0;
@@ -349,34 +340,36 @@ struct HPX_COMPONENT_EXPORT integrator
                 = double(top_it->second) / double(total_shepherds_);
 
             const boost::uint32_t points
-                = boost::uint32_t(std::floor(node_ratio * segments)) - 1;
+                = boost::uint32_t(std::floor(node_ratio * segments));
 
-            if (0 == depth)
+            if (0 >= depth)
             {
                 if (1 == points)
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] started segment %d at %f on L%d")
+                        "[%.12f/%.12f:%d] started segment %d at %f on L%d")
                         % (lower_bound + (increment * first_round))
                         % upper_bound
+                        % depth
                         % first_round
                         % t->elapsed()
                         % top_it->first) << hpx::endl;
                 else 
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] started segments %d-%d at %f on L%d")
+                        "[%.12f/%.12f:%d] started segments %d-%d at %f on L%d")
                         % (lower_bound + (increment * first_round))
                         % upper_bound
+                        % depth
                         % first_round
-                        % (first_round + points - 1)
+                        % (first_round + points)
                         % t->elapsed()
                         % top_it->first) << hpx::endl;
             }
 
             const T point = lower_bound + (increment * first_round);
             results.push_back(result_type
-                (lcos::eager_future<solve_iteration_action>
+                (lcos::eager_future<solve_iterations_action>
                     (network_[top_it->first - 1]
-                    , point, increment * points, depth)
+                    , point, increment, points, depth)
                 , current_shepherd(top_it->first, points))); 
 
             first_round += points;
@@ -391,59 +384,41 @@ struct HPX_COMPONENT_EXPORT integrator
 
             BOOST_ASSERT(shepherds);
 
-            if (0 == depth)
+            if (0 >= depth)
             {
                 if (1 == shepherds)
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] started segment %d at %f on L%d")
+                        "[%.12f/%.12f:%d] started segment %d at %f on L%d")
                         % (lower_bound + (increment * i))
                         % upper_bound
+                        % depth
                         % i
                         % t->elapsed()
                         % cs.prefix) << hpx::endl;
                 else 
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] started segments %d-%d at %f on L%d")
+                        "[%.12f/%.12f:%d] started segments %d-%d at %f on L%d")
                         % (lower_bound + (increment * i))
                         % upper_bound
+                        % depth
                         % i
-                        % (i + shepherds - 1)
+                        % (i + shepherds)
                         % t->elapsed()
                         % cs.prefix) << hpx::endl;
             }
 
             const T point = lower_bound + (increment * i);
             results.push_back(result_type
-                (lcos::eager_future<solve_iteration_action>
+                (lcos::eager_future<solve_iterations_action>
                     (network_[cs.prefix - 1]
-                    , point, increment * shepherds, depth)
+                    , point, increment, shepherds, depth)
                 , current_shepherd(cs.prefix, shepherds))); 
 
             i += shepherds;
         }
 
-/*
-        // Avoid computing f_(lower_bound) another time in the for loop.
-        if (0 == depth)
-            hpx::cout() <<
-                ( boost::format("[%.12f/%.12f] started segment 0 at %f")
-                % lower_bound
-                % upper_bound
-                % t.elapsed()) << hpx::endl;
-
-        T total_area = solve_first(f_lower, lower_bound, increment, depth);  
-
-        if (0 == depth)
-            hpx::cout() <<
-                ( boost::format("[%.12f/%.12f] completed segment 0 at %f")
-                % lower_bound
-                % upper_bound
-                % t.elapsed()) << hpx::endl;
-*/
-
-        typedef typename std::list<result_type>::iterator iterator;
-
-        iterator it = results.begin(), end = results.end();
+        typename std::list<result_type>::iterator it = results.begin()
+                                                , end = results.end();
  
         // Accumulate final result. TODO: Check for overflow.
         T total_area(0);
@@ -453,23 +428,25 @@ struct HPX_COMPONENT_EXPORT integrator
 
             total_area += at_c<0>(*it).get();
 
-            if (0 == depth)
+            if (0 >= depth)
             {
                 if (1 == at_c<1>(*it).shepherd)
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] segment %d on L%d completed at %f")
+                        "[%.12f/%.12f:%d] segment %d on L%d completed at %f")
                         % (lower_bound + (increment * i))
                         % upper_bound
+                        % depth
                         % i
                         % at_c<1>(*it).prefix  
                         % t->elapsed()) << hpx::endl;
                 else
                     hpx::cout() << (boost::format(
-                        "[%.12f/%.12f] segments %d-%d on L%d completed at %f")
+                        "[%.12f/%.12f:%d] segments %d-%d on L%d completed at %f")
                         % (lower_bound + (increment * i))
                         % upper_bound
+                        % depth
                         % i
-                        % (i + at_c<1>(*it).shepherd - 1)
+                        % (i + at_c<1>(*it).shepherd)
                         % at_c<1>(*it).prefix 
                         % t->elapsed()) << hpx::endl;
             }
@@ -477,7 +454,7 @@ struct HPX_COMPONENT_EXPORT integrator
             i += at_c<1>(*it).shepherd;
         }
 
-        if (0 == depth)
+        if (0 >= depth)
             delete t;
 
         return total_area;
@@ -516,20 +493,21 @@ struct HPX_COMPONENT_EXPORT integrator
       , &integrator<T>::deploy
     > deploy_action;
 
-    typedef actions::result_action3<
+    typedef actions::result_action4<
         // class
         integrator<T>
         // result
       , T 
         // action value type
-      , integrator_solve_iteration
+      , integrator_solve_iterations
         // arguments 
       , T const& 
       , T const& 
       , boost::uint32_t 
+      , boost::uint32_t 
         // function
-      , &integrator<T>::solve_iteration
-    > solve_iteration_action;
+      , &integrator<T>::solve_iterations
+    > solve_iterations_action;
     
     typedef actions::result_action4<
         // class
