@@ -8,9 +8,10 @@
 #define ABC9B037_3A25_4591_BB60_CD166773D61D
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
 
 #include <boost/program_options.hpp>
+#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // this function has to be implemented by the user
