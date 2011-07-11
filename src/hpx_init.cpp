@@ -62,7 +62,8 @@ namespace hpx
                 ;
 
                 hpx_options.add_options()
-                    ("console", "run this instance in console mode")
+                    ("console,c", "run this instance in console mode")
+                    ("worker,w", "run this instance in worker mode")
 #if HPX_AGAS_VERSION <= 0x10
                     ("run-agas-server-only", "run only the AGAS server")
 #endif
@@ -313,8 +314,11 @@ namespace hpx
                     rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
-                rt.add_startup_function(startup_function);
-                rt.add_shutdown_function(shutdown_function);
+                if (!startup_function.empty())
+                    rt.add_startup_function(startup_function);
+
+                if (!shutdown_function.empty())
+                    rt.add_shutdown_function(shutdown_function);
 #endif
 
                 if (vm.count("exit")) {
@@ -354,8 +358,11 @@ namespace hpx
                     rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
-                rt.add_startup_function(startup_function);
-                rt.add_shutdown_function(shutdown_function);
+                if (!startup_function.empty())
+                    rt.add_startup_function(startup_function);
+
+                if (!shutdown_function.empty())
+                    rt.add_shutdown_function(shutdown_function);
 #endif
 
                 if (vm.count("exit")) {
@@ -394,8 +401,11 @@ namespace hpx
                     rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
-                rt.add_startup_function(startup_function);
-                rt.add_shutdown_function(shutdown_function);
+                if (!startup_function.empty())
+                    rt.add_startup_function(startup_function);
+
+                if (!shutdown_function.empty())
+                    rt.add_shutdown_function(shutdown_function);
 #endif
 
                 if (vm.count("exit")) {
@@ -434,8 +444,11 @@ namespace hpx
                     rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
-                rt.add_startup_function(startup_function);
-                rt.add_shutdown_function(shutdown_function);
+                if (!startup_function.empty())
+                    rt.add_startup_function(startup_function);
+
+                if (!shutdown_function.empty())
+                    rt.add_shutdown_function(shutdown_function);
 #endif
 
                 if (vm.count("exit")) {
