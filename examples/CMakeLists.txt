@@ -14,35 +14,42 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      balancing
-      function
-      generic
-      globals
+      contact
       hplpx
-      math
-      nqueen
-      object_semaphore
       random_mem_access
       queue
       quickstart)
+
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    set(subdirs ${subdirs} iostreams)
+    set(subdirs ${subdirs} iostreams
+                           globals
+                           function
+                           math
+                           object_semaphore
+                           balancing)
   endif()
+
+  if(${BOOST_MINOR_VERSION} GREATER 46)
+    set(subdirs ${subdirs} geometry)
+  endif() 
 
 # Disabled by wash until Matt can fix this to not break other HPX code
 #  if(CMAKE_Fortran_COMPILER)
 #    set(subdirs ${subdirs} marduk)
 #  endif()
 
-  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} hpxi)
-  endif() 
+#  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
+#    set(subdirs ${subdirs} hpxi)
+#  endif() 
 else()
   set(subdirs
       accumulator
       quickstart
-      math
-      nqueen)
+      queue)
+
+  if(${BOOST_MINOR_VERSION} GREATER 46)
+    set(subdirs ${subdirs} geometry)
+  endif() 
 endif()
 
 foreach(subdir ${subdirs})
@@ -50,9 +57,4 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(examples examples.${subdir})
 endforeach()
-
-add_hpx_pseudo_target(dylan)
-#add_hpx_pseudo_target(matt)
-add_hpx_pseudo_dependencies(dylan examples.pxgl examples.quickstart.fibonacci1)
-#add_hpx_pseudo_dependencies(matt examples.marduk)
 

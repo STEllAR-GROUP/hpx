@@ -6,7 +6,9 @@
 set(group globals)
 
 set(example_programs
-    start_and_stop)
+    start_and_stop
+    performance_counters
+    parcel_receives)
 
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)
