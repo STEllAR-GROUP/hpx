@@ -16,7 +16,6 @@ if(NOT MSVC)
       accumulator
       balancing
       function
-      geometry
       generic
       globals
       hplpx
