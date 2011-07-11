@@ -65,7 +65,8 @@ namespace hpx { namespace parcelset
             try {
                 server::parcelport_connection_ptr conn(
                     new server::parcelport_connection(
-                        io_service_pool_.get_io_service(), parcels_)
+                        io_service_pool_.get_io_service(), parcels_,
+                        receives_started_)
                 );
 
                 tcp::endpoint ep = *it;
@@ -114,15 +115,13 @@ namespace hpx { namespace parcelset
         server::parcelport_connection_ptr conn)
     {
         if (!e) {
-        // increment number of parcels received
-            ++receives_started_;           
-  
         // handle this incoming parcel
             server::parcelport_connection_ptr c(conn);    // hold on to conn
 
         // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
-                io_service_pool_.get_io_service(), parcels_));
+                io_service_pool_.get_io_service(), parcels_,
+                receives_started_));
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
@@ -138,13 +137,15 @@ namespace hpx { namespace parcelset
     /// Handle completion of a read operation.
     void parcelport::handle_read_completion(boost::system::error_code const& e)
     {
-        // increment number of parcels read
-        ++receives_completed_;
-
         if (e && e != boost::asio::error::operation_aborted)
         {
             LPT_(error) << "handle read operation completion: error: " 
                         << e.message();
+        }
+        else
+        {
+            // increment number of receives completed
+            ++receives_completed_;
         }
     }
 
