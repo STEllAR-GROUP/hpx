@@ -6,8 +6,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -48,4 +46,3 @@ namespace hpx { namespace applier
     }
 }}
 
-#endif
