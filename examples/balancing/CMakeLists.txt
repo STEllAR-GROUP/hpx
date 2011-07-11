@@ -31,7 +31,8 @@ endforeach()
 
 set(example_programs
     parcel_sends1
-    parcel_sends2)
+    parcel_sends2
+    parcel_receives1)
 
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)
