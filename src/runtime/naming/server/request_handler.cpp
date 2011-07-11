@@ -14,6 +14,7 @@
 #include <boost/fusion/include/at.hpp>
 
 #include <hpx/util/logging.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/server/reply.hpp>
 #include <hpx/runtime/naming/server/request.hpp>
 #include <hpx/runtime/naming/server/request_handler.hpp>

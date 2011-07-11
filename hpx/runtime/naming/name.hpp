@@ -20,6 +20,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/runtime/naming/address.hpp>

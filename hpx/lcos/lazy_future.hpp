@@ -7,6 +7,7 @@
 #define HPX_LCOS_LAZY_FUTURE_JUN_27_2008_0420PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>

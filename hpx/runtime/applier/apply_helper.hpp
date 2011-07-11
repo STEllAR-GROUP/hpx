@@ -10,6 +10,7 @@
 #include <boost/mpl/bool.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

@@ -9,6 +9,7 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future_wait.hpp>

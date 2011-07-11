@@ -8,6 +8,7 @@
 #define HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>

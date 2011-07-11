@@ -10,6 +10,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/runtime/threads/thread.hpp>

@@ -8,6 +8,7 @@
 
 #include <stdexcept>
 
+#include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/function.hpp>

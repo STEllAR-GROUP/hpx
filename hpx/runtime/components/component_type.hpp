@@ -12,6 +12,7 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

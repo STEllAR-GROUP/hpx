@@ -7,6 +7,7 @@
 #if !defined(HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2)
 #define HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2
 
+#include <hpx/exception.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/stubs/object_semaphore.hpp>
 

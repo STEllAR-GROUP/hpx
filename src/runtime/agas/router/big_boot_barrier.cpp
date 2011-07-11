@@ -10,6 +10,7 @@
 
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/exception.hpp>
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

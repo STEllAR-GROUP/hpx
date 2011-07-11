@@ -16,6 +16,8 @@
 #include <boost/iostreams/categories.hpp>  // source_tag
 #include <boost/iostreams/positioning.hpp> // stream_offset
 
+#include <hpx/exception.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 
 {

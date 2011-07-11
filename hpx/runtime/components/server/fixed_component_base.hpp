@@ -8,6 +8,7 @@
 #define HPX_F5D19D10_9D74_4DB9_9ABB_ECCF2FA54497
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/naming/name.hpp>

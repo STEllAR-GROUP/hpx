@@ -19,6 +19,7 @@
 #include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

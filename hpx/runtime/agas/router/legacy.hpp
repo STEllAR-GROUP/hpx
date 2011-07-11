@@ -22,6 +22,7 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/noncopyable.hpp>
 
+#include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/mutex.hpp>

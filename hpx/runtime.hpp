@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/naming/locality.hpp>

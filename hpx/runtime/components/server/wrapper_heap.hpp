@@ -15,11 +15,12 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #if HPX_AGAS_VERSION > 0x10
     #include <hpx/lcos/mutex.hpp>
 #endif
-#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>

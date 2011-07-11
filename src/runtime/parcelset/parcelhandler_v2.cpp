@@ -9,6 +9,7 @@
 
 #if HPX_AGAS_VERSION > 0x10
 
+#include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>

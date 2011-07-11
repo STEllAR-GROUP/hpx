@@ -14,6 +14,7 @@
 #include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
 
+#include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/stringstream.hpp>

@@ -9,6 +9,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
+#include <hpx/exception.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>

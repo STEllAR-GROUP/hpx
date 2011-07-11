@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <vector>
 
+#include <hpx/exception.hpp>
 #include <hpx/util/mutex.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 

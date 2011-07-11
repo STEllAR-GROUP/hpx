@@ -8,6 +8,7 @@
 #define ABC9B037_3A25_4591_BB60_CD166773D61D
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/program_options.hpp>
 

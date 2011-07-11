@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <hpx/hpx.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

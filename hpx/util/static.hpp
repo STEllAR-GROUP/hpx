@@ -22,6 +22,8 @@
 
 #include <memory>   // for placement new
 
+#include <hpx/exception.hpp>
+
 namespace hpx { namespace util
 {
     //

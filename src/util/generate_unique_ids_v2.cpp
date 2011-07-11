@@ -7,7 +7,8 @@
 #include <hpx/hpx_fwd.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
- 
+
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>

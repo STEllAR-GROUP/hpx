@@ -14,6 +14,7 @@
 #include <boost/atomic.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util 

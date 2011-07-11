@@ -14,6 +14,7 @@
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
