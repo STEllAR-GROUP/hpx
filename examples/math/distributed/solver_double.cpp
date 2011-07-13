@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cfloat>
 
+#include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -22,6 +23,8 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/static.hpp>
+
 #include <examples/math/distributed/discovery/discovery.hpp>
 #include <examples/math/distributed/integrator/integrator.hpp>
 
@@ -58,14 +61,19 @@ using hpx::flush;
 using hpx::endl;
 
 using hpx::util::high_resolution_timer;
+using hpx::util::static_;
 
 using std::abs;
 using std::log;
 using std::pow;
 
+struct call_tag {};
+
 ///////////////////////////////////////////////////////////////////////////////
 double math_function (double const& r)
 {
+    static_<boost::atomic<boost::uint64_t>, call_tag> count_(0);
+    ++count_;
     return abs(sin(pow(r, 0.25L)) / (log(r) * log(r))); 
 }
 
@@ -202,19 +210,19 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "lower-bound"
-        , value<double>()->default_value(0, "0") 
+        , value<double>()->default_value(1 << 13, "2^13") 
         , "lower bound of integration")
 
         ( "upper-bound"
-        , value<double>()->default_value(1 << 20, "2^20")
+        , value<double>()->default_value(1 << 25, "2^25")
         , "upper bound of integration")
 
         ( "tolerance"
-        , value<double>()->default_value(0.0001, "0.0001") 
+        , value<double>()->default_value(1e-7, "1e-7") 
         , "resolution tolerance")
 
         ( "top-segments"
-        , value<boost::uint32_t>()->default_value(1 << 10, "2^10") 
+        , value<boost::uint32_t>()->default_value(1 << 25, "2^25") 
         , "number of top-level segments")
 
         ( "regrid-segments"
