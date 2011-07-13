@@ -342,10 +342,8 @@ namespace hpx { namespace performance_counters
 
         if (p.parentinstancename_.empty())
         {
-            naming::gid_type prefix = applier::get_applier().get_runtime_support_raw_gid();
-
             hpx::util::osstream strm;
-            strm << prefix;
+            strm << applier::get_applier().get_prefix_id();
             p.parentinstancename_ = hpx::util::osstream_get_string(strm);
         }
 
