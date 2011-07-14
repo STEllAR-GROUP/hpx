@@ -362,9 +362,37 @@ namespace boost
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(BOOST_DISABLE_ASSERTS)
-    #include <boost/current_function.hpp>
+#define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
+    HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
+    /**/
 
+#define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                             \
+    HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)               \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_THROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                       \
+    {                                                                         \
+        if (&ec == &hpx::throws) {                                            \
+            HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
+    /**/
+
+#define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                     \
+    {                                                                         \
+        if (&ec == &hpx::throws) {                                            \
+            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+        } else {                                                              \
+            ec = make_error_code((hpx::error)errcode, msg);                   \
+        }                                                                     \
+    }                                                                         \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(BOOST_DISABLE_ASSERTS)
     #define HPX_ASSERTS_IF(ec, expr)                                          \
         HPX_UNLIKELY(hpx::detail::asserts_if                                  \
             (ec, expr, #expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))    \
