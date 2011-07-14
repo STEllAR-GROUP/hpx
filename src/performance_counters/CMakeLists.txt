@@ -5,6 +5,8 @@
 
 add_hpx_library_sources(hpx
   counters.cpp
+  manage_counter_type.cpp
+  manage_counter.cpp
   registry.cpp)
 
 add_subdirectory(server)

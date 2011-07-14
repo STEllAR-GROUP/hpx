@@ -23,9 +23,11 @@ namespace hpx { namespace performance_counters
         }
 
         counter_status install(std::string const& name, counter_type type,
-                               error_code& ec = throws)
+            error_code& ec = throws)
         {
-            BOOST_ASSERT(status_invalid_data == status_);
+            if (HPX_ASSERTS_IF(ec, status_invalid_data == status_))
+                return status_invalid_data;
+
             info_.fullname_ = name;
             info_.type_ = type;
             status_ = add_counter_type(info_, ec);
@@ -45,6 +47,9 @@ namespace hpx { namespace performance_counters
         counter_status status_;
         counter_info info_;
     };
+
+    HPX_EXPORT void install_counter_type(std::string const& name,
+        counter_type type, error_code& ec = throws); 
 }}
 
 #endif // HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F

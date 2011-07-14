@@ -520,6 +520,8 @@ else()
   # performance counters
   set(hpxlib_performance_counters_SOURCES
       ${hpx_SOURCE_DIR}/src/performance_counters/counters.cpp
+      ${hpx_SOURCE_DIR}/src/performance_counters/manage_counter.cpp
+      ${hpx_SOURCE_DIR}/src/performance_counters/manage_counter_type.cpp
       ${hpx_SOURCE_DIR}/src/performance_counters/registry.cpp)
   source_group("Source Files\\Performance Counters" 
       FILES ${hpxlib_performance_counters_SOURCES})
