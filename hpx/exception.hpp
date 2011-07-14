@@ -153,7 +153,7 @@ namespace hpx
     };
 
     inline boost::system::error_code 
-    make_error_code(error e, throwmode mode = plain)
+    make_system_error_code(error e, throwmode mode = plain)
     {
         return boost::system::error_code(static_cast<int>(e), 
             mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
@@ -172,16 +172,16 @@ namespace hpx
     {
     public:
         explicit error_code(throwmode mode = plain)
-          : boost::system::error_code(make_error_code(success, mode))
+          : boost::system::error_code(make_system_error_code(success, mode))
         {}
 
         explicit error_code(error e, char const* msg = "", throwmode mode = plain)
-          : boost::system::error_code(make_error_code(e, mode))
+          : boost::system::error_code(make_system_error_code(e, mode))
           , message_(msg)
         {}
 
         error_code(error e, std::string const& msg, throwmode mode = plain)
-          : boost::system::error_code(make_error_code(e, mode))
+          : boost::system::error_code(make_system_error_code(e, mode))
           , message_(msg)
         {}
 
@@ -190,6 +190,12 @@ namespace hpx
     private:
         std::string message_;
     };
+
+    inline error_code 
+    make_error_code(error e, throwmode mode = plain)
+    {
+        return error_code(e, "", mode);
+    }
 
     inline error_code 
     make_error_code(error e, char const* msg, throwmode mode = plain)
@@ -224,13 +230,13 @@ namespace hpx
             LERR_(error) << "created exception: " << this->what();
         }
         exception(error e, char const* msg, throwmode mode = plain) 
-          : boost::system::system_error(make_error_code(e, mode), msg)
+          : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
         exception(error e, std::string const& msg, throwmode mode = plain) 
-          : boost::system::system_error(make_error_code(e, mode), msg)
+          : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
