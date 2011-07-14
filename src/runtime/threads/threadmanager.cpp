@@ -353,8 +353,8 @@ namespace hpx { namespace threads
         if (previous_state_val == active) 
         {
             // schedule a new thread to set the state
-            LTM_(warning) << "set_state: " << "thread(" << id << "), "
-                          << "is currently active, scheduling new thread...";
+            LTM_(warning) << "set_state: thread(" << id << "), "
+                             "is currently active, scheduling new thread...";
 
             thread_init_data data(
                 boost::bind(&threadmanager_impl::set_active_state, this, 
@@ -376,9 +376,9 @@ namespace hpx { namespace threads
         // at some point will ignore this thread by simply skipping it 
         // (if it's not pending anymore). 
 
-        LTM_(info) << "set_state: " << "thread(" << id << "), "
-                   << "description(" << thrd->get_description() << "), "
-                   << "new state(" << get_thread_state_name(new_state) << ")";
+        LTM_(info) << "set_state: thread(" << id << "), "
+                      "description(" << thrd->get_description() << "), "
+                      "new state(" << get_thread_state_name(new_state) << ")";
 
         // So all what we do here is to set the new state.
         thrd->set_state(new_state);
@@ -674,36 +674,6 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct manage_counter_type
-    {
-        manage_counter_type()
-          : status_(performance_counters::status_invalid_data)
-        {
-        }
-        ~manage_counter_type()
-        {
-            if (performance_counters::status_invalid_data != status_) {
-                error_code ec;
-                performance_counters::remove_counter_type(info_, ec);   // ignore errors
-            }
-        }
-
-        performance_counters::counter_status install(
-            std::string const& name, performance_counters::counter_type type, 
-            error_code& ec = throws)
-        {
-            BOOST_ASSERT(performance_counters::status_invalid_data == status_);
-            info_.fullname_ = name;
-            info_.type_ = type;
-            status_ = performance_counters::add_counter_type(info_, ec);
-            return status_;
-        }
-
-        performance_counters::counter_status status_;
-        performance_counters::counter_info info_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager_impl
     template <typename SP, typename NP>
     struct init_tss_helper
@@ -764,7 +734,7 @@ namespace hpx { namespace threads
 
         {
 #if HPX_AGAS_VERSION <= 0x10
-            manage_counter_type counter_type;
+            performance_counters::manage_counter_type counter_type;
             if (0 == num_thread) {
                 // register counter types
                 error_code ec;
@@ -816,36 +786,6 @@ namespace hpx { namespace threads
         notifier_.on_stop_thread(num_thread);
         scheduler_.on_stop_thread(num_thread);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct manage_counter
-    {
-        ~manage_counter()
-        {
-            uninstall();
-        }
-
-        performance_counters::counter_status install(
-            std::string const& name, boost::function<boost::int64_t()> f, 
-            error_code& ec = throws)
-        {
-            BOOST_ASSERT(!counter_);
-            info_.fullname_ = name;
-            return performance_counters::add_counter(info_, f, counter_, ec);
-        }
-
-        void uninstall()
-        {
-            if (counter_) {
-                error_code ec;
-                performance_counters::remove_counter(info_, counter_, ec);
-                counter_ = naming::invalid_id;
-            }
-        }
-
-        performance_counters::counter_info info_;
-        naming::id_type counter_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     inline void write_old_state_log(std::size_t num_thread, thread* thrd, 
@@ -1035,7 +975,7 @@ namespace hpx { namespace threads
 
 #if HPX_AGAS_VERSION <= 0x10
         // register performance counters
-        manage_counter queue_length_counter; 
+        performance_counters::manage_counter queue_length_counter; 
         if (is_master_thread) {
             std::string name("/queue(threadmanager)/length");
             queue_length_counter.install(name, 
