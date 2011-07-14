@@ -11,6 +11,7 @@
 #include <string>
 #include <iosfwd>
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -56,7 +57,7 @@ namespace hpx
         unknown_locality = 24,
         unknown_gid = 25,
         deadlock = 26,
-        assertion_failed = 27,
+        assertion_failure = 27,
         null_thread_id = 28,
         last_error
     };
@@ -90,7 +91,7 @@ namespace hpx
         "unknown_locality",
         "unknown_gid",
         "deadlock",
-        "assertion_failed",
+        "assertion_failure",
         "null_thread_id",
         ""
     };
@@ -279,6 +280,10 @@ namespace hpx
         // BOOST_ASSERT_MSG handler
         HPX_EXPORT void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
+
+        // Returns true if the assertion failed.
+        HPX_EXPORT bool asserts_if(error_code& ec, bool b, char const* expr,
+            char const* function, char const* file, long line);
     }
 }
 
@@ -357,36 +362,17 @@ namespace boost
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
-    HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
-    /**/
+#if !defined(BOOST_DISABLE_ASSERTS)
+    #include <boost/current_function.hpp>
 
-#define HPX_RETHROW_IN_CURRENT_FUNC(errcode, msg)                             \
-    HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)               \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                       \
-    {                                                                         \
-        if (&ec == &hpx::throws) {                                            \
-            HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
-        } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
-        }                                                                     \
-    }                                                                         \
-    /**/
-
-#define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                     \
-    {                                                                         \
-        if (&ec == &hpx::throws) {                                            \
-            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
-        } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
-        }                                                                     \
-    }                                                                         \
-    /**/
-
-
+    #define HPX_ASSERTS_IF(ec, expr)                                          \
+        HPX_UNLIKELY(hpx::detail::asserts_if                                  \
+            (ec, expr, #expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))    \ 
+        /**/
+#else
+    #define HPX_ASSERTS_IF(ec, expr) false
+#endif 
+    
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
