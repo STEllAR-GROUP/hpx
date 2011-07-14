@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/manage_counter.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 
 #endif
 
