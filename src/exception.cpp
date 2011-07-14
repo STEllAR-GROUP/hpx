@@ -125,7 +125,7 @@ namespace hpx { namespace detail
             detail::assertion_failed(expr, function, file, line);
 
         else
-            ec = make_error_code(hpx::assertion_failed);
+            ec = make_error_code(hpx::assertion_failure);
 
         return true;            
     }  
