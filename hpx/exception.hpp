@@ -367,7 +367,7 @@ namespace boost
 
     #define HPX_ASSERTS_IF(ec, expr)                                          \
         HPX_UNLIKELY(hpx::detail::asserts_if                                  \
-            (ec, expr, #expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))    \ 
+            (ec, expr, #expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))    \
         /**/
 #else
     #define HPX_ASSERTS_IF(ec, expr) false
@@ -376,6 +376,5 @@ namespace boost
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
 
 
