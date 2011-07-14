@@ -16,7 +16,7 @@ namespace hpx { namespace performance_counters
         p->uninstall();
     }
 
-    HPX_EXPORT void install_counter_type(std::string const& name,
+    void install_counter_type(std::string const& name,
         counter_type type, error_code& ec)
     {
         boost::shared_ptr<manage_counter_type> p(new manage_counter_type);
