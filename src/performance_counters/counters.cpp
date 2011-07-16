@@ -1,7 +1,10 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/format.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
@@ -10,7 +13,6 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/stringstream.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
@@ -341,11 +343,8 @@ namespace hpx { namespace performance_counters
         if (status_valid_data != status) return status;
 
         if (p.parentinstancename_.empty())
-        {
-            hpx::util::osstream strm;
-            strm << applier::get_applier().get_prefix_id();
-            p.parentinstancename_ = hpx::util::osstream_get_string(strm);
-        }
+            p.parentinstancename_ = boost::str(boost::format("[L%04x]")
+                                  % applier::get_applier().get_prefix_id());
 
         return get_counter_name(p, info.fullname_, ec);
     }
