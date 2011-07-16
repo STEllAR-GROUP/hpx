@@ -22,6 +22,7 @@ if(NOT MSVC)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} iostreams
+                           heartbeat 
                            globals
                            function
                            math
