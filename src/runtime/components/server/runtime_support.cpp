@@ -489,14 +489,12 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::call_startup_functions()
     {
-        recursive_mutex_type::scoped_lock l(globals_mtx_);
         BOOST_FOREACH(boost::function<void()> const& f, startup_functions_)
         { f(); } 
     }
 
     void runtime_support::call_shutdown_functions()
     {
-        recursive_mutex_type::scoped_lock l(globals_mtx_);
         BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
         { f(); } 
     }

@@ -21,6 +21,7 @@
 #include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -31,7 +32,6 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef boost::mutex mutex_type;
-        typedef boost::recursive_mutex recursive_mutex_type;
         typedef std::pair<
             boost::shared_ptr<component_factory_base>, boost::plugin::dll
         > component_factory_type;
@@ -254,13 +254,13 @@ namespace hpx { namespace components { namespace server
 #if HPX_AGAS_VERSION > 0x10
         void add_startup_function(boost::function<void()> const& f)
         {
-            recursive_mutex_type::scoped_lock l(globals_mtx_);
+            util::spinlock::scoped_lock l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
         void add_shutdown_function(boost::function<void()> const& f)
         {
-            recursive_mutex_type::scoped_lock l(globals_mtx_);
+            util::spinlock::scoped_lock l(globals_mtx_);
             shutdown_functions_.push_back(f);
         }
 #endif
@@ -284,9 +284,9 @@ namespace hpx { namespace components { namespace server
         component_map_type components_;
         util::section& ini_;
 
-        recursive_mutex_type globals_mtx_;
-        std::vector<boost::function<void()> > startup_functions_;
-        std::vector<boost::function<void()> > shutdown_functions_;
+        util::spinlock globals_mtx_;
+        std::list<boost::function<void()> > startup_functions_;
+        std::list<boost::function<void()> > shutdown_functions_;
     };
 
 }}}
