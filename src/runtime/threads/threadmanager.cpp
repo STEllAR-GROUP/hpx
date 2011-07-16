@@ -953,6 +953,19 @@ namespace hpx { namespace threads
     };
 #endif
 
+#if HPX_AGAS_VERSION > 0x10
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        install_counters()
+    {
+        performance_counters::install_counter_type("/queue/length",
+            performance_counters::counter_raw);
+        performance_counters::install_counter("/queue(threadmanager)/length",
+            boost::bind(&scheduling_policy_type::get_queue_lengths, 
+                        &scheduler_, -1));
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -980,7 +993,7 @@ namespace hpx { namespace threads
             std::string name("/queue(threadmanager)/length");
             queue_length_counter.install(name, 
                 boost::bind(&scheduling_policy_type::get_queue_lengths, 
-                    &scheduler_, num_thread));
+                    &scheduler_, -1));
         }
 #endif
 

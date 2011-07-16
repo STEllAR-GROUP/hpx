@@ -276,13 +276,18 @@ namespace hpx { namespace threads
         /// available 
         virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
 
-    public:
         static std::size_t get_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
         void deinit_tss();
 
     private:
+#if HPX_AGAS_VERSION > 0x10
+        friend void hpx::pre_main();
+ 
+        virtual void install_counters() = 0;
+#endif
+
         // the TSS holds the number associated with a given OS thread
         static boost::thread_specific_ptr<std::size_t> thread_num_;
     };
@@ -608,6 +613,10 @@ namespace hpx { namespace threads
             thread_priority priority);
 
     private:
+#if HPX_AGAS_VERSION > 0x10
+        void install_counters();
+#endif
+
         /// this thread manager has exactly as much threads as requested
         mutable mutex_type mtx_;                    ///< mutex protecting the members
         boost::barrier* startup_;                   ///< startup synchronization

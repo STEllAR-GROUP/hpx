@@ -11,6 +11,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/barrier.hpp>
 
 namespace hpx
@@ -26,7 +27,7 @@ void pre_main()
 
     lcos::barrier second_stage, third_stage;
 
-    // {{{ Second and third stage barrier creation
+    // {{{ Second and third stage barrier creation.
     if (agas_client.is_bootstrap())
     {
         second_stage.create_one(agas_client.local_prefix(),
@@ -108,6 +109,9 @@ void pre_main()
     // localities, ensuring that the component namespace tables are fully
     // populated before user code is executed.
     second_stage.wait();
+
+    // Install performance counter startup functions for core subsystems.
+    applier::get_applier().get_thread_manager().install_counters();  
 
     // Third stage bootstrap synchronizes startup functions across all
     // localities. This is done after component loading to gurantee that
