@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
@@ -81,16 +81,16 @@ int hpx_main(variables_map& vm)
     {
         resolver_client& agas = get_applier().get_agas_client();
 
-        gid_type here = get_applier().get_runtime_support_raw_gid();
+        boost::uint32_t here = get_applier().get_prefix_id();
+
+        boost::format fmter("/parcels([L%04x]/%s)/total");
 
         // Build full performance counter names.
-        std::string receives_started("/parcels(");
-        receives_started += boost::lexical_cast<std::string>(here);
-        receives_started += "/receives_started)/total";
+        std::string receives_started
+            = boost::str(fmter % here % "receives_started");
 
-        std::string receives_completed("/parcels(");
-        receives_completed += boost::lexical_cast<std::string>(here);
-        receives_completed += "/receives_completed)/total";
+        std::string receives_completed
+            = boost::str(fmter % here % "receives_completed");
 
         // Get GIDs of the performance counters.
         gid_type receives_started_gid, receives_completed_gid;
