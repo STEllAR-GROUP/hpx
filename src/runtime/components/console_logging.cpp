@@ -25,7 +25,7 @@ void console_logging(
 ) {
     util::static_<pending_logs, pending_logs_tag> logs;
 
-    // do logging only if applier is valid
+    // Do logging only if the threadmanager is running. 
     if (threads::threadmanager_is(running) && threads::get_self_ptr())
     {
         if (logs.get().sending_logs_)
