@@ -23,7 +23,6 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/static.hpp>
 
 #include <examples/math/distributed/discovery/discovery.hpp>
 #include <examples/math/distributed/integrator/integrator.hpp>
@@ -61,7 +60,6 @@ using hpx::flush;
 using hpx::endl;
 
 using hpx::util::high_resolution_timer;
-using hpx::util::static_;
 
 using std::abs;
 using std::log;
@@ -72,8 +70,6 @@ struct call_tag {};
 ///////////////////////////////////////////////////////////////////////////////
 double math_function (double const& r)
 {
-    static_<boost::atomic<boost::uint64_t>, call_tag> count_(0);
-    ++count_;
     return abs(sin(pow(r, 0.25L)) / (log(r) * log(r))); 
 }
 
