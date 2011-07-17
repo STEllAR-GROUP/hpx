@@ -48,8 +48,10 @@ namespace hpx { namespace performance_counters
         counter_info info_;
     };
 
+#if HPX_AGAS_VERSION > 0x10
     HPX_EXPORT void install_counter_type(std::string const& name,
         counter_type type, error_code& ec = throws); 
+#endif
 }}
 
 #endif // HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F

@@ -343,7 +343,7 @@ namespace hpx { namespace performance_counters
         if (status_valid_data != status) return status;
 
         if (p.parentinstancename_.empty())
-            p.parentinstancename_ = boost::str(boost::format("[L%04x]")
+            p.parentinstancename_ = boost::str(boost::format("[L%d]")
                                   % applier::get_applier().get_prefix_id());
 
         return get_counter_name(p, info.fullname_, ec);

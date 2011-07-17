@@ -52,7 +52,7 @@ int hpx_main(variables_map& vm)
 
         boost::uint32_t here = get_applier().get_prefix_id();
 
-        boost::format fmter("/parcels([L%04x]/%s)/total");
+        boost::format fmter("/parcels([L%d]/%s)/total");
 
         // Build full performance counter names.
         std::string receives_started

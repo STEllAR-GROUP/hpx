@@ -47,8 +47,10 @@ namespace hpx { namespace performance_counters
         naming::id_type counter_;
     };
 
+#if HPX_AGAS_VERSION > 0x10
     HPX_EXPORT void install_counter(std::string const& name,
         boost::function<boost::int64_t()> const& f, error_code& ec = throws); 
+#endif
 }}
 
 #endif // HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608

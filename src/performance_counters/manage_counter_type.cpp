@@ -5,6 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/version.hpp>
+
+#if HPX_AGAS_VERSION > 0x10
+
 #include <hpx/runtime.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 
@@ -29,4 +33,6 @@ namespace hpx { namespace performance_counters
             (boost::bind(&counter_type_shutdown, p));
     }
 }}
+
+#endif
 
