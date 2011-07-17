@@ -97,7 +97,7 @@ namespace hpx
                     ("exit", "exit after configuring the runtime")
                     ("queueing,q", value<std::string>(),
                      "the queue scheduling policy to use, options are `global/g', "
-                     "`local/l', `priority_local/p' and `abp/a' (default: local/l)")
+                     "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
                 ;
 
                 options_description desc_cmdline;
@@ -215,7 +215,7 @@ namespace hpx
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
-            std::string queueing = "local";
+            std::string queueing = "priority_local";
             hpx::runtime_mode mode = hpx::runtime_mode_console;
             std::vector<std::string> ini_config;
  
