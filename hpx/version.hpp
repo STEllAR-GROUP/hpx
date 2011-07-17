@@ -19,10 +19,9 @@
 #define HPX_VERSION_MINOR        5
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20100929
-
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x10
 #endif
 
 #endif
+
