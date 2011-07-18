@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2007 Richard D Guidry Jr
-//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
+//  Copyright (c) 2007      Richard D Guidry Jr
+//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +35,9 @@ namespace hpx { namespace parcelset
         sends_started_(0),
         sends_completed_(0),
         receives_started_(0),
-        receives_completed_(0)
+        receives_completed_(0),
+        send_timer_(0),
+        receive_timer_(0)
     {}
 
     parcelport::~parcelport()
@@ -66,7 +68,8 @@ namespace hpx { namespace parcelset
                 server::parcelport_connection_ptr conn(
                     new server::parcelport_connection(
                         io_service_pool_.get_io_service(), parcels_,
-                        receives_started_)
+                        receives_started_, receive_timer_, receive_data_,
+                        parcels_received_)
                 );
 
                 tcp::endpoint ep = *it;
@@ -121,7 +124,7 @@ namespace hpx { namespace parcelset
         // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
                 io_service_pool_.get_io_service(), parcels_,
-                receives_started_));
+                receives_started_, receive_timer_, receive_data_, parcels_received_));
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
@@ -144,8 +147,11 @@ namespace hpx { namespace parcelset
         }
         else
         {
-            // increment number of receives completed
+            // complete data point and push back 
+            receive_data_.end = receive_timer_.elapsed();
+            parcels_received_.push_back(receive_data_);
             ++receives_completed_;
+            
         }
     }
 
@@ -165,7 +171,7 @@ namespace hpx { namespace parcelset
             client_connection.reset(new parcelport_connection(
                     io_service_pool_.get_io_service(), addr.locality_, 
                     connection_cache_, sends_started_,
-                    sends_completed_)); 
+                    sends_completed_, send_timer_, send_data_, parcels_sent_)); 
 
             client_connection->set_parcel(p);
 

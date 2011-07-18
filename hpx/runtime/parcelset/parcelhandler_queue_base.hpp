@@ -10,6 +10,7 @@
 
 #include <boost/function.hpp>
 #include <boost/signals2.hpp>
+#include <boost/cstdint.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -40,6 +41,8 @@ struct parcelhandler_queue_base
     ) = 0; 
 
     virtual void set_parcelhandler(parcelhandler* ph) = 0;
+
+    virtual boost::int64_t get_queue_lenngths() const = 0;
 };
 
 }}

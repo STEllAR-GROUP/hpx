@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
+//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,9 @@
 
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -44,9 +47,14 @@ namespace hpx { namespace parcelset
                 naming::locality const& l, 
                 util::connection_cache<parcelport_connection>& cache,
                 boost::atomic<boost::int64_t>& started,
-                boost::atomic<boost::int64_t>& completed)
+                boost::atomic<boost::int64_t>& completed,
+                util::high_resolution_timer& timer,
+                performance_counters::parcels::data_point& send_data,
+                performance_counters::parcels::gatherer& parcels_sent
+                )
           : socket_(io_service), there_(l), connection_cache_(cache),
-            sends_started_(started), sends_completed_(completed)
+            sends_started_(started), sends_completed_(completed),
+            send_timer_(timer), send_data_(send_data), parcels_sent_(parcels_sent)
         {
         }
 
@@ -59,15 +67,21 @@ namespace hpx { namespace parcelset
         template <typename Handler>
         void async_write(Handler handler)
         {
-            // After data structure is written, increment reference to total sends started
+            /// Increment sends and begin timer.
             ++sends_started_;
-
+            send_timer_.restart();
+            send_data_.start = 0;
+            send_data_.parcel = sends_started_;            
+            
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
             buffers.push_back(boost::asio::buffer(out_buffer_));
-
+           
+            // record size of parcel
+            send_data_.bytes = buffers.size();
+ 
             // this additional wrapping of the handler into a bind object is 
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
@@ -105,6 +119,10 @@ namespace hpx { namespace parcelset
             out_buffer_.clear();
             out_size_ = 0;
             connection_cache_.add(there_, shared_from_this());
+            
+            // complete data point and push back onto gatherer 
+            send_data_.end = send_timer_.elapsed();
+            parcels_sent_.push_back(send_data_);
             ++sends_completed_;
         }
 
@@ -122,9 +140,13 @@ namespace hpx { namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection>& connection_cache_;
 
+        /// Counters and their data containers.
         boost::atomic<boost::int64_t>& sends_started_;
         boost::atomic<boost::int64_t>& sends_completed_;
-    };
+        util::high_resolution_timer& send_timer_;
+        performance_counters::parcels::data_point& send_data_;
+        performance_counters::parcels::gatherer& parcels_sent_;
+     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 

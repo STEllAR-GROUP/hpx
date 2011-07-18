@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2007 Richard D Guidry Jr
-//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
+//  Copyright (c) 2007      Richard D Guidry Jr
+//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,8 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/performance_counters/parcels/gatherer.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -29,6 +31,9 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
+
+#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/performance_counters/parcels/gatherer.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -242,11 +247,23 @@ namespace parcelset
         /// The local locality
         naming::locality here_;
 
+        /// Counters for parcels sent.
         boost::atomic<boost::int64_t> sends_started_;
         boost::atomic<boost::int64_t> sends_completed_;
 
+        /// Counters for parcels received.
         boost::atomic<boost::int64_t> receives_started_;
         boost::atomic<boost::int64_t> receives_completed_;
+        
+        /// Parcel timers and their data containers.
+        double elapsed_send_time_, elapsed_receive_time_;
+        util::high_resolution_timer send_timer_, receive_timer_;
+ 
+        performance_counters::parcels::gatherer parcels_sent_;
+        performance_counters::parcels::gatherer parcels_received_;
+
+        performance_counters::parcels::data_point send_data_;
+        performance_counters::parcels::data_point receive_data_;       
     };
 
 ///////////////////////////////////////////////////////////////////////////////

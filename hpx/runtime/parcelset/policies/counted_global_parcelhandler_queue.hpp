@@ -15,12 +15,18 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 
+#include <hpx/performance_counters/parcels/queue_length_data_point.hpp>
+
 namespace hpx { namespace parcelset { namespace policies
 {
 
-struct global_parcelhandler_queue : parcelhandler_queue_base
+struct counted_global_parcelhandler_queue : parcelhandler_queue_base
 {
-    ~global_parcelhandler_queue()
+    counted_global_parcelhandler_queue() :
+        queue_length(0)
+    {}
+    
+    ~counted_global_parcelhandler_queue()
     {
         parcel p;
         while (get_parcel(p)) {}
@@ -29,7 +35,11 @@ struct global_parcelhandler_queue : parcelhandler_queue_base
     void add_parcel(parcel const& p)
     {
         parcel* tmp = new parcel(p);
+
+        // Add parcel to queue and increment queue length.
         parcels_.enqueue(tmp);
+        ++queue_length;
+
         // do some work (notify event handlers)
         notify_(*ph_, tmp->get_destination_addr()); 
     }
@@ -37,11 +47,13 @@ struct global_parcelhandler_queue : parcelhandler_queue_base
     bool get_parcel(parcel& p)
     {
         parcel* tmp;
-
+        
+        // Remove parcel from queue and decrement queue length.
         if (parcels_.dequeue(&tmp))
         {
             p = *tmp;
-            delete tmp; 
+            delete tmp;
+            --queue_length; 
             return true;
         }
 
@@ -67,15 +79,17 @@ struct global_parcelhandler_queue : parcelhandler_queue_base
         ph_ = ph;
     }
 
-    boost::int64_t get_queue_lengths() const 
+    boost::int64_t get_queue_lengths() const
     {
-        return -1;
+        return queue_length.load();
     }
 
   private:
     boost::lockfree::fifo<parcel*> parcels_;
 
     parcelhandler* ph_;
+
+    boost::atomic<boost::int64_t> queue_length;
 
     boost::signals2::signal_type<
         void(parcelhandler&, naming::address const&)

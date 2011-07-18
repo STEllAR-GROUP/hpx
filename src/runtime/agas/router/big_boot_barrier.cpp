@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach and Katelyn Kufahl
+//  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
 //  Copyright (c) 2011 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -650,7 +650,8 @@ void big_boot_barrier::apply(
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection
             (io_service_pool_.get_io_service(), addr.locality_,
-                connection_cache_, pp.sends_started_, pp.sends_completed_)); 
+                connection_cache_, pp.sends_started_, pp.sends_completed_,
+                pp.send_timer_, pp.send_data_, pp.parcels_sent_)); 
         client_connection->set_parcel(p);
 
         // Connect to the target locality, retry if needed

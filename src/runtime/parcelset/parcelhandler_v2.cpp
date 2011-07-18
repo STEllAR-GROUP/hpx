@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2007 Richard D Guidry Jr
-//  Copyright (c) 2011      Bryce Lelbach 
+//  Copyright (c) 2007      Richard D Guidry Jr
+//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -158,8 +158,6 @@ namespace hpx { namespace parcelset
         , pp_(pp)
         , tm_(tm)
         , parcels_(policy)
-        , startup_time_(util::high_resolution_timer::now())
-        , timer_()
     {
         BOOST_ASSERT(parcels_);
 
