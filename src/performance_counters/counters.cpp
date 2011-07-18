@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/format.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -14,6 +12,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/format.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

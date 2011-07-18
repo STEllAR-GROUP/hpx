@@ -27,10 +27,13 @@ struct parcelhandler_queue_base
 
     virtual ~parcelhandler_queue_base() {}
 
+    /// add a new parcel to the end of the parcel queue
     virtual void add_parcel(parcel const& p) = 0;
 
+    /// return next available parcel
     virtual bool get_parcel(parcel& p) = 0;
 
+    /// register event handler to be notified whenever a parcel arrives
     virtual bool register_event_handler(
         callback_type const& sink
     ) = 0; 
@@ -42,7 +45,7 @@ struct parcelhandler_queue_base
 
     virtual void set_parcelhandler(parcelhandler* ph) = 0;
 
-    virtual boost::int64_t get_queue_lenngths() const = 0;
+    virtual boost::int64_t get_queue_lengths() const = 0;
 };
 
 }}

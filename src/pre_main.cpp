@@ -110,11 +110,8 @@ void pre_main()
     // populated before user code is executed.
     second_stage.wait();
 
-    // Install performance counter startup functions for core subsystems.
-    applier::get_applier().get_thread_manager().install_counters();  
-
     // Third stage bootstrap synchronizes startup functions across all
-    // localities. This is done after component loading to gurantee that
+    // localities. This is done after component loading to guarantee that
     // all user code, including startup functions, are only run after the
     // component tables are populated.
     components::stubs::runtime_support::call_startup_functions

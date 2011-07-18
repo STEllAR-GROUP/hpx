@@ -8,12 +8,13 @@
 #if !defined(HPX_894FCD94_A2A4_413D_AD50_088A9178DE77)
 #define HPX_894FCD94_A2A4_413D_AD50_088A9178DE77
 
-#include <boost/lockfree/fifo.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
+
+#include <boost/assert.hpp>
+#include <boost/lockfree/fifo.hpp>
 
 #include <hpx/performance_counters/parcels/queue_length_data_point.hpp>
 
@@ -23,7 +24,7 @@ namespace hpx { namespace parcelset { namespace policies
 struct counted_global_parcelhandler_queue : parcelhandler_queue_base
 {
     counted_global_parcelhandler_queue() :
-        queue_length(0)
+        ph_(0), queue_length(0)
     {}
     
     ~counted_global_parcelhandler_queue()
@@ -41,13 +42,14 @@ struct counted_global_parcelhandler_queue : parcelhandler_queue_base
         ++queue_length;
 
         // do some work (notify event handlers)
+        BOOST_ASSERT(ph_ != 0);
         notify_(*ph_, tmp->get_destination_addr()); 
     }
 
     bool get_parcel(parcel& p)
     {
         parcel* tmp;
-        
+
         // Remove parcel from queue and decrement queue length.
         if (parcels_.dequeue(&tmp))
         {
@@ -61,21 +63,20 @@ struct counted_global_parcelhandler_queue : parcelhandler_queue_base
             return false;
     }
 
-    bool register_event_handler(
-        callback_type const& sink
-    ) { 
+    bool register_event_handler(callback_type const& sink) 
+    { 
         return notify_.connect(sink).connected();
     }
 
-    bool register_event_handler(
-        callback_type const& sink
-      , connection_type& conn
-    ) {
+    bool register_event_handler(callback_type const& sink
+      , connection_type& conn) 
+    {
         return (conn = notify_.connect(sink)).connected();
     } 
 
     void set_parcelhandler(parcelhandler* ph)
     {
+        BOOST_ASSERT(ph_ == 0);
         ph_ = ph;
     }
 

@@ -34,7 +34,7 @@ class gatherer {
       timer(0),
       byte_count(0),
       gatherer_size(0),
-      point(0,0,0,0)
+      point(0,0,0,naming::invalid_gid)
     {}
 
     boost::int64_t size() const;

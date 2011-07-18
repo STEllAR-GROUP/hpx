@@ -284,8 +284,6 @@ namespace hpx { namespace threads
     private:
 #if HPX_AGAS_VERSION > 0x10
         friend void hpx::pre_main();
- 
-        virtual void install_counters() = 0;
 #endif
 
         // the TSS holds the number associated with a given OS thread
@@ -612,11 +610,14 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority);
 
-    private:
 #if HPX_AGAS_VERSION > 0x10
+    public:
+        /// install_counters is called during startup to allow registration of 
+        /// performance counters 
         void install_counters();
 #endif
 
+    private:
         /// this thread manager has exactly as much threads as requested
         mutable mutex_type mtx_;                    ///< mutex protecting the members
         boost::barrier* startup_;                   ///< startup synchronization

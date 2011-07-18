@@ -274,7 +274,8 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        boost::function<runtime::hpx_main_function_type> func, int& result)
+        boost::function<runtime::hpx_main_function_type> func, int& result,
+        std::size_t num_threads)
     {
         // if we're not the console, we'll pull the console configuration 
         // information and merge it with ours
@@ -300,13 +301,19 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        boost::function<runtime::hpx_main_function_type> func, int& result)
+        boost::function<runtime::hpx_main_function_type> func, int& result,
+        std::size_t num_threads)
     {
-        ::hpx::pre_main();
+        // run global pre_main functionality
+        hpx::pre_main();
+
+        // Install performance counter startup functions for core subsystems.
+        thread_manager_.install_counters();
 
         // now, execute the user supplied thread function
         if (!func.empty()) 
             result = func();
+
         return threads::thread_state(threads::terminated);
     }
 #endif
@@ -445,7 +452,8 @@ namespace hpx
         // {{{ launch main 
         // register the given main function with the thread manager
         threads::thread_init_data data(
-            boost::bind(&runtime_impl::run_helper, this, func, boost::ref(result_)), 
+            boost::bind(&runtime_impl::run_helper, this, func, 
+                boost::ref(result_), num_threads), 
             "hpx_main");
         thread_manager_.register_thread(data);
         this->runtime::start();
@@ -807,6 +815,17 @@ namespace hpx
     naming::gid_type get_next_id()
     {
         return get_runtime().get_next_id();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void register_startup_function(boost::function<void()> const& f)
+    {
+        get_runtime().add_startup_function(f);
+    }
+
+    void register_shutdown_function(boost::function<void()> const& f)
+    {
+        get_runtime().add_shutdown_function(f);
     }
 }
 

@@ -31,7 +31,7 @@ namespace hpx { namespace performance_counters
         /// not deliver an average.
         ///
         /// Formula:  None. Shows raw data as collected.
-        /// Average:  SUM(N) / x
+        /// Average:  None
         /// Type:     Instantaneous
         counter_raw,
 

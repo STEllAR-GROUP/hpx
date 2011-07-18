@@ -15,8 +15,8 @@ namespace hpx { namespace performance_counters { namespace parcels
 
 class data_point {
 
-    friend struct parcelset::parcelport;
-    friend struct parcelset::parcelport_connection;
+    friend class parcelset::parcelport;
+    friend class parcelset::parcelport_connection;
 
     public:
 

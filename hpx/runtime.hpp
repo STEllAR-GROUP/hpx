@@ -317,7 +317,8 @@ namespace hpx
 
         //
         threads::thread_state run_helper(
-            boost::function<runtime::hpx_main_function_type> func, int& result);
+            boost::function<runtime::hpx_main_function_type> func, int& result,
+            std::size_t num_threads);
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;

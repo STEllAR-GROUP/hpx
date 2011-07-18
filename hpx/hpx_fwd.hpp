@@ -275,6 +275,13 @@ namespace hpx
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
         std::size_t dflt);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Add a function to be executed inside a HPX thread before hpx_main
+    HPX_API_EXPORT void register_startup_function(boost::function<void()> const&);
+
+    /// Add a function to be executed inside a HPX thread during hpx::finalize
+    HPX_API_EXPORT void register_shutdown_function(boost::function<void()> const&);
+
     template <
         typename SchedulingPolicy, 
         typename NotificationPolicy = threads::policies::callback_notifier> 
@@ -314,10 +321,10 @@ namespace hpx
         template <boost::uint64_t MSB, boost::uint64_t LSB,
                   typename Component = detail::this_type>
         struct fixed_component_base;
- 
+
         template <typename Component> 
         struct fixed_component;
-   
+
         template <typename Component = detail::this_type>
         class simple_component_base; 
 
@@ -445,21 +452,21 @@ namespace hpx
         HPX_API_EXPORT counter_status add_counter_type(
             counter_info const& info, 
             error_code& ec = throws);
-    
+
         HPX_API_EXPORT counter_status remove_counter_type(
             counter_info const& info, 
             error_code& ec = throws);
-    
+
         HPX_API_EXPORT counter_status add_counter(
             counter_info const& info, 
             boost::int64_t* countervalue, naming::id_type& id, 
             error_code& ec = throws);
-    
+
         HPX_API_EXPORT counter_status add_counter(
             counter_info const& info, 
             boost::function<boost::int64_t()> f, naming::id_type& id, 
             error_code& ec = throws);
-    
+
         HPX_API_EXPORT counter_status remove_counter(
             counter_info const& info, 
             naming::id_type const& id, error_code& ec = throws);
