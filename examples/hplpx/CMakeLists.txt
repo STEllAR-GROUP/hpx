@@ -6,10 +6,14 @@
 
 add_subdirectory(hplmatrex)
 
+set(hplpx_DEPENDENCIES
+    hplmatrex_component
+    lublock_component)
+
 add_hpx_executable(hplpx
   MODULE hplmatrex
   SOURCES hplpx.cpp
-  DEPENDENCIES hplmatrex_component)
+  DEPENDENCIES ${hplpx_DEPENDENCIES})
 
 add_hpx_pseudo_dependencies(examples.hplpx hplpx_exe)
 

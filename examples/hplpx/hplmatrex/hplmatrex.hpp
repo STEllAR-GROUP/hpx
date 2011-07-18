@@ -7,7 +7,7 @@
 #ifndef _HPLMATREX_HPP
 #define _HPLMATREX_HPP
 
-/*This is the HPLMatreX interface header file.
+/*This is the hplmatrex interface header file.
 In order to keep things simple, only operations necessary
 to to perform LUP decomposition are declared, which is
 basically just constructors, assignment operators, 
@@ -21,24 +21,20 @@ a destructor, and access operators.
 
 namespace hpx { namespace components
 {
-    class HPLMatreX : public client_base<HPLMatreX, stubs::HPLMatreX>
+    class hplmatrex : public client_base<hplmatrex, stubs::hplmatrex>
     {
     typedef
-        client_base<HPLMatreX, stubs::HPLMatreX> base_type;
+        client_base<hplmatrex, stubs::hplmatrex> base_type;
 
     public:
     //constructors and destructor
-    HPLMatreX(){}
-    HPLMatreX(naming::id_type gid) : base_type(gid){}
-    void destruct(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::destruct(gid_);
-    }
+    hplmatrex(){}
+    hplmatrex(naming::id_type gid) : base_type(gid){}
 
     //initialization function
-    int construct(unsigned int h, unsigned int w, unsigned int ab, unsigned int bs){
+    int construct(unsigned int h, unsigned int ab, unsigned int bs){
         BOOST_ASSERT(gid_);
-        return this->base_type::construct(gid_,h,w,ab,bs);
+        return this->base_type::construct(gid_,h,ab,bs);
     }
 
     //functions for solving the matrix

@@ -19,7 +19,7 @@ using boost::program_options::value;
 using hpx::init;
 using hpx::finalize;
 
-using hpx::components::HPLMatreX;
+using hpx::components::hplmatrex;
 
 using hpx::naming::id_type;
 
@@ -43,18 +43,16 @@ int hpx_main(variables_map& vm)
     size = vm["size"].as<unsigned int>();
     allocblock = vm["allocblock"].as<unsigned int>();
     blocksize = vm["blocksize"].as<unsigned int>();
-
     {
         id_type prefix = get_applier().get_runtime_support_gid();
 
-        HPLMatreX dat;
+        hplmatrex dat;
 
         dat.create(prefix);
-        dat.construct(size, 125, allocblock, blocksize);
+        dat.construct(size, allocblock, blocksize);
 
         double r = dat.LUsolve();
 
-        dat.destruct();
         dat.free();
 
         std::cout << (boost::format("total error   : %1%\n"
@@ -79,7 +77,7 @@ int main(int argc, char* argv[])
         , "the height of the NxN+1 matrix generated")
 
         ( "blocksize,B"
-        , value<unsigned int>()->default_value(250) 
+        , value<unsigned int>()->default_value(256) 
         , "the amount of work performed by each pxthread during gaussian "
           "elimination")
 
@@ -88,7 +86,6 @@ int main(int argc, char* argv[])
         , "amount of work each thread performs during memory allocation "
           "(must be a power of 2)")
         ;
-
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv);
 }

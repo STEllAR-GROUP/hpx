@@ -7,7 +7,7 @@
 #ifndef _HPLMATREX_STUBS_HPP
 #define _HPLMATREX_STUBS_HPP
 
-/*This is the HPLMatreX stub file.
+/*This is the hplmatrex stub file.
 */
 
 #include <hpx/runtime/naming/name.hpp>
@@ -16,26 +16,22 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
-#include <examples/hplpx/hplmatrex/server/hplmatrex.hpp>
+#include "../server/hplmatrex.hpp"
 
 namespace hpx { namespace components { namespace stubs
 {
-    struct HPLMatreX : stub_base<server::HPLMatreX>
+    struct hplmatrex : stub_base<server::hplmatrex>
     {
-    //constructor and destructor
+    //constructor
     static int construct(naming::id_type gid, unsigned int h,
-        unsigned int w, unsigned int ab, unsigned int bs){
-        return lcos::eager_future<server::HPLMatreX::construct_action,
-            int>(gid,gid,h,w,ab,bs).get();
-    }
-    static void destruct(naming::id_type gid)
-    {
-        applier::apply<server::HPLMatreX::destruct_action>(gid);
+        unsigned int ab, unsigned int bs){
+        return lcos::eager_future<server::hplmatrex::construct_action,
+            int>(gid,gid,h,ab,bs).get();
     }
 
     //functions for manipulating the matrix
     static double LUsolve(naming::id_type gid){
-        return lcos::eager_future<server::HPLMatreX::solve_action,
+        return lcos::eager_future<server::hplmatrex::solve_action,
             double>(gid).get();
     }
     };
