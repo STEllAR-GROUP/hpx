@@ -123,6 +123,7 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // Addresses are supposed to have the format <hostname>[:port]
         inline void 
         split_ip_address(std::string const& v, std::string& addr, 
             boost::uint16_t& port)
@@ -137,6 +138,10 @@ namespace hpx
                 else {
                     addr = v;
                 }
+
+                // map localhost to loopback ip address
+                if (addr == "localhost") 
+                    addr = "127.0.0.1";
             }
             catch (boost::bad_lexical_cast const& /*e*/) {
                 std::cerr << "hpx::init: illegal port number given: "
