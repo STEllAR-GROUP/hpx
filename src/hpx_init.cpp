@@ -24,6 +24,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 
 // no-op, never called here
 int hpx_main(boost::program_options::variables_map &vm) { return 0; }
@@ -69,6 +70,8 @@ namespace hpx
 
                 hpx_options.add_options()
                     ("help,h", "print out program usage (this message)")
+                    ("hpx-version,v", "print out HPX version and copyright information")
+                    ("hpx-authors", "print out the full list of HPX contributors")
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
                 ;
@@ -131,6 +134,72 @@ namespace hpx
                 store(command_line_parser(argc, argv).
                     options(desc_cmdline).run(), vm);
                 notify(vm);
+
+                // print list of contributors 
+                if (vm.count("hpx-authors")) {
+                    std::string author_list = 
+                        "Copyright (C) 2006      Joao Abecasis\n"
+                        "Copyright (C) 2007-2008 Tim Blechmann\n"
+                        "Copyright (C) 2010      Maciej Brodowicz\n"
+                        "Copyright (C) 2007-2009 Chirag Dekate\n"
+                        "Copyright (C) 2008      Peter Dimov\n"
+                        "Copyright (C) 2007      Richard D. Guidry Jr.\n"
+                        "Copyright (C) 2003      Joel de Guzman\n"
+                        "Copyright (C) 1998-2011 Hartmut Kaiser\n"
+                        "Copyright (C) 2003-2007 Christopher M. Kohlhoff\n"
+                        "Copyright (C) 2011      Katelyn Kufahl\n"
+                        "Copyright (C) 2010-2011 Phillip LeBlanc\n"
+                        "Copyright (C) 2011      Bryce Lelbach \n"
+                        "Copyright (C) 2004      John Maddock\n"
+                        "Copyright (C) 2010      Scott McMurray\n"
+                        "Copyright (C) 2005-2007 Andre Merzky\n"
+                        "Copyright (C) 2002-2007 Robert Ramey\n"
+                        "Copyright (C) 2007-2011 Dylan Stark\n"
+                        "Copyright (C) 2007      Alexandre Tabbal\n"
+                        "Copyright (C) 2007-2009 Anshul Tandon\n"
+                        "Copyright (C) 2004      Jonathan Turkanis\n"
+                        "Copyright (C) 2005-2008 Anthony Williams\n";
+
+                    std::cout << author_list;
+                    return help;
+                }
+
+                // print version/copyright information 
+                if (vm.count("hpx-version")) {
+                    boost::format version("%d.%d.%d")
+                                , logo(
+                        "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n" 
+                        "\n"
+                        "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
+                        "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
+                        "\n"
+                        "Version\n"
+                        "  HPX %s\n"
+                        "  AGAS %x\n"
+                        "  Boost %s\n"
+                        "\n"
+                        "Build\n"
+                        "  Date: %s\n" 
+                        "  Platform: %s\n"
+                        "  Compiler: %s\n"
+                        "  Standard Library: %s\n");
+
+                    std::cout << (logo
+                                 % boost::str( version
+                                             % HPX_VERSION_MAJOR
+                                             % HPX_VERSION_MINOR
+                                             % HPX_VERSION_SUBMINOR)
+                                 % HPX_AGAS_VERSION 
+                                 % boost::str( version
+                                             % (BOOST_VERSION / 100000)
+                                             % (BOOST_VERSION / 100 % 1000)
+                                             % (BOOST_VERSION % 100))
+                                 % __DATE__
+                                 % BOOST_PLATFORM
+                                 % BOOST_COMPILER
+                                 % BOOST_STDLIB);
+                    return help;
+                }
 
                 // print help screen
                 if (vm.count("help")) {
