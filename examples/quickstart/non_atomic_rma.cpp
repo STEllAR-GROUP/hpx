@@ -58,6 +58,16 @@ private:
     }
 };
 
+int main(int argc, char* argv[])
+{
+    // Configure application-specific options
+    po::options_description desc_commandline ("usage:basic_example");
+
+    int retcode = hpx::init(desc_commandline, argc, argv);
+    return retcode;
+
+}
+
 naming::id_type set_initialdata(int);
 void update(naming::id_type);
 
@@ -179,15 +189,5 @@ void update (naming::id_type in)
     result->val_ += 1;
 
     components::stubs::memory_block::checkin(in, result);
-}
-
-int main(int argc, char* argv[])
-{
-    // Configure application-specific options
-    po::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    // Initialize and run HPX.
-    return hpx::init(hpx_main, desc_commandline, argc, argv);
 }
 

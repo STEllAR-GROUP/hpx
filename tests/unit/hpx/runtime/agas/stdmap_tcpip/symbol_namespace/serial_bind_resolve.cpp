@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(init(hpx_main, desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
     return report_errors();
 }

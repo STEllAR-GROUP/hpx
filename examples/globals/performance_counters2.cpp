@@ -45,6 +45,6 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
     
     // Initialize and run HPX
-    return init(hpx_main, desc_commandline, argc, argv, startup_);
+    return init(desc_commandline, argc, argv, startup_);
 }
 

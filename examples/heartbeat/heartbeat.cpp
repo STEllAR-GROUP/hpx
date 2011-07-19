@@ -120,17 +120,18 @@ void monitor(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_heartbeat_main(variables_map& vm)
+int hpx_worker_main(variables_map& vm)
 {
-    const std::string name = vm["name"].as<std::string>();
-    const double frequency = vm["frequency"].as<double>(); 
-    const double duration = vm["duration"].as<double>(); 
-    const double rate = vm["rate"].as<double>();
+    {
+        const std::string name = vm["name"].as<std::string>();
+        const double frequency = vm["frequency"].as<double>(); 
+        const double duration = vm["duration"].as<double>(); 
+        const double rate = vm["rate"].as<double>();
 
-    // This won't return.
-    monitor(name, frequency, duration, rate);
+        monitor(name, frequency, duration, rate);
+    }
 
-    // Never reached.
+    finalize();
     return 0;
 }
 
@@ -138,9 +139,10 @@ int hpx_heartbeat_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+    options_description
+       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
+    desc_commandline.add_options()
         ( "name"
         , value<std::string>()->default_value
             ("/queue([L1]/threadmanager)/length")
@@ -160,6 +162,6 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX.
-    return init(heartbeat_main, cmdline, argc, argv, runtime_mode_worker);
+    return init(desc_commandline, argc, argv, runtime_mode_worker);
 }
 

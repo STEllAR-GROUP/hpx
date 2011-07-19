@@ -141,6 +141,6 @@ int main(int argc, char* argv[])
       ;
 
   // Initialize and run HPX
-  return hpx::init(hpx_main, desc_commandline, argc, argv); 
+  return hpx::init(desc_commandline, argc, argv); 
 }
 

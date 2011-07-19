@@ -820,17 +820,15 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_AGAS_VERSION > 0x10
     void register_startup_function(boost::function<void()> const& f)
     {
         get_runtime().add_startup_function(f);
-    }    
+    }
 
     void register_shutdown_function(boost::function<void()> const& f)
     {
         get_runtime().add_shutdown_function(f);
     }
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

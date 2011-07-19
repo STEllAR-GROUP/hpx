@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(hpx_main, desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,
       "HPX main exited with non-zero status");
     return hpx::util::report_errors();
 }

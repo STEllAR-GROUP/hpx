@@ -14,6 +14,11 @@
 #include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// This function may be optionally implemented. It is run as the main function
+// on every worker node. By default it's a no-op.
+HPX_EXPORT int hpx_main(boost::program_options::variables_map& vm); 
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -123,17 +128,8 @@ namespace hpx
     init(boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[], hpx::runtime_mode mode)
     {
-        const boost::function<void()> empty;
+        boost::function<void()> empty;
         return init(0, desc_cmdline, argc, argv, empty, empty, mode);
-    }
-
-    inline int 
-    init(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description& desc_cmdline, 
-        int argc, char* argv[], hpx::runtime_mode mode)
-    {
-        const boost::function<void()> empty;
-        return init(f, desc_cmdline, argc, argv, empty, empty, mode);
     }
 
     inline int 

@@ -170,6 +170,6 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX
-    return init(hpx_main, desc_commandline, argc, argv);
+    return init(desc_commandline, argc, argv);
 }
 

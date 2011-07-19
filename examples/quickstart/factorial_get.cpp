@@ -157,6 +157,6 @@ int main(int argc, char* argv[])
        "the number to be used as the argument to factorial (default is 0)")
       ;
 
-  return hpx::init(hpx_main, desc_commandline, argc, argv); 
+  return hpx::init(desc_commandline, argc, argv); 
 }
 
