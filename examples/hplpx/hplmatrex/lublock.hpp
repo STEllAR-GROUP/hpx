@@ -52,7 +52,7 @@ namespace hpx { namespace components
         return this->base_type::gauss_trail(gid_, size, corner, left, top);
     }
 
-    //other functions
+    //get functions
     int get_rows(){
         BOOST_ASSERT(gid_);
         return this->base_type::get_rows(gid_);

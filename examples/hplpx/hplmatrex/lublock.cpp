@@ -49,4 +49,6 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::lublock::getColumns_action,HPLgetColumns_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::lublock::getData_action,HPLgetData_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::lublock::createLeftFuture_action,HPLcreateLeft_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::lublock);

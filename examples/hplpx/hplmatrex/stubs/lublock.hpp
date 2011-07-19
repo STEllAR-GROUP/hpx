@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace stubs
         return server::lublock::gtrFuture(gid,size,corner,left,top);
     }
 
-    //other functions
+    //get functions
     static int get_rows(const naming::id_type gid){
         return server::lublock::rowFuture(gid).get();
     }

@@ -79,9 +79,11 @@ namespace hpx { namespace components { namespace server
     int blocksize;        //reflects amount of computation per thread
     naming::id_type _gid; //the instance's gid
     components::lublock** datablock;  //stores pointers to data components
+    std::vector<std::vector<naming::id_type> > gidList;
+                          //the gids of the array of lublock components
     double** trueData;    //the original unaltered data
     double** transData;   //transpose of the original data(speeds up pivoting)
-    double** solution;     //for storing the solution
+    double** solution;    //for storing the solution
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
     int* tempivotarr;     //temporary copy of pivotarr
@@ -173,20 +175,18 @@ namespace hpx { namespace components { namespace server
 
     //allocate() allocates memory space for the matrix
     void hplmatrex::allocate(){
-    datablock = (components::lublock**) 
-        std::malloc(brows*sizeof(components::lublock*));
-    transData = (double**) std::malloc(columns*sizeof(double*));
-    trueData = (double**) std::malloc(rows*sizeof(double*));
-    pivotarr = (int*) std::malloc(rows*sizeof(int));
-    tempivotarr = (int*) std::malloc(rows*sizeof(int));
+    datablock = new components::lublock*[brows];
+    transData = new double*[columns];
+    trueData = new double*[rows];
+    pivotarr = new int[rows];
+    tempivotarr = new int[rows];
     for(int i = 0;i < rows;i++){
-        trueData[i] = (double*) std::malloc(columns*sizeof(double));
-        transData[i] = (double*) std::malloc(rows*sizeof(double));
+        trueData[i] = new double[columns];
+        transData[i] = new double[rows];
     }
-    transData[rows] = (double*) std::malloc(rows*sizeof(double));
+    transData[rows] = new double[rows];
     for(int i = 0;i < brows;i++){
-        datablock[i] = (components::lublock*) 
-            std::malloc(brows*sizeof(components::lublock));
+        datablock[i] = new components::lublock[brows];
     }
     }
 
@@ -221,26 +221,24 @@ namespace hpx { namespace components { namespace server
             else{
                 if(row + offset < rows){
                     futures.push_back(assign_future(_gid,row+offset,
-            (int)(offset*.5),false,gen()));
+                        (int)(offset*.5),false,gen()));
                 }
                 offset = (int)(offset*.5);
-            }
-        }
-    //initialize the assigned row
-    int temp = std::min((int)offset, (int)(rows - row));
-    int location;
-    for(int i=0;i<temp;i++){
-        location = row+i;
-        for(int j=0;j<columns;j++){
-            transData[j][location] = trueData[location][j]
+        }   }
+        //initialize the assigned row
+        int temp = std::min((int)offset, (int)(rows - row));
+        int location;
+        for(int i=0;i<temp;i++){
+            location = row+i;
+            for(int j=0;j<columns;j++){
+                transData[j][location] = trueData[location][j]
                                    = (double) (gen() % 1000);
+        }   }
+        //once all spun off futures are complete we are done
+        BOOST_FOREACH(assign_future af, futures){
+            af.get();
         }
-    }
-    //once all spun off futures are complete we are done
-    BOOST_FOREACH(assign_future af, futures){
-        af.get();
-    }
-    return 1;
+        return 1;
     }
 
     //the destructor frees the memory
@@ -307,10 +305,8 @@ namespace hpx { namespace components { namespace server
     std::cout<<"finished gaussian "<<temp2 - temp<<std::endl;
 
     //allocate memory space to store the solution
-    solution = (double**) std::malloc(rows*sizeof(double*));
-    for(int i = 0; i < rows; i++){
-        solution[i] = (double*) std::malloc((brows+1)*sizeof(double));
-    }
+    solution = new double*[rows];
+    for(int i = 0; i < rows; i++){solution[i] = new double[brows+1];}
 
     //perform back substitution
     lubacksubst();
@@ -335,7 +331,7 @@ namespace hpx { namespace components { namespace server
     int maxRow, temp_piv, outer;
     int i=0,j;
     bool good;
-    int* guessedPivots = (int*) std::malloc(rows*sizeof(int));
+    int* guessedPivots = new int[rows];
     std::vector<swap_future> futures;
     std::vector<search_future> searches;
 
@@ -395,8 +391,15 @@ namespace hpx { namespace components { namespace server
         //finding the pivot values for.  Due to how the lublocks are used
         //to represent the entire dataset, the second to last iteration
         //does not create a new swap future.
-        if(outer<brows-1){futures.push_back(swap_future(_gid,outer,0));}
-        else if(outer==brows){futures.push_back(swap_future(_gid,outer-1,0));}
+        std::vector<naming::id_type> vectorRow;
+        if(outer<brows-1){
+            gidList.push_back(vectorRow);
+            futures.push_back(swap_future(_gid,outer,0));
+        }
+        else if(outer==brows){
+            gidList.push_back(vectorRow);
+            futures.push_back(swap_future(_gid,outer-1,0));
+        }
     }
     //transData is no longer needed so free the memory and allocate
     //space for factorData
@@ -405,7 +408,6 @@ namespace hpx { namespace components { namespace server
     }
     free(transData[rows]);
     free(transData);
-
     //ensure that all pivoting is complete
     BOOST_FOREACH(swap_future sf, futures){
         sf.get();
@@ -454,8 +456,11 @@ namespace hpx { namespace components { namespace server
             for(j=0;j<numcols;j++){
                 tempData[i].push_back(trueData[pivotarr[off1+i]][off2+j]);
         }   }
-        datablock[brow][k].create(hpx::applier::get_applier().get_runtime_support_gid());
+        naming::id_type prefix =
+            hpx::applier::get_applier().get_runtime_support_gid();
+        datablock[brow][k].create(prefix);
         datablock[brow][k].construct_block(numrows,numcols,_gid,tempData);
+        gidList[brow].push_back(datablock[brow][k].get_gid());
         tempData.clear();
     }
     return 1;
@@ -467,63 +472,58 @@ namespace hpx { namespace components { namespace server
     //order with as many datablocks being operated on simultaneously as possible
     void hplmatrex::lu_gauss_manager(){
     int iter = 0, i, j;
-    int startElement, beginElement, endElement, nextElement, topElement;
-    std::vector<lublock::glFuture> lfutures;
+    int beginElement, nextElement;
     std::vector<lublock::gtopFuture> tfutures;
     std::vector<lublock::gtrFuture> trfutures;
+    lublock::createLeftFuture* leftFuture;
+//    creationTopFuture* topFuture;
 
-    //the first iteration works different because we do not need to wait for
+    //the first iteration works differently because we do not need to wait for
     //any futures to complete before creating new futures
     lublock::gcFuture(datablock[0][0].gauss_corner()).get();
+    leftFuture = new lublock::createLeftFuture(gidList[1][0],1,0,brows,gidList);
+
     for(i = 1; i < brows; i++){
-        lfutures.push_back(datablock[i][0].gauss_left(
-                                                    datablock[0][0].get_gid()));
+        tfutures.push_back(datablock[0][i].gauss_top(gidList[0][0]));
     }
-    endElement = lfutures.size();
-    for(i = 1; i < brows; i++){
-        tfutures.push_back(datablock[0][i].gauss_top(datablock[0][0].get_gid()));
-    }
-    for(i = 0; i < endElement; i++){
-        lfutures[i].get();
-    }
+    leftFuture->get();
     beginElement = trfutures.size();
     for(i = 1; i < brows; i++){
         tfutures[i-1].get();
         for(j = 1; j < brows; j++){
             trfutures.push_back(datablock[j][i].gauss_trail(blocksize,
-                datablock[0][0].get_gid(), datablock[j][0].get_gid(),
-                datablock[0][i].get_gid()));
+                gidList[0][0], gidList[j][0], gidList[0][i]));
     }   }
+    delete leftFuture;
+    tfutures.clear();
     //from here on we need to wait for the previous iteration to partially
     //complete before launching new futures
     for(iter = 1; iter < brows; iter++){
-        startElement = lfutures.size();
         trfutures[beginElement].get();
         lublock::gcFuture(datablock[iter][iter].gauss_corner()).get();
         for(i = iter+1; i < brows; i++){
             trfutures[beginElement+i-iter].get();
-            lfutures.push_back(datablock[i][iter].gauss_left(
-                                              datablock[iter][iter].get_gid()));
         }
-        endElement = lfutures.size();
-        topElement = tfutures.size();
+        if(iter+1 < brows){
+            leftFuture = new lublock::createLeftFuture(gidList[iter+1][iter],
+                iter+1, iter, brows, gidList);
+        }
         for(i = iter+1; i < brows; i++){
             trfutures[beginElement+(brows-iter)*(i-iter)].get();
-            tfutures.push_back(datablock[iter][i].gauss_top(
-                                              datablock[iter][iter].get_gid()));
+            tfutures.push_back(
+                datablock[iter][i].gauss_top(gidList[iter][iter]));
         }
-        for(i = startElement; i < endElement; i++){
-            lfutures[i].get();
-        }
+        if(iter+1 < brows){leftFuture->get();}
         nextElement = trfutures.size();
         for(i = iter+1; i < brows; i++){
-            tfutures[topElement+i-iter-1].get();
+            tfutures[i-iter-1].get();
             for(j = iter+1; j < brows; j++){
                 trfutures[beginElement+(brows-iter)*(i-iter)+j-iter].get();
                 trfutures.push_back(datablock[j][i].gauss_trail(blocksize,
-                    datablock[iter][iter].get_gid(),
-                    datablock[j][iter].get_gid(),datablock[iter][i].get_gid()));
+                    gidList[iter][iter], gidList[j][iter], gidList[iter][i]));
         }   }
+        if(iter+1 < brows){delete leftFuture;}
+        tfutures.clear();
         beginElement = nextElement;
     }
     }
@@ -535,7 +535,7 @@ namespace hpx { namespace components { namespace server
     //the additional work.
     int hplmatrex::lubacksubst(){
     int i,k,l,row,temp;
-    int* neededFuture = (int*)std::malloc((brows-1)*sizeof(int));
+    int* neededFuture = new int[brows-1];
     std::vector<partbsub_future> futures;
     std::vector<std::vector<double> > tempData;
 

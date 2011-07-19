@@ -32,11 +32,12 @@ namespace hpx { namespace components { namespace server
             hpl_gtrail,
             hpl_getRows,
             hpl_getColumns,
-            hpl_getData
+            hpl_getData,
+            hpl_createLeft
         };
         //constructors and destructor
         lublock(){}
-        int construct_block(const int h, const int w, const naming::id_type ctrl,
+        int construct_block(const int h,const int w, const naming::id_type ctrl,
             std::vector<std::vector<double> > theData);
         ~lublock(){destruct_block();}
         void destruct_block();
@@ -60,30 +61,48 @@ namespace hpx { namespace components { namespace server
         typedef actions::result_action4<lublock, int, hpl_constructBlock,
             int, int, naming::id_type, std::vector<std::vector<double> >,
             &lublock::construct_block> constructBlock_action;
+
         typedef actions::result_action0<lublock, int, hpl_gcorner,
             &lublock::lu_gauss_corner> gcorner_action;
+
         typedef actions::result_action1<lublock, int, hpl_gtop,
             naming::id_type, &lublock::lu_gauss_top> gtop_action;
+
         typedef actions::result_action1<lublock, int, hpl_gleft,
             naming::id_type, &lublock::lu_gauss_left> gleft_action;
+
         typedef actions::result_action4<lublock, int, hpl_gtrail, int,
             naming::id_type, naming::id_type, naming::id_type, 
             &lublock::lu_gauss_trail> gtrail_action;
+
         typedef actions::result_action0<lublock, int, hpl_getRows,
             &lublock::get_rows> getRows_action;
+
         typedef actions::result_action0<lublock, int, hpl_getColumns,
             &lublock::get_columns> getColumns_action;
-        typedef actions::result_action0<lublock, std::vector<std::vector<double> >,
+
+        typedef actions::result_action0<lublock,
+            std::vector<std::vector<double> >,
             hpl_getData, &lublock::get_data> getData_action;
 
         //futures
         typedef lcos::eager_future<server::lublock::getData_action> dataFuture;
         typedef lcos::eager_future<server::lublock::getRows_action> rowFuture;
-        typedef lcos::eager_future<server::lublock::getColumns_action> columnFuture;
+        typedef 
+            lcos::eager_future<server::lublock::getColumns_action> columnFuture;
         typedef lcos::eager_future<server::lublock::gcorner_action> gcFuture;
         typedef lcos::eager_future<server::lublock::gtop_action> gtopFuture;
         typedef lcos::eager_future<server::lublock::gleft_action> glFuture;
         typedef lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
+
+        //the below functions require futures and actions declared above
+        int create_left_futures(const int row, const int iter,
+            int brows,const std::vector<std::vector<naming::id_type> > gidList);
+        typedef actions::result_action4<lublock, int, hpl_createLeft, int, int,
+            int, std::vector<std::vector<naming::id_type> >,
+            &lublock::create_left_futures> createLeftFuture_action;
+        typedef lcos::eager_future<server::lublock::createLeftFuture_action>
+            createLeftFuture;
     };
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -91,8 +110,6 @@ namespace hpx { namespace components { namespace server
     int lublock::construct_block(const int h, const int w,
         const naming::id_type ctrl, std::vector<std::vector<double> > theData){
         controller = ctrl;
-//        workSpace = (double*) std::malloc((8+h*w)*sizeof(double));
-//        data = (double**) std::malloc(h*sizeof(double*));
         for(int i = 0; i < h; i++){
             std::vector<double> row;
             data.push_back(row);
@@ -101,9 +118,6 @@ namespace hpx { namespace components { namespace server
         }   }
         rows = h;
         columns = w;
-//        for(int i = 0; i < h; i++){
-//            data[i] = workSpace + 8 + i*w;
-//        }
         return 1;
     }
 
@@ -111,6 +125,29 @@ namespace hpx { namespace components { namespace server
     void lublock::destruct_block(){
         free(workSpace);
         data.clear();
+    }
+
+    //create_left_futures distributes the work of creating futures across a
+    //large number of lublock components
+    int lublock::create_left_futures(const int row,
+        const int iter, int brows,
+        const std::vector<std::vector<naming::id_type> > gidList){
+        int breadth = brows-row;
+        int jump = 1;
+        std::vector<createLeftFuture> needFutures;
+        std::vector<glFuture> returnFutures;
+
+        while(jump*2 < breadth){jump*=2;}
+        while(breadth > 1){
+            needFutures.push_back(createLeftFuture(gidList[row+jump][iter],
+                row+jump, iter, brows, gidList));
+            brows = row+jump;
+            jump /= 2;
+            breadth = brows - row;
+        }
+        lu_gauss_left(gidList[iter][iter]);
+        for(int i = 0; i < (int)needFutures.size(); i++){needFutures[i].get();}
+        return 1;
     }
 
     //lugausscorner peforms gaussian elimination on the topleft corner block
@@ -155,7 +192,7 @@ namespace hpx { namespace components { namespace server
     int lublock::lu_gauss_left(const naming::id_type iterCorner){
     int i,j,k;
     double factor;
-    double* fFactor = (double*) std::malloc(columns*sizeof(double));
+    double* fFactor = new double[columns];
     std::vector<std::vector<double> > cornerData = dataFuture(iterCorner).get();
 
     //this first block of code finds all necessary factors early on
