@@ -59,23 +59,6 @@
 using namespace hpx;
 namespace po = boost::program_options;
 
-int main(int argc, char* argv[])
-{
-    // Configure application-specific options
-    po::options_description desc_commandline ("usage:basic_example");
-
-    /* 
-       Initialize and run HPX; there are (at least) two ways to do this. One is using hpx_init
-       as shown below -- this is analogous to mpi_init and creates the hpx runtime and performs
-       other setup as directed by command line arguments. The other method is explicitly via
-       a series of calls to create the runtime manually with the desired characteristics. The
-       two methods have equivalent results (ie., and hpx runtime is created). 
-    */
-    int retcode = hpx::init(desc_commandline, argc, argv);
-    return retcode;
-
-}
-
 /* 
     These three delcarations are here, before hpx_main, because they will be needed by that
     block of code. As you will see when reading below, these declarations setup the routines
@@ -293,5 +276,15 @@ naming::id_type getnumber2 ()
     }
 
     return result;
+}
+
+int main(int argc, char* argv[])
+{
+    // Configure application-specific options
+    po::options_description
+       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+
+    // Initialize and run HPX.
+    return hpx::init(hpx_main, desc_commandline, argc, argv);
 }
 

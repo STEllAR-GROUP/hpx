@@ -1009,7 +1009,7 @@ int main(int argc, char* argv[])
        "the input data file")
       ;
 
-  int retcode = hpx::init(desc_commandline, argc, argv);
+  int retcode = hpx::init(hpx_main, desc_commandline, argc, argv);
   return retcode;
 }
 

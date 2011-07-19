@@ -124,6 +124,6 @@ int main(int argc, char* argv[])
             "the number of contact enforcement iterations") 
         ;
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(hpx_main, desc_commandline, argc, argv);
 }
 

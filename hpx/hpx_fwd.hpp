@@ -277,12 +277,14 @@ namespace hpx
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
         std::size_t dflt);
 
+#if HPX_AGAS_VERSION > 0x10
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
     HPX_API_EXPORT void register_startup_function(boost::function<void()> const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
     HPX_API_EXPORT void register_shutdown_function(boost::function<void()> const&);
+#endif
 
     template <
         typename SchedulingPolicy, 

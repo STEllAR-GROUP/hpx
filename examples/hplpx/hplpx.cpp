@@ -87,6 +87,6 @@ int main(int argc, char* argv[])
           "(must be a power of 2)")
         ;
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    return init(hpx_main, desc_commandline, argc, argv);
 }
 

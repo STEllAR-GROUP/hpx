@@ -116,6 +116,6 @@ int main(int argc, char* argv[])
             "the number of lookups to perform") 
         ;
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(hpx_main, desc_commandline, argc, argv);
 }
 

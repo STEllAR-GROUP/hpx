@@ -165,7 +165,7 @@ namespace hpx
                         ("console,c", "run this instance in console mode")
                     ;
                 }
-                else if (hpx::runtime_mode_worker == mode)
+                else 
                 {
                     // If the runtime for this application is always run in
                     // worker mode, silently ignore the worker option for
@@ -325,7 +325,7 @@ namespace hpx
             }
             else if (0 != f) {
                 // Run this runtime instance using the given hpx_main.
-                return rt.run(boost::bind(::hpx_main, vm), num_threads, 
+                return rt.run(boost::bind(f, vm), num_threads, 
                     num_localities);
             }
 
@@ -592,7 +592,7 @@ namespace hpx
         if (argc == 0 || argv == 0)
         {
             char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
-            return init(desc_commandline, 1, dummy_argv);
+            return init(f, desc_commandline, 1, dummy_argv);
         }
 
         return init(f, desc_commandline, argc, argv, 
