@@ -10,5 +10,8 @@
     <ClCompile Include="..\..\..\tests\unit\hpx\lcos\barrier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\examples\globals\start_and_stop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

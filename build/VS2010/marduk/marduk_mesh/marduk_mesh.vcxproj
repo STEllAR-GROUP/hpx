@@ -78,7 +78,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\marduk\mesh\amr.cpp" />
-    <ClCompile Include="..\..\..\..\examples\marduk\mesh\server\dynamic_stencil_value.cpp" />
+    <ClCompile Include="..\..\..\..\examples\marduk\mesh\server\dynamic_stencil_value.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\examples\marduk\mesh\server\functional_component.cpp" />
     <ClCompile Include="..\..\..\..\examples\marduk\mesh\server\stencil_value_out_adaptor.cpp" />
     <ClCompile Include="..\..\..\..\examples\marduk\mesh\server\unigrid_mesh.cpp">

@@ -50,9 +50,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp" />
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\point.hpp" />
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.hpp" />
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\server\point.hpp" />
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\stubs\point.hpp" />
   </ItemGroup>
@@ -73,6 +75,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\examples\geometry\point_geometry\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

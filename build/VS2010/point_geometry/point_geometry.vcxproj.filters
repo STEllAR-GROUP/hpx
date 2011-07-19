@@ -24,10 +24,19 @@
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\point.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\examples\geometry\point_geometry\CMakeLists.txt" />
   </ItemGroup>
 </Project>
