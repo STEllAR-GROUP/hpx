@@ -26,12 +26,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
-// no-op, never called here
-int hpx_main(boost::program_options::variables_map &vm) { return 0; }
-
-// default implementation
-int hpx_worker_main(boost::program_options::variables_map &vm) { return 0; }
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -43,6 +37,11 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    typedef int (*hpx_main_func)(boost::program_options::variables_map& vm);
+    typedef boost::function<void()> startup_func;
+    typedef boost::function<void()> shutdown_func;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         enum command_line_result
@@ -51,6 +50,89 @@ namespace hpx
             success,    ///< sucess parsing command line
             error       ///< error handling command line
         }; 
+
+        ///////////////////////////////////////////////////////////////////////
+        // Print authors list (why do we need that?) Who is going to maintain 
+        // this list?
+        command_line_result print_authors()
+        {
+            std::string author_list = 
+                "Copyright (C) 2006      Joao Abecasis\n"
+                "Copyright (C) 2007-2008 Tim Blechmann\n"
+                "Copyright (C) 2010      Maciej Brodowicz\n"
+                "Copyright (C) 2007-2009 Chirag Dekate\n"
+                "Copyright (C) 2008      Peter Dimov\n"
+                "Copyright (C) 2007      Richard D. Guidry Jr.\n"
+                "Copyright (C) 2003      Joel de Guzman\n"
+                "Copyright (C) 1998-2011 Hartmut Kaiser\n"
+                "Copyright (C) 2003-2007 Christopher M. Kohlhoff\n"
+                "Copyright (C) 2011      Katelyn Kufahl\n"
+                "Copyright (C) 2010-2011 Phillip LeBlanc\n"
+                "Copyright (C) 2011      Bryce Lelbach \n"
+                "Copyright (C) 2004      John Maddock\n"
+                "Copyright (C) 2010      Scott McMurray\n"
+                "Copyright (C) 2005-2007 Andre Merzky\n"
+                "Copyright (C) 2002-2007 Robert Ramey\n"
+                "Copyright (C) 2007-2011 Dylan Stark\n"
+                "Copyright (C) 2007      Alexandre Tabbal\n"
+                "Copyright (C) 2007-2009 Anshul Tandon\n"
+                "Copyright (C) 2004      Jonathan Turkanis\n"
+                "Copyright (C) 2005-2008 Anthony Williams\n";
+
+            std::cout << author_list;
+            return help;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        command_line_result print_version()
+        {
+            boost::format version("%d.%d.%d");
+            boost::format logo(
+                "HPX - High Performance ParalleX\n"
+                "A experimental runtime system for conventional machines implementing\n"
+                "(parts of) the ParalleX execution model." 
+                "\n"
+                "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
+                "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
+                "\n"
+                "Versions:\n"
+                "  HPX %s (AGAS %x)\n"
+                "  Boost %s\n"
+                "\n"
+                "Build:\n"
+                "  Date: %s\n" 
+                "  Platform: %s\n"
+                "  Compiler: %s\n"
+                "  Standard Library: %s\n");
+
+            std::cout << (logo
+                          % boost::str( version
+                                      % HPX_VERSION_MAJOR
+                                      % HPX_VERSION_MINOR
+                                      % HPX_VERSION_SUBMINOR)
+                          % HPX_AGAS_VERSION 
+                          % boost::str( version
+                                      % (BOOST_VERSION / 100000)
+                                      % (BOOST_VERSION / 100 % 1000)
+                                      % (BOOST_VERSION % 100))
+                          % __DATE__
+                          % BOOST_PLATFORM
+                          % BOOST_COMPILER
+                          % BOOST_STDLIB);
+            return help;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        command_line_result print_help(
+            boost::program_options::options_description const& app_options, 
+            boost::program_options::options_description const& hpx_options)
+        {
+            boost::program_options::options_description visible;
+
+            visible.add(app_options).add(hpx_options);
+            std::cout << visible;
+            return help;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // parse the command line
@@ -65,8 +147,8 @@ namespace hpx
             using boost::program_options::command_line_parser;
 
             try {
-                options_description hpx_options("HPX Options")
-                                  , hidden_options("Hidden Options");
+                options_description hpx_options("HPX Options");
+                options_description hidden_options("Hidden Options");
 
                 hpx_options.add_options()
                     ("help,h", "print out program usage (this message)")
@@ -80,6 +162,7 @@ namespace hpx
                 {
                     hpx_options.add_options()
                         ("worker,w", "run this instance in worker mode")
+                        ("console,c", "run this instance in console mode")
                     ;
                 }
                 else if (hpx::runtime_mode_worker == mode)
@@ -89,6 +172,7 @@ namespace hpx
                     // hpx_pbs compatibility.
                     hidden_options.add_options()
                         ("worker,w", "run this instance in worker mode")
+                        ("console,c", "run this instance in console mode")
                     ;
                 }
 
@@ -127,85 +211,24 @@ namespace hpx
                      "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
                 ;
 
-                options_description desc_cmdline, visible;
+                options_description desc_cmdline;
                 desc_cmdline.add(app_options).add(hpx_options).add(hidden_options);
-                visible.add(app_options).add(hpx_options);
 
                 store(command_line_parser(argc, argv).
                     options(desc_cmdline).run(), vm);
                 notify(vm);
 
                 // print list of contributors 
-                if (vm.count("hpx-authors")) {
-                    std::string author_list = 
-                        "Copyright (C) 2006      Joao Abecasis\n"
-                        "Copyright (C) 2007-2008 Tim Blechmann\n"
-                        "Copyright (C) 2010      Maciej Brodowicz\n"
-                        "Copyright (C) 2007-2009 Chirag Dekate\n"
-                        "Copyright (C) 2008      Peter Dimov\n"
-                        "Copyright (C) 2007      Richard D. Guidry Jr.\n"
-                        "Copyright (C) 2003      Joel de Guzman\n"
-                        "Copyright (C) 1998-2011 Hartmut Kaiser\n"
-                        "Copyright (C) 2003-2007 Christopher M. Kohlhoff\n"
-                        "Copyright (C) 2011      Katelyn Kufahl\n"
-                        "Copyright (C) 2010-2011 Phillip LeBlanc\n"
-                        "Copyright (C) 2011      Bryce Lelbach \n"
-                        "Copyright (C) 2004      John Maddock\n"
-                        "Copyright (C) 2010      Scott McMurray\n"
-                        "Copyright (C) 2005-2007 Andre Merzky\n"
-                        "Copyright (C) 2002-2007 Robert Ramey\n"
-                        "Copyright (C) 2007-2011 Dylan Stark\n"
-                        "Copyright (C) 2007      Alexandre Tabbal\n"
-                        "Copyright (C) 2007-2009 Anshul Tandon\n"
-                        "Copyright (C) 2004      Jonathan Turkanis\n"
-                        "Copyright (C) 2005-2008 Anthony Williams\n";
-
-                    std::cout << author_list;
-                    return help;
-                }
+                if (vm.count("hpx-authors")) 
+                    return print_authors();
 
                 // print version/copyright information 
-                if (vm.count("hpx-version")) {
-                    boost::format version("%d.%d.%d")
-                                , logo(
-                        "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n" 
-                        "\n"
-                        "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
-                        "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
-                        "\n"
-                        "Version\n"
-                        "  HPX %s\n"
-                        "  AGAS %x\n"
-                        "  Boost %s\n"
-                        "\n"
-                        "Build\n"
-                        "  Date: %s\n" 
-                        "  Platform: %s\n"
-                        "  Compiler: %s\n"
-                        "  Standard Library: %s\n");
-
-                    std::cout << (logo
-                                 % boost::str( version
-                                             % HPX_VERSION_MAJOR
-                                             % HPX_VERSION_MINOR
-                                             % HPX_VERSION_SUBMINOR)
-                                 % HPX_AGAS_VERSION 
-                                 % boost::str( version
-                                             % (BOOST_VERSION / 100000)
-                                             % (BOOST_VERSION / 100 % 1000)
-                                             % (BOOST_VERSION % 100))
-                                 % __DATE__
-                                 % BOOST_PLATFORM
-                                 % BOOST_COMPILER
-                                 % BOOST_STDLIB);
-                    return help;
-                }
+                if (vm.count("hpx-version")) 
+                    return print_version();
 
                 // print help screen
-                if (vm.count("help")) {
-                    std::cout << visible;
-                    return help;
-                }
+                if (vm.count("help")) 
+                    return print_help(app_options, hpx_options);
             }
             catch (std::exception const& e) {
                 std::cerr << "hpx::init: exception caught: "
@@ -233,7 +256,9 @@ namespace hpx
                     addr = v;
                 }
 
-                // map localhost to loopback ip address
+                // map localhost to loopback ip address (that's a quick hack 
+                // which will be removed as soon as we figure out why name 
+                // resolution does not handle this anymore)
                 if (addr == "localhost") 
                     addr = "127.0.0.1";
             }
@@ -269,13 +294,139 @@ namespace hpx
             hpx::naming::resolver_server agas_;
         };
 #endif
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Runtime>
+        int run(Runtime& rt, hpx_main_func hpx_main, 
+            boost::program_options::variables_map& vm, runtime_mode mode, 
+            startup_func startup_function, shutdown_func shutdown_function, 
+            std::size_t num_threads, std::size_t num_localities)
+        {
+            if (vm.count("app-config"))
+            {
+                std::string config(vm["app-config"].as<std::string>());
+                rt.get_config().load_application_configuration(config.c_str());
+            }
+
+            // Dump the configuration.
+            if (vm.count("dump-config"))
+                rt.get_config().dump();
+
+#if HPX_AGAS_VERSION > 0x10
+            if (!startup_function.empty())
+                rt.add_startup_function(startup_function);
+
+            if (!shutdown_function.empty())
+                rt.add_shutdown_function(shutdown_function);
+#endif
+
+            if (vm.count("exit")) {
+                return 0;
+            }
+            else if (0 != hpx_main) {
+                // Run this runtime instance using the given hpx_main.
+                return rt.run(boost::bind(hpx_main, vm), num_threads, 
+                    num_localities);
+            }
+
+            // Run this runtime instance using an empty hpx_main
+            return rt.run(num_threads, num_localities);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        int run_global(std::string const& hpx_host, boost::uint16_t hpx_port, 
+            std::string const& agas_host, boost::uint16_t agas_port, 
+            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            runtime_mode mode, std::vector<std::string> const& ini_config, 
+            startup_func startup_function, shutdown_func shutdown_function, 
+            std::size_t num_threads, std::size_t num_localities)
+        {
+            typedef hpx::threads::policies::global_queue_scheduler
+                global_queue_policy;
+            typedef hpx::runtime_impl<global_queue_policy> runtime_type;
+
+            // Build and configure this runtime instance.
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
+                global_queue_policy::init_parameter_type(), 
+                vm["hpx-config"].as<std::string>(), ini_config);
+
+            return run(rt, hpx_main, vm, mode, startup_function, 
+                shutdown_function, num_threads, num_localities);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        int run_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
+            std::string const& agas_host, boost::uint16_t agas_port, 
+            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            runtime_mode mode, std::vector<std::string> const& ini_config, 
+            startup_func startup_function, shutdown_func shutdown_function, 
+            std::size_t num_threads, std::size_t num_localities)
+        {
+            typedef hpx::threads::policies::local_queue_scheduler
+                local_queue_policy;
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            local_queue_policy::init_parameter_type init(num_threads, 1000);
+
+            // Build and configure this runtime instance.
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
+                init, vm["hpx-config"].as<std::string>(), ini_config);
+
+            return run(rt, hpx_main, vm, mode, startup_function, 
+                shutdown_function, num_threads, num_localities);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // local scheduler with priority queue (one queue for ech OS threads
+        // plus one separate queue for high priority PX-threads)
+        int run_priority_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
+            std::string const& agas_host, boost::uint16_t agas_port, 
+            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            runtime_mode mode, std::vector<std::string> const& ini_config, 
+            startup_func startup_function, shutdown_func shutdown_function, 
+            std::size_t num_threads, std::size_t num_localities)
+        {
+            typedef hpx::threads::policies::local_priority_queue_scheduler 
+                local_queue_policy;
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            local_queue_policy::init_parameter_type init(num_threads, 1000);
+
+            // Build and configure this runtime instance.
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
+                init, vm["hpx-config"].as<std::string>(), ini_config);
+
+            return run(rt, hpx_main, vm, mode, startup_function, 
+                shutdown_function, num_threads, num_localities);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // abp scheduler: local deques for each OS thread, with work
+        // stealing from the "bottom" of each.
+        int run_abp(std::string const& hpx_host, boost::uint16_t hpx_port, 
+            std::string const& agas_host, boost::uint16_t agas_port, 
+            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            runtime_mode mode, std::vector<std::string> const& ini_config, 
+            startup_func startup_function, shutdown_func shutdown_function, 
+            std::size_t num_threads, std::size_t num_localities)
+        {
+            typedef hpx::threads::policies::abp_queue_scheduler 
+                abp_queue_policy;
+            typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
+            abp_queue_policy::init_parameter_type init(num_threads, 1000);
+
+            // Build and configure this runtime instance.
+            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
+                init, vm["hpx-config"].as<std::string>(), ini_config);
+
+            return run(rt, hpx_main, vm, mode, startup_function, 
+                shutdown_function, num_threads, num_localities);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(int (*hpx_main)(boost::program_options::variables_map& vm),
+    int init(hpx_main_func hpx_main,
         boost::program_options::options_description& desc_cmdline, 
-        int argc, char* argv[], boost::function<void()> startup_function, 
-        boost::function<void()> shutdown_function, hpx::runtime_mode mode)
+        int argc, char* argv[], startup_func startup_function, 
+        shutdown_func shutdown_function, hpx::runtime_mode mode)
     {
         int result = 0;
 
@@ -302,8 +453,7 @@ namespace hpx
             // Analyze the command line.
             variables_map vm;
 
-            switch (detail::parse_commandline
-                (desc_cmdline, argc, argv, vm, mode))
+            switch (detail::parse_commandline(desc_cmdline, argc, argv, vm, mode))
             {
                 case detail::error:
                     return 1;
@@ -346,7 +496,10 @@ namespace hpx
             if (hpx::runtime_mode_default == mode)
             {
                 mode = hpx::runtime_mode_console;
-
+                if (vm.count("console") && vm.count("worker")) {
+                    throw std::logic_error("Ambiguous command line options. "
+                        "Do not specify both, --console/-c and --worker/-w\n");
+                }
                 if (vm.count("worker"))
                     mode = hpx::runtime_mode_worker;
             }
@@ -381,185 +534,34 @@ namespace hpx
 #endif
 
             // Initialize and start the HPX runtime.
-            if ((0 == std::string("global").find(queueing))) {
-                typedef hpx::threads::policies::global_queue_scheduler
-                    global_queue_policy;
-                typedef hpx::runtime_impl<global_queue_policy>
-                    runtime_type;
-
-                // Build and configure this runtime instance.
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
-                    global_queue_policy::init_parameter_type(), 
-                    vm["hpx-config"].as<std::string>(), ini_config);
-
-                if (vm.count("app-config"))
-                {
-                    std::string config(vm["app-config"].as<std::string>());
-                    rt.get_config().load_application_configuration(config.c_str());
-                }
-
-                // Dump the configuration.
-                if (vm.count("dump-config"))
-                    rt.get_config().dump();
-
-#if HPX_AGAS_VERSION > 0x10
-                if (!startup_function.empty())
-                    rt.add_startup_function(startup_function);
-
-                if (!shutdown_function.empty())
-                    rt.add_shutdown_function(shutdown_function);
-#endif
-
-                if (vm.count("exit")) {
-                    result = 0;
-                }
-                else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main.
-                    result = rt.run(boost::bind(hpx_main, vm), num_threads, 
-                        num_localities);
-                }
-                else {
-                    // Run this runtime instance using the given
-                    // hpx_worker_main.
-                    result = rt.run(boost::bind(hpx_worker_main, vm),
-                        num_threads, num_localities);
-                }
+            int result = -1;
+            if (0 == std::string("global").find(queueing)) {
+                result = detail::run_global(hpx_host, hpx_port, 
+                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    startup_function, shutdown_function, num_threads, 
+                    num_localities);
             }
-            else if ((0 == std::string("local").find(queueing))) {
-                typedef hpx::threads::policies::local_queue_scheduler
-                    local_queue_policy;
-                typedef hpx::runtime_impl<local_queue_policy> 
-                    runtime_type;
-
-                local_queue_policy::init_parameter_type init(num_threads, 1000);
-
-                // Build and configure this runtime instance.
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, 
-                    init, vm["hpx-config"].as<std::string>(), ini_config);
-
-                if (vm.count("app-config"))
-                {
-                    std::string config(vm["app-config"].as<std::string>());
-                    rt.get_config().load_application_configuration
-                        (config.c_str());
-                }
-
-                // Dump the configuration.
-                if (vm.count("dump-config"))
-                    rt.get_config().dump();
-
-#if HPX_AGAS_VERSION > 0x10
-                if (!startup_function.empty())
-                    rt.add_startup_function(startup_function);
-
-                if (!shutdown_function.empty())
-                    rt.add_shutdown_function(shutdown_function);
-#endif
-
-                if (vm.count("exit")) {
-                    result = 0;
-                }
-                else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main.
-                    result = rt.run(boost::bind(hpx_main, vm), num_threads, 
-                        num_localities);
-                }
-                else {
-                    // Run this runtime instance using the given
-                    // hpx_worker_main.
-                    result = rt.run(boost::bind(hpx_worker_main, vm),
-                        num_threads, num_localities);
-                }
+            else if (0 == std::string("local").find(queueing)) {
+                result = detail::run_local(hpx_host, hpx_port, 
+                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    startup_function, shutdown_function, num_threads, 
+                    num_localities);
             }
-            else if ((0 == std::string("priority_local").find(queueing))) {
-                // local scheduler with priority queue (one queue for ech OS threads
+            else if (0 == std::string("priority_local").find(queueing)) {
+                // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
-                typedef hpx::threads::policies::local_priority_queue_scheduler 
-                    local_queue_policy;
-                typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-                local_queue_policy::init_parameter_type init(num_threads, 1000);
-
-                // Build and configure this runtime instance.
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, 
-                    init, vm["hpx-config"].as<std::string>(), ini_config); 
-
-                if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
-                {
-                    std::string config(vm["app-config"].as<std::string>());
-                    rt.get_config().load_application_configuration(config.c_str());
-                }
-
-                // Dump the configuration.
-                if (vm.count("dump-config"))
-                    rt.get_config().dump();
-
-#if HPX_AGAS_VERSION > 0x10
-                if (!startup_function.empty())
-                    rt.add_startup_function(startup_function);
-
-                if (!shutdown_function.empty())
-                    rt.add_shutdown_function(shutdown_function);
-#endif
-
-                if (vm.count("exit")) {
-                    result = 0;
-                }
-                else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main.
-                    result = rt.run(boost::bind(hpx_main, vm), num_threads, 
-                        num_localities);
-                }
-                else {
-                    // Run this runtime instance using the given
-                    // hpx_worker_main.
-                    result = rt.run(boost::bind(hpx_worker_main, vm),
-                        num_threads, num_localities);
-                }
+                result = detail::run_priority_local(hpx_host, hpx_port, 
+                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    startup_function, shutdown_function, num_threads, 
+                    num_localities);
             }
-            else if ((0 == std::string("abp").find(queueing))) {
+            else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
-                typedef hpx::threads::policies::abp_queue_scheduler 
-                    abp_queue_policy;
-                typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
-                abp_queue_policy::init_parameter_type init(num_threads, 1000);
-
-                // Build and configure this runtime instance.
-                runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode, 
-                    init, vm["hpx-config"].as<std::string>(), ini_config); 
-
-                if (mode != hpx::runtime_mode_worker && vm.count("app-config"))
-                {
-                    std::string config(vm["app-config"].as<std::string>());
-                    rt.get_config().load_application_configuration(config.c_str());
-                }
-
-                // Dump the configuration.
-                if (vm.count("dump-config"))
-                    rt.get_config().dump();
-
-#if HPX_AGAS_VERSION > 0x10
-                if (!startup_function.empty())
-                    rt.add_startup_function(startup_function);
-
-                if (!shutdown_function.empty())
-                    rt.add_shutdown_function(shutdown_function);
-#endif
-
-                if (vm.count("exit")) {
-                    result = 0;
-                }
-                else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main.
-                    result = rt.run(boost::bind(hpx_main, vm), num_threads, 
-                        num_localities);
-                }
-                else {
-                    // Run this runtime instance using the given
-                    // hpx_worker_main.
-                    result = rt.run(boost::bind(hpx_worker_main, vm),
-                        num_threads, num_localities);
-                }
+                result = detail::run_abp(hpx_host, hpx_port, 
+                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    startup_function, shutdown_function, num_threads, 
+                    num_localities);
             }
             else {
                 throw std::logic_error("bad value for parameter --queueing/-q");

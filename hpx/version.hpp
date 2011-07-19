@@ -33,22 +33,20 @@
 
 namespace hpx
 {
+    // Returns the major HPX version.
+    HPX_EXPORT boost::uint8_t major_version();
 
-// Returns the major HPX version.
-HPX_EXPORT boost::uint8_t major_version();
+    // Returns the minor HPX version. 
+    HPX_EXPORT boost::uint8_t minor_version();
 
-// Returns the minor HPX version. 
-HPX_EXPORT boost::uint8_t minor_version();
+    // Returns the subminor/patchlevel HPX version. 
+    HPX_EXPORT boost::uint8_t subminor_version();
 
-// Returns the subminor/patchlevel HPX version. 
-HPX_EXPORT boost::uint8_t subminor_version();
+    // Returns the full HPX version.
+    HPX_EXPORT boost::uint32_t full_version();
 
-// Returns the full HPX version.
-HPX_EXPORT boost::uint32_t full_version();
-
-// Returns the AGAS subsystem version. 
-HPX_EXPORT boost::uint8_t agas_version();
-
+    // Returns the AGAS subsystem version. 
+    HPX_EXPORT boost::uint8_t agas_version();
 }
 
 #endif
