@@ -115,12 +115,13 @@ namespace hpx
             "invalid",
             "console",
             "worker",
+            "default",
         };
     }
 
     char const* get_runtime_mode_name(runtime_mode state)
     {
-        if (state < runtime_mode_invalid || state > runtime_mode_worker)
+        if (state < runtime_mode_invalid || state > runtime_mode_last)
             return "invalid";
         return strings::runtime_mode_names[state];
     }

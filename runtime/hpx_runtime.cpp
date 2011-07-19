@@ -7,9 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-// no-op, never called in this application
-int hpx_main(boost::program_options::variables_map &vm) { return 0; }
-
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
@@ -18,6 +15,6 @@ int main(int argc, char* argv[])
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(desc_commandline, argc, argv, hpx::runtime_mode_worker);
 }
 

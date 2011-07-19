@@ -12,7 +12,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/state.hpp>
@@ -32,12 +31,9 @@ using hpx::flush;
 using hpx::init;
 using hpx::finalize;
 using hpx::running;
-using hpx::find_here;
-
-using hpx::lcos::eager_future;
+using hpx::runtime_mode_worker;
 
 using hpx::applier::get_applier;
-using hpx::applier::apply;
 
 using hpx::actions::plain_action1;
 using hpx::actions::plain_action4;
@@ -88,19 +84,18 @@ void monitor(
                 counter_value value = performance_counter::get_value(gid); 
 
                 if (HPX_LIKELY(status_valid_data == value.status_))
-                    cout() << (format("(%s %f %#x %#x %#x)\n")
-                              % name
-                              % current_time
-                              % segment
-                              % block
-                              % value.value_) << flush;
+                    std::cout << (format("(%s %f %d %d %d)\n")
+                                 % name
+                                 % current_time
+                                 % segment
+                                 % block
+                                 % value.value_);
                 else
-                    cout() << (format("(%s %f %#x %#x '())\n")
-                              % name
-                              % current_time
-                              % segment
-                              % block
-                              % value.value_) << flush;
+                    std::cout << (format("(%s %f %d %d '())\n")
+                                 % name
+                                 % current_time
+                                 % segment
+                                 % block);
 
                 // Adjust rate of pinging values.
                 const double delay_start = t.elapsed();
@@ -124,40 +119,8 @@ void monitor(
     }
 }
 
-typedef plain_action4<
-    // arguments
-    std::string const&
-  , double
-  , double
-  , double
-    // function
-  , monitor
-> monitor_action;
-
-HPX_REGISTER_PLAIN_ACTION(monitor_action);
-
-typedef eager_future<monitor_action> monitor_future;
-
 ///////////////////////////////////////////////////////////////////////////////
-void fork_bomb(boost::uint64_t count);
-
-typedef plain_action1<
-    // arguments
-    boost::uint64_t
-    // function
-  , fork_bomb
-> fork_bomb_action;
-
-HPX_REGISTER_PLAIN_ACTION(fork_bomb_action);
-
-void fork_bomb(boost::uint64_t count)
-{
-    for (boost::uint64_t i = 0; i < count; ++i)
-        apply<fork_bomb_action>(find_here(), count);        
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_worker_main(variables_map& vm)
 {
     {
         const std::string name = vm["name"].as<std::string>();
@@ -165,12 +128,7 @@ int hpx_main(variables_map& vm)
         const double duration = vm["duration"].as<double>(); 
         const double rate = vm["rate"].as<double>();
 
-        monitor_future mf(find_here(), name, frequency, duration, rate);
-
-        // Create a TON of work recursively.
-        fork_bomb(4); 
- 
-        mf.get(); 
+        monitor(name, frequency, duration, rate);
     }
 
     finalize();
@@ -204,6 +162,6 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    return init(desc_commandline, argc, argv, runtime_mode_worker);
 }
 

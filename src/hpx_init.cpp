@@ -28,6 +28,9 @@
 // no-op, never called here
 int hpx_main(boost::program_options::variables_map &vm) { return 0; }
 
+// default implementation
+int hpx_worker_main(boost::program_options::variables_map &vm) { return 0; }
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -52,7 +55,8 @@ namespace hpx
         // parse the command line
         command_line_result parse_commandline(
             boost::program_options::options_description& app_options, 
-            int argc, char *argv[], boost::program_options::variables_map& vm)
+            int argc, char *argv[], boost::program_options::variables_map& vm,
+            hpx::runtime_mode mode)
         {
             using boost::program_options::options_description;
             using boost::program_options::value;
@@ -60,7 +64,8 @@ namespace hpx
             using boost::program_options::command_line_parser;
 
             try {
-                options_description hpx_options("HPX Options");
+                options_description hpx_options("HPX Options")
+                                  , hidden_options("Hidden Options");
 
                 hpx_options.add_options()
                     ("help,h", "print out program usage (this message)")
@@ -68,13 +73,27 @@ namespace hpx
                      "run AGAS server as part of this runtime instance")
                 ;
 
-                hpx_options.add_options()
-                    ("console,c", "run this instance in console mode")
-                    ("worker,w", "run this instance in worker mode")
+                if (hpx::runtime_mode_default == mode)
+                {
+                    hpx_options.add_options()
+                        ("worker,w", "run this instance in worker mode")
+                    ;
+                }
+                else if (hpx::runtime_mode_worker == mode)
+                {
+                    // If the runtime for this application is always run in
+                    // worker mode, silently ignore the worker option for
+                    // hpx_pbs compatibility.
+                    hidden_options.add_options()
+                        ("worker,w", "run this instance in worker mode")
+                    ;
+                }
+
 #if HPX_AGAS_VERSION <= 0x10
+                hpx_options.add_options()
                     ("run-agas-server-only", "run only the AGAS server")
-#endif
                 ;
+#endif
 
                 hpx_options.add_options()
                     ("app-config,p", value<std::string>(), 
@@ -89,8 +108,6 @@ namespace hpx
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
                      "127.0.0.1:7910)")
-                    ("random-ports",
-                     "use random ports for AGAS and parcels")
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -107,8 +124,9 @@ namespace hpx
                      "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
                 ;
 
-                options_description desc_cmdline;
-                desc_cmdline.add(app_options).add(hpx_options);
+                options_description desc_cmdline, visible;
+                desc_cmdline.add(app_options).add(hpx_options).add(hidden_options);
+                visible.add(app_options).add(hpx_options);
 
                 store(command_line_parser(argc, argv).
                     options(desc_cmdline).run(), vm);
@@ -116,7 +134,7 @@ namespace hpx
 
                 // print help screen
                 if (vm.count("help")) {
-                    std::cout << desc_cmdline;
+                    std::cout << visible;
                     return help;
                 }
             }
@@ -188,7 +206,7 @@ namespace hpx
     int init(int (*hpx_main)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[], boost::function<void()> startup_function, 
-        boost::function<void()> shutdown_function)
+        boost::function<void()> shutdown_function, hpx::runtime_mode mode)
     {
         int result = 0;
 
@@ -215,7 +233,8 @@ namespace hpx
             // Analyze the command line.
             variables_map vm;
 
-            switch (detail::parse_commandline(desc_cmdline, argc, argv, vm))
+            switch (detail::parse_commandline
+                (desc_cmdline, argc, argv, vm, mode))
             {
                 case detail::error:
                     return 1;
@@ -231,27 +250,10 @@ namespace hpx
             std::size_t num_threads = 1;
             std::size_t num_localities = 1;
             std::string queueing = "priority_local";
-            hpx::runtime_mode mode = hpx::runtime_mode_console;
             std::vector<std::string> ini_config;
  
             if (vm.count("ini"))
                 ini_config = vm["ini"].as<std::vector<std::string> >();
-
-            if (vm.count("random-ports")
-                && !vm.count("agas") && !vm.count("hpx"))
-            {
-                using boost::fusion::at_c;
-
-                boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
-                    ports = hpx::util::get_random_ports();
-
-                std::cout <<   "Randomized port for AGAS: " << at_c<0>(ports)
-                          << "\nRandomized port for parcels: " << at_c<1>(ports)
-                          << "\n"; 
-
-                agas_port = at_c<0>(ports);
-                hpx_port = at_c<1>(ports);
-            }
 
             if (vm.count("agas")) {
                 detail::split_ip_address(
@@ -272,10 +274,13 @@ namespace hpx
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
 
-            if (vm.count("worker"))
-                mode = hpx::runtime_mode_worker;
-            else if (vm.count("console"))
+            if (hpx::runtime_mode_default == mode)
+            {
                 mode = hpx::runtime_mode_console;
+
+                if (vm.count("worker"))
+                    mode = hpx::runtime_mode_worker;
+            }
 
 #if HPX_AGAS_VERSION <= 0x10
             // Initialize and run the AGAS service, if appropriate.
@@ -340,13 +345,15 @@ namespace hpx
                     result = 0;
                 }
                 else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main
+                    // Run this runtime instance using the given hpx_main.
                     result = rt.run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
                 }
                 else {
-                    // Run this runtime instance using an empty hpx_main
-                    result = rt.run(num_threads, num_localities);
+                    // Run this runtime instance using the given
+                    // hpx_worker_main.
+                    result = rt.run(boost::bind(hpx_worker_main, vm),
+                        num_threads, num_localities);
                 }
             }
             else if ((0 == std::string("local").find(queueing))) {
@@ -384,13 +391,15 @@ namespace hpx
                     result = 0;
                 }
                 else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main
+                    // Run this runtime instance using the given hpx_main.
                     result = rt.run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
                 }
                 else {
-                    // Run this runtime instance using an empty hpx_main
-                    result = rt.run(num_threads, num_localities);
+                    // Run this runtime instance using the given
+                    // hpx_worker_main.
+                    result = rt.run(boost::bind(hpx_worker_main, vm),
+                        num_threads, num_localities);
                 }
             }
             else if ((0 == std::string("priority_local").find(queueing))) {
@@ -427,13 +436,15 @@ namespace hpx
                     result = 0;
                 }
                 else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main
+                    // Run this runtime instance using the given hpx_main.
                     result = rt.run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
                 }
                 else {
-                    // Run this runtime instance using an empty hpx_main
-                    result = rt.run(num_threads, num_localities);
+                    // Run this runtime instance using the given
+                    // hpx_worker_main.
+                    result = rt.run(boost::bind(hpx_worker_main, vm),
+                        num_threads, num_localities);
                 }
             }
             else if ((0 == std::string("abp").find(queueing))) {
@@ -470,13 +481,15 @@ namespace hpx
                     result = 0;
                 }
                 else if (mode != hpx::runtime_mode_worker) {
-                    // Run this runtime instance using the given hpx_main
+                    // Run this runtime instance using the given hpx_main.
                     result = rt.run(boost::bind(hpx_main, vm), num_threads, 
                         num_localities);
                 }
                 else {
-                    // Run this runtime instance using an empty hpx_main
-                    result = rt.run(num_threads, num_localities);
+                    // Run this runtime instance using the given
+                    // hpx_worker_main.
+                    result = rt.run(boost::bind(hpx_worker_main, vm),
+                        num_threads, num_localities);
                 }
             }
             else {
