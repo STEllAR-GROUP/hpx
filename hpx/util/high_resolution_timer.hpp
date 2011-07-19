@@ -88,7 +88,7 @@ namespace hpx { namespace util
 
         boost::int64_t elapsed_microseconds() const
         {
-            return boost::int64_t(10e6 * elapsed())
+            return boost::int64_t(10e6 * elapsed());
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
