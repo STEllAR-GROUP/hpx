@@ -82,7 +82,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         hpx::geometry::plain_polygon_type plain_p;
 
-        // should be: boost::geometry::assign(plain_p, p));, but boost::geometry
+        // should be: boost::geometry::assign(plain_p, p)), but boost::geometry
         // has a bug preventing this from compiling
         boost::geometry::assign(plain_p.outer(), p.outer());
 
