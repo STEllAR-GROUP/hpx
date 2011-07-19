@@ -25,8 +25,12 @@ namespace hpx { namespace performance_counters
         counter_status install(std::string const& name, counter_type type,
             error_code& ec = throws)
         {
-            if (HPX_ASSERTS_IF(ec, status_invalid_data == status_))
+            if (status_invalid_data != status_) {
+                HPX_THROWS_IF(ec, hpx::invalid_status, 
+                    "manage_counter_type::install", 
+                    "counter type " + name + " has been already installed.");
                 return status_invalid_data;
+            }
 
             info_.fullname_ = name;
             info_.type_ = type;

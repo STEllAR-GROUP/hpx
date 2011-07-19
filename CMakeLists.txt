@@ -271,7 +271,7 @@ endif()
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
-  add_definitions(-DHPX_STACKTRACES)
+  add_definitions(-DHPX_STACKTRACES=1)
 endif()
 
 ################################################################################

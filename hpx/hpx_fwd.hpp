@@ -28,15 +28,8 @@
 /// The namespace \a hpx is the main namespace of the HPX library. All classes
 /// functions and variables are defined inside this namespace.
 
-#if !defined(BOOST_WINDOWS)
-    // Print stack trace and exit.
-    HPX_API_EXPORT void hpx_termination_handler(int signum);
-#endif
-
 namespace hpx
 {
-    HPX_API_EXPORT void pre_main();
-
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
@@ -91,6 +84,8 @@ namespace hpx
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
 
     HPX_API_EXPORT naming::gid_type get_next_id();
@@ -258,6 +253,10 @@ namespace hpx
         runtime_mode_worker = 1   ///< The runtime is a worker locality
     };
 
+    /// Get the readable string representing the name of the given runtime_mode
+    /// constant.
+    HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
+
     namespace agas
     {
         enum router_mode
@@ -267,11 +266,12 @@ namespace hpx
             router_mode_hosted = 1,
         };
     }
- 
-    HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Retrieve the string value of a configuration entry as given by \p key.
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
         std::string const& dflt);
+    /// Retrieve the integer value of a configuration entry as given by \p key.
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
         std::size_t dflt);
 
@@ -449,27 +449,34 @@ namespace hpx
         struct counter_info;
 
         ///////////////////////////////////////////////////////////////////////
+        /// \brief Add a new performance counter type to the (local) registry
         HPX_API_EXPORT counter_status add_counter_type(
-            counter_info const& info, 
-            error_code& ec = throws);
+            counter_info const& info, error_code& ec = throws);
 
+        /// \brief Remove an existing counter type from the (local) registry
+        ///
+        /// \note This doesn't remove existing counters of this type, it just
+        ///       inhibits defining new counters using this type.
         HPX_API_EXPORT counter_status remove_counter_type(
-            counter_info const& info, 
-            error_code& ec = throws);
+            counter_info const& info, error_code& ec = throws);
 
+        /// \brief Create a new performance counter instance based on given
+        ///        counter value
         HPX_API_EXPORT counter_status add_counter(
-            counter_info const& info, 
-            boost::int64_t* countervalue, naming::id_type& id, 
-            error_code& ec = throws);
+            counter_info const& info, boost::int64_t* countervalue, 
+            naming::id_type& id, error_code& ec = throws);
 
+        /// \brief Create a new performance counter instance based on given
+        ///        function returning the counter value
         HPX_API_EXPORT counter_status add_counter(
-            counter_info const& info, 
-            boost::function<boost::int64_t()> f, naming::id_type& id, 
-            error_code& ec = throws);
+            counter_info const& info, boost::function<boost::int64_t()> f, 
+            naming::id_type& id, error_code& ec = throws);
 
-        HPX_API_EXPORT counter_status remove_counter(
-            counter_info const& info, 
-            naming::id_type const& id, error_code& ec = throws);
+         /// \brief Remove an existing performance counter instance with the 
+         ///        given id (as returned from \a add_counter)
+       HPX_API_EXPORT counter_status remove_counter(
+            counter_info const& info, naming::id_type const& id, 
+            error_code& ec = throws);
     }
 }
 

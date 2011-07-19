@@ -36,29 +36,44 @@ namespace boost { namespace serialization
         std::string throw_file_;
         int throw_line_ = -1;
 
+#if HPX_STACKTRACES != 0
+        std::string back_trace_;
+#endif
+
         // retrieve information related to boost::exception
         try {
             boost::rethrow_exception(ep);
         }
         catch (boost::exception const& e) {
 #if BOOST_VERSION >= 103900
-            char const* const* func = boost::get_error_info<boost::throw_function>(e);
+            char const* const* func =
+                boost::get_error_info<boost::throw_function>(e);
             if (func) {
                 throw_function_ = *func;
             }
             else {
-                std::string const* s(boost::get_error_info<hpx::detail::throw_function>(e));
+                std::string const* s = 
+                    boost::get_error_info<hpx::detail::throw_function>(e);
                 if (s)
                     throw_function_ = *s;
             }
 
-            std::string const* file(boost::get_error_info<hpx::detail::throw_file>(e));
+            std::string const* file = 
+                boost::get_error_info<hpx::detail::throw_file>(e);
             if (file)
                 throw_file_ = *file;
 
-            int const* line(boost::get_error_info<hpx::detail::throw_line>(e));
+            int const* line = 
+                boost::get_error_info<hpx::detail::throw_line>(e);
             if (line)
                 throw_line_ = *line;
+
+#if HPX_STACKTRACES != 0
+            std::string const* back_trace =
+                boost::get_error_info<hpx::detail::throw_stacktrace>(e);
+            if (back_trace)
+                back_trace_ = *back_trace;
+#endif
 #else
             boost::shared_ptr<char const* const> func(
                 boost::get_error_info<boost::throw_function>(e));
@@ -81,6 +96,13 @@ namespace boost { namespace serialization
                 boost::get_error_info<hpx::detail::throw_line>(e));
             if (line)
                 throw_line_ = *line;
+
+#if HPX_STACKTRACES != 0
+            boost::shared_ptr<std::string const> back_trace(
+                boost::get_error_info<hpx::detail::throw_stacktrace>(e));
+            if (back_trace)
+                back_trace_ = *back_trace;
+#endif
 #endif
         }
 
@@ -153,6 +175,10 @@ namespace boost { namespace serialization
         else if (hpx::util::boost_system_error == type) {
             ar & err_value & err_message;
         }
+
+#if HPX_STACKTRACES != 0
+        ar & back_trace_;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -166,6 +192,7 @@ namespace boost { namespace serialization
 
         std::string throw_function_;
         std::string throw_file_;
+        std::string back_trace_;
         int throw_line_ = 0;
 
         ar & type & what & throw_function_ & throw_file_ & throw_line_;
@@ -175,55 +202,58 @@ namespace boost { namespace serialization
         else if (hpx::util::boost_system_error == type) {
             ar & err_value & err_message;
         }
+#if HPX_STACKTRACES != 0
+        ar & back_trace_;
+#endif
 
         try {
             switch (type) {
             case hpx::util::std_exception:
             case hpx::util::unknown_exception:
                 hpx::detail::throw_exception(std::exception(),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             // standard exceptions
             case hpx::util::std_runtime_error:
                 hpx::detail::throw_exception(std::runtime_error(what),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             case hpx::util::std_invalid_argument:
                 hpx::detail::throw_exception(std::invalid_argument(what),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             case hpx::util::std_out_of_range:
                 hpx::detail::throw_exception(std::out_of_range(what),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             case hpx::util::std_logic_error:
                 hpx::detail::throw_exception(std::logic_error(what),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             case hpx::util::std_bad_alloc:
                 hpx::detail::throw_exception(std::bad_alloc(),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
 #ifndef BOOST_NO_TYPEID
             case hpx::util::std_bad_cast:
                 hpx::detail::throw_exception(std::bad_cast(),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             case hpx::util::std_bad_typeid:
                 hpx::detail::throw_exception(std::bad_typeid(),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 #endif
             case hpx::util::std_bad_exception:
                 hpx::detail::throw_exception(std::bad_exception(),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             // boost exceptions
@@ -236,14 +266,14 @@ namespace boost { namespace serialization
                 hpx::detail::throw_exception(
                     boost::system::system_error(err_value, 
                         boost::system::get_system_category(), err_message),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
 
             // hpx::exception
             case hpx::util::hpx_exception:
                 hpx::detail::throw_exception(
                     hpx::exception((hpx::error)err_value, what, hpx::rethrow),
-                    throw_function_, throw_file_, throw_line_);
+                    throw_function_, throw_file_, throw_line_, back_trace_);
                 break;
             }
         }

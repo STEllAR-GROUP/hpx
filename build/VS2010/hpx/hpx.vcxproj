@@ -95,14 +95,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp" />
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\hpx_init.cpp" />
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp" />
     <ClCompile Include="..\..\..\src\pre_main.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp" />
@@ -373,7 +378,6 @@
     <ClInclude Include="..\..\..\hpx\include\threadmanager.hpp" />
     <ClInclude Include="..\..\..\hpx\include\util.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\counters.hpp" />
-    <ClInclude Include="..\..\..\hpx\performance_counters\performance_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\registry.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\server\base_performance_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\server\raw_counter.hpp" />

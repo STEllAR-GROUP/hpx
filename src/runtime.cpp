@@ -4,9 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <vector>
-
 #include <hpx/hpx_fwd.hpp>
+
+#include <iostream>
+#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
@@ -31,45 +32,74 @@
 // system signals
 #if defined(BOOST_WINDOWS)
 
-static boost::function0<void> console_ctrl_function;
-
-BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
+namespace hpx
 {
-    switch (ctrl_type) {
-    case CTRL_C_EVENT:
-    case CTRL_BREAK_EVENT:
-    case CTRL_CLOSE_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-        console_ctrl_function();
-        return TRUE;
+    void handle_termination(char const* reason)
+    {
+        std::cerr << "Received " << (reason ? reason : "unknown signal")
+#if HPX_STACKTRACES != 0
+                  << ", " << hpx::detail::backtrace() 
+#else
+                  << "."
+#endif
+                  << std::endl;
+        std::terminate();
+    }
 
-    default:
+    BOOL WINAPI termination_handler(DWORD ctrl_type)
+    {
+        switch (ctrl_type) {
+        case CTRL_C_EVENT:
+            handle_termination("Ctrl-C");
+            return TRUE;
+
+        case CTRL_BREAK_EVENT:
+            handle_termination("Ctrl-Break");
+            return TRUE;
+
+        case CTRL_CLOSE_EVENT:
+            handle_termination("Ctrl-Close");
+            return TRUE;
+
+        case CTRL_LOGOFF_EVENT:
+            handle_termination("Logoff");
+            return TRUE;
+
+        case CTRL_SHUTDOWN_EVENT:
+            handle_termination("Shutdown");
+            return TRUE;
+
+        default:
+            break;
+        }
         return FALSE;
     }
 }
 
 #else
 
-#include <iostream>
 #include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(HPX_STACKTRACES)
+#if HPX_STACKTRACES != 0
     #include <boost/backtrace.hpp>
 #endif
 
-void hpx_termination_handler(int signum)
+namespace hpx 
 {
-    char* c = strsignal(signum); 
-    std::cerr << "Received " << (c ? c : "unknown signal")
-#if defined(HPX_STACKTRACES)
-              << ", " << boost::trace() 
+    void termination_handler(int signum)
+    {
+        char* c = strsignal(signum); 
+        std::cerr << "Received " << (c ? c : "unknown signal")
+#if HPX_STACKTRACES != 0
+                  << ", " << hpx::detail::backtrace() 
 #else
-              << "."
+                  << "."
 #endif
-              << std::endl;
-    std::terminate();
+                  << std::endl;
+        std::terminate();
+    }
 }
 
 #endif
@@ -477,7 +507,6 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-// #if !defined(BOOST_WINDOWS)
     static void wait_helper(components::server::runtime_support& rts,
         boost::mutex& mtx, boost::condition& cond, bool& running)
     {
@@ -491,26 +520,11 @@ namespace hpx
         // wait for termination
         rts.wait();
     }
-// #endif
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::wait()
     {
         LRT_(info) << "runtime_impl: about to enter wait state";
-
-// #if defined(BOOST_WINDOWS)
-//         // Set console control handler to allow server to be stopped.
-//         console_ctrl_function = boost::bind(&runtime_impl::stop, this, true);
-//         SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-// 
-//         // wait for the shutdown action to be executed
-//         runtime_support_.wait();
-// #else
-//         // Block all signals for background thread.
-//         sigset_t new_mask;
-//         sigfillset(&new_mask);
-//         sigset_t old_mask;
-//         pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask);
 
         // start the wait_helper in a separate thread
         boost::mutex mtx;
@@ -529,22 +543,9 @@ namespace hpx
                 cond.wait(lk);
         }
 
-//         // Restore previous signals.
-//         pthread_sigmask(SIG_SETMASK, &old_mask, 0);
-// 
-//         // Wait for signal indicating time to shut down.
-//         sigset_t wait_mask;
-//         sigemptyset(&wait_mask);
-//         sigaddset(&wait_mask, SIGINT);
-//         sigaddset(&wait_mask, SIGQUIT);
-//         sigaddset(&wait_mask, SIGTERM);
-//         pthread_sigmask(SIG_BLOCK, &wait_mask, 0);
-//         int sig = 0;
-//         sigwait(&wait_mask, &sig);
-
         // block main thread
         t.join();
-// #endif
+
         LRT_(info) << "runtime_impl: exiting wait state";
         return result_;
     }

@@ -232,7 +232,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEFAULT_STACK_SIZE)
   #if defined(BOOST_WINDOWS)
-      #define HPX_DEFAULT_STACK_SIZE 0x4000
+    #define HPX_DEFAULT_STACK_SIZE 0x4000
   #else
     #if defined(HPX_DEBUG)
       #define HPX_DEFAULT_STACK_SIZE 0x10000 
@@ -242,13 +242,20 @@
   #endif
 #endif
 
-#define HPX_AGAS_BOOTSTRAP_PREFIX 1U 
-#define HPX_AGAS_PRIMARY_NS_MSB 0x0000000100000001ULL
-#define HPX_AGAS_PRIMARY_NS_LSB 0x0000000000000001ULL
-#define HPX_AGAS_COMPONENT_NS_MSB 0x0000000100000001ULL
-#define HPX_AGAS_COMPONENT_NS_LSB 0x0000000000000002ULL
-#define HPX_AGAS_SYMBOL_NS_MSB 0x0000000100000001ULL
-#define HPX_AGAS_SYMBOL_NS_LSB 0x0000000000000003ULL
+///////////////////////////////////////////////////////////////////////////////
+// Disable stack trace support by default
+#if !defined(HPX_STACKTRACES)
+  #define HPX_STACKTRACES 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_AGAS_BOOTSTRAP_PREFIX   1U 
+#define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
+#define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
+#define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL
+#define HPX_AGAS_COMPONENT_NS_LSB   0x0000000000000002ULL
+#define HPX_AGAS_SYMBOL_NS_MSB      0x0000000100000001ULL
+#define HPX_AGAS_SYMBOL_NS_LSB      0x0000000000000003ULL
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <hpx/config/defaults.hpp>

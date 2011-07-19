@@ -25,8 +25,11 @@ namespace hpx { namespace performance_counters
         counter_status install(std::string const& name,
             boost::function<boost::int64_t()> const& f, error_code& ec = throws)
         {
-            if (HPX_ASSERTS_IF(ec, !counter_))
+            if (0 != counter_) {
+                HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install", 
+                    "counter has been already installed");
                 return status_invalid_data;
+            }
  
             info_.fullname_ = name;
             return add_counter(info_, f, counter_, ec);

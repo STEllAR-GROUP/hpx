@@ -177,6 +177,9 @@
     <Filter Include="Source Files\LCOs\Barrier">
       <UniqueIdentifier>{e127cc68-84c5-4169-9b70-153a7cdbe060}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Boost Files\Backtrace">
+      <UniqueIdentifier>{5c6e8eb3-fdb1-4616-ac09-117f971d6f06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -371,6 +374,15 @@
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp">
       <Filter>Source Files\LCOs\Barrier</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp">
+      <Filter>Source Files\Performance Counters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp">
+      <Filter>Source Files\Performance Counters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp">
+      <Filter>Boost Files\Backtrace</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -476,9 +488,6 @@
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\performance_counters\counters.hpp">
-      <Filter>Header Files\Performance Counters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\performance_counters\performance_counter.hpp">
       <Filter>Header Files\Performance Counters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\performance_counters\registry.hpp">

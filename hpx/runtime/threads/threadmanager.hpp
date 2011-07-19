@@ -282,10 +282,6 @@ namespace hpx { namespace threads
         void deinit_tss();
 
     private:
-#if HPX_AGAS_VERSION > 0x10
-        friend void hpx::pre_main();
-#endif
-
         // the TSS holds the number associated with a given OS thread
         static boost::thread_specific_ptr<std::size_t> thread_num_;
     };

@@ -31,14 +31,21 @@ int hpx_main(boost::program_options::variables_map &vm) { return 0; }
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    // Print stack trace and exit.
+#if defined(BOOST_WINDOWS)
+    BOOL termination_handler(DWORD ctrl_type);
+#else
+    void termination_handler(int signum);
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         enum command_line_result
         {
-            help,
-            success,
-            error
+            help,       ///< command line handling printed help text
+            success,    ///< sucess parsing command line
+            error       ///< error handling command line
         }; 
 
         ///////////////////////////////////////////////////////////////////////
@@ -185,9 +192,12 @@ namespace hpx
     {
         int result = 0;
 
-#if !defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS)
+        // Set console control handler to allow server to be stopped.
+        SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
+#else
         struct sigaction new_action;
-        new_action.sa_handler = hpx_termination_handler;
+        new_action.sa_handler = hpx::termination_handler;
         sigemptyset(&new_action.sa_mask);
         new_action.sa_flags = 0;
 
