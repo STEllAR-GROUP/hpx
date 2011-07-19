@@ -1,12 +1,18 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <iostream>
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/components/console_error_sink.hpp>
 #if HPX_STACKTRACES != 0
   #include <boost/backtrace.hpp>
 #endif
@@ -32,16 +38,18 @@ namespace hpx { namespace detail
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
                     << throw_stacktrace(back_trace)
-                    << throw_function(func) 
                     << throw_thread_name(threads::get_thread_description(id))
-                    << throw_file(file) << throw_line(line));
+                    << ::boost::throw_function(func.c_str()) 
+                    << ::boost::throw_file(file.c_str())
+                    << ::boost::throw_line(line));
         }
         else {
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
                     << throw_stacktrace(back_trace)
-                    << throw_function(func) 
-                    << throw_file(file) << throw_line(line));
+                    << ::boost::throw_function(func.c_str()) 
+                    << ::boost::throw_file(file.c_str())
+                    << ::boost::throw_line(line));
         }
     }
 
@@ -84,15 +92,17 @@ namespace hpx { namespace detail
             threads::thread_id_type id = self->get_thread_id();
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
-                    << throw_function(func) 
                     << throw_thread_name(threads::get_thread_description(id))
-                    << throw_file(file) << throw_line(line));
+                    << ::boost::throw_function(func.c_str()) 
+                    << ::boost::throw_file(file.c_str())
+                    << ::boost::throw_line(line));
         }
         else {
             throw boost::enable_current_exception(
                 boost::enable_error_info(e) 
-                    << throw_function(func) 
-                    << throw_file(file) << throw_line(line));
+                    << ::boost::throw_function(func.c_str()) 
+                    << ::boost::throw_file(file.c_str())
+                    << ::boost::throw_line(line));
         }
     }
 
@@ -128,10 +138,7 @@ namespace hpx { namespace detail
     void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
-        boost::filesystem::path p(hpx::util::create_path(file));
-        hpx::exception e(hpx::assertion_failure, 
-            std::string("assertion '") + expr + "' failed");
-        hpx::detail::throw_exception(e, function, p.string(), line);
+        assertion_failed_msg(expr, expr, function, file, line);
     }
     
     void assertion_failed_msg(char const* msg, char const* expr,
@@ -140,7 +147,24 @@ namespace hpx { namespace detail
         boost::filesystem::path p(hpx::util::create_path(file));
         hpx::exception e(hpx::assertion_failure, 
             std::string("assertion '") + msg + "' failed");
-        hpx::detail::throw_exception(e, function, p.string(), line);
+
+        try {
+            hpx::detail::throw_exception(e, function, p.string(), line);
+        }
+
+        catch (...) {
+            // If the runtime pointer is available, we can safely get the prefix
+            // of this locality. If it's not available, then just terminate.
+            if (NULL != get_runtime_ptr())  {
+                get_runtime().report_error(boost::current_exception());
+            }
+            else {
+                std::cerr << "Runtime is not available, reporting error locally\n"
+                          << boost::diagnostic_information(boost::current_exception()); 
+            }
+
+            std::abort();
+        }
     }
 }}
 

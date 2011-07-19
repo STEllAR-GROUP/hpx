@@ -48,23 +48,16 @@ namespace boost { namespace serialization
 #if BOOST_VERSION >= 103900
             char const* const* func =
                 boost::get_error_info<boost::throw_function>(e);
-            if (func) {
+            if (func)
                 throw_function_ = *func;
-            }
-            else {
-                std::string const* s = 
-                    boost::get_error_info<hpx::detail::throw_function>(e);
-                if (s)
-                    throw_function_ = *s;
-            }
 
-            std::string const* file = 
-                boost::get_error_info<hpx::detail::throw_file>(e);
+            char const* const* file = 
+                boost::get_error_info<boost::throw_file>(e);
             if (file)
                 throw_file_ = *file;
 
             int const* line = 
-                boost::get_error_info<hpx::detail::throw_line>(e);
+                boost::get_error_info<boost::throw_line>(e);
             if (line)
                 throw_line_ = *line;
 
@@ -77,23 +70,16 @@ namespace boost { namespace serialization
 #else
             boost::shared_ptr<char const* const> func(
                 boost::get_error_info<boost::throw_function>(e));
-            if (func) {
+            if (func)
                 throw_function_ = *func;
-            }
-            else {
-                boost::shared_ptr<std::string const> s(
-                    boost::get_error_info<hpx::detail::throw_function>(e));
-                if (s)
-                    throw_function_ = *s;
-            }
 
-            boost::shared_ptr<std::string const> file(
-                boost::get_error_info<hpx::detail::throw_file>(e));
+            boost::shared_ptr<char const* const> file(
+                boost::get_error_info<boost::throw_file>(e));
             if (file)
-                throw_file_ = *file;
+                throw_filetion_ = *file;
 
             boost::shared_ptr<int const> line(
-                boost::get_error_info<hpx::detail::throw_line>(e));
+                boost::get_error_info<boost::throw_line>(e));
             if (line)
                 throw_line_ = *line;
 
