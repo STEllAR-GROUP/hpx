@@ -18,7 +18,7 @@
 namespace hpx { namespace components
 {
     // stub function allowing to apply the console_console_error_sink action
-    void console_error_sink(naming::id_type const& dst, 
+    inline void console_error_sink(naming::id_type const& dst, 
         naming::gid_type const& src, boost::exception_ptr const& e)
     {
         // do logging only if the system is still up. 
