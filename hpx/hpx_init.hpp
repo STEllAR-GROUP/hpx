@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This function may be optionally implemented. It is run as the main function
 // on every worker node. By default it's a no-op.
-int hpx_main(boost::program_options::variables_map& vm); 
+HPX_EXPORT int hpx_main(boost::program_options::variables_map& vm); 
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -49,9 +49,9 @@ namespace hpx
     /// This is the main entry point for any HPX application. This function 
     /// (or one of its overloads below) should be called from the users main()
     /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p hpx_main as a HPX thread.
+    /// function given by \p f as a HPX thread.
     /// 
-    /// \param hpx_main     [in] The function to be scheduled as an HPX 
+    /// \param f            [in] The function to be scheduled as an HPX 
     ///                     thread. Usually this function represents the main
     ///                     entry point of any HPX application.
     /// \param desc_cmdline [in] This parameter may hold the description of 
@@ -66,7 +66,7 @@ namespace hpx
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to main()).
     /// \param startup_function [in] A function to be executed inside a HPX
-    ///                     thread before hpx_main is called. If this parameter
+    ///                     thread before \p f is called. If this parameter
     ///                     is not given no function will be executed.
     /// \param shutdown_function [in] A function to be executed inside an HPX 
     ///                     thread while hpx::finalize is executed. If this 
@@ -82,9 +82,9 @@ namespace hpx
     ///                     to explicitly specify the mode.
     ///
     /// \returns            The function returns the value, which has been 
-    ///                     returned from the user supplied \p hpx_main.
+    ///                     returned from the user supplied \p f.
     HPX_EXPORT int 
-    init(int (*hpx_main)(boost::program_options::variables_map& vm),
+    init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[],
         boost::function<void()> startup_function = boost::function<void()>(),
@@ -96,7 +96,7 @@ namespace hpx
     /// console for a HPX application (the runtime system will be set up in
     /// console mode). 
     ///
-    /// \param hpx_main     [in] The function to be scheduled as an HPX 
+    /// \param f            [in] The function to be scheduled as an HPX 
     ///                     thread. Usually this function represents the main
     ///                     entry point of any HPX application.
     /// \param app_name     [in] The name of the application. 
@@ -108,9 +108,9 @@ namespace hpx
     ///                     by the operating system (to main()).
     ///
     /// \returns            The function returns the value, which has been 
-    ///                     returned from the user supplied \p hpx_main.
+    ///                     returned from the user supplied \p f.
     HPX_EXPORT int 
-    init(int (*hpx_main)(boost::program_options::variables_map& vm),
+    init(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char* argv[]);
 
     ///////////////////////////////////////////////////////////////////////////

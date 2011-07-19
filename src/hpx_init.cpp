@@ -297,7 +297,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
-        int run(Runtime& rt, hpx_main_func hpx_main, 
+        int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
             startup_func startup_function, shutdown_func shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
@@ -323,9 +323,9 @@ namespace hpx
             if (vm.count("exit")) {
                 return 0;
             }
-            else if (0 != hpx_main) {
+            else if (0 != f) {
                 // Run this runtime instance using the given hpx_main.
-                return rt.run(boost::bind(hpx_main, vm), num_threads, 
+                return rt.run(boost::bind(::hpx_main, vm), num_threads, 
                     num_localities);
             }
 
@@ -336,7 +336,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         int run_global(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func startup_function, shutdown_func shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
@@ -350,14 +350,14 @@ namespace hpx
                 global_queue_policy::init_parameter_type(), 
                 vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, hpx_main, vm, mode, startup_function, 
+            return run(rt, f, vm, mode, startup_function, 
                 shutdown_function, num_threads, num_localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
         int run_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func startup_function, shutdown_func shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
@@ -371,7 +371,7 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, hpx_main, vm, mode, startup_function, 
+            return run(rt, f, vm, mode, startup_function, 
                 shutdown_function, num_threads, num_localities);
         }
 
@@ -380,7 +380,7 @@ namespace hpx
         // plus one separate queue for high priority PX-threads)
         int run_priority_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func startup_function, shutdown_func shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
@@ -394,7 +394,7 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, hpx_main, vm, mode, startup_function, 
+            return run(rt, f, vm, mode, startup_function, 
                 shutdown_function, num_threads, num_localities);
         }
 
@@ -403,7 +403,7 @@ namespace hpx
         // stealing from the "bottom" of each.
         int run_abp(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func hpx_main, boost::program_options::variables_map& vm, 
+            hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func startup_function, shutdown_func shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
@@ -417,13 +417,13 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, hpx_main, vm, mode, startup_function, 
+            return run(rt, f, vm, mode, startup_function, 
                 shutdown_function, num_threads, num_localities);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(hpx_main_func hpx_main,
+    int init(hpx_main_func f,
         boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[], startup_func startup_function, 
         shutdown_func shutdown_function, hpx::runtime_mode mode)
@@ -537,13 +537,13 @@ namespace hpx
             int result = -1;
             if (0 == std::string("global").find(queueing)) {
                 result = detail::run_global(hpx_host, hpx_port, 
-                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    agas_host, agas_port, f, vm, mode, ini_config, 
                     startup_function, shutdown_function, num_threads, 
                     num_localities);
             }
             else if (0 == std::string("local").find(queueing)) {
                 result = detail::run_local(hpx_host, hpx_port, 
-                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    agas_host, agas_port, f, vm, mode, ini_config, 
                     startup_function, shutdown_function, num_threads, 
                     num_localities);
             }
@@ -551,7 +551,7 @@ namespace hpx
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
                 result = detail::run_priority_local(hpx_host, hpx_port, 
-                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    agas_host, agas_port, f, vm, mode, ini_config, 
                     startup_function, shutdown_function, num_threads, 
                     num_localities);
             }
@@ -559,7 +559,7 @@ namespace hpx
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
                 result = detail::run_abp(hpx_host, hpx_port, 
-                    agas_host, agas_port, hpx_main, vm, mode, ini_config, 
+                    agas_host, agas_port, f, vm, mode, ini_config, 
                     startup_function, shutdown_function, num_threads, 
                     num_localities);
             }
@@ -581,7 +581,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(int (*hpx_main)(boost::program_options::variables_map& vm),
+    int init(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char* argv[])
     {
         using boost::program_options::options_description; 
@@ -595,7 +595,7 @@ namespace hpx
             return init(desc_commandline, 1, dummy_argv);
         }
 
-        return init(hpx_main, desc_commandline, argc, argv, 
+        return init(f, desc_commandline, argc, argv, 
             boost::function<void()>(), boost::function<void()>());
     }
 
