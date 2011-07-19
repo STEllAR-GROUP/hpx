@@ -8,6 +8,7 @@
 
 #include <boost/config.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/cstdint.hpp>
 
 #if defined(BOOST_HAS_UNISTD_H)
 #include <unistd.h>
@@ -83,6 +84,11 @@ namespace hpx { namespace util
                 boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
 
             return double(now.QuadPart - start_time.QuadPart) / frequency.QuadPart;
+        }
+
+        boost::int64_t elapsed_microseconds() const
+        {
+            return boost::int64_t(10e6 * elapsed())
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
