@@ -515,7 +515,6 @@ namespace hpx
                 // In this case we default to executing with an empty hpx_main.
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
-                    f = 0;
                 }
             }
 
@@ -523,7 +522,7 @@ namespace hpx
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
 
-            if (vm.count("run-agas-server") || num_localities == 1) {
+            if (vm.count("run-agas-server") || (num_localities == 1 && !vm.count("agas"))) {
                 agas_server.reset(
                     new detail::agas_server_helper(agas_host, agas_port));
             }
@@ -533,7 +532,7 @@ namespace hpx
                 return 0;
             }
 #else
-            if (vm.count("run-agas-server") || num_localities == 1)  
+            if (vm.count("run-agas-server") || (num_localities == 1 && !vm.count("agas")))  
             {
                 using namespace boost::assign;
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
