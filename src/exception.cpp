@@ -164,7 +164,7 @@ namespace hpx { namespace detail
                           << boost::diagnostic_information(boost::current_exception()); 
             }
 
-            std::terminate();
+            std::abort();
         }
     }
 }}
