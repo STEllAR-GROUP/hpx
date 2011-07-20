@@ -4,11 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -18,6 +13,9 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+
+#include <boost/format.hpp>
+#include <boost/cstdint.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -120,7 +118,7 @@ void monitor(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_worker_main(variables_map& vm)
+int hpx_main(variables_map& vm)
 {
     {
         const std::string name = vm["name"].as<std::string>();
@@ -161,7 +159,8 @@ int main(int argc, char* argv[])
         , "rate of polling")
         ;
 
-    // Initialize and run HPX.
+    // Initialize and run HPX, enforce worker mode as we connect to an existing 
+    // application.
     return init(desc_commandline, argc, argv, runtime_mode_worker);
 }
 
