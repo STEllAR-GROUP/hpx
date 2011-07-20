@@ -324,9 +324,8 @@ namespace hpx
                 return 0;
             }
             else if (0 != f) {
-                // Run this runtime instance using the given hpx_main.
-                return rt.run(boost::bind(::hpx_main, vm), num_threads, 
-                    num_localities);
+                // Run this runtime instance using the given function f.
+                return rt.run(boost::bind(f, vm), num_threads, num_localities);
             }
 
             // Run this runtime instance using an empty hpx_main
@@ -477,6 +476,7 @@ namespace hpx
             if (vm.count("agas")) {
                 detail::split_ip_address(
                     vm["agas"].as<std::string>(), agas_host, agas_port);
+                // FIXME: map to hpx.agas.address and hpx.agas.port for AGAS V2
             }
 
             if (vm.count("hpx")) {
@@ -493,15 +493,23 @@ namespace hpx
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
 
+            // If the user has not specified an explicit runtime mode we 
+            // retrieve it from the command line.
             if (hpx::runtime_mode_default == mode)
             {
+                // The default mode is console, i.e. all workers need to be 
+                // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
                 if (vm.count("console") && vm.count("worker")) {
                     throw std::logic_error("Ambiguous command line options. "
                         "Do not specify both, --console/-c and --worker/-w\n");
                 }
-                if (vm.count("worker"))
+
+                // In this case we default to executing with an empty hpx_main.
+                if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
+                    f = 0;
+                }
             }
 
 #if HPX_AGAS_VERSION <= 0x10
@@ -578,25 +586,6 @@ namespace hpx
         }
 
         return result;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    int init(int (*f)(boost::program_options::variables_map& vm),
-        std::string const& app_name, int argc, char* argv[])
-    {
-        using boost::program_options::options_description; 
-
-        options_description desc_commandline(
-            "usage: " + app_name +  " [options]");
-
-        if (argc == 0 || argv == 0)
-        {
-            char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
-            return init(desc_commandline, 1, dummy_argv);
-        }
-
-        return init(f, desc_commandline, argc, argv, 
-            boost::function<void()>(), boost::function<void()>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
