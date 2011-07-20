@@ -8,6 +8,10 @@
 #include <hpx/hpx_init.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// no-op, never called in this application
+int hpx_main(boost::program_options::variables_map &vm) { return 0; }
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
