@@ -9,9 +9,11 @@
 #define HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_member.hpp>
 #include <vector>
 
 #include <hpx/lcos/mutex.hpp>
+#include <boost/serialization/valarray.hpp>
 
 #include <examples/dataflow/parameter.hpp>
 
@@ -22,7 +24,7 @@ namespace hpx { namespace components { namespace amr
 struct stencil_data 
 {
     stencil_data() 
-      : max_index_(0), index_(0), timestep_(0),value_(0)
+      : max_index_(0), index_(0), timestep_(0)
     {}
     ~stencil_data() {}
 
@@ -51,17 +53,33 @@ struct stencil_data
     std::size_t max_index_;   // overall number of data points
     std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double_type timestep_;    // current time step
-    double_type value_;       // current value
+    std::valarray<double> value_;    // current value
+    //double value_;    // current value
 
 private:
     // serialization support
     friend class boost::serialization::access;
 
+    //template<class Archive>
+    //void serialize(Archive & ar, const unsigned int version)
+    //{
+    //    ar & max_index_ & index_ & timestep_ & value_;
+    //}
+//#if 0
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void save(Archive & ar, const unsigned int version) const
     {
         ar & max_index_ & index_ & timestep_ & value_;
-    }
+    } 
+
+    template<class Archive>
+    void load(Archive & ar, const unsigned int version) 
+    {
+        ar & max_index_ & index_ & timestep_ & value_;
+    } 
+//#endif
 };
 
 }}}
