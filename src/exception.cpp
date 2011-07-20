@@ -140,16 +140,17 @@ namespace hpx { namespace detail
     {
         assertion_failed_msg(expr, expr, function, file, line);
     }
-    
+
     void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
-        boost::filesystem::path p(hpx::util::create_path(file));
-        hpx::exception e(hpx::assertion_failure, 
-            std::string("assertion '") + msg + "' failed");
-
         try {
-            hpx::detail::throw_exception(e, function, p.string(), line);
+            boost::filesystem::path p(hpx::util::create_path(file));
+            std::string str("assertion '" + std::string(msg) + "' failed (");
+            str += std::string(expr) + ")";
+            hpx::detail::throw_exception(
+                hpx::exception(hpx::assertion_failure, str), 
+                function, p.string(), line);
         }
 
         catch (...) {
@@ -163,7 +164,7 @@ namespace hpx { namespace detail
                           << boost::diagnostic_information(boost::current_exception()); 
             }
 
-            std::abort();
+            std::terminate();
         }
     }
 }}
