@@ -299,7 +299,8 @@ namespace hpx
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
-            startup_func startup_function, shutdown_func shutdown_function, 
+            startup_func const& startup_function, 
+            shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
             if (vm.count("app-config"))
@@ -333,11 +334,13 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // global scheduler (one queue for all OS threads)
         int run_global(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func startup_function, shutdown_func shutdown_function, 
+            startup_func const& startup_function, 
+            shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
             typedef hpx::threads::policies::global_queue_scheduler
@@ -354,11 +357,13 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // local scheduler (one queue for each OS threads)
         int run_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func startup_function, shutdown_func shutdown_function, 
+            startup_func const& startup_function, 
+            shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
             typedef hpx::threads::policies::local_queue_scheduler
@@ -375,13 +380,14 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // local scheduler with priority queue (one queue for ech OS threads
+        // local scheduler with priority queue (one queue for each OS threads
         // plus one separate queue for high priority PX-threads)
         int run_priority_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func startup_function, shutdown_func shutdown_function, 
+            startup_func const& startup_function, 
+            shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
             typedef hpx::threads::policies::local_priority_queue_scheduler 
@@ -404,7 +410,8 @@ namespace hpx
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func startup_function, shutdown_func shutdown_function, 
+            startup_func const& startup_function, 
+            shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
             typedef hpx::threads::policies::abp_queue_scheduler 
