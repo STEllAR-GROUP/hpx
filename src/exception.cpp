@@ -146,8 +146,9 @@ namespace hpx { namespace detail
     {
         try {
             boost::filesystem::path p(hpx::util::create_path(file));
-            std::string str("assertion '" + std::string(msg) + "' failed (");
-            str += std::string(expr) + ")";
+            std::string str("assertion '" + std::string(msg) + "' failed");
+            if (expr != msg)
+                str += " (" + std::string(expr) + ")";
             hpx::detail::throw_exception(
                 hpx::exception(hpx::assertion_failure, str), 
                 function, p.string(), line);
@@ -161,11 +162,11 @@ namespace hpx { namespace detail
             }
             else {
                 std::cerr << "Runtime is not available, reporting error locally\n"
-                          << boost::diagnostic_information(boost::current_exception()); 
+                    << boost::diagnostic_information(boost::current_exception()); 
             }
-
-            std::abort();
         }
+
+        std::abort();
     }
 }}
 
