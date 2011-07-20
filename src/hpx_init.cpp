@@ -515,6 +515,7 @@ namespace hpx
                 // In this case we default to executing with an empty hpx_main.
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
+                    f = 0;
                 }
             }
 
