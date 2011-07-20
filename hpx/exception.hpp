@@ -7,10 +7,6 @@
 #if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
-#include <exception>
-#include <string>
-#include <iosfwd>
-
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
@@ -21,6 +17,10 @@
 #include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
+
+#include <exception>
+#include <string>
+#include <iosfwd>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -259,12 +259,18 @@ namespace hpx
         struct tag_throw_function {};
         struct tag_throw_thread_name {};
         struct tag_throw_file {};
-        struct tag_throw_line {};
 
         typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
         typedef boost::error_info<struct tag_throw_thread_name, std::string> throw_thread_name;
         typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
+
+#if BOOST_VERSION > 103600
+        using boost::throw_line;
+#else
+        // use our own line information tag for older Boost versions
+        struct tag_throw_line {};
         typedef boost::error_info<struct tag_throw_line, int> throw_line;
+#endif
 
 #if HPX_STACKTRACES != 0
         struct tag_throw_stacktrace {};
@@ -330,14 +336,14 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost
 {
-    // forwarder 
+    // forwarder for BOOST_ASSERT handler
     inline void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
         hpx::detail::assertion_failed(expr, function, file, line);
     }
 
-    // forwarder 
+    // forwarder for BOOST_ASSERT_MSG handler
     inline void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
@@ -433,5 +439,3 @@ namespace boost
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
-
