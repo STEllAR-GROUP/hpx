@@ -18,6 +18,8 @@ if(NOT MSVC)
       fibonacci1
       fibonacci2
       error_handling1
+      error_handling2
+      error_handling3
       quicksort)
 else()
   set(example_programs
@@ -29,7 +31,9 @@ else()
       factorial_get
       fibonacci1
       fibonacci2
-      error_handling1)
+      error_handling1
+      error_handling2
+      error_handling3)
 endif()
 
 foreach(example_program ${example_programs})

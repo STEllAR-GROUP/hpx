@@ -8,36 +8,14 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0621PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/console_error_sink.hpp>
-#include <hpx/runtime/components/console_logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    // stub function allowing to apply the console_console_error_sink action
-    inline void console_error_sink(naming::id_type const& dst, 
-        naming::gid_type const& src, boost::exception_ptr const& e)
-    {
-        // do logging only if the system is still up. 
-        if (threads::threadmanager_is(running))
-        {
-            if (threads::get_self_ptr())
-            {
-                lcos::eager_future<server::console_error_sink_action> f
-                    (dst, naming::get_prefix_from_gid(src), e);
-                f.get();
-            }
-
-            else
-            {
-                applier::apply<server::console_error_sink_action>
-                    (dst, naming::get_prefix_from_gid(src), e);
-            }
-        }
-    }
+    // Stub function which applies the console_error_sink action.
+    HPX_EXPORT void console_error_sink(naming::id_type const& dst,
+        boost::exception_ptr const& e);
 }}
 
 #endif
+

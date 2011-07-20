@@ -313,7 +313,7 @@ namespace hpx
         runtime_impl* This() { return this; }
 
         // 
-        static void default_errorsink(boost::uint32_t, std::string const&);
+        static void default_errorsink(std::string const&);
 
         //
         threads::thread_state run_helper(

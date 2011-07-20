@@ -5,6 +5,7 @@
 
 add_hpx_library_sources(hpx
   component_type.cpp
+  console_error_sink.cpp
   console_logging.cpp)
 
 add_subdirectory(server)

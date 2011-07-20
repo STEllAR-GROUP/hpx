@@ -7,20 +7,22 @@
 #if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
+#include <exception>
+#include <string>
+#include <iosfwd>
+
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/current_function.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
-
-#include <exception>
-#include <string>
-#include <iosfwd>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -256,72 +258,60 @@ namespace hpx
     // types needed to add additional information to the thrown exceptions
     namespace detail
     {
-        struct tag_throw_function {};
+        struct tag_throw_locality {};
+        struct tag_throw_shepherd {};
+        struct tag_throw_thread_id {};
         struct tag_throw_thread_name {};
         struct tag_throw_file {};
+        struct tag_throw_function {};
+    }
 
-        typedef boost::error_info<struct tag_throw_function, std::string> throw_function;
-        typedef boost::error_info<struct tag_throw_thread_name, std::string> throw_thread_name;
-        typedef boost::error_info<struct tag_throw_file, std::string> throw_file;
+    typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
+        throw_locality;
 
-#if BOOST_VERSION > 103600
-        using boost::throw_line;
-#else
-        // use our own line information tag for older Boost versions
-        struct tag_throw_line {};
-        typedef boost::error_info<struct tag_throw_line, int> throw_line;
-#endif
+    typedef boost::error_info<detail::tag_throw_shepherd, boost::int64_t>
+        throw_shepherd;
+
+    typedef boost::error_info<detail::tag_throw_thread_id, hpx::uintptr_t>
+        throw_thread_id;
+
+    typedef boost::error_info<detail::tag_throw_thread_name, std::string>
+        throw_thread_name;
+
+    typedef boost::error_info<detail::tag_throw_function, std::string>
+        throw_function;
+
+    typedef boost::error_info<detail::tag_throw_file, std::string>
+        throw_file;
+
+    using boost::throw_line;
+
+    namespace detail
+    {
 
 #if HPX_STACKTRACES != 0
         struct tag_throw_stacktrace {};
-        typedef boost::error_info<struct tag_throw_stacktrace, std::string> throw_stacktrace;
+    }
 
+    typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
+        throw_stacktrace;
+
+    namespace detail
+    {
         HPX_EXPORT std::string backtrace();
+#endif
 
-        // main function for throwing exceptions
         template <typename Exception>
-        HPX_EXPORT void throw_exception(Exception const& e, 
+        HPX_EXPORT void rethrow_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line, 
-            std::string const& back_trace);
+            std::string const& back_trace, boost::uint32_t node = 0,
+            boost::int64_t shepherd = -1, hpx::uintptr_t thread_id = 0,
+            std::string const& thread_name = "");
 
-        // forwarding helpers
-        template <typename Exception>
-        inline void throw_exception(Exception const& e, 
-            char const* func, std::string const& file, int line)
-        {
-            throw_exception(e, std::string(func), file, line, backtrace());
-        }
-
-        template <typename Exception>
-        inline void throw_exception(Exception const& e, 
-            std::string const& func, std::string const& file, int line)
-        {
-            throw_exception(e, func, file, line, backtrace());
-        }
-#else
         // main function for throwing exceptions
         template <typename Exception>
         HPX_EXPORT void throw_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line);
-
-        // forwarding helpers
-        template <typename Exception>
-        inline void throw_exception(Exception const& e, 
-            char const* func, std::string const& file, int line)
-        {
-            throw_exception(e, std::string(func), file, line);
-        }
-
-        // dummy forwarding helper allowing to maintain the same API as when
-        // HPX_STACKTRACES is defined
-        template <typename Exception>
-        inline void throw_exception(Exception const& e, 
-            std::string const& func, std::string const& file, int line, 
-            std::string const&)
-        {
-            throw_exception(e, func, file, line);
-        }
-#endif
 
         // BOOST_ASSERT handler
         HPX_EXPORT void assertion_failed(char const* expr, char const* function,
@@ -331,19 +321,21 @@ namespace hpx
         HPX_EXPORT void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
     }
+
+    HPX_EXPORT std::string diagnostic_information(boost::exception const&); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost
 {
-    // forwarder for BOOST_ASSERT handler
+    // forwarder 
     inline void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
         hpx::detail::assertion_failed(expr, function, file, line);
     }
 
-    // forwarder for BOOST_ASSERT_MSG handler
+    // forwarder 
     inline void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
@@ -439,3 +431,4 @@ namespace boost
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
+

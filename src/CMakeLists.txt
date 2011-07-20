@@ -562,6 +562,8 @@ else()
 
   # components
   set(hpxlib_components_SOURCES
+      ${hpx_SOURCE_DIR}/src/runtime/components/console_error_sink.cpp
+      ${hpx_SOURCE_DIR}/src/runtime/components/console_logging.cpp
       ${hpx_SOURCE_DIR}/src/runtime/components/component_type.cpp)
   source_group("Source Files\\Runtime\\Components" 
       FILES ${hpxlib_components_SOURCES})

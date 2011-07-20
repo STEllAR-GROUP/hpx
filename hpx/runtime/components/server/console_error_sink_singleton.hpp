@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -21,11 +23,10 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     class console_error_dispatcher : boost::noncopyable
     {
-    private:
-        typedef boost::mutex mutex_type;
-        typedef void dispatcher_type(boost::uint32_t, std::string const&);
-
     public:
+        typedef util::spinlock mutex_type;
+        typedef void dispatcher_type(std::string const&);
+
         typedef boost::signals2::scoped_connection scoped_connection_type;
 
         template <typename F, typename Connection>
@@ -35,10 +36,10 @@ namespace hpx { namespace components { namespace server
             return (conn = dispatcher_.connect(sink)).connected();
         }
 
-        void operator()(boost::uint32_t src, std::string const& msg)
+        void operator()(std::string const& msg)
         {
             mutex_type::scoped_lock l(mtx_);
-            dispatcher_(src, msg);
+            dispatcher_(msg);
         }
 
     private:
@@ -52,3 +53,4 @@ namespace hpx { namespace components { namespace server
 }}}
 
 #endif
+

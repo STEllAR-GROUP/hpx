@@ -19,10 +19,10 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
-    void console_error_sink(boost::uint32_t, boost::exception_ptr const&);
+    void console_error_sink(boost::exception_ptr const&);
 
-    typedef actions::plain_action2<
-        boost::uint32_t, boost::exception_ptr const&, console_error_sink,
+    typedef actions::plain_action1<
+        boost::exception_ptr const&, console_error_sink,
         threads::thread_priority_critical
     > console_error_sink_action;
 }}}

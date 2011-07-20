@@ -13,13 +13,13 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <boost/io/ios_state.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
+#include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 
@@ -631,20 +631,19 @@ namespace hpx
         // never sees errors that kill the system before the error parcel gets
         // sent out. So, before we try to send the error parcel (which might
         // cause a double fault), print local diagnostics.
-        components::server::console_error_sink
-            (naming::get_prefix_from_gid(parcel_handler_.get_prefix()), e);
+        components::server::console_error_sink(e);
 
-        // first report this error to the console
+        // First report this error to the console.
         naming::gid_type console_prefix;
         if (agas_client_.get_console_prefix(console_prefix))
         {
             if (parcel_handler_.get_prefix() != console_prefix)
                 components::console_error_sink(
                     naming::id_type(console_prefix, naming::id_type::unmanaged), 
-                    parcel_handler_.get_prefix(), e);
+                    e);
         }
 
-        // stop all services
+        // Stop all services.
         stop(false);
     }
 
@@ -684,12 +683,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
-        boost::uint32_t src, std::string const& msg)
+        std::string const& msg)
     {
-        boost::io::ios_all_saver ifs(std::cerr); 
-        std::cerr << "locality (" << std::hex << std::setw(4) 
-                  << std::setfill('0') << src << "):" << std::endl
-                  << msg << std::endl;
+        std::cerr << msg << std::endl;
     }
 
     ///////////////////////////////////////////////////////////////////////////
