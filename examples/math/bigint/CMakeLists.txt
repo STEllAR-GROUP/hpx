@@ -5,5 +5,5 @@
 
 add_hpx_component(bigint
   MODULE math 
-  SOURCES lco_registeration.cpp)
+  SOURCES lco_registration.cpp)
 
