@@ -85,6 +85,7 @@ namespace hpx { namespace threads
         scheduler_(scheduler),
         notifier_(notifier),
         exec_time(0),
+        total_exec_time(0),
         tfunc_time(0)
     {
         //LTM_(debug) << "threadmanager_impl ctor";
@@ -1040,7 +1041,10 @@ namespace hpx { namespace threads
                                 // and add to aggregate execution time.
                                 exec_timer.restart();
                                 thrd_stat = (*thrd)();
-                                exec_time += exec_timer.elapsed_microseconds();
+                                exec_time = exec_timer.elapsed_microseconds();
+                                util::spinlock::scoped_lock mtx(acc_mtx);        
+                                exec_time_acc(double(exec_time));
+                                total_exec_time += exec_time;
                             }
                             tl2.tock();
                             ++num_px_threads;
@@ -1112,7 +1116,7 @@ namespace hpx { namespace threads
                 // push execution time ratio onto running average accumulator.
                 tfunc_time = tfunc_timer.elapsed_microseconds();
                 util::spinlock::scoped_lock mtx(acc_mtx);
-                exec_ratio( double(exec_time) / double(tfunc_time) );                
+                exec_ratio( double(total_exec_time) / double(tfunc_time) );                
                 break;
             }
         }

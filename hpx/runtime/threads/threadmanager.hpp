@@ -582,6 +582,12 @@ namespace hpx { namespace threads
             return (1 - avg_exec_ratio());
         }        
 
+        double avg_exec_time() const
+        {
+            util::spinlock::scoped_lock mtx(acc_mtx);
+            return boost::accumulators::extract::mean(exec_time_acc);
+        }
+
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread, std::size_t& theads_run);
@@ -653,10 +659,10 @@ namespace hpx { namespace threads
 
         // tfunc_impl timers
         util::high_resolution_timer exec_timer, tfunc_timer;
-        boost::int64_t exec_time, tfunc_time;
+        boost::int64_t exec_time, total_exec_time, tfunc_time;
         boost::accumulators::accumulator_set < double,
             boost::accumulators::features < boost::accumulators::tag::mean > >
-            exec_ratio;
+            exec_ratio, exec_time_acc;
         mutable util::spinlock acc_mtx; 
     };
 }}
