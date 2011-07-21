@@ -27,7 +27,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 class count_time_stats {
   typedef hpx::util::spinlock mutex_type;
   typedef mutex_type::scoped_lock lock;
-  typedef boost::accumulators::accumulator_set set;
+  typedef boost::accumulators::accumulator_set acc_set;
 
    public:
 
@@ -49,20 +49,18 @@ class count_time_stats {
     boost::atomic<boost::int64_t> count_time_stats_size;
 
     // Create mutexes for accumulator functions.
-    mutable mutex_type mean_time_mtx;
-    mutable mutex_type moment_time_mtx;
-    mutable mutex_type variance_time_mtx;
+    mutable mutex_type acc_mtx;
 
     // Create accumulator sets.
-    set < double,
+    acc_set < double,
         boost::accumulators::features< boost::accumulators::tag::mean > >
         mean_time_acc;
 
-    set < double,
+    acc_set < double,
         boost::accumulators::features< boost::accumulators::tag::moment<2> > >
         moment_time_acc;
    
-    set < double,
+    acc_set < double,
         boost::accumulators::features< boost::accumulators::tag::variance> >
         variance_time_acc;
 };
@@ -70,9 +68,7 @@ class count_time_stats {
 inline void count_time_stats::push_back(count_and_time_data_point const& x)
 {
     lock
-        nt(mean_time_mtx),
-        tt(moment_time_mtx),
-        et(variance_time_mtx),
+        mtx(acc_mtx)
 
     ++count_time_stats_size;
     
@@ -88,19 +84,19 @@ inline boost::int64_t count_time_stats::size() const
 
 inline double count_time_stats::mean_time() const
 {
-    lock nt(mean_time_mtx);
+    lock mtx(acc_mtx);
     return boost::accumulators::extract::mean(mean_time_acc);
 }   
    
 inline double count_time_stats::moment_time() const
 {
-    lock tt(moment_time_mtx);
+    lock mtx(acc_mtx);
     return boost::accumulators::extract::moment<2>(moment_time_acc);
 }
 
 inline double count_time_stats::variance_time() const
 {
-    lock vt(variance_time_mtx);
+    lock mtx(acc_mtx);
     return boost::accumulators::extract::variance(variance_time_acc);
 }
 
