@@ -121,7 +121,7 @@ namespace hpx { namespace parcelset
             connection_cache_.add(there_, shared_from_this());
             
             // complete data point and push back onto gatherer 
-            send_data_.end = send_timer_.elapsed();
+            send_data_.end = send_timer_.elapsed_microseconds();
             parcels_sent_.push_back(send_data_);
             ++sends_completed_;
         }
