@@ -27,7 +27,7 @@
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-
+#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <stack>
@@ -72,22 +72,45 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
+        coroutine_allocator() :
+            acount(0),
+            dcount(0),
+            atimer(0),
+            dtimer(0),
+            a_time(0),
+            d_time(0)
+        {}
+
         CoroutineImpl* get()
         {
+            atimer.restart();
             thread_mutex_type::scoped_lock l(this);
             if (heap_.empty())
                 return NULL;
 
             CoroutineImpl* next = heap_.top();
             heap_.pop();
+            util::spinlock::scoped_lock mtx(time_lock);
+            a_time = atimer.elapsed();
+            ++acount;
             return next;
         }
 
         void deallocate(CoroutineImpl* c)
         {
+            dtimer.restart();
             thread_mutex_type::scoped_lock l(this);
             heap_.push(c);
+            util::spinlock::scoped_lock mtx(time_lock);            
+            d_time = dtimer.elapsed();
+            ++dcount;
         }
+
+        // Declare allocation/deallocation counters and timers.
+        boost::int64_t acount, dcount;
+        util::high_resolution_timer atimer, dtimer;
+        double a_time, d_time;
+        util::spinlock time_lock;        
 
         std::stack<CoroutineImpl*> heap_;
     };
