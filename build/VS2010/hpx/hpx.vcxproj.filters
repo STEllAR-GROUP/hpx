@@ -383,6 +383,9 @@
     <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp">
       <Filter>Boost Files\Backtrace</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\components\console_error_sink.cpp">
+      <Filter>Source Files\Runtime\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">

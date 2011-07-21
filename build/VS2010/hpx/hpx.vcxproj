@@ -117,6 +117,10 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\symbol_namespace.cpp" />
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\console_error_sink.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_error_sink1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_error_sink1.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
