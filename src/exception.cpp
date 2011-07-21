@@ -258,7 +258,7 @@ namespace hpx { namespace detail
             boost::get_error_info<hpx::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            strm << *back_trace << "\n";
+            strm << "[stack_trace]: " << *back_trace << "\n";
         }
 
         return util::osstream_get_string(strm);

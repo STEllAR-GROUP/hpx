@@ -264,31 +264,53 @@ namespace hpx
         struct tag_throw_thread_name {};
         struct tag_throw_file {};
         struct tag_throw_function {};
-#if HPX_STACKTRACES != 0
         struct tag_throw_stacktrace {};
-#endif
     }
 
+    /// Stores the information about the locality the exception has been raised
+    /// on. This information will show up in error messages under the 
+    /// [locality] tag.
     typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
         throw_locality;
 
+    /// Stores the information about the shepherd thread the exception has been 
+    /// raised on. This information will show up in error messages under the 
+    /// [shepherd] tag.
     typedef boost::error_info<detail::tag_throw_shepherd, boost::int64_t>
         throw_shepherd;
 
+    /// Stores the information about the HPX thread the exception has been 
+    /// raised on. This information will show up in error messages under the 
+    /// [thread_id] tag.
     typedef boost::error_info<detail::tag_throw_thread_id, hpx::uintptr_t>
         throw_thread_id;
 
+    /// Stores the information about the HPX thread name the exception has been 
+    /// raised on. This information will show up in error messages under the 
+    /// [thread_name] tag.
     typedef boost::error_info<detail::tag_throw_thread_name, std::string>
         throw_thread_name;
 
+    /// Stores the information about the function name the exception has been 
+    /// raised in. This information will show up in error messages under the 
+    /// [function] tag.
     typedef boost::error_info<detail::tag_throw_function, std::string>
         throw_function;
 
+    /// Stores the information about the source file name the exception has 
+    /// been raised in. This information will show up in error messages under 
+    /// the [file] tag.
     typedef boost::error_info<detail::tag_throw_file, std::string>
         throw_file;
 
+    /// Stores the information about the source file line number the exception 
+    /// has been raised at. This information will show up in error messages 
+    /// under the [line] tag.
     using boost::throw_line;
 
+    /// Stores the information about the stack backtrace at the point the 
+    /// exception has been raised at. This information will show up in error 
+    /// messages under the [stack_trace] tag.
     typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
         throw_stacktrace;
 
