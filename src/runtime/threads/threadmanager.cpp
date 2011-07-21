@@ -22,6 +22,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
+#include <boost/cstdint.hpp>
 
 #include <numeric>
 
@@ -82,7 +83,9 @@ namespace hpx { namespace threads
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
-        notifier_(notifier)
+        notifier_(notifier),
+        exec_time(0),
+        tfunc_time(0)
     {
         //LTM_(debug) << "threadmanager_impl ctor";
     }
@@ -1001,6 +1004,7 @@ namespace hpx { namespace threads
         
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
+        tfunc_timer.restart();
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
@@ -1031,8 +1035,12 @@ namespace hpx { namespace threads
                             {
                                 undo_mark_context mark (mark_);  // itt support
                                 caller_context ctx (ctx_);
-
+                                
+                                // Record time elapsed in thread changing state
+                                // and add to aggregate execution time.
+                                exec_timer.restart();
                                 thrd_stat = (*thrd)();
+                                exec_time += exec_timer.elapsed_microseconds();
                             }
                             tl2.tock();
                             ++num_px_threads;
@@ -1100,6 +1108,8 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
+                // Before tfunc loop breaks, record total time elapsed.
+                tfunc_time = tfunc_timer.elapsed_microseconds();
                 break;
             }
         }

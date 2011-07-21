@@ -19,6 +19,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -27,6 +28,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -309,6 +311,7 @@ namespace hpx { namespace threads
     public:
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
+
 
         ///
         threadmanager_impl(util::io_service_pool& timer_pool,
@@ -631,6 +634,10 @@ namespace hpx { namespace threads
 
         scheduling_policy_type& scheduler_;
         notification_policy_type& notifier_;
+
+        // tfunc_impl timers
+        util::high_resolution_timer exec_timer, tfunc_timer;
+        boost::int64_t exec_time, tfunc_time;
     };
 }}
 
