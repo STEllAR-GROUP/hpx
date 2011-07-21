@@ -24,32 +24,35 @@ namespace hpx { namespace components
     public:
     //constructors 
     lublock(){}
-    lublock(naming::id_type gid) : base_type(gid){}
+    lublock(id_type gid) : base_type(gid){}
 
     //initialization function
-    int construct_block(const int h, const int w, const naming::id_type _gid,
-        const std::vector<std::vector<double> > theData){
+    int construct_block(const int h, const int w, const int px, const int py,
+        const int size, const vector<vector<double> > theData){
         BOOST_ASSERT(gid_);
-        return this->base_type::construct_block(gid_,h,w,_gid,theData);
+        return this->base_type::construct_block(gid_,h,w,px,py,size,theData);
     }
 
     //Gaussian functions below
-    server::lublock::gcFuture gauss_corner(){
+    server::lublock::gcFuture gauss_corner(const int iter,
+        vector<vector<id_type> > gidList){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_corner(gid_);
+        return this->base_type::gauss_corner(gid_,iter,gidList);
     }
-    server::lublock::gtopFuture gauss_top(const naming::id_type corner){
+    server::lublock::gtoFuture gauss_top(const int iter,
+        vector<vector<id_type> > gidList){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_top(gid_,corner);
+        return this->base_type::gauss_top(gid_,iter,gidList);
     }
-    server::lublock::glFuture gauss_left(const naming::id_type corner){
+    server::lublock::glFuture gauss_left(const int iter,
+        vector<vector<id_type> > gidList){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_left(gid_,corner);
+        return this->base_type::gauss_left(gid_,iter,gidList);
     }
-    server::lublock::gtrFuture gauss_trail(const int size, const naming::id_type corner, 
-        const naming::id_type left, const naming::id_type top){
+    server::lublock::gtrFuture gauss_trail(const int iter,
+        vector<vector<id_type> > gidList){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_trail(gid_, size, corner, left, top);
+        return this->base_type::gauss_trail(gid_,iter,gidList);
     }
 
     //get functions
@@ -61,7 +64,7 @@ namespace hpx { namespace components
         BOOST_ASSERT(gid_);
         return this->base_type::get_columns(gid_);
     }
-    std::vector<std::vector<double> > get_data(){
+    vector<vector<double> > get_data(){
         BOOST_ASSERT(gid_);
         return this->base_type::get_data(gid_);
     }

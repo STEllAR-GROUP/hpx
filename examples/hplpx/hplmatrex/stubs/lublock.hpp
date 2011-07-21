@@ -23,39 +23,39 @@ namespace hpx { namespace components { namespace stubs
     struct lublock : stub_base<server::lublock>
     {
     //constructor
-    static int construct_block(const naming::id_type gid, const int h,
-        const int w, const naming::id_type _gid,
-        const std::vector<std::vector<double> > theData){
+    static int construct_block(const id_type gid, const int h, const int w,
+        const int posx, const int posy, const int size,
+        const vector<vector<double> > theData){
         return lcos::eager_future<server::lublock::constructBlock_action,
-            int>(gid,h,w,_gid,theData).get();
+            int>(gid,h,w,posx,posy,size,theData).get();
     }
 
     //Gaussian functions
-    static server::lublock::gcFuture gauss_corner(const naming::id_type gid){
-        return server::lublock::gcFuture(gid);
+    static server::lublock::gcFuture gauss_corner(const id_type gid,
+        const int iter, const vector<vector<id_type> > gidList){
+        return server::lublock::gcFuture(gid,iter,gidList);
     }
-    static server::lublock::gtopFuture gauss_top(const naming::id_type gid,
-        const naming::id_type corner){
-        return server::lublock::gtopFuture(gid,corner);
+    static server::lublock::gtoFuture gauss_top(const id_type gid,
+        const int iter, const vector<vector<id_type> > gidList){
+        return server::lublock::gtoFuture(gid,iter,gidList);
     }
-    static server::lublock::glFuture gauss_left(const naming::id_type gid,
-        const naming::id_type corner){
-        return server::lublock::glFuture(gid,corner);
+    static server::lublock::glFuture gauss_left(const id_type gid,
+        const int iter, const vector<vector<id_type> > gidList){
+        return server::lublock::glFuture(gid,iter,gidList);
     }
-    static server::lublock::gtrFuture gauss_trail(const naming::id_type gid,
-        const int size, const naming::id_type corner,const naming::id_type left,
-        const naming::id_type top){
-        return server::lublock::gtrFuture(gid,size,corner,left,top);
+    static server::lublock::gtrFuture gauss_trail(const id_type gid,
+        const int iter, const vector<vector<id_type> > gidList){
+        return server::lublock::gtrFuture(gid,iter,gidList);
     }
 
     //get functions
-    static int get_rows(const naming::id_type gid){
+    static int get_rows(const id_type gid){
         return server::lublock::rowFuture(gid).get();
     }
-    static int get_columns(const naming::id_type gid){
+    static int get_columns(const id_type gid){
         return server::lublock::columnFuture(gid).get();
     }
-    static std::vector<std::vector<double> > get_data(const naming::id_type gid){
+    static vector<vector<double> > get_data(const id_type gid){
         return server::lublock::dataFuture(gid).get();
     }
     };

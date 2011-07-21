@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_subdirectory(hplmatrex)
+add_subdirectory(smphplmatrex)
 
 set(hplpx_DEPENDENCIES
     hplmatrex_component
@@ -15,5 +16,10 @@ add_hpx_executable(hplpx
   SOURCES hplpx.cpp
   DEPENDENCIES ${hplpx_DEPENDENCIES})
 
-add_hpx_pseudo_dependencies(examples.hplpx hplpx_exe)
+add_hpx_executable(smphplpx
+  MODULE smphplmatrex
+  SOURCES smphplpx.cpp
+  DEPENDENCIES smphplmatrex_component)
 
+add_hpx_pseudo_dependencies(examples.hplpx hplpx_exe)
+add_hpx_pseudo_dependencies(examples.hplpx smphplpx_exe)
