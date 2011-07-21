@@ -10,6 +10,13 @@
 #include <cstdlib>
 
 #include <boost/config.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION < 104200
+// Please update your Boost installation (see www.boost.org for details).
+#error HPX cannot be compiled with a Boost version earlier than V1.42.
+#endif
+
 #if defined(BOOST_WINDOWS)
 #include <winsock2.h>
 #include <windows.h>

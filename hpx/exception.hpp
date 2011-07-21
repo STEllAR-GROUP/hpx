@@ -264,6 +264,9 @@ namespace hpx
         struct tag_throw_thread_name {};
         struct tag_throw_file {};
         struct tag_throw_function {};
+#if HPX_STACKTRACES != 0
+        struct tag_throw_stacktrace {};
+#endif
     }
 
     typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
@@ -286,21 +289,13 @@ namespace hpx
 
     using boost::throw_line;
 
-    namespace detail
-    {
-
-#if HPX_STACKTRACES != 0
-        struct tag_throw_stacktrace {};
-    }
-
     typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
         throw_stacktrace;
 
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        HPX_EXPORT std::string backtrace();
-#endif
-
+        // rethrow an exception, internal helper
         template <typename Exception>
         HPX_EXPORT void rethrow_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line, 
@@ -320,22 +315,28 @@ namespace hpx
         // BOOST_ASSERT_MSG handler
         HPX_EXPORT void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
-    }
 
-    HPX_EXPORT std::string diagnostic_information(boost::exception const&); 
+        // If backtrace support is enabled, this function returns the current 
+        // stack backtrace, otherwise it will return an empty string.
+        std::string backtrace();
+
+        // Extract the diagnostic information embedded in the given exception and
+        // return a string holding a formatted message.
+        std::string diagnostic_information(boost::exception const& e);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost
 {
-    // forwarder 
+    // forwarder for BOOST_ASSERT handler
     inline void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
         hpx::detail::assertion_failed(expr, function, file, line);
     }
 
-    // forwarder 
+    // forwarder for BOOST_ASSERT_MSG handler
     inline void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {

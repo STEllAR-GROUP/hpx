@@ -89,7 +89,7 @@ namespace hpx
             boost::format version("%d.%d.%d");
             boost::format logo(
                 "HPX - High Performance ParalleX\n"
-                "A experimental runtime system for conventional machines implementing\n"
+                "An experimental runtime system for conventional machines implementing\n"
                 "(parts of) the ParalleX execution model." 
                 "\n"
                 "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 

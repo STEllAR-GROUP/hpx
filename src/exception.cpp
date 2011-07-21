@@ -17,17 +17,19 @@
   #include <boost/backtrace.hpp>
 #endif
 #include <boost/format.hpp>
-#include <boost/exception/diagnostic_information.hpp>
+
 #include <stdexcept>
 
 namespace hpx { namespace detail
 {
-#if HPX_STACKTRACES != 0
-    HPX_EXPORT std::string backtrace()
+    std::string backtrace()
     {
+#if HPX_STACKTRACES != 0
         return boost::trace();
-    }
+#else
+        return "";
 #endif
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
@@ -87,7 +89,6 @@ namespace hpx { namespace detail
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, hpx::uintptr_t, std::string const&);
 
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func, 
@@ -96,14 +97,8 @@ namespace hpx { namespace detail
         boost::uint32_t node = 0;
         boost::int64_t shepherd = -1;
         hpx::uintptr_t thread_id = 0;
-        std::string thread_name = "";
-        std::string back_trace =
-#if HPX_STACKTRACES != 0
-            backtrace()
-#else
-            ""
-#endif
-            ;
+        std::string thread_name("");
+        std::string back_trace(backtrace());
 
         if (threads::threadmanager_is(running))
         {
@@ -197,23 +192,23 @@ namespace hpx { namespace detail
         std::abort();
     }
 
-    } // detail
-
+    ///////////////////////////////////////////////////////////////////////////
+    // Extract the diagnostic information embedded in the given exception and
+    // return a string holding a formatted message.
     std::string diagnostic_information(boost::exception const& e)
     {
         util::osstream strm;
-
-        std::string const* back_trace = 
-            boost::get_error_info<hpx::throw_stacktrace>(e);
-        if (back_trace && !back_trace->empty()) {
-            strm << *back_trace << "\n";
-        }
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&e);
         if (se)
             strm << "[what]: " << se->what() << "\n";
+
+        boost::uint32_t const* locality = 
+            boost::get_error_info<hpx::throw_locality>(e);
+        if (locality && 0 != *locality) 
+            strm << "[locality]: " << *locality << "\n";
 
         char const* const* func =
             boost::get_error_info<boost::throw_function>(e);
@@ -241,35 +236,32 @@ namespace hpx { namespace detail
 
         int const* line = 
             boost::get_error_info<boost::throw_line>(e);
-        if (line) {
+        if (line) 
             strm << "[line]: " << *line << "\n";
-        }
-
-        boost::uint32_t const* locality = 
-            boost::get_error_info<hpx::throw_locality>(e);
-        if (locality && *locality) {
-            strm << "[locality]: " << *locality << "\n";
-        }
 
         boost::int64_t const* shepherd = 
             boost::get_error_info<hpx::throw_shepherd>(e);
-        if (shepherd && !(-1 == *shepherd)) {
+        if (shepherd && -1 != *shepherd) 
             strm << "[shepherd]: " << *shepherd << "\n";
-        }
 
         hpx::uintptr_t const* thread_id = 
             boost::get_error_info<hpx::throw_thread_id>(e);
-        if (thread_id && *thread_id) {
+        if (thread_id && *thread_id) 
             strm << (boost::format("[thread_id]: %016x\n") % *thread_id);
-        }
 
         std::string const* thread_name = 
             boost::get_error_info<hpx::throw_thread_name>(e);
-        if (thread_name && !thread_name->empty()) {
+        if (thread_name && !thread_name->empty()) 
             strm << "[thread_name]: " << *thread_name << "\n";
+
+        std::string const* back_trace = 
+            boost::get_error_info<hpx::throw_stacktrace>(e);
+        if (back_trace && !back_trace->empty()) {
+            // FIXME: add indentation to stack frame information
+            strm << *back_trace << "\n";
         }
 
         return util::osstream_get_string(strm);
     }
-}
+}}
 

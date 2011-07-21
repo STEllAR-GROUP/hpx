@@ -623,8 +623,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
-        std::size_t num_thread, 
-        boost::exception_ptr const& e)
+        std::size_t num_thread, boost::exception_ptr const& e)
     {
         // The console error sink is only applied at the console, so default
         // error sink never gets called on the locality, meaning that the user
@@ -633,14 +632,15 @@ namespace hpx
         // cause a double fault), print local diagnostics.
         components::server::console_error_sink(e);
 
-        // First report this error to the console.
+        // Report this error to the console.
         naming::gid_type console_prefix;
         if (agas_client_.get_console_prefix(console_prefix))
         {
-            if (parcel_handler_.get_prefix() != console_prefix)
+            if (parcel_handler_.get_prefix() != console_prefix) {
                 components::console_error_sink(
                     naming::id_type(console_prefix, naming::id_type::unmanaged), 
                     e);
+            }
         }
 
         // Stop all services.

@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace server
         }
         catch (boost::exception const& be) {
             // dispatch this error to registered functions
-            get_error_dispatcher()(hpx::diagnostic_information(be));
+            get_error_dispatcher()(hpx::detail::diagnostic_information(be));
         }
     }
 }}}
