@@ -70,7 +70,8 @@ namespace hpx { namespace components { namespace amr
         }
         resultval->timestep_ = val[1]->timestep_ + 1.0;
 
-        std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << std::endl;
+        std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " left input " << val[0]->value_.size() << " middle input " << val[1]->value_.size() << " right input " << val[2]->value_.size() << std::endl;
+        //std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " size " << val.size() << std::endl;
         if ( resultval->timestep_ >= par->nt0-1 ) {
           return 0;
         }

@@ -132,9 +132,9 @@ namespace hpx { namespace components { namespace amr { namespace server
             namespace stubs = components::amr::stubs;
             BOOST_ASSERT(function != functions.second);
 
-#if 0       // DEBUG
+//#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-#endif
+//#endif
 #if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
@@ -411,6 +411,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                                   parameter const& par)
     {
       std::size_t i,j;
+      int ii;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -430,9 +431,10 @@ namespace hpx { namespace components { namespace amr { namespace server
           counter = 0;
 
           dst = step + 1;
+          ii = i;
           if ( dst >= num_rows ) dst = 0;
 
-          for (int jj=i-1;jj<i+2;jj++) {          
+          for (int jj=ii-1;jj<ii+2;jj++) {          
             int dst_col = jj;
             if ( jj < 0 ) dst_col = each_row[step]-1;
             if ( jj == each_row[step] ) dst_col = 0;

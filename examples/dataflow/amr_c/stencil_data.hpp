@@ -54,18 +54,11 @@ struct stencil_data
     std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double_type timestep_;    // current time step
     std::valarray<double> value_;    // current value
-    //double value_;    // current value
 
 private:
     // serialization support
     friend class boost::serialization::access;
 
-    //template<class Archive>
-    //void serialize(Archive & ar, const unsigned int version)
-    //{
-    //    ar & max_index_ & index_ & timestep_ & value_;
-    //}
-//#if 0
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     template<class Archive>
@@ -79,7 +72,6 @@ private:
     {
         ar & max_index_ & index_ & timestep_ & value_;
     } 
-//#endif
 };
 
 }}}
