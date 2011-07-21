@@ -177,6 +177,11 @@ namespace hpx { namespace util
                 (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
         }
 
+        boost::int64_t elapsed_microseconds() const
+        {
+            return boost::int64_t(10e6 * elapsed());
+        }
+
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
             return double((std::numeric_limits<time_t>::max)() - start_time.tv_sec); 
@@ -269,6 +274,11 @@ namespace hpx { namespace util
                 
             return double(now.tv_sec - start_time.tv_sec) + 
                 (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
+        }
+
+        boost::int64_t elapsed_microseconds() const
+        {
+            return boost::int64_t(10e6 * elapsed());
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
