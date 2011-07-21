@@ -149,11 +149,11 @@ namespace hpx { namespace components { namespace server
     _gid = gid;
 // / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
-    int i;          //just counting variables
+    int i,j;        //just counting variables
     int offset = 1; //the initial offset used for the memory handling algorithm
     boost::rand48 gen;     //random generator used for seeding other generators
     gen.seed(time(NULL));
-    allocate();    //allocate memory for the elements of the array
+    allocate();     //allocate memory for the elements of the array
 
     //By making offset a power of two, the assign functions
     //are much simpler than they would be otherwise.
@@ -169,6 +169,15 @@ namespace hpx { namespace components { namespace server
 
     //initialize the pivot array
     for(i=0;i<rows;i++){pivotarr[i]=tempivotarr[i]=i;}
+    for(i=0;i<brows;i++){
+        std::vector<naming::id_type> vectorRow;
+        gidList.push_back(vectorRow);
+        for(j=0;j<brows;j++){
+            naming::id_type prefix =
+                hpx::applier::get_applier().get_runtime_support_gid();
+            datablock[i][j].create(prefix);
+            gidList[i].push_back(datablock[i][j].get_gid());
+    }   }
     future.get();
     return 1;
     }
@@ -260,38 +269,7 @@ namespace hpx { namespace components { namespace server
     free(solution);
     }
 
-//DEBUGGING FUNCTIONS/////////////////////////////////////////////////
-/*    //print out the matrix
-    void hplmatrex::print(){
-    for(int i = 0; i < brows; i++){
-        for(int j = 0; j < datablock[i][0]->rows; j++){
-        for(int k = 0; k < brows; k++){
-            for(int l = 0; l < datablock[i][k]->columns; l++){
-            std::cout<<datablock[i][k]->data[j][l]<<" ";
-        }   }
-        std::cout<<std::endl;
-    }   }
-    std::cout<<std::endl;
-    }
-    void hplmatrex::print2(){
-    for(int i = 0;i < rows; i++){
-        for(int j = 0;j < columns; j++){
-        std::cout<<trueData[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
-    for(int i = 0;i < columns; i++){
-        for(int j = 0;j < rows; j++){
-        std::cout<<transData[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
-    }*/
-//END DEBUGGING FUNCTIONS/////////////////////////////////////////////
-
-    //lusolve is simply a wrapper function for lufactor and lubacksubst
+    //lusolve is simply a wrapper function for all subfunctions
     double hplmatrex::lusolve(){
     //first perform partial pivoting
     ptime starttime = ptime(microsec_clock::local_time());
@@ -391,13 +369,10 @@ namespace hpx { namespace components { namespace server
         //finding the pivot values for.  Due to how the lublocks are used
         //to represent the entire dataset, the second to last iteration
         //does not create a new swap future.
-        std::vector<naming::id_type> vectorRow;
         if(outer<brows-1){
-            gidList.push_back(vectorRow);
             futures.push_back(swap_future(_gid,outer,0));
         }
         else if(outer==brows){
-            gidList.push_back(vectorRow);
             futures.push_back(swap_future(_gid,outer-1,0));
         }
     }
@@ -456,12 +431,8 @@ namespace hpx { namespace components { namespace server
             for(j=0;j<numcols;j++){
                 tempData[i].push_back(trueData[pivotarr[off1+i]][off2+j]);
         }   }
-        naming::id_type prefix =
-            hpx::applier::get_applier().get_runtime_support_gid();
-        datablock[brow][k].create(prefix);
         datablock[brow][k].construct_block(
-            numrows,numcols,brow,k,brows,tempData);
-        gidList[brow].push_back(datablock[brow][k].get_gid());
+            numrows,numcols,k,brow,brows,gidList,tempData);
         tempData.clear();
     }
     return 1;
@@ -476,11 +447,8 @@ namespace hpx { namespace components { namespace server
 
     for(iter = 0; iter < brows; iter++){
         lublock::gcFuture(
-            datablock[iter][iter].gauss_corner(iter,gidList)).get();
-        if(iter < brows-1){
-            lublock::gtrFuture(
-                datablock[iter+1][iter+1].gauss_trail(iter,gidList)).get();
-    }   }
+            datablock[iter][iter].gauss_corner(iter)).get();
+    }
     }
 /*    int iter = 0, i, j;
     int beginElement, nextElement;

@@ -28,31 +28,29 @@ namespace hpx { namespace components
 
     //initialization function
     int construct_block(const int h, const int w, const int px, const int py,
-        const int size, const vector<vector<double> > theData){
+        const int size, const vector<vector<id_type> > gidList,
+        const vector<vector<double> > theData){
         BOOST_ASSERT(gid_);
-        return this->base_type::construct_block(gid_,h,w,px,py,size,theData);
+        return this->base_type::construct_block(
+            gid_,h,w,px,py,size,gidList,theData);
     }
 
     //Gaussian functions below
-    server::lublock::gcFuture gauss_corner(const int iter,
-        vector<vector<id_type> > gidList){
+    server::lublock::gcFuture gauss_corner(const int iter){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_corner(gid_,iter,gidList);
+        return this->base_type::gauss_corner(gid_,iter);
     }
-    server::lublock::gtoFuture gauss_top(const int iter,
-        vector<vector<id_type> > gidList){
+    server::lublock::gtoFuture gauss_top(const int iter){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_top(gid_,iter,gidList);
+        return this->base_type::gauss_top(gid_,iter);
     }
-    server::lublock::glFuture gauss_left(const int iter,
-        vector<vector<id_type> > gidList){
+    server::lublock::glFuture gauss_left(const int iter){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_left(gid_,iter,gidList);
+        return this->base_type::gauss_left(gid_,iter);
     }
-    server::lublock::gtrFuture gauss_trail(const int iter,
-        vector<vector<id_type> > gidList){
+    server::lublock::gtrFuture gauss_trail(const int iter){
         BOOST_ASSERT(gid_);
-        return this->base_type::gauss_trail(gid_,iter,gidList);
+        return this->base_type::gauss_trail(gid_,iter);
     }
 
     //get functions

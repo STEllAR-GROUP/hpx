@@ -40,44 +40,40 @@ namespace hpx { namespace components { namespace server
         };
         //constructors and destructor
         lublock(){}
-        int construct_block(const int h,const int w, const int posx,
-            const int posy, const int size,
+        int construct_block(const int h, const int w, const int px,
+            const int py, const int size, vector<vector<id_type> > gids,
             vector<vector<double> > theData);
         ~lublock(){destruct_block();}
         void destruct_block();
-        int lu_gauss_corner(const int iter,
-            const vector<vector<id_type> > gidList);
-        int lu_gauss_top(const int iter,
-            const vector<vector<id_type> > gidList);
-        int lu_gauss_left(const int iter,
-            const vector<vector<id_type> > gidList);
-        int lu_gauss_trail(const int iter, 
-            const vector<vector<id_type> > gidList);
+        int lu_gauss_corner(const int iter);
+        int lu_gauss_top(const int iter);
+        int lu_gauss_left(const int iter);
+        int lu_gauss_trail(const int iter);
         int get_rows(){return rows;}
         int get_columns(){return columns;}
         vector<vector<double> > get_data(){return data;};
         int get_needed_future(const int type, const int iter);
 
         //data members
-        int rows, columns, gridPosx, gridPosy, gridSize;
+        int rows, columns, posX, posY, gridSize;
         vector<vector<double> > data;
+        vector<vector<id_type> > gidList;
 
         //actions
-        typedef actions::result_action6<lublock, int, hpl_constructBlock, int,
-            int, int, int, int, vector<vector<double> >,
+        typedef actions::result_action7<lublock, int, hpl_constructBlock, int,
+            int, int, int, int,vector<vector<id_type> >,vector<vector<double> >,
             &lublock::construct_block> constructBlock_action;
 
-        typedef actions::result_action2<lublock, int, hpl_gcorner, int,
-            vector<vector<id_type> >, &lublock::lu_gauss_corner> gcorner_action;
+        typedef actions::result_action1<lublock, int, hpl_gcorner, int,
+            &lublock::lu_gauss_corner> gcorner_action;
 
-        typedef actions::result_action2<lublock, int, hpl_gtop, int,
-            vector<vector<id_type> >, &lublock::lu_gauss_top> gtop_action;
+        typedef actions::result_action1<lublock, int, hpl_gtop, int,
+            &lublock::lu_gauss_top> gtop_action;
 
-        typedef actions::result_action2<lublock, int, hpl_gleft, int,
-            vector<vector<id_type> >, &lublock::lu_gauss_left> gleft_action;
+        typedef actions::result_action1<lublock, int, hpl_gleft, int,
+            &lublock::lu_gauss_left> gleft_action;
 
-        typedef actions::result_action2<lublock, int,
-            hpl_gtrail, int, vector<vector<id_type> >,
+        typedef actions::result_action1<lublock, int, hpl_gtrail, int,
             &lublock::lu_gauss_trail> gtrail_action;
 
         typedef actions::result_action0<lublock, int, hpl_getRows,
@@ -86,12 +82,11 @@ namespace hpx { namespace components { namespace server
         typedef actions::result_action0<lublock, int, hpl_getColumns,
             &lublock::get_columns> getColumns_action;
 
-        typedef actions::result_action0<lublock,
-            vector<vector<double> >,
+        typedef actions::result_action0<lublock, vector<vector<double> >,
             hpl_getData, &lublock::get_data> getData_action;
 
-        typedef actions::result_action2<lublock, int, hpl_getFuture,
-            int, int, &lublock::get_needed_future> getFuture_action;
+        typedef actions::result_action2<lublock, int, hpl_getFuture, int, int,
+            &lublock::get_needed_future> getFuture_action;
 
         //futures
         typedef lcos::eager_future<server::lublock::getData_action> dataFuture;
@@ -124,11 +119,12 @@ namespace hpx { namespace components { namespace server
 ////////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
-    int lublock::construct_block(const int h, const int w, const int posx,
-        const int posy, const int size,
+    int lublock::construct_block(const int h, const int w, const int px, 
+        const int py, const int size, vector<vector<id_type> > gids,
         vector<vector<double> > theData){
-        gridPosx = posx;
-        gridPosy = posy;
+        gidList = gids;
+        posX = px;
+        posY = py;
         gridSize = size;
         nextRight = new gtrFuture*[size];
         nextBelow = new gtrFuture*[size];
@@ -159,29 +155,6 @@ namespace hpx { namespace components { namespace server
         free(nextDagnl);
     }
 
-/*    //create_left_futures distributes the work of creating futures across a
-    //large number of lublock components
-    int lublock::create_left_futures(const int row,
-        const int iter, int brows,
-        const vector<vector<id_type> > gidList){
-        int breadth = brows-row;
-        int jump = 1;
-        vector<createLeftFuture> needFutures;
-        vector<glFuture> returnFutures;
-
-        while(jump*2 < breadth){jump*=2;}
-        while(breadth > 1){
-            needFutures.push_back(createLeftFuture(gidList[row+jump][iter],
-                row+jump, iter, brows, gidList));
-            brows = row+jump;
-            jump /= 2;
-            breadth = brows - row;
-        }
-        lu_gauss_left(gidList[iter][iter]);
-        for(int i = 0; i < (int)needFutures.size(); i++){needFutures[i].get();}
-        return 0;
-    }
-*/
     //get_needed_future gets the specified future from the component. It allows
     //a different component to retreive the value from this component's futures.
     int lublock::get_needed_future(const int type, const int iter){
@@ -198,10 +171,9 @@ namespace hpx { namespace components { namespace server
     //lugausscorner peforms gaussian elimination on the topleft corner block
     //of data that has not yet completed all of it's gaussian elimination
     //computations. Once complete, this block will need no further computations
-    int lublock::lu_gauss_corner(const int iter,
-        const vector<vector<id_type> > gidList){
+    int lublock::lu_gauss_corner(const int iter){
     if(iter > 0){
-        getFuture neededPrev(gidList[iter][iter], 5, iter-1);
+        getFuture neededPrev(gidList[iter-1][iter-1], 5, iter-1);
         neededPrev.get();
     }
     int i, j, k;
@@ -216,9 +188,10 @@ namespace hpx { namespace components { namespace server
                 data[j][k] -= factor*data[i][k];
     }   }   }
 
-    if(gridPosx < gridSize-1){
-        nextLeft = new glFuture(gidList[gridPosx+1][gridPosx], iter, gidList);
-        nextTop = new gtoFuture(gidList[gridPosx][gridPosx+1], iter, gidList);
+    if(posX < gridSize-1){
+        nextLeft = new glFuture(gidList[posX+1][posX], iter);
+        nextTop = new gtoFuture(gidList[posX][posX+1], iter);
+        nextDagnl[iter] = new gtrFuture(gidList[posX+1][posX+1], iter);
     }
     return 0;
     }
@@ -226,14 +199,10 @@ namespace hpx { namespace components { namespace server
     //lugausstop performs gaussian elimination on the topmost row of blocks
     //that have not yet finished all gaussian elimination computation.
     //Once complete, these blocks will no longer need further computations
-    int lublock::lu_gauss_top(const int iter,
-        const vector<vector<id_type> > gidList){
-    if(gridPosx < gridSize - 1){
-        nextTop = new gtoFuture(gidList[gridPosy][gridPosx+1], iter, gidList);
-    }
+    int lublock::lu_gauss_top(const int iter){
     getFuture* neededPrev = 0;
     if(iter > 0){
-        neededPrev = new getFuture(gidList[iter][gridPosx-1], 4, iter-1);
+        neededPrev = new getFuture(gidList[iter][posX-1], 4, iter-1);
     }
     int i,j,k;
     double fFactor, factor;
@@ -242,6 +211,9 @@ namespace hpx { namespace components { namespace server
     if(iter > 0){
         neededPrev->get();
         delete neededPrev;
+    }
+    if(posX < gridSize - 1){
+        nextTop = new gtoFuture(gidList[posY][posX+1], iter);
     }
     for(i=0;i<rows;i++){
         fFactor = 1/cornerData[i][i];
@@ -257,14 +229,10 @@ namespace hpx { namespace components { namespace server
     //lugaussleft performs gaussian elimination on the leftmost column of
     //blocks that have not yet finished all gaussian elimination computation.
     //Upon completion, no further computations need be done on these blocks.
-    int lublock::lu_gauss_left(const int iter,
-        const vector<vector<id_type> > gidList){
-    if(gridPosy < gridSize - 1){
-        nextLeft = new glFuture(gidList[gridPosy+1][gridPosx], iter, gidList);
-    }
-    getFuture* neededPrev;
+    int lublock::lu_gauss_left(const int iter){
+    getFuture* neededPrev = 0;
     if(iter > 0){
-        neededPrev = new getFuture(gidList[gridPosy-1][iter], 3, iter-1);
+        neededPrev = new getFuture(gidList[posY-1][iter], 3, iter-1);
     }
     int i,j,k;
     double factor;
@@ -274,6 +242,9 @@ namespace hpx { namespace components { namespace server
     if(iter > 0){
         neededPrev->get();
         delete neededPrev;
+    }
+    if(posY < gridSize - 1){
+        nextLeft = new glFuture(gidList[posY+1][posX], iter);
     }
     //this first block of code finds all necessary factors early on
     //and allows for more efficient cache accesses for the second
@@ -298,20 +269,19 @@ namespace hpx { namespace components { namespace server
     //the blocks operated on during the current iteration of the Gaussian
     //elimination computations. These blocks will still require further
     //computations to be performed in future iterations.
-    int lublock::lu_gauss_trail(const int iter,
-        const vector<vector<id_type> > gidList){
-    getFuture neededLeft(gidList[gridPosy-1][iter],1,iter);
-    getFuture neededTop(gidList[iter][gridPosx-1],2,iter);
+    int lublock::lu_gauss_trail(const int iter){
+    getFuture neededLeft(gidList[posY-1][iter],1,iter);
+    getFuture neededTop(gidList[iter][posX-1],2,iter);
     if(iter > 0){
         getFuture* neededPrev;
-        if(gridPosx < gridPosy){
-            neededPrev =new getFuture(gidList[gridPosy-1][gridPosx],3,iter-1);
+        if(posX < posY){
+            neededPrev =new getFuture(gidList[posY-1][posX],3,iter-1);
         }
-        else if(gridPosx > gridPosy){
-            neededPrev =new getFuture(gidList[gridPosy][gridPosx-1],4,iter-1);
+        else if(posX > posY){
+            neededPrev =new getFuture(gidList[posY][posX-1],4,iter-1);
         }
         else{
-            neededPrev =new getFuture(gidList[gridPosx-1][gridPosx-1],5,iter-1);
+            neededPrev =new getFuture(gidList[posY-1][posX-1],5,iter-1);
         }
         neededPrev->get();
         delete neededPrev;
@@ -319,24 +289,21 @@ namespace hpx { namespace components { namespace server
     neededLeft.get();
     neededTop.get();
 
-    if(gridPosx <= gridPosy && gridPosy < gridSize - 1){
-        nextBelow[iter] = new gtrFuture(gidList[gridPosy+1][gridPosx],
-                                        iter, gidList);
+    if(posX <= posY && posY < gridSize - 1){
+        nextBelow[iter] = new gtrFuture(gidList[posY+1][posX], iter);
     }
-    if(gridPosx == gridPosy && gridPosy < gridSize - 1){
-        nextDagnl[iter] = new gtrFuture(gidList[gridPosy+1][gridPosx+1],
-                                        iter, gidList);
+    if(posX == posY && posY < gridSize - 1){
+        nextDagnl[iter] = new gtrFuture(gidList[posY+1][posX+1], iter);
     }
-    if(gridPosx >= gridPosy && gridPosx < gridSize - 1){
-        nextRight[iter] = new gtrFuture(gidList[gridPosy][gridPosx+1],
-                                        iter, gidList);
+    if(posX >= posY && posX < gridSize - 1){
+        nextRight[iter] = new gtrFuture(gidList[posY][posX+1], iter);
     }
 
     int i,j,k;
     double fFactor, factor;
     vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get();
-    vector<vector<double> > leftData = dataFuture(gidList[gridPosy][iter]).get();
-    vector<vector<double> > topData = dataFuture(gidList[iter][gridPosx]).get();
+    vector<vector<double> > leftData = dataFuture(gidList[posY][iter]).get();
+    vector<vector<double> > topData = dataFuture(gidList[iter][posX]).get();
     const int size = cornerData.size();
 
     for(i=0;i<size;i++){
