@@ -1111,6 +1111,7 @@ namespace hpx { namespace threads
                 // Before tfunc loop breaks, record total time elapsed and
                 // push execution time ratio onto running average accumulator.
                 tfunc_time = tfunc_timer.elapsed_microseconds();
+                util::spinlock::scoped_lock mtx(acc_mtx);
                 exec_ratio( double(exec_time) / double(tfunc_time) );                
                 break;
             }

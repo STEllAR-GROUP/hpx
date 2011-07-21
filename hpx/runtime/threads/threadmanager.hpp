@@ -32,6 +32,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -570,12 +571,13 @@ namespace hpx { namespace threads
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// Get average ratios in tfunc_imp loop.
-        double avg_exec_ratio()
+        double avg_exec_ratio() const
         {
+            util::spinlock::scoped_lock mtx(acc_mtx);
             return boost::accumulators::extract::mean(exec_ratio);
         }
 
-        double avg_maint_ratio()
+        double avg_maint_ratio() const
         {
             return (1 - avg_exec_ratio());
         }        
@@ -654,7 +656,8 @@ namespace hpx { namespace threads
         boost::int64_t exec_time, tfunc_time;
         boost::accumulators::accumulator_set < double,
             boost::accumulators::features < boost::accumulators::tag::mean > >
-            exec_ratio; 
+            exec_ratio;
+        mutable util::spinlock acc_mtx; 
     };
 }}
 
