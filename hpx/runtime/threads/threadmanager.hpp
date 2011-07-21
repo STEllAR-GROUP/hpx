@@ -20,6 +20,9 @@
 #include <boost/lockfree/fifo.hpp>
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -566,6 +569,17 @@ namespace hpx { namespace threads
         std::string get_lco_description(thread_id_type id) const;
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
+        /// Get average ratios in tfunc_imp loop.
+        double avg_exec_ratio()
+        {
+            return boost::accumulators::extract::mean(exec_ratio);
+        }
+
+        double avg_maint_ratio()
+        {
+            return (1 - avg_exec_ratio());
+        }        
+
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread, std::size_t& theads_run);
@@ -638,6 +652,9 @@ namespace hpx { namespace threads
         // tfunc_impl timers
         util::high_resolution_timer exec_timer, tfunc_timer;
         boost::int64_t exec_time, tfunc_time;
+        boost::accumulators::accumulator_set < double,
+            boost::accumulators::features < boost::accumulators::tag::mean > >
+            exec_ratio; 
     };
 }}
 

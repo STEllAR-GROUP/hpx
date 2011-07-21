@@ -1108,8 +1108,10 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
-                // Before tfunc loop breaks, record total time elapsed.
+                // Before tfunc loop breaks, record total time elapsed and
+                // push execution time ratio onto running average accumulator.
                 tfunc_time = tfunc_timer.elapsed_microseconds();
+                exec_ratio( double(exec_time) / double(tfunc_time) );                
                 break;
             }
         }
