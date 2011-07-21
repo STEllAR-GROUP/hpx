@@ -506,8 +506,9 @@ struct primary_namespace :
                     "block sizes must match");
             }
 
+            response_type r(primary_ns_unbind, it->second);
             gva_table.erase(it);
-            return response_type(primary_ns_unbind, it->second);
+            return r; 
         }
 
         else
