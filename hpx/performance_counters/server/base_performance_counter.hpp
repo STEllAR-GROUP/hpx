@@ -73,18 +73,22 @@ namespace hpx { namespace performance_counters { namespace server
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
 
-        /// The \a get_counter_info_action may be used to ...
+        /// The \a get_counter_info_action retrieves a performance counters
+        /// information.
         typedef hpx::actions::result_action0<
             base_performance_counter, counter_info, 
             performance_counter_get_counter_info, 
-            &base_performance_counter::get_counter_info_nonvirt
+            &base_performance_counter::get_counter_info_nonvirt,
+            threads::thread_priority_critical
         > get_counter_info_action;
 
-        /// The \a get_counter_value_action may be used to ...
+        /// The \a get_counter_value_action queries the value of a performance
+        /// counter.
         typedef hpx::actions::result_action0<
             base_performance_counter, counter_value, 
             performance_counter_get_counter_value, 
-            &base_performance_counter::get_counter_value_nonvirt
+            &base_performance_counter::get_counter_value_nonvirt,
+            threads::thread_priority_critical
         > get_counter_value_action;
     };
 
