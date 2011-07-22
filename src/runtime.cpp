@@ -115,6 +115,7 @@ namespace hpx
             "invalid",
             "console",
             "worker",
+            "probe",
             "default",
         };
     }
@@ -327,7 +328,7 @@ namespace hpx
         return threads::thread_state(threads::terminated);
     }
 #else
-    void pre_main();
+    void pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
@@ -336,7 +337,7 @@ namespace hpx
         std::size_t num_threads)
     {
         // run global pre_main functionality
-        hpx::pre_main();
+        hpx::pre_main(mode_);
 
         // Install performance counter startup functions for core subsystems.
         thread_manager_.install_counters();
@@ -485,7 +486,7 @@ namespace hpx
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func, 
                 boost::ref(result_), num_threads), 
-            "hpx_main");
+            "run_helper");
         thread_manager_.register_thread(data);
         this->runtime::start();
 
