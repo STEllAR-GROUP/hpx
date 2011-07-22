@@ -82,9 +82,6 @@ void early_parcel_sink(
     
     archive >> p;
 
-    // decode the local virtual address of the parcel
-    naming::address addr = p.get_destination_addr();
-
     // decode the action-type in the parcel
     actions::action_type act = p.get_action();
 
@@ -232,18 +229,22 @@ void notify_worker(notification_header const& header);
 // {{{ early action types
 typedef actions::plain_action1<
     registration_header const&, register_console
+//  , threads::thread_priority_critical
 > register_console_action;
 
 typedef actions::plain_action1<
     notification_header const&, notify_console
+//  , threads::thread_priority_critical
 > notify_console_action;
 
 typedef actions::plain_action1<
     registration_header const&, register_worker
+//  , threads::thread_priority_critical
 > register_worker_action;
 
 typedef actions::plain_action1<
     notification_header const&, notify_worker
+//  , threads::thread_priority_critical
 > notify_worker_action;
 // }}}
 
@@ -338,6 +339,8 @@ void register_console(registration_header const& header)
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
 
+    // FIXME: handle the exceptional case of a late console.
+
     boost::function<void()>* thunk = new boost::function<void()>
         (boost::bind(&big_boot_barrier::apply
                    , boost::ref(get_big_boot_barrier())
@@ -428,18 +431,6 @@ void register_worker(registration_header const& header)
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
-/*
-    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
-    {
-        hpx::util::osstream strm;
-        strm << "AGAS server has already launched, can't register "
-             << baseaddr.locality_; 
-        HPX_THROW_EXCEPTION(internal_server_error, 
-            "agas::register_worker", 
-            hpx::util::osstream_get_string(strm));
-    }
-*/
-
     naming::gid_type prefix
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
@@ -506,13 +497,27 @@ void register_worker(registration_header const& header)
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
 
-    boost::function<void()>* thunk = new boost::function<void()>
-        (boost::bind(&big_boot_barrier::apply
-                   , boost::ref(get_big_boot_barrier())
-                   , naming::address(header.locality)
-                   , p)); 
+    // FIXME: This could screw with startup.
 
-    get_big_boot_barrier().add_thunk(thunk);
+    // TODO: Handle cases where localities try to connect to AGAS while it's
+    // shutting down.
+    if (agas_client.status() != starting)
+    {
+        // We can just send the parcel now, the connecting locality isn't a part
+        // of startup synchronization.
+        get_big_boot_barrier().apply(naming::address(header.locality), p);
+    }
+
+    else // AGAS is starting up; this locality is participating in startup
+    {    // synchronization.
+        boost::function<void()>* thunk = new boost::function<void()>
+            (boost::bind(&big_boot_barrier::apply
+                       , boost::ref(get_big_boot_barrier())
+                       , naming::address(header.locality)
+                       , p));
+
+        get_big_boot_barrier().add_thunk(thunk);
+    }
 
     get_big_boot_barrier().notify();
 }
@@ -741,7 +746,7 @@ void big_boot_barrier::wait()
             spin();
         }
 
-        // hosted, worker
+        // hosted, worker or probe
         else
         {
             // we need to contact the bootstrap AGAS node, and then wait
