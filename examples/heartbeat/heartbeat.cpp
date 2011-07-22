@@ -29,7 +29,7 @@ using hpx::flush;
 using hpx::init;
 using hpx::finalize;
 using hpx::running;
-using hpx::runtime_mode_worker;
+using hpx::runtime_mode_probe;
 
 using hpx::applier::get_applier;
 
@@ -121,6 +121,8 @@ void monitor(
 int hpx_main(variables_map& vm)
 {
     {
+        std::cout << "starting monitor" << std::endl;
+
         const std::string name = vm["name"].as<std::string>();
         const double frequency = vm["frequency"].as<double>(); 
         const double duration = vm["duration"].as<double>(); 
@@ -161,6 +163,6 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, enforce worker mode as we connect to an existing 
     // application.
-    return init(desc_commandline, argc, argv, runtime_mode_worker);
+    return init(desc_commandline, argc, argv, runtime_mode_probe);
 }
 
