@@ -1,2 +1,0 @@
-PROJECT(bh)
-ADD_EXECUTABLE (bh bh.cpp)
