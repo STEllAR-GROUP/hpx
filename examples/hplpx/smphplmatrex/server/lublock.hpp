@@ -29,8 +29,8 @@ class lublock
 
 //the constructor initializes the matrix
 lublock::lublock(unsigned int h, unsigned int w){
-    workSpace = (double*) std::malloc((8+h*w)*sizeof(double));
-    data = (double**) std::malloc(h*sizeof(double*));
+    workSpace = new double[8+h*w];
+    data = new double*[h];
     rows = h;
     columns = w;
     for(int i = 0;i < (int)h; i++){

@@ -75,8 +75,6 @@ namespace hpx { namespace components { namespace server
     int LUbacksubst();
     int part_bsub(const int brow, const int bcol);
     double checksolve(int row, int offset, bool complete);
-    void print();
-    void print2();
 
     int rows;             //number of rows in the matrix
     int brows;            //number of rows of blocks in the matrix
@@ -144,6 +142,10 @@ namespace hpx { namespace components { namespace server
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
     typedef lcos::eager_future<server::smphplmatrex::check_action> check_future;
+
+    //right here are special arrays of futures
+    gmain_future*** leftFutures, topFutures;
+    gmain_future**** rightFutures, belowFutures, dagnlFutures;
     };
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -191,19 +193,19 @@ namespace hpx { namespace components { namespace server
 
     //allocate() allocates memory space for the matrix
     void smphplmatrex::allocate(){
-    datablock = (lublock***) std::malloc(brows*sizeof(lublock**));
-    factorData = (double**) std::malloc(rows*sizeof(double*));
-    transData = (double**) std::malloc(columns*sizeof(double*));
-    trueData = (double**) std::malloc(rows*sizeof(double*));
-    pivotarr = (int*) std::malloc(rows*sizeof(int));
-    tempivotarr = (int*) std::malloc(rows*sizeof(int));
+    datablock = new lublock**[brows];
+    factorData = new double*[rows];
+    transData = new double*[columns];
+    trueData = new double*[rows];
+    pivotarr = new int[rows];
+    tempivotarr = new int[rows];
     for(int i = 0;i < rows;i++){
-        trueData[i] = (double*) std::malloc(columns*sizeof(double));
-        transData[i] = (double*) std::malloc(rows*sizeof(double));
+        trueData[i] = new double[columns];
+        transData[i] = new double[rows];
     }
-    transData[rows] = (double*) std::malloc(rows*sizeof(double));
+    transData[rows] = new double[rows];
     for(int i = 0;i < brows;i++){
-        datablock[i] = (lublock**)std::malloc(brows*sizeof(lublock*));
+        datablock[i] = new lublock*[brows];
     }
     }
 
@@ -279,37 +281,6 @@ namespace hpx { namespace components { namespace server
     free(solution);
     }
 
-//DEBUGGING FUNCTIONS/////////////////////////////////////////////////
-    //print out the matrix
-    void smphplmatrex::print(){
-    for(int i = 0; i < brows; i++){
-        for(int j = 0; j < datablock[i][0]->rows; j++){
-        for(int k = 0; k < brows; k++){
-            for(int l = 0; l < datablock[i][k]->columns; l++){
-            std::cout<<datablock[i][k]->data[j][l]<<" ";
-        }   }
-        std::cout<<std::endl;
-    }   }
-    std::cout<<std::endl;
-    }
-    void smphplmatrex::print2(){
-    for(int i = 0;i < rows; i++){
-        for(int j = 0;j < columns; j++){
-        std::cout<<trueData[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-/*    std::cout<<std::endl;
-    for(int i = 0;i < columns; i++){
-        for(int j = 0;j < rows; j++){
-        std::cout<<transData[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
-*/    }
-//END DEBUGGING FUNCTIONS/////////////////////////////////////////////
-
     //LUsolve is simply a wrapper function for LUfactor and LUbacksubst
     double smphplmatrex::LUsolve(){
     //first perform partial pivoting
@@ -324,10 +295,10 @@ namespace hpx { namespace components { namespace server
     std::cout<<"finished gaussian "<<temp2 - temp<<std::endl;
 
     //allocate memory space to store the solution
-    solution = (double**) std::malloc(rows*sizeof(double*));
+    solution = new double*[rows];
     for(int i = 0; i < rows; i++){
         free(factorData[i]);
-        solution[i] = (double*) std::malloc((brows+1)*sizeof(double));
+        solution[i] = new double[brows+1];
     }
     free(factorData);
 
@@ -354,7 +325,7 @@ namespace hpx { namespace components { namespace server
     int maxRow, temp_piv, outer;
     int i=0,j;
     bool good;
-    int* guessedPivots = (int*) std::malloc(rows*sizeof(int));
+    int* guessedPivots = new int[rows];
     std::vector<swap_future> futures;
     std::vector<search_future> searches;
 
@@ -421,7 +392,7 @@ namespace hpx { namespace components { namespace server
     //space for factorData
     for(i=0;i<rows;i++){
         free(transData[i]);
-        factorData[i] = (double*) std::malloc(i*sizeof(double));
+        factorData[i] = new double[i];
     }
     free(transData[rows]);
     free(transData);
@@ -480,6 +451,14 @@ namespace hpx { namespace components { namespace server
     //starvation occurs), the manager ensures that the computation is done in
     //order with as many datablocks being operated on simultaneously as possible
     void smphplmatrex::LU_gauss_manager(){
+/*    int iter, i,j,k;
+
+    for(i = 0; i < brows-1; i++){
+        leftFutures = new gmain_future
+        for(j = 0; j < brows-1; j++){
+        
+    }
+*/
     int iter = 0, i, j;
     int startElement, beginElement, endElement, nextElement;
     std::vector<gmain_future> futures;
@@ -545,6 +524,7 @@ namespace hpx { namespace components { namespace server
     else{
         LU_gauss_left(brow,iter);
     }
+
     return 1;
     }
 
@@ -595,8 +575,7 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     const int offset = brow*blocksize;
     const int offsetCol = iter*blocksize;
-    double* fFactor = (double*) std::malloc(datablock[brow][iter]->columns*
-                                                                sizeof(double));
+    double* fFactor = new double[datablock[brow][iter]->columns];
     double factor;
 
     //this first block of code finds all necessary factors early on
@@ -652,7 +631,7 @@ namespace hpx { namespace components { namespace server
     //the additional work.
     int smphplmatrex::LUbacksubst(){
     int i,k,l,row,temp;
-    int* neededFuture = (int*)std::malloc((brows-1)*sizeof(int));
+    int* neededFuture = new int[brows-1];
     std::vector<partbsub_future> futures;
 
     //first the solution values are initialized
