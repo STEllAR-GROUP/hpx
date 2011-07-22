@@ -38,7 +38,7 @@ public:
   {
     if (this != &other) 
     {
-      this.resize(other.size());
+      resize(other.size());
       for (std::size_t i=0;i<other.size();i++) {
         data_[i] = other.data_[i];
       }
