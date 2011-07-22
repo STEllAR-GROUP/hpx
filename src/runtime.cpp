@@ -815,6 +815,7 @@ namespace hpx
         return get_runtime().get_next_id();
     }
 
+#if HPX_AGAS_VERSION > 0x10
     ///////////////////////////////////////////////////////////////////////////
     void register_startup_function(boost::function<void()> const& f)
     {
@@ -825,6 +826,7 @@ namespace hpx
     {
         get_runtime().add_shutdown_function(f);
     }
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -984,16 +984,13 @@ namespace hpx { namespace threads
         util::time_logger tl1("tfunc", num_thread);
         util::time_logger tl2("tfunc2", num_thread);
 
-        // the thread with number zero is the master
-#if HPX_AGAS_VERSION <= 0x10
-        bool is_master_thread = (0 == num_thread) ? true : false;
-#endif
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
 #if HPX_AGAS_VERSION <= 0x10
         // register performance counters
         performance_counters::manage_counter queue_length_counter; 
-        if (is_master_thread) {
+        if (0 == num_thread) {
+            // the thread with number zero is the master
             std::string name("/queue(threadmanager)/length");
             queue_length_counter.install(name, 
                 boost::bind(&scheduling_policy_type::get_queue_lengths, 
@@ -1002,7 +999,7 @@ namespace hpx { namespace threads
 #endif
 
         std::size_t idle_loop_count = 0;
-        
+
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
         while (true) {
@@ -1035,7 +1032,7 @@ namespace hpx { namespace threads
                             {
                                 undo_mark_context mark (mark_);  // itt support
                                 caller_context ctx (ctx_);
-                                
+
                                 thrd_stat = (*thrd)();
                             }
                             tl2.tock();

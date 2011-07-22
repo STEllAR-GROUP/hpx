@@ -26,6 +26,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/config/warnings_prefix.hpp>
@@ -75,8 +76,6 @@ namespace hpx { namespace threads { namespace detail
         coroutine_allocator() :
             acount(0),
             dcount(0),
-            atimer(0),
-            dtimer(0),
             a_time(0),
             d_time(0)
         {}
@@ -101,7 +100,8 @@ namespace hpx { namespace threads { namespace detail
             dtimer.restart();
             thread_mutex_type::scoped_lock l(this);
             heap_.push(c);
-            util::spinlock::scoped_lock mtx(time_lock);            
+
+            util::spinlock::scoped_lock mtx(time_lock);
             d_time = dtimer.elapsed();
             ++dcount;
         }
@@ -110,7 +110,7 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t acount, dcount;
         util::high_resolution_timer atimer, dtimer;
         double a_time, d_time;
-        util::spinlock time_lock;        
+        util::spinlock time_lock;
 
         std::stack<CoroutineImpl*> heap_;
     };
