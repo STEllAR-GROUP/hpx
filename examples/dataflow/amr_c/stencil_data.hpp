@@ -16,6 +16,7 @@
 #include <boost/serialization/valarray.hpp>
 
 #include <examples/dataflow/parameter.hpp>
+#include <examples/dataflow/array1d.hpp>
 
 namespace hpx { namespace components { namespace amr 
 {
@@ -53,7 +54,7 @@ struct stencil_data
     std::size_t max_index_;   // overall number of data points
     std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
     double_type timestep_;    // current time step
-    std::valarray<double> value_;    // current value
+    array1d<double> value_;    // current value
 
 private:
     // serialization support
@@ -64,13 +65,15 @@ private:
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
     {
-        ar & max_index_ & index_ & timestep_ & value_;
+        ar & max_index_ & index_ & timestep_;
+        value_.do_save(ar,0,2);
     } 
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) 
     {
-        ar & max_index_ & index_ & timestep_ & value_;
+        ar & max_index_ & index_ & timestep_;
+        value_.do_load(ar);
     } 
 };
 

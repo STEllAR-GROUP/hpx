@@ -64,10 +64,13 @@ namespace hpx { namespace components { namespace amr
 
         resultval->max_index_ = val[1]->max_index_;
         resultval->index_ = val[1]->index_;
+
+        //resultval->value_ = val[1]->value_;
         resultval->value_.resize(val[1]->value_.size());
         for (std::size_t i=0;i<val[1]->value_.size();i++) {
           resultval->value_[i] = val[1]->value_[i];
         }
+
         resultval->timestep_ = val[1]->timestep_ + 1.0;
 
         std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " left input " << val[0]->value_.size() << " middle input " << val[1]->value_.size() << " right input " << val[2]->value_.size() << std::endl;
