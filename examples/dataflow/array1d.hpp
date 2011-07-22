@@ -1,5 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(ARRAY1D_JUL_22_2011_1042AM)
 #define ARRAY1D_JUL_22_2011_1042AM
@@ -31,15 +34,18 @@ public:
     data_.resize(s); 
   }
 
-  T & operator=(const T & other)
+  array1d & operator=(array1d const& other)
   {
     if (this != &other) 
     {
       this.resize(other.size());
       for (std::size_t i=0;i<other.size();i++) {
-        this[i] = other[i];
+        data_[i] = other.data_[i];
       }
+      start_ = other.start_;
+      vsize_ = other.vsize_;
     }
+    return *this;
   }
 
   // basic item reference
