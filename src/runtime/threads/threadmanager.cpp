@@ -1005,7 +1005,6 @@ namespace hpx { namespace threads
         
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
-        tfunc_timer.restart();
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
@@ -1037,14 +1036,7 @@ namespace hpx { namespace threads
                                 undo_mark_context mark (mark_);  // itt support
                                 caller_context ctx (ctx_);
                                 
-                                // Record time elapsed in thread changing state
-                                // and add to aggregate execution time.
-                                exec_timer.restart();
                                 thrd_stat = (*thrd)();
-                                exec_time = exec_timer.elapsed_microseconds();
-                                util::spinlock::scoped_lock mtx(acc_mtx);        
-                                exec_time_acc(double(exec_time));
-                                total_exec_time += exec_time;
                             }
                             tl2.tock();
                             ++num_px_threads;
@@ -1112,11 +1104,6 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
-                // Before tfunc loop breaks, record total time elapsed and
-                // push execution time ratio onto running average accumulator.
-                tfunc_time = tfunc_timer.elapsed_microseconds();
-                util::spinlock::scoped_lock mtx(acc_mtx);
-                exec_ratio( double(total_exec_time) / double(tfunc_time) );                
                 break;
             }
         }

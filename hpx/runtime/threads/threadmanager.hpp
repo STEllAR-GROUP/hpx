@@ -570,6 +570,7 @@ namespace hpx { namespace threads
         std::string get_lco_description(thread_id_type id) const;
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
+        /*
         /// Get average ratios in tfunc_imp loop.
         double avg_exec_ratio() const
         {
@@ -587,6 +588,7 @@ namespace hpx { namespace threads
             util::spinlock::scoped_lock mtx(acc_mtx);
             return boost::accumulators::extract::mean(exec_time_acc);
         }
+        */
 
     protected:
         // this is the thread function executing the work items in the queue
