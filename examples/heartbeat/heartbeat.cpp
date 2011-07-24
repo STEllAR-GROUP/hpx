@@ -92,7 +92,7 @@ void monitor(
                                  % block
                                  % value.value_);
 #if defined(BOOST_WINDOWS)
-                    update_counters(value.value_);
+                    update_windows_counters(value.value_);
 #endif
                 }
                 else {
@@ -169,11 +169,11 @@ int main(int argc, char* argv[])
         , "rate of polling")
         ;
 
-    // Initialize and run HPX, enforce worker mode as we connect to an existing 
+    // Initialize and run HPX, enforce probe mode as we connect to an existing 
     // application.
 #if defined(BOOST_WINDOWS)
-    return init(desc_commandline, argc, argv, install_counters, 
-        uninstall_counters, runtime_mode_probe);
+    return init(desc_commandline, argc, argv, install_windows_counters, 
+        uninstall_windows_counters, runtime_mode_probe);
 #else
     return init(desc_commandline, argc, argv, runtime_mode_probe);
 #endif

@@ -12,19 +12,15 @@
 // This is code specific to Windows
 #if defined(BOOST_WINDOWS)
 
-#include <windows.h>
-#include <perflib.h>
-#include <winperf.h>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Install the windows performance counters exposing  the HPX counters.
-void install_counters();
+void install_windows_counters();
 
 // Update the data to be exposed as the windows performance counter values.
-void update_counters(boost::uint64_t value);
+void update_windows_counters(boost::uint64_t value);
 
 // Uninstall the windows performance counters exposing  the HPX counters.
-void uninstall_counters();
+void uninstall_windows_counters();
 
 #endif
 

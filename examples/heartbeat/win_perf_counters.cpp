@@ -9,6 +9,10 @@
 // This is code specific to Windows
 #if defined(BOOST_WINDOWS)
 
+#include <windows.h>
+#include <perflib.h>
+#include <winperf.h>
+
 #include "win_perf_counters.hpp"
 #include "hpx_counters.hpp"
 
@@ -21,7 +25,7 @@ PPERF_COUNTERSET_INSTANCE avg_queue_counter = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install the windows performance counters exposing  the HPX counters.
-void install_counters()
+void install_windows_counters()
 {
     // CounterInitialize() is created by ctrpp.exe and is present in ucsCounter.h
     // CounterInitialize starts the provider and initializes the counter sets.
@@ -51,7 +55,7 @@ void install_counters()
 }
 
 // Update the data to be exposed as the windows performance counter values.
-void update_counters(boost::uint64_t value)
+void update_windows_counters(boost::uint64_t value)
 {
     // Set raw counter data for queue length.
     ULONG status = PerfSetULongCounterValue(HPXHeartBeat, queue_counter, 1, value);
@@ -73,7 +77,7 @@ void update_counters(boost::uint64_t value)
 }
 
 // Uninstall the windows performance counters exposing  the HPX counters.
-void uninstall_counters()
+void uninstall_windows_counters()
 {
     // uninstall counter instances
     if (queue_counter) {
