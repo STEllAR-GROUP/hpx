@@ -62,9 +62,16 @@ namespace parcelset
 #if HPX_AGAS_VERSION > 0x10
         friend struct agas::big_boot_barrier;
 #endif
+        typedef boost::function<
+              void(boost::system::error_code const&, std::size_t)
+        > write_handler_type;
 
-        /// Construct the parcelport server to listen to the endpoint given by 
-        /// the locality and serve up requests to the parcelport.
+        typedef boost::function<
+            void(parcelport& pp, boost::shared_ptr<std::vector<char> > const&,
+                 threads::thread_priority)
+        > read_handler_type;
+    
+        /// Construct the parcelport on the given locality.
         ///
         /// \param io_service_pool
         ///                 [in] The pool of networking threads to use to serve 
@@ -75,23 +82,22 @@ namespace parcelset
 
         ~parcelport();
 
-        /// Start the parcelport threads, enabling the parcel receiver
+        /// Start the parcelport I/O thread pool. 
         ///
         /// \param blocking [in] If blocking is set to \a true the routine will 
         ///                 not return before stop() has been called, otherwise
         ///                 the routine returns immediately.
-        bool run (bool blocking = true);
+        bool run(bool blocking = true);
 
-        /// Stop the io_service's loop and wait for all threads to join
+        /// Stop the parcelport I/O thread pool.
         ///
         /// \param blocking [in] If blocking is set to \a false the routine will 
         ///                 return immediately, otherwise it will wait for all
         ///                 worker threads to exit.
-        void stop (bool blocking = true);
+        void stop(bool blocking = true);
 
-        /// A parcel is submitted for transport at the source locality site to 
-        /// the parcel set of the locality with the put-parcel command
-        //
+        /// Queues a parcel for transmission to another locality 
+        ///
         /// \note The function put_parcel() is asynchronous, the provided   
         /// function or function object gets invoked on completion of the send 
         /// operation or on any error.
@@ -105,53 +111,27 @@ namespace parcelset
         ///                 completion or on errors. The signature of this
         ///                 function object is expected to be:
         ///
-        ///                     void f (boost::system::error_code const& err, 
-        ///                             std::size_t );
-        ///
-        ///                 where \a err is the status code of the operation and
-        ///                       \a size is the number of successfully 
-        ///                              transferred bytes.
-
-        typedef boost::function<
-              void(boost::system::error_code const&, std::size_t)
-        > handler_type;
-    
-        void put_parcel(parcel& p, handler_type f)
+        /// \code
+        ///      void handler(boost::system::error_code const& err,
+        ///                   std::size_t bytes_written); 
+        /// \endcode
+        void put_parcel(parcel& p, write_handler_type f)
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
         }
 
-        // The get_parcel command returns a parcel, or if the parcel set is 
-        // empty then false is returned. 
-        //
-        // \param p        [out] The parcel instance to be filled with the 
-        //                 received parcel. If the functioned returns \a true 
-        //                 this will be the next received parcel.
-        //
-        // \returns        \a true if the next parcel has been retrieved 
-        //                 successfully. 
-        //                 \a false if no parcel is available in the parcelport
-        //
-        // The returned parcel will be no longer available from the parcelport
-        // as it is removed from the internal queue of received parcels.
-//         bool get_parcel(parcel& p)
-//         {
-//             return parcels_.get_parcel(p);
-//         }
-
         /// Register an event handler to be called whenever a parcel has been 
-        /// received
+        /// received.
         ///
         /// \param sink     [in] A function object to be invoked whenever a 
-        ///                 parcel has been received by the parcelport. It is 
-        ///                 possible to register more than one (different) 
-        ///                 function object. The signature of this function 
-        ///                 object is expected to be:
+        ///                 parcel has been received by the parcelport. The
+        ///                 signature of this function object is expected to be:
         ///
         /// \code
-        ///      void sink (hpx::parcelset::parcelport& pp
-        ///                 hpx::parcelset::parcel const& p);
+        ///      void handler(hpx::parcelset::parcelport& pp,
+        ///                   boost::shared_ptr<std::vector<char> > const& data,
+        ///                   hpx::threads::thread_priority priority);
         /// \endcode
         ///
         ///                 where \a pp is a reference to the parcelport this
@@ -193,7 +173,6 @@ namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
-
         /// return sends started
         boost::int64_t total_sends_started() const
         {
@@ -226,7 +205,7 @@ namespace parcelset
 
         /// send the parcel to the specified address
         void send_parcel(parcel const& p, naming::address const& addr, 
-            handler_type f);
+            write_handler_type f);
 
     private:
         /// The site current range of ids to be used for id_type instances

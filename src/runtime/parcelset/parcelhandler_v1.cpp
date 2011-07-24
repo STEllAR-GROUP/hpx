@@ -105,7 +105,8 @@ namespace hpx { namespace parcelset
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
-        boost::shared_ptr<std::vector<char> > const& parcel_data)
+        boost::shared_ptr<std::vector<char> > const& parcel_data,
+        threads::thread_priority priority)
     {
         if (NULL == tm_ || !(tm_->status() == running))
         {
@@ -119,7 +120,7 @@ namespace hpx { namespace parcelset
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
                 boost::bind(&parcelhandler::decode_parcel, this, parcel_data),
-                "decode_parcel");
+                "decode_parcel", 0, priority);
             tm_->register_thread(data);
         }
     }
@@ -133,7 +134,7 @@ namespace hpx { namespace parcelset
             {
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+                boost::iostreams::stream<io_device_type> io(*parcel_data.get());
 
                 // De-serialize the parcel data
 #if HPX_USE_PORTABLE_ARCHIVES != 0
@@ -184,7 +185,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // this handler is called whenever the parcel has been sent
     void release_do_undo(boost::system::error_code const& e, 
-            std::size_t size, parcelhandler::handler_type f,
+            std::size_t size, parcelhandler::write_handler_type f,
             boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo)
     {
         if (e)
@@ -244,7 +245,7 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
     }
 
-    void parcelhandler::put_parcel(parcel& p, handler_type f)
+    void parcelhandler::put_parcel(parcel& p, write_handler_type f)
     {
         // properly initialize parcel
         init_parcel(p);

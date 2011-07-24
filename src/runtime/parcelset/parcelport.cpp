@@ -157,7 +157,7 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport::send_parcel(parcel const& p, naming::address const& addr, 
-        handler_type f)
+        write_handler_type f)
     {
         parcelport_connection_ptr client_connection(
             connection_cache_.get(addr.locality_));

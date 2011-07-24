@@ -69,7 +69,8 @@ namespace hpx { namespace parcelset
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
-        boost::shared_ptr<std::vector<char> > const& parcel_data)
+        boost::shared_ptr<std::vector<char> > const& parcel_data,
+        threads::thread_priority priority)
     {
         if (NULL == tm_ || !(tm_->status() == running))
         {
@@ -78,12 +79,12 @@ namespace hpx { namespace parcelset
             decode_parcel(parcel_data);
         }
 
-        else
+        else 
         {
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
                 boost::bind(&parcelhandler::decode_parcel, this, parcel_data),
-                "decode_parcel");
+                "decode_parcel", 0, priority);
             tm_->register_thread(data);
         }
     }
@@ -98,7 +99,7 @@ namespace hpx { namespace parcelset
             {
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+                boost::iostreams::stream<io_device_type> io(*parcel_data.get());
 
                 // De-serialize the parcel data
 #if HPX_USE_PORTABLE_ARCHIVES != 0
@@ -169,7 +170,7 @@ namespace hpx { namespace parcelset
 
         // register our callback function with the parcelport
         pp_.register_event_handler
-            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
+            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
     }
         
     naming::resolver_client& parcelhandler::get_resolver()
@@ -255,7 +256,7 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
     }
               
-    void parcelhandler::put_parcel(parcel& p, handler_type f)
+    void parcelhandler::put_parcel(parcel& p, write_handler_type f)
     {
         // properly initialize parcel
         init_parcel(p);

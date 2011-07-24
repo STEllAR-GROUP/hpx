@@ -52,9 +52,10 @@ namespace hpx { namespace parcelset
                 performance_counters::parcels::data_point& send_data,
                 performance_counters::parcels::gatherer& parcels_sent
                 )
-          : socket_(io_service), there_(l), connection_cache_(cache),
-            sends_started_(started), sends_completed_(completed),
-            send_timer_(timer), send_data_(send_data), parcels_sent_(parcels_sent)
+          : socket_(io_service), out_priority_(0), out_size_(0), there_(l),
+            connection_cache_(cache), sends_started_(started),
+            sends_completed_(completed), send_timer_(timer),
+            send_data_(send_data), parcels_sent_(parcels_sent)
         {
         }
 
@@ -76,11 +77,12 @@ namespace hpx { namespace parcelset
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
+            buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
             buffers.push_back(boost::asio::buffer(out_buffer_));
            
             // record size of parcel
-            send_data_.bytes = buffers.size();
+            send_data_.bytes = out_size_;
  
             // this additional wrapping of the handler into a bind object is 
             // needed to keep  this parcelport_connection object alive for the whole
@@ -117,6 +119,7 @@ namespace hpx { namespace parcelset
 
             // now we can give this connection back to the cache
             out_buffer_.clear();
+            out_priority_ = 0;
             out_size_ = 0;
             connection_cache_.add(there_, shared_from_this());
             
@@ -131,6 +134,7 @@ namespace hpx { namespace parcelset
         boost::asio::ip::tcp::socket socket_;
 
         /// buffer for outgoing data
+        boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
         std::vector<char> out_buffer_;
 

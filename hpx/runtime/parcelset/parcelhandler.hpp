@@ -41,7 +41,8 @@ namespace hpx { namespace parcelset
             std::size_t size) {}
 
         void parcel_sink(parcelport& pp, 
-            boost::shared_ptr<std::vector<char> > const& parcel_data);
+            boost::shared_ptr<std::vector<char> > const& parcel_data,
+            threads::thread_priority priority);
 
         threads::thread_state decode_parcel(
             boost::shared_ptr<std::vector<char> > const& parcel_data);
@@ -58,7 +59,8 @@ namespace hpx { namespace parcelset
         }
         
     public:
-        typedef parcelport::handler_type handler_type;
+        typedef parcelport::read_handler_type read_handler_type;
+        typedef parcelport::write_handler_type write_handler_type;
 
         /// Construct a new \a parcelhandler initializing it from a AGAS client
         /// instance (parameter \a resolver) and the parcelport to be used for
@@ -90,7 +92,7 @@ namespace hpx { namespace parcelset
     
             // register our callback function with the parcelport
             pp_.register_event_handler
-                (boost::bind(&parcelhandler::parcel_sink, this, _1, _2));
+                (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
         }
 #else
         ;
@@ -208,7 +210,7 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully 
         ///                              transferred bytes.
-        void put_parcel(parcel& p, handler_type f);
+        void put_parcel(parcel& p, write_handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no 
         /// callback functor is provided by the user. 

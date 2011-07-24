@@ -131,6 +131,12 @@ namespace hpx { namespace parcelset
             return creation_time_;
         }
 
+        threads::thread_priority get_thread_priority() const 
+        {
+            BOOST_ASSERT(action_);
+            return action_->get_thread_priority();
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);
 
