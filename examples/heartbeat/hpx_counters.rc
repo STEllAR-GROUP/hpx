@@ -1,0 +1,12 @@
+STRINGTABLE
+BEGIN
+    1 "Queue Length"
+    2 "Queue Length" // {Locked} means don't localize
+    3 "This counter set displays various HPX queue length"
+    5 "Console Thread Queue Length"
+    6 "Console Thread Queue Length" // {Locked} means don't localize
+    7 "This counter displays the overall current thread queue lengths on the console"
+    9 "Average Console Thread Queue Length"
+    10 "Average Console Thread Queue Length" // {Locked} means don't localize
+    11 "This counter displays the average thread queue length on the console"
+END

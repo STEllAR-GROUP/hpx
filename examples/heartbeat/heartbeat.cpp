@@ -17,6 +17,9 @@
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 
+// include Windows specific performance counter binding
+#include "win_perf_counters.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -81,19 +84,24 @@ void monitor(
                 // Query the performance counter.
                 counter_value value = performance_counter::get_value(gid); 
 
-                if (HPX_LIKELY(status_valid_data == value.status_))
+                if (HPX_LIKELY(status_valid_data == value.status_)) {
                     std::cout << (format("(%s %f %d %d %d)\n")
                                  % name
                                  % current_time
                                  % segment
                                  % block
                                  % value.value_);
-                else
+#if defined(BOOST_WINDOWS)
+                    update_counters(value.value_);
+#endif
+                }
+                else {
                     std::cout << (format("(%s %f %d %d '())\n")
                                  % name
                                  % current_time
                                  % segment
                                  % block);
+                }
 
                 // Adjust rate of pinging values.
                 const double delay_start = t.elapsed();
@@ -163,6 +171,11 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, enforce worker mode as we connect to an existing 
     // application.
+#if defined(BOOST_WINDOWS)
+    return init(desc_commandline, argc, argv, install_counters, 
+        uninstall_counters, runtime_mode_probe);
+#else
     return init(desc_commandline, argc, argv, runtime_mode_probe);
+#endif
 }
 
