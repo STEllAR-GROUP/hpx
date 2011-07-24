@@ -66,6 +66,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -196,6 +197,10 @@
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />

@@ -180,6 +180,9 @@
     <Filter Include="Boost Files\Backtrace">
       <UniqueIdentifier>{5c6e8eb3-fdb1-4616-ac09-117f971d6f06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Performance Counters\Parcels">
+      <UniqueIdentifier>{6203bd5e-5458-4b20-bd02-53db8a61a7ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -1005,6 +1008,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp">
       <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp">
+      <Filter>Header Files\Performance Counters\Parcels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp">
+      <Filter>Header Files\Performance Counters\Parcels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp">
+      <Filter>Header Files\Performance Counters\Parcels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp">
+      <Filter>Header Files\Performance Counters\Parcels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
