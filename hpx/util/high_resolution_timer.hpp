@@ -91,6 +91,11 @@ namespace hpx { namespace util
             return boost::int64_t(10e6 * elapsed());
         }
 
+        boost::int64_t elapsed_nanoseconds() const
+        {
+            return boost::int64_t(10e9 * elapsed());
+        }
+    
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
             LARGE_INTEGER frequency;
@@ -181,6 +186,11 @@ namespace hpx { namespace util
         {
             return boost::int64_t(10e6 * elapsed());
         }
+
+        boost::int64_t elapsed_nanoseconds() const
+        {
+            return boost::int64_t(10e9 * elapsed());
+        } 
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
@@ -279,6 +289,11 @@ namespace hpx { namespace util
         boost::int64_t elapsed_microseconds() const
         {
             return boost::int64_t(10e6 * elapsed());
+        }
+
+        boost::int64_t elapsed_nanoseconds() const
+        {
+            return boost::int64_t(10e9 * elapsed());
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
