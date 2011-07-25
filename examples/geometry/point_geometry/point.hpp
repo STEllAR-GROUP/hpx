@@ -37,7 +37,7 @@ namespace hpx { namespace geometry
         point(naming::id_type where, double x, double y)
           : base_type(base_type::create_sync(where))    // create component
         {
-            init(x, y);   // initialize coordinates
+            //init(x, y);   // initialize coordinates
         }
 
         /// Create a client side representation for the existing
@@ -50,16 +50,20 @@ namespace hpx { namespace geometry
         // exposed functionality of this component
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::future_value<void> init_async(double x, double y) 
+        lcos::future_value<void> init_async(double xmin, double xmax,
+                                            double ymin, double ymax,
+                                            std::size_t numpoints) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_, x, y);
+            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,numpoints);
         }
 
-        void init(double x, double y) 
+        void init(double xmin, double xmax,
+                  double ymin, double ymax,
+                  std::size_t numpoints) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_, x, y);
+            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,numpoints);
         }
 
         /// Initialize the server#point instance with the given \a gid

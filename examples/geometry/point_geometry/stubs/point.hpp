@@ -24,17 +24,17 @@ namespace hpx { namespace geometry { namespace stubs
 
         /// Initialize the server#point instance with the given \a gid
         static lcos::future_value<void> 
-        init_async(naming::id_type gid, double x, double y) 
+        init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,std::size_t numpoints) 
         {
             typedef server::point::init_action action_type;
-            return lcos::eager_future<action_type>(gid, x, y);
+            return lcos::eager_future<action_type>(gid,xmin,xmax,ymin,ymax,numpoints);
         }
 
-        static void init(naming::id_type const& gid, double x, double y) 
+        static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,std::size_t numpoints) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            init_async(gid, x, y).get();
+            init_async(gid,xmin,xmax,ymin,ymax,numpoints).get();
         }
 
         static lcos::future_value<bool> 

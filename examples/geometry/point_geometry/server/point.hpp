@@ -44,10 +44,15 @@ namespace hpx { namespace geometry { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(double x, double y) 
+        void init(double xmin,double xmax,double ymin,double ymax,std::size_t numpoints) 
         {
-            pt_.x(x);
-            pt_.y(y);
+            xmin_ = xmin;
+            xmax_ = xmax;
+            ymin_ = ymin;
+            ymax_ = ymax;
+            numpoints_ = numpoints;
+            //pt_.x(x);
+            //pt_.y(y);
         }
 
         /// search for contact
@@ -84,8 +89,8 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_action2<
-            point, point_init, double, double, &point::init
+        typedef hpx::actions::direct_action5<
+            point, point_init, double, double,double,double,std::size_t, &point::init
         > init_action;
 
         typedef hpx::actions::direct_result_action0<
@@ -111,6 +116,8 @@ namespace hpx { namespace geometry { namespace server
 
     private:
         plain_point_type pt_;
+        double xmin_,xmax_,ymin_,ymax_;
+        std::size_t numpoints_;
     };
 
 }}}
