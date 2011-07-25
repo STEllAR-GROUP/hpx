@@ -6,13 +6,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # define build targets for this directory
-set (heartbeat_HEADERS )
+set(heartbeat_HEADERS)
 
 set(heartbeat_SOURCES
     heartbeat.cpp)
 
 if(MSVC)
-    set (heartbeat_HEADERS 
+    set(heartbeat_HEADERS 
         ${heartbeat_HEADERS}
         win_perf_counters.hpp
         hpx_counters.hpp)
@@ -24,8 +24,8 @@ endif()
 
 add_hpx_executable(heartbeat
                    MODULE heartbeat 
-                   SOURCES $(heartbeat_SOURCES}
-                   HEADERS $(heartbeat_HEADERS}
+                   SOURCES ${heartbeat_SOURCES}
+                   HEADERS ${heartbeat_HEADERS}
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies
