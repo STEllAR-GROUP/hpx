@@ -90,6 +90,7 @@ namespace hpx { namespace util
     #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
     #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxiliary */
     #define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
+    #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
 
     ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
