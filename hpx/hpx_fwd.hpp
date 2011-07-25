@@ -171,6 +171,7 @@ namespace hpx
                                      thread manager) */
             terminated = 5,     /*!< thread has been stopped an may be
                                      garbage collected */
+            all = 6,            /*!< selector for all thread states */
         };
 
         ///////////////////////////////////////////////////////////////////////
