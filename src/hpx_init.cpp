@@ -201,6 +201,10 @@ namespace hpx
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
+                    ("high_priority_threads,t", value<std::size_t>(), 
+                     "the number of operating system threads maintaining a high "
+                     "priority queue (default: number of OS threads), valid for "
+                     "--queueing=priority_local only")
                     ("ini,I", value<std::vector<std::string> >(),
                      "add an ini definition to the default runtime "
                      "configuration")
@@ -343,11 +347,17 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
+            if (vm.count("high_priority_threads")) {
+                throw std::logic_error("bad parameter --high_priority_threads, "
+                    "valid for --queueing=priority_local only");
+            }
+
+            // scheduling policy
             typedef hpx::threads::policies::global_queue_scheduler
                 global_queue_policy;
-            typedef hpx::runtime_impl<global_queue_policy> runtime_type;
 
             // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<global_queue_policy> runtime_type;
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 global_queue_policy::init_parameter_type(), 
                 vm["hpx-config"].as<std::string>(), ini_config);
@@ -366,12 +376,18 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
+            if (vm.count("high_priority_threads")) {
+                throw std::logic_error("bad parameter --high_priority_threads, "
+                    "valid for --queueing=priority_local only");
+            }
+
+            // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler
                 local_queue_policy;
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             local_queue_policy::init_parameter_type init(num_threads, 1000);
 
             // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
@@ -390,12 +406,18 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
+            std::size_t num_high_priority_queues = num_threads;
+            if (vm.count("high_priority_threads"))
+                num_high_priority_queues = vm["high_priority_threads"].as<std::size_t>();
+
+            // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler 
                 local_queue_policy;
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            local_queue_policy::init_parameter_type init(num_threads, 1000);
+            local_queue_policy::init_parameter_type init(
+                num_threads, num_high_priority_queues, 1000);
 
             // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
@@ -414,12 +436,18 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
+            if (vm.count("high_priority_threads")) {
+                throw std::logic_error("bad parameter --high_priority_threads, "
+                    "valid for --queueing=priority_local only");
+            }
+
+            // scheduling policy
             typedef hpx::threads::policies::abp_queue_scheduler 
                 abp_queue_policy;
-            typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
             abp_queue_policy::init_parameter_type init(num_threads, 1000);
 
             // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
