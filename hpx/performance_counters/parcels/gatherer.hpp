@@ -40,20 +40,20 @@ class gatherer {
     boost::int64_t size() const;
     void push_back(data_point const& x);
 
-    double mean_time() const;
-    double mean_byte() const;
-    double mean_time_per_byte() const;
+    boost::int64_t mean_time() const;
+    boost::int64_t mean_byte() const;
+    boost::int64_t mean_time_per_byte() const;
 
-    double moment_time() const;
-    double moment_byte() const;
-    double moment_time_per_byte() const;
+    boost::int64_t moment_time() const;
+    boost::int64_t moment_byte() const;
+    boost::int64_t moment_time_per_byte() const;
 
-    double variance_time() const;
-    double variance_byte() const;
-    double variance_time_per_byte() const;
+    boost::int64_t variance_time() const;
+    boost::int64_t variance_byte() const;
+    boost::int64_t variance_time_per_byte() const;
 
     boost::int64_t total_bytes() const;
-    double total_time() const;    
+    boost::int64_t total_time() const;    
 
     private:
     util::high_resolution_timer timer;
@@ -119,45 +119,45 @@ inline boost::int64_t gatherer::size() const
     return gatherer_size.load();
 }
 
-inline double gatherer::mean_time() const
+inline boost::int64_t gatherer::mean_time() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::mean(mean_time_acc);
+    return boost::int64_t(boost::accumulators::extract::mean(mean_time_acc));
 }   
    
-inline double gatherer::moment_time() const
+inline boost::int64_t gatherer::moment_time() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::moment<2>(moment_time_acc);
+    return boost::int64_t(boost::accumulators::extract::moment<2>(moment_time_acc));
 }
 
-inline double gatherer::variance_time() const
+inline boost::int64_t gatherer::variance_time() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::variance(variance_time_acc);
+    return boost::int64_t(boost::accumulators::extract::variance(variance_time_acc));
 }
 
-inline double gatherer::mean_byte() const
+inline boost::int64_t gatherer::mean_byte() const
 {
     lock mtx(acc_mtx); 
-    return boost::accumulators::extract::mean(mean_byte_acc);
+    return boost::int64_t(boost::accumulators::extract::mean(mean_byte_acc));
 }
 
-inline double gatherer::moment_byte() const
+inline boost::int64_t gatherer::moment_byte() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::moment<2>(moment_byte_acc);
+    return boost::int64_t(boost::accumulators::extract::moment<2>(moment_byte_acc));
 }
 
-inline double gatherer::variance_byte() const
+inline boost::int64_t gatherer::variance_byte() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::variance(variance_byte_acc);
+    return boost::int64_t(boost::accumulators::extract::variance(variance_byte_acc));
 }
 
-inline double gatherer::total_time() const
+inline boost::int64_t gatherer::total_time() const
 {
-    return timer.elapsed();
+    return boost::int64_t(timer.elapsed());
 }
 
 inline boost::int64_t gatherer::total_bytes() const
@@ -165,21 +165,21 @@ inline boost::int64_t gatherer::total_bytes() const
     return byte_count.load();
 }
 
-inline double gatherer::mean_time_per_byte() const
+inline boost::int64_t gatherer::mean_time_per_byte() const
 {
-   return total_time() / double(total_bytes());
+   return boost::int64_t(total_time() / boost::int64_t(total_bytes()));
 }
 
-inline double gatherer::moment_time_per_byte() const
+inline boost::int64_t gatherer::moment_time_per_byte() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::moment<2>(moment_time_per_byte_acc);
+    return boost::int64_t(boost::accumulators::extract::moment<2>(moment_time_per_byte_acc));
 }
 
-inline double gatherer::variance_time_per_byte() const
+inline boost::int64_t gatherer::variance_time_per_byte() const
 {
     lock mtx(acc_mtx);
-    return boost::accumulators::extract::variance(variance_time_per_byte_acc);
+    return boost::int64_t(boost::accumulators::extract::variance(variance_time_per_byte_acc));
 }
 }}}
 
