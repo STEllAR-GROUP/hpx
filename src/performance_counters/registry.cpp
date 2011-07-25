@@ -10,6 +10,8 @@
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/format.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters 
 {
@@ -44,12 +46,9 @@ namespace hpx { namespace performance_counters
             return status_valid_data;
         }
 
-        else
-        {
-            LPCS_(warning) << ( boost::format("failed to create counter type %s")
-                              % type_name);
-            return status_invalid_data;
-        }
+        LPCS_(warning) << ( boost::format("failed to create counter type %s")
+                          % type_name);
+        return status_invalid_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -119,6 +118,7 @@ namespace hpx { namespace performance_counters
         try {
             typedef components::managed_component<server::raw_counter> counter_type;
             newid = components::server::create_one<counter_type>(complemented_info, f);
+
             // register the canonical name with AGAS
             agas_client_.registerid(complemented_info.fullname_, newid);
         }
@@ -155,8 +155,7 @@ namespace hpx { namespace performance_counters
 
         // unregister this counter from AGAS
         agas_client_.unregisterid(name, ec);
-        if (ec)
-        {
+        if (ec) {
             LPCS_(warning) << ( boost::format("failed to destroy counter %s")
                               % name);
             return status_invalid_data;
