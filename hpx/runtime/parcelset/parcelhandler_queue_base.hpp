@@ -45,7 +45,7 @@ struct parcelhandler_queue_base
 
     virtual void set_parcelhandler(parcelhandler* ph) = 0;
 
-    virtual boost::int64_t get_queue_lengths() const = 0;
+    virtual boost::int64_t get_queue_length() const = 0;
 };
 
 }}

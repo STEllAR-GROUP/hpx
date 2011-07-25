@@ -73,7 +73,7 @@ struct global_parcelhandler_queue : parcelhandler_queue_base
         ph_ = ph;
     }
 
-    boost::int64_t get_queue_lengths() const 
+    boost::int64_t get_queue_length() const 
     {
         return -1;
     }
