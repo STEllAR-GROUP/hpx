@@ -823,6 +823,7 @@ struct primary_namespace :
         /* enum value */  namespace_bind_locality,
         /* arguments */   endpoint_type const&, count_type,
         &primary_namespace<Database, Protocol>::bind_locality
+      , threads::thread_priority_critical
     > bind_locality_action; 
     
     typedef hpx::actions::result_action2<
@@ -831,6 +832,7 @@ struct primary_namespace :
         /* enum value */  namespace_bind_gid,
         /* arguments */   naming::gid_type const&, gva_type const&,
         &primary_namespace<Database, Protocol>::bind_gid
+      , threads::thread_priority_critical
     > bind_gid_action;
     
     typedef hpx::actions::result_action1<
@@ -839,6 +841,7 @@ struct primary_namespace :
         /* enum value */  namespace_resolve_locality,
         /* arguments */   endpoint_type const&,
         &primary_namespace<Database, Protocol>::resolve_locality
+      , threads::thread_priority_critical
     > resolve_locality_action;
     
     typedef hpx::actions::result_action1<
@@ -847,6 +850,7 @@ struct primary_namespace :
         /* enum value */  namespace_resolve_gid,
         /* arguments */   naming::gid_type const&,
         &primary_namespace<Database, Protocol>::resolve_gid
+      , threads::thread_priority_critical
     > resolve_gid_action;
     
     typedef hpx::actions::result_action2<
@@ -855,6 +859,7 @@ struct primary_namespace :
         /* enum value */  namespace_unbind,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::unbind
+      , threads::thread_priority_critical
     > unbind_action;
     
     typedef hpx::actions::result_action2<
@@ -863,6 +868,7 @@ struct primary_namespace :
         /* enum value */  namespace_increment,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::increment
+      , threads::thread_priority_critical
     > increment_action;
     
     typedef hpx::actions::result_action2<
@@ -871,6 +877,7 @@ struct primary_namespace :
         /* enum value */  namespace_decrement,
         /* arguments */   naming::gid_type const&, count_type,
         &primary_namespace<Database, Protocol>::decrement
+      , threads::thread_priority_critical
     > decrement_action;
     
     typedef hpx::actions::result_action0<
@@ -878,6 +885,7 @@ struct primary_namespace :
         /* return type */ response_type,
         /* enum value */  namespace_localities,
         &primary_namespace<Database, Protocol>::localities
+      , threads::thread_priority_critical
     > localities_action;
 };
 

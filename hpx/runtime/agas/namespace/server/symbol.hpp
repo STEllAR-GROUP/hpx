@@ -144,6 +144,7 @@ struct symbol_namespace :
         /* enum value */  namespace_bind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
         &symbol_namespace<Database, Protocol>::bind
+      , threads::thread_priority_critical
     > bind_action;
     
     typedef hpx::actions::result_action2<
@@ -152,6 +153,7 @@ struct symbol_namespace :
         /* enum value */  namespace_rebind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
         &symbol_namespace<Database, Protocol>::rebind
+      , threads::thread_priority_critical
     > rebind_action;
     
     typedef hpx::actions::result_action1<
@@ -160,6 +162,7 @@ struct symbol_namespace :
         /* enum value */  namespace_resolve,
         /* arguments */   symbol_type const&,
         &symbol_namespace<Database, Protocol>::resolve
+      , threads::thread_priority_critical
     > resolve_action;
     
     typedef hpx::actions::result_action1<
@@ -168,6 +171,7 @@ struct symbol_namespace :
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
         &symbol_namespace<Database, Protocol>::unbind
+      , threads::thread_priority_critical
     > unbind_action;
 };
 

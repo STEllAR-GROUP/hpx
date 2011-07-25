@@ -233,6 +233,7 @@ struct component_namespace :
         /* enum value */  namespace_bind_prefix,
         /* arguments */   component_name_type const&, prefix_type,
         &component_namespace<Database, Protocol>::bind_prefix
+      , threads::thread_priority_critical
     > bind_prefix_action;
     
     typedef hpx::actions::result_action1<
@@ -241,6 +242,7 @@ struct component_namespace :
         /* enum value */  namespace_bind_name,
         /* arguments */   component_name_type const&,
         &component_namespace<Database, Protocol>::bind_name
+      , threads::thread_priority_critical
     > bind_name_action;
     
     typedef hpx::actions::result_action1<
@@ -249,6 +251,7 @@ struct component_namespace :
         /* enum value */  namespace_resolve_id,
         /* arguments */   component_id_type,
         &component_namespace<Database, Protocol>::resolve_id
+      , threads::thread_priority_critical
     > resolve_id_action;
     
     typedef hpx::actions::result_action1<
@@ -257,6 +260,7 @@ struct component_namespace :
         /* enum value */  namespace_resolve_name,
         /* arguments */   component_name_type const&,
         &component_namespace<Database, Protocol>::resolve_name
+      , threads::thread_priority_critical
     > resolve_name_action;
     
     typedef hpx::actions::result_action1<
@@ -265,6 +269,7 @@ struct component_namespace :
         /* enum value */  namespace_unbind,
         /* arguments */   component_name_type const&,
         &component_namespace<Database, Protocol>::unbind
+      , threads::thread_priority_critical
     > unbind_action;
 };
 
