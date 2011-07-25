@@ -318,6 +318,12 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
+#if HPX_AGAS_VERSION > 0x10
+        /// install_counters is called during startup to allow registration of 
+        /// performance counters 
+        void install_counters();
+#endif
+
     private:
         /// The AGAS client
         naming::resolver_client& resolver_;

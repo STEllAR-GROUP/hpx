@@ -17,6 +17,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
+#include <hpx/include/performance_counters.hpp>
 
 #include <string>
 #include <algorithm>
@@ -288,6 +289,32 @@ namespace hpx { namespace parcelset
         }
 
         pp_.put_parcel(p, f);
+    }
+
+    void parcelhandler::install_counters()
+    {
+        performance_counters::install_counter_type("/parcels/count",
+            performance_counters::counter_raw);
+
+        // Total parcels sent (started). 
+        performance_counters::install_counter(
+            "/parcels(sent/started)/count"
+          , boost::bind(&parcelport::total_sends_started, &pp_));
+
+        // Total parcels sent (completed). 
+        performance_counters::install_counter(
+            "/parcels(sent/completed)/count"
+          , boost::bind(&parcelport::total_sends_completed, &pp_));
+
+        // Total parcels received (started). 
+        performance_counters::install_counter(
+            "/parcels(received/started)/count"
+          , boost::bind(&parcelport::total_receives_started, &pp_));
+
+        // Total parcels received (completed). 
+        performance_counters::install_counter(
+            "/parcels(received/completed)/count"
+          , boost::bind(&parcelport::total_receives_completed, &pp_));
     }
 
 ///////////////////////////////////////////////////////////////////////////////
