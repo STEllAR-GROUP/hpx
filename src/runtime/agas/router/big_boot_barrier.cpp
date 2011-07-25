@@ -229,22 +229,22 @@ void notify_worker(notification_header const& header);
 // {{{ early action types
 typedef actions::plain_action1<
     registration_header const&, register_console
-//  , threads::thread_priority_critical
+  , threads::thread_priority_critical
 > register_console_action;
 
 typedef actions::plain_action1<
     notification_header const&, notify_console
-//  , threads::thread_priority_critical
+  , threads::thread_priority_critical
 > notify_console_action;
 
 typedef actions::plain_action1<
     registration_header const&, register_worker
-//  , threads::thread_priority_critical
+  , threads::thread_priority_critical
 > register_worker_action;
 
 typedef actions::plain_action1<
     notification_header const&, notify_worker
-//  , threads::thread_priority_critical
+  , threads::thread_priority_critical
 > notify_worker_action;
 // }}}
 
