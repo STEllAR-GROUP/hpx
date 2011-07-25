@@ -341,6 +341,7 @@ namespace hpx
 
         // Install performance counter startup functions for core subsystems.
         thread_manager_.install_counters();
+        parcel_handler_.install_counters();
 
         // now, execute the user supplied thread function
         if (!func.empty()) 
