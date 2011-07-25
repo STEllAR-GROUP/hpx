@@ -54,13 +54,14 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        boost::uint64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
+        boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
-            return queue_.get_queue_lengths();
+            return queue_.get_queue_length();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        boost::uint64_t get_thread_count(thread_state_enum state)
+        boost::int64_t get_thread_count(thread_state_enum state = all,
+            std::size_t num_thread = std::size_t(-1)) const
         {
             return queue_.get_thread_count(state);
         }
@@ -106,12 +107,6 @@ namespace hpx { namespace threads { namespace policies
         bool destroy_thread(threads::thread* thrd)
         {
             return queue_.destroy_thread(thrd);
-        }
-
-        /// Return the number of existing threads, regardless of their state
-        boost::uint64_t get_thread_count(std::size_t num_thread) const
-        {
-            return queue_.get_thread_count();
         }
 
         /// This is a function which gets called periodically by the thread 

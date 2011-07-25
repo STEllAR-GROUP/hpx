@@ -103,43 +103,6 @@ namespace hpx { namespace threads { namespace policies
         bool numa_sensitive() const { return numa_sensitive_; }
 
         ///////////////////////////////////////////////////////////////////////
-        // This returns the current length of the queues (work items and new items)
-        boost::uint64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
-        {
-            // either return queue length of one specific queue
-            if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
-                boost::uint64_t count = 0;
-
-                if (num_thread == 0)
-                    count =  high_priority_queue_.get_thread_count();
-                if (num_thread == queues_.size())
-                    count += low_priority_queue_.get_thread_count();
-
-                return count + queues_[num_thread]->get_queue_lengths();
-            }
-
-            // or cumulative queue lengths of all queues
-            boost::uint64_t result = 
-                high_priority_queue_.get_queue_lengths() + 
-                low_priority_queue_.get_queue_lengths();
-
-            for (std::size_t i = 0; i < queues_.size(); ++i) 
-                result += queues_[i]->get_queue_lengths();
-            return result;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        boost::uint64_t get_thread_count(thread_state_enum state)
-        {
-            // or cumulative queue lengths of all queues
-            boost::uint64_t result = 0;
-            for (std::size_t i = 0; i < queues_.size(); ++i)
-                result += queues_[i]->get_thread_count(state);
-            return result;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
         {
             for (std::size_t i = 0; i < queues_.size(); ++i)
@@ -169,6 +132,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread)
         {
             if (data.priority == thread_priority_critical) {
+                BOOST_ASSERT(run_now == true);
                 return high_priority_queue_.create_thread(data, initial_state, 
                     run_now, queues_.size(), ec);
             }
@@ -254,18 +218,61 @@ namespace hpx { namespace threads { namespace policies
             return false;
         }
 
-        /// Return the number of existing threads, regardless of their state
-        boost::uint64_t get_thread_count(std::size_t num_thread) const
+        ///////////////////////////////////////////////////////////////////////
+        // This returns the current length of the queues (work items and new items)
+        boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
-            BOOST_ASSERT(num_thread < queues_.size());
-            boost::uint64_t count = 0;
+            // Return queue length of one specific queue.
+            if (std::size_t(-1) != num_thread) {
+                BOOST_ASSERT(num_thread < queues_.size());
 
-            if (num_thread == 0)
-                count = high_priority_queue_.get_thread_count();
-            if (num_thread == queues_.size()-1)
-                count += low_priority_queue_.get_thread_count();
+                boost::int64_t count = 0;
 
-            return count + queues_[num_thread]->get_thread_count();
+                if (num_thread == 0)
+                    count =  high_priority_queue_.get_thread_count();
+                if (num_thread == queues_.size())
+                    count += low_priority_queue_.get_thread_count();
+
+                return count + queues_[num_thread]->get_queue_length();
+            }
+
+            // Cumulative queue lengths of all queues.
+            boost::int64_t result = 
+                high_priority_queue_.get_queue_length() + 
+                low_priority_queue_.get_queue_length();
+
+            for (std::size_t i = 0; i < queues_.size(); ++i) 
+                result += queues_[i]->get_queue_length();
+            return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Queries the current thread count of the queues.
+        boost::int64_t get_thread_count(thread_state_enum state = all,
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            // Return thread count of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+
+                boost::int64_t result = 0;
+    
+                if (0 == num_thread)
+                    result = high_priority_queue_.get_thread_count(state);
+                else if (queues_.size() - 1 == num_thread)
+                    result += low_priority_queue_.get_thread_count(state);
+    
+                return result + queues_[num_thread]->get_thread_count(state);
+            }
+    
+            boost::int64_t result = high_priority_queue_.get_thread_count(state)
+                                  + low_priority_queue_.get_thread_count(state);
+
+            // Return the cumulative count for all queues.
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                result += queues_[i]->get_thread_count(state);
+            return result;
         }
 
         /// This is a function which gets called periodically by the thread 
@@ -280,6 +287,12 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
+
+            if ((queues_.size() - 1 == num_thread) && (0 == added))
+                // Convert low priority tasks to threads before attempting to
+                // steal from other shepherds.
+                result = result || low_priority_queue_.wait_or_add_new( 
+                    num_thread, running, idle_loop_count, added);
 
             if (0 == added) {
                 // steal work items: first try to steal from other cores in 

@@ -94,27 +94,37 @@ namespace hpx { namespace threads { namespace policies
         bool numa_sensitive() const { return numa_sensitive_; }
 
         ///////////////////////////////////////////////////////////////////////
-        // This returns the current length of the queues (work items and new items)
-        boost::uint64_t get_queue_lengths(std::size_t num_thread = std::size_t(-1)) const
+        // Queries the current length of the queues (work items and new items).
+        boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
-            // either return queue length of one specific queue
-            if (std::size_t(-1) != num_thread) {
+            // Return queue length of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
                 BOOST_ASSERT(num_thread < queues_.size());
-                return queues_[num_thread]->get_queue_lengths();
+                return queues_[num_thread]->get_queue_length();
             }
 
-            // or cumulative queue lengths of all queues
-            boost::uint64_t result = 0;
+            // Cumulative queue lengths of all queues.
+            boost::int64_t result = 0;
             for (std::size_t i = 0; i < queues_.size(); ++i)
-                result += queues_[i]->get_queue_lengths();
+                result += queues_[i]->get_queue_length();
             return result;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        boost::uint64_t get_thread_count(thread_state_enum state)
+        // Queries the current thread count of the queues.
+        boost::int64_t get_thread_count(thread_state_enum state = all,
+            std::size_t num_thread = std::size_t(-1)) const
         {
-            // or cumulative queue lengths of all queues
-            boost::uint64_t result = 0;
+            // Return thread count of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+                return queues_[num_thread]->get_thread_count(state);
+            }
+
+            // Return the cumulative count for all queues.
+            boost::int64_t result = 0;
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 result += queues_[i]->get_thread_count(state);
             return result;
@@ -203,13 +213,6 @@ namespace hpx { namespace threads { namespace policies
                     return true;
             }
             return false;
-        }
-
-        /// Return the number of existing threads, regardless of their state
-        boost::uint64_t get_thread_count(std::size_t num_thread) const
-        {
-            BOOST_ASSERT(num_thread < queues_.size());
-            return queues_[num_thread]->get_thread_count();
         }
 
         /// This is a function which gets called periodically by the thread 

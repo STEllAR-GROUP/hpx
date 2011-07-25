@@ -75,7 +75,7 @@ struct thread_deque
 
   protected:
     // add new threads if there is some amount of work available
-    std::size_t add_new(long add_count)
+    std::size_t add_new(boost::int64_t add_count)
     {
         if (0 == add_count)
             return 0;
@@ -131,7 +131,7 @@ struct thread_deque
     }
     
     // steal new threads if there is some amount of work available
-    std::size_t steal_new(long add_count, thread_deque* addfrom)
+    std::size_t steal_new(boost::int64_t add_count, thread_deque* addfrom)
     {
         if (0 == add_count)
             return 0;
@@ -186,11 +186,11 @@ struct thread_deque
         return added;
     }
     
-    long compute_count()
+    boost::int64_t compute_count()
     {
 
         // create new threads from pending tasks (if appropriate)
-        long add_count = -1; // default is no constraint
+        boost::int64_t add_count = -1; // default is no constraint
 
         // if we are desperate (no work in the queues), add some even if the 
         // map holds more than max_count
@@ -222,7 +222,7 @@ struct thread_deque
     {
         {
             // delete only this many threads
-            long delete_count = max_delete_count; 
+            boost::int64_t delete_count = max_delete_count; 
             thread_id_type todelete;
             while (delete_count && terminated_items_.dequeue(&todelete)) 
             {
@@ -265,7 +265,7 @@ struct thread_deque
     }
 
     // This returns the current length of the queues (work items and new items)
-    boost::int64_t get_queue_lengths() const
+    boost::int64_t get_queue_length() const
     { return work_items_count_ + new_tasks_count_; }
 
     // create a new thread and schedule it if the initial state is equal to 
@@ -345,24 +345,18 @@ struct thread_deque
         return false;
     }
 
-    // Return the number of existing threads, regardless of their state
-    boost::uint64_t get_thread_count() const
+    ///////////////////////////////////////////////////////////////////////
+    /// Return the number of existing threads with the given state.
+    boost::int64_t get_thread_count(thread_state_enum state = all) const
     {
         mutex_type::scoped_lock lk(mtx_);
-        return thread_map_.size();
-    }
-
-    // return the number of existing threads with given state
-    boost::uint64_t get_thread_count(thread_state_enum state) const
-    {
-        mutex_type::scoped_lock lk(mtx_);
-        if (state == unknown)
+        if (unknown == state || all == state)
             return thread_map_.size();
 
-        boost::uint64_t num_threads = 0;
+        boost::int64_t num_threads = 0;
         thread_map_type::const_iterator end = thread_map_.end();
         for (thread_map_type::const_iterator it = thread_map_.begin();
-              it != end; ++it)
+             it != end; ++it)
         {
             if ((*it).second->get_state() == state)
                 ++num_threads;
@@ -489,12 +483,12 @@ private:
 
     thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
     work_items_type work_items_;        ///< list of active work items
-    boost::atomic<long> work_items_count_;    ///< count of active work items
+    boost::atomic<boost::int64_t> work_items_count_;    ///< count of active work items
     thread_id_queue_type terminated_items_;   ///< list of terminated threads
 
     std::size_t max_count_;             ///< maximum number of existing PX-threads
     task_items_type new_tasks_;         ///< list of new tasks to run
-    boost::atomic<long> new_tasks_count_;     ///< count of new tasks to run
+    boost::atomic<boost::int64_t> new_tasks_count_;     ///< count of new tasks to run
 
     threads::thread_pool memory_pool_;  ///< OS thread local memory pools for
                                         ///< PX-threads 
