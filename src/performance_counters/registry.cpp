@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +8,7 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
+#include <hpx/util/logging.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters 
@@ -35,7 +37,19 @@ namespace hpx { namespace performance_counters
         std::pair<counter_type_map_type::iterator, bool> p = 
             countertypes_.insert(counter_type_map_type::value_type(type_name, info));
 
-        return p.second ? status_valid_data : status_invalid_data;
+        if (p.second)
+        {
+            LPCS_(info) << ( boost::format("counter type %s created")
+                           % type_name);
+            return status_valid_data;
+        }
+
+        else
+        {
+            LPCS_(warning) << ( boost::format("failed to create counter type %s")
+                              % type_name);
+            return status_invalid_data;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -53,6 +67,9 @@ namespace hpx { namespace performance_counters
                 "counter type is not defined");
             return status_counter_type_unknown;
         }
+
+        LPCS_(info) << ( boost::format("counter type %s destroyed")
+                       % type_name);
 
         countertypes_.erase(it);
         return status_valid_data;
@@ -102,17 +119,20 @@ namespace hpx { namespace performance_counters
         try {
             typedef components::managed_component<server::raw_counter> counter_type;
             newid = components::server::create_one<counter_type>(complemented_info, f);
+            // register the canonical name with AGAS
+            agas_client_.registerid(complemented_info.fullname_, newid);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
+            LPCS_(warning) << ( boost::format("failed to create counter %s (%s)")
+                              % type_name % e.what());
             return status_invalid_data;
         }
 
-        // register the conical name with AGAS
-        agas_client_.registerid(complemented_info.fullname_, newid, ec);
-        if (ec) return status_invalid_data;
+        LPCS_(info) << ( boost::format("counter %s created at %s")
+                       % type_name % newid);
 
         id = naming::id_type(newid, naming::id_type::managed);
         return status_valid_data;
@@ -135,7 +155,12 @@ namespace hpx { namespace performance_counters
 
         // unregister this counter from AGAS
         agas_client_.unregisterid(name, ec);
-        if (ec) return status_invalid_data;
+        if (ec)
+        {
+            LPCS_(warning) << ( boost::format("failed to destroy counter %s")
+                              % name);
+            return status_invalid_data;
+        }
 
         // delete the counter
         switch (info.type_) {
