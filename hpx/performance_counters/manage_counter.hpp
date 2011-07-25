@@ -51,8 +51,22 @@ namespace hpx { namespace performance_counters
     };
 
 #if HPX_AGAS_VERSION > 0x10
+    /// Install a new performance counter in a way, which will uninstall it
+    /// automatically during shutdown.
     HPX_EXPORT void install_counter(std::string const& name,
         boost::function<boost::int64_t()> const& f, error_code& ec = throws); 
+
+    /// A small data structure holding all data needed to install a counter 
+    struct counter_data
+    {
+        std::string name_;
+        boost::function<boost::int64_t()> func_;
+    };
+
+    /// Install several new performance counters in a way, which will uninstall 
+    /// them automatically during shutdown.
+    HPX_EXPORT void install_counters(counter_data const* data, 
+        std::size_t count, error_code& ec = throws); 
 #endif
 }}
 

@@ -296,25 +296,19 @@ namespace hpx { namespace parcelset
         performance_counters::install_counter_type("/parcels/count",
             performance_counters::counter_raw);
 
-        // Total parcels sent (started). 
-        performance_counters::install_counter(
-            "/parcels(sent/started)/count"
-          , boost::bind(&parcelport::total_sends_started, &pp_));
-
-        // Total parcels sent (completed). 
-        performance_counters::install_counter(
-            "/parcels(sent/completed)/count"
-          , boost::bind(&parcelport::total_sends_completed, &pp_));
-
-        // Total parcels received (started). 
-        performance_counters::install_counter(
-            "/parcels(received/started)/count"
-          , boost::bind(&parcelport::total_receives_started, &pp_));
-
-        // Total parcels received (completed). 
-        performance_counters::install_counter(
-            "/parcels(received/completed)/count"
-          , boost::bind(&parcelport::total_receives_completed, &pp_));
+        performance_counters::counter_data counters[] = 
+        {
+            { "/parcels(sent/started)/count",         // Total parcels sent (started)
+              boost::bind(&parcelport::total_sends_started, &pp_) },
+            { "/parcels(sent/completed)/count",       // Total parcels sent (completed)
+              boost::bind(&parcelport::total_sends_completed, &pp_) },
+            { "/parcels(received/started)/count",     // Total parcels received (started)
+              boost::bind(&parcelport::total_receives_started, &pp_) },
+            { "/parcels(received/completed)/count",   // Total parcels received (completed)
+              boost::bind(&parcelport::total_receives_completed, &pp_) }
+        };
+        performance_counters::install_counters(
+            counters, sizeof(counters)/sizeof(counters[0]));
     }
 
 ///////////////////////////////////////////////////////////////////////////////

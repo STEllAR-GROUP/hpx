@@ -287,13 +287,14 @@ namespace hpx { namespace threads
         //if (std::size_t(-1) == data.num_os_thread) 
         //    data.num_os_thread = get_thread_num();
 
-        // For critical priority threads, create the thread immediately.
-        if (thread_priority_critical == data.priority) 
+        if (thread_priority_critical == data.priority) {
+            // For critical priority threads, create the thread immediately.
             scheduler_.create_thread(data, initial_state, true, ec, data.num_os_thread);
-
-        else
+        }
+        else {
             // Create a task description for the new thread. 
             scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -968,96 +969,57 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         install_counters()
     {
-        performance_counters::install_counter_type("/queue/length",
-            performance_counters::counter_raw);
-
-        performance_counters::install_counter_type("/threads/count",
-            performance_counters::counter_raw);
-
-        // Cumulative queue length.
-        performance_counters::install_counter(
-            "/queue(threadmanager)/length"
-          , boost::bind(&scheduling_policy_type::get_queue_length
-                      , &scheduler_, -1));
-
-        // Cumulative thread count.
-        performance_counters::install_counter(
-            "/threads(total/all)/count"
-          , boost::bind(&scheduling_policy_type::get_thread_count 
-                      , &scheduler_, all, -1));
-
-        // Cumulative active thread count.
-        performance_counters::install_counter(
-            "/threads(total/active)/count"
-          , boost::bind(&scheduling_policy_type::get_thread_count 
-                      , &scheduler_, active, -1));
-
-        // Cumulative pending thread count.
-        performance_counters::install_counter(
-            "/threads(total/pending)/count"
-          , boost::bind(&scheduling_policy_type::get_thread_count 
-                      , &scheduler_, pending, -1));
-
-        // Cumulative suspended thread count.
-        performance_counters::install_counter(
-            "/threads(total/suspended)/count"
-          , boost::bind(&scheduling_policy_type::get_thread_count 
-                      , &scheduler_, suspended, -1));
-
-        // Cumulative terminated thread count.
-        performance_counters::install_counter(
-            "/threads(total/terminated)/count"
-          , boost::bind(&scheduling_policy_type::get_thread_count 
-                      , &scheduler_, terminated, -1));
-
-        std::size_t shepherd_count = 0; 
-
+        performance_counters::counter_type_data counter_types[] = 
         {
-            mutex_type::scoped_lock lk(mtx_);
-            shepherd_count = threads_.size();
-        }
- 
-        boost::format   
-            queue_length_fmt("/queue(shepherd#%d)/length")
-          , thread_count_fmt("/threads(shepherd#%d/%s)/count");
+            { "/queue/length", performance_counters::counter_raw },
+            { "/threads/count", performance_counters::counter_raw }
+        };
+        performance_counters::install_counter_types(
+            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+
+        typedef scheduling_policy_type spt;
+
+        performance_counters::counter_data counters[] = 
+        {
+            { "/queue(threadmanager)/length",     // Cumulative queue length
+              boost::bind(&spt::get_queue_length, &scheduler_, -1) },
+            { "/threads(total/all)/count",        // Cumulative thread count
+              boost::bind(&spt::get_thread_count, &scheduler_, unknown, -1) },
+            { "/threads(total/active)/count",     // Cumulative active thread count
+              boost::bind(&spt::get_thread_count, &scheduler_, active, -1) },
+            { "/threads(total/pending)/count",    // Cumulative pending thread count
+              boost::bind(&spt::get_thread_count, &scheduler_, pending, -1) },
+            { "/threads(total/suspended)/count",  // Cumulative suspended thread count
+              boost::bind(&spt::get_thread_count, &scheduler_, suspended, -1) },
+            { "/threads(total/terminated)/count", // Cumulative terminated thread count
+              boost::bind(&spt::get_thread_count, &scheduler_, terminated, -1) }
+        };
+        performance_counters::install_counters(
+            counters, sizeof(counters)/sizeof(counters[0]));
+
+        std::size_t shepherd_count = threads_.size(); 
+        boost::format queue_length_fmt("/queue(shepherd#%d)/length");
+        boost::format thread_count_fmt("/threads(shepherd#%d/%s)/count");
 
         for (std::size_t i = 0; i < shepherd_count; ++i)
         {
-            // Queue length.
-            performance_counters::install_counter(
-                boost::str(queue_length_fmt % i)
-              , boost::bind(&scheduling_policy_type::get_queue_length, 
-                            &scheduler_, i));
-
-            // Thread count.
-            performance_counters::install_counter(
-                boost::str(thread_count_fmt % i % "all") 
-              , boost::bind(&scheduling_policy_type::get_thread_count 
-                          , &scheduler_, all, i));
-    
-            // Active thread count.
-            performance_counters::install_counter(
-                boost::str(thread_count_fmt % i % "active") 
-              , boost::bind(&scheduling_policy_type::get_thread_count 
-                          , &scheduler_, active, i));
-    
-            // Pending thread count.
-            performance_counters::install_counter(
-                boost::str(thread_count_fmt % i % "pending") 
-              , boost::bind(&scheduling_policy_type::get_thread_count 
-                          , &scheduler_, pending, i));
-    
-            // Suspended thread count.
-            performance_counters::install_counter(
-                boost::str(thread_count_fmt % i % "suspended")
-              , boost::bind(&scheduling_policy_type::get_thread_count 
-                          , &scheduler_, suspended, i));
-    
-            // Terminated thread count.
-            performance_counters::install_counter(
-                boost::str(thread_count_fmt % i % "terminated") 
-              , boost::bind(&scheduling_policy_type::get_thread_count 
-                          , &scheduler_, terminated, i));
+            performance_counters::counter_data counters[] = 
+            {
+                { boost::str(queue_length_fmt % i),   // Queue length
+                  boost::bind(&spt::get_queue_length, &scheduler_, i) },
+                { boost::str(thread_count_fmt % i % "all"), // Thread count
+                  boost::bind(&spt::get_thread_count, &scheduler_, unknown, i) },
+                { boost::str(thread_count_fmt % i % "active"),     // Active thread count
+                  boost::bind(&spt::get_thread_count, &scheduler_, active, i) },
+                { boost::str(thread_count_fmt % i % "pending"),    // Pending thread count
+                  boost::bind(&spt::get_thread_count, &scheduler_, pending, i) },
+                { boost::str(thread_count_fmt % i % "suspended"),  // Suspended thread count
+                  boost::bind(&spt::get_thread_count, &scheduler_, suspended, i) },
+                { boost::str(thread_count_fmt % i % "terminated"), // Terminated thread count
+                  boost::bind(&spt::get_thread_count, &scheduler_, terminated, i) }
+            };
+            performance_counters::install_counters(
+                counters, sizeof(counters)/sizeof(counters[0]));
         }
     }
 #endif

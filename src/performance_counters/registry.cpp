@@ -39,15 +39,14 @@ namespace hpx { namespace performance_counters
         std::pair<counter_type_map_type::iterator, bool> p = 
             countertypes_.insert(counter_type_map_type::value_type(type_name, info));
 
-        if (p.second)
-        {
-            LPCS_(info) << ( boost::format("counter type %s created")
-                           % type_name);
+        if (p.second) {
+            LPCS_(info) << (boost::format("counter type %s created")
+                % type_name);
             return status_valid_data;
         }
 
-        LPCS_(warning) << ( boost::format("failed to create counter type %s")
-                          % type_name);
+        LPCS_(warning) << (boost::format("failed to create counter type %s")
+            % type_name);
         return status_invalid_data;
     }
 
@@ -67,8 +66,8 @@ namespace hpx { namespace performance_counters
             return status_counter_type_unknown;
         }
 
-        LPCS_(info) << ( boost::format("counter type %s destroyed")
-                       % type_name);
+        LPCS_(info) << (boost::format("counter type %s destroyed")
+            % type_name);
 
         countertypes_.erase(it);
         return status_valid_data;
@@ -131,8 +130,8 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        LPCS_(info) << ( boost::format("counter %s created at %s")
-                       % type_name % newid);
+        LPCS_(info) << (boost::format("counter %s created at %s") 
+            % type_name % newid);
 
         id = naming::id_type(newid, naming::id_type::managed);
         return status_valid_data;
@@ -156,8 +155,8 @@ namespace hpx { namespace performance_counters
         // unregister this counter from AGAS
         agas_client_.unregisterid(name, ec);
         if (ec) {
-            LPCS_(warning) << ( boost::format("failed to destroy counter %s")
-                              % name);
+            LPCS_(warning) << (boost::format("failed to destroy counter %s")
+                % name);
             return status_invalid_data;
         }
 
@@ -180,7 +179,6 @@ namespace hpx { namespace performance_counters
         }
         return status_valid_data;
     }
-
 }}
 
 

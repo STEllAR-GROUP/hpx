@@ -53,8 +53,22 @@ namespace hpx { namespace performance_counters
     };
 
 #if HPX_AGAS_VERSION > 0x10
+    /// Install a new performance counter type in a way, which will uninstall 
+    /// it automatically during shutdown.
     HPX_EXPORT void install_counter_type(std::string const& name,
         counter_type type, error_code& ec = throws); 
+
+    /// A small data structure holding all data needed to install a counter type
+    struct counter_type_data
+    {
+        std::string name_;
+        counter_type type_;
+    };
+
+    /// Install several new performance counter types in a way, which will 
+    /// uninstall them automatically during shutdown.
+    HPX_EXPORT void install_counter_types(counter_type_data const* data,
+        std::size_t count, error_code& ec = throws); 
 #endif
 }}
 
