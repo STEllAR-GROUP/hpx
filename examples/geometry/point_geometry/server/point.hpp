@@ -61,37 +61,31 @@ namespace hpx { namespace geometry { namespace server
             double dx = (xmax - xmin)/(numpoints-1);
             double dy = (ymax - ymin)/(numpoints-1);
 
-            bg::model::d2::point_xy<int> p1(1, 1), p2(2, 2);
-            std::cout << "Distance p1-p2 is: " << bg::distance(p1, p2) << std::endl;
+            typedef bg::model::d2::point_xy<double> point_type;
+            typedef bg::model::polygon<point_type> polygon_type;
 
-            double points[][2] = {{2.0, 1.3}, {4.1, 3.0}, {5.3, 2.6}, {2.9, 0.7}, {2.0, 1.3}};
-            bg::model::polygon<bg::model::d2::point_xy<double> > poly;
-            bg::append(poly, points);
-#if 0
-            double pt[2] = {xmin,ymin};            
-            boost::geometry::append(p_,pt);
+            polygon_type poly;
             // create the rectangle of the mesh object
             for (std::size_t i=0;i<numpoints;i++) {
               double x = xmin + dx*i;
-              double pt[2] = {x,ymin};            
-              p_.outer().push_back(pt);            
+              point_type p(x,ymin);
+              poly.outer().push_back(p);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
-              double pt[2] = {xmax,y};            
-              p_.outer().push_back(pt);            
+              point_type p(xmax,y);
+              poly.outer().push_back(p);
             }
-            for (std::size_t i=numpoints-1;i>=0;i--) {
-              double x = xmin + dx*i;
-              double pt[2] = {x,ymax};            
-              p_.outer().push_back(pt);            
+            for (std::size_t i=0;i<numpoints;i++) {
+              double x = xmax - dx*i;
+              point_type p(x,ymax);
+              poly.outer().push_back(p);
             }
-            for (std::size_t i=numpoints-1;i>=0;i--) {
-              double y = ymin + dy*i;
-              double pt[2] = {xmin,y};            
-              p_.outer().push_back(pt);            
+            for (std::size_t i=0;i<numpoints;i++) {
+              double y = ymax - dy*i;
+              point_type p(xmin,y);
+              poly.outer().push_back(p);
             }
-#endif
 
             //pt_.x(x);
             //pt_.y(y);
