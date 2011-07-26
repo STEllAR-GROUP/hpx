@@ -1004,14 +1004,18 @@ namespace hpx { namespace threads
 #endif
 
         std::size_t idle_loop_count = 0;
-        
+
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
-        tfunc_timer[num_thread].restart();
+        util::high_resolution_timer tfunc_timer;
+        util::high_resolution_timer exec_timer;
+
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
-            if (scheduler_.get_next_thread(num_thread, state_.load() == running, idle_loop_count, &thrd)) {
+            if (scheduler_.get_next_thread(num_thread, 
+                    state_.load() == running, idle_loop_count, &thrd)) 
+            {
                 idle_loop_count = 0;
                 tl1.tick();
 
@@ -1038,13 +1042,15 @@ namespace hpx { namespace threads
                             {
                                 undo_mark_context mark (mark_);  // itt support
                                 caller_context ctx (ctx_);
-                                
+
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
-                                exec_timer[num_thread].restart();                                
+                                exec_timer.restart();
                                 thrd_stat = (*thrd)();
-                                exec_time[num_thread] += exec_timer[num_thread].elapsed_nanoseconds();
+                                exec_time[num_thread] += exec_timer.elapsed();
                             }
+
+                            tfunc_time[num_thread] = tfunc_timer.elapsed();
                             tl2.tock();
                             ++num_px_threads;
                         }
@@ -1111,8 +1117,9 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
+
                 // Before tfunc loop breaks, record total time elapsed
-                tfunc_time[num_thread] = tfunc_timer[num_thread].elapsed_nanoseconds();
+                tfunc_time[num_thread] = tfunc_timer.elapsed();
                 break;
             }
         }
@@ -1144,9 +1151,7 @@ namespace hpx { namespace threads
         timer_pool_.run(false);
 
         executed_threads_.reserve(num_threads);
-        tfunc_timer.resize(num_threads);
         tfunc_time.resize(num_threads);
-        exec_timer.resize(num_threads);
         exec_time.resize(num_threads);
 
         try {
