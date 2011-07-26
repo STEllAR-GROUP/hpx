@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <numeric>
 
 #include <hpx/config.hpp>
 
@@ -20,9 +21,6 @@
 #include <boost/lockfree/fifo.hpp>
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -570,25 +568,22 @@ namespace hpx { namespace threads
         std::string get_lco_description(thread_id_type id) const;
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
-        /*
-        /// Get average ratios in tfunc_imp loop.
-        double avg_exec_ratio() const
+        /// Percent maintenence time in tfunc_impl. 
+        boost::int64_t avg_maint_ratio() const
         {
-            util::spinlock::scoped_lock mtx(acc_mtx);
-            return boost::accumulators::extract::mean(exec_ratio);
+           boost::int64_t exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
+           boost::int64_t tfunc_total = std::accumulate(tfunc_time.begin(), tfunc_time.end(), 0);
+           
+           double percent = 1 - (double(exec_total) / double(tfunc_total));
+           return boost::int64_t(100 * percent);
         }
 
-        double avg_maint_ratio() const
+        boost::int64_t avg_maint_ratio(std::size_t num_thread) const
         {
-            return (1 - avg_exec_ratio());
-        }        
-
-        double avg_exec_time() const
-        {
-            util::spinlock::scoped_lock mtx(acc_mtx);
-            return boost::accumulators::extract::mean(exec_time_acc);
+            double percent = 1 - (double(exec_time[num_thread])
+                 / double(tfunc_time[num_thread]));
+            return boost::int64_t(100 * percent);   
         }
-        */
 
     protected:
         // this is the thread function executing the work items in the queue
@@ -660,12 +655,9 @@ namespace hpx { namespace threads
         notification_policy_type& notifier_;
 
         // tfunc_impl timers
-        util::high_resolution_timer exec_timer, tfunc_timer;
-        boost::int64_t exec_time, total_exec_time, tfunc_time;
-        boost::accumulators::accumulator_set < double,
-            boost::accumulators::features < boost::accumulators::tag::mean > >
-            exec_ratio, exec_time_acc;
-        mutable util::spinlock acc_mtx; 
+
+        std::vector<util::high_resolution_timer> exec_timer, tfunc_timer;
+        std::vector<boost::int64_t> exec_time, tfunc_time;
     };
 }}
 

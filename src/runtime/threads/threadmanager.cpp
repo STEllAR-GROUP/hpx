@@ -23,7 +23,6 @@
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/format.hpp>
 
 #include <numeric>
 
@@ -84,10 +83,7 @@ namespace hpx { namespace threads
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
-        notifier_(notifier),
-        exec_time(0),
-        total_exec_time(0),
-        tfunc_time(0)
+        notifier_(notifier)
     {
         //LTM_(debug) << "threadmanager_impl ctor";
     }
@@ -287,14 +283,8 @@ namespace hpx { namespace threads
         //if (std::size_t(-1) == data.num_os_thread) 
         //    data.num_os_thread = get_thread_num();
 
-        if (thread_priority_critical == data.priority) {
-            // For critical priority threads, create the thread immediately.
-            scheduler_.create_thread(data, initial_state, true, ec, data.num_os_thread);
-        }
-        else {
-            // Create a task description for the new thread. 
-            scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
-        }
+        // create the new thread
+        scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -976,51 +966,9 @@ namespace hpx { namespace threads
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        typedef scheduling_policy_type spt;
-
-        performance_counters::counter_data counters[] = 
-        {
-            { "/queue(threadmanager)/length",     // Cumulative queue length
-              boost::bind(&spt::get_queue_length, &scheduler_, -1) },
-            { "/threads(total/all)/count",        // Cumulative thread count
-              boost::bind(&spt::get_thread_count, &scheduler_, unknown, -1) },
-            { "/threads(total/active)/count",     // Cumulative active thread count
-              boost::bind(&spt::get_thread_count, &scheduler_, active, -1) },
-            { "/threads(total/pending)/count",    // Cumulative pending thread count
-              boost::bind(&spt::get_thread_count, &scheduler_, pending, -1) },
-            { "/threads(total/suspended)/count",  // Cumulative suspended thread count
-              boost::bind(&spt::get_thread_count, &scheduler_, suspended, -1) },
-            { "/threads(total/terminated)/count", // Cumulative terminated thread count
-              boost::bind(&spt::get_thread_count, &scheduler_, terminated, -1) }
-        };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
-
-        std::size_t shepherd_count = threads_.size(); 
-        boost::format queue_length_fmt("/queue(shepherd#%d)/length");
-        boost::format thread_count_fmt("/threads(shepherd#%d/%s)/count");
-
-        for (std::size_t i = 0; i < shepherd_count; ++i)
-        {
-            performance_counters::counter_data counters[] = 
-            {
-                { boost::str(queue_length_fmt % i),   // Queue length
-                  boost::bind(&spt::get_queue_length, &scheduler_, i) },
-                { boost::str(thread_count_fmt % i % "all"), // Thread count
-                  boost::bind(&spt::get_thread_count, &scheduler_, unknown, i) },
-                { boost::str(thread_count_fmt % i % "active"),     // Active thread count
-                  boost::bind(&spt::get_thread_count, &scheduler_, active, i) },
-                { boost::str(thread_count_fmt % i % "pending"),    // Pending thread count
-                  boost::bind(&spt::get_thread_count, &scheduler_, pending, i) },
-                { boost::str(thread_count_fmt % i % "suspended"),  // Suspended thread count
-                  boost::bind(&spt::get_thread_count, &scheduler_, suspended, i) },
-                { boost::str(thread_count_fmt % i % "terminated"), // Terminated thread count
-                  boost::bind(&spt::get_thread_count, &scheduler_, terminated, i) }
-            };
-            performance_counters::install_counters(
-                counters, sizeof(counters)/sizeof(counters[0]));
-        }
+        performance_counters::install_counter("/queue(threadmanager)/length",
+            boost::bind(&scheduling_policy_type::get_queue_length, 
+                        &scheduler_, -1));
     }
 #endif
 
@@ -1038,24 +986,28 @@ namespace hpx { namespace threads
         util::time_logger tl1("tfunc", num_thread);
         util::time_logger tl2("tfunc2", num_thread);
 
+        // the thread with number zero is the master
+#if HPX_AGAS_VERSION <= 0x10
+        bool is_master_thread = (0 == num_thread) ? true : false;
+#endif
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
 #if HPX_AGAS_VERSION <= 0x10
         // register performance counters
         performance_counters::manage_counter queue_length_counter; 
-        if (0 == num_thread) {
-            // the thread with number zero is the master
+        if (is_master_thread) {
             std::string name("/queue(threadmanager)/length");
             queue_length_counter.install(name, 
-                boost::bind(&scheduling_policy_type::get_queue_length, 
+                boost::bind(&scheduling_policy_type::get_queue_lengths, 
                     &scheduler_, -1));
         }
 #endif
 
         std::size_t idle_loop_count = 0;
-
+        
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
+        tfunc_timer[num_thread].restart();
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
@@ -1086,8 +1038,12 @@ namespace hpx { namespace threads
                             {
                                 undo_mark_context mark (mark_);  // itt support
                                 caller_context ctx (ctx_);
-
+                                
+                                // Record time elapsed in thread changing state
+                                // and add to aggregate execution time.
+                                exec_timer[num_thread].restart();                                
                                 thrd_stat = (*thrd)();
+                                exec_time[num_thread] += exec_timer[num_thread].elapsed_nanoseconds();
                             }
                             tl2.tock();
                             ++num_px_threads;
@@ -1155,6 +1111,8 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
+                // Before tfunc loop breaks, record total time elapsed
+                tfunc_time[num_thread] = tfunc_timer[num_thread].elapsed_nanoseconds();
                 break;
             }
         }
@@ -1186,6 +1144,10 @@ namespace hpx { namespace threads
         timer_pool_.run(false);
 
         executed_threads_.reserve(num_threads);
+        tfunc_timer.resize(num_threads);
+        tfunc_time.resize(num_threads);
+        exec_timer.resize(num_threads);
+        exec_time.resize(num_threads);
 
         try {
             // run threads and wait for initialization to complete
