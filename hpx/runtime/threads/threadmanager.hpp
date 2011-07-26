@@ -568,7 +568,7 @@ namespace hpx { namespace threads
         std::string get_lco_description(thread_id_type id) const;
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
-        /// Percent maintenence time in tfunc_impl. 
+        /// Get percent maintenence time in tfunc_impl after execution. 
         boost::int64_t avg_maint_ratio() const
         {
            boost::int64_t exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
@@ -583,6 +583,30 @@ namespace hpx { namespace threads
             double percent = 1 - (double(exec_time[num_thread])
                  / double(tfunc_time[num_thread]));
             return boost::int64_t(100 * percent);   
+        }
+
+        /// Get percentage maintenance time during execution (less accurate).
+   
+        boost::int64_t avg_maint_ratio_now() const
+        {
+            boost::int64_t exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
+            boost::int64_t tfunc_total = 0;
+
+            for (std::size_t i = 0; i < tfunc_timer.size(); ++i)
+            {
+                tfunc_total += tfunc_timer[i].elapsed_nanoseconds();
+            }
+ 
+            double percent = 1 - (double(exec_total) / double(tfunc_total));
+            return boost::int64_t(100 * percent);
+        }
+    
+        boost::int64_t avg_maint_ratio_now(std::size_t num_thread) const
+
+        {
+            double percent = 1 - (double(exec_time[num_thread])
+                / double(tfunc_timer[num_thread].elapsed_nanoseconds()));
+            return boost::int64_t(100 * percent);
         }
 
     protected:
