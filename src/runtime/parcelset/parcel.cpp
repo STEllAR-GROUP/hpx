@@ -29,16 +29,16 @@ namespace hpx { namespace parcelset
     {
         ar << destination_id_;    // don't increment global refcnt
         ar << destination_addr_;
-        bool has_source_id = source_id_;
-        ar << has_source_id;
 
         // If we have a source id, serialize it.
+        bool has_source_id = source_id_;
+        ar << has_source_id;
         if (has_source_id)
             ar << source_id_;
         ar << action_;
-        bool has_continuations = continuation_;
 
         // If we have a continuation, serialize it.
+        bool has_continuations = continuation_;
         ar << has_continuations;
         if (has_continuations)
             ar << *(continuation_.get());
@@ -62,16 +62,16 @@ namespace hpx { namespace parcelset
 
         ar >> destination_id_;
         ar >> destination_addr_;
-        ar >> has_source_id;
 
         // Check for a source id.
+        ar >> has_source_id;
         if (has_source_id) 
             ar >> source_id_;
 
         ar >> action_;
-        ar >> has_continuation;
 
         // Check for a continuation.
+        ar >> has_continuation;
         if (has_continuation) {
             actions::continuation* c = new actions::continuation;
             ar >> *c;
