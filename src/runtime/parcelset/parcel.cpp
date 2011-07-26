@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,13 +31,18 @@ namespace hpx { namespace parcelset
         ar << destination_addr_;
         bool has_source_id = source_id_;
         ar << has_source_id;
+
+        // If we have a source id, serialize it.
         if (has_source_id)
             ar << source_id_;
         ar << action_;
         bool has_continuations = continuation_;
+
+        // If we have a continuation, serialize it.
         ar << has_continuations;
         if (has_continuations)
             ar << *(continuation_.get());
+
         ar << start_time_;
         ar << creation_time_;
     }
@@ -57,15 +63,21 @@ namespace hpx { namespace parcelset
         ar >> destination_id_;
         ar >> destination_addr_;
         ar >> has_source_id;
+
+        // Check for a source id.
         if (has_source_id) 
             ar >> source_id_;
+
         ar >> action_;
         ar >> has_continuation;
+
+        // Check for a continuation.
         if (has_continuation) {
             actions::continuation* c = new actions::continuation;
             ar >> *c;
             continuation_.reset(c);
         }
+
         ar >> start_time_;
         ar >> creation_time_;
     }
