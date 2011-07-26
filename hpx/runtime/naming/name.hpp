@@ -319,15 +319,15 @@ namespace hpx { namespace naming
           : public gid_type
         {
             explicit id_type_impl (boost::uint64_t lsb_id = 0) 
-              : gid_type(0, lsb_id)
+              : gid_type(0, lsb_id), address_()
             {}
 
             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id) 
-              : gid_type(msb_id, lsb_id)
+              : gid_type(msb_id, lsb_id), address_()
             {}
 
             explicit id_type_impl (gid_type const& gid) 
-              : gid_type(gid)
+              : gid_type(gid), address_()
             {}
 
             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,

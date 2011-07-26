@@ -66,7 +66,7 @@ namespace hpx { namespace naming
     {
     public:
         locality() 
-          : port_(boost::uint16_t(-1))
+          : address_(), port_(boost::uint16_t(-1))
         {}
 
         locality(std::string const& addr, boost::uint16_t port)

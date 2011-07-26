@@ -34,7 +34,7 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         address()
-          : type_(components::component_invalid), address_(0)
+          : locality_(), type_(components::component_invalid), address_(0)
         {}
 
         address(locality const& l, 
@@ -53,12 +53,12 @@ namespace hpx { namespace naming
 
         // local only addresses
         address(void* lva)
-          : type_(components::component_invalid), 
+          : locality_(), type_(components::component_invalid), 
             address_(reinterpret_cast<address_type>(lva)) 
         {}
 
         address(address_type a)
-          : type_(components::component_invalid), address_(a) 
+          : locality_(), type_(components::component_invalid), address_(a) 
         {}
 
         // safe operator bool()
