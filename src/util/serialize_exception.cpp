@@ -32,9 +32,9 @@ namespace boost { namespace serialization
         int err_value(0);
         std::string err_message;
 
-        boost::uint32_t throw_locality_;
-        boost::int64_t throw_shepherd_;
-        hpx::uintptr_t throw_thread_id_;
+        boost::uint32_t throw_locality_ = 0;
+        boost::int64_t throw_shepherd_ = 0;
+        hpx::uintptr_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;
@@ -190,9 +190,9 @@ namespace boost { namespace serialization
         int err_value(0);
         std::string err_message;
 
-        boost::uint32_t throw_locality_;
-        boost::int64_t throw_shepherd_;
-        hpx::uintptr_t throw_thread_id_;
+        boost::uint32_t throw_locality_ = 0;
+        boost::int64_t throw_shepherd_ = 0;
+        hpx::uintptr_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;
