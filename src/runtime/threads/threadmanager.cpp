@@ -1161,7 +1161,7 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
-        BOOST_ASSERT(!scheduler_.get_thread_count(all, num_thread));
+        BOOST_ASSERT(!scheduler_.get_thread_count(unknown, num_thread));
 #endif
         return num_px_threads;
     }

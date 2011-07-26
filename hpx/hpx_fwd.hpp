@@ -169,9 +169,8 @@ namespace hpx
             depleted = 4,       /*!< thread has been depleted (deeply
                                      suspended, it is not known to the
                                      thread manager) */
-            terminated = 5,     /*!< thread has been stopped an may be
+            terminated = 5      /*!< thread has been stopped an may be
                                      garbage collected */
-            all = unknown,      /*!< selector for all thread states */
         };
 
         ///////////////////////////////////////////////////////////////////////

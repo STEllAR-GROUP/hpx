@@ -347,10 +347,10 @@ struct thread_deque
 
     ///////////////////////////////////////////////////////////////////////
     /// Return the number of existing threads with the given state.
-    boost::int64_t get_thread_count(thread_state_enum state = all) const
+    boost::int64_t get_thread_count(thread_state_enum state = unknown) const
     {
         mutex_type::scoped_lock lk(mtx_);
-        if (unknown == state || all == state)
+        if (unknown == state)
             return thread_map_.size();
 
         boost::int64_t num_threads = 0;
