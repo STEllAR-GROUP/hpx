@@ -34,6 +34,7 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 using hpx::naming::gid_type;
 using hpx::naming::get_prefix_from_gid;
+using hpx::naming::get_prefix_from_id;
 
 using hpx::applier::get_applier;
 
@@ -121,13 +122,13 @@ int master(variables_map& vm)
 
     // Print out the system topology.
     boost::uint32_t total_shepherds = 0;
-    for (std::size_t i = 1; i <= topology.size(); ++i)
+    BOOST_FOREACH(topology_map::value_type const& kv, topology)
     {
         cout() << ( boost::format("locality %1% has %2% shepherds")
-                  % i 
-                  % topology[i])
+                  % kv.first 
+                  % kv.second)
                << endl;
-        total_shepherds += topology[i]; 
+        total_shepherds += kv.second; 
     }
 
     cout() << ( boost::format("%1% localities, %2% shepherds total")
@@ -164,7 +165,7 @@ int master(variables_map& vm)
         cout() << ( boost::format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
                                   "  integration server at %3%")
-                  % (i + 1)
+                  % get_prefix_from_id(discovery_network[i])
                   % discovery_network[i]
                   % integrator_network[i])
                << endl; 

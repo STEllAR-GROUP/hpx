@@ -112,7 +112,7 @@ struct HPX_COMPONENT_EXPORT integrator
             {
                 // Check if we're on the last locality.
                 if (topology_->size() == expected.prefix)
-                    desired.prefix = 1;
+                    desired.prefix = topology_->begin()->first;
                 else
                     desired.prefix = expected.prefix + 1;
 
@@ -197,9 +197,12 @@ struct HPX_COMPONENT_EXPORT integrator
 
         for (std::size_t i = 0; i < discovery_network.size(); ++i)
         {
-            if ((i + 1) == root_prefix)
+            const boost::uint32_t current_prefix =
+                naming::get_prefix_from_id(discovery_network[i]);
+
+            if (current_prefix == root_prefix)
                 integrator_network.push_back(this->get_gid());
-            else if ((i + 1) > root_prefix)
+            else if (current_prefix > root_prefix)
                 integrator_network.push_back(results0[i - 1].get());
             else
                 integrator_network.push_back(results0[i].get());
@@ -269,6 +272,9 @@ struct HPX_COMPONENT_EXPORT integrator
 
         std::list<lcos::future_value<T> > results;
 
+        const boost::uint32_t here_index
+            = here_ - naming::get_prefix_from_id(network_[0]);
+
         for (boost::uint32_t iteration = 0; iteration < iterations; ++iteration)
         { 
             const T i = lower_bound + (increment * iteration);
@@ -286,7 +292,7 @@ struct HPX_COMPONENT_EXPORT integrator
 //                area += solve(i, i + increment, regrid_segs_, 1 + depth);
                 results.push_back(
                     lcos::eager_future<solve_action>
-                        ( network_[here_ - 1], i, i + increment
+                        ( network_[here_index], i, i + increment
                         , regrid_segs_, 1 + depth));
             }
         }
@@ -334,7 +340,7 @@ struct HPX_COMPONENT_EXPORT integrator
         topology_map::iterator top_it = topology_->begin()
                              , top_end = topology_->end();
 
-        for (; top_it != top_end; ++top_it)
+        for (std::size_t i = 0; top_it != top_end; ++top_it, ++i)
         {
             const double node_ratio
                 = double(top_it->second) / double(total_shepherds_);
@@ -368,7 +374,7 @@ struct HPX_COMPONENT_EXPORT integrator
             const T point = lower_bound + (increment * first_round);
             results.push_back(result_type
                 (lcos::eager_future<solve_iterations_action>
-                    (network_[top_it->first - 1]
+                    (network_[i]
                     , point, increment, points, depth)
                 , current_shepherd(top_it->first, points))); 
 

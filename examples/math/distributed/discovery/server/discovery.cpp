@@ -8,6 +8,8 @@
 #include <list>
 #include <algorithm>
 
+#include <boost/phoenix/core.hpp>
+#include <boost/phoenix/operator.hpp>
 #include <boost/foreach.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/version.hpp>
@@ -85,10 +87,23 @@ std::vector<naming::id_type> discovery::build_network()
     const boost::uint32_t root_prefix
         = naming::get_prefix_from_gid(this->get_base_gid());
 
-    std::vector<naming::gid_type> localities;
-    applier::get_applier().get_agas_client().get_prefixes(localities);
+    std::vector<naming::gid_type> raw_localities, localities;
+    applier::get_applier().get_agas_client().get_prefixes(raw_localities,
+        components::get_component_type<discovery>());
 
-    // Ensure that the prefixes returned are ordered.    
+    if (raw_localities.size() > 1)
+    {
+        // Remove the AGAS node from the list. 
+        using boost::phoenix::arg_names::arg1;
+        std::remove_copy_if(raw_localities.begin(), raw_localities.end() 
+                          , std::back_inserter(localities)
+                          , arg1 == naming::get_gid_from_prefix(1));
+    }
+
+    else
+        localities = raw_localities;
+
+    // Ensure that the localities returned are ordered.    
     std::sort(localities.begin(), localities.end());
 
     std::vector<lcos::future_value<boost::uint32_t> > results0;
@@ -97,14 +112,14 @@ std::vector<naming::id_type> discovery::build_network()
     { results0.push_back(report_shepherd_count_future(locality)); }
 
     total_shepherds_ = 0; 
-    BOOST_FOREACH(naming::gid_type const& locality, localities)
+    for (std::size_t i = 0; i < localities.size(); ++i) 
     {
         const boost::uint32_t current_prefix
-            = naming::get_prefix_from_gid(locality);
+            = naming::get_prefix_from_gid(localities[i]);
 
         BOOST_ASSERT(!topology_.count(current_prefix));
 
-        topology_[current_prefix] = results0[current_prefix - 1].get();
+        topology_[current_prefix] = results0[i].get();
         total_shepherds_ += topology_[current_prefix]; 
     }
 
@@ -126,12 +141,20 @@ std::vector<naming::id_type> discovery::build_network()
 
     for (std::size_t i = 0; i < localities.size(); ++i)
     {
-        if ((i + 1) == root_prefix)
+        if (naming::get_prefix_from_gid(localities[i]) == root_prefix)
+        {
             network.push_back(this->get_gid());
-        else if ((i + 1) > root_prefix)
+        }
+        else if (naming::get_prefix_from_gid(localities[i]) > root_prefix)
+        {
+            BOOST_ASSERT((i - 1) < results1.size());
             network.push_back(results1[i - 1].get());
+        }
         else
+        {
+            BOOST_ASSERT(i < results1.size());
             network.push_back(results1[i].get());
+        }
     }
 
     std::list<lcos::future_value<void> > results2;
