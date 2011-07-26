@@ -13,6 +13,10 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include "../serialize_geometry.hpp"
 
@@ -46,11 +50,49 @@ namespace hpx { namespace geometry { namespace server
         /// Initialize the accumulator
         void init(double xmin,double xmax,double ymin,double ymax,std::size_t numpoints) 
         {
+            namespace bg = boost::geometry;
+
             xmin_ = xmin;
             xmax_ = xmax;
             ymin_ = ymin;
             ymax_ = ymax;
             numpoints_ = numpoints;
+  
+            double dx = (xmax - xmin)/(numpoints-1);
+            double dy = (ymax - ymin)/(numpoints-1);
+
+            bg::model::d2::point_xy<int> p1(1, 1), p2(2, 2);
+            std::cout << "Distance p1-p2 is: " << bg::distance(p1, p2) << std::endl;
+
+            double points[][2] = {{2.0, 1.3}, {4.1, 3.0}, {5.3, 2.6}, {2.9, 0.7}, {2.0, 1.3}};
+            bg::model::polygon<bg::model::d2::point_xy<double> > poly;
+            bg::append(poly, points);
+#if 0
+            double pt[2] = {xmin,ymin};            
+            boost::geometry::append(p_,pt);
+            // create the rectangle of the mesh object
+            for (std::size_t i=0;i<numpoints;i++) {
+              double x = xmin + dx*i;
+              double pt[2] = {x,ymin};            
+              p_.outer().push_back(pt);            
+            }
+            for (std::size_t i=0;i<numpoints;i++) {
+              double y = ymin + dy*i;
+              double pt[2] = {xmax,y};            
+              p_.outer().push_back(pt);            
+            }
+            for (std::size_t i=numpoints-1;i>=0;i--) {
+              double x = xmin + dx*i;
+              double pt[2] = {x,ymax};            
+              p_.outer().push_back(pt);            
+            }
+            for (std::size_t i=numpoints-1;i>=0;i--) {
+              double y = ymin + dy*i;
+              double pt[2] = {xmin,y};            
+              p_.outer().push_back(pt);            
+            }
+#endif
+
             //pt_.x(x);
             //pt_.y(y);
         }
@@ -118,6 +160,7 @@ namespace hpx { namespace geometry { namespace server
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;
+        boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
 
 }}}
