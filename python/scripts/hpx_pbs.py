@@ -465,6 +465,8 @@ for node in nodes.iterkeys():
 
   if not console == node:
     local_cmd += ' -w' 
+  else:
+    local_cmd += ' -c'
 
   local_cmd += '\''
 
