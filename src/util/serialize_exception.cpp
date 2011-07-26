@@ -34,7 +34,7 @@ namespace boost { namespace serialization
 
         boost::uint32_t throw_locality_ = 0;
         boost::int64_t throw_shepherd_ = 0;
-        hpx::uintptr_t throw_thread_id_ = 0;
+        std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;
@@ -88,7 +88,7 @@ namespace boost { namespace serialization
                 throw_shepherd_ = *shepherd;
             }
 
-            hpx::uintptr_t const* thread_id = 
+            std::size_t const* thread_id = 
                 boost::get_error_info<hpx::throw_thread_id>(e);
             if (thread_id) {
                 throw_thread_id_ = *thread_id;
@@ -192,7 +192,7 @@ namespace boost { namespace serialization
 
         boost::uint32_t throw_locality_ = 0;
         boost::int64_t throw_shepherd_ = 0;
-        hpx::uintptr_t throw_thread_id_ = 0;
+        std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;

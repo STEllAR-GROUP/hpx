@@ -16,7 +16,6 @@
 #include <hpx/runtime/applier/applier.hpp> 
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp> 
 #include <hpx/util/static.hpp>
-#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/stringstream.hpp>
 
 namespace hpx { namespace components 
@@ -74,7 +73,7 @@ struct fixed_component_base : detail::fixed_component_tag
         {
             naming::address addr(applier::get_applier().here(),
                 components::get_component_type<wrapped_type>(),
-                hpx::uintptr_t(static_cast<this_component_type const*>(this)));
+                std::size_t(static_cast<this_component_type const*>(this)));
 
             gid_ = fixed_gid();
 

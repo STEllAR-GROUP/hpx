@@ -9,7 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -253,9 +252,9 @@ namespace hpx
 
         virtual naming::locality const& here() const = 0;
 
-        virtual hpx::uintptr_t get_runtime_support_lva() const = 0;
+        virtual std::size_t get_runtime_support_lva() const = 0;
 
-        virtual hpx::uintptr_t get_memory_lva() const = 0;
+        virtual std::size_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread, 
             boost::exception_ptr const& e) = 0;
@@ -595,14 +594,14 @@ namespace hpx
         } 
 #endif
 
-        hpx::uintptr_t get_runtime_support_lva() const
+        std::size_t get_runtime_support_lva() const
         {
-            return (hpx::uintptr_t) &runtime_support_;
+            return (std::size_t) &runtime_support_;
         }
 
-        hpx::uintptr_t get_memory_lva() const
+        std::size_t get_memory_lva() const
         {
-            return (hpx::uintptr_t) &memory_;
+            return (std::size_t) &memory_;
         }
 
         naming::gid_type get_next_id();

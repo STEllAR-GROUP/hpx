@@ -13,7 +13,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/uintptr_t.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
@@ -282,7 +281,7 @@ namespace hpx
     /// Stores the information about the HPX thread the exception has been 
     /// raised on. This information will show up in error messages under the 
     /// [thread_id] tag.
-    typedef boost::error_info<detail::tag_throw_thread_id, hpx::uintptr_t>
+    typedef boost::error_info<detail::tag_throw_thread_id, std::size_t>
         throw_thread_id;
 
     /// Stores the information about the HPX thread name the exception has been 
@@ -322,7 +321,7 @@ namespace hpx
         HPX_EXPORT void rethrow_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line, 
             std::string const& back_trace, boost::uint32_t node = 0,
-            boost::int64_t shepherd = -1, hpx::uintptr_t thread_id = 0,
+            boost::int64_t shepherd = -1, std::size_t thread_id = 0,
             std::string const& thread_name = "");
 
         // main function for throwing exceptions
