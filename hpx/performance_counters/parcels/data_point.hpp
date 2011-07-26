@@ -10,6 +10,8 @@
 
 #include <hpx/runtime/naming/name.hpp>
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace performance_counters { namespace parcels
 {
 
@@ -20,7 +22,8 @@ class data_point {
 
     public:
 
-    data_point(double start_, double end_, std::size_t bytes_, naming::gid_type const& parcel_):
+    data_point(boost::int64_t start_, boost::int64_t end_, std::size_t bytes_,
+        naming::gid_type const& parcel_):
 
         bytes(bytes_)
       , parcel(parcel_)
@@ -44,19 +47,18 @@ class data_point {
       , end(x.end)
       {}
 
-    double elapsed() const;
+    boost::int64_t elapsed() const
+    {
+        return end - start;
+    }
+
     std::size_t bytes;
     naming::gid_type parcel;
 
-    double start;
-    double end;
+    boost::int64_t start;
+    boost::int64_t end;
 };
 
-
-inline double data_point::elapsed() const
-{
-    return end - start;
-}
 }}}
 
 #endif // HPX_76311D67_43DA_4B3A_8A2A_14B8A1A266D9
