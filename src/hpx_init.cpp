@@ -201,7 +201,7 @@ namespace hpx
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
-                    ("high_priority_threads,t", value<std::size_t>(), 
+                    ("high_priority_threads", value<std::size_t>(), 
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
