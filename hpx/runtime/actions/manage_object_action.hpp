@@ -254,6 +254,11 @@ namespace hpx { namespace actions
         typedef typename manage_object_action<T>::oarchive_type oarchive_type;
         typedef typename manage_object_action<T>::iarchive_type iarchive_type;
 
+        typedef typename manage_object_action<T>::serialize_save_function
+            serialize_save_function;
+        typedef typename manage_object_action<T>::serialize_load_function
+            serialize_load_function;
+
     private:
         static void save_(boost::uint8_t const* data, std::size_t size, 
             oarchive_type& ar, const unsigned int version,
