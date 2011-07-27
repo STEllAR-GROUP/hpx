@@ -11,7 +11,7 @@ add_subdirectory(discovery)
 add_subdirectory(integrator)
 
 set(examples
-    rational64
+    #rational64
     double)
 
 foreach(example ${examples})
