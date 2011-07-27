@@ -177,27 +177,6 @@ void agas_main(variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
-{
-    // Configure application-specific options.
-    options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    desc_commandline.add_options()
-        ;
-
-    // Initialize and run HPX, enforce probe mode as we connect to an existing 
-    // application.
-#if defined(BOOST_WINDOWS)
-    return init(desc_commandline, argc, argv, install_windows_counters, 
-        uninstall_windows_counters, runtime_mode_probe);
-#else
-    return init(desc_commandline, argc, argv, runtime_mode_probe);
-#endif
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 int console_main(variables_map& vm)
 {
     // Get options.
@@ -305,9 +284,9 @@ int console_main(variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
+    int r = 0;
+
     {
-        int r = 0;
-    
         if (get_prefix_id() == 1)
         {
             if (get_runtime().get_agas_client().is_console())
