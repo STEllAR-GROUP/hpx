@@ -185,7 +185,7 @@ namespace hpx
 #endif
 
                 hpx_options.add_options()
-                    ("app-config", value<std::string>(), 
+                    ("app-config,p", value<std::string>(), 
                      "load the specified application configuration file")
                     ("hpx-config", value<std::string>()->default_value(""), 
                      "load the specified hpx configuration file")
