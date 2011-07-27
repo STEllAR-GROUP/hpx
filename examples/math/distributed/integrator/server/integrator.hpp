@@ -110,9 +110,11 @@ struct HPX_COMPONENT_EXPORT integrator
             // Check if we need to go to the next locality.
             if ((*topology_)[expected.prefix] == expected.shepherd)
             {
+                const boost::uint32_t first_ = topology_->begin()->first;
+
                 // Check if we're on the last locality.
-                if (topology_->size() == expected.prefix)
-                    desired.prefix = topology_->begin()->first;
+                if (topology_->size() == (expected.prefix - first_ + 1))
+                    desired.prefix = first_;
                 else
                     desired.prefix = expected.prefix + 1;
 
