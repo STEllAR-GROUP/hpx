@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 
@@ -33,6 +34,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -296,15 +298,23 @@ namespace hpx { namespace parcelset
         performance_counters::install_counter_type("/parcels/count",
             performance_counters::counter_raw);
 
+        const boost::uint32_t prefix = applier::get_applier().get_prefix_id();
+
+        boost::format parcel_count_("/parcels([L%d]/%s)/count");
+
         performance_counters::counter_data counters[] = 
         {
-            { "/parcels(sent/started)/count",         // Total parcels sent (started)
+            // Total parcels sent (started)
+            { boost::str(parcel_count_ % prefix % "sent/started"),
               boost::bind(&parcelport::total_sends_started, &pp_) },
-            { "/parcels(sent/completed)/count",       // Total parcels sent (completed)
+            // Total parcels sent (completed)
+            { boost::str(parcel_count_ % prefix % "sent/completed"),
               boost::bind(&parcelport::total_sends_completed, &pp_) },
-            { "/parcels(received/started)/count",     // Total parcels received (started)
+            // Total parcels received (started)
+            { boost::str(parcel_count_ % prefix % "received/started"),
               boost::bind(&parcelport::total_receives_started, &pp_) },
-            { "/parcels(received/completed)/count",   // Total parcels received (completed)
+            // Total parcels received (completed)
+            { boost::str(parcel_count_ % prefix % "received/completed"),
               boost::bind(&parcelport::total_receives_completed, &pp_) }
         };
         performance_counters::install_counters(
