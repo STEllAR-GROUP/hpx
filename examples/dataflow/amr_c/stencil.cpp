@@ -100,7 +100,8 @@ namespace hpx { namespace components { namespace amr
         }
 
         // Generate new config info
-        stencil_config_data cfg(0, 2);
+        stencil_config_data cfg_right(0, 2);
+        stencil_config_data cfg_left(par->grain_size-3, 2);
 
         // get all input memory_block_data instances
         typedef std::vector<lcos::future_value<memory_block_data> > 
@@ -108,12 +109,23 @@ namespace hpx { namespace components { namespace amr
 
         // first invoke all remote operations
         lazy_results_type lazy_results;
-        BOOST_FOREACH(naming::id_type id, gids)
-        {
-            lazy_results.push_back(
+
+        lazy_results.push_back(
+               components::stubs::memory_block::get_async(
+                    gids[0], cfg_left.get_memory_block()));
+        lazy_results.push_back(
+               components::stubs::memory_block::get_async(
+                    gids[1]) );
+        lazy_results.push_back(
                 components::stubs::memory_block::get_async(
-                    id, cfg.get_memory_block()));
-        }
+                    gids[2], cfg_right.get_memory_block()));
+
+        //BOOST_FOREACH(naming::id_type id, gids)
+        //{
+        //    lazy_results.push_back(
+        //        components::stubs::memory_block::get_async(
+        //            id, cfg.get_memory_block()));
+        //}
 
         //  invoke the operation for the result gid as well
         lcos::future_value<memory_block_data> lazy_result =
@@ -135,11 +147,11 @@ namespace hpx { namespace components { namespace amr
         resultval->max_index_ = val[1]->max_index_;
         resultval->index_ = val[1]->index_;
 
-        //resultval->value_ = val[1]->value_;
-        resultval->value_.resize(val[1]->value_.size());
-        for (std::size_t i=0;i<val[1]->value_.size();i++) {
-          resultval->value_[i] = val[1]->value_[i];
-        }
+        resultval->value_ = val[1]->value_;
+        //resultval->value_.resize(val[1]->value_.size());
+        //for (std::size_t i=0;i<val[1]->value_.size();i++) {
+        //  resultval->value_[i] = val[1]->value_[i];
+        //}
 
         resultval->timestep_ = val[1]->timestep_ + 1.0;
 
