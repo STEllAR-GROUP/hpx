@@ -96,7 +96,8 @@ namespace hpx { namespace performance_counters
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
-                "unknown counter type");
+                boost::str(boost::format
+                    ("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
 
