@@ -26,18 +26,15 @@ void pre_main(runtime_mode mode)
         components::stubs::runtime_support::load_components
             (find_here());
 
-        if (!agas_client.is_bootstrap())
-        {
-            const std::size_t allocate_size = get_runtime().get_config().
-                get_agas_allocate_response_pool_size();
-            const std::size_t bind_size = get_runtime().get_config().
-                get_agas_bind_response_pool_size();
+        const std::size_t allocate_size
+            = get_runtime().get_config().get_agas_allocate_response_pool_size();
+        const std::size_t bind_size
+            = get_runtime().get_config().get_agas_bind_response_pool_size();
     
-            // Unblock the AGAS router by adding the initial pool size to the
-            // future pool semaphores. 
-            agas_client.hosted->allocate_response_sema_.signal(allocate_size);
-            agas_client.hosted->bind_response_sema_.signal(bind_size);
-        }
+        // Unblock the AGAS router by adding the initial pool size to the
+        // future pool semaphores. 
+        agas_client.hosted->allocate_response_sema_.signal(allocate_size);
+        agas_client.hosted->bind_response_sema_.signal(bind_size);
 
         components::stubs::runtime_support::call_startup_functions
             (find_here());

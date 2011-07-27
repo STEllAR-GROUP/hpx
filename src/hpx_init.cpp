@@ -156,13 +156,14 @@ namespace hpx
                     ("hpx-authors", "print out the full list of HPX contributors")
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
+                    ("run-hpx-main",
+                     "run the hpx_main function, regardless of locality mode")
                 ;
 
                 if (hpx::runtime_mode_default == mode)
                 {
                     hpx_options.add_options()
                         ("worker,w", "run this instance in worker mode")
-                        ("probe,p", "run this instance in probe mode")
                         ("console,c", "run this instance in console mode")
                     ;
                 }
@@ -173,7 +174,6 @@ namespace hpx
                     // hpx_pbs compatibility.
                     hidden_options.add_options()
                         ("worker,w", "run this instance in worker mode")
-                        ("probe,p", "run this instance in probe mode")
                         ("console,c", "run this instance in console mode")
                     ;
                 }
@@ -535,8 +535,7 @@ namespace hpx
             if (hpx::runtime_mode_default == mode)
             {
                 const std::size_t count_ = bool(vm.count("console"))
-                                         + bool(vm.count("worker"))
-                                         + bool(vm.count("probe"));
+                                         + bool(vm.count("worker"));
 
                 // The default mode is console, i.e. all workers need to be 
                 // started with --worker/-w.
@@ -549,11 +548,9 @@ namespace hpx
                 // In this case we default to executing with an empty hpx_main.
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
-                    f = 0;
-                }
 
-                if (vm.count("probe")) {
-                    mode = hpx::runtime_mode_probe;
+                    if (!vm.count("run-hpx-main"))
+                        f = 0;
                 }
             }
 
