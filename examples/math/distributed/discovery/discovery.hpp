@@ -36,13 +36,13 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::build_network(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<hpx::uintptr_t> topology_lva_async()
+    lcos::future_value<std::size_t> topology_lva_async()
     { return this->base_type::topology_lva_async(this->gid_); }
 
-    hpx::uintptr_t topology_lva_sync()
+    std::size_t topology_lva_sync()
     { return this->base_type::topology_lva_sync(this->gid_); }
 
-    hpx::uintptr_t topology_lva()
+    std::size_t topology_lva()
     { return this->base_type::topology_lva(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////

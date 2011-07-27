@@ -390,6 +390,9 @@ struct HPX_COMPONENT_EXPORT integrator
 
             BOOST_ASSERT(shepherds);
 
+            const boost::uint32_t cs_index
+                = cs.prefix - naming::get_prefix_from_id(network_[0]);
+
             if (0 >= depth)
             {
                 if (1 == shepherds)
@@ -416,7 +419,7 @@ struct HPX_COMPONENT_EXPORT integrator
             const T point = lower_bound + (increment * i);
             results.push_back(result_type
                 (lcos::eager_future<solve_iterations_action>
-                    (network_[cs.prefix - 1]
+                    (network_[cs_index]
                     , point, increment, shepherds, depth)
                 , current_shepherd(cs.prefix, shepherds))); 
 

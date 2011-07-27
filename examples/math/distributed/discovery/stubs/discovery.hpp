@@ -36,18 +36,18 @@ struct discovery : components::stub_base<server::discovery>
     ) { return build_network_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<hpx::uintptr_t> topology_lva_async(
+    static lcos::future_value<std::size_t> topology_lva_async(
         naming::id_type const& gid
     ) {
         typedef server::discovery::topology_lva_action action_type;
         return lcos::eager_future<action_type>(gid);
     }
 
-    static hpx::uintptr_t topology_lva_sync(
+    static std::size_t topology_lva_sync(
         naming::id_type const& gid
     ) { return topology_lva_async(gid).get(); }
 
-    static hpx::uintptr_t topology_lva(
+    static std::size_t topology_lva(
         naming::id_type const& gid
     ) { return topology_lva_async(gid).get(); }
 

@@ -15,7 +15,6 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/uintptr_t.hpp>
 
 namespace hpx { namespace balancing
 {
@@ -54,8 +53,8 @@ struct HPX_COMPONENT_EXPORT discovery
         total_shepherds_ = total_shepherds;
     }
 
-    hpx::uintptr_t topology_lva()
-    { return reinterpret_cast<hpx::uintptr_t>(&topology_); } 
+    std::size_t topology_lva()
+    { return reinterpret_cast<std::size_t>(&topology_); } 
 
     boost::uint32_t total_shepherds()
     { return total_shepherds_; }
@@ -89,7 +88,7 @@ struct HPX_COMPONENT_EXPORT discovery
     
     typedef actions::result_action0<
         discovery
-      , hpx::uintptr_t 
+      , std::size_t 
       , discovery_topology_lva
       , &discovery::topology_lva
     > topology_lva_action;
