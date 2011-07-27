@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace detail
 
         /// Return whether or not the data is available for this
         /// \a future_value.
-        bool is_data()
+        bool ready()
         {
             return !(data_->is_empty());
         }
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace detail
 
         /// Return whether or not the data is available for this
         /// \a future_value.
-        bool is_data()
+        bool ready()
         {
             return !(data_->is_empty());
         }
@@ -420,6 +420,13 @@ namespace hpx { namespace lcos
             return (*impl_)->get_gid(impl_.get());
         }
 
+        /// Return whether or not the data is available for this
+        /// \a future_value.
+        bool ready()
+        {
+            return (*impl_)->get_gid(impl_.get());
+        }
+
         typedef Result result_type;
 
         ~future_value()
@@ -499,6 +506,13 @@ namespace hpx { namespace lcos
 
         /// \brief Return the global id of this \a future instance
         naming::id_type const& get_gid() const
+        {
+            return (*impl_)->get_gid(impl_.get());
+        }
+
+        /// Return whether or not the data is available for this
+        /// \a future_value.
+        bool ready()
         {
             return (*impl_)->get_gid(impl_.get());
         }
