@@ -162,6 +162,7 @@ namespace hpx
                 {
                     hpx_options.add_options()
                         ("worker,w", "run this instance in worker mode")
+                        ("probe,p", "run this instance in probe mode")
                         ("console,c", "run this instance in console mode")
                     ;
                 }
@@ -172,6 +173,7 @@ namespace hpx
                     // hpx_pbs compatibility.
                     hidden_options.add_options()
                         ("worker,w", "run this instance in worker mode")
+                        ("probe,p", "run this instance in probe mode")
                         ("console,c", "run this instance in console mode")
                     ;
                 }
@@ -183,7 +185,7 @@ namespace hpx
 #endif
 
                 hpx_options.add_options()
-                    ("app-config,p", value<std::string>(), 
+                    ("app-config", value<std::string>(), 
                      "load the specified application configuration file")
                     ("hpx-config", value<std::string>()->default_value(""), 
                      "load the specified hpx configuration file")
@@ -532,18 +534,26 @@ namespace hpx
             // retrieve it from the command line.
             if (hpx::runtime_mode_default == mode)
             {
+                const std::size_t count_ = bool(vm.count("console"))
+                                         + bool(vm.count("worker"))
+                                         + bool(vm.count("probe"));
+
                 // The default mode is console, i.e. all workers need to be 
                 // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
-                if (vm.count("console") && vm.count("worker")) {
+                if (count_ > 1) {
                     throw std::logic_error("Ambiguous command line options. "
-                        "Do not specify both, --console/-c and --worker/-w\n");
+                        "Do not specify more than one runtime mode.");
                 }
 
                 // In this case we default to executing with an empty hpx_main.
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
                     f = 0;
+                }
+
+                if (vm.count("probe")) {
+                    mode = hpx::runtime_mode_probe;
                 }
             }
 
