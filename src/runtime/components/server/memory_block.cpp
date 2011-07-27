@@ -28,6 +28,9 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::detail::memory_block::get_action, 
     memory_block_get_action);
 HPX_REGISTER_ACTION_EX(
+    hpx::components::server::detail::memory_block::get_config_action, 
+    memory_block_get_action);
+HPX_REGISTER_ACTION_EX(
     hpx::components::server::detail::memory_block::checkout_action,
     memory_block_checkout_action);
 HPX_REGISTER_ACTION_EX(
@@ -66,6 +69,13 @@ namespace hpx { namespace components { namespace server { namespace detail
     components::memory_block_data memory_block::get() 
     {
         return components::memory_block_data(wrapper_->component_);
+    }
+
+    /// Get the current data for reading, use config info for serialization
+    components::memory_block_data memory_block::get_config(
+        components::memory_block_data const& config) 
+    {
+        return components::memory_block_data(wrapper_->component_, config.data_);
     }
 
     /// Get the current data for reading

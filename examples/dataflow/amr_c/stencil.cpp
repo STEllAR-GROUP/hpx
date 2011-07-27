@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future_wait.hpp>
+#include <hpx/runtime/components/memory_block.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
@@ -21,6 +22,51 @@
 #include "stencil_functions.hpp"
 #include "stencil_data_locking.hpp"
 #include "../mesh/unigrid_mesh.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace amr 
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // memory block support for config data needed for serialization of
+    // stencil_data
+    typedef hpx::actions::manage_object_action<server::stencil_config_data>
+        manage_object_config_data_action;
+    manage_object_config_data_action const manage_stencil_config_data = 
+        manage_object_config_data_action();
+
+    // memory block support for stencil data (user defined data)
+    typedef hpx::actions::manage_object_config_action<
+        stencil_data, server::stencil_config_data> manage_object_data_action;
+    manage_object_data_action const manage_stencil_data = 
+        manage_object_data_action();
+
+    ///////////////////////////////////////////////////////////////////////////
+    memory_block_data stencil_config_data::create_and_resolve_target()
+    {
+        mem_block.create(hpx::find_here(), sizeof(stencil_data), 
+            manage_stencil_data);
+        return mem_block.get();
+    }
+
+    stencil_config_data::stencil_config_data(int start, int count)
+    {
+        // create new instance
+        static_cast<base_type&>(*this) = create_and_resolve_target();
+
+        // initialize from arguments
+        (*this)->start_ = start;
+        (*this)->count_ = count;
+    }
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::components::amr::manage_object_config_data_action,
+    dataflow_manage_object_action_stencil_config_data)
+
+HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    hpx::components::amr::manage_object_data_action,
+    dataflow_manage_object_action_stencil_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -46,7 +92,6 @@ namespace hpx { namespace components { namespace amr
             return -1;
         }
 
-
         // this should occur only after result has been delivered already
         BOOST_FOREACH(naming::id_type gid, gids)
         {
@@ -54,10 +99,35 @@ namespace hpx { namespace components { namespace amr
                 return -1;
         }
 
-        // get all input and result memory_block_data instances
+        // Generate new config info
+        stencil_config_data cfg(0, 2);
+
+        // get all input memory_block_data instances
+        typedef std::vector<lcos::future_value<memory_block_data> > 
+            lazy_results_type;
+
+        // first invoke all remote operations
+        lazy_results_type lazy_results;
+        BOOST_FOREACH(naming::id_type id, gids)
+        {
+            lazy_results.push_back(
+                components::stubs::memory_block::get_async(
+                    id, cfg.get_memory_block()));
+        }
+
+        //  invoke the operation for the result gid as well
+        lcos::future_value<memory_block_data> lazy_result =
+            components::stubs::memory_block::get_async(result);   // no cfg data for result
+
+        // then wait for all results to get back to us
         std::vector<access_memory_block<stencil_data> > val;
-        access_memory_block<stencil_data> resultval = 
-            get_memory_block_async(val, gids, result);
+        BOOST_FOREACH(lcos::future_value<memory_block_data> const& f, lazy_results)
+        {
+            val.push_back(f.get());
+        }
+
+        // now return the resolved result
+        access_memory_block<stencil_data> resultval = lazy_result.get();
 
         // lock all user defined data elements, will be unlocked at function exit
         scoped_values_lock<lcos::mutex> l(resultval, val); 
@@ -81,18 +151,6 @@ namespace hpx { namespace components { namespace amr
         return 1;
     }
 
-    hpx::actions::manage_object_action<stencil_data> const manage_stencil_data =
-        hpx::actions::manage_object_action<stencil_data>();
-
-}}}
-
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<hpx::components::amr::stencil_data>,
-    dataflow_manage_object_action_stencil_data)
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
-{
     ///////////////////////////////////////////////////////////////////////////
     naming::id_type stencil::alloc_data(int item, int maxitems, int row,
                            std::vector<naming::id_type> const& interp_src_data,
@@ -122,6 +180,5 @@ namespace hpx { namespace components { namespace amr
         numsteps_ = numsteps;
         log_ = logging;
     }
-
 }}}
 

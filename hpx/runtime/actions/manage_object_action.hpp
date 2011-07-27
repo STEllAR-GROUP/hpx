@@ -34,10 +34,12 @@ namespace hpx { namespace actions
         typedef boost::archive::binary_oarchive oarchive_type;
         typedef boost::archive::binary_iarchive iarchive_type;
 #endif
-        typedef void (*serialize_save_function)(boost::uint8_t const*, 
-            std::size_t, oarchive_type&, const unsigned int);
-        typedef void (*serialize_load_function)(boost::uint8_t*, 
-            std::size_t, iarchive_type&, const unsigned int);
+        typedef void (*serialize_save_function)(
+            boost::uint8_t const*, std::size_t, oarchive_type&, 
+            const unsigned int, boost::uint8_t const*);
+        typedef void (*serialize_load_function)(
+            boost::uint8_t*, std::size_t, iarchive_type&, 
+            const unsigned int, boost::uint8_t const*);
 
     private:
         static void construct_(void*, std::size_t) {}
@@ -54,13 +56,15 @@ namespace hpx { namespace actions
         static void destruct_(void*) {}
 
         static void save_(boost::uint8_t const* data, std::size_t size, 
-            oarchive_type& ar, const unsigned int version)
+            oarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
         {
             using boost::serialization::make_array;
             ar << make_array(data, size);
         }
         static void load_(boost::uint8_t* data, std::size_t size, 
-            iarchive_type& ar, const unsigned int version)
+            iarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
         {
             using boost::serialization::make_array;
             ar >> make_array(data, size);
@@ -139,12 +143,14 @@ namespace hpx { namespace actions
         }
 
         static void save_(boost::uint8_t const* data, std::size_t size, 
-            oarchive_type& ar, const unsigned int version)
+            oarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
         {
             ar << *reinterpret_cast<T const*>(data);
         }
         static void load_(boost::uint8_t* data, std::size_t size, 
-            iarchive_type& ar, const unsigned int version)
+            iarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
         {
             ar >> *reinterpret_cast<T*>(data);
         }
@@ -237,6 +243,67 @@ namespace hpx { namespace actions
                 manage_object_action<boost::uint8_t>();
         return instance;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Config>
+    struct manage_object_config_action : manage_object_action<T>
+    {
+        manage_object_config_action() {}
+        ~manage_object_config_action() {}
+
+    private:
+        static void save_(boost::uint8_t const* data, std::size_t size, 
+            oarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
+        {
+            reinterpret_cast<T const*>(data)->save(ar, version, 
+                reinterpret_cast<Config const*>(config));
+        }
+        static void load_(boost::uint8_t* data, std::size_t size, 
+            iarchive_type& ar, const unsigned int version,
+            boost::uint8_t const* config)
+        {
+            reinterpret_cast<T*>(data)->load(ar, version, 
+                reinterpret_cast<Config const*>(config));
+        }
+
+    private:
+        // serialization support
+        serialize_save_function save() const
+        { 
+            return &manage_object_config_action::save_; 
+        }
+        serialize_load_function load() const
+        { 
+            return &manage_object_config_action::load_; 
+        }
+
+    public:
+        manage_object_action_base const& get_instance() const
+        {
+            static manage_object_config_action const instance =
+                manage_object_config_action();
+            return instance;
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<manage_object_config_action, manage_object_action<T> >();
+        }
+
+    private:
+        // serialization support, just serialize the type
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int) 
+        {
+            using namespace boost::serialization;
+            ar & base_object<manage_object_action_base>(*this);
+        }
+    };
 }}
 
 #define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \

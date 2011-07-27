@@ -20,7 +20,7 @@
 /// Define types of stencil components exposed by this module
 typedef hpx::components::managed_component<
     hpx::components::amr::server::dynamic_stencil_value 
-> marduk_dynamic_stencil_value_double_type;
+> dataflow_dynamic_stencil_value_double_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The following construct registers a minimal factory needed for the creation
@@ -33,23 +33,23 @@ typedef hpx::components::managed_component<
 /// name = had_amr                               # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(marduk_dynamic_stencil_value_double_type, 
-    marduk_dynamic_stencil_double3d);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(dataflow_dynamic_stencil_value_double_type, 
+    dataflow_dynamic_stencil_double3d);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
-    marduk_dynamic_stencil_value_double_type::wrapped_type::call_action,
-    marduk_dynamic_stencil_value_double_call_action);
+    dataflow_dynamic_stencil_value_double_type::wrapped_type::call_action,
+    dataflow_dynamic_stencil_value_double_call_action);
 HPX_REGISTER_ACTION_EX(
-    marduk_dynamic_stencil_value_double_type::wrapped_type::get_output_ports_action,
-    marduk_dynamic_stencil_value_double_get_output_ports_action);
+    dataflow_dynamic_stencil_value_double_type::wrapped_type::get_output_ports_action,
+    dataflow_dynamic_stencil_value_double_get_output_ports_action);
 HPX_REGISTER_ACTION_EX(
-    marduk_dynamic_stencil_value_double_type::wrapped_type::connect_input_ports_action,
-    marduk_dynamic_stencil_value_double_connect_input_ports_action);
+    dataflow_dynamic_stencil_value_double_type::wrapped_type::connect_input_ports_action,
+    dataflow_dynamic_stencil_value_double_connect_input_ports_action);
 HPX_REGISTER_ACTION_EX(
-    marduk_dynamic_stencil_value_double_type::wrapped_type::set_functional_component_action,
-    marduk_dynamic_stencil_value_double_set_functional_component_action);
+    dataflow_dynamic_stencil_value_double_type::wrapped_type::set_functional_component_action,
+    dataflow_dynamic_stencil_value_double_set_functional_component_action);
 HPX_REGISTER_ACTION_EX(
-    marduk_dynamic_stencil_value_double_type::wrapped_type::start_action,
-    marduk_dynamic_stencil_value_double_start_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(marduk_dynamic_stencil_value_double_type::wrapped_type);
+    dataflow_dynamic_stencil_value_double_type::wrapped_type::start_action,
+    dataflow_dynamic_stencil_value_double_start_action);
+HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_dynamic_stencil_value_double_type::wrapped_type);

@@ -20,63 +20,127 @@
 
 namespace hpx { namespace components { namespace amr 
 {
-
-///////////////////////////////////////////////////////////////////////////////
-struct stencil_data 
-{
-    stencil_data() 
-      : max_index_(0), index_(0), timestep_(0)
-    {}
-    ~stencil_data() {}
-
-    stencil_data(stencil_data const& rhs)
-      : max_index_(rhs.max_index_), index_(rhs.index_), 
-        timestep_(rhs.timestep_),
-        value_(rhs.value_)
+    namespace server
     {
-        // intentionally do not copy mutex, new copy will have it's own mutex
+        ///////////////////////////////////////////////////////////////////////////////
+        struct stencil_config_data
+        {
+            int start_;
+            int count_;
+
+        private:
+            friend class boost::serialization::access;
+
+            BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+            template<class Archive>
+            void save(Archive & ar, const unsigned int version) const
+            {
+                ar & start_ & count_;
+            } 
+
+            template<class Archive>
+            void load(Archive & ar, const unsigned int version)
+            {
+                ar & start_ & count_;
+            } 
+        };
     }
 
-    stencil_data& operator=(stencil_data const& rhs)
+    ///////////////////////////////////////////////////////////////////////////
+    // client side representation
+    struct stencil_config_data 
+      : access_memory_block<server::stencil_config_data>
     {
-        if (this != &rhs) {
-            max_index_ = rhs.max_index_;
-            index_ = rhs.index_;
-            timestep_ = rhs.timestep_;
-            value_ = rhs.value_;
+        typedef access_memory_block<server::stencil_config_data> base_type;
+
+        // create a new server::stencil_config_data locally and resolve it
+        memory_block_data create_and_resolve_target();
+
+        // create a new server::stencil_config_data locally and initialize it
+        stencil_config_data(int start, int size);
+
+        components::memory_block mem_block;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct stencil_data 
+    {
+        stencil_data() 
+          : max_index_(0), index_(0), timestep_(0)
+        {}
+        ~stencil_data() {}
+
+        stencil_data(stencil_data const& rhs)
+          : max_index_(rhs.max_index_), index_(rhs.index_), 
+            timestep_(rhs.timestep_),
+            value_(rhs.value_)
+        {
             // intentionally do not copy mutex, new copy will have it's own mutex
         }
-        return *this;
-    }
 
-    hpx::lcos::mutex mtx_;    // lock for this data block
+        stencil_data& operator=(stencil_data const& rhs)
+        {
+            if (this != &rhs) {
+                max_index_ = rhs.max_index_;
+                index_ = rhs.index_;
+                timestep_ = rhs.timestep_;
+                value_ = rhs.value_;
+                // intentionally do not copy mutex, new copy will have it's own mutex
+            }
+            return *this;
+        }
 
-    std::size_t max_index_;   // overall number of data points
-    std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
-    double_type timestep_;    // current time step
-    array1d<double> value_;    // current value
+        hpx::lcos::mutex mtx_;    // lock for this data block
 
-private:
-    // serialization support
-    friend class boost::serialization::access;
+        std::size_t max_index_;   // overall number of data points
+        std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
+        double_type timestep_;    // current time step
+        array1d<double> value_;    // current value
+        //double value_;    // current value
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    private:
+        // customized serialization support
+        friend struct actions::manage_object_config_action<
+            stencil_data, server::stencil_config_data>;
 
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const
-    {
-        ar & max_index_ & index_ & timestep_;
-        value_.do_save(ar,0,2);
-    } 
+        template<class Archive>
+        void save(Archive & ar, const unsigned int version,
+            server::stencil_config_data const* config) const
+        {
+            BOOST_ASSERT(0 != config);
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) 
-    {
-        ar & max_index_ & index_ & timestep_;
-        value_.do_load(ar);
-    } 
-};
+            ar & max_index_ & index_ & timestep_;
+            value_.do_save(ar, config->start_, config->count_);
+        } 
 
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version,
+            server::stencil_config_data const* config) 
+        {
+            BOOST_ASSERT(0 != config);
+
+            ar & max_index_ & index_ & timestep_;
+            value_.do_load(ar);
+        } 
+
+        // 'normal' serialization
+        friend class boost::serialization::access;
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+        template<class Archive>
+        void save(Archive & ar, const unsigned int version) const
+        {
+            BOOST_ASSERT(false);    // shouldn't ever be called
+        } 
+
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version)
+        {
+            BOOST_ASSERT(false);    // shouldn't ever be called
+        } 
+    };
 }}}
 
 #endif

@@ -80,6 +80,9 @@ namespace hpx { namespace components { namespace server { namespace detail
         memory_block_header& operator= (memory_block_header const& rhs)
         {
             if (this != &rhs) {
+                BOOST_ASSERT(this->managing_object_.assign());
+                this->managing_object_.assign()(
+                    this->get_ptr(), rhs.get_ptr(), size_);
             }
             return *this;
         }
@@ -155,6 +158,10 @@ namespace hpx { namespace components { namespace server { namespace detail
     {
         return (T*) ::malloc(size + sizeof(detail::memory_block_header));
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // forward declaration
+    class memory_block;
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,11 +173,18 @@ namespace hpx { namespace components
     ///        remote site.
     class memory_block_data
     {
+        // server::detail::memory_block needs access to our data_ member
+        friend class components::server::detail::memory_block;
+
     public:
         memory_block_data()
         {}
         memory_block_data(boost::intrusive_ptr<server::detail::memory_block_header> data)
           : data_(data)
+        {}
+        memory_block_data(boost::intrusive_ptr<server::detail::memory_block_header> data,
+                boost::intrusive_ptr<server::detail::memory_block_header> config)
+          : data_(data), config_(config)
         {}
 
         /// \brief Return a pointer to the wrapped memory_block_data instance
@@ -261,13 +275,16 @@ namespace hpx { namespace components
         ///       not considered.
         friend class boost::serialization::access;
 
+        ///////////////////////////////////////////////////////////////////////
         template <class Archive>
-        void save(Archive & ar, const unsigned int version) const
+        static void save_(Archive & ar, const unsigned int version,
+            server::detail::memory_block_header* data,
+            server::detail::memory_block_header* config = 0)
         {
-            std::size_t size = data_->get_size();
+            std::size_t size = data->get_size();
             actions::manage_object_action_base* act = 
                 const_cast<actions::manage_object_action_base*>(
-                    &data_->get_managing_object().get_instance());
+                    &data->get_managing_object().get_instance());
 
             BOOST_ASSERT(act);
 
@@ -275,32 +292,70 @@ namespace hpx { namespace components
             ar << act;
 
             BOOST_ASSERT(act->save());
-            act->save()(data_->get_ptr(), data_->get_size(), ar, version);
+            if (config) {
+                act->save()(data->get_ptr(), data->get_size(), ar, version, 
+                    config->get_ptr());
+            }
+            else {
+                act->save()(data->get_ptr(), data->get_size(), ar, version, 0);
+            }
         }
 
         template <class Archive>
-        void load(Archive & ar, const unsigned int version)
+        void save(Archive & ar, const unsigned int version) const
+        {
+            bool has_config = config_ ? true : false;
+            ar << has_config;
+            if (has_config)
+                save_(ar, version, config_.get());
+            save_(ar, version, data_.get(), config_.get());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <class Archive>
+        static server::detail::memory_block_header* 
+        load_(Archive & ar, const unsigned int version, 
+            server::detail::memory_block_header* config = 0)
         {
             std::size_t size = 0;
-            actions::manage_object_action_base* act = NULL;
+            actions::manage_object_action_base* act = 0;
 
             ar >> size;
             ar >> act;
 
             typedef server::detail::memory_block_header alloc_type;
-            alloc_type* p = server::detail::allocate_block<alloc_type>(size);
-
-            data_.reset(new (p) alloc_type(size, act->get_instance()));
+            alloc_type* p = 
+                new (server::detail::allocate_block<alloc_type>(size)) 
+                    alloc_type(size, act->get_instance());
 
             BOOST_ASSERT(act->load());
-            act->load()(data_->get_ptr(), size, ar, version);
+            if (config) {
+                act->load()(p->get_ptr(), size, ar, version, 
+                    config->get_ptr());
+            }
+            else {
+                act->load()(p->get_ptr(), size, ar, version, 0);
+            }
 
             delete act;
+
+            return p;
+        }
+
+        template <class Archive>
+        void load(Archive & ar, const unsigned int version)
+        {
+            bool has_config;
+            ar >> has_config;
+            if (has_config) 
+                config_.reset(load_(ar, version));
+            data_.reset(load_(ar, version, config_.get()));
         }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
         boost::intrusive_ptr<server::detail::memory_block_header> data_;
+        boost::intrusive_ptr<server::detail::memory_block_header> config_;
     };
 }}
 
@@ -315,9 +370,6 @@ namespace hpx { namespace components { namespace server { namespace detail
     /// memory_block_header directly followed by the actual raw memory.
     class HPX_EXPORT memory_block : public memory_block_header
     {
-        typedef actions::manage_object_action_base::destruct_function 
-            destruct_function;
-
     public:
         // parcel action code: the action to be performed on the destination 
         // object (the accumulator)
@@ -326,7 +378,8 @@ namespace hpx { namespace components { namespace server { namespace detail
             memory_block_get = 0,
             memory_block_checkout = 1,
             memory_block_checkin = 2,
-            memory_block_clone = 3
+            memory_block_clone = 3,
+            memory_block_get_config = 4
         };
 
         // construct a new memory block
@@ -355,6 +408,10 @@ namespace hpx { namespace components { namespace server { namespace detail
         /// Get the current data for reading
         components::memory_block_data get();
 
+        /// Get the current data for reading, use config data for serialization
+        components::memory_block_data get_config(
+            components::memory_block_data const& cfg);
+
         /// Get the current data for reading
         components::memory_block_data checkout();
 
@@ -372,6 +429,11 @@ namespace hpx { namespace components { namespace server { namespace detail
             memory_block, components::memory_block_data, memory_block_get, 
             &memory_block::get
         > get_action;
+
+        typedef hpx::actions::direct_result_action1<
+            memory_block, components::memory_block_data, memory_block_get_config, 
+            components::memory_block_data const&, &memory_block::get_config
+        > get_config_action;
 
         typedef hpx::actions::direct_result_action0<
             memory_block, components::memory_block_data, memory_block_checkout, 

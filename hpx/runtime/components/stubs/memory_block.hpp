@@ -76,6 +76,27 @@ namespace hpx { namespace components { namespace stubs
             return get_async(targetgid).get();
         }
 
+        static lcos::future_value<components::memory_block_data> get_async(
+            naming::id_type const& targetgid,
+            components::memory_block_data const& cfg) 
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::detail::memory_block::get_config_action action_type;
+            typedef components::memory_block_data data_type;
+            return lcos::eager_future<action_type, data_type>(targetgid, cfg);
+        }
+
+        static components::memory_block_data get(
+            naming::id_type const& targetgid, 
+            components::memory_block_data const& cfg) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            return get_async(targetgid, cfg).get();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         static lcos::future_value<components::memory_block_data> checkout_async(
             naming::id_type const& targetgid) 

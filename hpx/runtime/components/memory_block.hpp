@@ -72,6 +72,25 @@ namespace hpx { namespace components
             return this->base_type::get_async(gid_);
         }
 
+        /// Get the \a memory_block_data maintained by this memory_block, use 
+        /// given data for serialization configuration (will be passed to the
+        /// save() function exposed by the datatype instance wrapped in the 
+        /// return value of this get())
+        memory_block_data get(memory_block_data const& config) 
+        {
+            return this->base_type::get(gid_, config);
+        }
+
+        /// Asynchronously get the \a memory_block_data maintained by this 
+        /// memory_block. Use given data for serialization configuration (will 
+        /// be passed to the save() function exposed by the datatype instance 
+        /// wrapped in the return value of this get())
+        lcos::future_value<memory_block_data> get_async(
+          memory_block_data const& config) 
+        {
+            return this->base_type::get_async(gid_, config);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         /// Clone the \a memory_block_data maintained by this memory_block
         naming::id_type clone() 
