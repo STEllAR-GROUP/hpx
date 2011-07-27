@@ -350,10 +350,6 @@ parser.add_option("--hpx-agas-options",
                   action="store", type="string", dest="hpx_agas_options",
                   help="Options specific to the HPX AGAS locality")
 
-parser.add_option("--hpx-agas-mode",
-                  action="store", type="string", dest="hpx_agas_mode",
-                  help="HPX AGAS locality mode (`worker', `console' or `probe')")
-
 parser.add_option("--nodes",
                   action="store", type="string",
                   dest="nodes", help="PBS nodefile (default: $PBS_NODEFILE)")
@@ -469,7 +465,7 @@ for node in nodes.iterkeys():
 
   if agas == node:
     if options.hpx_agas_options:
-      local_cmd += options.hpx_agas_options
+      local_cmd += ' ' + options.hpx_agas_options
     local_cmd += ' -r'
     local_cmd += ' -x%s:%d' % (gethostbyname(agas[0]), agas[1]) 
   elif console[0] == node:
@@ -478,13 +474,10 @@ for node in nodes.iterkeys():
     local_cmd += ' -x%s:%d' % (gethostbyname(node[0]), node[1]) 
 
   if not console == node:
-    if agas == node and options.hpx_agas_mode:
-      local_cmd += ' --' + options.hpx_agas_mode
-    else:
-      local_cmd += ' -w' 
+    local_cmd += ' -w' 
   else:
     if options.hpx_console_options:
-      local_cmd += options.hpx_console_options
+      local_cmd += ' ' + options.hpx_console_options
     local_cmd += ' -c'
 
   local_cmd += '\''
