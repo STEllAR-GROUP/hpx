@@ -251,6 +251,9 @@ namespace hpx { namespace actions
         manage_object_config_action() {}
         ~manage_object_config_action() {}
 
+        typedef typename manage_object_action<T>::oarchive_type oarchive_type;
+        typedef typename manage_object_action<T>::iarchive_type iarchive_type;
+
     private:
         static void save_(boost::uint8_t const* data, std::size_t size, 
             oarchive_type& ar, const unsigned int version,
