@@ -254,10 +254,16 @@
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp" />
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\linux_x86.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\msvc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_32.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_64.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\msvc.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />
@@ -265,7 +271,6 @@
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
     <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\uintptr_t.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />

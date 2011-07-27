@@ -127,12 +127,12 @@ namespace hpx { namespace performance_counters
                 throw;
             ec = make_error_code(e.get_error(), e.what());
             LPCS_(warning) << ( boost::format("failed to create counter %s (%s)")
-                              % complemented_info.fullname_ % e.what());
+                % complemented_info.fullname_ % e.what());
             return status_invalid_data;
         }
 
         LPCS_(info) << ( boost::format("counter %s created at %s") 
-                       % complemented_info.fullname_ % newid);
+            % complemented_info.fullname_ % newid);
 
         id = naming::id_type(newid, naming::id_type::managed);
         return status_valid_data;
@@ -157,7 +157,7 @@ namespace hpx { namespace performance_counters
         agas_client_.unregisterid(name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to destroy counter %s")
-                              % complemented_info.fullname_);
+                % complemented_info.fullname_);
             return status_invalid_data;
         }
 

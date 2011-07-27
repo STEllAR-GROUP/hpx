@@ -569,20 +569,8 @@ namespace hpx { namespace threads
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// Get percent maintenance time in main thread-manager loop.
-        boost::int64_t avg_maint_ratio() const
-        {
-           const double exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
-           const double tfunc_total = std::accumulate(tfunc_time.begin(), tfunc_time.end(), 0);
-
-           const double percent = 1. - (exec_total / tfunc_total);
-           return boost::int64_t(1000. * percent);    // 0.1 percent
-        }
-
-        boost::int64_t avg_maint_ratio(std::size_t num_thread) const
-        {
-            const double percent = 1. - (exec_time[num_thread] / tfunc_time[num_thread]);
-            return boost::int64_t(1000. * percent);   // 0.1 percent
-        }
+        boost::int64_t avg_maint_ratio() const;
+        boost::int64_t avg_maint_ratio(std::size_t num_thread) const;
 
     protected:
         // this is the thread function executing the work items in the queue
@@ -654,7 +642,7 @@ namespace hpx { namespace threads
         notification_policy_type& notifier_;
 
         // tfunc_impl timers
-        std::vector<double> exec_time, tfunc_time;
+        std::vector<boost::uint64_t> exec_times, tfunc_times;
     };
 }}
 

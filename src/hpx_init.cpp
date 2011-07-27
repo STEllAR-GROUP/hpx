@@ -506,14 +506,21 @@ namespace hpx
             std::size_t num_localities = 1;
             std::string queueing = "priority_local";
             std::vector<std::string> ini_config;
- 
+
             if (vm.count("ini"))
                 ini_config = vm["ini"].as<std::vector<std::string> >();
 
             if (vm.count("agas")) {
                 detail::split_ip_address(
                     vm["agas"].as<std::string>(), agas_host, agas_port);
-                // FIXME: map to hpx.agas.address and hpx.agas.port for AGAS V2
+
+#if HPX_AGAS_VERSION > 0x10
+                // map this command line option to the proper ini-file entries
+                using namespace boost::assign;
+                ini_config += "hpx.agas.address=" + agas_host;
+                ini_config += "hpx.agas.port=" + 
+                    boost::lexical_cast<std::string>(agas_port);
+#endif
             }
 
             if (vm.count("hpx")) {
@@ -534,15 +541,12 @@ namespace hpx
             // retrieve it from the command line.
             if (hpx::runtime_mode_default == mode)
             {
-                const std::size_t count_ = bool(vm.count("console"))
-                                         + bool(vm.count("worker"));
-
                 // The default mode is console, i.e. all workers need to be 
                 // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
-                if (count_ > 1) {
+                if (vm.count("console") && vm.count("worker")) {
                     throw std::logic_error("Ambiguous command line options. "
-                        "Do not specify more than one runtime mode.");
+                        "Do not specify both, --console/-c and --worker/-w\n");
                 }
 
                 // In this case we default to executing with an empty hpx_main.
@@ -550,7 +554,7 @@ namespace hpx
                     mode = hpx::runtime_mode_worker;
 
                     if (!vm.count("run-hpx-main"))
-                        f = 0;
+                        f = 0;      // do not execute any explicit hpx_main
                 }
             }
 
@@ -578,8 +582,8 @@ namespace hpx
 #if HPX_AGAS_VERSION > 0x10
             {
                 using namespace boost::assign;
-                ini_config += "hpx.num_localities="
-                            + boost::lexical_cast<std::string>(num_localities);
+                ini_config += "hpx.num_localities=" + 
+                    boost::lexical_cast<std::string>(num_localities);
             }
 #endif
 

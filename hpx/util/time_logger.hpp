@@ -50,7 +50,7 @@ namespace hpx { namespace util
 
     public:
         time_logger(char const* const description, int thread_num, 
-                bool enabled = true)
+                bool enabled = false)
           : description_(description), thread_num_(thread_num), 
             enabled_(enabled && LTIM_ENABLED(warning))
         {

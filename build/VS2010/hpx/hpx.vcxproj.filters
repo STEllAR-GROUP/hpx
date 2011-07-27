@@ -183,6 +183,15 @@
     <Filter Include="Header Files\Performance Counters\Parcels">
       <UniqueIdentifier>{6203bd5e-5458-4b20-bd02-53db8a61a7ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util\Hardware">
+      <UniqueIdentifier>{5fb0b754-0288-4d5b-b14f-f0a9fa80ac14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util\Hardware\CpuId">
+      <UniqueIdentifier>{0be492dc-694a-4fe7-a8c4-406f1644cd9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util\Hardware\Timestamp">
+      <UniqueIdentifier>{1ec0081d-63d0-427b-a313-90364ad2307c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -859,12 +868,6 @@
     <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\jemalloc_allocator.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\nedmalloc_allocator.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\default_vector.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -985,9 +988,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\router\big_boot_barrier.hpp">
       <Filter>Header Files\Runtime\AGAS\Router</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\uintptr_t.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp">
       <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
     </ClInclude>
@@ -1020,6 +1020,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp">
       <Filter>Header Files\Performance Counters\Parcels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp">
+      <Filter>Header Files\Util\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp">
+      <Filter>Header Files\Util\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp.hpp">
+      <Filter>Header Files\Util\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\linux_x86.hpp">
+      <Filter>Header Files\Util\Hardware\CpuId</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\msvc.hpp">
+      <Filter>Header Files\Util\Hardware\CpuId</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_64.hpp">
+      <Filter>Header Files\Util\Hardware\Timestamp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\msvc.hpp">
+      <Filter>Header Files\Util\Hardware\Timestamp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_32.hpp">
+      <Filter>Header Files\Util\Hardware\Timestamp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
