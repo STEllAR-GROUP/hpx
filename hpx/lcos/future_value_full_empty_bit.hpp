@@ -424,7 +424,7 @@ namespace hpx { namespace lcos
         /// \a future_value.
         bool ready()
         {
-            return (*impl_)->get_gid(impl_.get());
+            return (*impl_)->ready();
         }
 
         typedef Result result_type;
@@ -514,7 +514,7 @@ namespace hpx { namespace lcos
         /// \a future_value.
         bool ready()
         {
-            return (*impl_)->get_gid(impl_.get());
+            return (*impl_)->ready();
         }
 
         typedef util::unused_type result_type;
