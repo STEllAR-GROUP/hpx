@@ -343,11 +343,11 @@ parser.add_option("--hpx-location",
                        "(default: $HPX_LOCATION or %s)" % location)
 
 parser.add_option("--hpx-console-options",
-                  action="store", type="string", dest="hpx_console_location",
+                  action="store", type="string", dest="hpx_console_options",
                   help="Options specific to the console locality")
 
 parser.add_option("--hpx-agas-options",
-                  action="store", type="string", dest="hpx_agas_location",
+                  action="store", type="string", dest="hpx_agas_options",
                   help="Options specific to the HPX AGAS locality")
 
 parser.add_option("--hpx-agas-mode",
