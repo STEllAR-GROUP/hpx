@@ -10,6 +10,8 @@
 #include <cmath>
 #include <cfloat>
 
+#include <boost/ref.hpp>
+#include <boost/bind.hpp>
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/foreach.hpp>
@@ -43,6 +45,7 @@ using hpx::actions::plain_action1;
 using hpx::actions::plain_action4;
 using hpx::actions::plain_result_action1;
 
+using hpx::applier::register_work;
 using hpx::applier::get_applier;
 using hpx::applier::get_prefix_id;
 
@@ -66,8 +69,8 @@ using hpx::components::get_component_type;
 
 using hpx::lcos::eager_future;
 using hpx::lcos::future_value;
-using hpx::naming::get_prefix_from_gid;
 
+using hpx::naming::get_prefix_from_gid;
 using hpx::naming::get_prefix_from_id;
 using hpx::naming::gid_type;
 using hpx::naming::id_type;
@@ -104,7 +107,7 @@ typedef plain_result_action1<
 HPX_REGISTER_PLAIN_ACTION(math_function_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int agas_main(variables_map& vm)
+void agas_main(variables_map& vm)
 {
     const double frequency = 10;
     const double duration = 5; 
@@ -302,10 +305,22 @@ int console_main(variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    if (get_prefix_id() == 1)
-        int r = agas_main(vm); 
-    else
-        int r = console_main(vm);
+    {
+        int r = 0;
+    
+        if (get_prefix_id() == 1)
+        {
+            if (get_runtime().get_agas_client().is_console())
+            {
+                register_work(boost::bind(&agas_main, boost::ref(vm)));
+                r = console_main(vm); 
+            }
+            else
+                agas_main(vm); 
+        }
+        else
+            r = console_main(vm);
+    }
 
     finalize();
     return r;
