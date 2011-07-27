@@ -62,6 +62,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 using hpx::get_runtime;
+using hpx::network_error;
 using hpx::running;
 using hpx::runtime_mode_probe;
 
@@ -69,9 +70,12 @@ using hpx::components::get_component_type;
 
 using hpx::lcos::eager_future;
 using hpx::lcos::future_value;
+using hpx::lcos::base_lco;
 
+using hpx::naming::resolver_client;
 using hpx::naming::get_prefix_from_gid;
 using hpx::naming::get_prefix_from_id;
+using hpx::naming::get_id_from_prefix;
 using hpx::naming::gid_type;
 using hpx::naming::id_type;
 
@@ -123,6 +127,12 @@ void agas_main(variables_map& vm)
 
     BOOST_ASSERT(gid); 
 
+    future_value<void> stop_flag;
+
+    // Associate the stop flag with a symbolic name.
+    get_applier().get_agas_client().registerid
+        ("/stop_flag([L1]/solver_double)", stop_flag.get_gid().get_gid());
+
     high_resolution_timer t;
     double current_time(0);
 
@@ -159,7 +169,7 @@ void agas_main(variables_map& vm)
 
                 do {
                     // Stop when the threadmanager is no longer available.
-                    if (!threadmanager_is(running))
+                    if (!threadmanager_is(running) || stop_flag.is_data())
                         return;
 
                     current_time = t.elapsed();
@@ -277,6 +287,22 @@ int console_main(variables_map& vm)
               % r
               % elapsed)
            << endl;
+
+    // Kill the monitor.
+    resolver_client& agas_client = get_runtime().get_agas_client();
+    gid_type stop_flag_gid;
+
+    if (!agas_client.queryid("/stop_flag([L1]/solver_double)", stop_flag_gid))
+    {
+        HPX_THROW_EXCEPTION(network_error, "console_main",
+            "couldn't find stop flag");
+    } 
+
+    BOOST_ASSERT(stop_flag_gid);
+
+    eager_future<base_lco::set_event_action> stop_future(stop_flag_gid);
+
+    stop_future.get();
 
     return 0;
 }
