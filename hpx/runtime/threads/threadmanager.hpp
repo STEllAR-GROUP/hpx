@@ -62,7 +62,7 @@ namespace hpx { namespace threads
         virtual state status() const = 0;
 
         /// \brief return the number of PX-threads with the given state
-        virtual boost::uint64_t get_thread_count(
+        virtual boost::int64_t get_thread_count(
             thread_state_enum state = unknown) const = 0;
 
         // \brief Abort all threads which are in suspended state. This will set 
@@ -411,7 +411,7 @@ namespace hpx { namespace threads
         /// \brief return the number of PX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the threadmanager
-        boost::uint64_t get_thread_count(thread_state_enum state = unknown) const;
+        boost::int64_t get_thread_count(thread_state_enum state = unknown) const;
 
         // \brief Abort all threads which are in suspended state. This will set 
         //        the state of all suspended threads to \a pending while 
@@ -571,16 +571,16 @@ namespace hpx { namespace threads
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_maint_ratio() const
         {
-           double exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
-           double tfunc_total = std::accumulate(tfunc_time.begin(), tfunc_time.end(), 0);
+           const double exec_total = std::accumulate(exec_time.begin(), exec_time.end(), 0);
+           const double tfunc_total = std::accumulate(tfunc_time.begin(), tfunc_time.end(), 0);
 
-           double percent = 1. - (exec_total / tfunc_total);
-           return boost::int64_t(1000 * percent);     // 0.1 percent
+           const double percent = 1. - (exec_total / tfunc_total);
+           return boost::int64_t(1000. * percent);    // 0.1 percent
         }
 
         boost::int64_t avg_maint_ratio(std::size_t num_thread) const
         {
-            double percent = 1. - (exec_time[num_thread] / tfunc_time[num_thread]);
+            const double percent = 1. - (exec_time[num_thread] / tfunc_time[num_thread]);
             return boost::int64_t(1000. * percent);   // 0.1 percent
         }
 
