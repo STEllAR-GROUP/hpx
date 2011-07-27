@@ -169,7 +169,7 @@ void agas_main(variables_map& vm)
 
                 do {
                     // Stop when the threadmanager is no longer available.
-                    if (!threadmanager_is(running) || stop_flag.is_data())
+                    if (!threadmanager_is(running) || stop_flag.ready())
                         return;
 
                     current_time = t.elapsed();
