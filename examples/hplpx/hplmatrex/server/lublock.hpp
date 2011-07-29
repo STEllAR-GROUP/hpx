@@ -172,13 +172,15 @@ namespace hpx { namespace components { namespace server
     //of data that has not yet completed all of it's gaussian elimination
     //computations. Once complete, this block will need no further computations
     int lublock::lu_gauss_corner(const int iter){
-    if(iter > 0){
-        getFuture neededPrev(gidList[iter-1][iter-1], 5, iter-1);
-        neededPrev.get();
-    }
+    getFuture* neededPrev = 0;
+    if(iter > 0){neededPrev = new getFuture(gidList[iter-1][iter-1],5, iter-1);}
     int i, j, k;
     double fFactor, factor;
 
+    if(iter > 0){
+        neededPrev->get();
+        delete neededPrev;
+    }
     for(i=0;i<rows;i++){
         if(data[i][i] == 0){std::cerr<<"Warning: divided by zero\n";}
         fFactor = 1/data[i][i];
@@ -275,14 +277,12 @@ namespace hpx { namespace components { namespace server
     if(iter > 0){
         getFuture* neededPrev;
         if(posX < posY){
-            neededPrev =new getFuture(gidList[posY-1][posX],3,iter-1);
+            neededPrev = new getFuture(gidList[posY-1][posX],3,iter-1);
         }
         else if(posX > posY){
-            neededPrev =new getFuture(gidList[posY][posX-1],4,iter-1);
+            neededPrev = new getFuture(gidList[posY][posX-1],4,iter-1);
         }
-        else{
-            neededPrev =new getFuture(gidList[posY-1][posX-1],5,iter-1);
-        }
+        else{neededPrev = new getFuture(gidList[posY-1][posX-1],5,iter-1);}
         neededPrev->get();
         delete neededPrev;
     }

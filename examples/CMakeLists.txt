@@ -16,6 +16,7 @@ if(NOT MSVC)
       accumulator
       contact
       hplpx
+      barnes_hut
       random_mem_access
       queue
       quickstart)

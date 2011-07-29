@@ -64,7 +64,6 @@ namespace hpx { namespace components { namespace server
     void pivot();
     int search_pivots(const int row);
     int swap(const int brow, const int bcol);
-    void lu_gauss_manager();
     int lubacksubst();
     int part_bsub(const int brow, const int bcol);
     double checksolve(int row, int offset, bool complete);
@@ -278,7 +277,10 @@ namespace hpx { namespace components { namespace server
     std::cout<<"pivoting over "<<temp-starttime<<std::endl;
 
     //to initiate the Gaussian elimination
-    lu_gauss_manager();
+    for(int iter = 0; iter < brows; iter++){
+        lublock::gcFuture(
+            datablock[iter][iter].gauss_corner(iter)).get();
+    }
     ptime temp2 = ptime(microsec_clock::local_time());
     std::cout<<"finished gaussian "<<temp2 - temp<<std::endl;
 
@@ -438,75 +440,6 @@ namespace hpx { namespace components { namespace server
     return 1;
     }
 
-    //lu_gauss_manager creates futures as old futures finish their computations
-    //Though not the perfect way of generating futures(a small amount of
-    //starvation occurs), the manager ensures that the computation is done in
-    //order with as many datablocks being operated on simultaneously as possible
-    void hplmatrex::lu_gauss_manager(){
-    int iter;
-
-    for(iter = 0; iter < brows; iter++){
-        lublock::gcFuture(
-            datablock[iter][iter].gauss_corner(iter)).get();
-    }
-    }
-/*    int iter = 0, i, j;
-    int beginElement, nextElement;
-    std::vector<lublock::gtoFuture> tfutures;
-    std::vector<lublock::gtrFuture> trfutures;
-    lublock::createLeftFuture* leftFuture;
-//    creationTopFuture* topFuture;
-
-    //the first iteration works differently because we do not need to wait for
-    //any futures to complete before creating new futures
-    lublock::gcFuture(datablock[0][0].gauss_corner()).get();
-    leftFuture = new lublock::createLeftFuture(gidList[1][0],1,0,brows,gidList);
-
-    for(i = 1; i < brows; i++){
-        tfutures.push_back(datablock[0][i].gauss_top(gidList[0][0]));
-    }
-    leftFuture->get();
-    beginElement = trfutures.size();
-    for(i = 1; i < brows; i++){
-        tfutures[i-1].get();
-        for(j = 1; j < brows; j++){
-            trfutures.push_back(datablock[j][i].gauss_trail(blocksize,
-                gidList[0][0], gidList[j][0], gidList[0][i]));
-    }   }
-    delete leftFuture;
-    tfutures.clear();
-    //from here on we need to wait for the previous iteration to partially
-    //complete before launching new futures
-    for(iter = 1; iter < brows; iter++){
-        trfutures[beginElement].get();
-        lublock::gcFuture(datablock[iter][iter].gauss_corner()).get();
-        for(i = iter+1; i < brows; i++){
-            trfutures[beginElement+i-iter].get();
-        }
-        if(iter+1 < brows){
-            leftFuture = new lublock::createLeftFuture(gidList[iter+1][iter],
-                iter+1, iter, brows, gidList);
-        }
-        for(i = iter+1; i < brows; i++){
-            trfutures[beginElement+(brows-iter)*(i-iter)].get();
-            tfutures.push_back(
-                datablock[iter][i].gauss_top(gidList[iter][iter]));
-        }
-        if(iter+1 < brows){leftFuture->get();}
-        nextElement = trfutures.size();
-        for(i = iter+1; i < brows; i++){
-            tfutures[i-iter-1].get();
-            for(j = iter+1; j < brows; j++){
-                trfutures[beginElement+(brows-iter)*(i-iter)+j-iter].get();
-                trfutures.push_back(datablock[j][i].gauss_trail(blocksize,
-                    gidList[iter][iter], gidList[j][iter], gidList[iter][i]));
-        }   }
-        if(iter+1 < brows){delete leftFuture;}
-        tfutures.clear();
-        beginElement = nextElement;
-    }
-    }
-*/
     //this is an implementation of back substitution modified for use on
     //multiple datablocks instead of a single large data structure.
     //Additionally, a large amount of the work is performed in parallel. This
