@@ -173,8 +173,12 @@ namespace hpx { namespace naming
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
     {
-        gid_type const& g = *gid_;
-        ar << g;
+        bool isvalid = gid_ ? true : false;
+        ar << isvalid;
+        if (isvalid) {
+            gid_type const& g = *gid_;
+            ar << g;
+        }
     }
 
     template <class Archive>
@@ -182,14 +186,17 @@ namespace hpx { namespace naming
     {
         if (version > HPX_IDTYPE_VERSION)
         {
-            HPX_THROW_EXCEPTION(version_too_new, 
-                "id_type::load",
+            HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                 "trying to load id_type with unknown version");
         }
 
-        gid_type g;
-        ar >> g;
-        gid_.reset(new detail::id_type_impl(g), get_deleter(managed));
+        bool isvalid;
+        ar >> isvalid;
+        if (isvalid) {
+            gid_type g;
+            ar >> g;
+            gid_.reset(new detail::id_type_impl(g), get_deleter(managed));
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
