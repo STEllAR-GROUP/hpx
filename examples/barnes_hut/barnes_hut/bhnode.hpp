@@ -26,9 +26,10 @@ namespace hpx { namespace components
         bhnode(id_type gid) : base_type(gid){}
 
         //initialization functions
-        server::bhnode::constFuture construct_node(const double dat[7]){
+        server::bhnode::constFuture construct_node(const double dat[7],
+            const bool root){
             BOOST_ASSERT(gid_);
-            return this->base_type::construct_node(gid_,dat);
+            return this->base_type::construct_node(gid_,dat,root);
         }
         server::bhnode::cnstFuture2 construct_node(const id_type insertPoint,
             const vector<double> bounds, const id_type nextNode,

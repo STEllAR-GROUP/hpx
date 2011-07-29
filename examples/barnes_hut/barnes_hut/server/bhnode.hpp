@@ -55,7 +55,8 @@ namespace hpx { namespace components { namespace server
         };
         //constructors and destructor
         bhnode(){}
-        int construct_node(const id_type gid, const vector<double> dat);
+        int construct_node(const id_type gid, const vector<double> dat,
+            const bool root);
         int construct_node(const id_type gid, const id_type insertPoint,
             const vector<double> bounds, const vector<id_type> child, 
             const vector<vector<double> > childData, const vector<int> octants);
@@ -66,7 +67,8 @@ namespace hpx { namespace components { namespace server
         region_path build_subregions(int octant, vector<double> subboundary,
             vector<double> nodep, double nodem, const id_type node1Gid,
             const id_type node2Gid);
-        int update_child(const int octant, const id_type newChild);
+        int update_child(const int octant, const id_type newChild,
+            const bool leaf);
         int set_boundaries(const id_type parId, const vector<double> bounds);
         int find_octant(const vector<double> nodep, const vector<double> center);
         vector<double> calculate_subboundary(const int octant,
@@ -82,8 +84,8 @@ namespace hpx { namespace components { namespace server
         id_type child[8];
 
         //actions
-        typedef actions::result_action2<bhnode, int, hpl_constNode,
-            id_type, vector<double>, &bhnode::construct_node>
+        typedef actions::result_action3<bhnode, int, hpl_constNode,
+            id_type, vector<double>, bool, &bhnode::construct_node>
             constNodeAction;
         typedef actions::result_action6<bhnode, int, hpl_cnstNode2, id_type,
             id_type, vector<double>, vector<id_type>, vector<vector<double> >,
@@ -93,8 +95,8 @@ namespace hpx { namespace components { namespace server
         typedef actions::result_action3<bhnode, region_path, hpl_insrtNode,
             vector<double>, double, id_type, &bhnode::insert_node>
             insrtNodeAction;
-        typedef actions::result_action2<bhnode, int, hpl_updateChd, int,
-            id_type, &bhnode::update_child> updatChldAction;
+        typedef actions::result_action3<bhnode, int, hpl_updateChd, int,
+            id_type, bool, &bhnode::update_child> updatChldAction;
 
         //futures
         typedef lcos::eager_future<server::bhnode::constNodeAction> constFuture;
@@ -108,7 +110,8 @@ namespace hpx { namespace components { namespace server
 /**********NEED TO ADD ISROOT TO FIRST CONSTRUCTOR****************/
     //the constructors
     //this first constructor is for all particles and the root node
-    int bhnode::construct_node(const id_type gid, const vector<double> dat){
+    int bhnode::construct_node(const id_type gid, const vector<double> dat,
+        const bool root){
         for(int i = 0; i < 3; i++){
             pos[i] = com[i] = dat[i+1];
             vel[i] = dat[i+4];
@@ -116,8 +119,8 @@ namespace hpx { namespace components { namespace server
         mass = dat[0];
         _gid = gid;
         for(int i = 0; i < 8; i++){hasChild[i] = childIsLeaf[i] = false;}
-        isLeaf = true;
-        isRoot = false;
+        isLeaf = !root;
+        isRoot = root;
         return 0;
     }
     //this constructor is for all intermediate "region" nodes
@@ -127,7 +130,10 @@ namespace hpx { namespace components { namespace server
         _gid = gid;
         parent = insertPoint;
         isLeaf = isRoot = false;
-//set bounds here
+        for(int i = 0; i < 6; i++){boundary[i] = bounds[i];}
+        for(int i = 0; i < 3; i++){
+            pos[i] = (boundary[i] + boundary[i+3])*.5;
+        }
         if(octants.size() == 1){
             for(int i = 0; i < 8; i++){
                 if(i == octants[0]){
@@ -150,7 +156,10 @@ namespace hpx { namespace components { namespace server
             insert_node(data[0], data[2][0], children[0]);
             insert_node(data[1], data[2][1], children[1]);
         }
-//calc com() here maybe
+        mass = data[2][0] + data[2][1];
+        for(int i = 0; i < 3; i++){
+            com[i] = (data[0][i]*data[2][0] + data[1][i]*data[2][1])*.5;
+        }
         return 0;
     }
 
@@ -164,9 +173,17 @@ namespace hpx { namespace components { namespace server
         const int octant = find_octant(nodep, tempPos);
         region_path insertPath;
         insertPath.isPath = false;
+/*std::cout<<"adding "<<nodeGid<<" to octant "<<octant<<"\n";
+std::cout<<_gid<<" is root? "<<isRoot<<" isLeaf? "<<isLeaf;
+if(isRoot)std::cout<<"\n";else{std::cout<<" parent: "<<parent<<"\n";}
+for(int i=0;i<8;i++){
+if(hasChild[i]){std::cout<<child[i]<<" ";}
+else{std::cout<<i<<" ";}}
+for(int i=0;i<8;i++){std::cout<<childIsLeaf[i]<<"/t";}
+std::cout<<"\n\n";*/
         if(hasChild[octant] && !childIsLeaf[octant]){
             iNodeFuture waitFuture(child[octant], nodep, nodem, nodeGid);
-            waitFuture.get();
+            insertPath = waitFuture.get();
         }
         else if(hasChild[octant]){
             vector<double> tempBoundary(boundary,boundary+6);
@@ -266,28 +283,28 @@ namespace hpx { namespace components { namespace server
     vector<double> bhnode::calculate_subboundary(const int octant,
         vector<double> subboundary){
         if(octant == 0 || octant == 3 || octant == 4 || octant == 7){
-            subboundary[0] = (subboundary[0]+subboundary[3])*.5;
-            subboundary[3] = subboundary[3];
-        }
-        else{
             subboundary[3] = (subboundary[0]+subboundary[3])*.5;
             subboundary[0] = subboundary[0];
+        }
+        else{
+            subboundary[0] = (subboundary[0]+subboundary[3])*.5;
+            subboundary[3] = subboundary[3];
         }            
         if(octant == 0 || octant == 1 || octant == 4 || octant == 5){
-            subboundary[1] = (subboundary[1]+subboundary[4])*.5;
-            subboundary[4] = subboundary[4];
-        }
-        else{
             subboundary[4] = (subboundary[1]+subboundary[4])*.5;
             subboundary[1] = subboundary[1];
-        }            
-        if(octant == 0 || octant == 1 || octant == 2 || octant == 3){
-            subboundary[2] = (subboundary[2]+subboundary[5])*.5;
-            subboundary[5] = subboundary[5];
         }
         else{
+            subboundary[1] = (subboundary[1]+subboundary[4])*.5;
+            subboundary[4] = subboundary[4];
+        }            
+        if(octant == 0 || octant == 1 || octant == 2 || octant == 3){
             subboundary[5] = (subboundary[2]+subboundary[5])*.5;
             subboundary[2] = subboundary[2];
+        }
+        else{
+            subboundary[2] = (subboundary[2]+subboundary[5])*.5;
+            subboundary[5] = subboundary[5];
         }
         return subboundary;
     }
@@ -307,8 +324,11 @@ namespace hpx { namespace components { namespace server
         return 0;
     }
 
-    int bhnode::update_child(const int octant, const id_type newChild){
+    int bhnode::update_child(const int octant, const id_type newChild,
+        const bool leaf){
         child[octant] = newChild;
+        hasChild[octant] = true;
+        childIsLeaf[octant] = leaf;
         update_com();
         return 0;
     }

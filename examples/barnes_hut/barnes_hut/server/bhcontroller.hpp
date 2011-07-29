@@ -90,11 +90,9 @@ namespace hpx { namespace components { namespace server
     try{
         double dat[7];
         double bounds[6] = {-1.7e308,-1.7e308,-1.7e308,1.7e308,1.7e308,1.7e308};
+        double totalMass = 0;
+
         infile>>numBodies>>numIters>>dtime>>eps>>tolerance;
-        halfdt = .5 * dtime;
-        softening = eps * eps;
-        invTolerance = 1 / (tolerance * tolerance);
-        treeRoot.create(get_applier().get_runtime_support_gid());
         particle = new components::bhnode[numBodies];
         particlePositions = new double*[numBodies];
         particleMasses = new double[numBodies];
@@ -102,18 +100,30 @@ namespace hpx { namespace components { namespace server
             particlePositions[i] = new double[3];
             particle[i].create(get_applier().get_runtime_support_gid());
             infile>>dat[0]>>dat[1]>>dat[2]>>dat[3]>>dat[4]>>dat[5]>>dat[6];
-            futures.push_back(particle[i].construct_node(dat));
+            futures.push_back(particle[i].construct_node(dat,false));
             for(int j = 0; j < 3; j++){
                 if(bounds[j] < dat[j+1]){bounds[j] = dat[j+1];}
                 if(bounds[j+3] > dat[j+1]){bounds[j+3] = dat[j+1];}
                 particlePositions[i][j] = dat[j+1];
             }
             particleMasses[i] = dat[0];
+            totalMass += dat[0];
         }
+
+        treeRoot.create(get_applier().get_runtime_support_gid());
         id_type treeGid = treeRoot.get_gid();
+        dat[0] = totalMass;
+        for(int i = 0; i < 3; i++){
+            dat[i+1] = (bounds[i]+bounds[i+3])*.5;
+            dat[i+4] = 0;
+        }
+        futures.push_back(treeRoot.construct_node(dat,true));
+        halfdt = .5 * dtime;
+        softening = eps * eps;
+        invTolerance = 1 / (tolerance * tolerance);
         treeRoot.set_boundaries(treeGid, bounds);
         regions.push_back(treeGid);
-        for(int i = 0; i < numBodies; i++){futures[i].get();}
+        for(int i = 0; i < numBodies+1; i++){futures[i].get();}
     }
     catch(...){
         std::cerr<<"An error occurred while reading the file "<<inputFile<<"\n";
@@ -154,7 +164,7 @@ namespace hpx { namespace components { namespace server
         id_type nextInsertPoint = path.insertPoint;
         firstNode.create(get_applier().get_runtime_support_gid());
         bhnode::childFuture chFuture(path.insertPoint,
-            path.octants[0], firstNode.get_gid());
+            path.octants[0], firstNode.get_gid(), false);
         regions.push_back(firstNode);
 
         for(int i = 0; i < (int)path.subboundaries.size()-1; i++){

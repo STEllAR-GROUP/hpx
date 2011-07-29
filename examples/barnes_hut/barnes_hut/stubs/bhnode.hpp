@@ -24,10 +24,10 @@ namespace hpx { namespace components { namespace stubs
     {
         //constructors
         static server::bhnode::constFuture construct_node(
-            const id_type gid, const double dat[7]){
+            const id_type gid, const double dat[7], const bool root){
             std::vector<double> theData(dat,dat+7);
             return lcos::eager_future<server::bhnode::constNodeAction,
-                int>(gid,gid,theData);
+                int>(gid,gid,theData,root);
         }
         static server::bhnode::cnstFuture2 construct_node(const id_type gid,
             const id_type insertPoint, const vector<double> bounds,
