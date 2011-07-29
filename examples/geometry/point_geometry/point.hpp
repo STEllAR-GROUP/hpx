@@ -67,16 +67,16 @@ namespace hpx { namespace geometry
         }
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::future_value<bool> search_async(plain_polygon_type const& p) 
+        lcos::future_value<bool> search_async(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::search_async(gid_, p);
+            return this->base_type::search_async(gid_, search_objects);
         }
 
-        bool search(plain_polygon_type const& p) 
+        bool search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::search(gid_, p);
+            return this->base_type::search(gid_, search_objects);
         }
 
         /// Query the current coordinate values of the server#point 

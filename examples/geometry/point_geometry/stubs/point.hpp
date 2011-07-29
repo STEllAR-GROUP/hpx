@@ -38,17 +38,17 @@ namespace hpx { namespace geometry { namespace stubs
         }
 
         static lcos::future_value<bool> 
-        search_async(naming::id_type gid, plain_polygon_type const& p) 
+        search_async(naming::id_type gid, std::vector<hpx::naming::id_type> const& search_objects) 
         {
             typedef server::point::search_action action_type;
-            return lcos::eager_future<action_type>(gid, p);
+            return lcos::eager_future<action_type>(gid, search_objects);
         }
 
-        static bool search(naming::id_type const& gid, plain_polygon_type const& p) 
+        static bool search(naming::id_type const& gid, std::vector<hpx::naming::id_type> const& search_objects) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            return search_async(gid, p).get();
+            return search_async(gid, search_objects).get();
         }
 
         /// Query the current coordinate values of the server#point 

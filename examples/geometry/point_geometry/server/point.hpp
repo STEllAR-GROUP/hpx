@@ -50,8 +50,6 @@ namespace hpx { namespace geometry { namespace server
         /// Initialize the accumulator
         void init(double xmin,double xmax,double ymin,double ymax,std::size_t numpoints) 
         {
-            namespace bg = boost::geometry;
-
             xmin_ = xmin;
             xmax_ = xmax;
             ymin_ = ymin;
@@ -61,40 +59,65 @@ namespace hpx { namespace geometry { namespace server
             double dx = (xmax - xmin)/(numpoints-1);
             double dy = (ymax - ymin)/(numpoints-1);
 
-            typedef bg::model::d2::point_xy<double> point_type;
-            typedef bg::model::polygon<point_type> polygon_type;
+            //typedef bg::model::d2::point_xy<double> point_type;
+            //typedef bg::model::polygon<point_type> polygon_type;
 
-            polygon_type poly;
+            //polygon_type poly;
             // create the rectangle of the mesh object
             for (std::size_t i=0;i<numpoints;i++) {
               double x = xmin + dx*i;
               point_type p(x,ymin);
-              poly.outer().push_back(p);
+              poly_.outer().push_back(p);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
               point_type p(xmax,y);
-              poly.outer().push_back(p);
+              poly_.outer().push_back(p);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double x = xmax - dx*i;
               point_type p(x,ymax);
-              poly.outer().push_back(p);
+              poly_.outer().push_back(p);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymax - dy*i;
               point_type p(xmin,y);
-              poly.outer().push_back(p);
+              poly_.outer().push_back(p);
             }
+
+            //point_type pt5(0.5, 0.5);
+            //bool inside = bg::within(pt5,poly_);
+            //std::cout << " Point is " << (inside ? "inside" : "outside") << std::endl;
 
             //pt_.x(x);
             //pt_.y(y);
         }
 
         /// search for contact
-        bool search(plain_polygon_type const& p) const
+        bool search(std::vector<hpx::naming::id_type> const& search_objects) const
         {
-            return boost::geometry::within(pt_, p);
+#if 0
+            // get the polygons
+            typedef std::vector<lcos::future_value<memory_block_data> > lazy_results_type;
+
+            // first invoke all remote operations
+            lazy_results_type lazy_results;
+
+            BOOST_FOREACH(naming::id_type id, search_objects)
+            {
+              lazy_results.push_back(
+                components::stubs::memory_block::get_async( id ));
+            }
+
+            std::vector<access_memory_block<point_data> > polygons;
+            BOOST_FOREACH(lcos::future_value<memory_block_data> const& f, lazy_results)
+            {
+              polygons.push_back(f.get());
+            }
+
+            //scoped_values_lock<lcos::mutex> l(polygons);
+#endif
+            return false;
         }
 
         /// retrieve the X coordinate of this point
@@ -146,15 +169,19 @@ namespace hpx { namespace geometry { namespace server
         > set_Y_action;
 
         typedef hpx::actions::direct_result_action1<
-            point const, bool, point_search, plain_polygon_type const&, 
+            point const, bool, point_search, std::vector<hpx::naming::id_type> const&, 
             &point::search
         > search_action;
 
     private:
+        typedef boost::geometry::model::d2::point_xy<double> point_type;
+        typedef boost::geometry::model::polygon<point_type> polygon_type;
+
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;
-        boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
+        polygon_type poly_;
+        //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
 
 }}}

@@ -98,7 +98,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // SIMPLE PROBLEM
         // create some boxes to smash together
         const std::size_t num_bodies = 5;
-        const std::size_t numpoints = 10;
+        const std::size_t numpoints = 5;
         double bbox[num_bodies][4];
         std::size_t imax = 1000;
 
@@ -138,9 +138,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         } 
 
         // TEST
-        for (i=0;i<num_bodies;i++) {
-          std::cout << " Bounding box : " << bbox[i][0] << " " << bbox[i][1] << " " << bbox[i][2] << " " << bbox[i][3] << std::endl;
-        } 
+        //for (i=0;i<num_bodies;i++) {
+        //  std::cout << " Bounding box : " << bbox[i][0] << " " << bbox[i][1] << " " << bbox[i][2] << " " << bbox[i][3] << std::endl;
+        //} 
 
         init(locality_results(blocks), accu);
 
@@ -151,31 +151,27 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         hpx::components::wait(initial_phase);
-#if 0
-        hpx::geometry::polygon_2d p;
-        p.outer().push_back(accu[0]);
-        p.outer().push_back(accu[1]);
-        p.outer().push_back(accu[2]);
-        p.outer().push_back(accu[3]);
-        p.outer().push_back(accu[0]);
-        bg::correct(p);
 
-        hpx::geometry::polygon_2d q;
-        q.outer().push_back(accu[4]);
-        q.outer().push_back(accu[5]);
-        q.outer().push_back(accu[6]);
-        q.outer().push_back(accu[7]);
-        q.outer().push_back(accu[4]);
-        bg::correct(q);
-
-        hpx::geometry::plain_polygon_type plain_p;
-
-        // should be: boost::geometry::assign(plain_p, p)), but boost::geometry
-        // has a bug preventing this from compiling
-        boost::geometry::assign(plain_p.outer(), p.outer());
-
+        // vector of futures
         std::vector<hpx::lcos::future_value<bool> > search_phase;
-        search_phase.push_back(accu[4].search_async(plain_p));
+
+        // vector of gids
+        std::vector<hpx::naming::id_type> search_objects;
+        for (i=0;i<num_bodies;i++) {
+          search_objects.resize(num_bodies-(i+1));
+          for (std::size_t j=i+1;j<num_bodies;j++) {
+            search_objects[j-(i+1)] = accu[j].get_gid();
+          }
+          search_phase.push_back(accu[i].search_async(search_objects));
+        }
+
+#if 0
+        std::vector<hpx::lcos::future_value<bool> > search_phase;
+        for (i=0;i<num_bodies;i++) {
+          for (std::size_t j=i+1;j<num_bodies;j++) {
+            search_phase.push_back(accu[i].search_async(accu[j].get_poly()));
+          }
+        }
 
         hpx::components::wait(search_phase);
 
