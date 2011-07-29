@@ -91,8 +91,16 @@ void early_parcel_sink(
     // early parcels can't have continuations 
     BOOST_ASSERT(!p.get_continuation());
 
-    act->get_thread_function(0)
-        (threads::thread_state_ex(threads::wait_signaled));
+    // We should not allow any exceptions to escape the execution of the
+    // action as this would bring down the ASIO thread we execute in.
+    try {
+        act->get_thread_function(0)
+            (threads::thread_state_ex(threads::wait_signaled));
+    }
+    catch(...) {
+        LTM_(error) << "Unhandled exception while executing early_parcel_sink";
+        hpx::report_error(boost::current_exception());
+    }
 } // }}}
 
 void early_write_handler(

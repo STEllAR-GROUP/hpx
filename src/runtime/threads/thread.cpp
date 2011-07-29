@@ -99,10 +99,10 @@ namespace hpx { namespace threads
     thread_self& get_self()
     {
         thread_self* p = get_self_ptr();
-        if (HPX_UNLIKELY(!p))
-            HPX_THROW_EXCEPTION(null_thread_id
-                              , "threads::get_self"
-                              , "NULL thread id encountered");
+        if (HPX_UNLIKELY(!p)) {
+            HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self", 
+                "NULL thread id encountered (is this executed on a HPX-thread?)");
+        }
         return *get_self_ptr();
     }
 

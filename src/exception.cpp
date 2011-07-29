@@ -100,15 +100,17 @@ namespace hpx { namespace detail
         std::string thread_name("");
         std::string back_trace(backtrace());
 
-        if (threads::threadmanager_is(running))
-        {
-            node = applier::get_applier().get_prefix_id();
-            shepherd = threads::threadmanager_base::get_thread_num();
-        }
-
+        // if this is not a HPX thread we do not need to query neither for 
+        // the shepherd thread nor for the thread id
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
         {
+            if (threads::threadmanager_is(running))
+            {
+                node = applier::get_applier().get_prefix_id();
+                shepherd = threads::threadmanager_base::get_thread_num();
+            }
+
             thread_id = reinterpret_cast<std::size_t>(self->get_thread_id());
             thread_name = threads::get_thread_description(self->get_thread_id());
         } 
