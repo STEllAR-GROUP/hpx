@@ -33,12 +33,10 @@ namespace hpx { namespace components
         }
         server::bhnode::cnstFuture2 construct_node(const id_type insertPoint,
             const vector<double> bounds, const id_type nextNode,
-            vector<vector<double> > data, const int octant,
-            const vector<double> center){
+            vector<vector<double> > data, const int octant){
             BOOST_ASSERT(gid_);
             vector<int> octants(1,octant);
             vector<id_type> children(1,nextNode);
-            data.push_back(center);
             return this->base_type::construct_node(gid_, insertPoint, bounds,
                                                    children, data, octants);
         }

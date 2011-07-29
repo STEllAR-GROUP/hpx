@@ -90,7 +90,6 @@ namespace hpx { namespace components { namespace server
     try{
         double dat[7];
         double bounds[6] = {-1.7e308,-1.7e308,-1.7e308,1.7e308,1.7e308,1.7e308};
-        double totalMass = 0;
 
         infile>>numBodies>>numIters>>dtime>>eps>>tolerance;
         particle = new components::bhnode[numBodies];
@@ -107,12 +106,11 @@ namespace hpx { namespace components { namespace server
                 particlePositions[i][j] = dat[j+1];
             }
             particleMasses[i] = dat[0];
-            totalMass += dat[0];
         }
 
         treeRoot.create(get_applier().get_runtime_support_gid());
         id_type treeGid = treeRoot.get_gid();
-        dat[0] = totalMass;
+        dat[0] = 0;
         for(int i = 0; i < 3; i++){
             dat[i+1] = (bounds[i]+bounds[i+3])*.5;
             dat[i+4] = 0;
@@ -162,22 +160,22 @@ namespace hpx { namespace components { namespace server
         components::bhnode firstNode;
         vector<bhnode::cnstFuture2> newNodeFutures;
         id_type nextInsertPoint = path.insertPoint;
+        vector<double> childPos;
+        for(int i = 0; i < 3; i++){
+            childPos.push_back((path.childData[0][i] * path.childData[2][0]
+                + path.childData[1][i] * path.childData[2][1])*.5);
+        }
         firstNode.create(get_applier().get_runtime_support_gid());
-        bhnode::childFuture chFuture(path.insertPoint,
-            path.octants[0], firstNode.get_gid(), false);
+        bhnode::childFuture chFuture(path.insertPoint, path.octants[0],
+            firstNode.get_gid(), false, childPos);
         regions.push_back(firstNode);
 
         for(int i = 0; i < (int)path.subboundaries.size()-1; i++){
             components::bhnode nextNode;
-            vector<double> tempPosition;
-            for(int j = 0; j < 3; j++){
-                tempPosition.push_back((path.subboundaries[i+1][j] +
-                                        path.subboundaries[i+1][j+3])*.5);
-            }
             nextNode.create(get_applier().get_runtime_support_gid());
             newNodeFutures.push_back(firstNode.construct_node(nextInsertPoint,
                 path.subboundaries[i], nextNode.get_gid(), path.childData,
-                path.octants[i], tempPosition));
+                path.octants[i]));
             regions.push_back(nextNode);
             nextInsertPoint = firstNode.get_gid();
             firstNode = nextNode;

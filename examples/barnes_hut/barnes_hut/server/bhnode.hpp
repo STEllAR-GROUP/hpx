@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace server
             vector<double> nodep, double nodem, const id_type node1Gid,
             const id_type node2Gid);
         int update_child(const int octant, const id_type newChild,
-            const bool leaf);
+            const bool leaf, const vector<double> childPosition);
         int set_boundaries(const id_type parId, const vector<double> bounds);
         int find_octant(const vector<double> nodep, const vector<double> center);
         vector<double> calculate_subboundary(const int octant,
@@ -95,8 +95,9 @@ namespace hpx { namespace components { namespace server
         typedef actions::result_action3<bhnode, region_path, hpl_insrtNode,
             vector<double>, double, id_type, &bhnode::insert_node>
             insrtNodeAction;
-        typedef actions::result_action3<bhnode, int, hpl_updateChd, int,
-            id_type, bool, &bhnode::update_child> updatChldAction;
+        typedef actions::result_action4<bhnode, int, hpl_updateChd,
+            int, id_type, bool, vector<double>, 
+            &bhnode::update_child> updatChldAction;
 
         //futures
         typedef lcos::eager_future<server::bhnode::constNodeAction> constFuture;
@@ -132,14 +133,15 @@ namespace hpx { namespace components { namespace server
         isLeaf = isRoot = false;
         for(int i = 0; i < 6; i++){boundary[i] = bounds[i];}
         for(int i = 0; i < 3; i++){
-            pos[i] = (boundary[i] + boundary[i+3])*.5;
+            com[i] = (data[0][i]*data[2][0] + data[1][i]*data[2][1])*.5;
+            pos[i] = (bounds[i] + bounds[i+3]) * .5;
         }
         if(octants.size() == 1){
             for(int i = 0; i < 8; i++){
                 if(i == octants[0]){
                     hasChild[i] = true;
                     child[i] = children[0];
-                    for(int j = 0; j < 3; j++){childPos[i][j] = data[3][j];}
+                    for(int j = 0; j < 3; j++){childPos[i][j] = com[j];}
                     childMasses[i] = data[2][0] + data[2][1];
                 }
                 else{hasChild[i] = false;}
@@ -157,9 +159,6 @@ namespace hpx { namespace components { namespace server
             insert_node(data[1], data[2][1], children[1]);
         }
         mass = data[2][0] + data[2][1];
-        for(int i = 0; i < 3; i++){
-            com[i] = (data[0][i]*data[2][0] + data[1][i]*data[2][1])*.5;
-        }
         return 0;
     }
 
@@ -325,15 +324,31 @@ std::cout<<"\n\n";*/
     }
 
     int bhnode::update_child(const int octant, const id_type newChild,
-        const bool leaf){
+        const bool leaf, const vector<double> childPosition){
         child[octant] = newChild;
         hasChild[octant] = true;
         childIsLeaf[octant] = leaf;
+        for(int i = 0; i < 3; i++){childPos[octant][i] = childPosition[i];}
         update_com();
         return 0;
     }
 
-    void bhnode::update_com(){}
+    void bhnode::update_com(){
+        int count = 0;
+        mass = com[0] = com[1] = com[2] = 0;
+        for(int i = 0; i < 8; i++){
+            if(hasChild[i]){
+                count++;
+                mass += childMasses[i];
+                com[0] += childMasses[i]*childPos[i][0];
+                com[1] += childMasses[i]*childPos[i][1];
+                com[2] += childMasses[i]*childPos[i][2];
+            }
+        }
+        com[0] /= count;
+        com[1] /= count;
+        com[2] /= count;
+    }
 
 }}}
 #endif
