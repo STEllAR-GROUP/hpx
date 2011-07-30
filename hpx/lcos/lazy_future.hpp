@@ -117,8 +117,9 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        static void invoke(hpx::lcos::lazy_future<Action,Result,boost::mpl::false_> *th, 
-                           naming::id_type const& gid)
+        static void invoke(
+            hpx::lcos::lazy_future<Action, Result, boost::mpl::false_> *th, 
+            naming::id_type const& gid)
         {
             // FIXME: Simultaneous calls to invokeN() methods may result in
             // multiple calls to apply(). This is a benign race condition,
@@ -126,7 +127,7 @@ namespace hpx { namespace lcos
             // more than once; but it would be more efficient to reduce the
             // number of calls to apply().
             if (!((*th->impl_)->ready()))
-              th->apply(gid);
+                th->apply(gid);
         }
 
         // suppress warning about using this in constructor base initializer list

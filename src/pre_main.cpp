@@ -34,8 +34,7 @@ create_barrier(naming::resolver_client& agas_client,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Find a registered barrier object from its symbolic name, return invalid_gid
-// if failed after N retries.
+// Find a registered barrier object from its symbolic name.
 inline lcos::barrier 
 find_barrier(naming::resolver_client& agas_client, char const* symname)
 {
