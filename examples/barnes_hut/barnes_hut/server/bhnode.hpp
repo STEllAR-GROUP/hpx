@@ -29,6 +29,7 @@ struct region_path{
     vector<id_type> child;
     vector<vector<double> > subboundaries, childData;
     vector<int> octants;
+    vector<double> forParent;
     template<typename Archive>
     void serialize(Archive& ar, unsigned int version){
         ar & isPath;
@@ -51,7 +52,8 @@ namespace hpx { namespace components { namespace server
             hpl_cnstNode2,
             hpl_setBounds,
             hpl_insrtNode,
-            hpl_updateChd
+            hpl_updateChd,
+            hpl_printTree
         };
         //constructors and destructor
         bhnode(){}
@@ -74,6 +76,9 @@ namespace hpx { namespace components { namespace server
         vector<double> calculate_subboundary(const int octant,
             vector<double> subboundary);
         void update_com();
+
+        //for debugging
+        int print_tree(const int level, const int depth);
 
         //data members
         double boundary[6], pos[3], vel[3], mass, com[3];
@@ -98,6 +103,9 @@ namespace hpx { namespace components { namespace server
         typedef actions::result_action4<bhnode, int, hpl_updateChd,
             int, id_type, bool, vector<double>, 
             &bhnode::update_child> updatChldAction;
+        //for debugging
+        typedef actions::result_action2<bhnode, int, hpl_printTree,
+            int, int, &bhnode::print_tree> printTreeAction;
 
         //futures
         typedef lcos::eager_future<server::bhnode::constNodeAction> constFuture;
@@ -105,6 +113,8 @@ namespace hpx { namespace components { namespace server
         typedef lcos::eager_future<server::bhnode::setBoundsAction> boundFuture;
         typedef lcos::eager_future<server::bhnode::insrtNodeAction> iNodeFuture;
         typedef lcos::eager_future<server::bhnode::updatChldAction> childFuture;
+        //for debugging
+        typedef lcos::eager_future<server::bhnode::printTreeAction> printFuture;
     };
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -131,9 +141,10 @@ namespace hpx { namespace components { namespace server
         _gid = gid;
         parent = insertPoint;
         isLeaf = isRoot = false;
+        mass = data[2][0] + data[2][1];
         for(int i = 0; i < 6; i++){boundary[i] = bounds[i];}
         for(int i = 0; i < 3; i++){
-            com[i] = (data[0][i]*data[2][0] + data[1][i]*data[2][1])*.5;
+            com[i] = (data[0][i]*data[2][0] + data[1][i]*data[2][1])/mass;
             pos[i] = (bounds[i] + bounds[i+3]) * .5;
         }
         if(octants.size() == 1){
@@ -142,7 +153,7 @@ namespace hpx { namespace components { namespace server
                     hasChild[i] = true;
                     child[i] = children[0];
                     for(int j = 0; j < 3; j++){childPos[i][j] = com[j];}
-                    childMasses[i] = data[2][0] + data[2][1];
+                    childMasses[i] = mass;
                 }
                 else{hasChild[i] = false;}
                 childIsLeaf[i] = false;
@@ -158,7 +169,6 @@ namespace hpx { namespace components { namespace server
             insert_node(data[0], data[2][0], children[0]);
             insert_node(data[1], data[2][1], children[1]);
         }
-        mass = data[2][0] + data[2][1];
         return 0;
     }
 
@@ -170,19 +180,14 @@ namespace hpx { namespace components { namespace server
         const double nodem, const id_type nodeGid){
         vector<double> tempPos(pos,pos+3);
         const int octant = find_octant(nodep, tempPos);
+        int i;
         region_path insertPath;
         insertPath.isPath = false;
-/*std::cout<<"adding "<<nodeGid<<" to octant "<<octant<<"\n";
-std::cout<<_gid<<" is root? "<<isRoot<<" isLeaf? "<<isLeaf;
-if(isRoot)std::cout<<"\n";else{std::cout<<" parent: "<<parent<<"\n";}
-for(int i=0;i<8;i++){
-if(hasChild[i]){std::cout<<child[i]<<" ";}
-else{std::cout<<i<<" ";}}
-for(int i=0;i<8;i++){std::cout<<childIsLeaf[i]<<"/t";}
-std::cout<<"\n\n";*/
         if(hasChild[octant] && !childIsLeaf[octant]){
             iNodeFuture waitFuture(child[octant], nodep, nodem, nodeGid);
             insertPath = waitFuture.get();
+            childMasses[octant] = insertPath.forParent[0];
+            for(i=0;i<3;i++){childPos[octant][i] = insertPath.forParent[i+1];}
         }
         else if(hasChild[octant]){
             vector<double> tempBoundary(boundary,boundary+6);
@@ -202,6 +207,11 @@ std::cout<<"\n\n";*/
             cM.push_back(childMasses[octant]);
             insertPath.childData.push_back(cM);
             childIsLeaf[octant] = false;
+            for(i = 0; i < 3; i++){
+                childPos[octant][i] = (childPos[octant][i]*childMasses[octant] +
+                                    nodep[i]*nodem)/(childMasses[octant]+nodem);
+            }
+            childMasses[octant] = nodem + childMasses[octant];
         }
         else{
             vector<double> tempBoundary(boundary,boundary+6);
@@ -211,11 +221,14 @@ std::cout<<"\n\n";*/
             child[octant] = nodeGid;
             hasChild[octant] = true;
             childIsLeaf[octant] = true;
-            for(int i = 0; i < 3; i++){childPos[octant][i] = nodep[i];}
+            for(i = 0; i < 3; i++){childPos[octant][i] = nodep[i];}
             childMasses[octant] = nodem;
             waitFuture.get();
         }
         update_com();
+        insertPath.forParent.clear();
+        insertPath.forParent.push_back(mass);
+        for(i = 0; i < 3; i++){insertPath.forParent.push_back(com[i]);}
         return insertPath; 
     }
 
@@ -334,21 +347,43 @@ std::cout<<"\n\n";*/
     }
 
     void bhnode::update_com(){
-        int count = 0;
         mass = com[0] = com[1] = com[2] = 0;
         for(int i = 0; i < 8; i++){
             if(hasChild[i]){
-                count++;
                 mass += childMasses[i];
                 com[0] += childMasses[i]*childPos[i][0];
                 com[1] += childMasses[i]*childPos[i][1];
                 com[2] += childMasses[i]*childPos[i][2];
             }
         }
-        com[0] /= count;
-        com[1] /= count;
-        com[2] /= count;
+        com[0] /= mass;
+        com[1] /= mass;
+        com[2] /= mass;
+    }
+
+    int bhnode::print_tree(const int level, const int depth){
+        int i;
+        if(level > 0){std::cout<<"  ";}
+        for(i = 1; i < level; i++){std::cout<<"| ";}
+        if(level > 0){std::cout<<"|_";}
+        std::cout<<"m: "<<mass<<"  p:("<<pos[0]<<", "<<pos[1]<<", "<<pos[2]
+                 <<")  com:("<<com[0]<<", "<<com[1]<<", "<<com[2]<<")\n";
+        for(i = 0; i < 8; i++){
+            if(hasChild[i]){
+                printFuture future(child[i],level+1, depth);
+                future.get();
+            }
+        }
+        return 0;
     }
 
 }}}
 #endif
+/*std::cout<<"adding "<<nodeGid<<" to octant "<<octant<<"\n";
+std::cout<<_gid<<" is root? "<<isRoot<<" isLeaf? "<<isLeaf;
+if(isRoot)std::cout<<"\n";else{std::cout<<" parent: "<<parent<<"\n";}
+for(int i=0;i<8;i++){
+if(hasChild[i]){std::cout<<child[i]<<" ";}
+else{std::cout<<i<<" ";}}
+for(int i=0;i<8;i++){std::cout<<childIsLeaf[i]<<"/t";}
+std::cout<<"\n\n";*/

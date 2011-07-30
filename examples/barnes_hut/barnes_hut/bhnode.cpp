@@ -40,4 +40,6 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::insrtNodeAction,hplInsrtNodeAction);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::updatChldAction,hplUpdatChldAction);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::bhnode::printTreeAction,hplPrintTreeAction);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::bhnode);

@@ -140,6 +140,8 @@ namespace hpx { namespace components { namespace server
 
     int bhcontroller::run_simulation(){
         build_init();
+        bhnode::printFuture future(treeRoot.get_gid(), 0, 8);
+        future.get();
         return 0;
     }
 
