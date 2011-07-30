@@ -553,8 +553,10 @@ namespace hpx
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
 
+                    // do not execute any explicit hpx_main except if asked 
+                    // otherwise
                     if (!vm.count("run-hpx-main"))
-                        f = 0;      // do not execute any explicit hpx_main
+                        f = 0;
                 }
             }
 
@@ -585,6 +587,10 @@ namespace hpx
                 ini_config += "hpx.num_localities=" + 
                     boost::lexical_cast<std::string>(num_localities);
             }
+
+            // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
+            //        service only and requests to use 'priority_local' as the
+            //        scheduler, switch to the 'local' scheduler instead.
 #endif
 
             // Initialize and start the HPX runtime.
