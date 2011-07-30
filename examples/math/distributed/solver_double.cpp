@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
+
 #include <iomanip>
 #include <cmath>
 #include <cfloat>
@@ -17,6 +19,7 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 #include <boost/integer_traits.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
@@ -28,6 +31,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -39,6 +43,8 @@ using boost::format;
 using boost::program_options::options_description;
 using boost::program_options::value;
 using boost::program_options::variables_map;
+
+using boost::posix_time::milliseconds;
 
 using hpx::actions::function;
 using hpx::actions::plain_action1;
@@ -84,6 +90,11 @@ using hpx::performance_counters::status_valid_data;
 using hpx::performance_counters::stubs::performance_counter;
 
 using hpx::threads::threadmanager_is;
+using hpx::threads::pending;
+using hpx::threads::suspended;
+using hpx::threads::get_self_id;
+using hpx::threads::get_self;
+using hpx::threads::set_thread_state;
 
 using hpx::util::high_resolution_timer;
 
@@ -113,13 +124,10 @@ HPX_REGISTER_PLAIN_ACTION(math_function_action);
 ///////////////////////////////////////////////////////////////////////////////
 void agas_main(variables_map& vm)
 {
-    const double frequency = 10;
-    const double duration = 5; 
-    const double rate = 0.01;
-
+    const boost::uint32_t rate = vm["monitoring-rate"].as<boost::uint32_t>();
     const std::string name = vm["performance-counter"].as<std::string>();
 
-    std::cout << (format("(monitor %s)\n") % name);
+    std::cout << (format("monitoring %s\n") % name);
 
     // Resolve the GID of the performance counter using it's symbolic name.
     gid_type gid;
@@ -133,56 +141,25 @@ void agas_main(variables_map& vm)
     get_applier().get_agas_client().registerid
         ("/stop_flag([L1]/solver_double)", stop_flag.get_gid().get_gid());
 
-    high_resolution_timer t;
-    double current_time(0);
-
-    for (boost::uint64_t segment = 0; true; ++segment)
+    while (true) 
     {
-        // Get the current time at the start of each segment.
-        const double segment_start = t.elapsed();
+        if (!threadmanager_is(running) || stop_flag.ready())
+            return;
 
-        // do-while style for loop.
-        for (boost::uint64_t block = 0;
-             block != 0 || current_time - segment_start < frequency;
-             ++block)
+        // Query the performance counter.
+        counter_value value = performance_counter::get_value(gid); 
+
+        if (HPX_LIKELY(status_valid_data == value.status_))
         {
-            // Start the monitoring phase.
-            const double monitor_start = t.elapsed();
-
-            do {
-                current_time = t.elapsed();
-
-                // Query the performance counter.
-                counter_value value = performance_counter::get_value(gid); 
-
-                if (HPX_LIKELY(status_valid_data == value.status_)) {
-                    std::cout << ( format("  (%f %d)\n")
-                                 % current_time
-                                 % value.value_);
-                }
-                else {
-                    std::cout << (format("  (%f '())\n") % current_time);
-                }
-
-                // Adjust rate of pinging values.
-                const double delay_start = t.elapsed();
-
-                do {
-                    // Stop when the threadmanager is no longer available.
-                    if (!threadmanager_is(running) || stop_flag.ready())
-                        return;
-
-                    current_time = t.elapsed();
-                } while (current_time - delay_start < rate);
-            } while (current_time - monitor_start < duration);
+            std::cout << ( format("  %d,%d\n")
+                         % value.time_
+                         % value.value_);
         }
 
-        // Adjust rate of monitoring phases.
-        const double pause_start = t.elapsed();
-
-        do {
-            current_time = t.elapsed();
-        } while (current_time - pause_start < (frequency - duration));
+        // Schedule a wakeup in 5 seconds.
+        set_thread_state(get_self_id(), milliseconds(rate), pending);
+        
+        get_self().yield(suspended);
     }
 }
 
@@ -281,7 +258,7 @@ int console_main(variables_map& vm)
     double elapsed = t.elapsed();
 
     cout() << ( format("integral from %.12f to %.12f is %.12f\n"
-                              "computation took %f seconds")
+                       "computation took %f seconds")
               % lower_bound
               % upper_bound
               % r
@@ -341,10 +318,12 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "lower-bound"
         , value<double>()->default_value(1 << 13, "2^13") 
+//        , value<double>()->default_value(100000) 
         , "lower bound of integration")
 
         ( "upper-bound"
         , value<double>()->default_value(1 << 25, "2^25")
+//      , value<double>()->default_value(108192)
         , "upper bound of integration")
 
         ( "tolerance"
@@ -353,11 +332,17 @@ int main(int argc, char* argv[])
 
         ( "top-segments"
         , value<boost::uint32_t>()->default_value(1 << 25, "2^25") 
+//      , value<boost::uint32_t>()->default_value(4096) 
         , "number of top-level segments")
 
         ( "regrid-segments"
         , value<boost::uint32_t>()->default_value(128) 
+//        , value<boost::uint32_t>()->default_value(512) 
         , "number of segment per regrid")
+
+        ( "monitoring-rate"
+        , value<boost::uint32_t>()->default_value(100) 
+        , "milliseconds between each performance counter query")
 
         ( "performance-counter"
         , value<std::string>()->default_value
