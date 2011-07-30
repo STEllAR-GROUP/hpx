@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace amr
         manage_object_config_data_action();
 
     // memory block support for stencil data (user defined data)
-    typedef hpx::actions::manage_object_config_action<
+    typedef hpx::actions::manage_object_action<
         stencil_data, server::stencil_config_data> manage_object_data_action;
     manage_object_data_action const manage_stencil_data = 
         manage_object_data_action();

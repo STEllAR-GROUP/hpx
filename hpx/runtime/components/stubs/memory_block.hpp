@@ -29,10 +29,34 @@ namespace hpx { namespace components { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-        template <typename T>
+//         template <typename T>
+//         static lcos::future_value<naming::id_type, naming::gid_type> 
+//         create_async(naming::id_type const& targetgid, std::size_t count,
+//             hpx::actions::manage_object_action<T> const& act) 
+//         {
+//             // Create an eager_future, execute the required action,
+//             // we simply return the initialized future_value, the caller needs
+//             // to call get() on the return value to obtain the result
+//             typedef server::runtime_support::create_memory_block_action action_type;
+//             return lcos::eager_future<action_type, naming::id_type>(targetgid, count, act);
+//         }
+// 
+//         /// Create a new component \a type using the runtime_support with the 
+//         /// given \a targetgid. Block for the creation to finish.
+//         template <typename T>
+//         static naming::id_type 
+//         create(naming::id_type const& targetgid, std::size_t count, 
+//             hpx::actions::manage_object_action<T> const& act) 
+//         {
+//             // The following get yields control while the action above 
+//             // is executed and the result is returned to the eager_future
+//             return create_async(targetgid, count, act).get();
+//         }
+
+        template <typename T, typename Config>
         static lcos::future_value<naming::id_type, naming::gid_type> 
         create_async(naming::id_type const& targetgid, std::size_t count,
-            hpx::actions::manage_object_action<T> const& act) 
+            hpx::actions::manage_object_action<T, Config> const& act) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
@@ -43,34 +67,10 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a new component \a type using the runtime_support with the 
         /// given \a targetgid. Block for the creation to finish.
-        template <typename T>
-        static naming::id_type 
-        create(naming::id_type const& targetgid, std::size_t count, 
-            hpx::actions::manage_object_action<T> const& act) 
-        {
-            // The following get yields control while the action above 
-            // is executed and the result is returned to the eager_future
-            return create_async(targetgid, count, act).get();
-        }
-
-        template <typename T, typename Config>
-        static lcos::future_value<naming::id_type, naming::gid_type> 
-        create_async(naming::id_type const& targetgid, std::size_t count,
-            hpx::actions::manage_object_config_action<T, Config> const& act) 
-        {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_memory_block_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(targetgid, count, act);
-        }
-
-        /// Create a new component \a type using the runtime_support with the 
-        /// given \a targetgid. Block for the creation to finish.
         template <typename T, typename Config>
         static naming::id_type 
         create(naming::id_type const& targetgid, std::size_t count, 
-            hpx::actions::manage_object_config_action<T, Config> const& act) 
+            hpx::actions::manage_object_action<T, Config> const& act) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the eager_future

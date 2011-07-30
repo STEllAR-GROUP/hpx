@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
-        int shutdown(double timeout);
+        void shutdown(double timeout, naming::id_type respond_to);
 
         /// \brief Action shut down runtime system instances on all localities
         void shutdown_all(double timeout);
@@ -134,32 +134,6 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-#ifdef STACKLESS_COROUTINE
-        typedef hpx::actions::direct_result_action1<
-            runtime_support, int,
-            runtime_support_factory_properties, components::component_type,
-            &runtime_support::factory_properties
-        > factory_properties_action;
-
-        typedef hpx::actions::direct_result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_component,
-            components::component_type, std::size_t,
-            &runtime_support::create_component
-        > create_component_action;
-
-        typedef hpx::actions::direct_result_action2<
-            runtime_support, naming::gid_type,
-            runtime_support_create_one_component,
-            components::component_type, constructor_argument const&,
-            &runtime_support::create_one_component
-        > create_one_component_action;
-
-        typedef hpx::actions::direct_result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_memory_block,
-            std::size_t, hpx::actions::manage_object_action_base const&,
-            &runtime_support::create_memory_block
-        > create_memory_block_action;
-#else
         typedef hpx::actions::result_action1<
             runtime_support, int, 
             runtime_support_factory_properties, components::component_type, 
@@ -184,7 +158,6 @@ namespace hpx { namespace components { namespace server
             std::size_t, hpx::actions::manage_object_action_base const&,
             &runtime_support::create_memory_block
         > create_memory_block_action;
-#endif
 
 #if HPX_AGAS_VERSION > 0x10
         typedef hpx::actions::direct_action0<
@@ -209,8 +182,8 @@ namespace hpx { namespace components { namespace server
             &runtime_support::free_component
         > free_component_action;
 
-        typedef hpx::actions::result_action1<
-            runtime_support, int, runtime_support_shutdown, double, 
+        typedef hpx::actions::action2<
+            runtime_support, runtime_support_shutdown, double, naming::id_type,
             &runtime_support::shutdown
         > shutdown_action;
 
@@ -244,7 +217,7 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout);
+        void stop(double timeout, naming::id_type respond_to);
 
         /// called locally only
         void stopped();

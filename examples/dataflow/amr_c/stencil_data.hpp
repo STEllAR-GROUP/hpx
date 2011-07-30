@@ -101,7 +101,7 @@ namespace hpx { namespace components { namespace amr
 
     private:
         // customized serialization support
-        friend struct actions::manage_object_config_action<
+        friend struct actions::manage_object_action<
             stencil_data, server::stencil_config_data>;
 
         template<class Archive>

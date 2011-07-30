@@ -113,8 +113,11 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Config = void>
+    struct manage_object_action;
+
     template <typename T>
-    struct manage_object_action : manage_object_action_base
+    struct manage_object_action<T, void> : manage_object_action_base
     {
         manage_object_action() {}
         ~manage_object_action() {}
@@ -240,16 +243,16 @@ namespace hpx { namespace actions
     manage_object_action_base::get_instance() const
     {
         static manage_object_action<boost::uint8_t> const instance =
-                manage_object_action<boost::uint8_t>();
+            manage_object_action<boost::uint8_t>();
         return instance;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Config>
-    struct manage_object_config_action : manage_object_action<T>
+    struct manage_object_action : manage_object_action<T>
     {
-        manage_object_config_action() {}
-        ~manage_object_config_action() {}
+        manage_object_action() {}
+        ~manage_object_action() {}
 
         typedef typename manage_object_action<T>::oarchive_type oarchive_type;
         typedef typename manage_object_action<T>::iarchive_type iarchive_type;
@@ -279,18 +282,18 @@ namespace hpx { namespace actions
         // serialization support
         serialize_save_function save() const
         { 
-            return &manage_object_config_action::save_; 
+            return &manage_object_action::save_; 
         }
         serialize_load_function load() const
         { 
-            return &manage_object_config_action::load_; 
+            return &manage_object_action::load_; 
         }
 
     public:
         manage_object_action_base const& get_instance() const
         {
-            static manage_object_config_action const instance =
-                manage_object_config_action();
+            static manage_object_action const instance =
+                manage_object_action();
             return instance;
         }
 
@@ -298,7 +301,7 @@ namespace hpx { namespace actions
         static void register_base()
         {
             using namespace boost::serialization;
-            void_cast_register<manage_object_config_action, manage_object_action<T> >();
+            void_cast_register<manage_object_action, manage_object_action<T> >();
         }
 
     private:

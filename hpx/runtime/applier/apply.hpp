@@ -130,6 +130,31 @@ namespace hpx { namespace applier
         return apply_r_p<Action>(addr, c, gid, threads::thread_priority_default);
     }
 
+    template <typename Action>
+    inline bool 
+    apply_r_sync_p(naming::address& addr, naming::id_type const& gid, 
+        threads::thread_priority priority)
+    {
+        // If remote, create a new parcel to be sent to the destination
+        // Create a new parcel with the gid, action, and arguments
+        parcelset::parcel p (gid.get_gid(), new Action(priority));
+        if (components::component_invalid == addr.type_)
+            addr.type_ = components::get_component_type<typename Action::component_type>();
+        p.set_destination_addr(addr);   // avoid to resolve address again
+
+        // Send the parcel through the parcel handler
+        hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);
+        return false;     // destination is remote
+    }
+
+    template <typename Action>
+    inline bool 
+    apply_r_sync (naming::address& addr, naming::id_type const& gid)
+    {
+        return apply_r_sync_p<Action>(addr, gid, 
+            threads::thread_priority_default);
+    }
+
     // we  know, it's local and has to be directly executed
     template <typename Action>
     inline bool apply_l_p(actions::continuation* c, 

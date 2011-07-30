@@ -85,26 +85,26 @@ namespace hpx { namespace components
         }
 
         /// Create a new memory block using the runtime_support 
-        template <typename T>
-        naming::id_type create_memory_block(std::size_t count, 
-            hpx::actions::manage_object_action<T> const& act) 
-        {
-            return this->base_type::create_memory_block(gid_, count, act);
-        }
-
-        /// Asynchronously create a new memory block using the runtime_support 
-        template <typename T>
-        lcos::future_value<naming::id_type, naming::gid_type> 
-        create_memory_block_async(std::size_t count,
-            hpx::actions::manage_object_action<T> const& act) 
-        {
-            return this->base_type::create_memory_block_async(gid_, count, act);
-        }
+//         template <typename T>
+//         naming::id_type create_memory_block(std::size_t count, 
+//             hpx::actions::manage_object_action<T> const& act) 
+//         {
+//             return this->base_type::create_memory_block(gid_, count, act);
+//         }
+// 
+//         /// Asynchronously create a new memory block using the runtime_support 
+//         template <typename T>
+//         lcos::future_value<naming::id_type, naming::gid_type> 
+//         create_memory_block_async(std::size_t count,
+//             hpx::actions::manage_object_action<T> const& act) 
+//         {
+//             return this->base_type::create_memory_block_async(gid_, count, act);
+//         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Config>
         naming::id_type create_memory_block(std::size_t count, 
-            hpx::actions::manage_object_config_action<T, Config> const& act) 
+            hpx::actions::manage_object_action<T, Config> const& act) 
         {
             return this->base_type::create_memory_block(gid_, count, act);
         }
@@ -113,7 +113,7 @@ namespace hpx { namespace components
         template <typename T, typename Config>
         lcos::future_value<naming::id_type, naming::gid_type> 
         create_memory_block_async(std::size_t count,
-            hpx::actions::manage_object_config_action<T, Config> const& act) 
+            hpx::actions::manage_object_action<T, Config> const& act) 
         {
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
@@ -150,28 +150,15 @@ namespace hpx { namespace components
         }
 #endif
 
-        /// Destroy an existing component
-//         void free_component (components::component_type type, 
-//             naming::id_type const& gid)
-//         {
-//             this->base_type::free_component(type, gid);
-//         }
-
-//         void free_component_sync(
-//             components::component_type type, naming::id_type const& gid)
-//         {
-//             this->base_type::free_component_sync(type, gid);
-//         }
-
         /// \brief Shutdown the given runtime system
-        lcos::future_value<int> shutdown_async(double timeout = -1)
+        lcos::future_value<void> shutdown_async(double timeout = -1)
         {
-            return this->base_type::shutdown_async(gid_);
+            return this->base_type::shutdown_async(gid_, timeout);
         }
 
-        int shutdown(double timeout = -1)
+        void shutdown(double timeout = -1)
         {
-            return this->base_type::shutdown(gid_);
+            this->base_type::shutdown(gid_, timeout);
         }
 
         /// \brief Shutdown the runtime systems of all localities
