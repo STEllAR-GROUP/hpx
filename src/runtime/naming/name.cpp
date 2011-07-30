@@ -42,8 +42,8 @@ namespace hpx { namespace naming
                 components::component_type t = components::component_invalid;
                 if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
                 {
-                    components::stubs::runtime_support::free_component_sync
-                        ((components::component_type)t, *p);
+                    components::stubs::runtime_support::free_component_sync(
+                        (components::component_type)t, *p);
                 }
             }
             catch (hpx::exception const& e) {
@@ -133,11 +133,11 @@ namespace hpx { namespace naming
             }
 
             // if it already has been resolved, just return the address
-            if (valid || resolve()) {
-                addr = address_;
-                return true;
-            }
-            return false;
+            if (!valid && !resolve()) 
+                return false;
+
+            addr = address_;
+            return true;
         }
 
         bool id_type_impl::resolve()
@@ -145,7 +145,7 @@ namespace hpx { namespace naming
             // call only if not already resolved
 
             applier::applier& appl = applier::get_applier();
-            if (strip_credit_from_gid(this->get_msb()) == appl.get_prefix().get_msb())
+            if (is_local_address(*this, appl.get_prefix()))
             {
                 // a zero address references the local runtime support component
                 gid_type::mutex_type::scoped_lock l(this);
@@ -166,7 +166,7 @@ namespace hpx { namespace naming
                 address_ = addr;
                 return true;
             }
-            return appl.get_agas_client().resolve(*this, addr, true, ec);
+            return false;
         }
     }   // detail
 

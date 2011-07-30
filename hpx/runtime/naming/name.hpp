@@ -377,8 +377,8 @@ namespace hpx { namespace naming
     {
         enum management_type
         {
-            unmanaged = 0
-          , managed = 1
+            unmanaged = 0,
+            managed = 1
         };
 
     private:
