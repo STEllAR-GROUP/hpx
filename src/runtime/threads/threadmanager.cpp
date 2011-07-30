@@ -486,14 +486,14 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::ake_timer_thread",
+                "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (id)");  
         }
 
         else if (HPX_UNLIKELY(!timer_id))
         {
             HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::ake_timer_thread",
+                "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (timer_id)");
         }
 
