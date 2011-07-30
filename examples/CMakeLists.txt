@@ -15,6 +15,7 @@ if(NOT MSVC)
   set(subdirs
       accumulator
       contact
+      dataflow
       hplpx
       barnes_hut
       random_mem_access
@@ -28,6 +29,7 @@ if(NOT MSVC)
                            function
                            math
                            object_semaphore
+                           timed
                            balancing)
   endif()
 
