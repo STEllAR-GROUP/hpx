@@ -40,11 +40,17 @@ namespace hpx { namespace components { namespace amr
     manage_object_data_action const manage_stencil_data = 
         manage_object_data_action();
 
+//     // memory block support for stencil data (user defined data)
+//     typedef hpx::actions::manage_object_action<stencil_data> 
+//         manage_object_data_action_simple;
+//     manage_object_data_action_simple const manage_stencil_data_simple = 
+//         manage_object_data_action_simple();
+
     ///////////////////////////////////////////////////////////////////////////
     memory_block_data stencil_config_data::create_and_resolve_target()
     {
-        mem_block.create(hpx::find_here(), sizeof(stencil_data), 
-            manage_stencil_data);
+        mem_block.create(hpx::find_here(), sizeof(server::stencil_config_data), 
+            manage_stencil_config_data);
         return mem_block.get();
     }
 
@@ -67,6 +73,10 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
 HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::components::amr::manage_object_data_action,
     dataflow_manage_object_action_stencil_data)
+
+// HPX_REGISTER_MANAGE_OBJECT_ACTION(
+//     hpx::components::amr::manage_object_data_action_simple,
+//     dataflow_manage_object_action_stencil_data_simple)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr 
@@ -110,54 +120,44 @@ namespace hpx { namespace components { namespace amr
         // first invoke all remote operations
         lazy_results_type lazy_results;
 
+        namespace s = hpx::components::stubs;
         lazy_results.push_back(
-               components::stubs::memory_block::get_async(
-                    gids[0], cfg_left.get_memory_block()));
+            s::memory_block::get_async(gids[0], cfg_left.get_memory_block()));
+        lazy_results.push_back(s::memory_block::get_async(gids[1]));
         lazy_results.push_back(
-               components::stubs::memory_block::get_async(
-                    gids[1]) );
-        lazy_results.push_back(
-                components::stubs::memory_block::get_async(
-                    gids[2], cfg_right.get_memory_block()));
-
-        //BOOST_FOREACH(naming::id_type id, gids)
-        //{
-        //    lazy_results.push_back(
-        //        components::stubs::memory_block::get_async(
-        //            id, cfg.get_memory_block()));
-        //}
+            s::memory_block::get_async(gids[2], cfg_right.get_memory_block()));
 
         //  invoke the operation for the result gid as well
-        lcos::future_value<memory_block_data> lazy_result =
-            components::stubs::memory_block::get_async(result);   // no cfg data for result
+        lazy_results.push_back(s::memory_block::get_async(result));
 
         // then wait for all results to get back to us
         std::vector<access_memory_block<stencil_data> > val;
         BOOST_FOREACH(lcos::future_value<memory_block_data> const& f, lazy_results)
-        {
             val.push_back(f.get());
-        }
-
-        // now return the resolved result
-        access_memory_block<stencil_data> resultval = lazy_result.get();
 
         // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(resultval, val); 
+        scoped_values_lock<lcos::mutex> l(val); 
 
-        resultval->max_index_ = val[1]->max_index_;
-        resultval->index_ = val[1]->index_;
+        val[3]->max_index_ = val[1]->max_index_;
+        val[3]->index_ = val[1]->index_;
+        val[3]->value_ = val[1]->value_;
 
-        resultval->value_ = val[1]->value_;
         //resultval->value_.resize(val[1]->value_.size());
         //for (std::size_t i=0;i<val[1]->value_.size();i++) {
         //  resultval->value_[i] = val[1]->value_[i];
         //}
 
-        resultval->timestep_ = val[1]->timestep_ + 1.0;
+        val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
-        std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " left input " << val[0]->value_.size() << " middle input " << val[1]->value_.size() << " right input " << val[2]->value_.size() << std::endl;
+        std::cout << " row " << row << " column " << column 
+            << " timestep " << val[3]->timestep_ 
+            << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
+            << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
+            << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
+            << std::endl;
+
         //std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " size " << val.size() << std::endl;
-        if ( resultval->timestep_ >= par->nt0-1 ) {
+        if (val[3]->timestep_ >= par->nt0-1) {
           return 0;
         }
         return 1;

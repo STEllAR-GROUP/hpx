@@ -101,6 +101,23 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Config>
+        naming::id_type create_memory_block(std::size_t count, 
+            hpx::actions::manage_object_config_action<T, Config> const& act) 
+        {
+            return this->base_type::create_memory_block(gid_, count, act);
+        }
+
+        /// Asynchronously create a new memory block using the runtime_support 
+        template <typename T, typename Config>
+        lcos::future_value<naming::id_type, naming::gid_type> 
+        create_memory_block_async(std::size_t count,
+            hpx::actions::manage_object_config_action<T, Config> const& act) 
+        {
+            return this->base_type::create_memory_block_async(gid_, count, act);
+        }
+
 #if HPX_AGAS_VERSION > 0x10
         lcos::future_value<void> load_components_async()
         {

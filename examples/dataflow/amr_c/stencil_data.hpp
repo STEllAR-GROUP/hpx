@@ -108,18 +108,17 @@ namespace hpx { namespace components { namespace amr
         void save(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) const
         {
-            BOOST_ASSERT(0 != config);
-
             ar & max_index_ & index_ & timestep_;
-            value_.do_save(ar, config->start_, config->count_);
+            if (config)
+                value_.do_save(ar, config->start_, config->count_);
+            else
+                value_.do_save(ar, 0, value_.size());
         } 
 
         template<class Archive>
         void load(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) 
         {
-            BOOST_ASSERT(0 != config);
-
             ar & max_index_ & index_ & timestep_;
             value_.do_load(ar);
         } 

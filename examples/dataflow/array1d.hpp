@@ -27,6 +27,11 @@ public:
     return vsize_;
   }
 
+  std::size_t data_size() const
+  {
+    return data_.size();
+  }
+
   void resize(std::size_t s) 
   {
     vsize_ = s;
