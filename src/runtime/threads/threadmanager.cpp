@@ -145,7 +145,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify state
-        if (thread_count_ == 0 && !(state_.load() == running)) 
+        if (thread_count_ == 0 && state_.load() != running) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -224,7 +224,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify state
-        if (thread_count_ == 0 && !(state_.load() == running)) 
+        if (thread_count_ == 0 && state_.load() != running) 
         {
             // threadmanager is not currently running
             HPX_THROWS_IF(ec, invalid_status,

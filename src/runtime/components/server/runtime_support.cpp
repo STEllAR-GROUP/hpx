@@ -402,6 +402,25 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    // let thread manager clean up HPX threads 
+    template <typename Lock>
+    inline void 
+    cleanup_threads(threads::threadmanager_base& tm, Lock& l)
+    {
+        // re-acquire pointer to self as it might have changed
+        threads::thread_self* self = threads::get_self_ptr();
+        BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread 
+
+        // give the scheduler some time to work on remaining tasks
+        {
+            util::unlock_the_lock<Lock> ul(l);
+            self->yield(threads::pending);
+        }
+
+        // get rid of all terminated threads
+        tm.cleanup_terminated();
+    }
+
     void runtime_support::stop(double timeout, naming::id_type respond_to)
     {
         mutex_type::scoped_lock l(mtx_);
@@ -410,25 +429,16 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            threads::thread_self* self = threads::get_self_ptr();
-            BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread 
-
-            threads::threadmanager_base& tm = 
-                hpx::applier::get_applier().get_thread_manager();
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
 
             util::high_resolution_timer t;
             double start_time = t.elapsed();
             bool timed_out = false;
 
             while (tm.get_thread_count() > 1) {
-                // give the scheduler some time to work on remaining tasks
-                {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    self->yield(threads::pending);
-                }
-
-                // get rid of all terminated threads
-                tm.cleanup_terminated();
+                // let thread-manager clean up threads
+                cleanup_threads(tm, l);
 
                 // obey timeout
                 if (timeout != -1 && timeout < (t.elapsed() - start_time)) {
@@ -438,20 +448,16 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
+            // If it took longer than expected, kill all suspended threads as 
+            // well.
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
                 while (tm.get_thread_count() > 1) {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
 
-                    {
-                        // give the scheduler some time to work on remaining tasks
-                        util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                        self->yield(threads::pending);
-                    }
-
-                    // get rid of all terminated threads
-                    tm.cleanup_terminated();
+                    // let thread-manager clean up threads
+                    cleanup_threads(tm, l);
                 }
             }
 
@@ -460,7 +466,6 @@ namespace hpx { namespace components { namespace server
                 typedef lcos::base_lco_with_value<void> void_lco_type;
                 typedef void_lco_type::set_event_action action_type;
 
-                applier::applier& appl = hpx::applier::get_applier();
                 naming::address addr;
                 if (appl.address_is_local(respond_to.get_gid(), addr)) {
                     // execute locally, action is executed immediately as it is

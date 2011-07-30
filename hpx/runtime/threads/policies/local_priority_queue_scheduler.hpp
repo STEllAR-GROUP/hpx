@@ -334,7 +334,7 @@ namespace hpx { namespace threads { namespace policies
             if ((queues_.size()-1 == num_thread) && (0 == added)) {
                 // Convert low priority tasks to threads before attempting to
                 // steal from other shepherds.
-                result = result || low_priority_queue_.wait_or_add_new( 
+                result = result && low_priority_queue_.wait_or_add_new(
                     num_thread, running, idle_loop_count, added);
             }
 
@@ -355,7 +355,7 @@ namespace hpx { namespace threads { namespace policies
                         std::size_t idx = least_significant_bit_set(m);
                         BOOST_ASSERT(idx < queues_.size());
 
-                        result = result || queues_[num_thread]->wait_or_add_new(
+                        result = result && queues_[num_thread]->wait_or_add_new(
                             idx, running, idle_loop_count, added, queues_[idx]);
                     }
                 }
@@ -363,7 +363,7 @@ namespace hpx { namespace threads { namespace policies
                 // if nothing found ask everybody else
                 for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
                     std::size_t idx = (i + num_thread) % queues_.size();
-                    result = result || queues_[num_thread]->wait_or_add_new(
+                    result = result && queues_[num_thread]->wait_or_add_new(
                         idx, running, idle_loop_count, added, queues_[idx]);
                 }
 
