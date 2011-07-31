@@ -87,11 +87,19 @@ std::vector<naming::id_type> discovery::build_network()
     const boost::uint32_t root_prefix
         = naming::get_prefix_from_gid(this->get_base_gid());
 
+    naming::resolver_client& agas_client
+        = applier::get_applier().get_agas_client();
+
     std::vector<naming::gid_type> raw_localities, localities;
-    applier::get_applier().get_agas_client().get_prefixes(raw_localities,
+    agas_client.get_prefixes(raw_localities,
         components::get_component_type<discovery>());
 
-    if (raw_localities.size() > 1)
+    naming::gid_type console_gid;
+    agas_client.queryid("/locality(console)", console_gid);
+
+    BOOST_ASSERT(naming::invalid_gid != console_gid);
+
+    if (1 != naming::get_prefix_from_gid(console_gid))
     {
         // Remove the AGAS node from the list. 
         using boost::phoenix::arg_names::arg1;
