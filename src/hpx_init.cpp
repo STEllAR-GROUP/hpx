@@ -203,7 +203,7 @@ namespace hpx
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
-                    ("high_priority_threads", value<std::size_t>(), 
+                    ("high-priority-threads", value<std::size_t>(), 
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
@@ -349,8 +349,8 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
-            if (vm.count("high_priority_threads")) {
-                throw std::logic_error("bad parameter --high_priority_threads, "
+            if (vm.count("high-priority-threads")) {
+                throw std::logic_error("bad parameter --high-priority-threads, "
                     "valid for --queueing=priority_local only");
             }
 
@@ -378,8 +378,8 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
-            if (vm.count("high_priority_threads")) {
-                throw std::logic_error("bad parameter --high_priority_threads, "
+            if (vm.count("high-priority-threads")) {
+                throw std::logic_error("bad parameter --high-priority-threads, "
                     "valid for --queueing=priority_local only");
             }
 
@@ -409,8 +409,9 @@ namespace hpx
             std::size_t num_threads, std::size_t num_localities)
         {
             std::size_t num_high_priority_queues = num_threads;
-            if (vm.count("high_priority_threads"))
-                num_high_priority_queues = vm["high_priority_threads"].as<std::size_t>();
+            if (vm.count("high-priority-threads"))
+                num_high_priority_queues
+                    = vm["high-priority-threads"].as<std::size_t>();
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler 
@@ -438,8 +439,8 @@ namespace hpx
             shutdown_func const& shutdown_function, 
             std::size_t num_threads, std::size_t num_localities)
         {
-            if (vm.count("high_priority_threads")) {
-                throw std::logic_error("bad parameter --high_priority_threads, "
+            if (vm.count("high-priority-threads")) {
+                throw std::logic_error("bad parameter --high-priority-threads, "
                     "valid for --queueing=priority_local only");
             }
 
