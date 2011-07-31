@@ -537,7 +537,7 @@ namespace hpx { namespace threads
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
                 newstate, newstate_ex, priority, self_id, triggered), 
             "wake_timer", 0, priority);
-        thread_id_type wake_id = register_thread(data, suspended);
+        thread_id_type wake_id = register_thread(data, suspended, true);
 
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
@@ -728,7 +728,7 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        tfunc(std::size_t num_thread, std::size_t& num_px_threads)
+        tfunc(std::size_t num_thread)
     {
         // wait for all threads to start up before before starting px work
         startup_->wait();   
@@ -758,7 +758,7 @@ namespace hpx { namespace threads
 
             LTM_(info) << "tfunc(" << num_thread << "): start";
             try {
-                num_px_threads = tfunc_impl(num_thread);
+                tfunc_impl(num_thread);
             }
             catch (hpx::exception const& e) {
                 LFATAL_ << "tfunc(" << num_thread 
@@ -789,7 +789,7 @@ namespace hpx { namespace threads
             }
 
             LTM_(fatal) << "tfunc(" << num_thread << "): end, executed " 
-                       << num_px_threads << " HPX threads";
+                       << executed_threads_[num_thread] << " HPX threads";
         }
 
         notifier_.on_stop_thread(num_thread);
@@ -970,7 +970,8 @@ namespace hpx { namespace threads
         performance_counters::counter_type_data counter_types[] = 
         {
             { "/queue/length", performance_counters::counter_raw },
-            { "/threads/count", performance_counters::counter_raw },
+            { "/threads/cumulative", performance_counters::counter_raw },
+            { "/threads/instantaneous", performance_counters::counter_raw },
             { "/time/maintenance", performance_counters::counter_raw }
         };
         performance_counters::install_counter_types(
@@ -984,33 +985,38 @@ namespace hpx { namespace threads
 
         boost::format total_queue_length("/queue([L%d]/threadmanager)/length");
         boost::format total_avg_maint("/time([L%d]/threadmanager)/maintenance");
-        boost::format total_thread_count("/threads([L%d]/total/%s)/count");
+        boost::format total_thread_cumulative("/threads([L%d]/total/%s)/cumulative");
+        boost::format total_thread_instant("/threads([L%d]/total/%s)/instantaneous");
         boost::format queue_length("/queue([L%d]/shepherd#%d)/length");
         boost::format avg_maint("/time([L%d]/shepherd#%d)/maintenance");
-        boost::format thread_count("/threads([L%d]/shepherd#%d/%s)/count");
+        boost::format thread_cumulative("/threads([L%d]/shepherd#%d/%s)/cumulative");
+        boost::format thread_instant("/threads([L%d]/shepherd#%d/%s)/instantaneous");
 
         performance_counters::counter_data counters[] = 
         {
-            // Cumulative queue length
+            // Locality-wide queue length
             { boost::str(total_queue_length % prefix), 
               boost::bind(&spt::get_queue_length, &scheduler_, -1) },
-            // Cumulative % time spent in maintenance
+            // Locality-wide % time spent in maintenance
             { boost::str(total_avg_maint % prefix),
               boost::bind(&ti::avg_maint_ratio, this) },
-            // Cumulative thread count
-            { boost::str(total_thread_count % prefix % "all"),
+            // Locality-wide thread count (cumulative)
+            { boost::str(total_thread_cumulative % prefix % "all"),
+              boost::bind(&ti::get_executed_threads, this, -1) },
+            // Locality-wide thread count (instantaneous)
+            { boost::str(total_thread_instant % prefix % "all"),
               boost::bind(&spt::get_thread_count, &scheduler_, unknown, -1) },
-            // Cumulative active thread count
-            { boost::str(total_thread_count % prefix % "active"),
+            // Locality-wide active thread count (instantaneous)
+            { boost::str(total_thread_instant % prefix % "active"),
               boost::bind(&spt::get_thread_count, &scheduler_, active, -1) },
-            // Cumulative pending thread count
-            { boost::str(total_thread_count % prefix % "pending"),
+            // Locality-wide pending thread count (instantaneous)
+            { boost::str(total_thread_instant % prefix % "pending"),
               boost::bind(&spt::get_thread_count, &scheduler_, pending, -1) },
-            // Cumulative suspended thread count
-            { boost::str(total_thread_count % prefix % "suspended"),
+            // Locality-wide suspended thread count (instantaneous)
+            { boost::str(total_thread_instant % prefix % "suspended"),
               boost::bind(&spt::get_thread_count, &scheduler_, suspended, -1) },
-            // Cumulative terminated thread count
-            { boost::str(total_thread_count % prefix % "terminated"), 
+            // Locality-wide terminated thread count (instantaneous)
+            { boost::str(total_thread_instant % prefix % "terminated"), 
               boost::bind(&spt::get_thread_count, &scheduler_, terminated, -1) }
         };
         performance_counters::install_counters(
@@ -1026,20 +1032,23 @@ namespace hpx { namespace threads
                 // % time spent in maintenance 
                 { boost::str(avg_maint % prefix % i),
                   boost::bind(&ti::avg_maint_ratio, this, i) },
-                // Thread count
-                { boost::str(thread_count % prefix % i % "all"),
+                // Thread count (instantaneous)
+                { boost::str(thread_cumulative % prefix % i % "all"),
+                  boost::bind(&ti::get_executed_threads, this, i) },
+                // Thread count (instantaneous)
+                { boost::str(thread_instant % prefix % i % "all"),
                   boost::bind(&spt::get_thread_count, &scheduler_, unknown, i) },
-                // Active thread count
-                { boost::str(thread_count % prefix % i % "active"),
+                // Active thread count (instantaneous)
+                { boost::str(thread_instant % prefix % i % "active"),
                   boost::bind(&spt::get_thread_count, &scheduler_, active, i) },
-                // Pending thread count
-                { boost::str(thread_count % prefix % i % "pending"),
+                // Pending thread count (instantaneous)
+                { boost::str(thread_instant % prefix % i % "pending"),
                   boost::bind(&spt::get_thread_count, &scheduler_, pending, i) },
-                // Suspended thread count
-                { boost::str(thread_count % prefix % i % "suspended"),
+                // Suspended thread count (instantaneous)
+                { boost::str(thread_instant % prefix % i % "suspended"),
                   boost::bind(&spt::get_thread_count, &scheduler_, suspended, i) },
-                // Terminated thread count
-                { boost::str(thread_count % prefix % i % "terminated"),
+                // Terminated thread count (instantaneous)
+                { boost::str(thread_instant % prefix % i % "terminated"),
                   boost::bind(&spt::get_thread_count, &scheduler_, terminated, i) }
             };
             performance_counters::install_counters(
@@ -1050,15 +1059,13 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
         itt_caller_context ctx;        // helper for itt support
         itt_mark_context mark("threadmanager");
 
         manage_active_thread_count count(thread_count_);
-
-        std::size_t num_px_threads = 0;
 
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
 
@@ -1122,7 +1129,7 @@ namespace hpx { namespace threads
                             }
 
                             tfunc_time = util::hardware::timestamp() - overall_timestamp;
-                            ++num_px_threads;
+                            ++executed_threads_[num_thread];
                         }
                         else {
                             // some other OS-thread got in between and started 
@@ -1196,7 +1203,6 @@ namespace hpx { namespace threads
         // the last OS thread is allowed to exit only if no more PX threads exist
         BOOST_ASSERT(!scheduler_.get_thread_count(unknown, num_thread));
 #endif
-        return num_px_threads;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1236,8 +1242,7 @@ namespace hpx { namespace threads
                 // create a new thread
                 executed_threads_.push_back(0);
                 threads_.push_back(new boost::thread(boost::bind(
-                    &threadmanager_impl::tfunc, this, thread_num, 
-                    boost::ref(executed_threads_.back()))));
+                    &threadmanager_impl::tfunc, this, thread_num)));
 
                 // set the new threads affinity (on Windows systems)
                 set_affinity(threads_.back(), thread_num, scheduler_.numa_sensitive());
@@ -1310,7 +1315,7 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_executed_threads(std::size_t num) const
     {
         if (num != std::size_t(-1)) 

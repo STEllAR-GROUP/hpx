@@ -574,8 +574,8 @@ namespace hpx { namespace threads
 
     protected:
         // this is the thread function executing the work items in the queue
-        void tfunc(std::size_t num_thread, std::size_t& theads_run);
-        std::size_t tfunc_impl(std::size_t num_thread);
+        void tfunc(std::size_t num_thread);
+        void tfunc_impl(std::size_t num_thread);
 
         // thread function registered for set_state if thread is currently 
         // active
@@ -598,7 +598,7 @@ namespace hpx { namespace threads
             scheduler_.on_error(num_thread, e);
         }
 
-        std::size_t get_executed_threads(std::size_t num = std::size_t(-1)) const;
+        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const;
 
     protected:
         /// This thread function is used by the at_timer thread below to trigger
@@ -628,7 +628,7 @@ namespace hpx { namespace threads
         boost::barrier* startup_;                   ///< startup synchronization
 
         boost::ptr_vector<boost::thread> threads_;
-        std::vector<std::size_t> executed_threads_;
+        std::vector<boost::int64_t> executed_threads_;
         boost::atomic<long> thread_count_;
 
         atomic_state state_;                ///< thread manager state 
