@@ -145,12 +145,12 @@ namespace hpx { namespace performance_counters
         typedef counter_type_path_elements base_type;
 
         counter_path_elements() 
-          : instanceindex_(0)
+          : instanceindex_(-1)
         {}
 
         template <typename S1, typename S2, typename S3, typename S4>
         counter_path_elements(S1 const& obj, S2 const& counter, 
-                S3 const& parent, S4 const& instance, int index = 0) 
+                S3 const& parent, S4 const& instance, boost::int32_t index = -1) 
           : base_type(obj, counter), 
             parentinstancename_(parent), instancename_(instance),
             instanceindex_(index)
@@ -158,7 +158,7 @@ namespace hpx { namespace performance_counters
 
         std::string parentinstancename_;  ///< the name of the parent instance 
         std::string instancename_;        ///< the name of the object instance 
-        boost::uint32_t instanceindex_;   ///< the instance index 
+        boost::int32_t instanceindex_;   ///< the instance index 
 
     private:
         // serialization support

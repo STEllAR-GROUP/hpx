@@ -76,7 +76,7 @@ namespace hpx { namespace performance_counters
             }
 
             result += path.instancename_;
-            if (path.instanceindex_ != 0)
+            if (-1 != path.instanceindex_)
             {
                 result += "#";
                 result += boost::lexical_cast<std::string>(path.instanceindex_);
