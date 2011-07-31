@@ -30,7 +30,7 @@ struct integrator
     ///////////////////////////////////////////////////////////////////////////
     lcos::future_value<std::vector<naming::id_type> > build_network_async(
         std::vector<naming::id_type> const& discovery_network
-      , actions::function<T(T const&)> const& f
+      , hpx::actions::function<T(T const&)> const& f
       , T const& tolerance
       , boost::uint32_t regrid_segs 
       , T const& eps 
@@ -41,7 +41,7 @@ struct integrator
 
     std::vector<naming::id_type> build_network_sync(
         std::vector<naming::id_type> const& discovery_network
-      , actions::function<T(T const&)> const& f
+      , hpx::actions::function<T(T const&)> const& f
       , T const& tolerance
       , boost::uint32_t regrid_segs 
       , T const& eps 
@@ -52,7 +52,7 @@ struct integrator
 
     std::vector<naming::id_type> build_network(
         std::vector<naming::id_type> const& discovery_network
-      , actions::function<T(T const&)> const& f
+      , hpx::actions::function<T(T const&)> const& f
       , T const& tolerance
       , boost::uint32_t regrid_segs 
       , T const& eps 

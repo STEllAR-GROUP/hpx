@@ -10,6 +10,7 @@
 namespace hpx { namespace iostreams
 {
 
+#if !defined(BOOST_WINDOWS)
 async_flush_type async_flush = { };
 async_endl_type async_endl = { };
 flush_type flush = flush_type();
@@ -18,6 +19,7 @@ sync_flush_type sync_flush = { };
 sync_endl_type sync_endl = { };
 local_flush_type local_flush = { };
 local_endl_type local_endl = { };
+#endif
 
 }}
 

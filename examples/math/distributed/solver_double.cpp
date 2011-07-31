@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 
 #include <iomanip>
 #include <cmath>
@@ -107,7 +107,7 @@ struct call_tag {};
 ///////////////////////////////////////////////////////////////////////////////
 double math_function (double const& r)
 {
-    return abs(sin(pow(r, 0.25L)) / (log(r) * log(r))); 
+    return abs(sin(pow(r, 0.25)) / (log(r) * log(r))); 
 }
 
 typedef plain_result_action1<

@@ -71,14 +71,14 @@ struct HPX_COMPONENT_EXPORT discovery
     boost::uint32_t operator[] (boost::uint32_t const& prefix) 
     { return topology_[prefix]; } 
 
-    typedef actions::result_action0<
+    typedef hpx::actions::result_action0<
         discovery
       , std::vector<naming::id_type>
       , discovery_build_network
       , &discovery::build_network
     > build_network_action;
 
-    typedef actions::action2<
+    typedef hpx::actions::action2<
         discovery
       , discovery_deploy
       , topology_map const& 
@@ -86,21 +86,21 @@ struct HPX_COMPONENT_EXPORT discovery
       , &discovery::deploy
     > deploy_action;
     
-    typedef actions::result_action0<
+    typedef hpx::actions::result_action0<
         discovery
       , std::size_t 
       , discovery_topology_lva
       , &discovery::topology_lva
     > topology_lva_action;
 
-    typedef actions::result_action0<
+    typedef hpx::actions::result_action0<
         discovery
       , boost::uint32_t 
       , discovery_total_shepherds
       , &discovery::total_shepherds
     > total_shepherds_action;
 
-    typedef actions::result_action0<
+    typedef hpx::actions::result_action0<
         discovery
       , bool 
       , discovery_empty

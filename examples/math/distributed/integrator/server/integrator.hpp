@@ -171,7 +171,7 @@ struct HPX_COMPONENT_EXPORT integrator
 
     std::vector<naming::id_type> build_network(
         std::vector<naming::id_type> const& discovery_network
-      , actions::function<T(T const&)> const& f 
+      , hpx::actions::function<T(T const&)> const& f 
       , T const& tolerance
       , boost::uint32_t regrid_segs 
       , T const& epsilon 
@@ -235,7 +235,7 @@ struct HPX_COMPONENT_EXPORT integrator
     void deploy(
         naming::id_type const& discovery_gid
       , std::vector<naming::id_type> const& network
-      , actions::function<T(T const&)> const& f 
+      , hpx::actions::function<T(T const&)> const& f 
       , T const& tolerance
       , boost::uint32_t regrid_segs
       , T const& epsilon 
@@ -471,7 +471,7 @@ struct HPX_COMPONENT_EXPORT integrator
         return total_area;
     }
 
-    typedef actions::result_action5<
+    typedef hpx::actions::result_action5<
         // class
         integrator<T>
         // result
@@ -480,7 +480,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , integrator_build_network
         // arguments 
       , std::vector<naming::id_type> const&
-      , actions::function<T(T const&)> const&
+      , hpx::actions::function<T(T const&)> const&
       , T const& 
       , boost::uint32_t 
       , T const& 
@@ -488,7 +488,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , &integrator<T>::build_network
     > build_network_action;
 
-    typedef actions::action6<
+    typedef hpx::actions::action6<
         // class
         integrator<T>
         // action value type
@@ -496,7 +496,7 @@ struct HPX_COMPONENT_EXPORT integrator
         // arguments 
       , naming::id_type const&
       , std::vector<naming::id_type> const&
-      , actions::function<T(T const&)> const&
+      , hpx::actions::function<T(T const&)> const&
       , T const& 
       , boost::uint32_t 
       , T const& 
@@ -504,7 +504,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , &integrator<T>::deploy
     > deploy_action;
 
-    typedef actions::result_action4<
+    typedef hpx::actions::result_action4<
         // class
         integrator<T>
         // result
@@ -520,7 +520,7 @@ struct HPX_COMPONENT_EXPORT integrator
       , &integrator<T>::solve_iterations
     > solve_iterations_action;
     
-    typedef actions::result_action4<
+    typedef hpx::actions::result_action4<
         // class
         integrator<T>
         // result
