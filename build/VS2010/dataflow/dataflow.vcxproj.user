@@ -5,4 +5,11 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>-p iddataflow -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -x127.0.0.1:7913 -r</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>-p iddataflow -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -x127.0.0.1:7913 -r</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerWorkingDirectory>..\..\..\bin64\Release\lib\hpx</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
