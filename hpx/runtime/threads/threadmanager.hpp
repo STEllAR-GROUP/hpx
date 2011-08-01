@@ -628,6 +628,8 @@ namespace hpx { namespace threads
         boost::barrier* startup_;                   ///< startup synchronization
 
         boost::ptr_vector<boost::thread> threads_;
+
+        // count number of executed HPX-threads (invocations)
         std::vector<boost::int64_t> executed_threads_;
         boost::atomic<long> thread_count_;
 

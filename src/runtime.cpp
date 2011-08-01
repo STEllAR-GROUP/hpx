@@ -306,8 +306,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        boost::function<runtime::hpx_main_function_type> func, int& result,
-        std::size_t num_threads)
+        boost::function<runtime::hpx_main_function_type> func, int& result)
     {
         // if we're not the console, we'll pull the console configuration 
         // information and merge it with ours
@@ -333,8 +332,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     threads::thread_state 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        boost::function<runtime::hpx_main_function_type> func, int& result,
-        std::size_t num_threads)
+        boost::function<runtime::hpx_main_function_type> func, int& result)
     {
         // run global pre_main functionality
         hpx::pre_main(mode_);
@@ -486,7 +484,7 @@ namespace hpx
         // register the given main function with the thread manager
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func, 
-                boost::ref(result_), num_threads), 
+                boost::ref(result_)), 
             "run_helper");
         thread_manager_.register_thread(data);
         this->runtime::start();

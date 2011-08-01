@@ -53,7 +53,7 @@
     apply_r (naming::address& addr, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_r_p<Action>(addr, gid, threads::thread_priority_default,
+        return apply_r_p<Action>(addr, gid, action_priority<Action>(),
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -75,7 +75,7 @@
     apply_l (naming::address const& addr, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_l_p<Action>(addr, threads::thread_priority_default, 
+        return apply_l_p<Action>(addr, action_priority<Action>(), 
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -98,7 +98,7 @@
     apply (naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_p<Action>(gid, threads::thread_priority_default, 
+        return apply_p<Action>(gid, action_priority<Action>(), 
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -142,7 +142,7 @@
         naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_r_p<Action>(addr, c, gid, threads::thread_priority_default,
+        return apply_r_p<Action>(addr, c, gid, action_priority<Action>(),
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -166,7 +166,7 @@
     apply_l (actions::continuation* c, naming::address const& addr, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_l_p<Action>(c, addr, threads::thread_priority_default,
+        return apply_l_p<Action>(c, addr, action_priority<Action>(),
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -190,7 +190,7 @@
     apply (actions::continuation* c, naming::id_type const& gid, 
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return apply_p<Action>(c, gid, threads::thread_priority_default,
+        return apply_p<Action>(c, gid, action_priority<Action>(),
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
@@ -223,7 +223,7 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         return apply_r_p<Action>(addr, new actions::continuation(contgid), 
-            gid, threads::thread_priority_default, BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 //     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -251,7 +251,7 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         return apply_p<Action>(new actions::continuation(contgid), 
-            gid, threads::thread_priority_default, BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 //     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

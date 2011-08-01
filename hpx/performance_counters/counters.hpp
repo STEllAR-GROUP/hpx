@@ -158,7 +158,7 @@ namespace hpx { namespace performance_counters
 
         std::string parentinstancename_;  ///< the name of the parent instance 
         std::string instancename_;        ///< the name of the object instance 
-        boost::int32_t instanceindex_;   ///< the instance index 
+        boost::int32_t instanceindex_;    ///< the instance index 
 
     private:
         // serialization support

@@ -17,6 +17,12 @@
 
 namespace hpx { namespace applier 
 {
+    template <typename Action>
+    threads::thread_priority action_priority()
+    {
+        return static_cast<threads::thread_priority>(Action::priority_value);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // zero parameter version of apply()
     // Invoked by a running PX-thread to apply an action to any resource
@@ -48,7 +54,7 @@ namespace hpx { namespace applier
     inline bool 
     apply_r (naming::address& addr, naming::id_type const& gid)
     {
-        return apply_r_p<Action>(addr, gid, threads::thread_priority_default);
+        return apply_r_p<Action>(addr, gid, action_priority<Action>());
     }
 
     // we  know, it's local and has to be directly executed
@@ -66,7 +72,7 @@ namespace hpx { namespace applier
     inline bool 
     apply_l (naming::address const& addr)
     {
-        return apply_l_p<Action>(addr, threads::thread_priority_default);
+        return apply_l_p<Action>(addr, action_priority<Action>());
     }
 
     template <typename Action>
@@ -85,7 +91,7 @@ namespace hpx { namespace applier
     template <typename Action>
     inline bool apply (naming::id_type const& gid)
     {
-        return apply_p<Action>(gid, threads::thread_priority_default);
+        return apply_p<Action>(gid, action_priority<Action>());
     }
 
 //     template <typename Action>
@@ -127,7 +133,7 @@ namespace hpx { namespace applier
     apply_r (naming::address& addr, actions::continuation* c, 
         naming::id_type const& gid)
     {
-        return apply_r_p<Action>(addr, c, gid, threads::thread_priority_default);
+        return apply_r_p<Action>(addr, c, gid, action_priority<Action>());
     }
 
     template <typename Action>
@@ -151,8 +157,7 @@ namespace hpx { namespace applier
     inline bool 
     apply_r_sync (naming::address& addr, naming::id_type const& gid)
     {
-        return apply_r_sync_p<Action>(addr, gid, 
-            threads::thread_priority_default);
+        return apply_r_sync_p<Action>(addr, gid, action_priority<Action>());
     }
 
     // we  know, it's local and has to be directly executed
@@ -170,7 +175,7 @@ namespace hpx { namespace applier
     template <typename Action>
     inline bool apply_l (actions::continuation* c, naming::address const& addr)
     {
-        return apply_l_p<Action>(c, addr, threads::thread_priority_default);
+        return apply_l_p<Action>(c, addr, action_priority<Action>());
     }
 
     template <typename Action>
@@ -189,7 +194,7 @@ namespace hpx { namespace applier
     template <typename Action>
     inline bool apply (actions::continuation* c, naming::id_type const& gid)
     {
-        return apply_p<Action>(c, gid, threads::thread_priority_default);
+        return apply_p<Action>(c, gid, action_priority<Action>());
     }
 
 //     template <typename Action>
@@ -272,7 +277,7 @@ namespace hpx { namespace applier
     apply_r (naming::address& addr, naming::id_type const& gid, 
         Arg0 const& arg0)
     {
-        return apply_r_p<Action>(addr, gid, threads::thread_priority_default, arg0);
+        return apply_r_p<Action>(addr, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
@@ -297,8 +302,7 @@ namespace hpx { namespace applier
     apply_r_sync (naming::address& addr, naming::id_type const& gid, 
         Arg0 const& arg0)
     {
-        return apply_r_sync_p<Action>(addr, gid, 
-            threads::thread_priority_default, arg0);
+        return apply_r_sync_p<Action>(addr, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
@@ -316,7 +320,7 @@ namespace hpx { namespace applier
     inline bool 
     apply_l (naming::address const& addr, Arg0 const& arg0)
     {
-        return apply_l_p<Action>(addr, threads::thread_priority_default, arg0);
+        return apply_l_p<Action>(addr, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
@@ -337,7 +341,7 @@ namespace hpx { namespace applier
     inline bool 
     apply (naming::id_type const& gid, Arg0 const& arg0)
     {
-        return apply_p<Action>(gid, threads::thread_priority_default, arg0);
+        return apply_p<Action>(gid, action_priority<Action>(), arg0);
     }
 
 //     template <typename Action, typename Arg0>
@@ -377,8 +381,7 @@ namespace hpx { namespace applier
     apply_r (naming::address& addr, actions::continuation* c, 
         naming::id_type const& gid, Arg0 const& arg0)
     {
-        return apply_r_p<Action>(addr, c, gid, 
-            threads::thread_priority_default, arg0);
+        return apply_r_p<Action>(addr, c, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
@@ -398,7 +401,7 @@ namespace hpx { namespace applier
     apply_l (actions::continuation* c, naming::address const& addr, 
         Arg0 const& arg0)
     {
-        return apply_l_p<Action>(c, addr, threads::thread_priority_default, arg0);
+        return apply_l_p<Action>(c, addr, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
@@ -420,7 +423,7 @@ namespace hpx { namespace applier
     apply (actions::continuation* c, naming::id_type const& gid, 
         Arg0 const& arg0)
     {
-        return apply_p<Action>(c, gid, threads::thread_priority_default, arg0);
+        return apply_p<Action>(c, gid, action_priority<Action>(), arg0);
     }
 
 //     template <typename Action, typename Arg0>
@@ -442,7 +445,7 @@ namespace hpx { namespace applier
         Arg0 const& arg0)
     {
         return apply_r_p<Action>(addr, new actions::continuation(contgid), gid, 
-            threads::thread_priority_default, arg0);
+            action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>

@@ -1,5 +1,6 @@
-//  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
+//  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +8,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread_affinity.hpp>      // must be first header!
+#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -66,7 +67,7 @@ namespace hpx { namespace threads
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_low || priority > thread_priority_critical)
+        if (priority < thread_priority_default || priority > thread_priority_critical)
             return "unknown";
         return strings::thread_priority_names[priority];
     }
@@ -192,11 +193,11 @@ namespace hpx { namespace threads
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
-        // a thread in if the os thread number is -1. Not only does overriding this
-        // prevent extensibility by forcing a certain queueing behavior, but it also
+        // a thread in if the OS thread number is -1. Not only does overriding this
+        // prevent extensibility by forcing a certain queuing behavior, but it also
         // schedules unfairly. A px thread is always put into the queue of the
-        // os thread that it's producer is currently running on. In a single
-        // producer environment, this can lead to unexpected inbalances and
+        // OS thread that it's producer is currently running on. In a single
+        // producer environment, this can lead to unexpected imbalances and
         // work only gets distributed by work stealing.
         //if (std::size_t(-1)  == data.num_os_thread) 
         //    data.num_os_thread = get_thread_num();
@@ -276,11 +277,11 @@ namespace hpx { namespace threads
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
-        // a thread in if the os thread number is -1. Not only does overriding this
-        // prevent extensibility by forcing a certain queueing behavior, but it also
+        // a thread in if the OS thread number is -1. Not only does overriding this
+        // prevent extensibility by forcing a certain queuing behavior, but it also
         // schedules unfairly. A px thread is always put into the queue of the
-        // os thread that it's producer is currently running on. In a single
-        // producer environment, this can lead to unexpected inbalances and
+        // OS thread that it's producer is currently running on. In a single
+        // producer environment, this can lead to unexpected imbalances and
         // work only gets distributed by work stealing.
         //if (std::size_t(-1) == data.num_os_thread) 
         //    data.num_os_thread = get_thread_num();
@@ -549,7 +550,7 @@ namespace hpx { namespace threads
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns 'signalled' the timer has been canceled, otherwise 
-        // the tiler fired and the wake_timer_thread above has been executed
+        // the timer fired and the wake_timer_thread above has been executed
         bool oldvalue = false;
         thread_state_ex_enum statex = self.yield(suspended);
 
@@ -1086,6 +1087,7 @@ namespace hpx { namespace threads
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
 
+        boost::int64_t& executed_threads = executed_threads_[num_thread];
         boost::uint64_t& tfunc_time = tfunc_times[num_thread];
         boost::uint64_t& exec_time = exec_times[num_thread];
         boost::uint64_t overall_timestamp = util::hardware::timestamp();
@@ -1129,7 +1131,7 @@ namespace hpx { namespace threads
                             }
 
                             tfunc_time = util::hardware::timestamp() - overall_timestamp;
-                            ++executed_threads_[num_thread];
+                            ++executed_threads;
                         }
                         else {
                             // some other OS-thread got in between and started 
@@ -1224,7 +1226,7 @@ namespace hpx { namespace threads
         LTM_(info) << "run: running timer pool"; 
         timer_pool_.run(false);
 
-        executed_threads_.reserve(num_threads);
+        executed_threads_.resize(num_threads);
         tfunc_times.resize(num_threads);
         exec_times.resize(num_threads);
 
@@ -1240,7 +1242,6 @@ namespace hpx { namespace threads
                 LTM_(info) << "run: create OS thread: " << thread_num;
 
                 // create a new thread
-                executed_threads_.push_back(0);
                 threads_.push_back(new boost::thread(boost::bind(
                     &threadmanager_impl::tfunc, this, thread_num)));
 
@@ -1321,7 +1322,8 @@ namespace hpx { namespace threads
         if (num != std::size_t(-1)) 
             return executed_threads_[num];
 
-        return std::accumulate(executed_threads_.begin(), executed_threads_.end(), 0);
+        return std::accumulate(executed_threads_.begin(), 
+            executed_threads_.end(), 0LL);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1330,9 +1332,9 @@ namespace hpx { namespace threads
         avg_maint_ratio() const
     {
         boost::uint64_t const exec_total = 
-          std::accumulate(exec_times.begin(), exec_times.end(), 0UL);
+          std::accumulate(exec_times.begin(), exec_times.end(), 0ULL);
         boost::uint64_t const tfunc_total = 
-          std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0UL);
+          std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0ULL);
 
         double const percent = 1. - (double(exec_total) / tfunc_total);
         return boost::int64_t(1000. * percent);    // 0.1 percent
