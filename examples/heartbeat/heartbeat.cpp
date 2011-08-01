@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "name"
         , value<std::string>()->default_value
-            ("/queue([L1]/threadmanager)/length")
+            ("/pcs/queue([L1]/threadmanager)/length")
         , "symbolic name of the performance counter")
 
         ( "frequency"
