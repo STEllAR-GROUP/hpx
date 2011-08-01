@@ -120,7 +120,8 @@ namespace hpx { namespace performance_counters
             newid = components::server::create_one<counter_type>(complemented_info, f);
 
             // register the canonical name with AGAS
-            agas_client_.registerid(complemented_info.fullname_, newid);
+            agas_client_.registerid
+                (std::string("/pcs") + complemented_info.fullname_, newid);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -154,7 +155,7 @@ namespace hpx { namespace performance_counters
         if (status_valid_data != status) return status;
 
         // unregister this counter from AGAS
-        agas_client_.unregisterid(name, ec);
+        agas_client_.unregisterid(std::string("/pcs") + name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to destroy counter %s")
                 % complemented_info.fullname_);

@@ -354,7 +354,7 @@ int main(int argc, char* argv[])
 
         ( "monitor"
         , value<std::string>()->default_value
-            ("/time([L1]/threadmanager)/maintenance")
+            ("/pcs/time([L1]/threadmanager)/maintenance")
         , "symbolic name of the performance counter to monitor on the AGAS "
           "locality")
 
