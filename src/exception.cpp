@@ -201,66 +201,128 @@ namespace hpx { namespace detail
     {
         util::osstream strm;
 
-        // Try a cast to std::exception - this should handle boost.system
-        // error codes in addition to the standard library exceptions.
-        std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        if (se)
-            strm << "[what]: " << se->what() << "\n";
-
-        boost::uint32_t const* locality = 
-            boost::get_error_info<hpx::throw_locality>(e);
-        if (locality && 0 != *locality) 
-            strm << "[locality]: " << *locality << "\n";
-
-        char const* const* func =
-            boost::get_error_info<boost::throw_function>(e);
-        if (func) {
-            strm << "[function]: " << *func << "\n";
-        }
-        else {
-            std::string const* s = 
-                boost::get_error_info<hpx::throw_function>(e);
-            if (s)
-                strm << "[function]: " << *s << "\n";
-        }
-
-        char const* const* file =
-            boost::get_error_info<boost::throw_file>(e);
-        if (file) {
-            strm << "[file]: " << *file << "\n";
-        }
-        else {
-            std::string const* s = 
-                boost::get_error_info<hpx::throw_file>(e);
-            if (s)
-                strm << "[file]: " << *s << "\n"; 
-        }
-
-        int const* line = 
-            boost::get_error_info<boost::throw_line>(e);
-        if (line) 
-            strm << "[line]: " << *line << "\n";
-
-        boost::int64_t const* shepherd = 
-            boost::get_error_info<hpx::throw_shepherd>(e);
-        if (shepherd && -1 != *shepherd) 
-            strm << "[shepherd]: " << *shepherd << "\n";
-
-        std::size_t const* thread_id = 
-            boost::get_error_info<hpx::throw_thread_id>(e);
-        if (thread_id && *thread_id) 
-            strm << (boost::format("[thread_id]: %016x\n") % *thread_id);
-
-        std::string const* thread_name = 
-            boost::get_error_info<hpx::throw_thread_name>(e);
-        if (thread_name && !thread_name->empty()) 
-            strm << "[thread_name]: " << *thread_name << "\n";
+        bool done_first = false;
 
         std::string const* back_trace = 
             boost::get_error_info<hpx::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            strm << "[stack_trace]: " << *back_trace << "\n";
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[stack_trace]: " << *back_trace;
+        }
+
+        // Try a cast to std::exception - this should handle boost.system
+        // error codes in addition to the standard library exceptions.
+        std::exception const* se = dynamic_cast<std::exception const*>(&e);
+        if (se)
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[what]: " << se->what();
+        }
+
+        boost::uint32_t const* locality = 
+            boost::get_error_info<hpx::throw_locality>(e);
+        if (locality && 0 != *locality) 
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[locality]: " << *locality;
+        }
+
+        char const* const* func =
+            boost::get_error_info<boost::throw_function>(e);
+        if (func) {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[function]: " << *func;
+        }
+        else {
+            std::string const* s = 
+                boost::get_error_info<hpx::throw_function>(e);
+            if (s)
+            {
+                if (done_first)
+                    strm << "\n";
+
+                done_first = true;
+                strm << "[function]: " << *s;
+            }
+        }
+
+        char const* const* file =
+            boost::get_error_info<boost::throw_file>(e);
+        if (file) {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[file]: " << *file;
+        }
+        else {
+            std::string const* s = 
+                boost::get_error_info<hpx::throw_file>(e);
+            if (s)
+            {
+                if (done_first)
+                    strm << "\n";
+
+                done_first = true;
+                strm << "[file]: " << *s; 
+            }
+        }
+
+        int const* line = 
+            boost::get_error_info<boost::throw_line>(e);
+        if (line) 
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[line]: " << *line;
+        }
+
+        boost::int64_t const* shepherd = 
+            boost::get_error_info<hpx::throw_shepherd>(e);
+        if (shepherd && -1 != *shepherd) 
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[shepherd]: " << *shepherd;
+        }
+
+        std::size_t const* thread_id = 
+            boost::get_error_info<hpx::throw_thread_id>(e);
+        if (thread_id && *thread_id) 
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << (boost::format("[thread_id]: %016x") % *thread_id);
+        }
+
+        std::string const* thread_name = 
+            boost::get_error_info<hpx::throw_thread_name>(e);
+        if (thread_name && !thread_name->empty()) 
+        {
+            if (done_first)
+                strm << "\n";
+
+            done_first = true;
+            strm << "[thread_name]: " << *thread_name;
         }
 
         return util::osstream_get_string(strm);
