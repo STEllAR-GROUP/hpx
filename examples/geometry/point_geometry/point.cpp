@@ -51,3 +51,10 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::set_Y_action,
     point_geometry_set_Y_action);
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<polygon_type>::set_result_action, 
+    set_result_action_polygon_type);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<polygon_type>,
+    hpx::components::component_base_lco_with_value);
