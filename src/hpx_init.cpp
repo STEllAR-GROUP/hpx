@@ -12,8 +12,10 @@
 
 #if HPX_AGAS_VERSION > 0x10
     #include <boost/assign/std/vector.hpp>
+    #include <boost/foreach.hpp>
     #include <hpx/runtime/components/runtime_support.hpp>
     #include <hpx/runtime/applier/applier.hpp>
+    #include <hpx/include/performance_counters.hpp>
 #endif
 
 #if !defined(BOOST_WINDOWS)
@@ -210,6 +212,9 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >(),
                      "add an ini definition to the default runtime "
                      "configuration")
+                    ("print-counter,P", value<std::vector<std::string> >(),
+                     "print the specified performance counter before shutting "
+                     "down the system")
                     ("dump-config", "print the runtime configuration")
                     ("exit", "exit after configuring the runtime")
                     ("queueing,q", value<std::string>(),
@@ -301,6 +306,32 @@ namespace hpx
         };
 #endif
 
+#if HPX_AGAS_VERSION > 0x10
+        void print_counter(std::string const& name)
+        {
+            naming::gid_type gid;
+            applier::get_applier().get_agas_client().queryid(name, gid);
+
+            if (HPX_UNLIKELY(!gid))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter, "print_counter",
+                    boost::str( boost::format("invalid performance counter '%s'")
+                              % name))
+            }
+
+            using hpx::performance_counters::stubs::performance_counter;
+
+            // Query the performance counter.
+            performance_counters::counter_value value
+                = performance_counter::get_value(gid);
+
+            if (HPX_LIKELY(performance_counters::status_valid_data == value.status_))
+                std::cout << name << " " << value.value_ << "\n"; 
+            else
+                std::cout << name << " invalid\n"; 
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
@@ -320,6 +351,16 @@ namespace hpx
                 rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
+            std::vector<std::string> counters;
+
+            if (vm.count("print-counter"))
+                counters = vm["print-counter"].as<std::vector<std::string> >();
+
+            BOOST_FOREACH(std::string const& counter, counters)
+            {
+                rt.add_shutdown_function(boost::bind(print_counter, counter));
+            }
+
             if (!startup_function.empty())
                 rt.add_startup_function(startup_function);
 
