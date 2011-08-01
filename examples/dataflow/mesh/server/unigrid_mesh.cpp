@@ -411,8 +411,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                                   std::vector<std::size_t> &each_row,
                                   parameter const& par)
     {
-      std::size_t i,j;
-      int ii;
+      std::size_t j;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -423,26 +422,29 @@ namespace hpx { namespace components { namespace amr { namespace server
 
       //using namespace boost::assign;
 
-      int counter;
-      std::size_t step,dst;
+      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(2);
 
-      for (step=0;step<num_rows;step = step + 1) {
-        for (i=0;i<each_row[step];i++) {
-          counter = 0;
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(2);
 
-          dst = step + 1;
-          ii = i;
-          if ( dst >= num_rows ) dst = 0;
+      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(0);
+      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(1);
+      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(2);
 
-          for (int jj=ii-1;jj<ii+2;jj++) {          
-            int dst_col = jj;
-            if ( jj < 0 ) dst_col = each_row[step]-1;
-            if ( jj == each_row[step] ) dst_col = 0;
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(dst_col);vport.push_back(counter);
-            counter++;
-          }
-        }
-      }
+      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(2);
+
+      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(2);
+
+      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(0);
+      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(1);
+      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(2);
 
       // Create a ragged 3D array
       for (j=0;j<vsrc_step.size();j++) {
@@ -455,47 +457,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         dst_step( step,column,dst_size(step,column,0) ) = src_step;
         dst_size(step,column,0) += 1;
         src_size(src_step,src_column,0) += 1;
-      }
-
-      // sort the src step (or row) in descending order
-      int t1,k,kk;
-      std::size_t column;
-      for (j=0;j<vsrc_step.size();j++) {
-        step = vstep[j];
-        column = vcolumn[j];
-
-        for (kk=dst_size(step,column,0);kk>=0;kk--) {
-          for (k=0;k<kk-1;k++) {
-            if (dst_step( step,column,k) < dst_step( step,column,k+1) ) {
-              // swap
-              t1 = dst_step( step,column,k);
-              dst_step( step,column,k) = dst_step( step,column,k+1);
-              dst_step( step,column,k+1) = t1;
-  
-              // swap the src, port info too
-              t1 = dst_src( step,column,k);
-              dst_src( step,column,k) = dst_src( step,column,k+1);
-              dst_src( step,column,k+1) = t1;
-  
-              t1 = dst_port( step,column,k);
-              dst_port( step,column,k) = dst_port( step,column,k+1);
-              dst_port( step,column,k+1) = t1;
-            } else if ( dst_step( step,column,k) == dst_step( step,column,k+1) ) {
-              //sort the src column in ascending order if the step is the same
-              if (dst_src( step,column,k) > dst_src( step,column,k+1) ) {
-                t1 = dst_src( step,column,k);
-                dst_src( step,column,k) = dst_src( step,column,k+1);
-                dst_src( step,column,k+1) = t1;
-
-                // swap the src, port info too
-                t1 = dst_port( step,column,k);
-                dst_port( step,column,k) = dst_port( step,column,k+1);
-                dst_port( step,column,k+1) = t1;
-              }
-
-            }
-          }
-        }
       }
     }
 

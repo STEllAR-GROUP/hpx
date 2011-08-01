@@ -88,7 +88,7 @@ int hpx_main(variables_map& vm)
         section pars = *(root.get_section("dataflow"));
 
         appconfig_option<std::size_t>("loglevel", pars, par->loglevel);
-        appconfig_option<std::size_t>("nx0", pars, par->nx0);
+        //appconfig_option<std::size_t>("nx0", pars, par->nx0);
         appconfig_option<std::size_t>("nt0", pars, par->nt0);
         appconfig_option<std::size_t>("grain_size", pars, par->grain_size);
     }

@@ -181,8 +181,8 @@ namespace hpx { namespace components { namespace amr
             // call provided (external) function
             generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
 
-            if (log_ && par->loglevel > 1)         // send initial value to logging instance
-                stubs::logging::logentry(log_, val.get(), row,item, par);
+            //if (log_ && par->loglevel > 1)         // send initial value to logging instance
+            //    stubs::logging::logentry(log_, val.get(), row,item, par);
         }
         return result;
     }
