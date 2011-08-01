@@ -109,9 +109,9 @@ namespace hpx { namespace components { namespace amr
             server::stencil_config_data const* config) const
         {
             ar & max_index_ & index_ & timestep_;
-            if (config)
-                value_.do_save(ar, config->start_, config->count_);
-            else
+            if (config) {
+                value_.do_save(ar, config->start_, config->start_+config->count_);
+            } else
                 value_.do_save(ar, 0, value_.size());
         } 
 
