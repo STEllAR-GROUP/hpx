@@ -51,6 +51,20 @@ namespace hpx { namespace geometry { namespace stubs
             return search_async(gid, search_objects).get();
         }
 
+        static lcos::future_value<polygon_type> 
+        get_poly_async(naming::id_type gid) 
+        {
+            typedef server::point::get_poly_action action_type;
+            return lcos::eager_future<action_type>(gid);
+        }
+
+        static polygon_type get_poly(naming::id_type const& gid) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the future_value
+            return get_poly_async(gid).get();
+        }
+
         /// Query the current coordinate values of the server#point 
         /// instance with the given \a gid. 
         static lcos::future_value<double> 

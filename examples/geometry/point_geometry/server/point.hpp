@@ -20,6 +20,9 @@
 
 #include "../serialize_geometry.hpp"
 
+typedef boost::geometry::model::d2::point_xy<double> point_type;
+typedef boost::geometry::model::polygon<point_type> polygon_type;
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
 {
@@ -37,7 +40,8 @@ namespace hpx { namespace geometry { namespace server
             point_get_Y = 2,
             point_set_X = 3,
             point_set_Y = 4,
-            point_search = 5
+            point_search = 5,
+            point_get_poly = 6
         };
 
         // constructor: initialize accumulator value
@@ -94,30 +98,12 @@ namespace hpx { namespace geometry { namespace server
         }
 
         /// search for contact
-        bool search(std::vector<hpx::naming::id_type> const& search_objects) const
+        bool search(std::vector<hpx::naming::id_type> const& search_objects) const;
+
+        // retrieve the polygon object
+        polygon_type get_poly() const
         {
-#if 0
-            // get the polygons
-            typedef std::vector<lcos::future_value<memory_block_data> > lazy_results_type;
-
-            // first invoke all remote operations
-            lazy_results_type lazy_results;
-
-            BOOST_FOREACH(naming::id_type id, search_objects)
-            {
-              lazy_results.push_back(
-                components::stubs::memory_block::get_async( id ));
-            }
-
-            std::vector<access_memory_block<point_data> > polygons;
-            BOOST_FOREACH(lcos::future_value<memory_block_data> const& f, lazy_results)
-            {
-              polygons.push_back(f.get());
-            }
-
-            //scoped_values_lock<lcos::mutex> l(polygons);
-#endif
-            return false;
+            return poly_;
         }
 
         /// retrieve the X coordinate of this point
@@ -157,6 +143,10 @@ namespace hpx { namespace geometry { namespace server
         > get_X_action;
 
         typedef hpx::actions::direct_result_action0<
+            point const, polygon_type, point_get_poly, &point::get_poly
+        > get_poly_action;
+
+        typedef hpx::actions::direct_result_action0<
             point const, double, point_get_Y, &point::get_Y
         > get_Y_action;
 
@@ -174,9 +164,6 @@ namespace hpx { namespace geometry { namespace server
         > search_action;
 
     private:
-        typedef boost::geometry::model::d2::point_xy<double> point_type;
-        typedef boost::geometry::model::polygon<point_type> polygon_type;
-
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;

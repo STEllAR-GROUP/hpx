@@ -37,6 +37,9 @@ HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::search_action,
     point_geometry_search_action);
 HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::get_poly_action,
+    point_geometry_get_poly_action);
+HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::get_X_action,
     point_geometry_get_X_action);
 HPX_REGISTER_ACTION_EX(

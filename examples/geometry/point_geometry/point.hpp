@@ -15,6 +15,9 @@
 
 #include "stubs/point.hpp"
 
+typedef boost::geometry::model::d2::point_xy<double> point_type;
+typedef boost::geometry::model::polygon<point_type> polygon_type;
+
 namespace hpx { namespace geometry 
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -77,6 +80,18 @@ namespace hpx { namespace geometry
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search(gid_, search_objects);
+        }
+
+        lcos::future_value<polygon_type> get_poly_async() const
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_poly_async(gid_);
+        }
+
+        polygon_type get_poly() const
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_poly(gid_);
         }
 
         /// Query the current coordinate values of the server#point 

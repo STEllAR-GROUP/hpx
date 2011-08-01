@@ -22,7 +22,14 @@ set(stubs_headers
 set(server_headers
     server/point.hpp)
 
+set(server_sources
+    server/point.cpp)
+
 ###############################################################################
+set(sources
+    ${client_sources}
+    ${server_sources})
+
 set(headers
     ${common_headers}
     ${client_headers}
@@ -31,6 +38,7 @@ set(headers
 
 ###############################################################################
 source_group("Source Files\\Client" FILES ${client_sources})
+source_group("Source Files\\Client" FILES ${server_sources})
 source_group("Header Files\\Client" FILES ${client_headers})
 source_group("Header Files\\Stubs"  FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
@@ -39,6 +47,6 @@ source_group("Header Files" FILES ${common_headers})
 ###############################################################################
 add_hpx_component(point_geometry 
     MODULE point_geometry
-    SOURCES ${client_sources} 
+    SOURCES ${sources} 
     HEADERS ${headers})
 
