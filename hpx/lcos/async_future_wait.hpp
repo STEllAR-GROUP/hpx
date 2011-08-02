@@ -57,6 +57,8 @@ namespace hpx { namespace components
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
         while (handled.count() < lazy_values.size()) {
+
+            bool suspended = false;
             for (int i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
@@ -65,16 +67,20 @@ namespace hpx { namespace components
                     handled[i] = true;
 
                     // get the value from the future, invoke the function
-                    if (!f(lazy_values[i].get()))
+                    if (!f(i, lazy_values[i].get()))
                         return handled.count();
 
                     // give thread-manager a chance to look for more work while 
                     // waiting
                     if (!threads::suspend())
                         return handled.count();
+
+                    suspended = true;
                 }
             }
-            if (!threads::suspend())     // suspend after one full loop over all values
+
+            // suspend after one full loop over all values
+            if (!suspended && !threads::suspend())
                 return handled.count();
         }
         return handled.count();

@@ -38,13 +38,14 @@ namespace hpx { namespace geometry { namespace server
             }
 
             // will return the number of invoked futures
-            wait(lazy_results, boost::bind(&point::search_callback, this, _1));
+            wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2));
 
             return false;
         }
 
-        bool point::search_callback(polygon_type const& poly) const {
-              
+        bool point::search_callback(std::size_t, polygon_type const& poly) const 
+        {
+
           // return type says continue or not
           // usually return true
           return true;

@@ -101,7 +101,7 @@ namespace hpx { namespace geometry { namespace server
         bool search(std::vector<hpx::naming::id_type> const& search_objects) const;
 
         /// callback for search-wait
-        bool search_callback(polygon_type const& poly) const;
+        bool search_callback(std::size_t idx, polygon_type const& poly) const;
 
         // retrieve the polygon object
         polygon_type get_poly() const
