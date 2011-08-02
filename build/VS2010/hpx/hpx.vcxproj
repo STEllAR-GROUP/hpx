@@ -100,7 +100,6 @@
     <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp" />
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
-    <ClCompile Include="..\..\..\src\hpx_init.cpp" />
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
-    <ClInclude Include="..\..\..\hpx\hpx_init.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
@@ -204,7 +202,10 @@
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function_implementations.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\stdmap.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp" />

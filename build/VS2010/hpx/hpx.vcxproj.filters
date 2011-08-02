@@ -380,9 +380,6 @@
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
       <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\hpx_init.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp">
       <Filter>Source Files\LCOs\Barrier</Filter>
     </ClCompile>
@@ -841,9 +838,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\hpx_init.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\random.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -1044,6 +1038,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_32.hpp">
       <Filter>Header Files\Util\Hardware\Timestamp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function_implementations.hpp">
+      <Filter>Header Files\Runtime\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function.hpp">
+      <Filter>Header Files\Runtime\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp">
+      <Filter>Header Files\Runtime\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

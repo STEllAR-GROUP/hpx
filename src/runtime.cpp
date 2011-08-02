@@ -46,7 +46,7 @@ namespace hpx
         std::abort();
     }
 
-    BOOL WINAPI termination_handler(DWORD ctrl_type)
+    HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
     {
         switch (ctrl_type) {
         case CTRL_C_EVENT:
@@ -88,7 +88,7 @@ namespace hpx
 
 namespace hpx 
 {
-    void termination_handler(int signum)
+    HPX_EXPORT void termination_handler(int signum)
     {
         char* c = strsignal(signum); 
         std::cerr << "Received " << (c ? c : "unknown signal")

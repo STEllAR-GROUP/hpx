@@ -90,8 +90,7 @@ namespace hpx
     ///                     command line arguments passed in argc/argv. 
     ///                     Otherwise it will be executed as specified by the 
     ///                     parameter\p mode.
-    HPX_EXPORT int 
-    init(int (*f)(boost::program_options::variables_map& vm),
+    int init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[],
         boost::function<void()> startup_function = boost::function<void()>(),
@@ -120,11 +119,9 @@ namespace hpx
     /// \note               The created runtime system instance will be 
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in argc/argv.
-    HPX_EXPORT int 
-    init(int (*f)(boost::program_options::variables_map& vm),
+    int init(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char* argv[]);
 
-#if !defined(HPX_EXPORTS)
     ///////////////////////////////////////////////////////////////////////////
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
@@ -295,10 +292,9 @@ namespace hpx
         boost::function<void()> const empty;
         return init(f, desc_commandline, argc, argv, empty, empty);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void finalize(double shutdown_timeout = -1.0, 
+    void finalize(double shutdown_timeout = -1.0, 
         double localwait = -1.0);
 }
 

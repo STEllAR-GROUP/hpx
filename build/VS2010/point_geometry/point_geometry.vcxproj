@@ -51,6 +51,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp" />
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp" />
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\server\point.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/point1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)/point1.obj</ObjectFileName>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\point.hpp" />

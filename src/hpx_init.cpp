@@ -287,10 +287,10 @@ namespace hpx
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
-                    ("ini,I", value<std::vector<std::string> >(),
+                    ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add an ini definition to the default runtime "
                      "configuration")
-                    ("print-counter,P", value<std::vector<std::string> >(),
+                    ("print-counter,P", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter before shutting "
                      "down the system")
                     ("dump-config", "print the runtime configuration")

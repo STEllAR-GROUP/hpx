@@ -13,6 +13,9 @@
     <Filter Include="Header Files\Stubs">
       <UniqueIdentifier>{8bada9ed-586f-4225-a47e-7f9252a51e7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Server">
+      <UniqueIdentifier>{352c9c52-3090-4774-8464-19c90401072d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\examples\geometry\point_geometry\server\point.hpp">
@@ -34,6 +37,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\server\point.cpp">
+      <Filter>Source Files\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

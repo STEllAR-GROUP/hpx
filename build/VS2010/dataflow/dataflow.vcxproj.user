@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>..\..\..\bin64\Debug\lib\hpx</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-p iddataflow -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -x127.0.0.1:7913 -r</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-p iddataflow -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -l2 -r -x127.0.0.1:7913</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>-p iddataflow -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -x127.0.0.1:7913 -r</LocalDebuggerCommandArguments>
