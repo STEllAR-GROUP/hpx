@@ -1048,6 +1048,9 @@
     <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp">
       <Filter>Header Files\Runtime\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

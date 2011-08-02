@@ -12,14 +12,16 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
+
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
+#include <boost/bind.hpp>
 
 #include "../serialize_geometry.hpp"
-#include "./point.hpp"
 #include "../stubs/point.hpp"
+#include "./point.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
@@ -35,7 +37,8 @@ namespace hpx { namespace geometry { namespace server
               lazy_results.push_back( stubs::point::get_poly_async( gid ) );
             }
 
-            wait(lazy_results,boost::bind(this, &search_callback,_1));
+            // will return the number of invoked futures
+            wait(lazy_results, boost::bind(&point::search_callback, this, _1));
 
             return false;
         }

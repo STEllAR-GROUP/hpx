@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
