@@ -33,6 +33,7 @@ struct symbol_namespace :
     typedef server::symbol_namespace<Database, Protocol> server_type;
 
     typedef typename server_type::response_type response_type;
+    typedef typename server_type::iterate_function_type iterate_function_type;
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
@@ -74,6 +75,15 @@ struct symbol_namespace :
     
     response_type unbind(symbol_type const& key)
     { return this->base_type::unbind(this->gid_, key); }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // iterate interface 
+    lcos::future_value<response_type>
+    iterate_async(iterate_function_type const& f)
+    { return this->base_type::iterate_async(this->gid_, f); }
+    
+    response_type iterate(iterate_function_type const& f)
+    { return this->base_type::iterate(this->gid_, f); }
 };            
 
 }}

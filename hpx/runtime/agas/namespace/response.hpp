@@ -97,7 +97,8 @@ enum request_code
     symbol_ns_bind              = BOOST_BINARY_U(0010000), 
     symbol_ns_rebind            = BOOST_BINARY_U(0010001), 
     symbol_ns_resolve           = BOOST_BINARY_U(0010010), 
-    symbol_ns_unbind            = BOOST_BINARY_U(0010011)  
+    symbol_ns_unbind            = BOOST_BINARY_U(0010011), 
+    symbol_ns_iterate           = BOOST_BINARY_U(0010100)  
 };
 
 template <typename Protocol>
@@ -444,6 +445,7 @@ struct response
     // component_ns_unbind
     // symbol_ns_bind
     // symbol_ns_unbind
+    // symbol_ns_iterate
     void assign(
         request_code type_
       , error e = success
@@ -457,6 +459,7 @@ struct response
             case component_ns_unbind:
             case symbol_ns_bind:
             case symbol_ns_unbind:
+            case symbol_ns_iterate:
                 break;
 
             default: {

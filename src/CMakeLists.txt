@@ -133,6 +133,7 @@ if(UNIX)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     target_link_libraries(hpx hpx_serialization hpx_ini
+      iostreams_component
       #agas_stdmap_tcpip_lib barrier_component
       ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
   else()

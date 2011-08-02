@@ -48,5 +48,8 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     symbol_namespace_type::unbind_action,
     stdmap_symbol_namespace_unbind_action);
+HPX_REGISTER_ACTION_EX(
+    symbol_namespace_type::iterate_action,
+    stdmap_symbol_namespace_iterate_action);
 
 #endif

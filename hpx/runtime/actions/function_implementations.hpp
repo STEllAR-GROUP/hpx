@@ -51,7 +51,7 @@
 template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T)>
 struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
 {
-    typedef Result result_type;
+    typedef typename detail::function_result<Result>::type result_type;
     typedef boost::fusion::vector<
         BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _) 
     > arguments_type;

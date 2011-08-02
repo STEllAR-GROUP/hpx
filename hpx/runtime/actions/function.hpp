@@ -21,11 +21,22 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/future_value.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/unused.hpp>
 
 #define HPX_FUNCTION_VERSION 0x10
 
 namespace hpx { namespace actions
 {
+
+namespace detail
+{
+
+template <typename T>
+struct function_result
+    : boost::mpl::if_<boost::is_same<T, void>, util::unused_type, T>
+ {};
+
+}
 
 template <typename Signature>
 struct function;
@@ -33,7 +44,7 @@ struct function;
 template <typename Result>
 struct function<Result()>
 {
-    typedef Result result_type;
+    typedef typename detail::function_result<Result>::type result_type;
     typedef boost::fusion::vector<> arguments_type;
     typedef signature<result_type, arguments_type> action_type;
 

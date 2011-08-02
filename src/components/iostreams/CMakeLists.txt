@@ -11,6 +11,7 @@ if("${HPX_AGAS_VERSION}" STREQUAL "2")
             manipulators.cpp
             standard_streams.cpp
             server/output_stream.cpp 
-    HEADERS ${headers})
+    HEADERS ${headers}
+    NOLIBS)
 endif()
 

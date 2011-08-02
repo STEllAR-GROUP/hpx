@@ -78,6 +78,9 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     typedef primary_namespace_type::endpoint_type endpoint_type;
     typedef component_namespace_type::prefix_type prefix_type;
 
+    typedef symbol_namespace_type::iterate_function_type
+        iterateids_function_type;
+
     typedef hpx::lcos::mutex cache_mutex_type;
 
     typedef boost::atomic<boost::uint32_t> console_cache_type;
@@ -327,6 +330,8 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
 
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws);
+
+    bool iterateids(iterateids_function_type const& f);
 };
 
 }}

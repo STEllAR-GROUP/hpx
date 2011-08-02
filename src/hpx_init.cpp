@@ -14,8 +14,12 @@
     #include <boost/assign/std/vector.hpp>
     #include <boost/foreach.hpp>
     #include <hpx/runtime/components/runtime_support.hpp>
+    #include <hpx/runtime/actions/function.hpp>
+    #include <hpx/runtime/actions/plain_action.hpp>
+    #include <hpx/runtime/components/plain_component_factory.hpp>
     #include <hpx/runtime/applier/applier.hpp>
     #include <hpx/include/performance_counters.hpp>
+    #include <hpx/include/iostreams.hpp>
 #endif
 
 #if !defined(BOOST_WINDOWS)
@@ -28,6 +32,60 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
+namespace hpx
+{
+    typedef int (*hpx_main_func)(boost::program_options::variables_map& vm);
+}
+
+#if HPX_AGAS_VERSION > 0x10
+    namespace hpx
+    {
+        void list_counter(std::string const& name, naming::gid_type const& gid)
+        {
+            if ((4 <= name.size()) && (name.substr(0, 4) == "/pcs"))
+            {
+                cout() << "  " << name << endl;
+            }
+        }
+    }
+
+    typedef hpx::actions::plain_action2<
+        std::string const&,
+        hpx::naming::gid_type const&,
+        hpx::list_counter
+    > list_counter_action;
+
+    namespace hpx
+    {
+        int list_counters(boost::program_options::variables_map& vm, hpx_main_func f)
+        {
+            {
+                cout() << "registered performance counters" << endl; 
+                actions::function<void(std::string const&, naming::gid_type const&)>
+                    cb(new list_counter_action);
+                applier::get_applier().get_agas_client().iterateids(cb);
+            }
+
+            if (0 != f)
+                return boost::bind(f, vm)();
+
+            else
+            {
+                finalize();
+
+                return 0;
+            }
+        }
+
+        inline int list_counters(boost::program_options::variables_map& vm)
+        {
+            return list_counters(vm, 0);
+        }
+    }
+
+    HPX_REGISTER_PLAIN_ACTION(list_counter_action);
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -39,7 +97,6 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef int (*hpx_main_func)(boost::program_options::variables_map& vm);
     typedef boost::function<void()> startup_func;
     typedef boost::function<void()> shutdown_func;
 
@@ -180,11 +237,13 @@ namespace hpx
                     ;
                 }
 
-#if HPX_AGAS_VERSION <= 0x10
                 hpx_options.add_options()
+#if HPX_AGAS_VERSION <= 0x10
                     ("run-agas-server-only", "run only the AGAS server")
-                ;
+#else
+                    ("list-counters", "list registered performance counters")
 #endif
+                ;
 
                 hpx_options.add_options()
                     ("app-config,p", value<std::string>(), 
@@ -307,28 +366,35 @@ namespace hpx
 #endif
 
 #if HPX_AGAS_VERSION > 0x10
-        void print_counter(std::string const& name)
+        void print_counters(std::vector<std::string> const& names)
         {
-            naming::gid_type gid;
-            applier::get_applier().get_agas_client().queryid(name, gid);
+            std::cout << "shutdown performance counter queries\n";
 
-            if (HPX_UNLIKELY(!gid))
+            BOOST_FOREACH(std::string const& name, names)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "print_counter",
-                    boost::str( boost::format("invalid performance counter '%s'")
-                              % name))
+                naming::gid_type gid;
+                applier::get_applier().get_agas_client().queryid(name, gid);
+
+                if (HPX_UNLIKELY(!gid))
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter, "print_counters",
+                        boost::str(boost::format(
+                            "invalid performance counter '%s'")
+                            % name))
+                }
+
+                using hpx::performance_counters::stubs::performance_counter;
+                using hpx::performance_counters::status_valid_data;
+
+                // Query the performance counter.
+                performance_counters::counter_value value
+                    = performance_counter::get_value(gid);
+
+                if (HPX_LIKELY(status_valid_data == value.status_))
+                    std::cout << "  " << name << "," << value.value_ << "\n"; 
+                else
+                    std::cout << "  " << name << ",invalid\n"; 
             }
-
-            using hpx::performance_counters::stubs::performance_counter;
-
-            // Query the performance counter.
-            performance_counters::counter_value value
-                = performance_counter::get_value(gid);
-
-            if (HPX_LIKELY(performance_counters::status_valid_data == value.status_))
-                std::cout << name << " " << value.value_ << "\n"; 
-            else
-                std::cout << name << " invalid\n"; 
         }
 #endif
 
@@ -351,14 +417,12 @@ namespace hpx
                 rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
-            std::vector<std::string> counters;
 
             if (vm.count("print-counter"))
-                counters = vm["print-counter"].as<std::vector<std::string> >();
-
-            BOOST_FOREACH(std::string const& counter, counters)
             {
-                rt.add_shutdown_function(boost::bind(print_counter, counter));
+                std::vector<std::string> counters
+                    = vm["print-counter"].as<std::vector<std::string> >();
+                rt.add_shutdown_function(boost::bind(print_counters, counters));
             }
 
             if (!startup_function.empty())
@@ -366,17 +430,41 @@ namespace hpx
 
             if (!shutdown_function.empty())
                 rt.add_shutdown_function(shutdown_function);
-#endif
 
-            if (vm.count("exit")) {
-                return 0;
+            if (vm.count("exit"))
+            { 
+                if (vm.count("list-counters"))
+                    // Call list_counters, which will print out all available
+                    // performance counters and then return 0.
+                    return rt.run(boost::bind(&list_counters, vm),
+                        num_threads, num_localities);
+                else
+                    return 0;
             }
-            else if (0 != f) {
+
+            else if (vm.count("list-counters"))
+                // Call list_counters, which will print out all available
+                // performance counters and then call f.
+                return rt.run(boost::bind(&list_counters, vm, f),
+                    num_threads, num_localities);
+
+            else
+            {
+                if (vm.count("exit"))
+                    return 0;
+                else if (0 != f)
+                    // Run this runtime instance using the given function f.
+                    return rt.run(boost::bind(f, vm), num_threads, num_localities);
+            }
+#else
+            if (vm.count("exit"))
+                return 0;
+            else if (0 != f)
                 // Run this runtime instance using the given function f.
                 return rt.run(boost::bind(f, vm), num_threads, num_localities);
-            }
+#endif
 
-            // Run this runtime instance using an empty hpx_main
+            // Run this runtime instance without an hpx_main
             return rt.run(num_threads, num_localities);
         }
 
@@ -700,7 +788,6 @@ namespace hpx
         if (shutdown_timeout == -1.0)
             get_option(shutdown_timeout, "hpx.shutdown_timeout");
 
-//        components::stubs::runtime_support::shutdown_all(shutdown_timeout);
         components::server::runtime_support* p = 
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());

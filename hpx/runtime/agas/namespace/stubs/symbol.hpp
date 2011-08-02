@@ -22,6 +22,7 @@ struct symbol_namespace
     typedef server::symbol_namespace<Database, Protocol> server_type; 
 
     typedef typename server_type::response_type response_type;
+    typedef typename server_type::iterate_function_type iterate_function_type;
     typedef typename server_type::symbol_type symbol_type;
     // }}}
 
@@ -79,6 +80,19 @@ struct symbol_namespace
     static response_type
     unbind(naming::id_type const& gid, symbol_type const& key)
     { return unbind_async(gid, key).get(); } 
+    // }}}
+
+    // {{{ iterate dispatch 
+    static lcos::future_value<response_type>
+    iterate_async(naming::id_type const& gid, iterate_function_type const& f)
+    {
+        typedef typename server_type::iterate_action action_type;
+        return lcos::eager_future<action_type, response_type>(gid, f);
+    }
+    
+    static response_type
+    iterate(naming::id_type const& gid, iterate_function_type const& f)
+    { return iterate_async(gid, f).get(); } 
     // }}}
 };            
 

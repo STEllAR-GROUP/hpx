@@ -653,6 +653,22 @@ bool legacy_router::queryid(
         return false;
 } // }}}
 
+bool legacy_router::iterateids(
+    iterateids_function_type const& f
+) { // {{{
+    response_type r;
+
+    if (is_bootstrap())
+        r = bootstrap->symbol_ns_server.iterate(f);
+    else
+        r = hosted->symbol_ns_.iterate(f);
+
+    if (r.get_status() == success)
+        return true;
+    else
+        return false;
+} // }}}
+
 }}
 
 #endif // HPX_AGAS_VERSION > 0x10

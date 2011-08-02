@@ -11,6 +11,7 @@
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
@@ -33,6 +34,10 @@ struct symbol_namespace :
         database_mutex_type;
 
     typedef std::string symbol_type;
+
+    typedef hpx::actions::function<
+        void(symbol_type const&, naming::gid_type const&)
+    > iterate_function_type;
 
     typedef response<Protocol> response_type;
 
@@ -130,12 +135,30 @@ struct symbol_namespace :
         return response_type(symbol_ns_unbind);
     } // }}} 
 
+    response_type iterate(
+        iterate_function_type const& f
+    ) { // {{{ iterate implementation
+        typename database_mutex_type::scoped_lock l(mutex_);
+        
+        typename gid_table_type::map_type& gid_table = gids_.get();
+
+        for (typename gid_table_type::map_type::iterator it = gid_table.begin(),
+                                                         end = gid_table.end();
+             it != end; ++it)
+        {
+            f(it->first, it->second);
+        }
+
+        return response_type(symbol_ns_iterate);
+    } // }}} 
+
     enum actions
     { // {{{ action enum
         namespace_bind    = BOOST_BINARY_U(0010000),
         namespace_rebind  = BOOST_BINARY_U(0010001),
         namespace_resolve = BOOST_BINARY_U(0010010),
-        namespace_unbind  = BOOST_BINARY_U(0010011)
+        namespace_unbind  = BOOST_BINARY_U(0010011),
+        namespace_iterate = BOOST_BINARY_U(0010100)
     }; // }}}
     
     typedef hpx::actions::result_action2<
@@ -173,6 +196,15 @@ struct symbol_namespace :
         &symbol_namespace<Database, Protocol>::unbind
       , threads::thread_priority_critical
     > unbind_action;
+
+    typedef hpx::actions::result_action1<
+        symbol_namespace<Database, Protocol>,
+        /* retrun type */ response_type,
+        /* enum value */  namespace_iterate,
+        /* arguments */   iterate_function_type const&,
+        &symbol_namespace<Database, Protocol>::iterate
+      , threads::thread_priority_critical
+    > iterate_action;
 };
 
 }}}
