@@ -43,8 +43,39 @@ namespace hpx { namespace geometry { namespace server
             return false;
         }
 
-        bool point::search_callback(std::size_t, polygon_type const& poly) const 
+        bool point::search_callback(std::size_t i, polygon_type const& poly) const 
         {
+
+          // not implemented in boost geometry yet
+          //if ( boost::geometry::overlaps(poly_,poly) ) {
+            // Contact!
+          //}
+
+          // Check for contact
+          std::deque<polygon_type> output;
+          boost::geometry::intersection(poly_,poly,output);
+          BOOST_FOREACH(polygon_type const& p, output) {
+            std::cout << i++ << " Contact region area  " << boost::geometry::area(p) << std::endl;
+            // Find the master segment
+            //for (std::size_t j=0;j<p.outer().size();j++) {
+            //}
+           
+          }
+
+          // for each node in the polygon, see if there is contact with this polygon
+          //for (std::size_t j=0;j<poly_.outer().size();j++) {
+          //  if ( boost::geometry::within(poly.outer()[j],poly) ) {
+            // Contact!
+            // Find the master segment -- the two nodes of the polygon 
+            //                             nearest the contact node
+
+            // Record pertinent information for contact enforcement
+            //    -Master segment
+            //    -l,A,B,C,delta, R_1, R_2,xsm,zsm
+               
+          //  }
+          //}
+          std::cout << " TEST poly.outer().size() " << poly.outer().size() << " i " << i << " poly_ " << poly_.outer().size() << std::endl;
 
           // return type says continue or not
           // usually return true
