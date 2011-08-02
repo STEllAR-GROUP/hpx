@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_DYNAMIC_STENCIL_VALUE_IMPL)
-#define HPX_COMPONENTS_AMR_DYNAMIC_STENCIL_VALUE_IMPL
+#if !defined(HPX_COMPONENTS_DATAFLOW_DYNAMIC_STENCIL_VALUE_IMPL)
+#define HPX_COMPONENTS_DATAFLOW_DYNAMIC_STENCIL_VALUE_IMPL
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_STUBS_FUNCTIONAL_COMPONENT_NOV_05_2008_0338PM)
-#define HPX_COMPONENTS_AMR_STUBS_FUNCTIONAL_COMPONENT_NOV_05_2008_0338PM
+#if !defined(HPX_COMPONENTS_DATAFLOW_STUBS_FUNCTIONAL_COMPONENT_NOV_05_2011_0338PM)
+#define HPX_COMPONENTS_DATAFLOW_STUBS_FUNCTIONAL_COMPONENT_NOV_05_2011_0338PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>

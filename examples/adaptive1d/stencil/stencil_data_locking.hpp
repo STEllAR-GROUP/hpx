@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_LOCKING_AUG_13_1139AM)
-#define HPX_COMPONENTS_AMR_LOCKING_AUG_13_1139AM
+#if !defined(HPX_COMPONENTS_STENCIL_LOCKING_AUG_02_1139AM)
+#define HPX_COMPONENTS_STENCIL_LOCKING_AUG_02_1139AM
 
 #include <hpx/hpx.hpp>
 #include <hpx/util/locking_helpers.hpp>

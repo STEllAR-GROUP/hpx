@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM)
-#define HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM
+#if !defined(HPX_COMPONENTS_STENCIL_STENCIL_DATA_AUG_02_2011_0719PM)
+#define HPX_COMPONENTS_STENCIL_STENCIL_DATA_AUG_02_2011_0719PM
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/split_member.hpp>

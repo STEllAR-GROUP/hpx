@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM)
-#define HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM
+#if !defined(HPX_COMPONENTS_STENCIL_LOGGING_AUG_02_2011_0719PM)
+#define HPX_COMPONENTS_STENCIL_LOGGING_AUG_02_2011_0719PM
 
 #include <hpx/lcos/mutex.hpp>
 #include "stencil_data.hpp"

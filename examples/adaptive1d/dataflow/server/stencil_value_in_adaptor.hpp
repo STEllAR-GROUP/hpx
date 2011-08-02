@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2008_0850PM)
-#define HPX_COMPONENTS_AMR_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2008_0850PM
+#if !defined(HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2011_0850PM)
+#define HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2011_0850PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread.hpp>

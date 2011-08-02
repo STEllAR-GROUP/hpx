@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(ARRAY1D_JUL_22_2011_1042AM)
-#define ARRAY1D_JUL_22_2011_1042AM
+#if !defined(ARRAY1D_AUG_22_2011_1042AM)
+#define ARRAY1D_AUG_22_2011_1042AM
 
 #include <fstream>
 #include <iostream>

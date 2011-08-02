@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_NOV_02_2008_0506PM)
-#define HPX_COMPONENTS_AMR_STENCIL_VALUE_NOV_02_2008_0506PM
+#if !defined(HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_NOV_02_2011_0506PM)
+#define HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_NOV_02_2011_0506PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>

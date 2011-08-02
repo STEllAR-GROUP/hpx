@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_RK_MESH_FEB_25_2010_0312PM)
-#define HPX_COMPONENTS_RK_MESH_FEB_25_2010_0312PM
+#if !defined(HPX_COMPONENTS_RK_MESH_FEB_25_2011_0312PM)
+#define HPX_COMPONENTS_RK_MESH_FEB_25_2011_0312PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
