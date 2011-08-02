@@ -10,6 +10,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/lcos/eager_future.hpp>
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -17,6 +18,7 @@
 
 #include "../serialize_geometry.hpp"
 #include "./point.hpp"
+#include "../stubs/point.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
@@ -24,6 +26,14 @@ namespace hpx { namespace geometry { namespace server
         /// search for contact
         bool point::search(std::vector<hpx::naming::id_type> const& search_objects) const
         {
+            typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+
+            lazy_results_type lazy_results;
+            BOOST_FOREACH(naming::id_type gid, search_objects)
+            {
+              lazy_results.push_back( stubs::point::get_poly_async( gid ) );
+            }
+            
             return false;
         }
 }}}
