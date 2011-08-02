@@ -1,3 +1,4 @@
+# Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2007-2010 Hartmut Kaiser
 # Copyright (c) 2009-2011 Matt Anderson
 #
@@ -20,10 +21,7 @@ set(sources
 
 # define basic dependencies
 set(dependencies
-    adaptive1d_dataflow_component 
-    adaptive1d_stencil_component 
-    adaptive1d_application_lib
-    distributing_factory_component)
+    adaptive1d_dataflow_component)
 
 source_group("Source Files" FILES ${sources})
 

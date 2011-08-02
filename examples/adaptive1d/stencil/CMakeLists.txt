@@ -1,3 +1,4 @@
+# Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c) 2007-2011 Matthew Anderson
 #
@@ -23,7 +24,7 @@ source_group("Header Files" FILES ${headers})
 
 ###############################################################################
 add_hpx_component(adaptive1d_stencil
-  MODULE adaptive1d_stencil
+  MODULE adaptive1d
   SOURCES ${sources} 
   HEADERS ${headers}
   DEPENDENCIES adaptive1d_application_lib)

@@ -1,3 +1,4 @@
+# Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c) 2009-2011 Matthew Anderson
 #
@@ -52,7 +53,9 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(adaptive1d_dataflow 
-  MODULE adaptive1d_dataflow
+  MODULE adaptive1d
   SOURCES ${sources} 
-  HEADERS ${headers})
+  HEADERS ${headers}
+  DEPENDENCIES adaptive1d_stencil_component
+               distributing_factory_component)
 
