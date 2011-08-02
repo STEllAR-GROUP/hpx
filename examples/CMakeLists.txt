@@ -16,6 +16,7 @@ if(NOT MSVC)
       accumulator
       contact
       dataflow
+      adaptive1d
       hplpx
       barnes_hut
       random_mem_access
