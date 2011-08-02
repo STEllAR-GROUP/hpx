@@ -84,7 +84,7 @@ namespace hpx { namespace actions
         {}
 
     protected:
-        /// The \a continuation_thread_function will be registered as the thread
+        /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the 
         /// original function (given by \a func), while ignoring the return 
         /// value.

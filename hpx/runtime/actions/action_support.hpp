@@ -227,8 +227,7 @@ namespace hpx { namespace actions
         typedef Result result_type;
 
         virtual result_type execute_function(
-            naming::address::address_type lva
-        ) const = 0; 
+            naming::address::address_type lva) const = 0; 
 
         virtual boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,

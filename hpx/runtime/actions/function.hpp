@@ -105,10 +105,10 @@ struct function<Result()>
 
     bool empty() const
     { return !f; }
-  
+
     operator typename util::safe_bool<function>::result_type() const
     { return util::safe_bool<function>()(f); }
- 
+
     bool operator!() const
     { return !f; }
 
