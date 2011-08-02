@@ -38,7 +38,7 @@ namespace hpx { namespace geometry { namespace server
             }
 
             // will return the number of invoked futures
-            wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2));
+            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2));
 
             return false;
         }
