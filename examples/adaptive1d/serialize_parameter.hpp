@@ -27,6 +27,19 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.nt0;
     ar & par.nx0;
     ar & par.grain_size;
+    ar & par.allowedl;
+    ar & par.num_neighbors;
+
+    ar & par.cfl;
+    ar & par.disip;
+    ar & par.Rmin;
+    ar & par.Rout;
+    ar & par.tau;
+    ar & par.lambda;
+    ar & par.v;
+    ar & par.amp;
+    ar & par.x0;
+    ar & par.id_sigma;
 }
 
 template <typename Archive>

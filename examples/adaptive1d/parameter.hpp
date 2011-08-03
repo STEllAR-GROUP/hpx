@@ -11,7 +11,7 @@
 #include <boost/config.hpp>
 
 #if !defined(NUM_EQUATIONS)
-    #define NUM_EQUATIONS 5
+    #define NUM_EQUATIONS 9
 #endif
 
 #if !defined(MAX_LEVELS)
@@ -31,7 +31,21 @@ struct HPX_COMPONENT_EXPORT parameter
     std::size_t loglevel;
     std::size_t nt0;
     std::size_t nx0;
+    std::size_t allowedl;
     std::size_t grain_size;
+    std::size_t num_neighbors;
+
+    // Application parameters
+    double cfl;
+    double disip;
+    double Rmin;
+    double Rout;
+    double tau;
+    double lambda;
+    double v;
+    double amp;
+    double x0;
+    double id_sigma;
 };
 
 } // detail

@@ -21,6 +21,7 @@ namespace hpx { namespace components { namespace adaptive1d
 {
     namespace server
     {
+
         ///////////////////////////////////////////////////////////////////////////////
         struct stencil_config_data
         {
@@ -62,6 +63,21 @@ namespace hpx { namespace components { namespace adaptive1d
         components::memory_block mem_block;
     };
 
+    struct nodedata
+    {
+      double phi[2][NUM_EQUATIONS];
+      double error;
+
+      private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & phi & error;
+        }
+    };
     ///////////////////////////////////////////////////////////////////////////
     struct stencil_data 
     {
@@ -95,8 +111,7 @@ namespace hpx { namespace components { namespace adaptive1d
         std::size_t max_index_;   // overall number of data points
         std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
         double_type timestep_;    // current time step
-        array1d<double> value_;    // current value
-        //double value_;    // current value
+        array1d<nodedata> value_;    // current value
 
     private:
         // customized serialization support

@@ -29,9 +29,10 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     val->value_.resize(par.grain_size);
     for (std::size_t i=0;i<par.grain_size;i++) {
-      val->value_[i] = item * 10 + i;
+      for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
+        val->value_[i].phi[0][j] = 0.0;
+      }
     }
-    //val->value_ = 1.0;
 
     return 1;
 }

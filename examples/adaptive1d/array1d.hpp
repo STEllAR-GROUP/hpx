@@ -13,6 +13,7 @@
 #include <string>
 #include <valarray>
 #include <vector>
+#include "stencil/stencil_data.hpp"
 
 template<typename T>
 
@@ -73,7 +74,7 @@ public:
     ar & slice_start;
     std::size_t s = data_.size();
     ar & s; // vsize
-    std::valarray<double> const& d = data_[std::slice(slice_start,slice_end-slice_start,1)];
+    std::valarray<hpx::components::adaptive1d::nodedata> const& d = data_[std::slice(slice_start,slice_end-slice_start,1)];
     ar & d;
   }
 

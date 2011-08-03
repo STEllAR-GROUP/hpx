@@ -76,6 +76,20 @@ int hpx_main(variables_map& vm)
     par->nt0            = 4;
     par->nx0            = 3;
     par->grain_size     = 5;
+    par->allowedl       = 0;
+    par->num_neighbors  = 2;
+
+    // application specific parameters
+    par->cfl    = 0.01;
+    par->disip  = 0.005;
+    par->Rmin   = -5.0;
+    par->Rout   = 15.0;
+    par->tau    = 1.0;
+    par->lambda = 1.0;
+    par->v      = 0.1;
+    par->amp    = 0.0001;
+    par->x0     = 10.0;
+    par->id_sigma = 0.9;
 
     id_type rt_id = get_applier().get_runtime_support_gid();
 
@@ -87,9 +101,23 @@ int hpx_main(variables_map& vm)
         section pars = *(root.get_section("adaptive1d"));
 
         appconfig_option<std::size_t>("loglevel", pars, par->loglevel);
-        //appconfig_option<std::size_t>("nx0", pars, par->nx0);
+        appconfig_option<std::size_t>("nx0", pars, par->nx0);
         appconfig_option<std::size_t>("nt0", pars, par->nt0);
+        appconfig_option<std::size_t>("allowedl", pars, par->allowedl);
         appconfig_option<std::size_t>("grain_size", pars, par->grain_size);
+        appconfig_option<std::size_t>("num_neighbors", pars, par->num_neighbors);
+
+        // Application parameters
+        appconfig_option<double>("cfl", pars, par->cfl);
+        appconfig_option<double>("disip", pars, par->disip);
+        appconfig_option<double>("Rmin", pars, par->Rmin);
+        appconfig_option<double>("Rout", pars, par->Rout);
+        appconfig_option<double>("tau", pars, par->tau);
+        appconfig_option<double>("lambda", pars, par->lambda);
+        appconfig_option<double>("v", pars, par->v);
+        appconfig_option<double>("amp", pars, par->amp);
+        appconfig_option<double>("x0", pars, par->x0);
+        appconfig_option<double>("id_sigma", pars, par->id_sigma);
     }
 
     // derived parameters
@@ -107,15 +135,34 @@ int hpx_main(variables_map& vm)
             ) % par->nt0);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     } 
+    if ( par->grain_size <= par->num_neighbors ) {
+        std::string msg = boost::str(boost::format(
+            "Increase grain size (%1%) or decrease the num_neighbors (%2%) "
+            ) % par->grain_size % par->num_neighbors);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    }
 
     std::cout << " Parameters    : " << std::endl;
     std::cout << " nx0           : " << par->nx0 << std::endl;
     std::cout << " nt0           : " << par->nt0 << std::endl;
     std::cout << " grain_size    : " << par->grain_size << std::endl;
+    std::cout << " num_neighbors : " << par->num_neighbors << std::endl;
     std::cout << " --------------: " << std::endl;
     std::cout << " loglevel      : " << par->loglevel << std::endl;
     std::cout << " --------------: " << std::endl;
-
+    std::cout << " Application     " << std::endl;
+    std::cout << " --------------: " << std::endl;
+    std::cout << " cfl           : " << par->cfl << std::endl;
+    std::cout << " disip         : " << par->disip << std::endl;
+    std::cout << " Rmin          : " << par->Rmin << std::endl;
+    std::cout << " Rout          : " << par->Rout << std::endl;
+    std::cout << " tau           : " << par->tau << std::endl;
+    std::cout << " lambda        : " << par->lambda << std::endl;
+    std::cout << " v             : " << par->v << std::endl;
+    std::cout << " amp           : " << par->amp << std::endl;
+    std::cout << " x0            : " << par->x0 << std::endl;
+    std::cout << " id_sigma      : " << par->id_sigma << std::endl;
+ 
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
     component_type logging_type = get_component_type<logging>();
