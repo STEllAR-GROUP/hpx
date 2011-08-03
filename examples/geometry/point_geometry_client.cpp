@@ -174,7 +174,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Contact enforcement ----------------------------------
 
         // Move bodies--------------------------------------------
-        std::vector<hpx::lcos::future_value<bool> > move_phase;
+        std::vector<hpx::lcos::future_value<void> > move_phase;
         for (i=0;i<num_bodies;i++) {
           move_phase.push_back(accu[i].move_async());
         }
