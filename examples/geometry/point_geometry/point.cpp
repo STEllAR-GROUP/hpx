@@ -34,6 +34,9 @@ HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::init_action,
     point_geometry_init_action);
 HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::move_action,
+    point_geometry_move_action);
+HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::search_action,
     point_geometry_search_action);
 HPX_REGISTER_ACTION_EX(

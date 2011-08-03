@@ -41,7 +41,8 @@ namespace hpx { namespace geometry { namespace server
             point_set_X = 3,
             point_set_Y = 4,
             point_search = 5,
-            point_get_poly = 6
+            point_get_poly = 6,
+            point_move = 7
         };
 
         // constructor: initialize accumulator value
@@ -103,6 +104,9 @@ namespace hpx { namespace geometry { namespace server
         /// callback for search-wait
         bool search_callback(std::size_t idx, polygon_type const& poly) const;
 
+        // move the bodies
+        void move() const;
+
         // retrieve the polygon object
         polygon_type get_poly() const
         {
@@ -150,6 +154,10 @@ namespace hpx { namespace geometry { namespace server
         > get_poly_action;
 
         typedef hpx::actions::direct_result_action0<
+            point const, void, point_move, &point::move
+        > move_action;
+
+        typedef hpx::actions::direct_result_action0<
             point const, double, point_get_Y, &point::get_Y
         > get_Y_action;
 
@@ -171,6 +179,8 @@ namespace hpx { namespace geometry { namespace server
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;
         polygon_type poly_;
+        std::vector<double> velx_;
+        std::vector<double> vely_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
 

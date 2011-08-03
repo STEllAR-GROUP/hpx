@@ -65,6 +65,20 @@ namespace hpx { namespace geometry { namespace stubs
             return get_poly_async(gid).get();
         }
 
+        static lcos::future_value<void> 
+        move_async(naming::id_type gid) 
+        {
+            typedef server::point::move_action action_type;
+            return lcos::eager_future<action_type>(gid);
+        }
+
+        static void move(naming::id_type const& gid) 
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the future_value
+            move_async(gid).get();
+        }
+
         /// Query the current coordinate values of the server#point 
         /// instance with the given \a gid. 
         static lcos::future_value<double> 

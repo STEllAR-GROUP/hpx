@@ -94,6 +94,18 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
+        lcos::future_value<void> move_async() const
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::move_async(gid_);
+        }
+
+        void move() const
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::move(gid_);
+        }
+
         /// Query the current coordinate values of the server#point 
         /// instance with the given \a gid. 
         lcos::future_value<double> get_X_async() const

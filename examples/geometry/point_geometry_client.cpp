@@ -144,6 +144,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         init(locality_results(blocks), accu);
 
+
+        // Initial Data -----------------------------------------
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
         for (i=0;i<num_bodies;i++) {
@@ -151,6 +153,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         hpx::components::wait(initial_phase);
+
+        // Search for Contact------------------------------------
 
         // vector of futures
         std::vector<hpx::lcos::future_value<bool> > search_phase;
@@ -165,16 +169,18 @@ int hpx_main(boost::program_options::variables_map &vm)
           search_phase.push_back(accu[i].search_async(search_objects));
         }
 
-#if 0
-        std::vector<hpx::lcos::future_value<bool> > search_phase;
-        for (i=0;i<num_bodies;i++) {
-          for (std::size_t j=i+1;j<num_bodies;j++) {
-            search_phase.push_back(accu[i].search_async(accu[j].get_poly()));
-          }
-        }
-
         hpx::components::wait(search_phase);
 
+        // Contact enforcement ----------------------------------
+
+        // Move bodies--------------------------------------------
+        std::vector<hpx::lcos::future_value<bool> > move_phase;
+        for (i=0;i<num_bodies;i++) {
+          move_phase.push_back(accu[i].move_async());
+        }
+        hpx::components::wait(move_phase);
+
+#if 0
         hpx::geometry::point pt5(hpx::find_here(), 0.5, 0.5);
         bool inside = bg::within(pt5, p);
         std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
