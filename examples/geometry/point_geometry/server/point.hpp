@@ -153,8 +153,8 @@ namespace hpx { namespace geometry { namespace server
             point const, polygon_type, point_get_poly, &point::get_poly
         > get_poly_action;
 
-        typedef hpx::actions::direct_result_action0<
-            point const, void, point_move, &point::move
+        typedef hpx::actions::direct_action0<
+            point const, point_move, &point::move
         > move_action;
 
         typedef hpx::actions::direct_result_action0<
