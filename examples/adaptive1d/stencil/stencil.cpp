@@ -54,13 +54,13 @@ namespace hpx { namespace components { namespace adaptive1d
         return mem_block.get();
     }
 
-    stencil_config_data::stencil_config_data(int start, int count)
+    stencil_config_data::stencil_config_data(int face, int count)
     {
         // create new instance
         static_cast<base_type&>(*this) = create_and_resolve_target();
 
         // initialize from arguments
-        (*this)->start_ = start;
+        (*this)->face_ = face;
         (*this)->count_ = count;
     }
 }}}
@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         // Generate new config info
-        stencil_config_data cfg_right(0, par->num_neighbors);
-        stencil_config_data cfg_left(par->grain_size-1-par->num_neighbors, 2);
+        stencil_config_data cfg0(0,par->num_neighbors);  // serializes the left face
+        stencil_config_data cfg1(1,par->num_neighbors);  // serializes the right face
 
         // get all input memory_block_data instances
         typedef std::vector<lcos::future_value<memory_block_data> > 
@@ -122,10 +122,10 @@ namespace hpx { namespace components { namespace adaptive1d
 
         namespace s = hpx::components::stubs;
         lazy_results.push_back(
-            s::memory_block::get_async(gids[0], cfg_left.get_memory_block()));
+            s::memory_block::get_async(gids[0], cfg1.get_memory_block()));
         lazy_results.push_back(s::memory_block::get_async(gids[1]));
         lazy_results.push_back(
-            s::memory_block::get_async(gids[2], cfg_right.get_memory_block()));
+            s::memory_block::get_async(gids[2], cfg0.get_memory_block()));
 
         //  invoke the operation for the result gid as well
         lazy_results.push_back(s::memory_block::get_async(result));
