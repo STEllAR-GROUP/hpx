@@ -20,7 +20,8 @@ if(NOT MSVC)
       barnes_hut
       random_mem_access
       queue
-      quickstart)
+      quickstart
+      nqueen)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} iostreams

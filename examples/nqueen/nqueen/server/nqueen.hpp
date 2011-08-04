@@ -80,6 +80,7 @@ namespace hpx { namespace components { namespace server
 
         void printBoard()
         {
+          std::cout << "Total Solution Count:" << c_soln << std::endl;
           std::cout << "Printing Contents" << std::endl;
           std::cout << "Size:" << size_ << "   "
             " Level:" << level_ << std::endl;
@@ -124,15 +125,16 @@ namespace hpx { namespace components { namespace server
             Board board_(tmp_list, tmp_size, tmp_level);
 
             if(tmp_level== tmp_size){
-                std::cout << std::endl << "Solution "<<(++c_soln)<<":"<< std::endl;
-                for(std::size_t i=0; i < tmp_size; i++){
-                    for(std::size_t j=0; j < tmp_size; j++){
-                        if(board_.accessBoard().at(i)==j)
-                            std::cout << "X";
-                        else
-                            std::cout << "-";
-                    }
-                    std::cout << std::endl;
+            	++c_soln;
+                //std::cout << std::endl << "Solution "<<(++c_soln)<<":"<< std::endl;
+                //for(std::size_t i=0; i < tmp_size; i++){
+                    //for(std::size_t j=0; j < tmp_size; j++){
+                        //if(board_.accessBoard().at(i)==j)
+                            //std::cout << "X";
+                        //else
+                            //std::cout << "-";
+                    //}
+                    //std::cout << std::endl;
                 }
             }
             else{
