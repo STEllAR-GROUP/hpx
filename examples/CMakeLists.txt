@@ -14,7 +14,6 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      contact
       dataflow
       adaptive1d
       hplpx
@@ -35,7 +34,8 @@ if(NOT MSVC)
   endif()
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} geometry)
+    set(subdirs ${subdirs} geometry
+                           contact)
   endif() 
 
 # Disabled by wash until Matt can fix this to not break other HPX code
