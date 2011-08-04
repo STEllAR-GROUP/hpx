@@ -1,0 +1,3 @@
+dataflow  -p iddataflow -a localhost:5005 -x localhost:5006
+adaptive1d -p idadaptive1d -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -l2 -r -x127.0.0.1:7913
+adaptive1d -p idadaptive1d -t2 -Ihpx.agas.address=127.0.0.1 -Ihpx.agas.port=7913 -l2 -x127.0.0.1:7912 -w
