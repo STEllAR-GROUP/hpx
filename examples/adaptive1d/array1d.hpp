@@ -74,7 +74,7 @@ public:
     ar & slice_start;
     std::size_t s = data_.size();
     ar & s; // vsize
-    std::valarray<hpx::components::adaptive1d::nodedata> const& d = data_[std::slice(slice_start,slice_end-slice_start,1)];
+    std::valarray<T> const& d = data_[std::slice(slice_start,slice_end-slice_start,1)];
     ar & d;
   }
 
