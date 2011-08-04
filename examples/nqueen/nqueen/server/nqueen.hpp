@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace server
                             //std::cout << "-";
                     //}
                     //std::cout << std::endl;
-                }
+                //}
             }
             else{
                 for(std::size_t i = 0; i < tmp_size; i++){

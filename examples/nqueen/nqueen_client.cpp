@@ -8,6 +8,19 @@
 //  Parts of this nqueen_client.cpp has been taken from the accumulator example
 //  by Hartmut Kaiser.
 
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Running the code: Runs in single locality mode with -r option for AGAS.
+//  Must enter a value/size either using size[value] option or default option.
+//  Must enter print to get output. Get's the output after quitting app. 
+//
+//
+//  p.s. Will work on more intuitive interface. 
+//
+////////////////////////////////////////////////////////////////////////
+
+
 #include <cstring>
 #include <iostream>
 
