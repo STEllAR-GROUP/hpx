@@ -15,6 +15,9 @@
 #include "../stencil/stencil_functions.hpp"
 #include <examples/adaptive1d/parameter.hpp>
 
+#include <iostream>
+#include <fstream>
+
 #if defined(RNPL_FOUND)
 #include <sdf.h>
 #endif
@@ -43,7 +46,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 
     val->value_.resize(val->grain_size_);
     for (std::size_t i=0;i<val->grain_size_;i++) {
-      double x = par.Rmin + i*dx;
+      double x = item*par.grain_size*dx + par.Rmin + i*dx;
       val->value_[i].x = x;
 
       double x1 = 0.5*par.x0;
@@ -114,6 +117,24 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       }
       gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
     }
+#endif
+#if 0
+    // Output data as plain text
+    char fname[80];
+    std::ofstream myfile;
+    myfile.precision(10);
+    applier::applier& appl = applier::get_applier();
+    naming::id_type this_prefix = appl.get_runtime_support_gid();
+    int locality = get_prefix_from_id( this_prefix );
+    for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
+      sprintf(fname,"%dfield%d.txt",locality,(int) j);
+      myfile.open(fname,std::fstream::app);
+      for (std::size_t i=0;i<val->grain_size_;i++) {
+        myfile << val->value_[i].x << " " << val->value_[i].phi[0][j] << std::endl;
+      }
+      myfile.close();
+    }
+
 #endif
 
     return 1;
