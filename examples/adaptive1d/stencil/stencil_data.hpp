@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace adaptive1d
     struct stencil_data 
     {
         stencil_data() 
-          : max_index_(0), index_(0), timestep_(0)
+          : max_index_(0), index_(0), timestep_(0), grain_size_(0)
         {}
         ~stencil_data() {}
 
@@ -125,7 +125,7 @@ namespace hpx { namespace components { namespace adaptive1d
         void save(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) const
         {
-            ar & max_index_ & index_ & timestep_;
+            ar & max_index_ & index_ & timestep_ & grain_size_ ;
             if (config) {
                 if ( config->face_ == 0 ) {
                   // right face
@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace adaptive1d
         void load(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) 
         {
-            ar & max_index_ & index_ & timestep_;
+            ar & max_index_ & index_ & timestep_ & grain_size_;
             value_.do_load(ar);
         } 
 

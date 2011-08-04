@@ -140,6 +140,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         val[3]->max_index_ = val[1]->max_index_;
         val[3]->index_ = val[1]->index_;
+        val[3]->grain_size_ = val[1]->grain_size_;
         val[3]->value_ = val[1]->value_;
 
         //resultval->value_.resize(val[1]->value_.size());
