@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace adaptive1d
         ///////////////////////////////////////////////////////////////////////////////
         struct stencil_config_data
         {
-            int start_;
+            int face_;
             int count_;
 
         private:
@@ -36,13 +36,13 @@ namespace hpx { namespace components { namespace adaptive1d
             template<class Archive>
             void save(Archive & ar, const unsigned int version) const
             {
-                ar & start_ & count_;
+                ar & face_ & count_;
             } 
 
             template<class Archive>
             void load(Archive & ar, const unsigned int version)
             {
-                ar & start_ & count_;
+                ar & face_ & count_;
             } 
         };
     }
@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace adaptive1d
         memory_block_data create_and_resolve_target();
 
         // create a new server::stencil_config_data locally and initialize it
-        stencil_config_data(int start, int size);
+        stencil_config_data(int face, int size);
 
         components::memory_block mem_block;
     };
@@ -66,6 +66,7 @@ namespace hpx { namespace components { namespace adaptive1d
     struct nodedata
     {
       double phi[2][NUM_EQUATIONS];
+      double x;
       double error;
 
       private:
@@ -75,7 +76,7 @@ namespace hpx { namespace components { namespace adaptive1d
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & phi & error;
+            ar & phi & x & error;
         }
     };
     ///////////////////////////////////////////////////////////////////////////
@@ -88,7 +89,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         stencil_data(stencil_data const& rhs)
           : max_index_(rhs.max_index_), index_(rhs.index_), 
-            timestep_(rhs.timestep_),
+            timestep_(rhs.timestep_),grain_size_(rhs.grain_size_),
             value_(rhs.value_)
         {
             // intentionally do not copy mutex, new copy will have it's own mutex
@@ -100,6 +101,7 @@ namespace hpx { namespace components { namespace adaptive1d
                 max_index_ = rhs.max_index_;
                 index_ = rhs.index_;
                 timestep_ = rhs.timestep_;
+                grain_size_ = rhs.grain_size_;
                 value_ = rhs.value_;
                 // intentionally do not copy mutex, new copy will have it's own mutex
             }
@@ -110,6 +112,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         std::size_t max_index_;   // overall number of data points
         std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
+        std::size_t grain_size_;
         double_type timestep_;    // current time step
         array1d<nodedata> value_;    // current value
 
@@ -124,7 +127,16 @@ namespace hpx { namespace components { namespace adaptive1d
         {
             ar & max_index_ & index_ & timestep_;
             if (config) {
-                value_.do_save(ar, config->start_, config->start_+config->count_);
+                if ( config->face_ == 0 ) {
+                  // right face
+                  value_.do_save(ar, grain_size_ - config->count_ - 1, grain_size_-1);
+                } else if ( config->face_ == 1 ) {
+                  // left face
+                  value_.do_save(ar, 0, config->count_);
+                } else {
+                  BOOST_ASSERT(false);
+                }
+                //value_.do_save(ar, config->start_, config->start_+config->count_);
             } else
                 value_.do_save(ar, 0, value_.size());
         } 

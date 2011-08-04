@@ -162,6 +162,9 @@ int hpx_main(variables_map& vm)
     std::cout << " amp           : " << par->amp << std::endl;
     std::cout << " x0            : " << par->x0 << std::endl;
     std::cout << " id_sigma      : " << par->id_sigma << std::endl;
+
+    // number stencils
+    std::size_t number_stencils = par->nx0/par->grain_size;
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
@@ -179,7 +182,7 @@ int hpx_main(variables_map& vm)
 
         double time = 0.0;
         result_data = um.init_execute(*result_data,time,function_type, 
-                                      par->nx0, numsteps,
+                                      number_stencils, numsteps,
                               par->loglevel ? logging_type : component_invalid, par);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

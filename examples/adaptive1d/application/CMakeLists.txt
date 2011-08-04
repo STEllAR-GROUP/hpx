@@ -11,8 +11,15 @@ set(sources
 ###############################################################################
 source_group("Source Files" FILES ${sources})
 
+if(RNPL_FOUND)
+  # add RNPL as a dependency
+  set(dependencies 
+      ${RNPL_LIBRARY})
+endif()
+
 ###############################################################################
 add_hpx_library(adaptive1d_application
   MODULE adaptive1d
-  SOURCES ${sources}) 
+  SOURCES ${sources}
+  DEPENDENCIES ${dependencies}) 
 

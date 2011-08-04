@@ -11,6 +11,12 @@ set(subdirs
     stencil
     application)
 
+if(RNPL_FOUND)
+  # FIXME: HPX_* identifiers please
+  add_definitions(-DRNPL_FOUND)
+  include_directories(${RNPL_INCLUDE_DIR})
+endif()
+
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 endforeach()
@@ -22,6 +28,13 @@ set(sources
 # define basic dependencies
 set(dependencies
     adaptive1d_dataflow_component)
+
+if(RNPL_FOUND)
+  # add RNPL as a dependency
+  set(dependencies 
+      ${dependencies}
+      ${RNPL_LIBRARY})
+endif()
 
 source_group("Source Files" FILES ${sources})
 
