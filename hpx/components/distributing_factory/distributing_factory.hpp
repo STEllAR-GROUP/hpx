@@ -41,9 +41,11 @@ namespace hpx { namespace components
         typedef base_type::iterator_type iterator_type;
         typedef base_type::iterator_range_type iterator_range_type;
 
+        typedef lcos::future_value<result_type, remote_result_type> 
+            async_create_result_type;
+
         ///
-        lcos::future_value<result_type, remote_result_type> 
-        create_components_async(
+        async_create_result_type create_components_async(
             components::component_type type, std::size_t count = 1) 
         {
             return this->base_type::create_components_async(gid_, type, count);
@@ -56,15 +58,13 @@ namespace hpx { namespace components
             return this->base_type::create_components(gid_, type, count);
         }
 
-        ///
+        /// Left in for backwards compatibility
         void free_components(result_type const& gids) 
         {
-//             this->base_type::free_components(gid_, gids);
         }
 
         void free_components_sync(result_type const& gids)
         {
-//             this->base_type::free_components_sync(gid_, gids);
         }
     };
 

@@ -46,6 +46,9 @@ namespace hpx { namespace components { namespace server
                 components::get_component_type_name(type));
         }
 
+        if (count == std::size_t(-1))
+            count = prefixes.size();
+
         std::size_t created_count = 0;
         std::size_t count_on_locality = count / prefixes.size();
         std::size_t excess = count - count_on_locality*prefixes.size();

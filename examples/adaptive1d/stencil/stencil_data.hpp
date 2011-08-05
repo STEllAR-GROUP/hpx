@@ -69,6 +69,8 @@ namespace hpx { namespace components { namespace adaptive1d
       double x;
       double error;
 
+      nodedata() {}
+
       private:
         // serialization support
         friend class boost::serialization::access;
