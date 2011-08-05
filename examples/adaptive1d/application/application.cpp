@@ -33,19 +33,20 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
+    std::size_t grain_size;
     if ( item != maxitems-1 ) {
-      val->grain_size_ = par.grain_size;
+      grain_size = par.grain_size;
     } else {
-      val->grain_size_ = par.nx0 - (maxitems-1)*par.grain_size;
+      grain_size = par.nx0 - (maxitems-1)*par.grain_size;
     }
     // make sure the local grain size is always at least as big as the
     // user suggested grain size
-    BOOST_ASSERT(val->grain_size_ >= par.grain_size);
+    BOOST_ASSERT(grain_size >= par.grain_size);
 
-    double dx = (par.Rout - par.Rmin)/(par.nx0-1);
+    double dx = par.h;
 
-    val->value_.resize(val->grain_size_);
-    for (std::size_t i=0;i<val->grain_size_;i++) {
+    val->value_.resize(grain_size);
+    for (std::size_t i=0;i<val->value_.size();i++) {
       double x = item*par.grain_size*dx + par.Rmin + i*dx;
       val->value_[i].x = x;
 
@@ -100,18 +101,18 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     // output initial data
     double datatime = 0.0;
     int shape[3];
-    shape[0] = val->grain_size_;
+    shape[0] = val->value_.size();
     char cnames[80] = { "x|y|z" };
     char fname[80];
     applier::applier& appl = applier::get_applier();
     naming::id_type this_prefix = appl.get_runtime_support_gid();
     int locality = get_prefix_from_id( this_prefix );
     std::vector<double> xcoord,value;
-    xcoord.resize(val->grain_size_);
-    value.resize(val->grain_size_);
+    xcoord.resize(val->value_.size());
+    value.resize(val->value_.size());
     for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
       sprintf(fname,"%dfield%d",locality,(int) j);
-      for (std::size_t i=0;i<val->grain_size_;i++) {
+      for (std::size_t i=0;i<val->value_.size();i++) {
         xcoord[i] = val->value_[i].x;
         value[i] = val->value_[i].phi[0][j];
       }
@@ -129,7 +130,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
       sprintf(fname,"%dfield%d.txt",locality,(int) j);
       myfile.open(fname,std::fstream::app);
-      for (std::size_t i=0;i<val->grain_size_;i++) {
+      for (std::size_t i=0;i<val->value_.size();i++) {
         myfile << val->value_[i].x << " " << val->value_[i].phi[0][j] << std::endl;
       }
       myfile.close();
@@ -140,13 +141,13 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
-int rkupdate(std::vector<access_memory_block<stencil_data> > const&val, 
-             stencil_data* result, 
-             std::vector<int> &src, std::vector<int> &vsrc,double dt,double dx,double t,
-             int nx0, int ny0, int nz0,
-             double minx0, double miny0, double minz0,
-             detail::parameter const& par)
+int rkupdate(std::vector<access_memory_block<stencil_data> > &val, 
+             double t, detail::parameter const& par)
 {
+
+    //boost::scoped_array<nodedata> work(new nodedata[lnx]);
+    //boost::scoped_array<nodedata> work2(new nodedata[lnx]);
+
     return 1;
 }
 

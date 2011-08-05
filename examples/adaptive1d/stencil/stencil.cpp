@@ -140,24 +140,20 @@ namespace hpx { namespace components { namespace adaptive1d
 
         val[3]->max_index_ = val[1]->max_index_;
         val[3]->index_ = val[1]->index_;
-        val[3]->grain_size_ = val[1]->grain_size_;
         val[3]->value_ = val[1]->value_;
-
-        //resultval->value_.resize(val[1]->value_.size());
-        //for (std::size_t i=0;i<val[1]->value_.size();i++) {
-        //  resultval->value_[i] = val[1]->value_[i];
-        //}
 
         val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
-        std::cout << " row " << row << " column " << column 
-            << " timestep " << val[3]->timestep_ 
-            << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
-            << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
-            << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
-            << std::endl;
+        double t = val[1]->timestep_*par->h*par->lambda + cycle_time;
+        rkupdate(val,t,*par.p);
 
-        //std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " size " << val.size() << std::endl;
+        //std::cout << " row " << row << " column " << column 
+        //    << " timestep " << val[3]->timestep_ 
+        //    << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
+        //    << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
+        //    << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
+        //    << std::endl;
+
         if (val[3]->timestep_ >= par->nt0-1) {
           return 0;
         }

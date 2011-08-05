@@ -133,10 +133,10 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             namespace stubs = components::adaptive1d::stubs;
             BOOST_ASSERT(function != functions.second);
 
-#if 0       // DEBUG
+//#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-#endif
-#if 0
+//#endif
+//#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -149,7 +149,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             if ( dst_size(static_step,column,0) > 3 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
             }
-#endif
+//#endif
 
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
@@ -412,6 +412,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
                                   parameter const& par)
     {
       std::size_t j;
+      std::size_t counter,dst;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -421,30 +422,29 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
       std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
 
       //using namespace boost::assign;
+      for (std::size_t step=0;step<num_rows;step = step + 1) {
+        for (std::size_t i=0;i<each_row[step];i++) {
+          counter = 0;
+     
+          dst = step + 1;
+          if ( dst >= num_rows ) dst = 0;
 
-      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(1);
-      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(2);
+          if ( i == 0 ) {
+            vsrc_step.push_back(step);vsrc_column.push_back(each_row[step]-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+            vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+          } else if ( i == each_row[step]-1 ) {
+            vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+            vsrc_step.push_back(step);vsrc_column.push_back(0);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+          } else {
+            vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+            vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+          }
 
-      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(1);
-      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(1);vport.push_back(2);
-
-      vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(0);
-      vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(1);
-      vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(2);vport.push_back(2);
-
-      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(0);
-      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(1);
-      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(0);vport.push_back(2);
-
-      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(0);
-      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(1);
-      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(1);vport.push_back(2);
-
-      vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(0);
-      vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(1);
-      vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(2);
+        }
+      }
 
       // Create a ragged 3D array
       for (j=0;j<vsrc_step.size();j++) {

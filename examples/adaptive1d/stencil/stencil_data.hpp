@@ -83,13 +83,13 @@ namespace hpx { namespace components { namespace adaptive1d
     struct stencil_data 
     {
         stencil_data() 
-          : max_index_(0), index_(0), timestep_(0), grain_size_(0)
+          : max_index_(0), index_(0), timestep_(0)
         {}
         ~stencil_data() {}
 
         stencil_data(stencil_data const& rhs)
           : max_index_(rhs.max_index_), index_(rhs.index_), 
-            timestep_(rhs.timestep_),grain_size_(rhs.grain_size_),
+            timestep_(rhs.timestep_),
             value_(rhs.value_)
         {
             // intentionally do not copy mutex, new copy will have it's own mutex
@@ -101,7 +101,6 @@ namespace hpx { namespace components { namespace adaptive1d
                 max_index_ = rhs.max_index_;
                 index_ = rhs.index_;
                 timestep_ = rhs.timestep_;
-                grain_size_ = rhs.grain_size_;
                 value_ = rhs.value_;
                 // intentionally do not copy mutex, new copy will have it's own mutex
             }
@@ -112,7 +111,6 @@ namespace hpx { namespace components { namespace adaptive1d
 
         std::size_t max_index_;   // overall number of data points
         std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)
-        std::size_t grain_size_;
         double_type timestep_;    // current time step
         array1d<nodedata> value_;    // current value
 
@@ -125,11 +123,11 @@ namespace hpx { namespace components { namespace adaptive1d
         void save(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) const
         {
-            ar & max_index_ & index_ & timestep_ & grain_size_ ;
+            ar & max_index_ & index_ & timestep_;
             if (config) {
                 if ( config->face_ == 0 ) {
                   // right face
-                  value_.do_save(ar, grain_size_ - config->count_ - 1, grain_size_-1);
+                  value_.do_save(ar, value_.size() - config->count_ - 1, value_.size()-1);
                 } else if ( config->face_ == 1 ) {
                   // left face
                   value_.do_save(ar, 0, config->count_);
@@ -145,7 +143,7 @@ namespace hpx { namespace components { namespace adaptive1d
         void load(Archive & ar, const unsigned int version,
             server::stencil_config_data const* config) 
         {
-            ar & max_index_ & index_ & timestep_ & grain_size_;
+            ar & max_index_ & index_ & timestep_;
             value_.do_load(ar);
         } 
 

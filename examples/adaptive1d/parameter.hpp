@@ -46,6 +46,9 @@ struct HPX_COMPONENT_EXPORT parameter
     double amp;
     double x0;
     double id_sigma;
+
+    // Derived parameter
+    double h;
 };
 
 } // detail

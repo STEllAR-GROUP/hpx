@@ -165,6 +165,9 @@ int hpx_main(variables_map& vm)
 
     // number stencils
     std::size_t number_stencils = par->nx0/par->grain_size;
+
+    // compute derived parameters
+    par->h = (par->Rout - par->Rmin)/(par->nx0-1);
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();

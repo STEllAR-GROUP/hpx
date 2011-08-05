@@ -40,6 +40,8 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.amp;
     ar & par.x0;
     ar & par.id_sigma;
+
+    ar & par.h;
 }
 
 template <typename Archive>
