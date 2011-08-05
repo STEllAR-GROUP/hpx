@@ -141,12 +141,216 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     return 1;
 }
 
+inline void calcrhs(struct nodedata &rhs,
+                   double phi,double Pi,
+                   double chi,double a,double f,
+                   double g, double b, double q, 
+                   double r, double VV, double dphiVV,
+                   double dzphi,double dzPi,double dzchi,
+                   double dza,double dzf,
+                   double dzg,double dzb,double dzq,double dzr) {
+
+      rhs.phi[0][0] = Pi;
+      rhs.phi[0][1] = -Pi*(f/a + q/b)
+                      + ((3.0*a*g/(b*b)-(a*a)*r/(b*b*b))*chi
+                      +  pow(a/b,2)*dzchi - (a*a)*dphiVV);
+      rhs.phi[0][2] = dzPi;
+      rhs.phi[0][3] = f;
+      rhs.phi[0][4] = a*(-(f*q)/(a*b)
+                   + (2*(g*g)/(b*b) - a*g*r/(b*b*b)
+                   + a*dzg/(b*b) + (a*a)*VV));
+      rhs.phi[0][5] = dzf;
+      rhs.phi[0][6] = q;
+      rhs.phi[0][7] = b*(-(f*q)/(a*b)
+                      + (-3.0*a*g*r/(b*b*b)
+                      + 3.0*a*dzg/(b*b)
+                      + pow(a*chi/b,2) + a*a*VV));
+      rhs.phi[0][8] = dzq;
+}
+
 int rkupdate(std::vector<access_memory_block<stencil_data> > &val, 
              double t, detail::parameter const& par)
 {
 
-    //boost::scoped_array<nodedata> work(new nodedata[lnx]);
-    //boost::scoped_array<nodedata> work2(new nodedata[lnx]);
+    nodedata rhs;
+
+    int size0 = val[0]->value_.size();
+    int size1 = val[1]->value_.size();
+
+    double phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV;
+    double dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr;
+
+    int num_eqns = NUM_EQUATIONS;
+
+    int worksize = size1 + 4*par.num_neighbors;
+    boost::scoped_array<nodedata> work(new nodedata[worksize]);
+    boost::scoped_array<nodedata> work2(new nodedata[worksize]);
+
+    double dt = par.lambda*par.h;
+    double odx = 1.0/par.h;
+
+    int input,index;
+    int linput,lindex;
+    int rinput,rindex;
+
+    static double const c_0_75 = 0.75;
+    static double const c_0_25 = 0.25;
+    static double const c_2_3 = double(2.)/double(3.);
+    static double const c_1_3 = double(1.)/double(3.);
+
+    // ----------------------------------------------------------------------
+    // iter 0
+    for (int i=-2*par.num_neighbors;i<size1 + 2*par.num_neighbors;i++) {
+      // Computer derivatives {{{
+      if ( i < 0 ) { index = size0+i; input = 0; }
+      else if ( i >= size1 ) { index = i-size1; input = 2; }
+      else { index = i; input = 1; }
+
+      if ( i-1 < 0 ) { lindex = size0+i; linput = 0; } 
+      else if ( i-1 >= size1 ) { lindex = i-size1; linput = 2; }
+      else { lindex = i; linput = 1; }
+
+      if ( i+1 < 0 ) { rindex = size0+i; rinput = 0; }
+      else if ( i+1 >= size1 ) { rindex = i-size1; rinput = 2; }
+      else { rindex = i; rinput = 1; }
+
+      phi = val[input]->value_[index].phi[0][0]; 
+      Pi  = val[input]->value_[index].phi[0][1]; 
+      chi = val[input]->value_[index].phi[0][2]; 
+      a   = val[input]->value_[index].phi[0][3]; 
+      f   = val[input]->value_[index].phi[0][4]; 
+      g   = val[input]->value_[index].phi[0][5]; 
+      b   = val[input]->value_[index].phi[0][6]; 
+      q   = val[input]->value_[index].phi[0][7]; 
+      r   = val[input]->value_[index].phi[0][8]; 
+      VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
+      dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
+
+      dzphi = 0.5*odx*( val[rinput]->value_[rindex].phi[0][0] -
+                    val[linput]->value_[lindex].phi[0][0]);
+      dzPi   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][1] -
+                    val[linput]->value_[lindex].phi[0][1]);
+      dzchi = 0.5*odx*( val[rinput]->value_[rindex].phi[0][2] -
+                    val[linput]->value_[lindex].phi[0][2]);
+      dza   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][3] -
+                    val[linput]->value_[lindex].phi[0][3]);
+      dzf   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][4] -
+                    val[linput]->value_[lindex].phi[0][4]);
+      dzg   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][5] -
+                    val[linput]->value_[lindex].phi[0][5]);
+      dzb   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][6] -
+                    val[linput]->value_[lindex].phi[0][6]);
+      dzq   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][7] -
+                    val[linput]->value_[lindex].phi[0][7]);
+      dzr   = 0.5*odx*( val[rinput]->value_[rindex].phi[0][8] -
+                    val[linput]->value_[lindex].phi[0][8]);
+      // }}}
+
+      calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
+
+      nodedata& nd = work[i+2*par.num_neighbors];
+
+      nd.phi[0][0] = phi;
+      nd.phi[0][1] = Pi;
+      nd.phi[0][2] = chi;
+      nd.phi[0][3] = a;
+      nd.phi[0][4] = f;
+      nd.phi[0][5] = g;
+      nd.phi[0][6] = b;
+      nd.phi[0][7] = q;
+      nd.phi[0][8] = r;
+
+      nd.phi[1][0] = phi + rhs.phi[0][0]*dt;
+      nd.phi[1][1] = Pi  + rhs.phi[0][1]*dt;
+      nd.phi[1][2] = chi + rhs.phi[0][2]*dt;
+      nd.phi[1][3] = a   + rhs.phi[0][3]*dt;
+      nd.phi[1][4] = f   + rhs.phi[0][4]*dt;
+      nd.phi[1][5] = g   + rhs.phi[0][5]*dt;
+      nd.phi[1][6] = b   + rhs.phi[0][6]*dt;
+      nd.phi[1][7] = q   + rhs.phi[0][7]*dt;
+      nd.phi[1][8] = r   + rhs.phi[0][8]*dt;
+    }
+
+    // ----------------------------------------------------------------------
+    // iter 1
+    for (int i=par.num_neighbors;i<worksize-par.num_neighbors;i++) {
+      // Calculate derivatives {{{
+      nodedata& nd = work[i];
+      nodedata& lnd = work[i-1];
+      nodedata& rnd = work[i+1];
+      nodedata& nd2 = work2[i];
+
+      phi = nd.phi[1][0]; 
+      Pi  = nd.phi[1][1]; 
+      chi = nd.phi[1][2]; 
+      a   = nd.phi[1][3]; 
+      f   = nd.phi[1][4]; 
+      g   = nd.phi[1][5]; 
+      b   = nd.phi[1][6]; 
+      q   = nd.phi[1][7]; 
+      r   = nd.phi[1][8]; 
+      VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
+      dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
+
+      dzphi = 0.5*odx*( rnd.phi[0][0] - lnd.phi[0][0]);
+      dzPi   = 0.5*odx*( rnd.phi[0][1] - lnd.phi[0][1]);
+      dzchi = 0.5*odx*( rnd.phi[0][2] - lnd.phi[0][2]);
+      dza   = 0.5*odx*( rnd.phi[0][3] - lnd.phi[0][3]);
+      dzf   = 0.5*odx*( rnd.phi[0][4] - lnd.phi[0][4]);
+      dzg   = 0.5*odx*( rnd.phi[0][5] - lnd.phi[0][5]);
+      dzb   = 0.5*odx*( rnd.phi[0][6] - lnd.phi[0][6]);
+      dzq   = 0.5*odx*( rnd.phi[0][7] - lnd.phi[0][7]);
+      dzr   = 0.5*odx*( rnd.phi[0][8] - lnd.phi[0][8]);
+      // }}}
+
+      calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
+
+      for (int ll=0;ll<num_eqns;ll++) {
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll] 
+                                              + c_0_25*rhs.phi[0][ll]*dt;
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // iter 2
+    for (int i=2*par.num_neighbors;i<worksize-2*par.num_neighbors;i++) {
+      // Calculate derivatives {{{
+      nodedata& nd = work[i];
+      nodedata& nd2 = work2[i];
+      nodedata& lnd2 = work2[i-1];
+      nodedata& rnd2 = work2[i+1];
+
+      phi = nd2.phi[1][0]; 
+      Pi  = nd2.phi[1][1]; 
+      chi = nd2.phi[1][2]; 
+      a   = nd2.phi[1][3]; 
+      f   = nd2.phi[1][4]; 
+      g   = nd2.phi[1][5]; 
+      b   = nd2.phi[1][6]; 
+      q   = nd2.phi[1][7]; 
+      r   = nd2.phi[1][8]; 
+      VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
+      dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
+
+      dzphi = 0.5*odx*( rnd2.phi[0][0] - lnd2.phi[0][0]);
+      dzPi   = 0.5*odx*( rnd2.phi[0][1] - lnd2.phi[0][1]);
+      dzchi = 0.5*odx*( rnd2.phi[0][2] - lnd2.phi[0][2]);
+      dza   = 0.5*odx*( rnd2.phi[0][3] - lnd2.phi[0][3]);
+      dzf   = 0.5*odx*( rnd2.phi[0][4] - lnd2.phi[0][4]);
+      dzg   = 0.5*odx*( rnd2.phi[0][5] - lnd2.phi[0][5]);
+      dzb   = 0.5*odx*( rnd2.phi[0][6] - lnd2.phi[0][6]);
+      dzq   = 0.5*odx*( rnd2.phi[0][7] - lnd2.phi[0][7]);
+      dzr   = 0.5*odx*( rnd2.phi[0][8] - lnd2.phi[0][8]);
+      // }}}
+
+      calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
+      
+      for (int ll=0;ll<num_eqns;ll++) {
+        val[3]->value_[i-2*par.num_neighbors].phi[1][ll] = 
+                         c_1_3*nd.phi[0][ll]   
+                       + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
+      }
+    }
 
     return 1;
 }

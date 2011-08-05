@@ -135,7 +135,7 @@ int hpx_main(variables_map& vm)
             ) % par->nt0);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     } 
-    if ( par->grain_size <= par->num_neighbors ) {
+    if ( par->grain_size <= 3*par->num_neighbors ) {
         std::string msg = boost::str(boost::format(
             "Increase grain size (%1%) or decrease the num_neighbors (%2%) "
             ) % par->grain_size % par->num_neighbors);

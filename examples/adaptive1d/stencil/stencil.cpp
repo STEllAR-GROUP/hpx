@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         // Generate new config info
-        stencil_config_data cfg0(0,par->num_neighbors);  // serializes the left face
-        stencil_config_data cfg1(1,par->num_neighbors);  // serializes the right face
+        stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the left face
+        stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the right face
 
         // get all input memory_block_data instances
         typedef std::vector<lcos::future_value<memory_block_data> > 
