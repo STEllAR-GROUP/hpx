@@ -97,7 +97,7 @@ namespace interpolate1d
 
         if (index == partitions_.size())
             --index;
-        BOOST_ASSERT(0 <= index && index < partitions_.size());
+        BOOST_ASSERT(index < partitions_.size());
 
         return partitions_[index];
     }

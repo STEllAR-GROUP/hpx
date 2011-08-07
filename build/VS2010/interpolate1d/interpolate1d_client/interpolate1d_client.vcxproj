@@ -121,6 +121,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\interpolate1d\interpolate1d_client.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\examples\interpolate1d\CMakeLists.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
