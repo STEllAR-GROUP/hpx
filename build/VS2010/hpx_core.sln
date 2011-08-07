@@ -78,6 +78,17 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "adaptive1d_clientd", "..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "create_testdata", "interpolate1d\create_testdata\create_testdata.vcxproj", "{833B7B14-35A2-4176-BC6B-25D5D8B337E4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interpolate3d", "Interpolate3d", "{B48AD0A3-D99A-4233-BC53-16EADA003B83}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\examples\interpolate3d\CMakeLists.txt = ..\..\examples\interpolate3d\CMakeLists.txt
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "create_testdata3d", "interpolate3d\create_testdata3d\create_testdata3d.vcxproj", "{C5F87556-B112-45A6-95AD-B424FE787A81}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "interpolate3d", "interpolate3d\interpolate3d\interpolate3d.vcxproj", "{405A4551-7063-4BC8-9C62-42118CBA8C98}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "interpolate3d_client", "interpolate3d\interpolate3d_client\interpolate3d_client.vcxproj", "{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -277,6 +288,36 @@ Global
 		{833B7B14-35A2-4176-BC6B-25D5D8B337E4}.Release|Win32.ActiveCfg = Release|x64
 		{833B7B14-35A2-4176-BC6B-25D5D8B337E4}.Release|x64.ActiveCfg = Release|x64
 		{833B7B14-35A2-4176-BC6B-25D5D8B337E4}.Release|x64.Build.0 = Release|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Debug|Win32.ActiveCfg = Debug|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Debug|x64.ActiveCfg = Debug|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Debug|x64.Build.0 = Debug|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Release|Mixed Platforms.Build.0 = Release|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Release|Win32.ActiveCfg = Release|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Release|x64.ActiveCfg = Release|x64
+		{C5F87556-B112-45A6-95AD-B424FE787A81}.Release|x64.Build.0 = Release|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Debug|Win32.ActiveCfg = Debug|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Debug|x64.ActiveCfg = Debug|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Debug|x64.Build.0 = Debug|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Release|Mixed Platforms.Build.0 = Release|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Release|Win32.ActiveCfg = Release|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Release|x64.ActiveCfg = Release|x64
+		{405A4551-7063-4BC8-9C62-42118CBA8C98}.Release|x64.Build.0 = Release|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Debug|Win32.ActiveCfg = Debug|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Debug|x64.ActiveCfg = Debug|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Debug|x64.Build.0 = Debug|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Release|Mixed Platforms.Build.0 = Release|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Release|Win32.ActiveCfg = Release|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Release|x64.ActiveCfg = Release|x64
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,5 +337,8 @@ Global
 		{DDABEFB4-4068-4921-A9E6-497BCAAFD011} = {8E825F5C-59D9-49B6-8BCB-A7123E8F37ED}
 		{79427E35-D409-4C2D-8449-73906E172065} = {8E825F5C-59D9-49B6-8BCB-A7123E8F37ED}
 		{833B7B14-35A2-4176-BC6B-25D5D8B337E4} = {8E825F5C-59D9-49B6-8BCB-A7123E8F37ED}
+		{C5F87556-B112-45A6-95AD-B424FE787A81} = {B48AD0A3-D99A-4233-BC53-16EADA003B83}
+		{405A4551-7063-4BC8-9C62-42118CBA8C98} = {B48AD0A3-D99A-4233-BC53-16EADA003B83}
+		{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006} = {B48AD0A3-D99A-4233-BC53-16EADA003B83}
 	EndGlobalSection
 EndGlobal
