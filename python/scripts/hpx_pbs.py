@@ -12,7 +12,7 @@ from __future__ import with_statement
 from sys import exit, argv
 
 from os import getpid, environ
-from os.path import join, dirname, expanduser
+from os.path import join, dirname, abspath, expanduser
 
 from re import compile
 
@@ -297,7 +297,7 @@ except:
 try:
   # argv[0] is PREFIX/bin/hpx_pbs or PREFIX/bin/hpx_pbs.py if we've been invoked
   # with a fully qualified path
-  location = dirname(dirname(argv[0]))
+  location = dirname(dirname(abspath(argv[0])))
 except:
   pass
 # }}}
