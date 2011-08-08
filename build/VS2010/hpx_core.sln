@@ -79,9 +79,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "create_testdata", "interpolate1d\create_testdata\create_testdata.vcxproj", "{833B7B14-35A2-4176-BC6B-25D5D8B337E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interpolate3d", "Interpolate3d", "{B48AD0A3-D99A-4233-BC53-16EADA003B83}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\examples\interpolate3d\CMakeLists.txt = ..\..\examples\interpolate3d\CMakeLists.txt
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "create_testdata3d", "interpolate3d\create_testdata3d\create_testdata3d.vcxproj", "{C5F87556-B112-45A6-95AD-B424FE787A81}"
 EndProject

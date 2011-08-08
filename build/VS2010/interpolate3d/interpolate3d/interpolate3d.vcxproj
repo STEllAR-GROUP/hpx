@@ -17,14 +17,18 @@
     <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d\dimension.cpp" />
     <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d\interpolate3d.cpp" />
     <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d\read_values.cpp" />
+    <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d\server\configuration.cpp" />
     <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d\server\partition3d.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\configuration.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\dimension.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\interpolate3d.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\partition3d.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\read_values.hpp" />
+    <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\server\configuration.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\server\partition3d.hpp" />
+    <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\stubs\configuration.hpp" />
     <ClInclude Include="..\..\..\..\examples\interpolate3d\interpolate3d\stubs\partition3d.hpp" />
   </ItemGroup>
   <ItemGroup>
