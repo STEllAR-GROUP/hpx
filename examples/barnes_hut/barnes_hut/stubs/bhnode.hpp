@@ -30,24 +30,28 @@ namespace hpx { namespace components { namespace stubs
                 int>(gid,gid,theData,root);
         }
         static server::bhnode::cnstFuture2 construct_node(const id_type gid,
-            const id_type insertPoint, const vector<double> bounds,
-            const vector<id_type> children, const vector<vector<double> > data,
-            const vector<int> octants){
+            const id_type insertPoint, const vector<double> bounds){
             return lcos::eager_future<server::bhnode::cnstNodeAction2,
-                int>(gid,gid,insertPoint,bounds,children,data,octants);
+                int>(gid,gid,insertPoint,bounds);
         }
 
+        //other functions
         static int set_boundaries(const id_type gid, const id_type parId,
             const double bounds[6]){
             std::vector<double> theBounds(bounds,bounds+6);
             return lcos::eager_future<server::bhnode::setBoundsAction,
                 int>(gid,parId,theBounds).get();
         }
-        static region_path insert_node(const id_type gid,
+        static server::bhnode::inPntFuture insert_node(const id_type gid,
             const vector<double> nodep, const double nodem,
             const id_type nodeGid){
-            return lcos::eager_future<server::bhnode::insrtNodeAction,
-                region_path>(gid,nodep,nodem,nodeGid).get();
+            return lcos::eager_future<server::bhnode::findInPntAction,
+                vector<double> >(gid,nodep,nodem,nodeGid);
+        }
+        static server::bhnode::runFuture run(const id_type gid,
+            const id_type controllerGid, const vector<double> info){
+            return lcos::eager_future<server::bhnode::runSimAction,
+                int>(gid,controllerGid,info);
         }
     };
 }}}

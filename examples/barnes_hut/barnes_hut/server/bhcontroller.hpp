@@ -25,6 +25,7 @@
 #include <boost/foreach.hpp>
 #include <boost/random/linear_congruential.hpp>
 #include "../bhnode.hpp"
+#include "bhnode.cpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -52,7 +53,6 @@ namespace hpx { namespace components { namespace server
 
     private:
     void build_init();
-    void create_region_nodes(region_path path);
 
     //data members
     id_type _gid;
@@ -139,59 +139,37 @@ namespace hpx { namespace components { namespace server
     }
 
     int bhcontroller::run_simulation(){
+ptime start = microsec_clock::local_time();
         build_init();
-        bhnode::printFuture future(treeRoot.get_gid(), 0, 8);
-        future.get();
+std::cout<<microsec_clock::local_time() - start<<std::endl;
+        vector<bhnode::runFuture> simFutures;
+        vector<double> runParams;
+        {
+            bhnode::printFuture future(treeRoot.get_gid(), 0, 8);
+            future.get();
+        }
+        runParams.push_back(numIters);
+        runParams.push_back(dtime);
+        runParams.push_back(eps);
+        runParams.push_back(tolerance);
+        for(int i = 0; i < numBodies; i++){
+            simFutures.push_back(particle[i].run(_gid, runParams));
+        }
+        for(int i = 0; i < numBodies; i++){simFutures[i].get();}
         return 0;
     }
 
     void bhcontroller::build_init(){
+        vector<bhnode::inPntFuture> futures;
         for(int i = 0; i < numBodies; i++){
-            region_path path;
             vector<double> pos(particlePositions[i],
                                particlePositions[i]+3);
-            path = treeRoot.insert_node(pos, particleMasses[i],
-                                        particle[i].get_gid());
-            if(path.isPath){create_region_nodes(path);}
+            futures.push_back(treeRoot.insert_node(pos, particleMasses[i],
+                                        particle[i].get_gid()));
         }
+        for(int i = 0; i < numBodies; i++){futures[i].get();}
     }
 
-    //this creates all region nodes needed after inserting a new particle node
-    //onto the octtree
-    void bhcontroller::create_region_nodes(region_path path){
-        components::bhnode firstNode;
-        vector<bhnode::cnstFuture2> newNodeFutures;
-        id_type nextInsertPoint = path.insertPoint;
-        vector<double> childPos;
-        for(int i = 0; i < 3; i++){
-            childPos.push_back((path.childData[0][i] * path.childData[2][0]
-                + path.childData[1][i] * path.childData[2][1])*.5);
-        }
-        firstNode.create(get_applier().get_runtime_support_gid());
-        bhnode::childFuture chFuture(path.insertPoint, path.octants[0],
-            firstNode.get_gid(), false, childPos);
-        regions.push_back(firstNode);
-
-        for(int i = 0; i < (int)path.subboundaries.size()-1; i++){
-            components::bhnode nextNode;
-            nextNode.create(get_applier().get_runtime_support_gid());
-            newNodeFutures.push_back(firstNode.construct_node(nextInsertPoint,
-                path.subboundaries[i], nextNode.get_gid(), path.childData,
-                path.octants[i]));
-            regions.push_back(nextNode);
-            nextInsertPoint = firstNode.get_gid();
-            firstNode = nextNode;
-        }
-        
-        newNodeFutures.push_back(firstNode.construct_node(nextInsertPoint,
-            path.subboundaries[path.subboundaries.size()-1], path.child,
-            path.childData, path.octants));
-
-        chFuture.get();
-        for(int i = 0; i < (int)newNodeFutures.size(); i++){
-            newNodeFutures[i].get();
-        }
-    }
 }}}
 
 #endif

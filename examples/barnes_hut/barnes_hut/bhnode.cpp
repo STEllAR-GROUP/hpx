@@ -23,11 +23,12 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     bhnode);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<region_path>, component_base_lco_with_value);
+    hpx::lcos::base_lco_with_value<vector<double> >,
+        component_base_lco_with_value);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<region_path>::set_result_action,
-    base_lco_with_value_set_result_region_path);
+    hpx::lcos::base_lco_with_value<vector<double> >::set_result_action,
+    base_lco_with_value_set_result_vector_double);
 
 //Register the actions
 HPX_REGISTER_ACTION_EX(
@@ -37,9 +38,13 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::setBoundsAction,hplSetBoundsAction);
 HPX_REGISTER_ACTION_EX(
+    hpx::components::server::bhnode::findInPntAction,hplFindInPntAction);
+HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::insrtNodeAction,hplInsrtNodeAction);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::updatChldAction,hplUpdatChldAction);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::bhnode::printTreeAction,hplPrintTreeAction);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::bhnode::runSimAction,hplRunSimAction);
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::bhnode);
