@@ -11,7 +11,7 @@
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
 #include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/cstdint.hpp>
