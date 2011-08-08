@@ -25,15 +25,14 @@ namespace interpolate3d
 
     public:
         // create a new partition instance and initialize it synchronously
-        partition3d(std::string datafilename, dimension const& dimx, 
+        partition3d(std::string const& datafilename, dimension const& dimx, 
                 dimension const& dimy, dimension const& dimz) 
           : base_type(interpolate3d::stubs::partition3d::create_sync(hpx::find_here()))
         {
             init(datafilename, dimx, dimy, dimz);
         }
-        partition3d(hpx::naming::id_type gid, std::string datafilename, 
-                dimension const& dimx, dimension const& dimy, 
-                dimension const& dimz) 
+        partition3d(hpx::naming::id_type gid, std::string const& datafilename, 
+                dimension const& dimx, dimension const& dimy, dimension const& dimz) 
           : base_type(interpolate3d::stubs::partition3d::create_sync(gid))
         {
             init(datafilename, dimx, dimy, dimz);
@@ -44,15 +43,15 @@ namespace interpolate3d
 
         // initialize this partition
         hpx::lcos::future_value<void>
-        init_async(std::string datafilename, dimension const& dimx, 
-            dimension const& dimy, dimension const& dimz)
+        init_async(std::string const& datafilename, 
+            dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             return stubs::partition3d::init_async(this->gid_, datafilename, 
                 dimx, dimy, dimz);
         }
 
-        void init(std::string datafilename, dimension const& dimx, 
-            dimension const& dimy, dimension const& dimz)
+        void init(std::string const& datafilename, 
+            dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             stubs::partition3d::init(this->gid_, datafilename, dimx, dimy, dimz);
         }

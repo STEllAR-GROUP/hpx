@@ -6,24 +6,28 @@
 ###############################################################################
 set(client_sources
     dimension.cpp
-    interpolate1d.cpp
+    interpolate3d.cpp
     read_values.cpp)
 
 set(server_sources
+    server/configuration.cpp
     server/partition.cpp)
 
 ###############################################################################
 set(client_headers
+    configuration.hpp
     dimension.hpp
-    interpolate1d.hpp
-    partition.hpp
+    interpolate3d.hpp
+    partition3d.hpp
     read_values.hpp)
 
 set(stubs_headers
-    stubs/partition.hpp)
+    stubs/configuration.hpp
+    stubs/partition3d.hpp)
 
 set(server_headers
-    server/partition.hpp)
+    server/configuration.hpp
+    server/partition3d.hpp)
 
 set(headers
     ${client_headers}

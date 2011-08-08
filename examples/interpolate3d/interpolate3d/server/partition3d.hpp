@@ -43,7 +43,7 @@ namespace interpolate3d { namespace server
         };
 
         // exposed functionality
-        void init(std::string datafilename, dimension const&, dimension const&, 
+        void init(std::string const&, dimension const&, dimension const&, 
             dimension const&);
         double interpolate(double valuex, double valuey, double valuez);
 
@@ -52,7 +52,7 @@ namespace interpolate3d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action4<
-            partition3d, partition3d_init, std::string, 
+            partition3d, partition3d_init, std::string const&, 
             dimension const&, dimension const&, dimension const&,
             &partition3d::init
         > init_action;

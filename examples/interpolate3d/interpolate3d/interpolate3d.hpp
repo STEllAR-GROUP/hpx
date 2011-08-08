@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "stubs/partition3d.hpp"
+#include "configuration.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate3d 
@@ -22,11 +23,27 @@ namespace interpolate3d
     class HPX_COMPONENT_EXPORT interpolate3d 
     {
     public:
+        // Initialize an interpolation object which is not connected to any
+        // interpolation partitions. Call connect() to attach a running 
+        // instance or create() to create a new one.
+        interpolate3d();
+
+        // Destruct an interpolation object instance. If this instance was 
+        // initialized using create(), this will unregister the symbolic name
+        //  of the associated partition objects.
+        ~interpolate3d();
+
         // Create a new interpolation instance and initialize it synchronously.
         // Passing -1 as the second argument creates exactly one partition 
-        // instance on each available locality.
-        interpolate3d(std::string const& datafilename, 
+        // instance on each available locality. Register this interpolation
+        // object with the given symbolic name
+        void create(std::string const& datafilename, 
+            std::string const& symbolic_name_base = "/interpolate3d/gauss/",
             std::size_t num_instances = std::size_t(-1));
+
+        // Connect to an existing interpolation object with the given symbolic 
+        // name.
+        void connect(std::string symbolic_name_base = "/interpolate3d/gauss/");
 
         // Return the interpolated  function value for the given argument. This
         // function dispatches to the proper partition for the actual 
@@ -55,7 +72,7 @@ namespace interpolate3d
             async_create_result_type;
 
         void fill_partitions(std::string const& datafilename,
-            async_create_result_type future);
+            std::string symbolic_name_base, async_create_result_type future);
         std::size_t get_index(int d, double value);
 
     private:
@@ -64,6 +81,9 @@ namespace interpolate3d
         double delta_[dimension::dim];
         std::size_t num_values_[dimension::dim];
         std::size_t num_partitions_per_dim_;
+        bool was_created_;
+
+        configuration cfg_;
     };
 }
 

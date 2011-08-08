@@ -20,7 +20,7 @@ namespace interpolate3d { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future_value<void>
-        init_async(hpx::naming::id_type const& gid, std::string datafilename, 
+        init_async(hpx::naming::id_type const& gid, std::string const& datafilename, 
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             // Create an eager_future, execute the required action,
@@ -32,8 +32,8 @@ namespace interpolate3d { namespace stubs
         }
 
         static void init(hpx::naming::id_type const& gid, 
-            std::string datafilename, dimension const& dimx, dimension const& dimy, 
-            dimension const& dimz)
+            std::string const& datafilename, dimension const& dimx, 
+            dimension const& dimy, dimension const& dimz)
         {
             init_async(gid, datafilename, dimx, dimy, dimz).get();
         }

@@ -28,7 +28,8 @@ int hpx_main(variables_map& vm)
 
     {
         // create the distributed interpolation object on num_localities
-        interpolate3d::interpolate3d gauss(datafilename, num_localities);
+        interpolate3d::interpolate3d gauss;
+        gauss.create(datafilename, "/interpolate3d_client/gauss", num_localities);
 
         // use it to calculate some values
         eval("gauss(0, 0, 0) == ", gauss, 0, 0, 0);
@@ -44,6 +45,28 @@ int hpx_main(variables_map& vm)
         eval("gauss(-1,  0, -1) == ", gauss, -1,  0, -1);
         eval("gauss(-1, -1,  0) == ", gauss, -1, -1,  0);
         eval("gauss( 0, -1, -1) == ", gauss,  0, -1, -1);
+
+        std::cout << std::endl << std::endl;
+
+        // create a second client instance connected to the already existing 
+        // interpolation object
+        interpolate3d::interpolate3d gauss_connected;
+        gauss_connected.connect("/interpolate3d_client/gauss");
+
+        // use it to calculate some values
+        eval("gauss(0, 0, 0) == ", gauss_connected, 0, 0, 0);
+        eval("gauss(1, 0, 0) == ", gauss_connected, 1, 0, 0);
+        eval("gauss(0, 1, 0) == ", gauss_connected, 0, 1, 0);
+        eval("gauss(0, 0, 1) == ", gauss_connected, 0, 0, 1);
+        eval("gauss(1, 0, 1) == ", gauss_connected, 1, 0, 1);
+        eval("gauss(1, 1, 0) == ", gauss_connected, 1, 1, 0);
+        eval("gauss(0, 1, 1) == ", gauss_connected, 0, 1, 1);
+        eval("gauss(-1,  0,  0) == ", gauss_connected, -1,  0,  0);
+        eval("gauss( 0, -1,  0) == ", gauss_connected,  0, -1,  0);
+        eval("gauss( 0,  0, -1) == ", gauss_connected,  0,  0, -1);
+        eval("gauss(-1,  0, -1) == ", gauss_connected, -1,  0, -1);
+        eval("gauss(-1, -1,  0) == ", gauss_connected, -1, -1,  0);
+        eval("gauss( 0, -1, -1) == ", gauss_connected,  0, -1, -1);
     }
 
     hpx::finalize();
