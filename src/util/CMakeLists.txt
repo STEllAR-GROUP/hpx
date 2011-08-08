@@ -8,10 +8,8 @@ add_hpx_library_sources(hpx_serialization
   portable_binary_iarchive.cpp
   portable_binary_oarchive.cpp)
 
-add_hpx_library_sources(hpx_ini
-  ini.cpp)
-
 add_hpx_library_sources(hpx
+  ini.cpp
   init_ini_data.cpp
   itt_notify.cpp
   logging.cpp

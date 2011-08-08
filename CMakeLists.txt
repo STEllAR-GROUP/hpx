@@ -552,13 +552,8 @@ endif()
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
 # default. There may be more for individual modules, but this is the mandatory
 # set.
-if(MSVC)
-  set(hpx_CORE hpx hpx_serialization)
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
-else()
-  set(hpx_CORE hpx hpx_serialization hpx_ini)
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization hpx_ini)
-endif()
+set(hpx_CORE hpx hpx_serialization)
+set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's entire 

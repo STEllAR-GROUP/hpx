@@ -55,6 +55,7 @@ macro(add_hpx_executable name)
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES} 
       ${hpx_LIBRARIES}
+      hpx_init
       ${libs}
       ${pxaccel_LIBRARIES})
     set_property(TARGET ${name}_exe APPEND

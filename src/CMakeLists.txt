@@ -6,6 +6,8 @@
   
 add_subdirectory(components)
 
+add_library(hpx_init STATIC hpx_init.cpp)
+
 ###############################################################################
 # POSIX 
 if(UNIX)
@@ -14,7 +16,6 @@ if(UNIX)
   endforeach()
 
   add_hpx_library_sources(hpx
-    hpx_init.cpp
     exception.cpp
     exception_list.cpp
     pre_main.cpp
@@ -95,31 +96,6 @@ if(UNIX)
     "HPX_COMPONENT_NAME=hpx"
     "HPX_EXPORTS"
     "BOOST_COROUTINE_EXPORTS")
-
-  
-  #############################################################################
-  # libhpx_ini
-  add_library(hpx_ini SHARED ${hpx_ini_SOURCES})
-
-  set_target_properties(hpx_ini PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-    VERSION ${HPX_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME hpx_ini)
-
-  target_link_libraries(hpx_ini
-    ${hpx_MALLOC_LIBRARY} ${BOOST_regex_LIBRARY} hpx_serialization)
-
-  get_target_property(path hpx_ini LOCATION)
-  get_filename_component(name "${path}" NAME)
-
-  set_property(TARGET hpx_ini APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIBRARY=\"${name}\""
-    "HPX_COMPONENT_NAME=hpx"
-    "HPX_EXPORTS"
-    "BOOST_COROUTINE_EXPORTS")
   
   #############################################################################
   # libhpx
@@ -131,14 +107,8 @@ if(UNIX)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx)
 
-  if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    target_link_libraries(hpx hpx_serialization hpx_ini
-      #agas_stdmap_tcpip_lib barrier_component
-      ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
-  else()
-    target_link_libraries(hpx hpx_serialization hpx_ini
-      ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
-  endif()
+  target_link_libraries(hpx hpx_serialization
+    ${hpx_MALLOC_LIBRARY} ${BOOST_FOUND_LIBRARIES})
  
   get_target_property(path hpx LOCATION)
   get_filename_component(name "${path}" NAME)
