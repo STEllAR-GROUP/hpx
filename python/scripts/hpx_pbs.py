@@ -139,7 +139,7 @@ class channel_raii:
     if not None == self.channel:
       self.channel.close()
 
-def execute_function(user, hostname, port, keys, key, cmd, callback, timeout):
+def execute_function(user, hostname, port, keys, path, cmd, callback, timeout):
   with transport_raii(hostname, port) as transport:
     if None == transport:
       return  
@@ -156,7 +156,7 @@ def execute_function(user, hostname, port, keys, key, cmd, callback, timeout):
     agent_auth(transport, user)
   
     if not transport.is_authenticated():
-      key_auth(transport, user, key)
+      key_auth(transport, user, path)
   
     if not transport.is_authenticated():
       report("Authentication failed.")
