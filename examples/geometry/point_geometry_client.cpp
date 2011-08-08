@@ -148,8 +148,19 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Initial Data -----------------------------------------
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
+        double velx = 0;
+        double vely = 0;
+        double speed = 1.0;
+        double dt = 0.25;
+        double midx,midy,norm;
         for (i=0;i<num_bodies;i++) {
-          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],numpoints));
+          // compute the initial velocity so that everything heads to the origin
+          midx = 0.5*(bbox[i][0] + bbox[i][1]);
+          midy = 0.5*(bbox[i][2] + bbox[i][3]);
+          norm = sqrt(midx*midx+midy*midy);
+          velx = -speed*midx/norm;
+          vely = -speed*midy/norm;
+          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx,vely,numpoints));
         }
 
         hpx::components::wait(initial_phase);
@@ -176,7 +187,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Move bodies--------------------------------------------
         std::vector<hpx::lcos::future_value<void> > move_phase;
         for (i=0;i<num_bodies;i++) {
-          move_phase.push_back(accu[i].move_async());
+          move_phase.push_back(accu[i].move_async(dt));
         }
         hpx::components::wait(move_phase);
 

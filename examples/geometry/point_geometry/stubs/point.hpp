@@ -24,17 +24,17 @@ namespace hpx { namespace geometry { namespace stubs
 
         /// Initialize the server#point instance with the given \a gid
         static lcos::future_value<void> 
-        init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,std::size_t numpoints) 
+        init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,double velx,double vely,std::size_t numpoints) 
         {
             typedef server::point::init_action action_type;
-            return lcos::eager_future<action_type>(gid,xmin,xmax,ymin,ymax,numpoints);
+            return lcos::eager_future<action_type>(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints);
         }
 
-        static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,std::size_t numpoints) 
+        static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,double velx, double vely,std::size_t numpoints) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            init_async(gid,xmin,xmax,ymin,ymax,numpoints).get();
+            init_async(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints).get();
         }
 
         static lcos::future_value<bool> 
@@ -66,17 +66,17 @@ namespace hpx { namespace geometry { namespace stubs
         }
 
         static lcos::future_value<void> 
-        move_async(naming::id_type gid) 
+        move_async(naming::id_type gid,double dt) 
         {
             typedef server::point::move_action action_type;
-            return lcos::eager_future<action_type>(gid);
+            return lcos::eager_future<action_type>(gid,dt);
         }
 
-        static void move(naming::id_type const& gid) 
+        static void move(naming::id_type const& gid,double dt) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            move_async(gid).get();
+            move_async(gid,dt).get();
         }
 
         /// Query the current coordinate values of the server#point 

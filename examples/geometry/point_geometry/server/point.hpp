@@ -53,7 +53,7 @@ namespace hpx { namespace geometry { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(double xmin,double xmax,double ymin,double ymax,std::size_t numpoints) 
+        void init(double xmin,double xmax,double ymin,double ymax,double velx, double vely, std::size_t numpoints) 
         {
             xmin_ = xmin;
             xmax_ = xmax;
@@ -73,21 +73,29 @@ namespace hpx { namespace geometry { namespace server
               double x = xmin + dx*i;
               point_type p(x,ymin);
               poly_.outer().push_back(p);
+              velx_.push_back(velx);
+              vely_.push_back(vely);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
               point_type p(xmax,y);
               poly_.outer().push_back(p);
+              velx_.push_back(velx);
+              vely_.push_back(vely);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double x = xmax - dx*i;
               point_type p(x,ymax);
               poly_.outer().push_back(p);
+              velx_.push_back(velx);
+              vely_.push_back(vely);
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymax - dy*i;
               point_type p(xmin,y);
               poly_.outer().push_back(p);
+              velx_.push_back(velx);
+              vely_.push_back(vely);
             }
 
             //point_type pt5(0.5, 0.5);
@@ -105,7 +113,7 @@ namespace hpx { namespace geometry { namespace server
         bool search_callback(std::size_t idx, polygon_type const& poly) const;
 
         // move the bodies
-        void move() const;
+        void move(double dt) const;
 
         // retrieve the polygon object
         polygon_type get_poly() const
@@ -141,8 +149,8 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_action5<
-            point, point_init, double, double,double,double,std::size_t, &point::init
+        typedef hpx::actions::direct_action7<
+            point, point_init, double, double,double,double,double,double,std::size_t, &point::init
         > init_action;
 
         typedef hpx::actions::direct_result_action0<
@@ -153,8 +161,8 @@ namespace hpx { namespace geometry { namespace server
             point const, polygon_type, point_get_poly, &point::get_poly
         > get_poly_action;
 
-        typedef hpx::actions::direct_action0<
-            point const, point_move, &point::move
+        typedef hpx::actions::direct_action1<
+            point const, point_move, double, &point::move
         > move_action;
 
         typedef hpx::actions::direct_result_action0<

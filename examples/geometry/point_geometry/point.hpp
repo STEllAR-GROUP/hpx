@@ -55,18 +55,20 @@ namespace hpx { namespace geometry
         /// Initialize the server#point instance with the given \a gid
         lcos::future_value<void> init_async(double xmin, double xmax,
                                             double ymin, double ymax,
+                                            double velx, double vely,
                                             std::size_t numpoints) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,numpoints);
+            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,velx,vely,numpoints);
         }
 
         void init(double xmin, double xmax,
                   double ymin, double ymax,
+                  double velx, double vely,
                   std::size_t numpoints) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,numpoints);
+            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,velx,vely,numpoints);
         }
 
         /// Initialize the server#point instance with the given \a gid
@@ -94,16 +96,16 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
-        lcos::future_value<void> move_async() const
+        lcos::future_value<void> move_async(double dt) const
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::move_async(gid_);
+            return this->base_type::move_async(gid_,dt);
         }
 
-        void move() const
+        void move(double dt) const
         {
             BOOST_ASSERT(gid_);
-            this->base_type::move(gid_);
+            this->base_type::move(gid_,dt);
         }
 
         /// Query the current coordinate values of the server#point 

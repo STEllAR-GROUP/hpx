@@ -82,10 +82,13 @@ namespace hpx { namespace geometry { namespace server
           return true;
         }
 
-        void point::move() const 
+        void point::move(double dt) const 
         {
-         // for (std::size_t i=0;i<poly_.outer().size();i++) {
-         // }
+          //for (std::size_t i=0;i<poly_.outer().size();i++) {
+          //  std::cout << " TEST x " << (poly_.outer())[i].x() << " y " << (poly_.outer())[i].y() << " velx " <<  velx_[i]<< " vely " << vely_[i] << std::endl;
+            //(poly_.outer())[i].x() += velx_[i]*dt;        
+            //(poly_.outer())[i].y() += vely_[i]*dt;        
+          //}
         }
 }}}
 
