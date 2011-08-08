@@ -4,27 +4,22 @@
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#
-# just recurse into all components subdirectories and execute the scripts there
 
-add_subdirectory(${subdir})
-  
-set(sources ${subdir}_client.cpp)
-      
-source_group("Source Files" FILES ${sources})
-  
-# add example executable
-add_hpx_executable(${subdir}_client
+add_hpx_component(board
   MODULE nqueen
-  SOURCES ${sources}
-  DEPENDENCIES ${subdir}_component)
+  SOURCES board.cpp)
 
 if(MSVC)  
-  set_property(TARGET ${subdir}_component APPEND
+  set_property(TARGET board_component APPEND
     PROPERTY COMPILE_FLAGS
     "-bigobj")
 endif()
+ 
+add_hpx_executable(nqueen_client
+  MODULE nqueen
+  SOURCES nqueen_client.cpp
+  DEPENDENCIES board_component)
    
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.nqueen ${subdir}_client_exe)
+add_hpx_pseudo_dependencies(examples.nqueen nqueen_client_exe)
 
