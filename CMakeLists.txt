@@ -575,6 +575,7 @@ if(HPX_EXAMPLES)
   # executables that depend on libraries above
   add_hpx_pseudo_target(examples)
 
+  include_directories(examples)
   add_subdirectory(examples)
 endif()
 
