@@ -75,9 +75,8 @@ namespace interpolate3d
             int i = 0;
             BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
             {
-                using boost::lexical_cast;
-                register_name(id.get_gid(), 
-                    data.symbolic_name_ + lexical_cast<std::string>(i++));
+                unregister_name(data.symbolic_name_ + 
+                    boost::lexical_cast<std::string>(i++));
             }
         }
     }
