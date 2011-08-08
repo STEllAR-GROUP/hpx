@@ -59,7 +59,7 @@ namespace hpx { namespace components
         while (handled.count() < lazy_values.size()) {
 
             bool suspended = false;
-            for (int i = 0; i < lazy_values.size(); ++i) {
+            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
                 // value gets available 
