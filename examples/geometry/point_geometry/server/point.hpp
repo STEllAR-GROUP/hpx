@@ -107,10 +107,10 @@ namespace hpx { namespace geometry { namespace server
         }
 
         /// search for contact
-        bool search(std::vector<hpx::naming::id_type> const& search_objects) const;
+        int search(std::vector<hpx::naming::id_type> const& search_objects) const;
 
         /// callback for search-wait
-        bool search_callback(std::size_t idx, polygon_type const& poly) const;
+        bool search_callback(std::size_t idx, polygon_type const& poly,bool &redo) const;
 
         // move the bodies
         void move(double dt);
@@ -178,7 +178,7 @@ namespace hpx { namespace geometry { namespace server
         > set_Y_action;
 
         typedef hpx::actions::direct_result_action1<
-            point const, bool, point_search, std::vector<hpx::naming::id_type> const&, 
+            point const, int, point_search, std::vector<hpx::naming::id_type> const&, 
             &point::search
         > search_action;
 

@@ -72,13 +72,13 @@ namespace hpx { namespace geometry
         }
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::future_value<bool> search_async(std::vector<hpx::naming::id_type> const& search_objects) 
+        lcos::future_value<int> search_async(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search_async(gid_, search_objects);
         }
 
-        bool search(std::vector<hpx::naming::id_type> const& search_objects) 
+        int search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search(gid_, search_objects);

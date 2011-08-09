@@ -37,14 +37,14 @@ namespace hpx { namespace geometry { namespace stubs
             init_async(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints).get();
         }
 
-        static lcos::future_value<bool> 
+        static lcos::future_value<int> 
         search_async(naming::id_type gid, std::vector<hpx::naming::id_type> const& search_objects) 
         {
             typedef server::point::search_action action_type;
             return lcos::eager_future<action_type>(gid, search_objects);
         }
 
-        static bool search(naming::id_type const& gid, std::vector<hpx::naming::id_type> const& search_objects) 
+        static int search(naming::id_type const& gid, std::vector<hpx::naming::id_type> const& search_objects) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value

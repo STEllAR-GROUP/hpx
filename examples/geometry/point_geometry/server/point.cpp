@@ -18,6 +18,7 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 #include <boost/bind.hpp>
+#include <boost/ref.hpp>
 
 #include "../serialize_geometry.hpp"
 #include "../stubs/point.hpp"
@@ -27,7 +28,7 @@
 namespace hpx { namespace geometry { namespace server 
 {
         /// search for contact
-        bool point::search(std::vector<hpx::naming::id_type> const& search_objects) const
+        int point::search(std::vector<hpx::naming::id_type> const& search_objects) const
         {
             typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
 
@@ -38,12 +39,13 @@ namespace hpx { namespace geometry { namespace server
             }
 
             // will return the number of invoked futures
-            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2));
+            bool redo = false;
+            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
 
-            return false;
+            return 0;
         }
 
-        bool point::search_callback(std::size_t i, polygon_type const& poly) const 
+        bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) const 
         {
 
           // not implemented in boost geometry yet
@@ -55,10 +57,14 @@ namespace hpx { namespace geometry { namespace server
           std::deque<polygon_type> output;
           boost::geometry::intersection(poly_,poly,output);
           BOOST_FOREACH(polygon_type const& p, output) {
-            std::cout << i++ << " Contact region area  " << boost::geometry::area(p) << std::endl;
+            std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
             // Find the master segment
-            //for (std::size_t j=0;j<p.outer().size();j++) {
-            //}
+            std::cout << " contact region size " << p.outer().size() << std::endl;
+
+       //     for (std::size_t j=0;j<p.outer().size();j++) {
+       //       std::cout << " Contact Vertex " 
+       //                 << (p.outer())[j].x() << " " << (p.outer())[j].y() << std::endl;
+       //     }
            
           }
 
@@ -75,7 +81,7 @@ namespace hpx { namespace geometry { namespace server
                
           //  }
           //}
-          std::cout << " TEST poly.outer().size() " << poly.outer().size() << " i " << i << " poly_ " << poly_.outer().size() << std::endl;
+          //std::cout << " TEST poly.outer().size() " << poly.outer().size() << " i " << i << " poly_ " << poly_.outer().size() << std::endl;
 
           // return type says continue or not
           // usually return true

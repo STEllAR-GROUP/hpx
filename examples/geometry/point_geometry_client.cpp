@@ -97,50 +97,32 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // SIMPLE PROBLEM
         // create some boxes to smash together
-        const std::size_t num_bodies = 5;
+        const std::size_t num_bodies = 2;
         const std::size_t numpoints = 5;
         double bbox[num_bodies][4];
-        std::size_t imax = 1000;
+        double velx[num_bodies];
+        double vely[num_bodies];
 
         srand( time(NULL) );
         std::size_t i = 0;
-        while (i < num_bodies) {
-          std::size_t rnx = rand() % imax;
-          std::size_t rny = rand() % imax;
-          std::size_t rn_extent1 = rand() % imax;
-          std::size_t rn_extent2 = rand() % imax;
 
-          double xmin = 0.001*(rnx - rn_extent1);
-          double ymin = 0.001*(rny - rn_extent2);
-          double xmax = 0.001*(rnx + rn_extent1);
-          double ymax = 0.001*(rny + rn_extent2);
+        // Object #1
+        bbox[0][0] =  -2.0;
+        bbox[0][1] =   0.0;
+        bbox[0][2] =   0.0;
+        bbox[0][3] =   2.0;
 
-          bool found = 0;
-          for (std::size_t j=0;j<i;j++) {
-            if ( intersection(xmin,xmax,ymin,ymax,
-              bbox[j][0],bbox[j][1],bbox[j][2],bbox[j][3]) ) {
-              found = 1;
-              break;
-            } 
-          }
- 
-          if ( xmin > 1000 || ymin > 1000 || xmax > 1000 || ymax > 1000 ) {
-            found = 1;
-          }
+        velx[0] = 1.0;
+        vely[0] = 0.0;
 
-          if ( found == 0 ) { 
-            bbox[i][0] = xmin;
-            bbox[i][1] = xmax;
-            bbox[i][2] = ymin;
-            bbox[i][3] = ymax;
-            i++;
-          }
-        } 
+        // Object #2
+        bbox[1][0] =   0.001;
+        bbox[1][1] =   1.5;
+        bbox[1][2] =   0.5;
+        bbox[1][3] =   1.5;
 
-        // TEST
-        //for (i=0;i<num_bodies;i++) {
-        //  std::cout << " Bounding box : " << bbox[i][0] << " " << bbox[i][1] << " " << bbox[i][2] << " " << bbox[i][3] << std::endl;
-        //} 
+        velx[1] = -1.0;
+        vely[1] =  0.0;
 
         init(locality_results(blocks), accu);
 
@@ -148,48 +130,49 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Initial Data -----------------------------------------
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
-        double velx = 0;
-        double vely = 0;
-        double speed = 1.0;
-        double dt = 0.25;
-        double midx,midy,norm;
+        double dt = 0.1; // guess for start dt
+        double stop_time = 0.05;
+        double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
-          midx = 0.5*(bbox[i][0] + bbox[i][1]);
-          midy = 0.5*(bbox[i][2] + bbox[i][3]);
-          norm = sqrt(midx*midx+midy*midy);
-          velx = -speed*midx/norm;
-          vely = -speed*midy/norm;
-          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx,vely,numpoints));
+          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx[i],vely[i],numpoints));
         }
 
         hpx::components::wait(initial_phase);
+        while (time < stop_time) {
+            {
+              // Move bodies--------------------------------------------
+              std::vector<hpx::lcos::future_value<void> > move_phase;
+              for (i=0;i<num_bodies;i++) {
+                move_phase.push_back(accu[i].move_async(dt));
+              }
+              hpx::components::wait(move_phase);
+            }
 
-        // Search for Contact------------------------------------
+            time += dt;
+          
+            { 
+              // Search for Contact------------------------------------
+              // vector of futures
+              std::vector<hpx::lcos::future_value<int> > search_phase;
+    
+              // vector of gids
+              std::vector<hpx::naming::id_type> search_objects;
+              for (i=0;i<num_bodies;i++) {
+                search_objects.resize(num_bodies-(i+1));
+                for (std::size_t j=i+1;j<num_bodies;j++) {
+                  search_objects[j-(i+1)] = accu[j].get_gid();
+                }
+                search_phase.push_back(accu[i].search_async(search_objects));
+              }
 
-        // vector of futures
-        std::vector<hpx::lcos::future_value<bool> > search_phase;
+              std::vector<int> search_vector;
+              hpx::components::wait(search_phase,search_vector);
+            }
 
-        // vector of gids
-        std::vector<hpx::naming::id_type> search_objects;
-        for (i=0;i<num_bodies;i++) {
-          search_objects.resize(num_bodies-(i+1));
-          for (std::size_t j=i+1;j<num_bodies;j++) {
-            search_objects[j-(i+1)] = accu[j].get_gid();
-          }
-          search_phase.push_back(accu[i].search_async(search_objects));
+            // Contact enforcement ----------------------------------
+
         }
-
-        hpx::components::wait(search_phase);
-
-        // Contact enforcement ----------------------------------
-
-        // Move bodies--------------------------------------------
-        std::vector<hpx::lcos::future_value<void> > move_phase;
-        for (i=0;i<num_bodies;i++) {
-          move_phase.push_back(accu[i].move_async(dt));
-        }
-        hpx::components::wait(move_phase);
 
 #if 0
         hpx::geometry::point pt5(hpx::find_here(), 0.5, 0.5);
