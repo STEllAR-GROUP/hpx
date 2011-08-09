@@ -96,13 +96,13 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
-        lcos::future_value<void> move_async(double dt) const
+        lcos::future_value<void> move_async(double dt) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::move_async(gid_,dt);
         }
 
-        void move(double dt) const
+        void move(double dt) 
         {
             BOOST_ASSERT(gid_);
             this->base_type::move(gid_,dt);

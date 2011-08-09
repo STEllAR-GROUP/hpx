@@ -113,7 +113,7 @@ namespace hpx { namespace geometry { namespace server
         bool search_callback(std::size_t idx, polygon_type const& poly) const;
 
         // move the bodies
-        void move(double dt) const;
+        void move(double dt);
 
         // retrieve the polygon object
         polygon_type get_poly() const
@@ -162,7 +162,7 @@ namespace hpx { namespace geometry { namespace server
         > get_poly_action;
 
         typedef hpx::actions::direct_action1<
-            point const, point_move, double, &point::move
+            point, point_move, double, &point::move
         > move_action;
 
         typedef hpx::actions::direct_result_action0<
