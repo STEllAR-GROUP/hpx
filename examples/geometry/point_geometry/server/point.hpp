@@ -27,7 +27,7 @@ typedef boost::geometry::model::polygon<point_type> polygon_type;
 namespace hpx { namespace geometry { namespace server 
 {
     ///////////////////////////////////////////////////////////////////////////
-    class point
+    class HPX_COMPONENT_EXPORT point
       : public components::detail::managed_component_base<point> 
     {
     public:
