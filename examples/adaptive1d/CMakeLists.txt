@@ -29,23 +29,12 @@ set(sources
 set(dependencies
     adaptive1d_dataflow_component)
 
-if(RNPL_FOUND)
-  # add RNPL as a dependency
-  set(dependencies 
-      ${dependencies}
-      ${RNPL_LIBRARY})
-endif()
-
 source_group("Source Files" FILES ${sources})
-
-set(hpx_LIBRARIES ${hpx_LIBRARIES} gfortran)
 
 add_hpx_executable(adaptive1d 
   MODULE adaptive1d_module
   SOURCES ${sources}
   DEPENDENCIES ${dependencies})
-
-target_link_libraries(adaptive1d_exe gfortran)
 
 # add a dependency to the pseudo-target  
 add_hpx_pseudo_dependencies(examples.adaptive1d adaptive1d_exe) 

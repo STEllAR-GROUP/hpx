@@ -102,7 +102,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     double datatime = 0.0;
     int shape[3];
     shape[0] = val->value_.size();
-    char cnames[80] = { "x|y|z" };
+    char cnames[80] = { "x" };
     char fname[80];
     applier::applier& appl = applier::get_applier();
     naming::id_type this_prefix = appl.get_runtime_support_gid();
@@ -171,22 +171,23 @@ inline void calcrhs(struct nodedata &rhs,
 int rkupdate(std::vector<access_memory_block<stencil_data> > &val, 
              double t, detail::parameter const& par)
 {
-
     nodedata rhs;
 
     int size0 = val[0]->value_.size();
     int size1 = val[1]->value_.size();
+
+    int num_neighbors = par.num_neighbors;
 
     double phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV;
     double dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr;
 
     int num_eqns = NUM_EQUATIONS;
 
-    int worksize = size1 + 4*par.num_neighbors;
+    int worksize = size1 + 4*num_neighbors;
     boost::scoped_array<nodedata> work(new nodedata[worksize]);
     boost::scoped_array<nodedata> work2(new nodedata[worksize]);
 
-    double dt = par.lambda*par.h;
+    double dt = par.cfl*par.h;
     double odx = 1.0/par.h;
 
     int input,index;
@@ -200,19 +201,19 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
 
     // ----------------------------------------------------------------------
     // iter 0
-    for (int i=-2*par.num_neighbors;i<size1 + 2*par.num_neighbors;i++) {
+    for (int i=-2*num_neighbors;i<size1 + 2*num_neighbors;i++) {
       // Computer derivatives {{{
       if ( i < 0 ) { index = size0+i; input = 0; }
       else if ( i >= size1 ) { index = i-size1; input = 2; }
       else { index = i; input = 1; }
 
-      if ( i-1 < 0 ) { lindex = size0+i; linput = 0; } 
-      else if ( i-1 >= size1 ) { lindex = i-size1; linput = 2; }
-      else { lindex = i; linput = 1; }
+      if ( i-1 < 0 ) { lindex = size0+i-1; linput = 0; } 
+      else if ( i-1 >= size1 ) { lindex = i-1-size1; linput = 2; }
+      else { lindex = i-1; linput = 1; }
 
-      if ( i+1 < 0 ) { rindex = size0+i; rinput = 0; }
-      else if ( i+1 >= size1 ) { rindex = i-size1; rinput = 2; }
-      else { rindex = i; rinput = 1; }
+      if ( i+1 < 0 ) { rindex = size0+i+1; rinput = 0; }
+      else if ( i+1 >= size1 ) { rindex = i+1-size1; rinput = 2; }
+      else { rindex = i+1; rinput = 1; }
 
       phi = val[input]->value_[index].phi[0][0]; 
       Pi  = val[input]->value_[index].phi[0][1]; 
@@ -248,7 +249,7 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
 
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
 
-      nodedata& nd = work[i+2*par.num_neighbors];
+      nodedata& nd = work[i+2*num_neighbors];
 
       nd.phi[0][0] = phi;
       nd.phi[0][1] = Pi;
@@ -273,7 +274,7 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
 
     // ----------------------------------------------------------------------
     // iter 1
-    for (int i=par.num_neighbors;i<worksize-par.num_neighbors;i++) {
+    for (int i=num_neighbors;i<worksize-num_neighbors;i++) {
       // Calculate derivatives {{{
       nodedata& nd = work[i];
       nodedata& lnd = work[i-1];
@@ -313,7 +314,7 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
 
     // ----------------------------------------------------------------------
     // iter 2
-    for (int i=2*par.num_neighbors;i<worksize-2*par.num_neighbors;i++) {
+    for (int i=2*num_neighbors;i<worksize-2*num_neighbors;i++) {
       // Calculate derivatives {{{
       nodedata& nd = work[i];
       nodedata& nd2 = work2[i];
@@ -346,11 +347,34 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
       
       for (int ll=0;ll<num_eqns;ll++) {
-        val[3]->value_[i-2*par.num_neighbors].phi[1][ll] = 
+        val[3]->value_[i-2*num_neighbors].phi[0][ll] = 
                          c_1_3*nd.phi[0][ll]   
                        + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }
+
+#if defined(RNPL_FOUND)
+    // output initial data
+    double datatime = t + dt;
+    int shape[3];
+    shape[0] = val[3]->value_.size();
+    char cnames[80] = { "x" };
+    char fname[80];
+    applier::applier& appl = applier::get_applier();
+    naming::id_type this_prefix = appl.get_runtime_support_gid();
+    int locality = get_prefix_from_id( this_prefix );
+    std::vector<double> xcoord,value;
+    xcoord.resize(val[3]->value_.size());
+    value.resize(val[3]->value_.size());
+    for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
+      sprintf(fname,"%dfield%d",locality,(int) j);
+      for (std::size_t i=0;i<val[3]->value_.size();i++) {
+        xcoord[i] = val[3]->value_[i].x;
+        value[i] = val[3]->value_[i].phi[0][j];
+      }
+      gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+    }
+#endif
 
     return 1;
 }

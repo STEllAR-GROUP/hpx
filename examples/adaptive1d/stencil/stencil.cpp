@@ -144,7 +144,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
-        double t = val[1]->timestep_*par->h*par->lambda + cycle_time;
+        double t = val[1]->timestep_*par->h*par->cfl + cycle_time;
         rkupdate(val,t,*par.p);
 
         //std::cout << " row " << row << " column " << column 
