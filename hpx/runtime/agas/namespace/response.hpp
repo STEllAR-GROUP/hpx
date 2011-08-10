@@ -84,11 +84,12 @@ enum request_code
     primary_ns_bind_gid         = BOOST_BINARY_U(1000001), 
     primary_ns_resolve_locality = BOOST_BINARY_U(1000010), 
     primary_ns_resolve_gid      = BOOST_BINARY_U(1000011), 
-    primary_ns_unbind           = BOOST_BINARY_U(1000100), 
-    primary_ns_increment        = BOOST_BINARY_U(1000101), 
-    primary_ns_decrement        = BOOST_BINARY_U(1000110), 
-    primary_ns_localities       = BOOST_BINARY_U(1000111), 
-    primary_ns_route            = BOOST_BINARY_U(1001000), 
+    primary_ns_unbind_locality  = BOOST_BINARY_U(1000100), 
+    primary_ns_unbind_gid       = BOOST_BINARY_U(1000101), 
+    primary_ns_increment        = BOOST_BINARY_U(1000110), 
+    primary_ns_decrement        = BOOST_BINARY_U(1000111), 
+    primary_ns_localities       = BOOST_BINARY_U(1001000), 
+    primary_ns_route            = BOOST_BINARY_U(1001001), 
     component_ns_bind_prefix    = BOOST_BINARY_U(0100000), 
     component_ns_bind_name      = BOOST_BINARY_U(0100001), 
     component_ns_resolve_id     = BOOST_BINARY_U(0100010), 
@@ -292,7 +293,7 @@ struct response
             }
 
             case primary_ns_resolve_gid:
-            case primary_ns_unbind: {
+            case primary_ns_unbind_gid: {
                 data.gva.ep.get() = other.data.gva.ep.get();
                 data.gva.ctype = other.data.gva.ctype;
                 data.gva.count = other.data.gva.count;
@@ -394,7 +395,7 @@ struct response
             }
 
             case primary_ns_resolve_gid:
-            case primary_ns_unbind: {
+            case primary_ns_unbind_gid: {
                 data.gva.ep.get() = other.data.gva.ep.get();
                 data.gva.ctype = other.data.gva.ctype;
                 data.gva.count = other.data.gva.count;
@@ -440,6 +441,7 @@ struct response
         other.clear();
     } // }}}
 
+    // primary_ns_unbind_locality
     // primary_ns_bind_gid
     // primary_ns_route
     // component_ns_unbind
@@ -454,6 +456,7 @@ struct response
 
         switch (type_)
         {
+            case primary_ns_unbind_locality:
             case primary_ns_bind_gid:
             case primary_ns_route:
             case component_ns_unbind:
@@ -567,7 +570,7 @@ struct response
     } // }}} 
 
     // primary_ns_resolve_gid
-    // primary_ns_unbind
+    // primary_ns_unbind_gid
     void assign(
         request_code type_
       , gva<Protocol> const& gva_
@@ -578,7 +581,7 @@ struct response
         switch (type_)
         {
             case primary_ns_resolve_gid:
-            case primary_ns_unbind:
+            case primary_ns_unbind_gid:
                 break;
 
             default: {
@@ -721,7 +724,7 @@ struct response
     { // {{{
         switch (rc)
         {
-            case primary_ns_unbind:
+            case primary_ns_unbind_gid:
             case primary_ns_resolve_gid:
                 return gva<Protocol>(data.gva.ep.get()
                                    , data.gva.ctype
@@ -965,7 +968,7 @@ struct response
             }
 
             case primary_ns_resolve_gid:
-            case primary_ns_unbind: {
+            case primary_ns_unbind_gid: {
                 ar & data.gva.ep.get();
                 ar & data.gva.ctype;
                 ar & data.gva.count;
@@ -1048,7 +1051,7 @@ struct response
             }
 
             case primary_ns_resolve_gid:
-            case primary_ns_unbind: {
+            case primary_ns_unbind_gid: {
                 ar & data.gva.ep.get();
                 ar & data.gva.ctype;
                 ar & data.gva.count;

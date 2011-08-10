@@ -51,8 +51,11 @@ HPX_REGISTER_ACTION_EX(
     primary_namespace_type::resolve_gid_action,
     stdmap_tcpip_primary_namespace_resolve_gid_action);
 HPX_REGISTER_ACTION_EX(
-    primary_namespace_type::unbind_action,
-    stdmap_tcpip_primary_namespace_unbind_action);
+    primary_namespace_type::unbind_locality_action,
+    stdmap_tcpip_primary_namespace_unbind_locality_action);
+HPX_REGISTER_ACTION_EX(
+    primary_namespace_type::unbind_gid_action,
+    stdmap_tcpip_primary_namespace_unbind_gid_action);
 HPX_REGISTER_ACTION_EX(
     primary_namespace_type::localities_action,
     stdmap_tcpip_primary_namespace_localities_action);

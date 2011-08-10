@@ -461,6 +461,20 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
+#if HPX_AGAS_VERSION > 0x10
+            naming::resolver_client& agas_client_
+                = get_runtime().get_agas_client();
+
+            error_code ec;
+            agas_client_.unbind
+                (applier::get_applier().get_runtime_support_raw_gid(), ec);
+            agas_client_.unbind
+                (applier::get_applier().get_memory_raw_gid(), ec);
+
+            // Drop the locality from the partition table.
+            agas_client_.remove_prefix(applier::get_applier().here());
+#endif
+
             if (respond_to) {
                 // respond synchronously
                 typedef lcos::base_lco_with_value<void> void_lco_type;

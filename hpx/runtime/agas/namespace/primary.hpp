@@ -62,7 +62,7 @@ struct primary_namespace :
     { return this->base_type::bind_gid(this->gid_, gid, gva); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // resolve_endpoint and resolve_gid interface
+    // resolve_locality and resolve_gid interface
     lcos::future_value<response_type>
     resolve_async(endpoint_type const& ep)
     { return this->base_type::resolve_locality_async(this->gid_, ep); }
@@ -78,13 +78,20 @@ struct primary_namespace :
     { return this->base_type::resolve_gid(this->gid_, gid); }
  
     ///////////////////////////////////////////////////////////////////////////
-    // unbind interface 
+    // unbind_locality and unbind_gid interface 
+    lcos::future_value<response_type>
+    unbind_async(endpoint_type const& ep)
+    { return this->base_type::unbind_locality_async(this->gid_, ep); }
+    
+    response_type unbind(endpoint_type const& ep)
+    { return this->base_type::unbind_locality(this->gid_, ep); }
+
     lcos::future_value<response_type>
     unbind_async(naming::gid_type const& gid, count_type count)
-    { return this->base_type::unbind_async(this->gid_, gid, count); }
+    { return this->base_type::unbind_gid_async(this->gid_, gid, count); }
     
     response_type unbind(naming::gid_type const& gid, count_type count)
-    { return this->base_type::unbind(this->gid_, gid, count); }
+    { return this->base_type::unbind_gid(this->gid_, gid, count); }
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 

@@ -196,6 +196,29 @@ bool legacy_router::get_prefix_cached(
     return false; 
 } // }}}
 
+bool legacy_router::remove_prefix(
+    naming::locality const& l
+) { // {{{
+    using boost::asio::ip::address;
+    using boost::fusion::at_c;
+
+    const address addr = address::from_string(l.get_address());
+
+    const endpoint_type ep(addr, l.get_port()); 
+
+    response_type r;
+
+    if (is_bootstrap())
+        r = bootstrap->primary_ns_server.unbind_locality(ep);
+    else
+        r = hosted->primary_ns_.unbind(ep);
+
+    if (success == r.get_status())
+        return true;
+    else
+        return false;
+} // }}}
+
 bool legacy_router::get_console_prefix(
     naming::gid_type& prefix
   , bool try_cache
@@ -488,7 +511,7 @@ bool legacy_router::unbind_range(
     response_type r;
 
     if (is_bootstrap())
-        r = bootstrap->primary_ns_server.unbind(lower_id, count);
+        r = bootstrap->primary_ns_server.unbind_gid(lower_id, count);
     else
         r = hosted->primary_ns_.unbind(lower_id, count);
 

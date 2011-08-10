@@ -103,11 +103,11 @@ struct primary_namespace :
         {
             // Just return the prefix
             if (count == 0)
-              return response_type(primary_ns_bind_locality
-                                 , at_c<1>(it->second)
-                                 , at_c<1>(it->second)
-                                 , at_c<0>(it->second)
-                                 , repeated_request);
+                return response_type(primary_ns_bind_locality
+                                   , at_c<1>(it->second)
+                                   , at_c<1>(it->second)
+                                   , at_c<0>(it->second)
+                                   , repeated_request);
 
             // Compute the new allocation.
             naming::gid_type lower(at_c<1>(it->second) + 1),
@@ -321,7 +321,7 @@ struct primary_namespace :
 
     response_type resolve_locality(
         endpoint_type const& ep
-    ) { // {{{ resolve_endpoint implementation
+    ) { // {{{ resolve_locality implementation
         using boost::fusion::at_c;
 
         typename database_mutex_type::scoped_lock l(mutex_);
@@ -480,10 +480,35 @@ struct primary_namespace :
                            , unknown_gid);
     } // }}}
 
-    response_type unbind(
+    response_type unbind_locality(
+        endpoint_type const& ep
+    ) { // {{{ unbind_locality implementation
+        using boost::fusion::at_c;
+
+        typename database_mutex_type::scoped_lock l(mutex_);
+
+        // Load the partition table 
+        typename partition_table_type::map_type&
+            partition_table = partitions_.get();
+
+        typename partition_table_type::map_type::iterator
+            pit = partition_table.find(ep),
+            pend = partition_table.end(); 
+
+        if (pit != pend)
+        {
+            partition_table.erase(pit);
+            return response_type(primary_ns_unbind_locality);
+        }
+
+        return response_type(primary_ns_unbind_locality
+                           , unknown_locality);
+    } // }}}
+
+    response_type unbind_gid(
         naming::gid_type const& gid
       , count_type count
-    ) { // {{{ unbind implementation
+    ) { // {{{ unbind_gid implementation
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -506,13 +531,13 @@ struct primary_namespace :
                     "block sizes must match");
             }
 
-            response_type r(primary_ns_unbind, it->second);
+            response_type r(primary_ns_unbind_gid, it->second);
             gva_table.erase(it);
             return r; 
         }
 
         else
-            return response_type(primary_ns_unbind
+            return response_type(primary_ns_unbind_gid
                                , gva_type()
                                , unknown_gid);
     } // }}}
@@ -810,11 +835,12 @@ struct primary_namespace :
         namespace_bind_gid         = BOOST_BINARY_U(1000001),
         namespace_resolve_locality = BOOST_BINARY_U(1000010),
         namespace_resolve_gid      = BOOST_BINARY_U(1000011),
-        namespace_unbind           = BOOST_BINARY_U(1000100),
-        namespace_increment        = BOOST_BINARY_U(1000101),
-        namespace_decrement        = BOOST_BINARY_U(1000110),
-        namespace_localities       = BOOST_BINARY_U(1000111),
-        namespace_route            = BOOST_BINARY_U(1001000) // IMPLEMENT
+        namespace_unbind_locality  = BOOST_BINARY_U(1000100),
+        namespace_unbind_gid       = BOOST_BINARY_U(1000101),
+        namespace_increment        = BOOST_BINARY_U(1000110),
+        namespace_decrement        = BOOST_BINARY_U(1000111),
+        namespace_localities       = BOOST_BINARY_U(1001000),
+        namespace_route            = BOOST_BINARY_U(1001001) // IMPLEMENT
     }; // }}}
     
     typedef hpx::actions::result_action2<
@@ -852,15 +878,24 @@ struct primary_namespace :
         &primary_namespace<Database, Protocol>::resolve_gid
       , threads::thread_priority_critical
     > resolve_gid_action;
+
+    typedef hpx::actions::result_action1<
+        primary_namespace<Database, Protocol>,
+        /* return type */ response_type,
+        /* enum value */  namespace_unbind_locality,
+        /* arguments */   endpoint_type const&,
+        &primary_namespace<Database, Protocol>::unbind_locality
+      , threads::thread_priority_critical
+    > unbind_locality_action;
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
         /* return type */ response_type,
-        /* enum value */  namespace_unbind,
+        /* enum value */  namespace_unbind_gid,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::unbind
+        &primary_namespace<Database, Protocol>::unbind_gid
       , threads::thread_priority_critical
-    > unbind_action;
+    > unbind_gid_action;
     
     typedef hpx::actions::result_action2<
         primary_namespace<Database, Protocol>,
