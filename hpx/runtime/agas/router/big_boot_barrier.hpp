@@ -9,6 +9,7 @@
 #if !defined(HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9)
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
+#include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -49,7 +50,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     );
 
     void apply(
-        naming::address const& addr
+        boost::uint32_t prefix
+      , naming::address const& addr
       , actions::base_action* act 
     );
 

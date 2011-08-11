@@ -351,6 +351,7 @@ void register_console(registration_header const& header)
     boost::function<void()>* thunk = new boost::function<void()>
         (boost::bind(&big_boot_barrier::apply
                    , boost::ref(get_big_boot_barrier())
+                   , naming::get_prefix_from_gid(prefix)
                    , naming::address(header.locality)
                    , p)); 
 
@@ -512,8 +513,8 @@ void register_worker(registration_header const& header)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
-        get_big_boot_barrier().apply
-            (prefix, naming::address(header.locality), p);
+        get_big_boot_barrier().apply(naming::get_prefix_from_gid(prefix)
+                                   , naming::address(header.locality), p);
     }
 
     else // AGAS is starting up; this locality is participating in startup
@@ -521,7 +522,7 @@ void register_worker(registration_header const& header)
         boost::function<void()>* thunk = new boost::function<void()>
             (boost::bind(&big_boot_barrier::apply
                        , boost::ref(get_big_boot_barrier())
-                       , prefix
+                       , naming::get_prefix_from_gid(prefix)
                        , naming::address(header.locality)
                        , p));
 

@@ -52,7 +52,7 @@ namespace hpx { namespace parcelset
                 performance_counters::parcels::data_point& send_data,
                 performance_counters::parcels::gatherer& parcels_sent
                 )
-          : socket_(io_service), out_priority_(0), out_size_(0), there_(l),
+          : socket_(io_service), out_priority_(0), out_size_(0), there_(prefix),
             connection_cache_(cache), sends_started_(started),
             sends_completed_(completed), send_timer_(timer),
             send_data_(send_data), parcels_sent_(parcels_sent)
