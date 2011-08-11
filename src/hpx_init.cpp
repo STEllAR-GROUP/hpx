@@ -250,6 +250,7 @@ namespace hpx
                     break;
 
                 case runtime_mode_worker:
+                case runtime_mode_console:
                 case runtime_mode_connect:
                     // If the runtime for this application is always run in
                     // worker mode, silently ignore the worker option for
@@ -260,6 +261,9 @@ namespace hpx
                         ("connect", "run this instance in worker mode, but connecting late")
                     ;
                     break;
+
+                case runtime_mode_invalid:
+                    throw std::logic_error("invalid runtime mode specified");
                 }
 
                 hpx_options.add_options()
