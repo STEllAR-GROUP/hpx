@@ -13,7 +13,7 @@
 namespace boost { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lru_entry lru_entry.hpp boost/cache/lru_entry.hpp
+    /// \class lru_entry lru_entry.hpp boost/cache/entries/lru_entry.hpp
     ///
     /// The \a lru_entry type can be used to store arbitrary values in a cache. 
     /// Using this type as the cache's entry type makes sure that the least 
@@ -64,6 +64,7 @@ namespace boost { namespace cache { namespace entries
             return true;
         }
 
+        /// \brief Returns the last access time of the entry.
         boost::posix_time::ptime const& get_access_time() const
         {
             return access_time_;

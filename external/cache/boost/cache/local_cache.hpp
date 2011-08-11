@@ -123,7 +123,7 @@ namespace boost { namespace cache
         ///                   for this cache. The default is to use a default 
         ///                   constructed instance of the type as defined by 
         ///                   the \a UpdatePolicy template parameter.
-        /// \param ip         [in] An instance of the \a InputPolicy to use for
+        /// \param ip         [in] An instance of the \a InsertPolicy to use for
         ///                   this cache. The default is to use a default 
         ///                   constructed instance of the type as defined by 
         ///                   the \a InsertPolicy template parameter.

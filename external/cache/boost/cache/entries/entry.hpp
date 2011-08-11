@@ -32,7 +32,7 @@ namespace boost { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class entry entry.hpp boost/cache/entry.hpp
+    /// \class entry entry.hpp boost/cache/entries/entry.hpp
     ///
     /// \tparam Value     The data type to be stored in a cache. It has to be 
     ///                   default constructible, copy constructible and 

@@ -12,7 +12,7 @@
 namespace boost { namespace cache { namespace entries
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lfu_entry lfu_entry.hpp boost/cache/lfu_entry.hpp
+    /// \class lfu_entry lfu_entry.hpp boost/cache/entries/lfu_entry.hpp
     ///
     /// The \a lfu_entry type can be used to store arbitrary values in a cache. 
     /// Using this type as the cache's entry type makes sure that the least 

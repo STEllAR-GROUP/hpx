@@ -32,7 +32,7 @@ namespace boost { namespace cache { namespace entries
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class size_entry size_entry.hpp boost/cache/size_entry.hpp
+    /// \class size_entry size_entry.hpp boost/cache/entries/size_entry.hpp
     ///
     /// The \a size_entry type can be used to store values in a cache which 
     /// have a size associated (such as files, etc.). 
