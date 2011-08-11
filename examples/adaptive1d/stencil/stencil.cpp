@@ -140,12 +140,15 @@ namespace hpx { namespace components { namespace adaptive1d
 
         val[3]->max_index_ = val[1]->max_index_;
         val[3]->index_ = val[1]->index_;
-        val[3]->value_ = val[1]->value_;
-
-        val[3]->timestep_ = val[1]->timestep_ + 1.0;
+        val[3]->value_.resize(val[1]->value_.size());
+        for (std::size_t i=0;i<val[1]->value_.size();i++) {
+          val[3]->value_[i].x = val[1]->value_[i].x;
+        }
 
         double t = val[1]->timestep_*par->h*par->cfl + cycle_time;
         rkupdate(val,t,*par.p);
+
+        val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
         //std::cout << " row " << row << " column " << column 
         //    << " timestep " << val[3]->timestep_ 

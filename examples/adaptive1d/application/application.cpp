@@ -119,24 +119,6 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
     }
 #endif
-#if 0
-    // Output data as plain text
-    char fname[80];
-    std::ofstream myfile;
-    myfile.precision(10);
-    applier::applier& appl = applier::get_applier();
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
-    int locality = get_prefix_from_id( this_prefix );
-    for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
-      sprintf(fname,"%dfield%d.txt",locality,(int) j);
-      myfile.open(fname,std::fstream::app);
-      for (std::size_t i=0;i<val->value_.size();i++) {
-        myfile << val->value_[i].x << " " << val->value_[i].phi[0][j] << std::endl;
-      }
-      myfile.close();
-    }
-
-#endif
 
     return 1;
 }
@@ -354,25 +336,27 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
     }
 
 #if defined(RNPL_FOUND)
-    // output initial data
-    double datatime = t + dt;
-    int shape[3];
-    shape[0] = val[3]->value_.size();
-    char cnames[80] = { "x" };
-    char fname[80];
-    applier::applier& appl = applier::get_applier();
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
-    int locality = get_prefix_from_id( this_prefix );
-    std::vector<double> xcoord,value;
-    xcoord.resize(val[3]->value_.size());
-    value.resize(val[3]->value_.size());
-    for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
-      sprintf(fname,"%dfield%d",locality,(int) j);
-      for (std::size_t i=0;i<val[3]->value_.size();i++) {
-        xcoord[i] = val[3]->value_[i].x;
-        value[i] = val[3]->value_[i].phi[0][j];
+    if ( fmod(val[1]->timestep_,par.out_every) < 1.e-6 ) {
+      // output initial data
+      double datatime = t + dt;
+      int shape[3];
+      shape[0] = val[3]->value_.size();
+      char cnames[80] = { "x" };
+      char fname[80];
+      applier::applier& appl = applier::get_applier();
+      naming::id_type this_prefix = appl.get_runtime_support_gid();
+      int locality = get_prefix_from_id( this_prefix );
+      std::vector<double> xcoord,value;
+      xcoord.resize(val[3]->value_.size());
+      value.resize(val[3]->value_.size());
+      for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
+        sprintf(fname,"%dfield%d",locality,(int) j);
+        for (std::size_t i=0;i<val[3]->value_.size();i++) {
+          xcoord[i] = val[3]->value_[i].x;
+          value[i] = val[3]->value_[i].phi[0][j];
+        }
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
       }
-      gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
     }
 #endif
 

@@ -1,8 +1,9 @@
 [adaptive1d]
-nx0  = 17
-nt0  = 10
-grain_size = 5
-num_neighbors = 2
+nx0  = 801
+nt0  = 5800
+grain_size = 100
+num_neighbors = 1
+out_every = 5.0
 loglevel     = 2
 
 cfl = 0.01

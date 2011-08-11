@@ -78,6 +78,7 @@ int hpx_main(variables_map& vm)
     par->grain_size     = 5;
     par->allowedl       = 0;
     par->num_neighbors  = 2;
+    par->out_every      = 5.0;
 
     // application specific parameters
     par->cfl    = 0.01;
@@ -106,6 +107,7 @@ int hpx_main(variables_map& vm)
         appconfig_option<std::size_t>("allowedl", pars, par->allowedl);
         appconfig_option<std::size_t>("grain_size", pars, par->grain_size);
         appconfig_option<std::size_t>("num_neighbors", pars, par->num_neighbors);
+        appconfig_option<double>("out_every", pars, par->out_every);
 
         // Application parameters
         appconfig_option<double>("cfl", pars, par->cfl);
@@ -147,6 +149,7 @@ int hpx_main(variables_map& vm)
     std::cout << " nt0           : " << par->nt0 << std::endl;
     std::cout << " grain_size    : " << par->grain_size << std::endl;
     std::cout << " num_neighbors : " << par->num_neighbors << std::endl;
+    std::cout << " out_every     : " << par->out_every << std::endl;
     std::cout << " --------------: " << std::endl;
     std::cout << " loglevel      : " << par->loglevel << std::endl;
     std::cout << " --------------: " << std::endl;

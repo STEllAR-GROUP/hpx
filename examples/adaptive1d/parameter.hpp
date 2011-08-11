@@ -34,6 +34,7 @@ struct HPX_COMPONENT_EXPORT parameter
     std::size_t allowedl;
     std::size_t grain_size;
     std::size_t num_neighbors;
+    double out_every;
 
     // Application parameters
     double cfl;
