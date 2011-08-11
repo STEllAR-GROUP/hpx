@@ -43,10 +43,11 @@ struct fixed_component_base : detail::fixed_component_tag
     fixed_component_base()
     {}
 
-    /// \brief Destruct a fixed_component
+    /// \brief Unbind the GID if it's not this instantiations fixed gid and is
+    ///        is not invalid.
     ~fixed_component_base()
     {
-        if ((gid_ != naming::invalid_gid) && (gid_ != fixed_gid()))
+        if ((naming::invalid_gid != gid_) && (fixed_gid() != gid_))
             applier::unbind_gid(gid_); 
     }
  
@@ -66,7 +67,7 @@ struct fixed_component_base : detail::fixed_component_tag
 
     /// \brief Return the component's fixed GID. 
     ///
-    /// \returns      The fixed global id (GID) for this component
+    /// \returns The fixed global id (GID) for this component
     naming::gid_type const& get_base_gid() const
     {
         if (!gid_)
