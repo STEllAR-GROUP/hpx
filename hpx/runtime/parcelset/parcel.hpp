@@ -66,10 +66,11 @@ namespace hpx { namespace parcelset
             creation_time_(0)
         {}
         
-        parcel(naming::address addr, actions::base_action* act) 
-          : destination_id_(), destination_addr_(addr), source_id_(),
-            action_(act), continuation_(), start_time_(0),
-            creation_time_(0)
+        parcel(boost::uint32_t prefix, naming::address addr,
+            actions::base_action* act) 
+          : destination_id_(naming::get_gid_from_prefix(prefix)),
+            destination_addr_(addr), source_id_(), action_(act),
+            continuation_(), start_time_(0), creation_time_(0)
         {}
 
         ~parcel()

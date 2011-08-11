@@ -44,7 +44,7 @@ namespace hpx { namespace parcelset
 
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                naming::locality const& l, 
+                boost::uint32_t prefix, 
                 util::connection_cache<parcelport_connection>& cache,
                 boost::atomic<boost::int64_t>& started,
                 boost::atomic<boost::int64_t>& completed,
@@ -139,7 +139,7 @@ namespace hpx { namespace parcelset
         std::vector<char> out_buffer_;
 
         /// the other (receiving) end of this connection
-        naming::locality there_;
+        boost::uint32_t there_;
 
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection>& connection_cache_;

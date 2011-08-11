@@ -27,13 +27,13 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Connection>
+    template <typename Connection, typename Key = boost::uint32_t>
     class connection_cache
     {
     public:
         typedef boost::recursive_mutex mutex_type;
         typedef boost::shared_ptr<Connection> connection_type;
-        typedef naming::locality key_type;
+        typedef Key key_type;
 
         typedef std::pair<connection_type, std::pair<key_type const*, int> > value_type;
         typedef std::list<value_type> list_type;
@@ -49,7 +49,7 @@ namespace hpx { namespace util
             logdest_(logdest), count_(0)
         {}
 
-        connection_type get (key_type const& l)
+        connection_type get(key_type const& l)
         {
             mutex_type::scoped_lock lock(mtx_);
 
@@ -76,7 +76,7 @@ namespace hpx { namespace util
             return connection_type();
         }
 
-        void add (key_type const& l, connection_type conn)
+        void add(key_type const& l, connection_type conn)
         {
             mutex_type::scoped_lock lock(mtx_);
 

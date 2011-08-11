@@ -512,7 +512,8 @@ void register_worker(registration_header const& header)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
-        get_big_boot_barrier().apply(naming::address(header.locality), p);
+        get_big_boot_barrier().apply
+            (prefix, naming::address(header.locality), p);
     }
 
     else // AGAS is starting up; this locality is participating in startup
@@ -520,6 +521,7 @@ void register_worker(registration_header const& header)
         boost::function<void()>* thunk = new boost::function<void()>
             (boost::bind(&big_boot_barrier::apply
                        , boost::ref(get_big_boot_barrier())
+                       , prefix
                        , naming::address(header.locality)
                        , p));
 
@@ -648,20 +650,21 @@ big_boot_barrier::big_boot_barrier(
 }
 
 void big_boot_barrier::apply(
-    naming::address const& addr
+    boost::uint32_t prefix
+  , naming::address const& addr
   , actions::base_action* act 
 ) { // {{{
-    parcelset::parcel p(addr, act);
+    parcelset::parcel p(prefix, addr, act);
 
     parcelset::parcelport_connection_ptr client_connection
-        (connection_cache_.get(addr.locality_));
+        (connection_cache_.get(prefix));
 
     if (!client_connection)
     {
         // The parcel gets serialized inside the connection constructor, no 
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection
-            (io_service_pool_.get_io_service(), addr.locality_,
+            (io_service_pool_.get_io_service(), prefix,
                 connection_cache_, pp.sends_started_, pp.sends_completed_,
                 pp.send_timer_, pp.send_data_, pp.parcels_sent_)); 
         client_connection->set_parcel(p);
@@ -740,7 +743,7 @@ void big_boot_barrier::wait()
             // on the bootstrap AGAS node, and sleeping on this node. We'll
             // be woken up by notify_console. 
 
-            apply(bootstrap_agas, new register_console_action(
+            apply(1, bootstrap_agas, new register_console_action(
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,
@@ -759,7 +762,7 @@ void big_boot_barrier::wait()
             // we need to contact the bootstrap AGAS node, and then wait
             // for it to signal us. 
 
-            apply(bootstrap_agas, new register_worker_action(
+            apply(1, bootstrap_agas, new register_worker_action(
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,

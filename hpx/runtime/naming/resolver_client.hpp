@@ -778,7 +778,8 @@ namespace hpx { namespace naming
 
         /// The connection cache for sending connections
         mutable mutex_type connection_mtx_;
-        mutable util::connection_cache<resolver_client_connection> connection_cache_;
+        mutable util::connection_cache<resolver_client_connection, naming::locality>
+            connection_cache_;
         bool isconsole_;
         bool local_only_;
 

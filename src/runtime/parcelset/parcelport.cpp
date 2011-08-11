@@ -159,8 +159,11 @@ namespace hpx { namespace parcelset
     void parcelport::send_parcel(parcel const& p, naming::address const& addr, 
         write_handler_type f)
     {
-        parcelport_connection_ptr client_connection(
-            connection_cache_.get(addr.locality_));
+        const boost::uint32_t prefix
+            = naming::get_prefix_from_gid(p.get_destination()); 
+
+        parcelport_connection_ptr client_connection
+            (connection_cache_.get(prefix));
 
         if (!client_connection) {
 //                 LPT_(info) << "parcelport: creating new connection to: " 
@@ -169,7 +172,7 @@ namespace hpx { namespace parcelset
         // The parcel gets serialized inside the connection constructor, no 
         // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                    io_service_pool_.get_io_service(), addr.locality_, 
+                    io_service_pool_.get_io_service(), prefix, 
                     connection_cache_, sends_started_,
                     sends_completed_, send_timer_, send_data_, parcels_sent_)); 
 
