@@ -103,7 +103,6 @@ namespace hpx
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
         class parcelport_connection;
-        class connection_cache;
         class HPX_API_EXPORT parcelhandler;
         
         namespace server
@@ -437,6 +436,9 @@ namespace hpx
     {
         class HPX_API_EXPORT section;
         class runtime_configuration;
+
+        template <typename Connection, typename Key = boost::uint32_t>
+        class connection_cache;
     }
 
     class error_code;

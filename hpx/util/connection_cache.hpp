@@ -27,7 +27,7 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Connection, typename Key = boost::uint32_t>
+    template <typename Connection, typename Key>
     class connection_cache
     {
     public:
