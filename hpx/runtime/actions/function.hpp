@@ -159,7 +159,11 @@ struct function<Result()>
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/function_implementations.hpp>
 
-}}
+}
+
+using hpx::actions::function;
+
+}
 
 namespace boost { namespace serialization
 {
