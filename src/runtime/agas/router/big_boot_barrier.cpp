@@ -753,7 +753,7 @@ void big_boot_barrier::wait()
             spin();
         }
 
-        // hosted, worker or probe
+        // hosted, worker or connected
         else
         {
             // we need to contact the bootstrap AGAS node, and then wait
@@ -810,6 +810,18 @@ void create_big_boot_barrier(
             "create_big_boot_barrier was called more than once");
     }
     bbb.get().reset(new big_boot_barrier(pp_, ini_, runtime_type_));
+}
+
+void destroy_big_boot_barrier()
+{
+    util::static_<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    if (!bbb.get())
+    {
+        HPX_THROW_EXCEPTION(internal_server_error, 
+            "destroy_big_boot_barrier",
+            "big_boot_barrier has not been created yet");
+    }
+    bbb.get().reset();
 }
 
 big_boot_barrier& get_big_boot_barrier()

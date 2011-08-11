@@ -207,6 +207,9 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
       , runtime_mode runtime_type_
     );
 
+    ~legacy_router()
+    { destroy_big_boot_barrier(); }
+
     void launch_bootstrap(
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_

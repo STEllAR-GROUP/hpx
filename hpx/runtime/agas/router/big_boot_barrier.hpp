@@ -78,6 +78,8 @@ HPX_EXPORT void create_big_boot_barrier(
   , runtime_mode runtime_type_
 );
 
+HPX_EXPORT void destroy_big_boot_barrier();
+
 HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 
 }}

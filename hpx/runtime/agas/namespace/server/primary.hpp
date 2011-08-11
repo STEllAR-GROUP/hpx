@@ -8,6 +8,7 @@
 #if !defined(HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21)
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
+#include <boost/format.hpp>
 #include <boost/optional.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
@@ -71,7 +72,8 @@ struct primary_namespace :
     gva_table_type gvas_;
     partition_table_type partitions_;
     refcnt_table_type refcnts_;
-  
+    boost::uint32_t prefix_counter_; 
+
   public:
     primary_namespace(std::string const& name = "root_primary_namespace")
       : mutex_(),
@@ -153,8 +155,7 @@ struct primary_namespace :
             }
 
             // Compute the locality's prefix
-            boost::uint32_t prefix = static_cast<boost::uint32_t>
-                (partition_table.size() + 1);
+            boost::uint32_t prefix = ++prefix_counter_;
             naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
             // Start assigning ids with the second block of 64bit numbers only
@@ -173,8 +174,11 @@ struct primary_namespace :
             if (HPX_UNLIKELY(!pit.second))
             {
                 HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                    "insertion failed due to memory corruption or a locking "
-                    "error");
+                    boost::str(boost::format(
+                        "partition table insertion failed due to memory "
+                        "corruption or a locking error, endpoint(%1%), "
+                        "prefix(%2%), lower_id(%3%)")
+                        % ep % prefix % lower_id));
             }
 
             // Load the GVA table. Now that we've inserted the locality into
@@ -183,11 +187,12 @@ struct primary_namespace :
             // of a locality.
             typename gva_table_type::map_type& gva_table = gvas_.get();
 
+            const gva_type gva
+                (ep, components::component_runtime_support, count);
+
             std::pair<typename gva_table_type::map_type::iterator, bool>
                 git = gva_table.insert(typename
-                    gva_table_type::map_type::value_type
-                        (id, gva_type
-                            (ep, components::component_runtime_support, count)));
+                    gva_table_type::map_type::value_type(id, gva));
 
             // REVIEW: Should this be an assertion?
             // Check for insertion failure.
@@ -195,8 +200,10 @@ struct primary_namespace :
             {
                 // REVIEW: Is this the right error code to use?
                 HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                    "insertion failed due to memory corruption or a locking "
-                    "error");
+                    boost::str(boost::format(
+                        "GVA table insertion failed due to memory corruption "
+                        "or a locking error, gid(%1%), gva(%2%)")
+                        % id % gva));
             }
 
             if (count != 0)
@@ -312,8 +319,10 @@ struct primary_namespace :
         if (HPX_UNLIKELY(!p.second))
         {
             HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                "insertion failed due to memory corruption or a locking "
-                "error");
+                boost::str(boost::format(
+                    "GVA table insertion failed due to memory corruption or a "
+                    "locking error, gid(%1%), gva(%2%)")
+                    % id % gva));
         }
 
         return response_type(primary_ns_bind_gid);
@@ -497,7 +506,27 @@ struct primary_namespace :
 
         if (pit != pend)
         {
+            // Load the GVA table 
+            typename gva_table_type::map_type& gva_table = gvas_.get();
+
+            typename gva_table_type::map_type::iterator
+                git = gva_table.find(naming::get_gid_from_prefix
+                    (at_c<0>(pit->second))),
+                gend = gva_table.end();
+
+            if (git == gend)
+            {
+                HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
+                    boost::str(boost::format(
+                        "partition table entry has no corresponding GVA table "
+                        "entry, endpoint(%1%)")
+                        % ep));
+            }
+
+            // Wipe the locality from the tables.
             partition_table.erase(pit);
+            gva_table.erase(git);
+
             return response_type(primary_ns_unbind_locality);
         }
 
@@ -570,8 +599,10 @@ struct primary_namespace :
             if (HPX_UNLIKELY(!p.second))
             {
                 HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                    "insertion failed due to memory corruption or a locking "
-                    "error");
+                    boost::str(boost::format(
+                        "refcnt table insertion failed due to memory "
+                        "corruption or a locking error, gid(%1%)")
+                        % id));
             }
 
             it = p.first;
@@ -767,8 +798,10 @@ struct primary_namespace :
             if (HPX_UNLIKELY(!p.second))
             {
                 HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
-                    "insertion failed due to memory corruption or a locking "
-                    "error");
+                    boost::str(boost::format(
+                        "refcnt table insertion failed due to memory "
+                        "corruption or a locking error, gid(%1%)")
+                        % id));
                 return response_type(primary_ns_decrement
                                    , 0
                                    , components::component_invalid

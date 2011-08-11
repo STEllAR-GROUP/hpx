@@ -16,11 +16,11 @@ using boost::program_options::options_description;
 int hpx_main(variables_map& vm)
 {
     {
-        std::cout << "commands: help, quit\n";
+        std::cout << "[hpx_main] commands: help, disconnect\n";
 
         while (true)
         {
-            std::cout << "> ";
+            std::cout << "[hpx_main] > ";
 
             std::string arg;
             std::getline(std::cin, arg);
@@ -28,14 +28,15 @@ int hpx_main(variables_map& vm)
             if (arg.empty())
                 continue;
             
-            if (0 == std::string("quit").find(arg))
+            if (0 == std::string("disconnect").find(arg))
                 break; 
 
             if (0 != std::string("help").find(arg))
-                std::cout << ( boost::format("error: unknown command '%1%'\n")
+                std::cout << ( boost::format(
+                               "[hpx_main] error: unknown command '%1%'\n")
                              % arg);
             
-            std::cout << "commands: help, quit\n";
+            std::cout << "[hpx_main] commands: help, disconnect\n";
         }
     }
 
