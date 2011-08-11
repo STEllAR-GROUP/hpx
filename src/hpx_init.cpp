@@ -855,7 +855,9 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
+#if HPX_AGAS_VERSION > 0x10
         p->call_shutdown_functions();
+#endif
 
         p->shutdown(shutdown_timeout); 
     }
