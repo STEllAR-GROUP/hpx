@@ -115,7 +115,8 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& gid); 
 
         /// \brief Action shut down this runtime system instance
-        void shutdown(double timeout, naming::id_type respond_to);
+        void shutdown(double timeout,
+            naming::id_type respond_to = naming::invalid_id);
 
         /// \brief Action shut down runtime system instances on all localities
         void shutdown_all(double timeout);

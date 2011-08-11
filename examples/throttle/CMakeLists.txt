@@ -35,3 +35,16 @@ foreach(subdir ${subdirs})
                               ${subdir}_client_exe) 
 endforeach()
 
+add_hpx_executable(spin
+  MODULE throttle
+  SOURCES spin.cpp)
+
+# add a custom target for this example 
+add_hpx_pseudo_target(examples.throttle.spin)
+
+# make pseudo-targets depend on master pseudo-target
+add_hpx_pseudo_dependencies(examples.throttle examples.throttle.spin)
+
+# add dependencies to pseudo-target 
+add_hpx_pseudo_dependencies(examples.throttle.spin spin_exe)
+ 

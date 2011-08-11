@@ -27,6 +27,7 @@ if(NOT MSVC)
     set(subdirs ${subdirs} iostreams
                            heartbeat 
                            globals
+                           throttle
                            function
                            math
                            object_semaphore

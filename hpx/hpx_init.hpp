@@ -296,6 +296,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void finalize(double shutdown_timeout = -1.0, 
         double localwait = -1.0);
+
+    ///////////////////////////////////////////////////////////////////////////
+    void disconnect(double shutdown_timeout = -1.0,
+        double localwait = -1.0);
 }
 
 #endif // HPX_ABC9B037_3A25_4591_BB60_CD166773D61D

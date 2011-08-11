@@ -815,4 +815,31 @@ namespace hpx
 
         p->shutdown_all(shutdown_timeout); 
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void disconnect(double shutdown_timeout, double localwait)
+    {
+        if (localwait == -1.0)
+            get_option(localwait, "hpx.finalize_wait_time");
+
+        if (localwait != -1.0) {
+            hpx::util::high_resolution_timer t;
+            double start_time = t.elapsed();
+            double current = 0.0;
+            do {
+                current = t.elapsed();
+            } while (current - start_time < localwait * 1e-6);
+        }
+
+        if (shutdown_timeout == -1.0)
+            get_option(shutdown_timeout, "hpx.shutdown_timeout");
+
+        components::server::runtime_support* p = 
+            reinterpret_cast<components::server::runtime_support*>(
+                  get_runtime().get_runtime_support_lva());
+
+        p->call_shutdown_functions();
+
+        p->shutdown(shutdown_timeout); 
+    }
 }
