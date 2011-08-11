@@ -31,6 +31,8 @@
     #define HPX_AGAS_VERSION 0x10
 #endif
 
+#define HPX_SVN_REVISION         "$Revision$"
+
 namespace hpx
 {
     // Returns the major HPX version.
