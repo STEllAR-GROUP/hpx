@@ -125,7 +125,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_code returns the code of the action 
         /// instance it is called for.
-        virtual int get_action_code() const = 0;
+        virtual std::size_t get_action_code() const = 0;
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
@@ -473,9 +473,9 @@ namespace hpx { namespace actions
 
     private:
         /// retrieve action code
-        int get_action_code() const 
-        { 
-            return static_cast<std::size_t>(value); 
+        std::size_t get_action_code() const 
+        {
+            return static_cast<std::size_t>(value);
         }
 
         /// retrieve component type

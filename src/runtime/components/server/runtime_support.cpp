@@ -350,11 +350,11 @@ namespace hpx { namespace components { namespace server
     // Retrieve configuration information
     util::section runtime_support::get_config()
     {
-        #if HPX_AGAS_VERSION > 0x10
-            return *(get_runtime().get_config().get_section("application"));
-        #else
-            return *ini_.get_section("application");
-        #endif
+#if HPX_AGAS_VERSION > 0x10
+        return *(get_runtime().get_config().get_section("application"));
+#else
+        return *ini_.get_section("application");
+#endif
     }
 
     void runtime_support::tidy()
@@ -462,17 +462,15 @@ namespace hpx { namespace components { namespace server
             }
 
 #if HPX_AGAS_VERSION > 0x10
-            naming::resolver_client& agas_client_
-                = get_runtime().get_agas_client();
+            naming::resolver_client& agas_client = 
+                get_runtime().get_agas_client();
 
             error_code ec;
-            agas_client_.unbind
-                (applier::get_applier().get_runtime_support_raw_gid(), ec);
-            agas_client_.unbind
-                (applier::get_applier().get_memory_raw_gid(), ec);
+            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
+            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             // Drop the locality from the partition table.
-            agas_client_.remove_prefix(applier::get_applier().here());
+            agas_client.remove_prefix(appl.here(), ec);
 #endif
 
             if (respond_to) {

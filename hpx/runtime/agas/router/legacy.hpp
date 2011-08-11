@@ -253,7 +253,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     bool get_prefix_cached(naming::locality const& l, naming::gid_type& prefix,
                            bool self = true, error_code& ec = throws);
 
-    bool remove_prefix(naming::locality const& l);
+    bool remove_prefix(naming::locality const& l, error_code& ec = throws);
 
     bool get_console_prefix(naming::gid_type& prefix,
                             bool try_cache = true, error_code& ec = throws);

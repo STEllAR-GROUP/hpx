@@ -198,6 +198,7 @@ bool legacy_router::get_prefix_cached(
 
 bool legacy_router::remove_prefix(
     naming::locality const& l
+  , error_code& ec
 ) { // {{{
     using boost::asio::ip::address;
     using boost::fusion::at_c;
