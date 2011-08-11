@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Throttle", "Throttle", "{55
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "throttle_client", "components\throttle\throttle_client.vcxproj", "{BFB61394-1746-4751-A6D7-67BFD95A7BB9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spin", "components\throttle\spin\spin.vcxproj", "{DE0F97DE-7B5F-4831-9874-85A172EAAC63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -206,6 +208,16 @@ Global
 		{BFB61394-1746-4751-A6D7-67BFD95A7BB9}.Release|Win32.ActiveCfg = Release|x64
 		{BFB61394-1746-4751-A6D7-67BFD95A7BB9}.Release|x64.ActiveCfg = Release|x64
 		{BFB61394-1746-4751-A6D7-67BFD95A7BB9}.Release|x64.Build.0 = Release|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Debug|Win32.ActiveCfg = Debug|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Debug|x64.ActiveCfg = Debug|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Debug|x64.Build.0 = Debug|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Release|Mixed Platforms.Build.0 = Release|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Release|Win32.ActiveCfg = Release|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Release|x64.ActiveCfg = Release|x64
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -222,5 +234,6 @@ Global
 		{D0DEEE03-C48C-4212-9831-483B1A6C9AFD} = {17335F00-B89F-4E42-84B6-8A41DE7162D0}
 		{70918EC2-0744-4E18-B26E-B3519A434A79} = {5514A14B-A247-4B97-B6E7-8E646E31ABBE}
 		{BFB61394-1746-4751-A6D7-67BFD95A7BB9} = {5514A14B-A247-4B97-B6E7-8E646E31ABBE}
+		{DE0F97DE-7B5F-4831-9874-85A172EAAC63} = {5514A14B-A247-4B97-B6E7-8E646E31ABBE}
 	EndGlobalSection
 EndGlobal

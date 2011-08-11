@@ -51,6 +51,6 @@ int main(int argc, char* argv[])
         "usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv, hpx::runtime_mode_probe);
+    return hpx::init(desc_commandline, argc, argv, hpx::runtime_mode_connect);
 }
 

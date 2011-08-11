@@ -66,7 +66,7 @@ void pre_main(runtime_mode mode)
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
-    if (runtime_mode_probe == mode)
+    if (runtime_mode_connect == mode)
     {
         // Load components, so that we can use the barrier LCO.
         components::stubs::runtime_support::load_components

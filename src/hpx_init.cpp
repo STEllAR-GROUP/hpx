@@ -167,14 +167,15 @@ namespace hpx
             boost::format version("%d.%d.%d");
             boost::format logo(
                 "HPX - High Performance ParalleX\n"
+                "\n"
                 "An experimental runtime system for conventional machines implementing\n"
-                "(parts of) the ParalleX execution model." 
+                "(parts of) the ParalleX execution model.\n" 
                 "\n"
                 "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
                 "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
                 "\n"
                 "Versions:\n"
-                "  HPX %s (AGAS %x)\n"
+                "  HPX %s (AGAS %x), SVN %s\n"
                 "  Boost %s\n"
                 "\n"
                 "Build:\n"
@@ -189,6 +190,7 @@ namespace hpx
                                       % HPX_VERSION_MINOR
                                       % HPX_VERSION_SUBMINOR)
                           % HPX_AGAS_VERSION 
+                          % HPX_SVN_REVISION
                           % boost::str( version
                                       % (BOOST_VERSION / 100000)
                                       % (BOOST_VERSION / 100 % 1000)
@@ -238,22 +240,26 @@ namespace hpx
                      "run the hpx_main function, regardless of locality mode")
                 ;
 
-                if (hpx::runtime_mode_default == mode)
-                {
+                switch (mode) {
+                case runtime_mode_default:
                     hpx_options.add_options()
                         ("worker,w", "run this instance in worker mode")
                         ("console,c", "run this instance in console mode")
+                        ("connect", "run this instance in worker mode, but connecting late")
                     ;
-                }
-                else if (hpx::runtime_mode_worker == mode)
-                {
+                    break;
+
+                case runtime_mode_worker:
+                case runtime_mode_connect:
                     // If the runtime for this application is always run in
                     // worker mode, silently ignore the worker option for
                     // hpx_pbs compatibility.
                     hidden_options.add_options()
                         ("worker,w", "run this instance in worker mode")
                         ("console,c", "run this instance in console mode")
+                        ("connect", "run this instance in worker mode, but connecting late")
                     ;
+                    break;
                 }
 
                 hpx_options.add_options()
@@ -639,15 +645,16 @@ namespace hpx
 
             // Analyze the command line.
             variables_map vm;
+            detail::command_line_result r = 
+                detail::parse_commandline(desc_cmdline, argc, argv, vm, mode);
 
-            switch (detail::parse_commandline(desc_cmdline, argc, argv, vm, mode))
-            {
-                case detail::error:
-                    return 1;
-                case detail::help:
-                    return 0;
-                default:
-                    break;
+            switch (r) {
+            case detail::error:
+                return 1;
+            case detail::help:
+                return 0;
+            default:
+                break;
             }
 
             // Check command line arguments.
@@ -695,14 +702,24 @@ namespace hpx
                 // The default mode is console, i.e. all workers need to be 
                 // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
-                if (vm.count("console") && vm.count("worker")) {
+                if (vm.count("console") + vm.count("worker") + vm.count("connect") > 1) {
                     throw std::logic_error("Ambiguous command line options. "
-                        "Do not specify both, --console/-c and --worker/-w\n");
+                        "Do not specify more than one of --console/-c, "
+                        "--worker/-w, or --connect\n");
                 }
 
-                // In this case we default to executing with an empty hpx_main.
+                // In these cases we default to executing with an empty 
+                // hpx_main, except if specified otherwise.
                 if (vm.count("worker")) {
                     mode = hpx::runtime_mode_worker;
+
+                    // do not execute any explicit hpx_main except if asked 
+                    // otherwise
+                    if (!vm.count("run-hpx-main"))
+                        f = 0;
+                }
+                else if (vm.count("connect")) {
+                    mode = hpx::runtime_mode_connect;
 
                     // do not execute any explicit hpx_main except if asked 
                     // otherwise

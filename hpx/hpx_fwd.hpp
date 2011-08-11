@@ -256,9 +256,9 @@ namespace hpx
     enum runtime_mode
     {
         runtime_mode_invalid = -1,
-        runtime_mode_console = 0, ///< The runtime is the console locality
-        runtime_mode_worker = 1,  ///< The runtime is a worker locality
-        runtime_mode_probe = 2,  
+        runtime_mode_console = 0,   ///< The runtime is the console locality
+        runtime_mode_worker = 1,    ///< The runtime is a worker locality
+        runtime_mode_connect = 2,   ///< The runtime is a worker locality connecting late
         runtime_mode_default = 3, 
         runtime_mode_last = 3
     };

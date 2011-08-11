@@ -31,6 +31,9 @@
     #define HPX_AGAS_VERSION 0x10
 #endif
 
+// Note: This file needs to explicitly committed in order to update the 
+//       revision number. As an alternative, we could use svnversion in the 
+//       build process.
 #define HPX_SVN_REVISION         "$Revision$"
 
 namespace hpx
