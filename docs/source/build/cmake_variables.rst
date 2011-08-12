@@ -56,7 +56,7 @@ HPX_WARNINGS : BOOL : ON
 HPX_EXAMPLES : BOOL : ON (Linux) OFF (Windows)
   If true, HPX examples are configured when CMake is run.
 
-HPX_STACKTRACES : BOOL : ON
+HPX_STACKTRACES : BOOL : ON (Linux) OFF (Windows)
   If true, exceptions thrown by HPX will include stack traces.
 
 HPX_AGAS_VERSION : STRING : 2 : 1 2

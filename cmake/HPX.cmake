@@ -254,7 +254,11 @@ option(HPX_WARNINGS "Enable compiler warnings (default: ON)" ON)
 ################################################################################
 # Backtrace configuration 
 ################################################################################
-option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
+if(MSVC)
+  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: OFF)" OFF)
+else()
+  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
+endif()
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
