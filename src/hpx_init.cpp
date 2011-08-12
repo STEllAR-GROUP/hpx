@@ -135,10 +135,12 @@ namespace hpx
             boost::format hpx_version("%d.%d.%d%s");
             boost::format boost_version("%d.%d.%d");
             boost::format logo(
-                "HPX - High Performance ParalleX\n"
+                "HPX3 - High Performance ParalleX\n"
                 "\n"
                 "An experimental runtime system for conventional machines implementing\n"
-                "(parts of) the ParalleX execution model.\n" 
+                "the ParalleX execution model.\n" 
+                "\n"
+                "Developed at the Center for Computation and Technology (cct.lsu.edu)\n"
                 "\n"
                 "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n"
                 "\n"
