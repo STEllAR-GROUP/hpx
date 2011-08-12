@@ -31,13 +31,13 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\hpx64_component.props" />
-    <Import Project="..\..\hpx64_debug.props" />
+    <Import Project="..\..\..\hpx64_component.props" />
+    <Import Project="..\..\..\hpx64_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\hpx64_component.props" />
-    <Import Project="..\..\hpx64_release.props" />
+    <Import Project="..\..\..\hpx64_component.props" />
+    <Import Project="..\..\..\hpx64_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -78,7 +78,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\hpx\hpx.vcxproj">
+    <None Include="..\..\..\..\..\examples\throttle\throttle\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\throttle1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\throttle1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\examples\throttle\throttle\throttle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.hpp" />
+    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\stubs\throttle.hpp" />
+    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\throttle.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\hpx\hpx.vcxproj">
       <Project>{e6c6c6c4-6959-4b47-b92a-6323a906cc40}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -86,7 +101,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\hpx_serialization\hpx_serialization.vcxproj">
+    <ProjectReference Include="..\..\..\hpx_serialization\hpx_serialization.vcxproj">
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -94,7 +109,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\distributing_factory\distributing_factory.vcxproj">
+    <ProjectReference Include="..\..\distributing_factory\distributing_factory.vcxproj">
       <Project>{46e027f2-3afc-4f13-b8c8-35a8e8559cd5}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -102,21 +117,6 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\throttle\throttle\server\throttle.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\throttle1.obj</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\throttle1.obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\throttle\throttle\throttle.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\examples\throttle\throttle\server\throttle.hpp" />
-    <ClInclude Include="..\..\..\..\examples\throttle\throttle\stubs\throttle.hpp" />
-    <ClInclude Include="..\..\..\..\examples\throttle\throttle\throttle.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\..\examples\throttle\throttle\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

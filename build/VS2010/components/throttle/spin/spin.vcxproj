@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BFB61394-1746-4751-A6D7-67BFD95A7BB9}</ProjectGuid>
+    <ProjectGuid>{DE0F97DE-7B5F-4831-9874-85A172EAAC63}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>throttle_client</RootNamespace>
+    <RootNamespace>spin</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -30,13 +30,13 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\hpx64_application.props" />
-    <Import Project="..\..\hpx64_debug.props" />
+    <Import Project="..\..\..\hpx64_application.props" />
+    <Import Project="..\..\..\hpx64_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\hpx64_application.props" />
-    <Import Project="..\..\hpx64_release.props" />
+    <Import Project="..\..\..\hpx64_application.props" />
+    <Import Project="..\..\..\hpx64_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -77,18 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\throttle\throttle_client.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
-      <Project>{46e027f2-3afc-4f13-b8c8-35a8e8559cd5}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
-    <ProjectReference Include="..\..\hpx\hpx.vcxproj">
+    <ProjectReference Include="..\..\..\hpx\hpx.vcxproj">
       <Project>{e6c6c6c4-6959-4b47-b92a-6323a906cc40}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -96,7 +85,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\hpx\init\init.vcxproj">
+    <ProjectReference Include="..\..\..\hpx\init\init.vcxproj">
       <Project>{bde2250c-073a-436b-8fdd-00f9e83c87e3}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -104,7 +93,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\hpx_serialization\hpx_serialization.vcxproj">
+    <ProjectReference Include="..\..\..\hpx_serialization\hpx_serialization.vcxproj">
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -112,14 +101,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="throttle\throttle.vcxproj">
-      <Project>{70918ec2-0744-4e18-b26e-b3519a434a79}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\examples\throttle\spin.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
