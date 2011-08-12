@@ -40,10 +40,10 @@ int hpx_main(variables_map& vm)
             if (arg.empty())
                 continue;
             
-            if (0 == std::string("quit").find(arg))
+            else if (0 == std::string("quit").find(arg))
                 break; 
 
-            if (0 == std::string("localities").find(arg))
+            else if (0 == std::string("localities").find(arg))
             {
                 std::vector<gid_type> prefixes;
                 agas_client.get_prefixes(prefixes);
@@ -61,7 +61,7 @@ int hpx_main(variables_map& vm)
                 continue;
             } 
 
-            if (0 != std::string("help").find(arg))
+            else if (0 != std::string("help").find(arg))
                 std::cout << ( boost::format("error: unknown command '%1%'\n")
                              % arg);
             
