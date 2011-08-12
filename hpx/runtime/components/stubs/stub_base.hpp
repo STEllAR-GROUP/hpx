@@ -20,6 +20,13 @@ namespace hpx { namespace components
         typedef ServerComponent server_component_type;
 
         ///////////////////////////////////////////////////////////////////////
+        // expose component type of the corresponding server component
+        static components::component_type get_component_type()
+        {
+            return components::get_component_type<ServerComponent>();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a component
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::gid_type const& gid, 
@@ -31,7 +38,7 @@ namespace hpx { namespace components
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::gid_type const& gid, std::size_t count = 1)
         {
-            return create_async(gid, get_component_type<ServerComponent>(), count);
+            return create_async(gid, get_component_type(), count);
         }
 
         static lcos::future_value<naming::id_type, naming::gid_type>
@@ -45,8 +52,7 @@ namespace hpx { namespace components
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& gid, std::size_t count = 1)
         {
-            return create_async(gid.get_gid(), 
-                get_component_type<ServerComponent>(), count);
+            return create_async(gid.get_gid(), get_component_type(), count);
         }
 
         /// Create a new instance of an simple_accumulator
@@ -60,7 +66,7 @@ namespace hpx { namespace components
         static naming::id_type
         create_sync(naming::gid_type const& gid, std::size_t count = 1)
         {
-            return create_sync(gid, get_component_type<ServerComponent>(), count);
+            return create_sync(gid, get_component_type(), count);
         }
 
         static naming::id_type
@@ -74,8 +80,7 @@ namespace hpx { namespace components
         static naming::id_type
         create_sync(naming::id_type const& gid, std::size_t count = 1)
         {
-            return create_sync(gid.get_gid(), 
-                get_component_type<ServerComponent>(), count);
+            return create_sync(gid.get_gid(), get_component_type(), count);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -93,7 +98,7 @@ namespace hpx { namespace components
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_one_async(naming::gid_type const& gid, Arg0 const& arg0)
         {
-            return create_one_async(gid, get_component_type<ServerComponent>(), arg0);
+            return create_one_async(gid, get_component_type(), arg0);
         }
 
         template <typename Arg0>
@@ -109,8 +114,7 @@ namespace hpx { namespace components
         static lcos::future_value<naming::id_type, naming::gid_type>
         create_one_async(naming::id_type const& gid, Arg0 const& arg0)
         {
-            return create_one_async(gid.get_gid(), 
-                get_component_type<ServerComponent>(), arg0);
+            return create_one_async(gid.get_gid(), get_component_type(), arg0);
         }
 
         template <typename Arg0>
@@ -124,7 +128,7 @@ namespace hpx { namespace components
         static naming::id_type
         create_one_sync(naming::gid_type const& gid, Arg0 const& arg0)
         {
-            return create_one_sync(gid, get_component_type<ServerComponent>(), arg0);
+            return create_one_sync(gid, get_component_type(), arg0);
         }
 
         template <typename Arg0>
@@ -139,8 +143,7 @@ namespace hpx { namespace components
         static naming::id_type
         create_one_sync(naming::id_type const& gid, Arg0 const& arg0)
         {
-            return create_one_sync(gid.get_gid(), 
-                get_component_type<ServerComponent>(), arg0);
+            return create_one_sync(gid.get_gid(), get_component_type(), arg0);
         }
 
         /// Delete an existing component

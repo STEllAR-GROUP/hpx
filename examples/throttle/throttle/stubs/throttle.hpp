@@ -17,6 +17,39 @@ namespace throttle { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     struct throttle : hpx::components::stubs::stub_base<server::throttle>
     {
+        ///////////////////////////////////////////////////////////////////////
+        static hpx::lcos::future_value<void>
+        suspend_async(hpx::naming::id_type const& gid, std::size_t thread_num)
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::throttle::suspend_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid, thread_num);
+        }
+
+        static void 
+        suspend(hpx::naming::id_type const& gid, std::size_t thread_num)
+        {
+            suspend_async(gid, thread_num).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static hpx::lcos::future_value<void>
+        resume_async(hpx::naming::id_type const& gid, std::size_t thread_num)
+        {
+            // Create an eager_future, execute the required action,
+            // we simply return the initialized future_value, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::throttle::resume_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid, thread_num);
+        }
+
+        static void 
+        resume(hpx::naming::id_type const& gid, std::size_t thread_num)
+        {
+            resume_async(gid, thread_num).get();
+        }
     };
 }}
 

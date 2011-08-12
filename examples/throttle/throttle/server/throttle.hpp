@@ -26,6 +26,7 @@ namespace throttle { namespace server
 
     public:
         throttle();
+        ~throttle();
 
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this component

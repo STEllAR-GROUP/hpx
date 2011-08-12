@@ -15,17 +15,81 @@
 #include <boost/format.hpp>
 
 using boost::program_options::variables_map;
-using boost::program_options::options_description;
 
 using boost::algorithm::is_space;
 using boost::algorithm::split;
 
+using hpx::naming::get_agas_client;
+
+///////////////////////////////////////////////////////////////////////////////
+// AGAS helpers
+inline void 
+register_name(hpx::naming::id_type const& id, std::string const& name)
+{
+    get_agas_client().registerid(name, id.get_gid()); 
+}
+
+inline void unregister_name(std::string const& name)
+{
+    get_agas_client().unregisterid(name); 
+}
+
+inline hpx::naming::id_type query_name(std::string const& name)
+{
+    hpx::naming::gid_type gid;
+    if (get_agas_client().queryid(name, gid))
+      return hpx::naming::id_type(gid, hpx::naming::id_type::unmanaged);
+
+    return hpx::naming::invalid_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    {
+    try {
         std::cout << ( boost::format("prefix: %d")
                      % hpx::naming::get_prefix_from_id(hpx::find_here()))
                   << std::endl;
+
+        // Try to connect to existing throttle instance, create a new one if 
+        // this fails.
+        char const* throttle_component_name = "/throttle/0";
+        throttle::throttle t(query_name(throttle_component_name));
+        if (!t.get_gid()) {
+            std::vector<hpx::naming::id_type> prefixes;
+            hpx::applier::applier& appl = hpx::applier::get_applier();
+
+            // create throttle on the console, register the instance with AGAS
+            // and add an additional reference count to keep it alive
+            if (appl.get_remote_prefixes(prefixes)) {
+                t.create(prefixes[0]);
+                register_name(t.get_gid(), throttle_component_name);
+                get_agas_client().incref(t.get_gid().get_gid());
+            }
+            else {
+                std::cerr << "Can't find throttle component." << std::endl;
+            }
+        }
+
+        // handle commands
+        if (t.get_gid()) {
+            if (vm.count("suspend")) {
+                t.suspend(vm["suspend"].as<int>());
+            }
+            else if (vm.count("resume")) {
+                t.suspend(vm["resume"].as<int>());
+            }
+            else if (vm.count("release")) {
+                // unregister from AGAS, remove additional reference count which 
+                // will allow for the throttle instance to be released
+                hpx::components::component_type type = t.get_component_type();
+                get_agas_client().decref(t.get_gid().get_gid(), type);
+                unregister_name(throttle_component_name);
+            }
+        }
+    }
+    catch (hpx::exception const& e) {
+        std::cerr << "throttle_client: caught exception: " << e.what() << std::endl;
     }
 
     hpx::disconnect();
@@ -35,65 +99,16 @@ int hpx_main(variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    namespace po = boost::program_options;
+
     // Configure application-specific options
-    options_description cmdline(
-        "usage: " HPX_APPLICATION_STRING " [options]");
+    po::options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+    cmdline.add_options()
+        ("suspend", po::value<int>(), "suspend thread with given number")
+        ("resume", po::value<int>(), "resume thread with given number")
+        ("release", "release throttle component instance")
+    ;
 
-    std::cout << "commands: init [iterations], help, quit\n";
-
-    while (true)
-    {
-        std::cout << "> ";
-
-        std::string line;
-        std::getline(std::cin, line);
-
-        if (line.empty())
-            continue;
-
-        else if (0 == std::string("quit").find(line))
-            break; 
-
-        std::vector<std::string> call;
-        split(call, line, is_space());
-
-        if (0 == std::string("init").find(call[0]))
-        {
-            try
-            {
-                boost::uint64_t iterations = 1;
-
-                if (call.size() == 2)
-                    iterations = boost::lexical_cast<boost::uint64_t>(call[1]);
-
-                else if (call.size() > 2)
-                    std::cout << ( boost::format(
-                                   "error: '%s' has too many arguments\n")
-                                 % line);
-                    
-                // Initialize and run HPX.
-                for (boost::uint64_t i = 0; i < iterations; ++i)
-                {
-                    hpx::init(cmdline, argc, argv, hpx::runtime_mode_connect);
-                }
-            }
-
-            catch (boost::bad_lexical_cast&)
-            {
-                std::cout << ( boost::format(
-                               "error: '%s' is not an unsigned integer\n")
-                             % call[1]);
-            }
-
-            continue;
-        } 
-
-        else if (0 != std::string("help").find(line))
-            std::cout << ( boost::format(
-                           "error: unknown command '%s'\n")
-                         % line);
-        
-        std::cout << "commands: init [iterations], help, quit\n";
-    }
+    return hpx::init(cmdline, argc, argv, hpx::runtime_mode_connect);
 }
 

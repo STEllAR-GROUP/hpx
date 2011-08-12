@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future_value.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/throttle.hpp"
@@ -30,6 +31,16 @@ namespace throttle
         throttle(hpx::naming::id_type gid) 
           : base_type(gid) 
         {}
+
+        void suspend(std::size_t thread_num) const
+        {
+            return stubs::throttle::suspend(this->get_gid(), thread_num);
+        }
+
+        void resume(std::size_t thread_num) const
+        {
+            return stubs::throttle::resume(this->get_gid(), thread_num);
+        }
     };
 }
 

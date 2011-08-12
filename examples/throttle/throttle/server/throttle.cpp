@@ -26,11 +26,24 @@ namespace throttle { namespace server
             hpx::threads::threadmanager_base::get_thread_num();
         BOOST_ASSERT(num_threads != std::size_t(-1));
         blocked_shepherds_.resize(num_threads);
+// 
+//         std::cerr << "Created throttle component!" << std::endl;
+    }
+
+    throttle::~throttle()
+    {
+//         std::cerr << "Released throttle component!" << std::endl;
     }
 
     void throttle::suspend(std::size_t shepherd)
     {
         mutex_type::scoped_lock l(mtx_);
+
+        if (shepherd >= blocked_shepherds_.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::suspend",
+                "invalid thread number");
+        }
+
         bool is_suspended = blocked_shepherds_[shepherd];
         if (!is_suspended) {
             blocked_shepherds_[shepherd] = true;
@@ -41,12 +54,24 @@ namespace throttle { namespace server
     void throttle::resume(std::size_t shepherd)
     {
         mutex_type::scoped_lock l(mtx_);
+
+        if (shepherd >= blocked_shepherds_.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::resume",
+                "invalid thread number");
+        }
+
         blocked_shepherds_[shepherd] = false;   // re-activate shepherd
     }
 
     bool throttle::is_suspended(std::size_t shepherd) const
     {
         mutex_type::scoped_lock l(mtx_);
+
+        if (shepherd >= blocked_shepherds_.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::is_suspended",
+                "invalid thread number");
+        }
+
         return blocked_shepherds_[shepherd];
     }
 
@@ -91,13 +116,13 @@ namespace throttle { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 typedef throttle::server::throttle throttle_type;
 
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    hpx::components::simple_component<throttle_type>, throttle_throttle_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(throttle_type);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
 HPX_REGISTER_ACTION_EX(throttle_type::suspend_action, throttle_suspend_action);
 HPX_REGISTER_ACTION_EX(throttle_type::resume_action, throttle_resume_action);
 HPX_REGISTER_ACTION_EX(throttle_type::is_suspended_action, throttle_is_suspended_action);
-
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<throttle_type>, throttle_throttle_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(throttle_type);
 
