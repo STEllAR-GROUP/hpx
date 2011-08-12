@@ -7,6 +7,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#
+#  WARNING:  This file requires python 2.5 or higher.
+#            It also requires paramiko.
+#
+#
+
 from __future__ import with_statement
 
 from sys import exit, argv
