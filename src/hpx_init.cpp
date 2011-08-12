@@ -130,46 +130,17 @@ namespace hpx
         }; 
 
         ///////////////////////////////////////////////////////////////////////
-        // Print authors list (why do we need that?) Who is going to maintain 
-        // this list?
-        command_line_result print_authors()
-        {
-            std::string author_list = 
-                "Copyright (C) 2006      Joao Abecasis\n"
-                "Copyright (C) 2007-2008 Tim Blechmann\n"
-                "Copyright (C) 2010      Maciej Brodowicz\n"
-                "Copyright (C) 2007-2009 Chirag Dekate\n"
-                "Copyright (C) 2008      Peter Dimov\n"
-                "Copyright (C) 2007      Richard D. Guidry Jr.\n"
-                "Copyright (C) 2003      Joel de Guzman\n"
-                "Copyright (C) 1998-2011 Hartmut Kaiser\n"
-                "Copyright (C) 2003-2007 Christopher M. Kohlhoff\n"
-                "Copyright (C) 2011      Katelyn Kufahl\n"
-                "Copyright (C) 2010-2011 Phillip LeBlanc\n"
-                "Copyright (C) 2011      Bryce Lelbach \n"
-                "Copyright (C) 2004      John Maddock\n"
-                "Copyright (C) 2010      Scott McMurray\n"
-                "Copyright (C) 2005-2007 Andre Merzky\n"
-                "Copyright (C) 2002-2007 Robert Ramey\n"
-                "Copyright (C) 2007-2011 Dylan Stark\n"
-                "Copyright (C) 2007      Alexandre Tabbal\n"
-                "Copyright (C) 2007-2009 Anshul Tandon\n"
-                "Copyright (C) 2004      Jonathan Turkanis\n"
-                "Copyright (C) 2005-2008 Anthony Williams\n";
-
-            std::cout << author_list;
-            return help;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         command_line_result print_version()
         {
-            boost::format version("%d.%d.%d");
+            boost::format hpx_version("%d.%d.%d%s");
+            boost::format boost_version("%d.%d.%d");
             boost::format logo(
                 "HPX - High Performance ParalleX\n"
                 "\n"
                 "An experimental runtime system for conventional machines implementing\n"
                 "(parts of) the ParalleX execution model.\n" 
+                "\n"
+                "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n"
                 "\n"
                 "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
                 "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
@@ -185,13 +156,14 @@ namespace hpx
                 "  Standard Library: %s\n");
 
             std::cout << (logo
-                          % boost::str( version
+                          % boost::str( hpx_version
                                       % HPX_VERSION_MAJOR
                                       % HPX_VERSION_MINOR
-                                      % HPX_VERSION_SUBMINOR)
+                                      % HPX_VERSION_SUBMINOR
+                                      % HPX_VERSION_TAG)
                           % HPX_AGAS_VERSION 
                           % HPX_SVN_REVISION
-                          % boost::str( version
+                          % boost::str( boost_version
                                       % (BOOST_VERSION / 100000)
                                       % (BOOST_VERSION / 100 % 1000)
                                       % (BOOST_VERSION % 100))
@@ -232,8 +204,7 @@ namespace hpx
 
                 hpx_options.add_options()
                     ("help,h", "print out program usage (this message)")
-                    ("hpx-version,v", "print out HPX version and copyright information")
-                    ("hpx-authors", "print out the full list of HPX contributors")
+                    ("version,v", "print out HPX version and copyright information")
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
                     ("run-hpx-main",
@@ -318,12 +289,8 @@ namespace hpx
                     options(desc_cmdline).run(), vm);
                 notify(vm);
 
-                // print list of contributors 
-                if (vm.count("hpx-authors")) 
-                    return print_authors();
-
                 // print version/copyright information 
-                if (vm.count("hpx-version")) 
+                if (vm.count("version")) 
                     return print_version();
 
                 // print help screen

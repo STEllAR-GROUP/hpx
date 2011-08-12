@@ -228,7 +228,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 # AGAS configuration
 ################################################################################
-set(HPX_AGAS_VERSION "1" CACHE STRING "AGAS subsystem version")
+set(HPX_AGAS_VERSION "2" CACHE STRING "AGAS subsystem version")
 
 if("${HPX_AGAS_VERSION}" STREQUAL "2")
   add_definitions(-DHPX_AGAS_VERSION=0x20)

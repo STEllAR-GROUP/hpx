@@ -35,5 +35,10 @@ boost::uint8_t agas_version()
     return HPX_AGAS_VERSION;
 }
 
+std::string tag()
+{
+    return HPX_VERSION_TAG;
+}
+
 }
 

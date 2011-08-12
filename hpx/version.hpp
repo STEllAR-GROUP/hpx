@@ -7,6 +7,8 @@
 #if !defined(HPX_VERSION_JUN_26_2008_0831PM)
 #define HPX_VERSION_JUN_26_2008_0831PM
 
+#include <string>
+
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 
@@ -19,17 +21,19 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x000500
+#define HPX_VERSION_FULL         0x000600
 
 #define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        5
+#define HPX_VERSION_MINOR        6
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20100929
+#define HPX_VERSION_DATE         20110811
 
 #if !defined(HPX_AGAS_VERSION)
-    #define HPX_AGAS_VERSION 0x10
+    #define HPX_AGAS_VERSION 0x20
 #endif
+
+#define HPX_VERSION_TAG          "-rc1"
 
 // Note: This file needs to explicitly committed in order to update the 
 //       revision number. As an alternative, we could use svnversion in the 
@@ -52,6 +56,9 @@ namespace hpx
 
     // Returns the AGAS subsystem version. 
     HPX_EXPORT boost::uint8_t agas_version();
+
+    // Returns the tag.
+    HPX_EXPORT std::string tag();
 }
 
 #endif
