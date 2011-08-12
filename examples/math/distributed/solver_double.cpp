@@ -71,7 +71,6 @@ using hpx::find_here;
 using hpx::get_runtime;
 using hpx::network_error;
 using hpx::running;
-using hpx::runtime_mode_probe;
 
 using hpx::components::get_component_type;
 

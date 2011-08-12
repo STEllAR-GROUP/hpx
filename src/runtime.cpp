@@ -115,7 +115,7 @@ namespace hpx
             "invalid",
             "console",
             "worker",
-            "probe",
+            "connect",
             "default",
         };
     }
