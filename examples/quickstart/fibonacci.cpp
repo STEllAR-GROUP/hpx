@@ -5,15 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with eager_futures and arbitrary size integers.
-
 #include <iostream>
 
 #include <boost/cstdint.hpp>
-#include <boost/bigint.hpp>
-#include <boost/bigint/serialize.hpp>
 #include <boost/format.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -25,8 +20,6 @@
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
-
-using boost::bigint;
 
 using hpx::naming::id_type;
 
@@ -42,14 +35,14 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<bigint> fibonacci(
+boost::uint64_t fibonacci(
     id_type const& prefix 
   , boost::uint64_t m
 );
 
 typedef plain_result_action2<
     // result type
-    boost::shared_ptr<bigint> 
+    boost::uint64_t
     // arguments
   , id_type const&  
   , boost::uint64_t
@@ -62,19 +55,17 @@ HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 typedef eager_future<fibonacci_action> fibonacci_future;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<bigint> fibonacci(
+boost::uint64_t fibonacci(
     id_type const& prefix
   , boost::uint64_t n
 ) {
     if (2 > n)
-        return boost::make_shared<bigint>(n);
+        return n;
 
     fibonacci_future n1(prefix, prefix, n - 1); 
     fibonacci_future n2(prefix, prefix, n - 2); 
 
-    boost::shared_ptr<bigint> r = n1.get();
-    *r += *n2.get();
-    return r;
+    return n1.get() + n2.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,14 +80,14 @@ int hpx_main(variables_map& vm)
 
         fibonacci_future f(prefix, prefix, n);
 
-        boost::shared_ptr<bigint> r = f.get();
+        boost::uint64_t r = f.get();
 
         double elapsed = t.elapsed();
 
         std::cout
             << ( boost::format("fibonacci(%1%) == %2%\n"
                                "elapsed time == %3%\n")
-               % n % *r % elapsed);
+               % n % r % elapsed);
     }
 
     finalize();
@@ -114,7 +105,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "n-value"
         , value<boost::uint64_t>()->default_value(10)
-        , "n value for the fibonacci function") 
+        , "n value for the Fibonacci function") 
         ;
 
     // Initialize and run HPX

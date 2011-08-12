@@ -25,5 +25,6 @@ add_hpx_component(dataflow_c
   MODULE dataflow_c
   SOURCES ${sources} 
   HEADERS ${headers}
-  DEPENDENCIES dataflow_c_test_lib)
+  DEPENDENCIES dataflow_c_test_lib
+               dataflow_mesh_component) 
 

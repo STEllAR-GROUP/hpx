@@ -9,7 +9,7 @@
 # project metadata
 ################################################################################
 set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 5)
+set(HPX_MINOR_VERSION 6)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -18,11 +18,6 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 # Python detection (part 1)
 ################################################################################
 include(FindPythonInterp)
-
-################################################################################
-# Fortran detection (part 1)
-################################################################################
-include(CMakeDetermineFortranCompiler)
 
 ################################################################################
 # cmake configuration
@@ -73,16 +68,6 @@ hpx_check_for_python_with_statement(HPX_PYTHON_WITH_STATEMENT
 # Process control
 hpx_check_for_python_subprocess(HPX_PYTHON_SUBPROCESS
     DEFINITIONS HPX_HAVE_PYTHON_SUBPROCESS)
-
-################################################################################
-# Fortran detection (part 2)
-################################################################################
-if(CMAKE_Fortran_COMPILER)
-  hpx_info("fortran" "Found a Fortran compiler")
-  enable_language(Fortran)
-else()
-  hpx_warn("fortran" "Couldn't find a Fortran compiler")
-endif()
 
 ################################################################################
 # environment detection 
@@ -150,7 +135,6 @@ add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
-add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 
 ################################################################################
 # search path configuration
@@ -158,14 +142,12 @@ add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/move)
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
-include_directories(${hpx_SOURCE_DIR}/external/bigint)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
 include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/bigint)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
@@ -226,25 +208,6 @@ if("${HPX_AGAS_VERSION}" STREQUAL "2")
 else()
   add_definitions(-DHPX_AGAS_VERSION=0x10)
 endif()
-
-################################################################################
-# LISP bindings 
-################################################################################
-find_package(HPX_Phxpr)
-
-################################################################################
-# SDF output 
-################################################################################
-find_package(HPX_RNPL)
-
-################################################################################
-# Arbitrary precision math 
-################################################################################
-find_package(HPX_GMP)
-
-#if(GMP_FOUND)
-#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
-#endif()
 
 ################################################################################
 # Warning configuration
@@ -524,13 +487,6 @@ else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc" "HPX will perform poorly without tcmalloc.")
   endif()
-endif()
-
-################################################################################
-# Mac OS X specific configuration 
-################################################################################
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-  add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
 endif()
 
 if(MSVC)

@@ -21,21 +21,14 @@ set(sources
 
 # define basic dependencies
 set(dependencies
-    dataflow_mesh_component 
-    dataflow_c_component 
-    dataflow_c_test_lib
-    distributing_factory_component)
+    dataflow_c_component)
 
 source_group("Source Files" FILES ${sources})
-
-#set(hpx_LIBRARIES ${hpx_LIBRARIES} gfortran)
 
 add_hpx_executable(dataflow 
   MODULE dataflow_module
   SOURCES ${sources}
   DEPENDENCIES ${dependencies})
-
-target_link_libraries(dataflow_exe gfortran)
 
 # add a dependency to the pseudo-target  
 add_hpx_pseudo_dependencies(examples.dataflow dataflow_exe) 

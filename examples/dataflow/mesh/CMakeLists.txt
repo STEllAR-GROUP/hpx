@@ -53,5 +53,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 add_hpx_component(dataflow_mesh 
   MODULE dataflow_mesh
   SOURCES ${sources} 
-  HEADERS ${headers})
+  HEADERS ${headers}
+  DEPENDENCIES distributing_factory_component)
 
