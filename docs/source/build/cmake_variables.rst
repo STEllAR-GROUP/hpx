@@ -4,7 +4,7 @@
  CMake Variable Reference 
 **************************
 
-.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
+.. sectionauthor:: Bryce Lelbach 
 
 Entries take the following format:
 
@@ -15,173 +15,148 @@ Platform-Independent Variables
 ------------------------------
 
 BOOST_FOUND_LIBRARIES : LIST
-  Placeholder
+  The list of Boost libraries that CMake has found.
 
 BOOST_INCLUDE_DIR : PATH
-  Placeholder
+  The include directory for Boost.
 
 BOOST_LIBRARIES : LIST
-  Placeholder
+  The list of Boost libraries to search for.
 
 BOOST_LIBRARY_DIR : PATH
-  Placeholder
+  The directory containing the Boost libraries.
 
 BOOST_ROOT : PATH
-  Placeholder
+  The root of a Boost installation or source tree.
 
 BOOST_SUFFIX : STRING
-  Placeholder
+  The suffix to use while searching for Boost. 
 
 BOOST_USE_MULTITHREADED : BOOL : ON
-  Placeholder
+  Explicitly instruct CMake to search for multi-threaded Boost libraries.
 
 BOOST_USE_SYSTEM : BOOL : OFF
-  Placeholder
+  Explicitly instruct CMake to search for a system installation of Boost.
 
 CMAKE_BUILD_TYPE : STRING : RELEASE : Release RelWithDebInfo MinSizeRel Debug
-  Placeholder
+  Specifies optimization levels and availability of debugging information.
 
 CMAKE_CXX_COMPILER : FILEPATH
-  Placeholder
+  The C++ compiler to use to build HPX.
 
 CMAKE_INSTALL_PREFIX : PATH : /usr/local (Linux) C:/Program Files/hpx (Windows)
-  Placeholder
+  The installation prefix for HPX.
 
 HPX_CMAKE_LOGLEVEL : STRING : WARN : Error Warn Info Debug
-  Placeholder
+  The verbosity of CMake logging messages.
 
-HPX_DISABLE_WARNINGS : BOOL : OFF
-  Placeholder
+HPX_WARNINGS : BOOL : ON
+  If true, compiler warnings are enabled.
+
+HPX_EXAMPLES : BOOL : ON (Linux) OFF (Windows)
+  If true, HPX examples are configured when CMake is run.
+
+HPX_STACKTRACES : BOOL : ON
+  If true, exceptions thrown by HPX will include stack traces.
+
+HPX_AGAS_VERSION : STRING : 2 : 1 2
+  The version of the AGAS subsystem to use.
 
 Linux-Specific Variables
 ------------------------
 
 GMP_FOUND : BOOL 
-  Placeholder
+  Set to true if the GMP library is found.
 
 GMP_INCLUDE_DIR : PATH
-  Placeholder
+  The include directory for GMP.
 
 GMP_LIBRARY : FILEPATH
-  Placeholder
+  Path to the GMP library. 
 
 GMP_ROOT : PATH 
-  Placeholder
+  The root of a GMP installation.
 
 GMP_USE_SYSTEM : BOOL : OFF
-  Placeholder
+  Explicitly instruct CMake to search for a system installation of GMP.
 
 HPX_COMPILER_AUTO_TUNE : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use compiler automated tuning to improve code optimization. Decreases the
+  portability of the compiled binaries.
 
 HPX_ELF_HIDDEN_VISIBILITY : BOOL : ON
-  Placeholder
+  Set the default ELF symbol visibility to hidden. Decreases compiled binary
+  size.
 
 HPX_GNU_128BIT_INTEGERS : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use GCC-style 128-bit integers. 
 
 HPX_GNU_ALIGNED_16 : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use GCC-style __attribute__((aligned(16))).
 
 HPX_GNU_MCX16 : STRING : DETECT : ON OFF DETECT
-  Placeholder
-
-HPX_HW_ACCELERATION : BOOL : OFF
-  Placeholder
+  Use GCC-style support for the CMPXCHG16B instruction.
 
 HPX_INTERNAL_CHRONO : BOOL : ON 
-  Placeholder
+  Use HPX's internal version of Boost.Chrono.
 
 HPX_MALLOC : STRING : TCMalloc : TCMalloc Jemalloc System
-  Placeholder
+  The Malloc allocator to use for HPX. 
 
 HPX_PTHREAD_AFFINITY_NP : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use pthread_setaffinity_np and pthread_getaffinity_np.
 
 HPX_RDTSC : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use the RDTSC instruction.
 
 HPX_RDTSCP : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use the RDTSCP instruction.
 
 HPX_SSE2 : STRING : DETECT : ON OFF DETECT
-  Placeholder
+  Use SSE2 extensions.
 
 JEMALLOC_FOUND : BOOL
-  Placeholder
+  Set to true if the jemalloc library is found.
 
 JEMALLOC_INCLUDE_DIR : PATH
-  Placeholder
+  The include directory for jemalloc.
 
 JEMALLOC_LIBRARY : FILEPATH
-  Placeholder
+  Path to the jemalloc library. 
 
 JEMALLOC_ROOT : PATH
-  Placeholder
+  The root of a jemalloc installation.
 
 JEMALLOC_USE_SYSTEM : BOOL : OFF
-  Placeholder
-
-MPFR_FOUND : BOOL
-  Placeholder
-
-MPFR_INCLUDE_DIR : PATH
-  Placeholder
-
-MPFR_LIBRARY : FILEPATH
-  Placeholder
-
-MPFR_ROOT : PATH
-  Placeholder
-
-MPFR_USE_SYSTEM : BOOL : OFF
-  Placeholder
-
-PXACCEL_BINARY_DIR : PATH
-  Placeholder
-
-PXACCEL_FOUND : BOOL 
-  Placeholder
-
-PXACCEL_INCLUDE_DIR : PATH
-  Placeholder
-
-PXACCEL_LIBRARY_DIR : PATH
-  Placeholder
-
-PXACCEL_ROOT : PATH 
-  Placeholder
-
-PXACCEL_USE_SYSTEM : BOOL : OFF
-  Placeholder
+  Explicitly instruct CMake to search for a system installation of jemalloc.
 
 RNPL_FOUND : BOOL
-  Placeholder
+  Set to true if the RNPL library is found.
 
 RNPL_INCLUDE_DIR : PATH
-  Placeholder
+  The include directory for RNPL.
 
 RNPL_LIBRARY : FILEPATH
-  Placeholder
+  Path to the RNPL library. 
 
 RNPL_ROOT : PATH
-  Placeholder
+  The root of a RNPL installation.
 
 RNPL_USE_SYSTEM : BOOL : OFF
-  Placeholder
+  Explicitly instruct CMake to search for a system installation of RNPL.
 
 TCMALLOC_FOUND : BOOL
-  Placeholder
+  Set to true if the tcmalloc library is found.
 
 TCMALLOC_INCLUDE_DIR : PATH
-  Placeholder
+  The include directory for tcmalloc.
 
 TCMALLOC_LIBRARY : FILEPATH
-  Placeholder
+  Path to the tcmalloc library. 
 
 TCMALLOC_ROOT : PATH
-  Placeholder
+  The root of a tcmalloc installation.
 
 TCMALLOC_USE_SYSTEM : BOOL : OFF
-  Placeholder
+  Explicitly instruct CMake to search for a system installation of tcmalloc.
 

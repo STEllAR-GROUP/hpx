@@ -4,9 +4,9 @@
  Instructions 
 **************
 
-.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
+.. sectionauthor:: Bryce Lelbach 
 
-0) Download the latest Subversion release of HPX:::
+0) Download the latest Subversion release of HPX (or a stable tag):::
 
     $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
 

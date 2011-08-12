@@ -4,7 +4,7 @@
  Malloc Allocators 
 *******************
 
-.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
+.. sectionauthor:: Bryce Lelbach 
 
 HPX supports the use of alternative malloc implementations. On Linux systems,
 an alternative malloc allocator is used by default if one is available. The

@@ -4,7 +4,7 @@
  HPX Documentation 
 *******************
 
-.. sectionauthor:: Bryce Lelbach (wash) <blelbach@cct.lsu.edu>
+.. sectionauthor:: Bryce Lelbach 
 
 Distributed under the |bsl|_, Version 1.0. 
 

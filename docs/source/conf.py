@@ -7,8 +7,8 @@ import sys, os
 source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
-project = u'Wash\'s Notes on HPX, C++ and ParalleX'
-copyright = u'2011, Bryce Lelbach (wash) <blelbach@cct.lsu.edu>'
+project = u'The HPX Reference Manual'
+copyright = u'2011, Hartmut Kaiser, Bryce Lelbach and others'
 version = '0.5'
 release = '0.5.0'
 today_fmt = '%Y.%m.%d_%H.%M.%S'
@@ -23,23 +23,18 @@ html_theme = 'default'
 # -- Epilog for all global substitution ----------------------------------------
 
 rst_epilog = """
-.. |amr_only|     replace:: :ref:`AMR only <linux_amr_support_libraries>`
-.. |malloc|       replace:: :ref:`malloc allocator <linux_malloc_allocators>`
+.. |amr_only|       replace:: :ref:`AMR only <linux_amr_support_libraries>`
+.. |malloc|         replace:: :ref:`malloc allocator <linux_malloc_allocators>`
+
+.. |env_var_syntax| replace:: :ref:`INI environmental variable syntax <ini_env_var_syntax>`
+
+.. |log_levels|     replace:: :ref:`log levels <diagnostics_log_levels>`
 
 .. |bsl| replace:: Boost Software License
 .. _bsl: http://www.boost.org/LICENSE_1_0.txt
 
 .. |boost| replace:: Boost C++ Libraries
 .. _boost: http://boost.org
-
-.. |pathscale| replace:: EKOPath PathScale
-.. _pathscale: http://www.pathscale.com
-
-.. |icpc| replace:: Intel C++ Compiler
-.. _icpc: http://software.intel.com/en-us/articles/intel-compilers
-
-.. |clang| replace:: Clang/LLVM
-.. _clang: http://github.com/lll-project
 
 .. |gcc| replace:: GNU Compiler Collection
 .. _gcc: http://gcc.gnu.org 
@@ -58,9 +53,6 @@ rst_epilog = """
 
 .. |cmake| replace:: CMake
 .. _cmake: http://cmake.org
-
-.. |mpfr| replace:: GNU MPFR Library
-.. _mpfr: http://www.mpfr.org
 
 .. |gmp| replace:: GNU Multi-Precision Library
 .. _gmp: http://gmplib.org

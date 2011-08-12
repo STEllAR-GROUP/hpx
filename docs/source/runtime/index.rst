@@ -5,7 +5,6 @@
 .. toctree::
   :maxdepth: 2
 
-  agas/index
+  ini/index
   logging/index
-  threads/index
 
