@@ -89,6 +89,8 @@ namespace hpx
             class reply;
             class request;
         }
+
+        HPX_API_EXPORT resolver_client& get_agas_client();
     }
 
     ///////////////////////////////////////////////////////////////////////////

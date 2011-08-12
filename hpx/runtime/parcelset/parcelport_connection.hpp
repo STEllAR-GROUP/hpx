@@ -50,8 +50,7 @@ namespace hpx { namespace parcelset
                 boost::atomic<boost::int64_t>& completed,
                 util::high_resolution_timer& timer,
                 performance_counters::parcels::data_point& send_data,
-                performance_counters::parcels::gatherer& parcels_sent
-                )
+                performance_counters::parcels::gatherer& parcels_sent)
           : socket_(io_service), out_priority_(0), out_size_(0), there_(prefix),
             connection_cache_(cache), sends_started_(started),
             sends_completed_(completed), send_timer_(timer),
@@ -72,18 +71,18 @@ namespace hpx { namespace parcelset
             ++sends_started_;
             send_timer_.restart();
             send_data_.start = 0;
-            send_data_.parcel = sends_started_;            
-            
+            send_data_.parcel = sends_started_;
+
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
             buffers.push_back(boost::asio::buffer(out_buffer_));
-           
+
             // record size of parcel
             send_data_.bytes = out_size_;
- 
+
             // this additional wrapping of the handler into a bind object is 
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
@@ -97,7 +96,6 @@ namespace hpx { namespace parcelset
                     boost::make_tuple(handler)));
         }
 
- 
     protected:
         /// handle completed write operation
         template <typename Handler>
@@ -122,8 +120,8 @@ namespace hpx { namespace parcelset
             out_priority_ = 0;
             out_size_ = 0;
             connection_cache_.add(there_, shared_from_this());
-            
-            // complete data point and push back onto gatherer 
+
+            // complete data point and push back onto gatherer
             send_data_.end = send_timer_.elapsed_microseconds();
             parcels_sent_.push_back(send_data_);
             ++sends_completed_;

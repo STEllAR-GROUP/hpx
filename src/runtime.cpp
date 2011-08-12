@@ -761,18 +761,17 @@ namespace hpx
     }
 
     naming::locality const& get_locality()
-    { return get_runtime().here(); }
+    { 
+        return get_runtime().here(); 
+    }
 
-    void report_error(
-        std::size_t num_thread
-      , boost::exception_ptr const& e
-    ) {
+    void report_error(std::size_t num_thread, boost::exception_ptr const& e) 
+    {
         get_runtime().report_error(num_thread, e);
     }
 
-    void report_error(
-        boost::exception_ptr const& e
-    ) {
+    void report_error(boost::exception_ptr const& e) 
+    {
         get_runtime().report_error(e);
     }
 
@@ -828,6 +827,16 @@ namespace hpx
     }
 #endif
 }
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace naming
+{
+    // shortcut for get_runtime().get_agas_client()
+    resolver_client& get_agas_client()
+    {
+        return get_runtime().get_agas_client();
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice

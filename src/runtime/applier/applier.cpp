@@ -7,9 +7,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#if HPX_AGAS_VERSION > 0x10
-    #include <hpx/runtime.hpp>
-#endif
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/parcelset.hpp>
@@ -231,7 +228,7 @@ namespace hpx { namespace applier
 #if HPX_AGAS_VERSION <= 0x10
         return parcel_handler_.get_resolver();
 #else
-        return get_runtime().get_agas_client();
+        return hpx::naming::get_agas_client();
 #endif
     }
 
@@ -250,7 +247,7 @@ namespace hpx { namespace applier
 #if HPX_AGAS_VERSION <= 0x10
         return parcel_handler_.here();
 #else
-        return get_runtime().here();
+        return hpx::get_locality();
 #endif
     }
 
@@ -259,7 +256,7 @@ namespace hpx { namespace applier
 #if HPX_AGAS_VERSION <= 0x10
         return parcel_handler_.get_prefix();
 #else
-        return get_runtime().get_agas_client().local_prefix();
+        return hpx::naming::get_agas_client().local_prefix();
 #endif
     }
 
@@ -394,7 +391,4 @@ namespace hpx { namespace applier
         applier** appl = applier::applier_.get();
         return appl ? (*appl)->get_prefix_id() : 0;
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}
-

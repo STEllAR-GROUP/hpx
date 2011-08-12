@@ -15,7 +15,7 @@ using boost::program_options::options_description;
 using hpx::init;
 using hpx::finalize;
 
-using hpx::applier::get_applier;
+using hpx::naming::get_agas_client;
 
 using hpx::naming::address;
 using hpx::naming::gid_type;
@@ -26,7 +26,7 @@ using hpx::naming::get_prefix_from_gid;
 int hpx_main(variables_map& vm)
 {
     {
-        resolver_client& agas_client = get_applier().get_agas_client();
+        resolver_client& agas_client = get_agas_client();
 
         std::cout << "commands: localities, help, quit\n";
 
@@ -39,7 +39,7 @@ int hpx_main(variables_map& vm)
 
             if (arg.empty())
                 continue;
-            
+
             else if (0 == std::string("quit").find(arg))
                 break; 
 
@@ -59,12 +59,12 @@ int hpx_main(variables_map& vm)
                 }
 
                 continue;
-            } 
+            }
 
             else if (0 != std::string("help").find(arg))
                 std::cout << ( boost::format("error: unknown command '%1%'\n")
                              % arg);
-            
+
             std::cout << "commands: localities, help, quit\n";
         }
     }

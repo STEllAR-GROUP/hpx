@@ -68,52 +68,33 @@ namespace hpx { namespace parcelset { namespace server
             receive_data_.start = 0;
             receive_data_.parcel = receives_started_;
 
-            // Issue a read operation to read the parcel priority. 
+            // Issue a read operation to read the parcel priority and size. 
             void (parcelport_connection::*f)(boost::system::error_code const&, 
                     boost::tuple<Handler>)
-                = &parcelport_connection::handle_read_priority<Handler>;
+                = &parcelport_connection::handle_read_header<Handler>;
 
             in_buffer_->clear();
             in_priority_ = 0;
             in_size_ = 0;
-            boost::asio::async_read(socket_, 
-                boost::asio::buffer(&in_priority_, sizeof(in_priority_)),
+
+            using boost::asio::buffer;
+            std::vector<boost::asio::mutable_buffer> buffers;
+            buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
+            buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
+
+            boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(), 
                     boost::asio::placeholders::error, boost::make_tuple(handler)));
         }
 
     protected:
-        /// Handle a completed read of the message priority from the message
-        /// header. The handler is passed using a tuple since boost::bind seems
-        /// to have trouble binding a function object created using boost::bind
-        /// as a parameter.
-        template <typename Handler>
-        void handle_read_priority(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
-        {
-            if (e) {
-                boost::get<0>(handler)(e);
-            }
-            else {
-                // Issue a read operation to read exactly the number of bytes in a 
-                // header.
-                void (parcelport_connection::*f)(boost::system::error_code const&,
-                        boost::tuple<Handler>)
-                    = &parcelport_connection::handle_read_size<Handler>;
-
-                boost::asio::async_read(socket_, 
-                    boost::asio::buffer(&in_size_, sizeof(in_size_)),
-                        boost::bind(f, shared_from_this(), 
-                        boost::asio::placeholders::error, handler));
-            }
-        }
-
-        /// Handle a completed read of the message size from the message header.
+        /// Handle a completed read of the message priority and size from the 
+        /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
         /// trouble binding a function object created using boost::bind as a
         /// parameter.
         template <typename Handler>
-        void handle_read_size(boost::system::error_code const& e,
+        void handle_read_header(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
             if (e) {
@@ -147,23 +128,28 @@ namespace hpx { namespace parcelset { namespace server
             }
             else {
                 // add parcel data to incoming parcel queue
-                parcels_.add_parcel
-                    (in_buffer_, static_cast<threads::thread_priority>
-                        (boost::integer::ulittle8_t::value_type(in_priority_)));
+                boost::integer::ulittle8_t::value_type priority = in_priority_;
+                parcels_.add_parcel(in_buffer_, 
+                    static_cast<threads::thread_priority>(priority));
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the parcel priority. 
                 void (parcelport_connection::*f)(boost::system::error_code const&, 
-                      boost::tuple<Handler>)
-                    = &parcelport_connection::handle_read_priority<Handler>;
+                        boost::tuple<Handler>)
+                    = &parcelport_connection::handle_read_header<Handler>;
 
                 in_buffer_.reset(new std::vector<char>());
                 in_priority_ = 0;
                 in_size_ = 0;
-                boost::asio::async_read(socket_, 
-                    boost::asio::buffer(&in_priority_, sizeof(in_priority_)),
+
+                using boost::asio::buffer;
+                std::vector<boost::asio::mutable_buffer> buffers;
+                buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
+                buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
+
+                boost::asio::async_read(socket_, buffers,
                     boost::bind(f, shared_from_this(), 
                         boost::asio::placeholders::error, handler));
             }
