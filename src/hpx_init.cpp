@@ -263,6 +263,7 @@ namespace hpx
                     break;
 
                 case runtime_mode_invalid:
+                default:
                     throw std::logic_error("invalid runtime mode specified");
                 }
 
