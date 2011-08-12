@@ -153,6 +153,9 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
+            if (std::size_t(-1) == num_thread) 
+                num_thread = ++curr_queue_ % queues_.size();
+
             if (data.priority == thread_priority_critical) {
                 BOOST_ASSERT(run_now == true);
                 std::size_t num = num_thread % high_priority_queues_.size();
@@ -163,9 +166,6 @@ namespace hpx { namespace threads { namespace policies
                 return low_priority_queue_.create_thread(data, initial_state, 
                     run_now, queues_.size()+high_priority_queues_.size(), ec);
             }
-
-            if (std::size_t(-1) == num_thread) 
-                num_thread = ++curr_queue_ % queues_.size();
 
             BOOST_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->create_thread(data, initial_state, 
@@ -211,6 +211,9 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread(threads::thread* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
+            if (std::size_t(-1) == num_thread) 
+                num_thread = ++curr_queue_ % queues_.size();
+
             if (priority == thread_priority_critical) {
                 std::size_t num = num_thread % high_priority_queues_.size();
                 high_priority_queues_[num]->schedule_thread(
@@ -220,12 +223,9 @@ namespace hpx { namespace threads { namespace policies
                 low_priority_queue_.schedule_thread(thrd, 
                     queues_.size()+high_priority_queues_.size());
             }
-            else if (std::size_t(-1) != num_thread) {
+            else {
                 BOOST_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->schedule_thread(thrd, num_thread);
-            }
-            else {
-                queues_[++curr_queue_ % queues_.size()]->schedule_thread(thrd, num_thread);
             }
         }
 
