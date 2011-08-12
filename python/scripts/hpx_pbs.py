@@ -7,15 +7,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#
-#  WARNING:  This file requires python 2.5 or higher.
-#            It also requires paramiko.
-#
-#
-
 from __future__ import with_statement
 
-from sys import exit, argv
+from sys import exit, argv, version_info
 
 from os import getpid, environ
 from os.path import join, dirname, abspath, expanduser
@@ -287,6 +281,13 @@ class io_callback:
 # }}}
 
 # {{{ main
+
+if version_info[0] < 2:
+  report("Python %d.%d is too old." % (version_info[:2])
+  exit(1) 
+elif 2 == version_info[0] and version_info[1] < 5:
+  report("Python %d.%d is too old." % (version_info[:2])
+  exit(1) 
 
 # {{{ default HPX location discovery
 # use the default HPX install directory as our fallback
