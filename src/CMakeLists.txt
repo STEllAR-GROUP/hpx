@@ -40,7 +40,7 @@ if(UNIX)
       ${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp)
   endif()
 
-  if(NOT HPX_DISABLE_WARNINGS)
+  if(HPX_WARNINGS)
     hpx_use_flag_if_available(Wextra)
 
     # these are usually benign and can't be suppressed because of

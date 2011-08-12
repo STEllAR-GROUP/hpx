@@ -258,16 +258,12 @@ find_package(HPX_GMP)
 ################################################################################
 # Warning configuration
 ################################################################################
-option(HPX_DISABLE_WARNINGS "Disable all warnings (default: OFF)" OFF)
+option(HPX_WARNINGS "Enable compiler warnings (default: ON)" ON)
 
 ################################################################################
 # Backtrace configuration 
 ################################################################################
-if(MSVC)
-  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: OFF)" OFF)
-else()
-  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
-endif()
+option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
@@ -358,7 +354,7 @@ else()
     hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
   endif()
 
-  if(NOT HPX_DISABLE_WARNINGS)
+  if(HPX_WARNINGS)
     hpx_use_flag_if_available(Wall)
     hpx_use_flag_if_available(Wno-strict-aliasing)
     hpx_use_flag_if_available(Wsign-promo)
@@ -561,9 +557,9 @@ set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 add_subdirectory(src)
 
 if(MSVC)
-  option(HPX_EXAMPLES "Build examples (default: OFF)" OFF)
+  option(HPX_EXAMPLES "Build HPX examples (default: OFF)" OFF)
 else()
-  option(HPX_EXAMPLES "Build examples (default: ON)" ON)
+  option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
 endif()
 
 if(HPX_EXAMPLES)
