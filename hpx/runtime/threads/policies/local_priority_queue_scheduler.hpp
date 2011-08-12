@@ -198,7 +198,17 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
 
-            // steal thread from other queue
+            // steal thread from other queue, first try high priority queues,
+            // then normal ones
+            for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
+                std::size_t idx = (i + num_thread) % high_priority_queues_.size();
+                if (high_priority_queues_[idx]->
+                        get_next_thread(thrd, queues_.size()+num_thread))
+                {
+                    return true;
+                }
+            }
+
             for (std::size_t i = 1; i < queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % queues_.size();
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
