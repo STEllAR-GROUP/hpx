@@ -79,7 +79,8 @@ struct primary_namespace :
       : mutex_(),
         gvas_(std::string("hpx.agas.") + name + ".gva"),
         partitions_(std::string("hpx.agas.") + name + ".partition"),
-        refcnts_(std::string("hpx.agas.") + name +".refcnt")
+        refcnts_(std::string("hpx.agas.") + name +".refcnt"),
+        prefix_counter_(0)
     { traits::initialize_mutex(mutex_); }
 
     response_type bind_locality(
