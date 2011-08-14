@@ -1,0 +1,86 @@
+! #########################################################
+!
+! Copyright C. D. Ott and E. O'Connor, July 2009
+!
+!
+!
+! EOS constructed on the basis of the Shen et al. 1998
+! relativistic-mean field nuclear EOS table. Electrons (fully
+! general, based on TimmesEOS) and Photons added.
+! 
+! Original Shen EOS table extent:
+! 
+! Density:  10^5.1 to 10^15.4 g/cm^3
+! Temperature: 0.1 to 100 MeV
+! Ye: 0.01 to 0.56
+! 
+! Table extent of current table
+! (myshen_test_220r_180t_50y_extT_20090312.h5)
+! 
+! Density: 10^3 to 10^15.36 g/cm^3
+! Temperature: 0.01 to 250 MeV
+! Ye: 0.015 to 0.56 MeV
+! 
+! This bigger table is realized by extending the
+! original Shen table in multiple ways in multiple
+! directions:
+! 
+! (a) density: 
+! Match of pure ideal gas of Ni56 + electrons/positrons +
+! photons at densities below 10^7 g/ccm -- at this density
+! pressures, energies and entropies match okayish with the
+! values in the Shen table. The compositions (A,Z,xh,xa,xp,xn)
+! are kept constant in the low-density region and n and p
+! chemical potentials are set to 0. 
+! -- ideally, at low densities, a full NSE EOS with nuclear
+! reaction network (at low T) should be stiched onto the
+! Shen; working on that, but not yet ready.
+! 
+! (b) temperature (extrapolation): 
+! At high density: linear extrapolation of everything in T to lower
+! temperatures and higher temperatures. At low densities (below 10^7
+! g/ccm), ideal gas of Ni56 + electrons/positrons + photons.
+!
+!
+! Variable         Units             Description
+! pointsrho	   dimensionless     number of table points 
+! 		   		     in log_10(rho)
+! pointstemp	   dimensionless     number of table points 
+! 		   		     in log_10(temp)
+! pointsye         dimensionless     number of table point in Y_e
+! logrho	   log10(rho)	     index variable rho
+! logtemp	   log10(MeV)	     index variable temperature
+! ye		   number fraction   index variable electron fraction
+! Abar             A                 average heavy nucleus A
+! Zbar             Z                 average heavy nucleus Z
+! Xa               number fraction   alpha particle number frac
+! Xh               number fraction   heavy nucleos number frac
+! Xn               number fraction   neutron number frac
+! Xn		   number fraction   proton number frac
+! cs2              cm^2/s^2          speed of sound squared
+! dedt             erg/g/K	     C_v
+! dpderho	   dyn g/cm^2/erg    dp/deps|rho
+! dpdrhoe	   dyn cm^3/cm^2/g   dp/drho|eps
+! energy_shift     erg/g	     Energy shift for table storage
+! entropy	   k_B/baryon	     specific entropy 
+! gamma		   dimensionless     Gamma_1
+! logenergy	   log10(erg/g)	     specific internal energy
+! logpress	   log10(dyn/cm^2)   pressure
+! mu_e		   MeV/baryon	     electron chemical potential
+! 		   		     INCLUDING electron rest mass
+! mu_p		   MeV/baryon	     proton chemical potential
+! mu_n		   MeV/baryon	     neutron chemical potential
+! muhat		   MeV/baryon	     mu_n - mu_p
+! munu		   MeV/baryon	     mu_e - mun + mu_p
+!
+!
+! * energy shift: 
+! 
+! In some regions the negative nuclear binding energy
+! is larger in magnitude than the thermal/excitation energy. In this
+! case the specific internal energy (eps) becomes negative. To allow for
+! storage and interpolation of eps in logarithmic fashion, the energy
+! is shifted up by an energy shift specified in the variable "energy_shift".
+! This energy shift is handled internally in the EOS routines.
+
+
