@@ -388,23 +388,23 @@ namespace hpx { namespace components { namespace amr
       int shape[3];
       char cnames[80] = { "x|y|z" };
       char phi_name[80];
-      sprintf(phi_name,"%dphi",locality);
-      char phi1_name[80];
-      sprintf(phi1_name,"%dd1phi",locality);
-      char phi2_name[80];
-      sprintf(phi2_name,"%dd2phi",locality);
-      char phi3_name[80];
-      sprintf(phi3_name,"%dd3phi",locality);
-      char phi4_name[80];
-      sprintf(phi4_name,"%dd4phi",locality);
+      sprintf(phi_name,"%dphi_%5.3f",locality,datatime);
+    //  char phi1_name[80];
+    //  sprintf(phi1_name,"%dd1phi",locality);
+    //  char phi2_name[80];
+    //  sprintf(phi2_name,"%dd2phi",locality);
+    //  char phi3_name[80];
+    //  sprintf(phi3_name,"%dd3phi",locality);
+    //  char phi4_name[80];
+    //  sprintf(phi4_name,"%dd4phi",locality);
       shape[0] = nx;
       shape[1] = ny;
       shape[2] = nz;
       gft_out_full(phi_name,datatime,shape,cnames,3,&*x.begin(),&*phi.begin());
-      gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
-      gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
-      gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
-      gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
+   //   gft_out_full(phi1_name,datatime,shape,cnames,3,&*x.begin(),&*d1phi.begin());
+   //   gft_out_full(phi2_name,datatime,shape,cnames,3,&*x.begin(),&*d2phi.begin());
+   //   gft_out_full(phi3_name,datatime,shape,cnames,3,&*x.begin(),&*d3phi.begin());
+   //   gft_out_full(phi4_name,datatime,shape,cnames,3,&*x.begin(),&*d4phi.begin());
     }
     // }}}
 #endif

@@ -28,7 +28,7 @@ lambda      = 0.025
 ethreshold  = 0.01
 
 loglevel     = 2
-output       = 1.0
+output       = 5.0
 output_level = 0
 output_stdout = 1
 
