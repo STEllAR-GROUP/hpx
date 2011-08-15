@@ -868,91 +868,93 @@ int compute_error(std::vector<double> &error,int nx0, int ny0, int nz0,
       for (int step=0;step<par->prev_gi.size();step++) {
         // see if the new gi is the same as the old
         int gi = par->prev_gi[step];
-        if ( floatcmp(minx0,par->gr_minx[gi]) && 
-             floatcmp(miny0,par->gr_miny[gi]) && 
-             floatcmp(minz0,par->gr_minz[gi]) && 
-             floatcmp(h,par->gr_h[gi]) && 
-             nx0 == par->gr_nx[gi] && 
-             ny0 == par->gr_ny[gi] && 
-             nz0 == par->gr_nz[gi] 
-           ) {
-          hpx::components::access_memory_block<hpx::components::amr::stencil_data>
-              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
-          for (int k=0;k<nz0;k++) {
-          for (int j=0;j<ny0;j++) {
-          for (int i=0;i<nx0;i++) {
-            error[i+nx0*(j+ny0*k)] = result->value_[i+nx0*(j+ny0*k)].error;
-          } } }
-        } else if ( intersection(minx0,maxx0,
-                                 miny0,maxy0,
-                                 minz0,maxz0,
-                                 par->gr_minx[gi],par->gr_maxx[gi],
-                                 par->gr_miny[gi],par->gr_maxy[gi],
-                                 par->gr_minz[gi],par->gr_maxz[gi]) &&
-                    floatcmp(h,par->gr_h[gi])
-                  ) { 
-          hpx::components::access_memory_block<hpx::components::amr::stencil_data>
-              result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
+        if ( gi != -1 ) {
+          if ( floatcmp(minx0,par->gr_minx[gi]) && 
+               floatcmp(miny0,par->gr_miny[gi]) && 
+               floatcmp(minz0,par->gr_minz[gi]) && 
+               floatcmp(h,par->gr_h[gi]) && 
+               nx0 == par->gr_nx[gi] && 
+               ny0 == par->gr_ny[gi] && 
+               nz0 == par->gr_nz[gi] 
+             ) {
+            hpx::components::access_memory_block<hpx::components::amr::stencil_data>
+                result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
+            for (int k=0;k<nz0;k++) {
+            for (int j=0;j<ny0;j++) {
+            for (int i=0;i<nx0;i++) {
+              error[i+nx0*(j+ny0*k)] = result->value_[i+nx0*(j+ny0*k)].error;
+            } } }
+          } else if ( intersection(minx0,maxx0,
+                                   miny0,maxy0,
+                                   minz0,maxz0,
+                                   par->gr_minx[gi],par->gr_maxx[gi],
+                                   par->gr_miny[gi],par->gr_maxy[gi],
+                                   par->gr_minz[gi],par->gr_maxz[gi]) &&
+                      floatcmp(h,par->gr_h[gi])
+                    ) { 
+            hpx::components::access_memory_block<hpx::components::amr::stencil_data>
+                result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
 
-          // find the intersection index
-          double x1 = (std::max)(minx0,par->gr_minx[gi]); 
-          double x2 = (std::min)(maxx0,par->gr_maxx[gi]); 
-          double y1 = (std::max)(miny0,par->gr_miny[gi]); 
-          double y2 = (std::min)(maxy0,par->gr_maxy[gi]); 
-          double z1 = (std::max)(minz0,par->gr_minz[gi]); 
-          double z2 = (std::min)(maxz0,par->gr_maxz[gi]); 
+            // find the intersection index
+            double x1 = (std::max)(minx0,par->gr_minx[gi]); 
+            double x2 = (std::min)(maxx0,par->gr_maxx[gi]); 
+            double y1 = (std::max)(miny0,par->gr_miny[gi]); 
+            double y2 = (std::min)(maxy0,par->gr_maxy[gi]); 
+            double z1 = (std::max)(minz0,par->gr_minz[gi]); 
+            double z2 = (std::min)(maxz0,par->gr_maxz[gi]); 
+  
+            //std::cout << " x TEST " << minx0 << " " << maxx0 << std::endl;
+            //std::cout << " y TEST " << miny0 << " " << maxy0 << std::endl;
+            //std::cout << " z TEST " << minz0 << " " << maxz0 << std::endl;
+            //std::cout << " x gr TEST " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
+            //std::cout << " y gr TEST " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
+            //std::cout << " z gr TEST " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
+            //std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
+            //std::cout << " HELLO WORLD " << result->value_.size() << std::endl;
 
-          //std::cout << " x TEST " << minx0 << " " << maxx0 << std::endl;
-          //std::cout << " y TEST " << miny0 << " " << maxy0 << std::endl;
-          //std::cout << " z TEST " << minz0 << " " << maxz0 << std::endl;
-          //std::cout << " x gr TEST " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
-          //std::cout << " y gr TEST " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
-          //std::cout << " z gr TEST " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
-          //std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
-          //std::cout << " HELLO WORLD " << result->value_.size() << std::endl;
+            int isize = (int) ( (x2-x1)/h );
+            int jsize = (int) ( (y2-y1)/h );
+            int ksize = (int) ( (z2-z1)/h );
+  
+            int lnx = par->gr_nx[gi]; 
+            int lny = par->gr_ny[gi]; 
+  
+            int istart_dst = (int) ( (x1 - minx0)/h );
+            int jstart_dst = (int) ( (y1 - miny0)/h );
+            int kstart_dst = (int) ( (z1 - minz0)/h );
+  
+            int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
+            int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
+            int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
+  
+         //   std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
+         //   std::cout << " result val size " << result->value_.size() << std::endl;
+         //   std::cout << " istart_src " << istart_src << std::endl;
+         //   std::cout << " jstart_src " << jstart_src << std::endl;
+         //   std::cout << " kstart_src " << kstart_src << std::endl;
+         //   std::cout << " isize " << isize << std::endl;
+         //   std::cout << " jsize " << jsize << std::endl;
+         //   std::cout << " ksize " << ksize << std::endl;
+         //   std::cout << " lnx " << lnx << std::endl;
+         //   std::cout << " lny " << lny << std::endl;
+         //   std::cout << " lnz " << par->gr_nz[i] << std::endl;
+  
+            for (int kk=0;kk<=ksize;kk++) {
+            for (int jj=0;jj<=jsize;jj++) {
+            for (int ii=0;ii<=isize;ii++) {
+              int i = ii + istart_dst;
+              int j = jj + jstart_dst;
+              int k = kk + kstart_dst;
+  
+              int si = ii + istart_src;
+              int sj = jj + jstart_src;
+              int sk = kk + kstart_src;
+              BOOST_ASSERT(i+nx0*(j+ny0*k) < error.size());
+              BOOST_ASSERT(si+lnx*(sj+lny*sk) < result->value_.size());
+              error[i+nx0*(j+ny0*k)] = result->value_[si+lnx*(sj+lny*sk)].error;
+            } } }
 
-          int isize = (int) ( (x2-x1)/h );
-          int jsize = (int) ( (y2-y1)/h );
-          int ksize = (int) ( (z2-z1)/h );
-
-          int lnx = par->gr_nx[gi]; 
-          int lny = par->gr_ny[gi]; 
-
-          int istart_dst = (int) ( (x1 - minx0)/h );
-          int jstart_dst = (int) ( (y1 - miny0)/h );
-          int kstart_dst = (int) ( (z1 - minz0)/h );
-
-          int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
-          int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
-          int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
-
-       //   std::cout << " TEST " << x1 << " " << x2 << " " << y1 << " " << y2 << " " << z1 << " " << z2 << std::endl;
-       //   std::cout << " result val size " << result->value_.size() << std::endl;
-       //   std::cout << " istart_src " << istart_src << std::endl;
-       //   std::cout << " jstart_src " << jstart_src << std::endl;
-       //   std::cout << " kstart_src " << kstart_src << std::endl;
-       //   std::cout << " isize " << isize << std::endl;
-       //   std::cout << " jsize " << jsize << std::endl;
-       //   std::cout << " ksize " << ksize << std::endl;
-       //   std::cout << " lnx " << lnx << std::endl;
-       //   std::cout << " lny " << lny << std::endl;
-       //   std::cout << " lnz " << par->gr_nz[i] << std::endl;
-
-          for (int kk=0;kk<=ksize;kk++) {
-          for (int jj=0;jj<=jsize;jj++) {
-          for (int ii=0;ii<=isize;ii++) {
-            int i = ii + istart_dst;
-            int j = jj + jstart_dst;
-            int k = kk + kstart_dst;
-
-            int si = ii + istart_src;
-            int sj = jj + jstart_src;
-            int sk = kk + kstart_src;
-            BOOST_ASSERT(i+nx0*(j+ny0*k) < error.size());
-            BOOST_ASSERT(si+lnx*(sj+lny*sk) < result->value_.size());
-            error[i+nx0*(j+ny0*k)] = result->value_[si+lnx*(sj+lny*sk)].error;
-          } } }
-
+          }
         }
       }
 //#endif
