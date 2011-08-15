@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}</ProjectGuid>
+    <ProjectGuid>{C500A12B-7D73-4C07-ABB4-FD9C85D393AA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>interpolate3d_client</RootNamespace>
+    <RootNamespace>adaptive1d_client</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -32,13 +32,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\hpx64_application.props" />
     <Import Project="..\..\hpx64_debug.props" />
-    <Import Project="..\..\hdf5_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\hpx64_application.props" />
     <Import Project="..\..\hpx64_release.props" />
-    <Import Project="..\..\hdf5.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -79,7 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d_client.cpp" />
+    <ClCompile Include="..\..\..\..\examples\adaptive1d\adaptive1d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
@@ -122,17 +120,22 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\interpolate3d\interpolate3d.vcxproj">
-      <Project>{405a4551-7063-4bc8-9c62-42118cba8c98}</Project>
+    <ProjectReference Include="..\dataflow\dataflow.vcxproj">
+      <Project>{39d37908-f218-4928-9d08-4b68ab0daece}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\..\examples\interpolate3d\CMakeLists.txt" />
+    <ProjectReference Include="..\stencil\stencil.vcxproj">
+      <Project>{d68e31f5-bbd0-4774-8912-43557d0b2999}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Server">
+      <UniqueIdentifier>{1e77da91-db8d-4a37-bbb7-4cc9ad993f36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server">
+      <UniqueIdentifier>{2360332a-5c8d-4748-b6e8-6d0b70bfad8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stubs">
+      <UniqueIdentifier>{479f2ee5-2059-4d7e-b0d2-db8205262471}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\stubs\partition.hpp">
+      <Filter>Header Files\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\server\partition.hpp">
+      <Filter>Header Files\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\partition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\interpolate1d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\dimension.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\interpolate1d\interpolate1d\read_values.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\examples\interpolate1d\interpolate1d\interpolate1d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\interpolate1d\interpolate1d\server\partition.cpp">
+      <Filter>Source Files\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\interpolate1d\interpolate1d\dimension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\examples\interpolate1d\interpolate1d\read_values.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

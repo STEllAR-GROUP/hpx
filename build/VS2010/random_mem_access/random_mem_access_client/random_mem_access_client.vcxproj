@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}</ProjectGuid>
+    <ProjectGuid>{651EDC21-231F-4177-8FB6-2756BD4C67EC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>interpolate3d_client</RootNamespace>
+    <RootNamespace>random_mem_access_client</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -24,6 +24,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -32,13 +33,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\hpx64_application.props" />
     <Import Project="..\..\hpx64_debug.props" />
-    <Import Project="..\..\hdf5_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\hpx64_application.props" />
     <Import Project="..\..\hpx64_release.props" />
-    <Import Project="..\..\hdf5.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -79,19 +78,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d_client.cpp" />
+    <None Include="..\..\..\..\examples\random_mem_access\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\examples\random_mem_access\random_mem_access_client.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
       <Project>{46e027f2-3afc-4f13-b8c8-35a8e8559cd5}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
-    <ProjectReference Include="..\..\components\iostreams\iostreams.vcxproj">
-      <Project>{808c1629-0ff7-4f49-89d2-e42a8383ec6a}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -106,14 +100,6 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\hpx\init\init.vcxproj">
-      <Project>{bde2250c-073a-436b-8fdd-00f9e83c87e3}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
     <ProjectReference Include="..\..\hpx_serialization\hpx_serialization.vcxproj">
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
       <Private>true</Private>
@@ -122,17 +108,14 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\interpolate3d\interpolate3d.vcxproj">
-      <Project>{405a4551-7063-4bc8-9c62-42118cba8c98}</Project>
+    <ProjectReference Include="..\random_mem_access\random_mem_access\random_mem_access.vcxproj">
+      <Project>{630a4d12-0315-499e-b71f-bb7c05847ced}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\..\examples\interpolate3d\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

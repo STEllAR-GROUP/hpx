@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3D7F86D9-D927-4BFB-93DC-9AFAE8BE4006}</ProjectGuid>
+    <ProjectGuid>{A51F6A9F-19D6-4C4B-B294-5EB37EA7A950}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>interpolate3d_client</RootNamespace>
+    <RootNamespace>sheneos_test</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -79,19 +79,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\interpolate3d\interpolate3d_client.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
       <Project>{46e027f2-3afc-4f13-b8c8-35a8e8559cd5}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
-    <ProjectReference Include="..\..\components\iostreams\iostreams.vcxproj">
-      <Project>{808c1629-0ff7-4f49-89d2-e42a8383ec6a}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -108,11 +97,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\hpx\init\init.vcxproj">
       <Project>{bde2250c-073a-436b-8fdd-00f9e83c87e3}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="..\..\hpx_serialization\hpx_serialization.vcxproj">
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
@@ -122,8 +106,8 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\interpolate3d\interpolate3d.vcxproj">
-      <Project>{405a4551-7063-4bc8-9c62-42118cba8c98}</Project>
+    <ProjectReference Include="..\sheneos\sheneos.vcxproj">
+      <Project>{0f573b12-afd3-422e-a2d1-54917185dd95}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -132,7 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\examples\interpolate3d\CMakeLists.txt" />
+    <ClCompile Include="..\..\..\..\examples\sheneos\sheneos_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
