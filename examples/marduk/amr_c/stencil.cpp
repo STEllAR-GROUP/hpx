@@ -644,82 +644,84 @@ namespace hpx { namespace components { namespace amr
               for (std::size_t step=0;step<par->prev_gi.size();step++) {
                 // see if the new gi is the same as the old
                 int gi = par->prev_gi[step];
-                if ( floatcmp(minx,par->gr_minx[gi]) && 
-                     floatcmp(miny,par->gr_miny[gi]) && 
-                     floatcmp(minz,par->gr_minz[gi]) && 
-                     floatcmp(maxx,par->gr_maxx[gi]) && 
-                     floatcmp(maxy,par->gr_maxy[gi]) && 
-                     floatcmp(maxz,par->gr_maxz[gi]) && 
-                     floatcmp(h,par->gr_h[gi]) 
-                   ) 
-                {
-                  // This has the same data -- copy it over
-                  access_memory_block<stencil_data> prev_val(
-                    components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
-                  val.get() = prev_val.get();
+                if ( gi != -1 ) {
+                  if ( floatcmp(minx,par->gr_minx[gi]) && 
+                       floatcmp(miny,par->gr_miny[gi]) && 
+                       floatcmp(minz,par->gr_minz[gi]) && 
+                       floatcmp(maxx,par->gr_maxx[gi]) && 
+                       floatcmp(maxy,par->gr_maxy[gi]) && 
+                       floatcmp(maxz,par->gr_maxz[gi]) && 
+                       floatcmp(h,par->gr_h[gi]) 
+                     ) 
+                  {
+                    // This has the same data -- copy it over
+                    access_memory_block<stencil_data> prev_val(
+                      components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
+                    val.get() = prev_val.get();
 
-                  val->max_index_ = maxitems;
-                  val->index_ = item;
-                  val->timestep_ = 0;
-                  complete = true;
-                  break;
-                } else if (
-                  intersection(minx,maxx,
-                               miny,maxy,
-                               minz,maxz,
-                               par->gr_minx[gi],par->gr_maxx[gi],
-                               par->gr_miny[gi],par->gr_maxy[gi],
-                               par->gr_minz[gi],par->gr_maxz[gi])
-                  && floatcmp(h,par->gr_h[gi]) 
-                          ) 
-                {
-                  access_memory_block<stencil_data> prev_val(
-                    components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
-                  // find the intersection index
-                  double x1 = (std::max)(minx,par->gr_minx[gi]); 
-                  double x2 = (std::min)(maxx,par->gr_maxx[gi]); 
-                  double y1 = (std::max)(miny,par->gr_miny[gi]); 
-                  double y2 = (std::min)(maxy,par->gr_maxy[gi]); 
-                  double z1 = (std::max)(minz,par->gr_minz[gi]); 
-                  double z2 = (std::min)(maxz,par->gr_maxz[gi]);
+                    val->max_index_ = maxitems;
+                    val->index_ = item;
+                    val->timestep_ = 0;
+                    complete = true;
+                    break;
+                  } else if (
+                    intersection(minx,maxx,
+                                 miny,maxy,
+                                 minz,maxz,
+                                 par->gr_minx[gi],par->gr_maxx[gi],
+                                 par->gr_miny[gi],par->gr_maxy[gi],
+                                 par->gr_minz[gi],par->gr_maxz[gi])
+                    && floatcmp(h,par->gr_h[gi]) 
+                            ) 
+                  {
+                    access_memory_block<stencil_data> prev_val(
+                      components::stubs::memory_block::checkout(interp_src_data[par->prev_gi2item[gi]]));
+                    // find the intersection index
+                    double x1 = (std::max)(minx,par->gr_minx[gi]); 
+                    double x2 = (std::min)(maxx,par->gr_maxx[gi]); 
+                    double y1 = (std::max)(miny,par->gr_miny[gi]); 
+                    double y2 = (std::min)(maxy,par->gr_maxy[gi]); 
+                    double z1 = (std::max)(minz,par->gr_minz[gi]); 
+                    double z2 = (std::min)(maxz,par->gr_maxz[gi]);
 
-                  int isize = (int) ( (x2-x1)/h );
-                  int jsize = (int) ( (y2-y1)/h );
-                  int ksize = (int) ( (z2-z1)/h );
+                    int isize = (int) ( (x2-x1)/h );
+                    int jsize = (int) ( (y2-y1)/h );
+                    int ksize = (int) ( (z2-z1)/h );
 
-                  int lnx = par->gr_nx[gi]; 
-                  int lny = par->gr_ny[gi]; 
-//                  int lnz = par->gr_nz[gi]; 
+                    int lnx = par->gr_nx[gi]; 
+                    int lny = par->gr_ny[gi]; 
+//                    int lnz = par->gr_nz[gi]; 
 
-                  int istart_dst = (int) ( (x1 - minx)/h );
-                  int jstart_dst = (int) ( (y1 - miny)/h );
-                  int kstart_dst = (int) ( (z1 - minz)/h );
+                    int istart_dst = (int) ( (x1 - minx)/h );
+                    int jstart_dst = (int) ( (y1 - miny)/h );
+                    int kstart_dst = (int) ( (z1 - minz)/h );
 
-                  int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
-                  int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
-                  int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
+                    int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
+                    int jstart_src = (int) ( (y1 - par->gr_miny[gi])/h );
+                    int kstart_src = (int) ( (z1 - par->gr_minz[gi])/h );
 
-                  val->level_ = prev_val->level_;
-                  for (int kk=0;kk<=ksize;kk++) {
-                  for (int jj=0;jj<=jsize;jj++) {
-                  for (int ii=0;ii<=isize;ii++) {
-                    int i = ii + istart_dst;
-                    int j = jj + jstart_dst;
-                    int k = kk + kstart_dst;
+                    val->level_ = prev_val->level_;
+                    for (int kk=0;kk<=ksize;kk++) {
+                    for (int jj=0;jj<=jsize;jj++) {
+                    for (int ii=0;ii<=isize;ii++) {
+                      int i = ii + istart_dst;
+                      int j = jj + jstart_dst;
+                      int k = kk + kstart_dst;
 
-                    int si = ii + istart_src;
-                    int sj = jj + jstart_src;
-                    int sk = kk + kstart_src;
-                    BOOST_ASSERT(i+nx0*(j+ny0*k) < int(val->value_.size()));
-                    BOOST_ASSERT(si+lnx*(sj+lny*sk) < int(prev_val->value_.size()));
-                    val->value_[i+nx0*(j+ny0*k)] = prev_val->value_[si+lnx*(sj+lny*sk)];
+                      int si = ii + istart_src;
+                      int sj = jj + jstart_src;
+                      int sk = kk + kstart_src;
+                      BOOST_ASSERT(i+nx0*(j+ny0*k) < int(val->value_.size()));
+                      BOOST_ASSERT(si+lnx*(sj+lny*sk) < int(prev_val->value_.size()));
+                      val->value_[i+nx0*(j+ny0*k)] = prev_val->value_[si+lnx*(sj+lny*sk)];
 
-                    // record that the value at this index doesn't need interpolation
-                    vindex[i+nx0*(j+ny0*k)] = 1;
-                  } } }
+                      // record that the value at this index doesn't need interpolation
+                      vindex[i+nx0*(j+ny0*k)] = 1;
+                    } } }
 
-                  // record what indices in the dst were filled in
-                  complete = false;
+                    // record what indices in the dst were filled in
+                    complete = false;
+                  }
                 }
               }
 
