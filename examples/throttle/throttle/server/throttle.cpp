@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -23,16 +24,16 @@ namespace throttle { namespace server
     throttle::throttle()
     {
         std::size_t num_threads = 
-            hpx::threads::threadmanager_base::get_thread_num();
+            hpx::get_runtime().get_process().get_num_os_threads();
         BOOST_ASSERT(num_threads != std::size_t(-1));
         blocked_shepherds_.resize(num_threads);
-// 
-//         std::cerr << "Created throttle component!" << std::endl;
+
+        std::cerr << "Created throttle component!" << std::endl;
     }
 
     throttle::~throttle()
     {
-//         std::cerr << "Released throttle component!" << std::endl;
+        std::cerr << "Released throttle component!" << std::endl;
     }
 
     void throttle::suspend(std::size_t shepherd)
@@ -91,7 +92,7 @@ namespace throttle { namespace server
             boost::thread::sleep(xt);
         }
 
-        // is this thread still needs to be suspended, re-schedule this routine
+        // if this thread still needs to be suspended, re-schedule this routine
         // which will give the thread manager some cycles to tend to the high 
         // priority tasks which might have arrived
         if (blocked_shepherds_[shepherd])

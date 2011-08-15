@@ -219,7 +219,7 @@ namespace hpx
         {
             return process_;
         }
-        
+
         /// \brief Allow access to the registry counter registry instance used 
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
