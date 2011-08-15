@@ -312,7 +312,7 @@ except:
 # }}}
 
 # {{{ command line handling
-usage = "usage: %prog [options] program [program-arguments]\n\n *NOTE* You need to run hpx_pbs from your HPX install directory." 
+usage = "usage: %prog [options] program [program-arguments]" 
 
 parser = OptionParser(usage=usage)
 
@@ -359,6 +359,19 @@ parser.add_option("--hpx-agas-options",
                   action="store", type="string", dest="hpx_agas_options",
                   help="Options specific to the HPX AGAS locality")
 
+parser.add_option("--no-hpx-location",
+                  action="store_true", dest="no_hpx_location", default=False,
+                  help="Don't add a prefix to the program invocation")
+
+parser.add_option("--no-hpx-invoke",
+                  action="store_true", dest="no_hpx_invoke", default=False,
+                  help="Don't use hpx_invoke")
+
+parser.add_option("--python",
+                  action="store", type="string", dest="python",
+                  default="python",
+                  help="Path to the python interpreter")
+
 parser.add_option("--nodes",
                   action="store", type="string",
                   dest="nodes", help="PBS nodefile (default: $PBS_NODEFILE)")
@@ -369,8 +382,7 @@ parser.add_option("--timeout",
                   help="Program timeout (seconds)")
 
 parser.add_option("--dry-run",
-                  action="store_true",
-                  dest="dry_run", default=False,
+                  action="store_true", dest="dry_run", default=False,
                   help="Print out commands, don't run them")
 
 (options, cmd) = parser.parse_args()
@@ -381,7 +393,11 @@ if 0 == len(cmd):
 # }}}
 
 # {{{ HPX location
-if not None == options.hpx_location: 
+if options.no_hpx_location:
+  if not None == options.hpx_location:
+    report("--no-hpx-invoke and --hpx-location are incompatible")
+    exit(1)
+elif not None == options.hpx_location: 
   location = expanduser(options.hpx_location)
 elif environ.has_key('HPX_LOCATION'):
   location = expanduser(environ['HPX_LOCATION'])
@@ -451,22 +467,33 @@ if not None == options.console:
 bin = cmd[0]
 args = prepare_args(cmd[1:])
 
-bindir = join(location, 'bin')
+invoc = ''
+bindir = ''
 
-cmd = join(bindir, 'hpx_invoke.py')
+if not options.no_hpx_location:
+  bindir = join(location, 'bin')
 
-cmd += ' --timeout=%d' % options.timeout
-cmd += ' --program=\'' + join(bindir, bin)
+if not options.no_hpx_invoke:
+  if len(options.python):
+    invoc = options.python + ' ' + join(bindir, 'hpx_invoke.py')
+  else:
+    invoc = join(bindir, 'hpx_invoke.py')
+
+  invoc += ' --timeout=%d' % options.timeout
+  invoc += ' --program=\'' + join(bindir, bin)
+
+else:
+  invoc = join(bindir, bin)
 
 if len(args):
-  cmd += ' ' + args 
+  invoc += ' ' + args 
 # }}}
 
 # {{{ scheduler loop
 cmds = []
 
 for node in nodes.iterkeys():
-  local_cmd = cmd  
+  local_cmd = invoc  
   local_cmd += ' -t%d'                  % nodes[node]
   local_cmd += ' -Ihpx.agas.address=%s' % gethostbyname(agas[0])
   local_cmd += ' -Ihpx.agas.port=%d'    % agas[1]
@@ -489,7 +516,8 @@ for node in nodes.iterkeys():
       local_cmd += ' ' + options.hpx_console_options
     local_cmd += ' -c'
 
-  local_cmd += '\''
+  if not options.no_hpx_invoke:
+    local_cmd += '\''
 
   if options.dry_run:
     print '%s:%d == %s' % (node[0], node[1], local_cmd)
