@@ -312,7 +312,7 @@ except:
 # }}}
 
 # {{{ command line handling
-usage = "usage: %prog [options] program [program-arguments]" 
+usage = "usage: %prog [options] program [program-arguments]\n\n *NOTE* You need to run hpx_pbs from your HPX install directory." 
 
 parser = OptionParser(usage=usage)
 
