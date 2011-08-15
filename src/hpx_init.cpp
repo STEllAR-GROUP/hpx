@@ -728,6 +728,14 @@ namespace hpx
                     boost::lexical_cast<std::string>(num_localities);
             }
 
+            // if we connect only temporarily disable loading/registering any 
+            // components
+            if (mode == hpx::runtime_mode_connect)
+            {
+                using namespace boost::assign;
+                ini_config += "hpx.components.load_external=0";
+            }
+
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.

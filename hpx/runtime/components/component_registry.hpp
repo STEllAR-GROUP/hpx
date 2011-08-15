@@ -53,6 +53,7 @@ namespace hpx { namespace components
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
             fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
+            fillini += "enabled = $[hpx.components.load_external]";
             return true;
         }
     };

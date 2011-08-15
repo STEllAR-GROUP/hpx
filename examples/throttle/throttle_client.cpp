@@ -62,7 +62,13 @@ int hpx_main(variables_map& vm)
             // create throttle on the console, register the instance with AGAS
             // and add an additional reference count to keep it alive
             if (appl.get_remote_prefixes(prefixes)) {
-                t.create(prefixes[0]);
+                // use AGAS client to get the component type as we do not
+                // register any factories
+                hpx::components::component_type type =
+                    get_agas_client().get_component_id("throttle_throttle_type");
+                std::cout << "throttle component type: " << (int)type << std::endl;
+
+                t.create(prefixes[0], type);
                 register_name(t.get_gid(), throttle_component_name);
                 get_agas_client().incref(t.get_gid().get_gid());
             }
@@ -77,7 +83,7 @@ int hpx_main(variables_map& vm)
                 t.suspend(vm["suspend"].as<int>());
             }
             else if (vm.count("resume")) {
-                t.suspend(vm["resume"].as<int>());
+                t.resume(vm["resume"].as<int>());
             }
             else if (vm.count("release")) {
                 // unregister from AGAS, remove additional reference count which 

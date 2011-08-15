@@ -60,9 +60,13 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE) "}",
             "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
 
+            "[hpx.components]",
+            "load_external = ${HPX_LOAD_EXTERNAL_COMPONENTS:1}",
+
             "[hpx.components.barrier]",
             "name = hpx",
-            "path = $[hpx.location]/lib/" HPX_LIBRARY
+            "path = $[hpx.location]/lib/" HPX_LIBRARY,
+            "enabled = $[hpx.components.load_external]"
 
         ;
         // don't overload user overrides

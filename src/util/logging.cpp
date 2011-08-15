@@ -884,7 +884,7 @@ namespace hpx { namespace util { namespace detail
     init_logging::init_logging(runtime_configuration& ini, bool isconsole,
         naming::resolver_client& agas_client)
     {
-        #if HPX_AGAS_VERSION <= 0x10
+#if HPX_AGAS_VERSION <= 0x10
         naming::gid_type console_prefix;
         for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
@@ -907,14 +907,14 @@ namespace hpx { namespace util { namespace detail
         init_timing_log(ini, isconsole, console_prefix);
         init_hpx_logs(ini, isconsole, console_prefix);
         init_app_logs(ini, isconsole, console_prefix);
-        #else
+#else
 
         init_agas_log(ini, isconsole);
         init_timing_log(ini, isconsole);
         init_hpx_logs(ini, isconsole);
         init_app_logs(ini, isconsole);
 
-        #endif
+#endif
 
         // initialize console logs 
         init_agas_console_log(ini);
