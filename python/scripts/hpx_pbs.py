@@ -9,7 +9,7 @@
 
 from __future__ import with_statement
 
-from sys import exit, argv, version_info
+from sys import exit, argv, version_info, executable
 
 from os import getpid, environ
 from os.path import join, dirname, abspath, expanduser
@@ -369,11 +369,6 @@ parser.add_option("--no-hpx-invoke",
                   action="store_true", dest="no_hpx_invoke", default=False,
                   help="Don't use hpx_invoke")
 
-parser.add_option("--python",
-                  action="store", type="string", dest="python",
-                  default="python",
-                  help="Path to the python interpreter")
-
 parser.add_option("--nodes",
                   action="store", type="string",
                   dest="nodes", help="PBS nodefile (default: $PBS_NODEFILE)")
@@ -476,11 +471,7 @@ if not options.no_hpx_location:
   bindir = join(location, 'bin')
 
 if not options.no_hpx_invoke:
-  if len(options.python):
-    invoc = options.python + ' ' + join(bindir, 'hpx_invoke.py')
-  else:
-    invoc = join(bindir, 'hpx_invoke.py')
-
+  invoc = executable + ' ' + join(bindir, 'hpx_invoke.py')
   invoc += ' --timeout=%d' % options.timeout
   invoc += ' --program=\'' + join(bindir, bin)
 
