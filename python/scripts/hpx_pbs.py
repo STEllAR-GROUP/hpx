@@ -38,6 +38,17 @@ from copy import deepcopy
 def report(str):
   print str
 
+# {{{ version check
+if version_info[0] < 2:
+  report("Python %d.%d is too old, Python 2.5 or newer is required."
+        % (version_info[:2]))
+  exit(1) 
+elif 2 == version_info[0] and version_info[1] < 5:
+  report("Python %d.%d is too old, Python 2.5 or newer is required."
+        % (version_info[:2]))
+  exit(1) 
+# }}}
+
 def agent_auth(transport, username):
   agent = Agent()
   agent_keys = agent.get_keys()
@@ -281,15 +292,6 @@ class io_callback:
 # }}}
 
 # {{{ main
-
-if version_info[0] < 2:
-  report("Python %d.%d is too old, Python 2.5 or newer is required."
-        % (version_info[:2]))
-  exit(1) 
-elif 2 == version_info[0] and version_info[1] < 5:
-  report("Python %d.%d is too old, Python 2.5 or newer is required."
-        % (version_info[:2]))
-  exit(1) 
 
 # {{{ default HPX location discovery
 # use the default HPX install directory as our fallback
