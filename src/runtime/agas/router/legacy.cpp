@@ -497,8 +497,10 @@ legacy_router::count_type legacy_router::decref(
     else
         r = hosted->primary_ns_.decrement(id, credits);
 
-    if (0 == r.get_count())
+    if (0 == r.get_count()) {
         t = (components::component_type) r.get_component_type();
+        BOOST_ASSERT(t != components::component_invalid);
+    }
 
     return r.get_count();
 } // }}}

@@ -88,7 +88,7 @@ int hpx_main(variables_map& vm)
             else if (vm.count("release")) {
                 // unregister from AGAS, remove additional reference count which 
                 // will allow for the throttle instance to be released
-                hpx::components::component_type type = t.get_component_type();
+                hpx::components::component_type type;
                 get_agas_client().decref(t.get_gid().get_gid(), type);
                 unregister_name(throttle_component_name);
             }
