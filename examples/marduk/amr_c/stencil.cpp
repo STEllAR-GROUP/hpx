@@ -731,6 +731,7 @@ namespace hpx { namespace components { namespace amr
 
                 // initialize ogi to possibly save a for loop
                 int ogi = par->prev_gi[0];
+                BOOST_ASSERT(ogi != -1);
                 bool proceed = false;;
                 for (int kk=0;kk<nz0;kk++) {
                   double z = minz + kk*h;
@@ -757,17 +758,19 @@ namespace hpx { namespace components { namespace amr
                       for (std::size_t cycle=1;cycle <= val->level_;cycle++) {
                         for (std::size_t step=0;step<par->prev_gi.size();step++) {
                           int gi = par->prev_gi[step];
-                          if (floatcmp(pow((double)par->refine_factor,(int)cycle)*h,par->gr_h[gi]) &&
+                          if ( gi != -1 ) {
+                            if (floatcmp(pow((double)par->refine_factor,(int)cycle)*h,par->gr_h[gi]) &&
                                x >= par->gr_minx[gi] &&
                                x <= par->gr_maxx[gi] &&
                                y >= par->gr_miny[gi] &&
                                y <= par->gr_maxy[gi] &&
                                z >= par->gr_minz[gi] &&
                                z <= par->gr_maxz[gi] ) 
-                          {
-                            ogi = gi;
-                            proceed = true;
-                            break;
+                            {
+                              ogi = gi;
+                              proceed = true;
+                              break;
+                            }
                           }
                         }
                         if (proceed) break;
@@ -789,10 +792,12 @@ namespace hpx { namespace components { namespace amr
                       std::cout << " Here's what we have to choose from " << std::endl;
                       for (std::size_t step=0;step<par->prev_gi.size();step++) {
                         int gi = par->prev_gi[step];
-                        std::cout << " bbox: " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
-                        std::cout << "       " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
-                        std::cout << "       " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
-                        std::cout << "  h    " << par->gr_h[gi] << " our level h " << h << " *2 " << par->refine_factor*h << std::endl;
+                        if ( gi != -1 ) { 
+                          std::cout << " bbox: " << par->gr_minx[gi] << " " << par->gr_maxx[gi] << std::endl;
+                          std::cout << "       " << par->gr_miny[gi] << " " << par->gr_maxy[gi] << std::endl;
+                          std::cout << "       " << par->gr_minz[gi] << " " << par->gr_maxz[gi] << std::endl;
+                          std::cout << "  h    " << par->gr_h[gi] << " our level h " << h << " *2 " << par->refine_factor*h << std::endl;
+                        }
                       }
                       BOOST_ASSERT(false);
                     }
