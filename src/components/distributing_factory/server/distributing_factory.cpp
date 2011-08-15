@@ -3,11 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <vector>
-
 #include <hpx/hpx.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
+
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
@@ -27,7 +31,7 @@ namespace hpx { namespace components { namespace server
     // create a new instance of a component
     distributing_factory::remote_result_type 
     distributing_factory::create_components(
-        components::component_type type, std::size_t count)
+        components::component_type type, std::size_t count) const
     {
         // make sure we get prefixes for derived component type, if any
         components::component_type prefix_type = type;
@@ -36,7 +40,7 @@ namespace hpx { namespace components { namespace server
 
         // get list of locality prefixes
         std::vector<naming::gid_type> prefixes;
-        hpx::applier::get_applier().get_agas_client().get_prefixes(prefixes, prefix_type);
+        hpx::naming::get_agas_client().get_prefixes(prefixes, prefix_type);
 
         if (prefixes.empty())
         {
@@ -102,28 +106,77 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Action to delete existing components
-//     void distributing_factory::free_components(result_type const& gids, bool sync)
-//     {
-//         result_type::const_iterator end = gids.end();
-//         for (result_type::const_iterator it = gids.begin(); it != end; ++it) 
-//         {
-//             for (std::size_t i = 0; i < (*it).count_; ++i) 
-//             {
-//                 // We need to free every components separately because it may
-//                 // have been moved to a different locality than it was 
-//                 // initially created on.
-//                 if (sync) {
-//                     components::stubs::runtime_support::free_component_sync(
-//                         (*it).type_, (*it).first_gid_ + i);
-//                 }
-//                 else {
-//                     components::stubs::runtime_support::free_component(
-//                         (*it).type_, (*it).first_gid_ + i);
-//                 }
-//             }
-//         }
-//     }
+    distributing_factory::remote_result_type 
+    distributing_factory::create_partitioned(components::component_type type, 
+        std::size_t count, std::size_t parts, partition_info const& info) const
+    {
+        // make sure we get prefixes for derived component type, if any
+        components::component_type prefix_type = type;
+        if (type != components::get_base_type(type))
+            prefix_type = components::get_derived_type(type);
+
+        // get list of locality prefixes
+        std::vector<naming::gid_type> prefixes;
+        hpx::naming::get_agas_client().get_prefixes(prefixes, prefix_type);
+
+        if (prefixes.empty())
+        {
+            // no locality supports creating the requested component type
+            HPX_THROW_EXCEPTION(bad_component_type, 
+                "distributing_factory::create_partitioned",
+                "attempt to create component instance of unknown type: " +
+                components::get_component_type_name(type));
+        }
+
+        std::size_t part_size = info.size();
+        if (part_size < prefixes.size()) 
+        {
+            // we have less localities as required by one partition 
+            HPX_THROW_EXCEPTION(bad_parameter, 
+                "distributing_factory::create_partitioned",
+                "partition size is smaller than number of localities");
+        }
+
+        // a new partition starts every parts_delta localities
+        std::size_t parts_delta = 0;
+        if (prefixes.size() > part_size)
+            parts_delta = prefixes.size() / part_size;
+
+        // distribute the number of components to create evenly over all 
+        // available localities
+        typedef std::vector<lazy_result> future_values_type;
+        typedef server::runtime_support::create_component_action action_type;
+
+        // start an asynchronous operation for each of the localities
+        future_values_type v;
+
+        for (std::size_t i = 0, j = 0; 
+             i < prefixes.size() && j < parts; 
+             i += parts_delta, ++j)
+        {
+            // create one component at a time, overall, 'count' components
+            // for each partition
+            naming::id_type fact(prefixes[i], naming::id_type::unmanaged);
+
+            v.push_back(future_values_type::value_type(prefixes[i]));
+            for (std::size_t k = 0; k < count; ++k) 
+            {
+                lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
+                v.back().gids_.push_back(f);
+            }
+        }
+
+        // now wait for the results
+        remote_result_type results;
+
+        BOOST_FOREACH(lazy_result const& lr, v)
+        {
+            results.push_back(remote_result_type::value_type(lr.prefix_, type));
+            components::wait(lr.gids_, results.back().gids_);
+        }
+
+        return results;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// 
@@ -178,6 +231,36 @@ namespace hpx { namespace components { namespace server
             result_type;
         return result_type(locality_result_iterator(v), locality_result_iterator());
     }
-
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace serialization
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // implement the serialization functions
+    template <typename Archive>
+    void serialize(Archive& ar, hpx::components::server::partition_info& info, 
+        unsigned int const)
+    {
+        ar & info.dims_ & info.dim_sizes_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // explicit instantiation for the correct archive types
+#if HPX_USE_PORTABLE_ARCHIVES != 0
+    template HPX_COMPONENT_EXPORT void 
+    serialize(hpx::util::portable_binary_iarchive&, 
+        hpx::components::server::partition_info&, unsigned int const);
+    template HPX_COMPONENT_EXPORT void 
+    serialize(hpx::util::portable_binary_oarchive&, 
+        hpx::components::server::partition_info&, unsigned int const);
+#else
+    template HPX_COMPONENT_EXPORT void 
+    serialize(boost::archive::binary_iarchive&, 
+        hpx::components::server::partition_info&, unsigned int const);
+    template HPX_COMPONENT_EXPORT void 
+    serialize(boost::archive::binary_oarchive&, 
+        hpx::components::server::partition_info&, unsigned int const);
+#endif
+}}
 

@@ -6,8 +6,6 @@
 #if !defined(HPX_COMPONENTS_DISTRIBUTING_FACTORY_JUN_20_2008_0948PM)
 #define HPX_COMPONENTS_DISTRIBUTING_FACTORY_JUN_20_2008_0948PM
 
-#include <vector>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -20,6 +18,9 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/foreach.hpp>
+
+#include <vector>
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server 
@@ -93,6 +94,31 @@ namespace hpx { namespace components { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief The partition_info data structure describes the dimensionality 
+    ///        and the size of the partitions for which components need to be 
+    ///        created.
+    struct HPX_COMPONENT_EXPORT partition_info
+    {
+        partition_info() 
+          : dims_(0) 
+        {}
+
+        partition_info(std::size_t dims, std::vector<std::size_t> const& sizes)
+          : dims_(dims), dim_sizes_(sizes)
+        {}
+
+        // return the overall size of a partition described by this info
+        std::size_t size() const
+        {
+            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 1U,
+                std::multiplies<std::size_t>());
+        }
+
+        std::size_t dims_;                    ///< dimensionality of the partitions 
+        std::vector<std::size_t> dim_sizes_;  ///< size of dimension of the partitions
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT distributing_factory
       : public simple_component_base<distributing_factory>
     {
@@ -102,7 +128,7 @@ namespace hpx { namespace components { namespace server
         enum actions
         {
             factory_create_components = 0,  // create new components
-            factory_free_components = 1,    // free existing components
+            factory_create_partitioned = 1, // create components in partitions
         };
 
         // constructor
@@ -119,25 +145,44 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action to create new components
         remote_result_type create_components(components::component_type type, 
-            std::size_t count); 
+            std::size_t count) const; 
 
-        /// \brief Action to delete existing components
-//         void free_components(result_type const& gids, bool sync); 
+        /// \brief Action to create new components based on the given 
+        ///        partitioning information
+        ///
+        /// This function will create new components, assuming that \a count 
+        /// newly created components are to be placed into each partition, 
+        /// where all the partitions are equal in size as described by the 
+        /// passed \a partition_info. The number of partitions to create is 
+        /// specified by \a part_count.
+        /// 
+        /// For example:
+        /// <code>
+        ///       partition_info pi(3, {2, 2, 2});
+        ///       create_partitioned(t, 2, 16, pi);
+        /// </code>
+        /// will create 32 new components in 16 partitions (2 in each 
+        /// partition), where each partition is assumed to span 8 localities.
+        remote_result_type create_partitioned(components::component_type type, 
+            std::size_t count, std::size_t part_count, 
+            partition_info const& info) const; 
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action2<
-            distributing_factory, remote_result_type, factory_create_components, 
-            components::component_type, std::size_t, 
+            distributing_factory const, remote_result_type, 
+            factory_create_components, components::component_type, std::size_t, 
             &distributing_factory::create_components
         > create_components_action;
 
-//         typedef hpx::actions::action2<
-//             distributing_factory, factory_free_components, 
-//             result_type const&, bool, &distributing_factory::free_components
-//         > free_components_action;
+        typedef hpx::actions::result_action4<
+            distributing_factory const, remote_result_type, 
+            factory_create_partitioned, components::component_type, std::size_t, 
+            std::size_t, partition_info const&, 
+            &distributing_factory::create_partitioned
+        > create_partitioned_action;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -146,8 +191,7 @@ namespace hpx { namespace components { namespace server
     class HPX_COMPONENT_EXPORT locality_result_iterator
       : public boost::iterator_facade<
             locality_result_iterator, naming::id_type, 
-            boost::forward_traversal_tag, naming::id_type const&
-        >
+            boost::forward_traversal_tag, naming::id_type const&>
     {
     private:
         typedef distributing_factory::result_type result_type;
@@ -209,7 +253,6 @@ namespace hpx { namespace components { namespace server
     HPX_COMPONENT_EXPORT 
     std::pair<locality_result_iterator, locality_result_iterator>
         locality_results(distributing_factory::result_type const& v);
-
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -223,7 +266,8 @@ namespace hpx { namespace lcos
         std::vector<components::server::remote_locality_result> >
     {
         typedef std::vector<components::server::locality_result> result_type;
-        typedef std::vector<components::server::remote_locality_result> remote_result_type;
+        typedef std::vector<components::server::remote_locality_result> 
+            remote_result_type;
 
         static result_type call(remote_result_type const& rhs)
         {
@@ -235,6 +279,15 @@ namespace hpx { namespace lcos
             return result;
         }
     };
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialization of partition_info 
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive&, hpx::components::server::partition_info&, 
+        unsigned int const);
 }}
 
 #endif
