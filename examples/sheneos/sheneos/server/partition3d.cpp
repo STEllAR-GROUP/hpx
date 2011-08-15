@@ -60,22 +60,22 @@ namespace sheneos { namespace server
     {
         values.reset(new double[array_size]);
         extract_data(datafilename, name, values.get(), dim_[dimension::ye], 
-            dim_[dimension::logtemp], dim_[dimension::logrho]);
+            dim_[dimension::temp], dim_[dimension::rho]);
     }
 
     void partition3d::init(std::string const& datafilename, 
         dimension const& dimx, dimension const& dimy, dimension const& dimz)
     {
         init_dimension(datafilename, dimension::ye, dimx, "ye", ye_values_);
-        init_dimension(datafilename, dimension::logtemp, dimy, "logtemp", logtemp_values_);
-        init_dimension(datafilename, dimension::logrho, dimz, "logrho", logrho_values_);
+        init_dimension(datafilename, dimension::temp, dimy, "logtemp", logtemp_values_);
+        init_dimension(datafilename, dimension::rho, dimz, "logrho", logrho_values_);
 
         // init energy shift
         extract_data(datafilename, "energy_shift", &energy_shift_, 0, 1);
 
         // read the slice of our data
         std::size_t array_size = dim_[dimension::ye].count_ * 
-            dim_[dimension::logtemp].count_ * dim_[dimension::logrho].count_;
+            dim_[dimension::temp].count_ * dim_[dimension::rho].count_;
 
         init_data(datafilename, "logpress", logpress_values_, array_size);
         init_data(datafilename, "logenergy", logenergy_values_, array_size);
@@ -125,11 +125,11 @@ namespace sheneos { namespace server
     inline std::size_t 
     index(std::size_t x, std::size_t y, std::size_t z, dimension const* dim)
     {
-        std::size_t idx = z + (y + x * dim[dimension::logtemp].count_) * 
-            dim[dimension::logrho].count_;
+        std::size_t idx = z + (y + x * dim[dimension::temp].count_) * 
+            dim[dimension::rho].count_;
 
         BOOST_ASSERT(idx < dim[dimension::ye].count_ * 
-            dim[dimension::logtemp].count_ * dim[dimension::logrho].count_);
+            dim[dimension::temp].count_ * dim[dimension::rho].count_);
 
         return idx;
     }
@@ -176,12 +176,12 @@ namespace sheneos { namespace server
         double logtemp = std::log10(temp);
 
         std::size_t idx_ye = get_index(dimension::ye, ye);
-        std::size_t idx_logtemp = get_index(dimension::logtemp, logtemp);
-        std::size_t idx_logrho = get_index(dimension::logrho, logrho);
+        std::size_t idx_logtemp = get_index(dimension::temp, logtemp);
+        std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::logtemp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::logrho];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
 
         std::vector<double> results; 
         results.reserve(19);

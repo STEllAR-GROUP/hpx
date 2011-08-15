@@ -72,7 +72,6 @@ int hpx_main(variables_map& vm)
         eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen_connected,
             0.2660725, 63.0, std::pow(10., 14.74994), expected);
 
-
         std::cout << std::endl << std::endl;
     }
 

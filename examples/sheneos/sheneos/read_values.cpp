@@ -95,7 +95,7 @@ namespace sheneos
             delta -= minval;
             return dims[0];     // return size of dataset
         }
-        catch (H5::Exception const& e) {
+        catch (H5::Exception const& e) {  
             HPX_THROW_EXCEPTION(hpx::no_success, "extract_data_range",
                 e.getDetailMsg());
         }

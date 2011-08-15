@@ -66,6 +66,9 @@ namespace sheneos
                 get_gid(ye, temp, rho), ye, temp, rho, eosvalues);
         }
 
+        // return the description for the given dimension 
+        void get_dimension(int what, double& min, double& max);
+
     private:
         // map the given value to the gid of the partition responsible for the
         // interpolation
@@ -83,6 +86,7 @@ namespace sheneos
     private:
         std::vector<hpx::naming::id_type> partitions_;
         double minval_[dimension::dim];
+        double maxval_[dimension::dim];
         double delta_[dimension::dim];
         std::size_t num_values_[dimension::dim];
         std::size_t num_partitions_per_dim_;

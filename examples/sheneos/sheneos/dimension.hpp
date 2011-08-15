@@ -16,7 +16,7 @@ namespace sheneos
     struct dimension
     {
         enum {
-            ye = 0, logtemp = 1, logrho = 2,
+            ye = 0, temp = 1, rho = 2,
             dim = 3
         };
 
