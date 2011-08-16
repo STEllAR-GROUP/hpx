@@ -38,7 +38,8 @@ typedef hpx::lcos::base_lco_with_value<
 
 HPX_REGISTER_ACTION_EX(marduk_lco_gid_vector_ptr::set_result_action,
     marduk_set_result_action_gid_vector_ptr);
-HPX_DEFINE_GET_COMPONENT_TYPE(marduk_lco_gid_vector_ptr);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(marduk_lco_gid_vector_ptr,
+    hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<marduk_unigrid_mesh_type>, marduk_unigrid_mesh3d);
