@@ -11,7 +11,7 @@ set(client_sources
 
 set(server_sources
     server/configuration.cpp
-    server/partition.cpp)
+    server/partition3d.cpp)
 
 ###############################################################################
 set(client_headers
@@ -36,6 +36,7 @@ set(headers
 
 ###############################################################################
 set(dependencies
+    ${HDF5_LIBRARY} 
     distributing_factory_component)
 
 ###############################################################################
@@ -46,7 +47,7 @@ source_group("Header Files\\Stubs"  FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
-add_hpx_component(interpolate1d 
+add_hpx_component(sheneos 
   MODULE sheneos
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}

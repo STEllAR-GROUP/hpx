@@ -4,34 +4,26 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# just recurse into all components subdirectories and execute the scripts there
-set(subdirs 
-    sheneos)
+include_directories(${HDF5_INCLUDE_DIR})
 
-# for all targets specified above
-foreach(subdir ${subdirs})
-  add_subdirectory(${subdir})
+add_subdirectory(sheneos)
 
-  set(sources
-      ${subdir}_client.cpp)
+source_group("Source Files" FILES sheneos_client.cpp sheneos_test.cpp)
 
-  source_group("Source Files" FILES ${sources})
+# add example executable
+add_hpx_executable(sheneos_client 
+  MODULE sheneos
+  SOURCES sheneos_client.cpp  
+  DEPENDENCIES sheneos_component)
 
-  # add example executable
-  add_hpx_executable(${subdir}_client 
-    MODULE sheneos
-    SOURCES ${sources} 
-    DEPENDENCIES ${subdir}_component)
+# add dependencies to pseudo-target 
+add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe) 
 
-  # add a custom target for this example 
-  add_hpx_pseudo_target(examples.sheneos.${subdir})
+add_hpx_executable(sheneos_test 
+  MODULE sheneos
+  SOURCES sheneos_test.cpp 
+  DEPENDENCIES sheneos_component)
 
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.sheneos
-                              examples.sheneos.${subdir})
-
-  # add dependencies to pseudo-target 
-  add_hpx_pseudo_dependencies(examples.sheneos.${subdir}
-                              ${subdir}_client_exe) 
-endforeach()
+# add dependencies to pseudo-target 
+add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe) 
 

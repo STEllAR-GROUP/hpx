@@ -7,6 +7,12 @@
 #define HPX_SHENEOS_READ_VALUES_AUG_08_2011_1225PM
 
 #include <H5Cpp.h>
+#include <H5pubconf.h>
+
+#if !defined(H5_HAVE_THREADSAFE)
+    #error sheneos requires threadsafe HDF5 libraries
+#endif
+
 #include <boost/cstdint.hpp>
 
 #include "dimension.hpp"
