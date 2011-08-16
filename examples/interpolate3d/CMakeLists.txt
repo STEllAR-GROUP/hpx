@@ -35,3 +35,22 @@ foreach(subdir ${subdirs})
                               ${subdir}_client_exe) 
 endforeach()
 
+if(HDF5_FOUND)
+  add_hpx_executable(create_testdata
+    MODULE interpolate3d
+    SOURCES create_testdata.cpp
+    DEPENDENCIES ${HDF5_LIBRARY}
+    NOLIBS)
+
+  # add a custom target for this example 
+  add_hpx_pseudo_target(examples.interpolate3d.create_testdata)
+
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(examples.interpolate3d
+                              examples.interpolate3d.create_testdata)
+
+  # add dependencies to pseudo-target 
+  add_hpx_pseudo_dependencies(examples.interpolate3d.create_testdata
+                              create_testdata_exe)
+endif() 
+
