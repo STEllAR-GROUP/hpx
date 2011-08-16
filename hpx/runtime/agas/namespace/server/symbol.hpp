@@ -8,9 +8,11 @@
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
+#include <boost/format.hpp>
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
@@ -69,10 +71,21 @@ struct symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it != end)
+        {
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::bind, key(%1%), gid(%2%), "
+                "response(no_success)")
+                % key % gid);
             return response_type(symbol_ns_bind, no_success);
+        }
 
+        // TODO: Check for insertion failure.
         gid_table.insert(typename
             gid_table_type::map_type::value_type(key, gid));
+
+        LAGAS_(info) << (boost::format(
+            "symbol_namespace::bind, key(%1%), gid(%2%)")
+            % key % gid);
         return response_type(symbol_ns_bind); 
     } // }}}
     
@@ -92,11 +105,19 @@ struct symbol_namespace :
         {
             naming::gid_type old = it->second;
             it->second = gid;
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::rebind, key(%1%), gid(%2%), old_gid(%3%)")
+                % key % gid % old);
             return response_type(symbol_ns_rebind, old);
         }
 
+        // TODO: Check for insertion failure.
         gid_table.insert(typename
             gid_table_type::map_type::value_type(key, gid));
+
+        LAGAS_(info) << (boost::format(
+            "symbol_namespace::rebind, key(%1%), gid(%2%), old_gid(%3%)")
+            % key % gid % gid);
         return response_type(symbol_ns_rebind, gid); 
     } // }}}
 
@@ -111,10 +132,18 @@ struct symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it == end)
+        {
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::resolve, key(%1%), response(no_success)")
+                % key);
             return response_type(symbol_ns_resolve
                                , naming::invalid_gid
                                , no_success);
+        }
 
+        LAGAS_(info) << (boost::format(
+            "symbol_namespace::resolve, key(%1%), gid(%2%)")
+            % key % it->second);
         return response_type(symbol_ns_resolve, it->second);
     } // }}}  
     
@@ -129,9 +158,18 @@ struct symbol_namespace :
             it = gid_table.find(key), end = gid_table.end();
 
         if (it == end)
+        {
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::unbind, key(%1%), response(no_success)")
+                % key);
             return response_type(symbol_ns_unbind, no_success);
+        }
 
         gid_table.erase(it);
+
+        LAGAS_(info) << (boost::format(
+            "symbol_namespace::unbind, key(%1%)")
+            % key);
         return response_type(symbol_ns_unbind);
     } // }}} 
 
@@ -149,6 +187,7 @@ struct symbol_namespace :
             f(it->first, it->second);
         }
 
+        LAGAS_(info) << "symbol_namespace::iterate";
         return response_type(symbol_ns_iterate);
     } // }}} 
 

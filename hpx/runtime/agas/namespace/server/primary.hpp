@@ -19,6 +19,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
@@ -106,11 +107,21 @@ struct primary_namespace :
         {
             // Just return the prefix
             if (count == 0)
+            {
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+                    "lower(%3%), upper(%4%), prefix(%5%), "
+                    "response(repeated_request)")
+                    % ep % count
+                    % at_c<1>(it->second)
+                    % at_c<1>(it->second)
+                    % at_c<0>(it->second));
                 return response_type(primary_ns_bind_locality
                                    , at_c<1>(it->second)
                                    , at_c<1>(it->second)
                                    , at_c<0>(it->second)
                                    , repeated_request);
+            }
 
             // Compute the new allocation.
             naming::gid_type lower(at_c<1>(it->second) + 1),
@@ -138,6 +149,11 @@ struct primary_namespace :
             naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
             naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+                "lower(%3%), upper(%4%), prefix(%5%), "
+                "response(repeated_request)")
+                % ep % count % lower % upper % at_c<0>(it->second));
             return response_type(primary_ns_bind_locality
                                , lower
                                , upper
@@ -155,11 +171,26 @@ struct primary_namespace :
                     "primary namespace has been exhausted");
             }
 
-            // Compute the locality's prefix
+            // Compute the locality's prefix.
             boost::uint32_t prefix = ++prefix_counter_;
+
+            // Don't allow 0 to be used as a prefix.
+            if (0 == prefix)
+                prefix = ++prefix_counter_;
+
             naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
-            // Start assigning ids with the second block of 64bit numbers only
+            // Load the GVA table, so that we can check if this prefix has
+            // already been assigned.
+            typename gva_table_type::map_type& gva_table = gvas_.get();
+
+            while (gva_table.count(id))
+            {
+                prefix = ++prefix_counter_;
+                id = naming::get_gid_from_prefix(prefix); 
+            }
+
+            // Start assigning ids with the second block of 64bit numbers only.
             naming::gid_type lower_id(id.get_msb() + 1, 0);
 
             std::pair<typename partition_table_type::map_type::iterator, bool>
@@ -182,15 +213,12 @@ struct primary_namespace :
                         % ep % prefix % lower_id));
             }
 
-            // Load the GVA table. Now that we've inserted the locality into
-            // the partition table successfully, we need to put the locality's
-            // GID into the GVA table so that parcels can be sent to the memory
-            // of a locality.
-            typename gva_table_type::map_type& gva_table = gvas_.get();
-
             const gva_type gva
                 (ep, components::component_runtime_support, count);
 
+            // Now that we've inserted the locality into the partition table
+            // successfully, we need to put the locality's GID into the GVA
+            // table so that parcels can be sent to the memory of a locality.
             std::pair<typename gva_table_type::map_type::iterator, bool>
                 git = gva_table.insert(typename
                     gva_table_type::map_type::value_type(id, gva));
@@ -219,12 +247,20 @@ struct primary_namespace :
                 naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
                 naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+                    "lower(%3%), upper(%4%), prefix(%5%)")
+                    % ep % count % lower % upper % prefix);
                 return response_type(primary_ns_bind_locality
                                    , lower
                                    , upper
                                    , prefix);
             }
 
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+                "prefix(%5%), response(no_sucess")
+                % ep % count % prefix);
             return response_type(primary_ns_bind_locality
                                , naming::invalid_gid
                                , naming::invalid_gid
@@ -282,6 +318,11 @@ struct primary_namespace :
                 it->second.type = gva.type;
                 it->second.lva(gva.lva());
                 it->second.offset = gva.offset;
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
+                    "response(repeated_request)")
+                    % gid % gva);
                 return response_type(primary_ns_bind_gid, repeated_request);
             }
 
@@ -344,6 +385,9 @@ struct primary_namespace :
                     % id % gva));
         }
 
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::bind_gid, gid(%1%), gva(%2%), ")
+            % gid % gva);
         return response_type(primary_ns_bind_gid);
     } // }}}
 
@@ -379,10 +423,18 @@ struct primary_namespace :
             {
                 // Check for exact match
                 if (git->first == id)
+                {
+                    LAGAS_(info) << (boost::format(
+                        "primary_namespace::resolve_locality, ep(%1%), "
+                        "prefix(%2%), gva(%3%)")
+                        % ep
+                        % naming::get_prefix_from_gid(git->first)
+                        % git->second);
                     return response_type(primary_ns_resolve_locality
                                        , naming::get_prefix_from_gid(git->first)
                                        , git->second);
-    
+                }
+ 
                 // We need to decrement the iterator, check that it's safe to do
                 // so.
                 else if (git != gbegin)
@@ -401,6 +453,12 @@ struct primary_namespace :
      
                         // Calculation of the lva address occurs in
                         // gva<>::resolve()
+                        LAGAS_(info) << (boost::format(
+                            "primary_namespace::resolve_locality, ep(%1%), "
+                            "gva(%2%), gva(%3%)")
+                            % ep
+                            % naming::get_prefix_from_gid(git->first)
+                            % git->second.resolve(id, git->first));
                         return response_type
                             (primary_ns_resolve_locality
                            , naming::get_prefix_from_gid(git->first)
@@ -424,6 +482,12 @@ struct primary_namespace :
      
                     // Calculation of the local address occurs in
                     // gva<>::resolve()
+                    LAGAS_(info) << (boost::format(
+                        "primary_namespace::resolve_locality, ep(%1%), "
+                        "gva(%2%), gva(%3%)")
+                        % ep
+                        % naming::get_prefix_from_gid(git->first)
+                        % git->second.resolve(id, git->first));
                     return response_type(primary_ns_resolve_locality
                                        , naming::get_prefix_from_gid(git->first)
                                        , git->second.resolve(id, git->first));
@@ -431,6 +495,10 @@ struct primary_namespace :
             }
         }
 
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_locality, ep(%1%), "
+            "response(unknown_locality)")
+            % ep);
         return response_type(primary_ns_resolve_locality
                            , 0
                            , gva_type()
@@ -459,8 +527,13 @@ struct primary_namespace :
         {
             // Check for exact match
             if (it->first == id)
+            {
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
+                    % gid % it->second);
                 return response_type(primary_ns_resolve_gid
                                    , it->second);
+            }
 
             // We need to decrement the iterator, check that it's safe to do
             // so.
@@ -478,6 +551,9 @@ struct primary_namespace :
                     }
  
                     // Calculation of the lva address occurs in gva<>::resolve()
+                    LAGAS_(info) << (boost::format(
+                        "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
+                        % gid % it->second.resolve(id, it->first));
                     return response_type(primary_ns_resolve_gid
                                        , it->second.resolve(id, it->first));
                 }
@@ -498,11 +574,17 @@ struct primary_namespace :
                 }
  
                 // Calculation of the local address occurs in gva<>::resolve()
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
+                    % gid % it->second.resolve(id, it->first));
                 return response_type(primary_ns_resolve_gid
                                    , it->second.resolve(id, it->first));
             }
         }
 
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_gid, gid(%1%), response(unknown_gid)")
+            % gid);
         return response_type(primary_ns_resolve_gid
                            , gva_type() 
                            , unknown_gid);
@@ -546,9 +628,16 @@ struct primary_namespace :
             partition_table.erase(pit);
             gva_table.erase(git);
 
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::unbind_locality, ep(%1%)")
+                % ep);
             return response_type(primary_ns_unbind_locality);
         }
 
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::unbind_locality, ep(%1%), "
+            "response(unknown_locality)")
+            % ep);
         return response_type(primary_ns_unbind_locality
                            , unknown_locality);
     } // }}}
@@ -580,14 +669,24 @@ struct primary_namespace :
             }
 
             response_type r(primary_ns_unbind_gid, it->second);
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%)")
+                % gid % count % it->second);
+
             gva_table.erase(it);
             return r; 
         }
 
         else
+        {
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::unbind_gid, gid(%1%), count(%2%), "
+                "response(unknown_gid)")
+                % gid % count);
             return response_type(primary_ns_unbind_gid
                                , gva_type()
                                , unknown_gid);
+        }
     } // }}}
 
     response_type increment(
@@ -628,6 +727,10 @@ struct primary_namespace :
         }
        
         // Add the requested amount and return the new total 
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::increment, gid(%1%), credits(%2%), "
+            "new_count(%3%)")
+            % gid % credits % (it->second + credits));
         return response_type(primary_ns_increment, it->second += credits);
     } // }}}
     
@@ -664,6 +767,11 @@ struct primary_namespace :
                 HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                     "bogus credit encountered while decrement global reference "
                     "count");
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                    "response(bad_parameter)")
+                    % gid % credits);
                 return response_type(primary_ns_decrement
                                    , 0
                                    , components::component_invalid
@@ -688,9 +796,16 @@ struct primary_namespace :
                 {
                     // Did we get an exact match?
                     if (git->first == id)
+                    {
+                        LAGAS_(info) << (boost::format(
+                            "primary_namespace::decrement, gid(%1%), "
+                            "credits(%2%), new_total(0), type(%3%)")
+                            % gid % credits % git->second.type);
+                        // TODO: Check that git->second.type isn't invalid?
                         return response_type(primary_ns_decrement
                                            , cnt
                                            , git->second.type);
+                    }
 
                     // Check if we can safely decrement the iterator.
                     else if (git != gbegin)
@@ -700,11 +815,21 @@ struct primary_namespace :
                         // See if the previous range covers this GID
                         if ((git->first + git->second.count) > id)
                         {
-                            // Make sure that the msbs match
+                            // Make sure that the MSBs match.
+                            // TODO: Shouldn't this be an error if the MSBs
+                            // don't match?
                             if (id.get_msb() == git->first.get_msb())
+                            {
+                                LAGAS_(info) << (boost::format(
+                                    "primary_namespace::decrement, gid(%1%), "
+                                    "credits(%2%), new_total(0), type(%3%)")
+                                    % gid % credits % git->second.type);
+                                // TODO: Check that git->second.type isn't
+                                // invalid?
                                 return response_type(primary_ns_decrement
                                                    , cnt
                                                    , git->second.type);
+                            }
                         } 
                     }
                 }
@@ -716,11 +841,20 @@ struct primary_namespace :
                     // See if the previous range covers this GID
                     if ((git->first + git->second.count) > id)
                     {
-                        // Make sure that the msbs match
+                        // Make sure that the MSBs match
+                        // TODO: Shouldn't this be an error if the MSBs
+                        // don't match?
                         if (id.get_msb() == git->first.get_msb())
+                        {
+                            LAGAS_(info) << (boost::format(
+                                "primary_namespace::decrement, gid(%1%), "
+                                "credits(%2%), new_total(0), type(%3%)")
+                                % gid % credits % git->second.type);
+                            // TODO: Check that git->second.type isn't invalid?
                             return response_type(primary_ns_decrement
                                                , cnt
                                                , git->second.type);
+                        }
                     } 
                 }
 
@@ -729,6 +863,11 @@ struct primary_namespace :
                 HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                     "unregistered GID encountered while decrementing global "
                     "reference count");
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                    "response(bad_parameter")
+                    % gid % credits);
                 return response_type(primary_ns_decrement
                                    , 0
                                    , components::component_invalid
@@ -736,9 +875,15 @@ struct primary_namespace :
             }
 
             else
+            {
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                    "new_total(%3%)")
+                    % gid % credits % cnt);
                 return response_type(primary_ns_decrement
                                    , cnt
                                    , components::component_invalid);
+            }
         }
         
         // If the id isn't in the refcnt table and the credit count is
@@ -757,9 +902,16 @@ struct primary_namespace :
             {
                 // Did we get an exact match?
                 if (git->first == id)
+                {
+                    LAGAS_(info) << (boost::format(
+                        "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                        "new_total(0), type(%3%)")
+                        % gid % credits % git->second.type);
+                    // TODO: Check that git->second.type isn't invalid?
                     return response_type(primary_ns_decrement
                                        , 0
                                        , git->second.type);
+                }
 
                 // Check if we can safely decrement the iterator.
                 else if (git != gbegin)
@@ -769,11 +921,20 @@ struct primary_namespace :
                     // See if the previous range covers this GID
                     if ((git->first + git->second.count) > id)
                     {
-                        // Make sure that the msbs match
+                        // Make sure that the MSBs match
+                        // TODO: Shouldn't this be an error if the MSBs
+                        // don't match?
                         if (id.get_msb() == git->first.get_msb())
+                        {
+                            LAGAS_(info) << (boost::format(
+                                "primary_namespace::decrement, gid(%1%), "
+                                "credits(%2%), new_total(0), type(%3%)")
+                                % gid % credits % git->second.type);
+                            // TODO: Check that git->second.type isn't invalid?
                             return response_type(primary_ns_decrement
                                                , 0
                                                , git->second.type);
+                        }
                     } 
                 }
             }
@@ -785,11 +946,20 @@ struct primary_namespace :
                 // See if the previous range covers this GID
                 if ((git->first + git->second.count) > id)
                 {
-                    // Make sure that the msbs match
+                    // Make sure that the MSBs match
+                    // TODO: Shouldn't this be an error if the MSBs
+                    // don't match?
                     if (id.get_msb() == git->first.get_msb())
+                    {
+                        LAGAS_(info) << (boost::format(
+                            "primary_namespace::decrement, gid(%1%), "
+                            "credits(%2%), new_total(0), type(%3%)")
+                            % gid % credits % git->second.type);
+                        // TODO: Check that git->second.type isn't invalid?
                         return response_type(primary_ns_decrement
                                            , 0
                                            , git->second.type);
+                    }
                 } 
             }
 
@@ -797,6 +967,11 @@ struct primary_namespace :
             HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                 "unknown component type encountered while decrement global "
                 "reference count");
+
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                "response(bad_parameter")
+                % gid % credits);
             return response_type(primary_ns_decrement
                                , 0
                                , components::component_invalid
@@ -821,6 +996,11 @@ struct primary_namespace :
                         "refcnt table insertion failed due to memory "
                         "corruption or a locking error, gid(%1%)")
                         % id));
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                    "response(internal_server_error")
+                    % gid % credits);
                 return response_type(primary_ns_decrement
                                    , 0
                                    , components::component_invalid
@@ -834,6 +1014,11 @@ struct primary_namespace :
                 HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                     "bogus credit encountered while decrement global reference "
                     "count");
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                    "response(bad_parameter")
+                    % gid % credits);
                 return response_type(primary_ns_decrement
                                    , 0
                                    , components::component_invalid
@@ -842,6 +1027,10 @@ struct primary_namespace :
             
             count_type cnt = (it->second -= credits);
 
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::decrement, gid(%1%), credits(%2%), "
+                "new_total(%3%)")
+                % gid % credits % cnt);
             return response_type(primary_ns_decrement
                                , cnt
                                , components::component_invalid);
@@ -851,6 +1040,8 @@ struct primary_namespace :
     response_type localities()
     { // {{{ localities implementation
         using boost::fusion::at_c;
+
+        LAGAS_(info) << "primary_namespace::localities";
 
         typename database_mutex_type::scoped_lock l(mutex_);
 

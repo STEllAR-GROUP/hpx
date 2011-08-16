@@ -10,11 +10,13 @@
 
 #include <set>
 
+#include <boost/format.hpp>
 #include <boost/assert.hpp>
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
@@ -111,6 +113,10 @@ struct component_namespace :
 
         fit->second.insert(prefix);
 
+        LAGAS_(info) << (boost::format(
+            "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
+            "ctype(%3%)")
+            % key % prefix % cit->second);
         return response_type(component_ns_bind_prefix, cit->second);
     } // }}}
     
@@ -136,6 +142,9 @@ struct component_namespace :
         // REVIEW: make this a locking exception?
         BOOST_ASSERT(it != end);
 
+        LAGAS_(info) << (boost::format(
+            "component_namespace::bind_name, key(%1%), ctype(%3%)")
+            % key % it->second);
         return response_type(component_ns_bind_name, it->second);
     } // }}} 
 
@@ -153,12 +162,18 @@ struct component_namespace :
 
         // REVIEW: Should we differentiate between these two cases? Should we
         // throw an exception if it->second.empty()? It should be impossible.
-        if (it == end || it->second.empty()) {
+        if (it == end || it->second.empty())
+        {
             prefix_type* p = 0;
+
+            LAGAS_(info) << (boost::format(
+                "component_namespace::resolve_id, key(%1%), localities(0)")
+                % key);
             return response_type(component_ns_resolve_id, 0, p);
         }
 
-        else {
+        else
+        {
             prefix_type* p = new prefix_type [it->second.size()];
 
             typename prefixes_type::const_iterator pit = it->second.begin()
@@ -167,6 +182,9 @@ struct component_namespace :
             for (std::size_t i = 0; pit != pend; ++pit, ++i)
                 p[i] = *pit;
 
+            LAGAS_(info) << (boost::format(
+                "component_namespace::resolve_id, key(%1%), localities(%2%)")
+                % key % it->second.size());
             return response_type(component_ns_resolve_id, it->second.size(), p);
         } 
     } // }}}
@@ -184,11 +202,20 @@ struct component_namespace :
             it = c_id_table.find(key), end = c_id_table.end();
 
         if (it == end)
+        {
             // REVIEW: Right response?
+            LAGAS_(info) << (boost::format(
+                "component_namespace::resolve_name, key(%1%), "
+                "response(no_success)")
+                % key);
             return response_type(component_ns_resolve_name
                                , components::component_invalid
                                , no_success);
+        }
  
+        LAGAS_(info) << (boost::format(
+            "component_namespace::resolve_name, key(%1%), ctype(%2%)")
+            % key % it->second);
         return response_type(component_ns_resolve_name, it->second);
     } // }}} 
     
@@ -208,13 +235,21 @@ struct component_namespace :
 
         // REVIEW: Should this be an error?
         if (it == end)
-          return response_type(component_ns_unbind, no_success);
+        {
+            LAGAS_(info) << (boost::format(
+                "component_namespace::unbind, key(%1%), response(no_success)")
+                % key);
+           return response_type(component_ns_unbind, no_success);
+        }
 
         // REVIEW: If there are no localities with this type, should we throw
         // an exception here?
         factory_table.erase(it->second);
         c_id_table.erase(it);
 
+        LAGAS_(info) << (boost::format(
+            "component_namespace::unbind, key(%1%)")
+            % key);
         return response_type(component_ns_unbind);
     } // }}} 
 
