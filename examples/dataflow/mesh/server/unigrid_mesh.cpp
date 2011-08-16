@@ -38,7 +38,8 @@ typedef hpx::lcos::base_lco_with_value<
 
 HPX_REGISTER_ACTION_EX(dataflow_lco_gid_vector_ptr::set_result_action,
     dataflow_set_result_action_gid_vector_ptr);
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_lco_gid_vector_ptr);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
+                             hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_unigrid_mesh_type>, 
