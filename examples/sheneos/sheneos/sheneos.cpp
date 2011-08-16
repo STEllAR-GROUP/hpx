@@ -73,8 +73,7 @@ namespace sheneos
             config_data data = cfg_.get();
             unregister_name(data.symbolic_name_);   // unregister config data
 
-            int i = 0;
-            BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
+            for (std::size_t i = 0; i < partitions_.size(); ++i)
             {
                 unregister_name(data.symbolic_name_ + 
                     boost::lexical_cast<std::string>(i++));
