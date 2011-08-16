@@ -31,9 +31,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\throttle.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>

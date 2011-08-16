@@ -89,7 +89,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.hpp" />
     <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\stubs\throttle.hpp" />
-    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\throttle.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\hpx\hpx.vcxproj">

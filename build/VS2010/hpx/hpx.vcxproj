@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\..\src\util\serialize_exception.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\examples\throttle\throttle\throttle.hpp" />
     <ClInclude Include="..\..\..\hpx\config.hpp" />
     <ClInclude Include="..\..\..\hpx\exception.hpp" />
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />

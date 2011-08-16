@@ -1051,6 +1051,9 @@
     <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\examples\throttle\throttle\throttle.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
