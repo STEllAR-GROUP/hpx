@@ -42,16 +42,24 @@ macro(get_boost_version)
       hpx_debug("boost.version" "Using ${BOOST_LIBRARY_DIR} as Boost shared library directory")
     endif()
     
-    if(NOT BOOST_INCLUDE_DIR)
+    if(NOT BOOST_INCLUDE_DIR AND BOOST_ROOT)
       find_path(BOOST_INCLUDE_DIR boost PATHS ${BOOST_ROOT} ${BOOST_ROOT}/include NO_DEFAULT_PATH)
     endif()
   
-    # Locate include directory
-    find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
-  
-    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
-      hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
+    if(BOOST_ROOT)
+      # Locate include directory
+      find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
+
+      if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+        hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
       
+        find_path(BOOST_VERSION_HPP boost/version.hpp)
+    
+        if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+          hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
+        endif()
+      endif()
+    else() 
       find_path(BOOST_VERSION_HPP boost/version.hpp)
     
       if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
