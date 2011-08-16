@@ -3,13 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <ctime>
-
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
@@ -17,6 +10,12 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+
+#include <ctime>
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
