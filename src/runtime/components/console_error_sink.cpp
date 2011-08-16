@@ -10,6 +10,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -18,7 +19,31 @@ namespace hpx { namespace components
     void console_error_sink(naming::id_type const& dst,
         boost::exception_ptr const& e)
     {
-        // Report the error only if the threadmanager is up. 
+        // Report the error only if the thread-manager is up. 
+        if (threads::threadmanager_is(running))
+        {
+            if (threads::get_self_ptr())
+            {
+                lcos::eager_future<server::console_error_sink_action> f(dst, e);
+                f.get();
+            }
+            else
+            {
+                // FIXME: This should use a sync_put_parcel.
+                applier::apply<server::console_error_sink_action>(dst, e);
+            }
+        }
+    }
+
+    // Stub function which applies the console_error_sink action.
+    void console_error_sink(boost::exception_ptr const& e)
+    {
+        // retrieve console locality
+        naming::gid_type console_gid;
+        naming::get_agas_client().get_console_prefix(console_gid);
+        naming::id_type dst(console_gid, naming::id_type::unmanaged);
+
+        // Report the error only if the thread-manager is up. 
         if (threads::threadmanager_is(running))
         {
             if (threads::get_self_ptr())

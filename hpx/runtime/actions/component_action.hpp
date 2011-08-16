@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/version.hpp>
@@ -75,6 +76,9 @@ namespace hpx { namespace actions
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
+
+                // report this error to the console in any case
+                components::console_error_sink(boost::current_exception());
             }
             return threads::terminated;
         }
@@ -420,6 +424,9 @@ namespace hpx { namespace actions
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
+
+                // report this error to the console in any case
+                components::console_error_sink(boost::current_exception());
             }
             return threads::terminated;
         }
