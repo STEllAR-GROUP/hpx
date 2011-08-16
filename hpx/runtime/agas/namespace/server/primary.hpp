@@ -261,11 +261,20 @@ struct primary_namespace :
             {
                 // Check for count mismatch (we can't change block sizes of
                 // existing bindings).
-                if (it->second.count != gva.count)
+                if (HPX_UNLIKELY(it->second.count != gva.count))
                 {
                     // REVIEW: Is this the right error code to use?
                     HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
                         "cannot change block size of existing binding");
+                }
+
+                if (HPX_UNLIKELY(gva.type == components::component_invalid))
+                {
+                    HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                        boost::str(boost::format(
+                            "attempt to update a GVA with an invalid type, "
+                            "gid(%1%), gva(%2%)")
+                            % id % gva));
                 }
 
                 // Store the new endpoint and offset
@@ -282,7 +291,7 @@ struct primary_namespace :
                 --it;
 
                 // Check that a previous range doesn't cover the new id.
-                if ((it->first + it->second.count) > id)
+                if (HPX_UNLIKELY((it->first + it->second.count) > id))
                 {
                     // REVIEW: Is this the right error code to use?
                     HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
@@ -309,6 +318,15 @@ struct primary_namespace :
         {
             HPX_THROW_IN_CURRENT_FUNC(internal_server_error, 
                 "MSBs of lower and upper range bound do not match");
+        }
+
+        if (HPX_UNLIKELY(gva.type == components::component_invalid))
+        {
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, 
+                boost::str(boost::format(
+                    "attempt to insert a GVA with an invalid type, "
+                    "gid(%1%), gva(%2%)")
+                    % id % gva));
         }
 
         std::pair<typename gva_table_type::map_type::iterator, bool>

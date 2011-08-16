@@ -66,7 +66,10 @@ namespace hpx { namespace util
             "[hpx.components.barrier]",
             "name = hpx",
             "path = $[hpx.location]/lib/" HPX_LIBRARY,
-            "enabled = $[hpx.components.load_external]"
+
+            "[hpx.components.raw_counter]",
+            "name = hpx",
+            "path = $[hpx.location]/lib/" HPX_LIBRARY
 
         ;
         // don't overload user overrides
