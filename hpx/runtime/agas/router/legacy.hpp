@@ -169,13 +169,17 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        hosted_data_type()
+          : console_cache_(0)
+        {}
+
         primary_namespace_type primary_ns_;
         component_namespace_type component_ns_;
         symbol_namespace_type symbol_ns_;
 
         cache_mutex_type gva_cache_mtx_;
         gva_cache_type gva_cache_;
-    
+
         cache_mutex_type locality_cache_mtx_;
         locality_cache_type locality_cache_;
 
