@@ -100,10 +100,7 @@ def identify(driver):
 
   (system, node, release, version, machine, processor) = uname()
 
-  if len(processor) == 0:
-    processor = machine
-
-  return "%s_%s-%s_%s" % (make_component(processor, "processor"),
+  return "%s_%s-%s_%s" % (make_component(machine, "processor"),
                           make_component(system, "kernel"),
                           make_component(release, "version"),
                           make_compiler_component(absolute_path(driver))) 
