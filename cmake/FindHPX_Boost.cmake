@@ -144,7 +144,7 @@ macro(find_boost_library TARGET_LIB)
   endif()
  
   # Non-system Boost tree (tarball, SCM checkout, etc)
-  if(NOT BOOST_USE_SYSTEM)
+  if(NOT BOOST_USE_SYSTEM AND BOOST_LIBRARY_DIR)
     # Locate libraries 
     build_boost_libname(${TARGET_LIB}) 
     hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)

@@ -29,7 +29,7 @@ macro(get_boost_version)
       endif()
     endif()
   
-    if(NOT BOOST_LIBRARY_DIR)
+    if(NOT BOOST_LIBRARY_DIR AND BOOST_ROOT)
       find_path(BOOST_LIBRARY_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
       if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
         find_path(BOOST_LIBRARY_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
