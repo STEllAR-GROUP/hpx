@@ -110,7 +110,7 @@ namespace hpx { namespace geometry { namespace server
         int search(std::vector<hpx::naming::id_type> const& search_objects) const;
 
         /// callback for search-wait
-        bool search_callback(std::size_t idx, polygon_type const& poly,bool &redo) const;
+        bool search_callback(std::size_t idx, polygon_type const& poly,bool &redo);
 
         // move the bodies
         void move(double dt);
@@ -189,6 +189,10 @@ namespace hpx { namespace geometry { namespace server
         polygon_type poly_;
         std::vector<double> velx_;
         std::vector<double> vely_;
+        // for contact enforcement
+        std::vector<std::size_t> slave_;
+        std::vector<std::size_t> master_;
+        std::vector<std::size_t> object_id_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
 

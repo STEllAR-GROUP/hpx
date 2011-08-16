@@ -103,7 +103,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         double velx[num_bodies];
         double vely[num_bodies];
 
-        srand( time(NULL) );
         std::size_t i = 0;
 
         // Object #1
@@ -159,9 +158,13 @@ int hpx_main(boost::program_options::variables_map &vm)
               // vector of gids
               std::vector<hpx::naming::id_type> search_objects;
               for (i=0;i<num_bodies;i++) {
-                search_objects.resize(num_bodies-(i+1));
-                for (std::size_t j=i+1;j<num_bodies;j++) {
-                  search_objects[j-(i+1)] = accu[j].get_gid();
+                search_objects.resize(num_bodies-1);
+                std::size_t count = 0;
+                for (std::size_t j=0;j<num_bodies;j++) {
+                  if ( j != i ) {
+                    search_objects[count] = accu[j].get_gid();
+                    count++;
+                  }
                 }
                 search_phase.push_back(accu[i].search_async(search_objects));
               }

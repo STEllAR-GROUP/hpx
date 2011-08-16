@@ -14,6 +14,7 @@
 #include <hpx/lcos/async_future_wait.hpp>
 
 #include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
@@ -45,27 +46,71 @@ namespace hpx { namespace geometry { namespace server
             return 0;
         }
 
-        bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) const 
+        bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
         {
 
-          // not implemented in boost geometry yet
-          //if ( boost::geometry::overlaps(poly_,poly) ) {
-            // Contact!
+          // TEST 
+          //std::cout << " TEST search callback " << std::endl;
+          //for (std::size_t j=0;j<poly_.outer().size();j++) {
+          //  std::cout << (poly_.outer())[j].x() << " " << (poly_.outer())[j].y() << std::endl;
           //}
+          //std::cout << " END TEST search callback " << std::endl << std::endl;
+
+          typedef boost::geometry::model::linestring<point_type> linestring_type;
 
           // Check for contact
           std::deque<polygon_type> output;
           boost::geometry::intersection(poly_,poly,output);
           BOOST_FOREACH(polygon_type const& p, output) {
             std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
-            // Find the master segment
             std::cout << " contact region size " << p.outer().size() << std::endl;
 
-       //     for (std::size_t j=0;j<p.outer().size();j++) {
-       //       std::cout << " Contact Vertex " 
-       //                 << (p.outer())[j].x() << " " << (p.outer())[j].y() << std::endl;
-       //     }
-           
+            linestring_type line;
+            line.resize(2);
+
+            for (std::size_t j=0;j<p.outer().size();j++) {
+              double d1 = boost::geometry::distance((p.outer())[j],poly_);
+              double d2 = boost::geometry::distance((p.outer())[j],poly);
+              // Check if there is actual contact
+              if ( d1 > 1.e-10 || d2 > 1.e-10 ) {
+                // there is actual contact -- find the vertices of poly_
+                // which have contact and their corresponding master segments 
+                if ( d1 < 1.e-10 ) {
+                  // this is a vertex belonging to poly_
+                  // record the point as a slave
+                  // find the index of poly_ that corresponds to this point
+                  for (std::size_t k=0;k<poly_.outer().size();k++) {
+                    if ( boost::geometry::distance( (p.outer())[j],(poly_.outer())[k] ) < 1.e-10 ) {
+                      slave_.push_back(k); 
+                      break;
+                    }
+                  }
+
+                  // The following section will be replaced by Barend 
+                  // with the nearest neighbor routine
+                  // but for now, this works
+
+                  // the master segment should belong to poly
+                  object_id_.push_back(i);        
+                  double mindist = 999.;
+                  int min_k = -1;
+                  int final;
+                  for (std::size_t k=0;k<poly_.outer().size();k++) {
+                    final = k+1; 
+                    if ( k+1 >= poly_.outer().size() ) final = 0;
+                    line[0] = (poly_.outer())[k];
+                    line[1] = (poly_.outer())[final];
+                    double testdist = boost::geometry::distance((p.outer())[j],line);    
+                    if ( mindist > testdist ) {
+                      testdist = mindist;
+                      min_k = k;
+                    }
+                  }
+                  BOOST_ASSERT(min_k >= 0 );
+                  master_.push_back(min_k); 
+                }
+              }
+            }
           }
 
           // for each node in the polygon, see if there is contact with this polygon
