@@ -398,6 +398,19 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
+        struct dump_config
+        {
+            dump_config(Runtime const& rt) : rt_(rt) {}
+
+            void operator()() const
+            {
+                rt_.get_config().dump();
+            }
+
+            Runtime const& rt_;
+        };
+
+        template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
             startup_func const& startup_function, 
@@ -409,10 +422,6 @@ namespace hpx
                 std::string config(vm["app-config"].as<std::string>());
                 rt.get_config().load_application_configuration(config.c_str());
             }
-
-            // Dump the configuration.
-            if (vm.count("dump-config"))
-                rt.get_config().dump();
 
 #if HPX_AGAS_VERSION > 0x10
 
@@ -429,6 +438,10 @@ namespace hpx
 
             if (!shutdown_function.empty())
                 rt.add_shutdown_function(shutdown_function);
+
+            // Dump the configuration after all components have been loaded.
+            if (vm.count("dump-config"))
+                rt.add_startup_function(dump_config<Runtime>(rt));
 
             if (vm.count("exit"))
             { 

@@ -218,6 +218,7 @@ namespace hpx { namespace util
                 catch (std::logic_error const& e) {
                     LRT_(info) << "dynamic loading failed: " << curr.string() 
                                << ": " << e.what();
+                    continue;   // handle next module
                 }
 
             // if something went wrong while reading the registry, just use
