@@ -22,7 +22,6 @@ if(NOT MSVC)
       random_mem_access
       queue
       quickstart
-      sheneos
       nqueen)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
@@ -41,6 +40,10 @@ if(NOT MSVC)
     set(subdirs ${subdirs} geometry
                            contact)
   endif() 
+
+  if(HDF5_FOUND)
+    set(subdirs ${subdirs} sheneos)
+  endif()
 
 # Disabled by wash until Matt can fix this to not break other HPX code
 #  if(CMAKE_Fortran_COMPILER)
