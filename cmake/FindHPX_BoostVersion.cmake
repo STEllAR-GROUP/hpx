@@ -31,9 +31,9 @@ macro(get_boost_version)
   
     if(NOT BOOST_LIBRARY_DIR)
       find_path(BOOST_LIBRARY_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
-      if(NOT BOOST_LIBRARY_DIR)
+      if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
         find_path(BOOST_LIBRARY_DIR lib64 PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
-        if(BOOST_LIBRARY_DIR)
+        if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
           set(BOOST_LIBRARY_DIR "${BOOST_LIBRARY_DIR}/lib64" )
         endif()
       else()
@@ -49,12 +49,12 @@ macro(get_boost_version)
     # Locate include directory
     find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
   
-    if(NOT BOOST_VERSION_HPP)
+    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
       hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
       
       find_path(BOOST_VERSION_HPP boost/version.hpp)
     
-      if(NOT BOOST_VERSION_HPP)
+      if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
         hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
       endif()
     endif()
@@ -64,8 +64,8 @@ macro(get_boost_version)
     # Locate include directory
     find_path(BOOST_VERSION_HPP boost/version.hpp)
     
-    if(NOT BOOST_VERSION_HPP)
-      hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
+    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+      hpx_error("boost.version" "Failed to locate Boost include directory in the default path.")
     endif()
   
   endif()    
