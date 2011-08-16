@@ -72,6 +72,7 @@ namespace throttle { namespace server
 
         // schedule a high priority task on the given shepherd thread
         void register_thread(std::size_t shepherd);
+        void register_suspend_thread(std::size_t shepherd);
 
         // this is a bit mask where any set bit means the corresponding 
         // shepherd is to be blocked

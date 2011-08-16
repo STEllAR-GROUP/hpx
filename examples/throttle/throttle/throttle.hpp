@@ -32,6 +32,10 @@ namespace throttle
           : base_type(gid) 
         {}
 
+        ~throttle()
+        {
+        }
+
         void suspend(std::size_t thread_num) const
         {
             return stubs::throttle::suspend(this->get_gid(), thread_num);

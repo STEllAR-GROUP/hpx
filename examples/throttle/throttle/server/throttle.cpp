@@ -38,6 +38,15 @@ namespace throttle { namespace server
 
     void throttle::suspend(std::size_t shepherd)
     {
+        // If the current thread is not the requested one, re-schedule a new 
+        // PX thread in order to retry.
+        std::size_t thread_num = 
+            hpx::threads::threadmanager_base::get_thread_num();
+        if (thread_num != shepherd) {
+            register_suspend_thread(shepherd);
+            return;
+        }
+
         mutex_type::scoped_lock l(mtx_);
 
         if (shepherd >= blocked_shepherds_.size()) {
@@ -102,11 +111,25 @@ namespace throttle { namespace server
     // schedule a high priority task on the given shepherd thread
     void throttle::register_thread(std::size_t shepherd)
     {
-        std::string description("suspend shepherd thread (" + 
+        std::string description("throttle controller for shepherd thread (" + 
             boost::lexical_cast<std::string>(shepherd) + ")");
 
         hpx::applier::register_thread(
             boost::bind(&throttle::throttle_controller, this, shepherd),
+            description.c_str(), 
+            hpx::threads::pending, true, 
+            hpx::threads::thread_priority_critical,
+            shepherd);
+    }
+
+    // schedule a high priority task on the given shepherd thread to suspend
+    void throttle::register_suspend_thread(std::size_t shepherd)
+    {
+        std::string description("suspend shepherd thread (" + 
+            boost::lexical_cast<std::string>(shepherd) + ")");
+
+        hpx::applier::register_thread(
+            boost::bind(&throttle::suspend, this, shepherd),
             description.c_str(), 
             hpx::threads::pending, true, 
             hpx::threads::thread_priority_critical,
