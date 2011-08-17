@@ -468,8 +468,15 @@ namespace hpx
         void report_error(std::size_t num_thread, 
             boost::exception_ptr const& e);
 
-        void report_error(boost::exception_ptr const& e)
-        { report_error(-1, e); }
+        /// \brief Report a non-recoverable error to the runtime system
+        ///
+        /// \param e          [in] This is an instance encapsulating an 
+        ///                   exception which lead to this function call.
+        ///
+        /// \note This function will retrieve the number of the current 
+        ///       shepherd thread and forward to the report_error function 
+        ///       above.
+        void report_error(boost::exception_ptr const& e);
 
         /// \brief Run the HPX runtime system, use the given function for the 
         ///        main \a thread and block waiting for all threads to 
@@ -604,7 +611,7 @@ namespace hpx
         }
 
         naming::gid_type get_next_id();
- 
+
         util::unique_ids& get_id_pool()
         {
             return id_pool;

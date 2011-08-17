@@ -107,7 +107,7 @@
                     << "): " << e.what();
 
                 // report this error to the console in any case
-                components::console_error_sink(boost::current_exception());
+                hpx::report_error(boost::current_exception());
             }
             return threads::terminated;
         }
@@ -577,7 +577,7 @@
                     << "): " << e.what();
 
                 // report this error to the console in any case
-                components::console_error_sink(boost::current_exception());
+                hpx::report_error(boost::current_exception());
             }
             return threads::terminated;
         }

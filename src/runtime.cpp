@@ -605,11 +605,11 @@ namespace hpx
 
         // unregister the runtime_support and memory instances from the AGAS 
         // ignore errors, as AGAS might be down already
-        #if HPX_AGAS_VERSION <= 0x10
-            error_code ec;
-            agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
-            agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        error_code ec;
+        agas_client_.unbind(applier_.get_runtime_support_raw_gid(), ec);
+        agas_client_.unbind(applier_.get_memory_raw_gid(), ec);
+#endif
 
         // this disables all logging from the main thread
         deinit_tss();
@@ -645,6 +645,14 @@ namespace hpx
 
         // Stop all services.
         stop(false);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
+        boost::exception_ptr const& e)
+    {
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        return report_error(num_thread, e); 
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -767,12 +775,13 @@ namespace hpx
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e) 
     {
-        get_runtime().report_error(num_thread, e);
+        hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
     void report_error(boost::exception_ptr const& e) 
     {
-        get_runtime().report_error(e);
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
     bool register_on_exit(boost::function<void()> f)
@@ -835,6 +844,16 @@ namespace hpx { namespace naming
     resolver_client& get_agas_client()
     {
         return get_runtime().get_agas_client();
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads
+{
+    // shortcut for get_applier().get_thread_manager()
+    threadmanager_base& get_thread_manager()
+    {
+        return hpx::applier::get_applier().get_thread_manager();
     }
 }}
 

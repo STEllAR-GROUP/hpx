@@ -280,6 +280,12 @@ namespace hpx { namespace threads
         /// available 
         virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
 
+        /// This notifies the thread manager that the passed exception has been 
+        /// raised. The exception will be routed through the notifier and the 
+        /// scheduler (which will result in it being passed to the runtime
+        /// object, which in turn will report it to the console, etc.).
+        virtual void report_error(std::size_t, boost::exception_ptr const&) = 0;
+
         static std::size_t get_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
