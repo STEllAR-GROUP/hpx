@@ -65,6 +65,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_mesh", "marduk\mardu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread_test", "tests\thread_test\thread_test.vcxproj", "{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}"
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "thread_testd", "tests\thread_test\x64\Debug\thread_testd.exe", "{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\CVS\hpx\hpx\build\VS2010\tests\thread_test\x64\Debug\thread_testd.exe
+		RemoteMachine = FIFTYTWO
+		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib\hpx
+		Arguments = -l2 -r
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -311,11 +324,18 @@ Global
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Debug|Win32.ActiveCfg = Debug|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Debug|x64.ActiveCfg = Debug|x64
+		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Debug|x64.Build.0 = Debug|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|Mixed Platforms.Build.0 = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|Win32.ActiveCfg = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|x64.ActiveCfg = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|x64.Build.0 = Release|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|Win32.ActiveCfg = Debug|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|x64.ActiveCfg = Debug|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|Mixed Platforms.ActiveCfg = Debug|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|Win32.ActiveCfg = Debug|x64
+		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|x64.ActiveCfg = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

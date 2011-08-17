@@ -366,6 +366,46 @@ namespace hpx { namespace components { namespace stubs
                     hpx::naming::id_type::unmanaged), timeout);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        /// \brief Retrieve configuration information
+        /// \brief Terminate the given runtime system
+        static lcos::future_value<void>  
+        terminate_async(naming::id_type const& targetgid)
+        {
+            // Create a future_value directly and execute the required action.
+            // This action has implemented special response handling as the
+            // back-parcel is sent explicitly (and synchronously).
+            typedef server::runtime_support::terminate_action action_type;
+
+            lcos::future_value<void> value;
+            hpx::applier::apply<action_type>(targetgid, value.get_gid());
+            return value;
+        }
+
+        static void terminate(naming::id_type const& targetgid)
+        {
+            // The following get yields control while the action above 
+            // is executed and the result is returned to the eager_future
+            terminate_async(targetgid).get();
+        }
+
+        /// \brief Terminate the runtime systems of all localities
+        static void 
+        terminate_all(naming::id_type const& targetgid)
+        {
+            hpx::applier::apply<server::runtime_support::terminate_all_action>(
+                targetgid);
+        }
+
+        static void terminate_all()
+        {
+            hpx::applier::apply<server::runtime_support::terminate_all_action>(
+                hpx::naming::id_type(
+                    hpx::applier::get_applier().get_runtime_support_raw_gid(),
+                    hpx::naming::id_type::unmanaged));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         static lcos::future_value<util::section> get_config_async(
             naming::id_type const& targetgid) 

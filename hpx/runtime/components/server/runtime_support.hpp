@@ -52,13 +52,15 @@ namespace hpx { namespace components { namespace server
             runtime_support_free_component = 3,     ///< delete existing components
             runtime_support_shutdown = 4,           ///< shut down this runtime instance
             runtime_support_shutdown_all = 5,       ///< shut down the runtime instances of all localities
+            runtime_support_terminate = 6,          ///< terminate the runtime instances of all localities
+            runtime_support_terminate_all = 7,      ///< terminate the runtime instances of all localities
 
-            runtime_support_get_config = 6,         ///< get configuration information 
-            runtime_support_create_memory_block = 7,   ///< create new memory block
+            runtime_support_get_config = 8,         ///< get configuration information 
+            runtime_support_create_memory_block = 9,  ///< create new memory block
 #if HPX_AGAS_VERSION > 0x10
-            runtime_support_load_components = 8,
-            runtime_support_call_startup_functions = 9,
-            runtime_support_call_shutdown_functions = 10,
+            runtime_support_load_components = 10,
+            runtime_support_call_startup_functions = 11,
+            runtime_support_call_shutdown_functions = 12,
 #endif
         };
 
@@ -120,6 +122,12 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Action shut down runtime system instances on all localities
         void shutdown_all(double timeout);
+
+        /// \brief Action shut down this runtime system instance
+        void terminate(naming::id_type respond_to = naming::invalid_id);
+
+        /// \brief Action shut down runtime system instances on all localities
+        void terminate_all();
 
         /// \brief Retrieve configuration information
         util::section get_config();
@@ -192,6 +200,16 @@ namespace hpx { namespace components { namespace server
             runtime_support, runtime_support_shutdown_all, double, 
             &runtime_support::shutdown_all
         > shutdown_all_action;
+
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_terminate, naming::id_type,
+            &runtime_support::terminate
+        > terminate_action;
+
+        typedef hpx::actions::action0<
+            runtime_support, runtime_support_terminate_all, 
+            &runtime_support::terminate_all
+        > terminate_all_action;
 
         // even if this is not a short/minimal action, we still execute it 
         // directly to avoid a deadlock condition inside the thread manager

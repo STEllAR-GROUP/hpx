@@ -573,18 +573,18 @@ namespace hpx
         boost::condition cond;
         boost::mutex::scoped_lock l(mtx);
 
-        #if HPX_AGAS_VERSION <= 0x10
-            parcel_port_.get_io_service_pool().get_io_service().post
-        #else
-            boost::thread t
-        #endif
+#if HPX_AGAS_VERSION <= 0x10
+        parcel_port_.get_io_service_pool().get_io_service().post
+#else
+        boost::thread t
+#endif
             (boost::bind(&runtime_impl::stopped, this, blocking, 
                 boost::ref(cond), boost::ref(mtx)));
         cond.wait(l);
 
-        #if HPX_AGAS_VERSION > 0x10
-            t.join();
-        #endif
+#if HPX_AGAS_VERSION > 0x10
+        t.join();
+#endif
 
 //        // stop the rest of the system
 //        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
@@ -644,7 +644,12 @@ namespace hpx
         }
 
         // Stop all services.
-        stop(false);
+        //stop(false);
+        components::server::runtime_support* p = 
+            reinterpret_cast<components::server::runtime_support*>(
+                  get_runtime_support_lva());
+
+        p->terminate_all();     // this does not return
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 

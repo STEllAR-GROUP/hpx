@@ -167,6 +167,23 @@ namespace hpx { namespace components
             this->base_type::shutdown_all(gid_, timeout);
         }
 
+        /// \brief Terminate the given runtime system
+        lcos::future_value<void> terminate_async()
+        {
+            return this->base_type::terminate_async(gid_);
+        }
+
+        void terminate()
+        {
+            this->base_type::terminate(gid_);
+        }
+
+        /// \brief Terminate the runtime systems of all localities
+        void terminate_all()
+        {
+            this->base_type::terminate_all(gid_);
+        }
+
         /// \brief Retrieve configuration information
         void get_config(util::section& ini)
         {

@@ -71,6 +71,12 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::shutdown_all_action,
     shutdown_all_action);
 HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::terminate_action,
+    terminate_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::terminate_all_action,
+    terminate_all_action);
+HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action);
 
@@ -298,6 +304,30 @@ namespace hpx { namespace components { namespace server
         stop(timeout, respond_to);
     }
 
+    // function to be called to terminate this locality immediately
+    void runtime_support::terminate(naming::id_type respond_to)
+    {
+        if (respond_to) {
+            // respond synchronously
+            typedef lcos::base_lco_with_value<void> void_lco_type;
+            typedef void_lco_type::set_event_action action_type;
+
+            naming::address addr;
+            applier::applier& appl = hpx::applier::get_applier();
+            if (appl.address_is_local(respond_to.get_gid(), addr)) {
+                // execute locally, action is executed immediately as it is
+                // a direct_action
+                hpx::applier::apply_l<action_type>(addr);
+            }
+            else {
+                // apply remotely, parcel is sent synchronously
+                hpx::applier::apply_r_sync<action_type>(addr, respond_to);
+            }
+        }
+
+        std::abort();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
     void runtime_support::shutdown_all(double timeout)
@@ -347,6 +377,38 @@ namespace hpx { namespace components { namespace server
         stop(timeout, naming::invalid_id);    // no need to respond
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // initiate system shutdown for all localities
+    void runtime_support::terminate_all()
+    {
+        std::vector<naming::gid_type> prefixes;
+        applier::applier& appl = hpx::applier::get_applier();
+        appl.get_agas_client().get_prefixes(prefixes);
+
+        // terminate all localities except the the local one
+        {
+            boost::uint32_t prefix = applier::get_prefix_id();
+            std::vector<lcos::future_value<void> > lazy_actions;
+
+            BOOST_FOREACH(naming::gid_type gid, prefixes)
+            {
+                if (prefix != naming::get_prefix_from_gid(gid))
+                {
+                    using components::stubs::runtime_support;
+                    naming::id_type id(gid, naming::id_type::unmanaged);
+                    lazy_actions.push_back(runtime_support::terminate_async(id));
+                }
+            }
+
+            // wait for all localities to be stopped
+            components::wait(lazy_actions);
+        }
+
+        // now make sure this local locality gets terminated as well.
+        terminate(naming::invalid_id);   //good night
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Retrieve configuration information
     util::section runtime_support::get_config()
     {
