@@ -16,7 +16,6 @@ if(NOT MSVC)
       accumulator
       dataflow
       adaptive1d
-      marduk
       hplpx
       barnes_hut
       random_mem_access
