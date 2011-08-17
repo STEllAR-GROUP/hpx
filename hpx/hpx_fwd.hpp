@@ -491,7 +491,7 @@ namespace hpx
 
          /// \brief Remove an existing performance counter instance with the 
          ///        given id (as returned from \a add_counter)
-        HPX_API_EXPORT counter_status remove_counter(
+         HPX_API_EXPORT counter_status remove_counter(
             counter_info const& info, naming::id_type const& id, 
             error_code& ec = throws);
     }
