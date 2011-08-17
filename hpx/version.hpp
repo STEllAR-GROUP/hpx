@@ -35,10 +35,9 @@
 
 #define HPX_VERSION_TAG          "-rc1"
 
-// Note: This file needs to explicitly committed in order to update the 
-//       revision number. As an alternative, we could use svnversion in the 
-//       build process.
-#define HPX_SVN_REVISION         "$Revision$"
+#if !defined(HPX_SVN_REVISION)
+    #define HPX_SVN_REVISION     "$Revision$"
+#endif
 
 namespace hpx
 {

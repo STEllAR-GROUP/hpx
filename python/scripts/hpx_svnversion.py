@@ -16,20 +16,19 @@ if exists(join(path[0], "../hpx")):
 if exists(join(path[0], "../share/hpx/python/hpx")):
   path.append(join(path[0], "../share/hpx/python"))
 
-from hpx.environment import identify
+from hpx.svn import revision
 
-usage = "usage: %prog [options] compiler-driver" 
+usage = "usage: %prog [options] [path]" 
 
 parser = OptionParser(usage=usage)
 
-(options, driver) = parser.parse_args()
+(options, wc_path) = parser.parse_args()
 
-if 0 == len(driver):
-  print "No compiler driver specified."
-  exit(1) 
-elif 1 != len(driver):
-  print "More than one compiler driver specified."
+if 0 == len(wc_path):
+  # If no path is specified, use the current working directory
+  print revision()
+elif 1 != len(wc_path):
+  print "More than one path specified."
   exit(1)
-
-print identify(driver[0])
-
+else:
+  print revision(wc_path[0])
