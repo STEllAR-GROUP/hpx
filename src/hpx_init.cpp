@@ -38,71 +38,64 @@ namespace hpx
     typedef int (*hpx_main_func)(boost::program_options::variables_map& vm);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 #if HPX_AGAS_VERSION > 0x10
-    namespace hpx
+namespace hpx { namespace detail
+{
+    // forward declarations only
+    void print_counter(std::string const& name);
+    void list_counter(std::string const& name, naming::gid_type const& gid);
+}}
+
+typedef hpx::actions::plain_action1<
+    std::string const&, hpx::detail::print_counter
+> print_counter_action;
+HPX_REGISTER_PLAIN_ACTION(print_counter_action);
+
+typedef hpx::actions::plain_action2<
+    std::string const&, hpx::naming::gid_type const&, hpx::detail::list_counter
+> list_counter_action;
+HPX_REGISTER_PLAIN_ACTION(list_counter_action);
+
+namespace hpx { namespace detail
+{
+    // print counter value on the console
+    void print_counter(std::string const& name)
     {
-        void print_counter(std::string const& name)
-        {
-            std::cout << "  " << name << std::endl;
-        }
+        std::cout << "  " << name << std::endl;
     }
 
-    typedef hpx::actions::plain_action1<
-        std::string const&,
-        hpx::print_counter
-    > print_counter_action;
-
-    HPX_REGISTER_PLAIN_ACTION(print_counter_action);
-
-    namespace hpx
+    // redirect the printing of the given value to the console
+    void list_counter(std::string const& name, naming::gid_type const& gid)
     {
-        void list_counter(std::string const& name, naming::gid_type const& gid)
-        {
-            typedef lcos::eager_future<print_counter_action> future_type;
- 
-            const naming::id_type console
-                (naming::get_gid_from_prefix(1), naming::id_type::unmanaged);
+        typedef lcos::eager_future<print_counter_action> future_type;
 
-            if ((4 <= name.size()) && (name.substr(0, 4) == "/pcs"))
-                future_type(console, name).get();
-        }
+        const naming::id_type console(naming::get_gid_from_prefix(1), 
+            naming::id_type::unmanaged);
+
+        if ((4 <= name.size()) && (name.substr(0, 4) == "/pcs"))
+            future_type(console, name).get();
     }
 
-    typedef hpx::actions::plain_action2<
-        std::string const&,
-        hpx::naming::gid_type const&,
-        hpx::list_counter
-    > list_counter_action;
-
-    namespace hpx
+    // iterate all registered performance counters and invoke printing their
+    // names
+    int list_counters(boost::program_options::variables_map& vm, 
+        hpx_main_func f)
     {
-        int list_counters(boost::program_options::variables_map& vm, hpx_main_func f)
         {
-            {
-                std::cout << "registered performance counters" << std::endl; 
-                actions::function<void(std::string const&, naming::gid_type const&)>
-                    cb(new list_counter_action);
-                applier::get_applier().get_agas_client().iterateids(cb);
-            }
-
-            if (0 != f)
-                return boost::bind(f, vm)();
-
-            else
-            {
-                finalize();
-
-                return 0;
-            }
+            std::cout << "registered performance counters" << std::endl; 
+            actions::function<void(std::string const&, naming::gid_type const&)>
+                cb(new list_counter_action);
+            applier::get_applier().get_agas_client().iterateids(cb);
         }
 
-        inline int list_counters(boost::program_options::variables_map& vm)
-        {
-            return list_counters(vm, 0);
-        }
+        if (0 != f)
+            return f(vm);
+
+        finalize();
+        return 0;
     }
-
-    HPX_REGISTER_PLAIN_ACTION(list_counter_action);
+}}
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,6 +180,105 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // Additional command line parser which interprets '@something' as an 
+        // option "options-file" with the value "something".
+        inline std::pair<std::string, std::string> 
+        at_option_parser(std::string const&s)
+        {
+            if ('@' == s[0]) 
+                return std::make_pair(std::string("options-file"), s.substr(1));
+            return std::pair<std::string, std::string>();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Read all options from a given config file, parse and add them to the
+        // given variables_map
+        bool read_config_file_options(std::string const &filename, 
+            boost::program_options::options_description const &desc, 
+            boost::program_options::variables_map &vm, bool may_fail = false)
+        {
+            std::ifstream ifs(filename.c_str());
+            if (!ifs.is_open()) {
+                if (!may_fail) {
+                    std::cerr << filename 
+                        << ": command line warning: command line options file not found"
+                        << std::endl;
+                }
+                return false;
+            }
+
+            std::vector<std::string> options;
+            std::string line;
+            while (std::getline(ifs, line)) {
+                // skip empty lines
+                std::string::size_type pos = line.find_first_not_of(" \t");
+                if (pos == std::string::npos) 
+                    continue;
+
+                // skip comment lines
+                if ('#' != line[pos]) {
+                    // strip leading and trailing whitespace
+                    std::string::size_type endpos = line.find_last_not_of(" \t");
+                    BOOST_ASSERT(endpos != std::string::npos);
+                    options.push_back(line.substr(pos, endpos-pos+1));
+                }
+            }
+
+            // add options to parsed settings
+            if (options.size() > 0) {
+                using boost::program_options::value;
+                using boost::program_options::store;
+                using boost::program_options::command_line_parser;
+                using namespace boost::program_options::command_line_style;
+
+                store(command_line_parser(options)
+                    .options(desc).style(unix_style).run(), vm);
+                notify(vm);
+            }
+            return true;
+        }
+
+        // try to find a config file somewhere up the filesystem hierarchy 
+        // starting with the input file path. This allows to use a general wave.cfg 
+        // file for all files in a certain project.
+        void handle_generic_config_options(std::string appname,
+            boost::program_options::variables_map& vm,
+            boost::program_options::options_description const& desc_cfgfile)
+        {
+            if (appname.empty())
+                return;
+
+            boost::filesystem::path dir (boost::filesystem::initial_path());
+            boost::filesystem::path app (appname);
+            appname = boost::filesystem::basename(app.filename());
+
+            // walk up the hierarchy, trying to find a file appname.cfg 
+            while (!dir.empty()) {
+                boost::filesystem::path filename = dir / (appname + ".cfg");
+                if (read_config_file_options(filename.string(), desc_cfgfile, vm, true))
+                    break;    // break on the first options file found
+
+                dir = dir.parent_path();    // chop off last directory part
+            }
+        }
+
+        // handle all --options-config found on the command line
+        void handle_config_options(boost::program_options::variables_map& vm,
+            boost::program_options::options_description const& desc_cfgfile)
+        {
+            using boost::program_options::options_description;
+            if (vm.count("options-file")) {
+                std::vector<std::string> const &cfg_files = 
+                    vm["options-file"].as<std::vector<std::string> >();
+                BOOST_FOREACH(std::string const& cfg_file, cfg_files)
+                {
+                    // parse a single config file and store the results
+                    read_config_file_options(cfg_file, desc_cfgfile, vm);
+                }
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // parse the command line
         command_line_result parse_commandline(
             boost::program_options::options_description& app_options, 
@@ -197,18 +289,20 @@ namespace hpx
             using boost::program_options::value;
             using boost::program_options::store;
             using boost::program_options::command_line_parser;
+            using boost::program_options::parsed_options;
+            using namespace boost::program_options::command_line_style;
 
             try {
-                options_description hpx_options("HPX Options");
-                options_description hidden_options("Hidden Options");
+                options_description cmdline_options("HPX options (command line only)");
+                options_description hpx_options("HPX options");
+                options_description hidden_options("Hidden options");
 
-                hpx_options.add_options()
+                cmdline_options.add_options()
                     ("help,h", "print out program usage (this message)")
                     ("version,v", "print out HPX version and copyright information")
-                    ("run-agas-server,r",
-                     "run AGAS server as part of this runtime instance")
-                    ("run-hpx-main",
-                     "run the hpx_main function, regardless of locality mode")
+                    ("options-file", value<std::vector<std::string> >()->composing(), 
+                        "specify a file containing command line options "
+                        "(alternatively: @filepath)")
                 ;
 
                 switch (mode) {
@@ -242,19 +336,23 @@ namespace hpx
 #if HPX_AGAS_VERSION <= 0x10
                     ("run-agas-server-only", "run only the AGAS server")
 #else
-                    ("list-counters", "list registered performance counters")
+                    ("list-counters", "list all registered performance counters")
 #endif
                 ;
 
                 hpx_options.add_options()
+                    ("run-agas-server,r",
+                     "run AGAS server as part of this runtime instance")
+                    ("run-hpx-main",
+                     "run the hpx_main function, regardless of locality mode")
                     ("app-config,p", value<std::string>(), 
-                     "load the specified application configuration file")
+                     "load the specified application configuration (ini) file")
                     ("hpx-config", value<std::string>()->default_value(""), 
-                     "load the specified hpx configuration file")
+                     "load the specified hpx configuration (ini) file")
                     ("agas,a", value<std::string>(), 
                      "the IP address the AGAS server is running on, "
                      "expected format: `address:port' (default: "
-                     "taken from hpx.ini)")
+                     "127.0.0.1:7910)")
                     ("hpx,x", value<std::string>(), 
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
@@ -270,7 +368,7 @@ namespace hpx
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
                     ("ini,I", value<std::vector<std::string> >()->composing(),
-                     "add an ini definition to the default runtime "
+                     "add a configuration definition to the default runtime "
                      "configuration")
                     ("print-counter,P", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter before shutting "
@@ -283,11 +381,21 @@ namespace hpx
                 ;
 
                 options_description desc_cmdline;
-                desc_cmdline.add(app_options).add(hpx_options).add(hidden_options);
+                desc_cmdline
+                    .add(app_options).add(cmdline_options)
+                    .add(hpx_options).add(hidden_options);
 
-                store(command_line_parser(argc, argv).
-                    options(desc_cmdline).run(), vm);
+                parsed_options opts(parse_command_line(argc, argv, 
+                    desc_cmdline, unix_style, at_option_parser));
+                store(opts, vm);
                 notify(vm);
+
+                options_description desc_cfgfile;
+                desc_cfgfile
+                    .add(app_options).add(hpx_options).add(hidden_options);
+
+                handle_generic_config_options(argv[0], vm, desc_cfgfile);
+                handle_config_options(vm, desc_cfgfile);
 
                 // print version/copyright information 
                 if (vm.count("version")) 
@@ -424,13 +532,11 @@ namespace hpx
             }
 
 #if HPX_AGAS_VERSION > 0x10
-
-            if (vm.count("print-counter"))
-            {
-                std::vector<std::string> counters
-                    = vm["print-counter"].as<std::vector<std::string> >();
-                rt.add_shutdown_function
-                    (boost::bind(print_shutdown_counters, counters));
+            if (vm.count("print-counter")) {
+                std::vector<std::string> counters = 
+                    vm["print-counter"].as<std::vector<std::string> >();
+                rt.add_shutdown_function(
+                    boost::bind(print_shutdown_counters, counters));
             }
 
             if (!startup_function.empty())
@@ -443,37 +549,35 @@ namespace hpx
             if (vm.count("dump-config"))
                 rt.add_startup_function(dump_config<Runtime>(rt));
 
-            if (vm.count("exit"))
-            { 
-                if (vm.count("list-counters"))
+            if (vm.count("exit")) { 
+                if (vm.count("list-counters")) {
                     // Call list_counters, which will print out all available
                     // performance counters and then return 0.
-                    return rt.run(boost::bind(&list_counters, vm),
+                  return rt.run(boost::bind(&detail::list_counters, vm, hpx::hpx_main_func(0)),
                         num_threads, num_localities);
-                else
-                    return 0;
+                }
+                return 0;
             }
 
-            else if (vm.count("list-counters"))
+            if (vm.count("list-counters")) {
                 // Call list_counters, which will print out all available
                 // performance counters and then call f.
                 return rt.run(boost::bind(&list_counters, vm, f),
                     num_threads, num_localities);
+            }
 
-            else
-            {
-                if (vm.count("exit"))
-                    return 0;
-                else if (0 != f)
-                    // Run this runtime instance using the given function f.
-                    return rt.run(boost::bind(f, vm), num_threads, num_localities);
+            if (0 != f) {
+                // Run this runtime instance using the given function f.
+                return rt.run(boost::bind(f, vm), num_threads, num_localities);
             }
 #else
             if (vm.count("exit"))
                 return 0;
-            else if (0 != f)
+
+            if (0 != f) {
                 // Run this runtime instance using the given function f.
                 return rt.run(boost::bind(f, vm), num_threads, num_localities);
+            }
 #endif
 
             // Run this runtime instance without an hpx_main
@@ -801,11 +905,27 @@ namespace hpx
         return result;
     }
 
+    template <typename T>
+    inline T
+    get_option(std::string const& config, T default_ = T())
+    {
+        if (!config.empty()) {
+            try {
+                return boost::lexical_cast<T>(
+                    get_runtime().get_config().get_entry(config, default_));
+            }
+            catch (boost::bad_lexical_cast const&) {
+                ;   // do nothing
+            }
+        }
+        return default_;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void finalize(double shutdown_timeout, double localwait)
     {
         if (localwait == -1.0)
-            get_option(localwait, "hpx.finalize_wait_time");
+            localwait = get_option("hpx.finalize_wait_time", -1.0);
 
         if (localwait != -1.0) {
             hpx::util::high_resolution_timer t;
@@ -817,7 +937,7 @@ namespace hpx
         }
 
         if (shutdown_timeout == -1.0)
-            get_option(shutdown_timeout, "hpx.shutdown_timeout");
+            shutdown_timeout = get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p = 
             reinterpret_cast<components::server::runtime_support*>(
@@ -830,7 +950,7 @@ namespace hpx
     void disconnect(double shutdown_timeout, double localwait)
     {
         if (localwait == -1.0)
-            get_option(localwait, "hpx.finalize_wait_time");
+            localwait = get_option("hpx.finalize_wait_time", -1.0);
 
         if (localwait != -1.0) {
             hpx::util::high_resolution_timer t;
@@ -842,7 +962,7 @@ namespace hpx
         }
 
         if (shutdown_timeout == -1.0)
-            get_option(shutdown_timeout, "hpx.shutdown_timeout");
+            shutdown_timeout = get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p = 
             reinterpret_cast<components::server::runtime_support*>(

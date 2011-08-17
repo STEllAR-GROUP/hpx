@@ -150,12 +150,10 @@ namespace hpx
             typename NotificationPolicy = threads::policies::callback_notifier> 
         class HPX_API_EXPORT threadmanager_impl;
 
-        /**********************************************************************
-         * \enum thread_state_enum
-         *
-         * The \a thread_state_enum enumerator encodes the current state of a
-         * \a thread instance
-         */
+        /// \enum thread_state_enum
+        ///
+        /// The \a thread_state_enum enumerator encodes the current state of a
+        /// \a thread instance
         enum thread_state_enum
         {
             unknown = 0,
@@ -174,7 +172,7 @@ namespace hpx
                                      garbage collected */
         };
 
-        ///////////////////////////////////////////////////////////////////////
+        /// \enum thread_priority
         enum thread_priority
         {
             thread_priority_default = 0,      ///< use default priority
@@ -188,12 +186,10 @@ namespace hpx
         HPX_API_EXPORT char const* get_thread_state_name(thread_state_enum state);
         HPX_API_EXPORT char const* get_thread_priority_name(thread_priority priority);
 
-        /**********************************************************************
-         * \enum thread_state_ex_enum
-         *
-         * The \a thread_state_ex_enum enumerator encodes the reason why a
-         * thread is being restarted
-         */
+        /// \enum thread_state_ex_enum
+        ///
+        /// The \a thread_state_ex_enum enumerator encodes the reason why a
+        /// thread is being restarted
         enum thread_state_ex_enum
         {
             wait_unknown = -1,
@@ -248,6 +244,9 @@ namespace hpx
         /// component the current thread is acting on
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
 
+        /// The function \a get_thread_manager returns a reference to the
+        /// current thread manager.
+        HPX_API_EXPORT threadmanager_base& get_thread_manager();
     }
 
     class HPX_API_EXPORT runtime;
@@ -259,8 +258,10 @@ namespace hpx
         runtime_mode_invalid = -1,
         runtime_mode_console = 0,   ///< The runtime is the console locality
         runtime_mode_worker = 1,    ///< The runtime is a worker locality
-        runtime_mode_connect = 2,   ///< The runtime is a worker locality connecting late
-        runtime_mode_default = 3, 
+        runtime_mode_connect = 2,   ///< The runtime is a worker locality 
+                                    ///< connecting late
+        runtime_mode_default = 3,   ///< The runtime mode will be determinded 
+                                    ///< based on the command line arguments
         runtime_mode_last = 3
     };
 
@@ -395,7 +396,7 @@ namespace hpx
 
         template <typename Value, typename RemoteValue = Value>
         class local_dataflow_variable;
- 
+
         template <typename Action, 
             typename Result = typename future_value_local_result<
                 typename Action::result_type>::type,
@@ -490,7 +491,7 @@ namespace hpx
 
          /// \brief Remove an existing performance counter instance with the 
          ///        given id (as returned from \a add_counter)
-       HPX_API_EXPORT counter_status remove_counter(
+        HPX_API_EXPORT counter_status remove_counter(
             counter_info const& info, naming::id_type const& id, 
             error_code& ec = throws);
     }

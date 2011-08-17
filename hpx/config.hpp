@@ -255,6 +255,20 @@
 #define HPX_AGAS_SYMBOL_NS_MSB      0x0000000100000001ULL
 #define HPX_AGAS_SYMBOL_NS_LSB      0x0000000000000003ULL
 
+#if !defined(HPX_NO_DEPRECATED)
+#define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
+
+# if defined(BOOST_MSVC)
+#  define HPX_DEPRECATED(x) __declspec(deprecated(x))
+# elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
+#  define HPX_DEPRECATED(x) __attribute__((__deprecated__))
+# endif
+
+# if !defined(HPX_DEPRECATED)
+#  define HPX_DEPRECATED(x)  /**/
+# endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 #include <hpx/config/defaults.hpp>
 

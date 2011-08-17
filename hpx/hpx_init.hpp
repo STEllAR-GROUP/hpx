@@ -21,8 +21,10 @@ int hpx_main(boost::program_options::variables_map& vm);
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+#if !defined(HPX_NO_DEPRECATED)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG) 
     inline void 
     get_option(boost::program_options::variables_map& vm,
                std::string const& name, T& x,
@@ -31,19 +33,23 @@ namespace hpx
         if (vm.count(name)) 
             x = vm[name].as<T>();
 
-        if (!config.empty()) 
-            x = boost::lexical_cast<T>
-                (get_runtime().get_config().get_entry(config, x));
+        if (!config.empty()) {
+            x = boost::lexical_cast<T>(
+                get_runtime().get_config().get_entry(config, x));
+        }
     }
 
     template <typename T>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG) 
     inline void
     get_option(T& x, std::string const& config)
     {
-        if (!config.empty())
-            x = boost::lexical_cast<T>
-                (get_runtime().get_config().get_entry(config, x));
+        if (!config.empty()) {
+            x = boost::lexical_cast<T>(
+                get_runtime().get_config().get_entry(config, x));
+        }
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is the main entry point for any HPX application. This function 
@@ -294,12 +300,132 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The function \a hpx#finalize is the main way to (gracefully) exit any 
+    /// HPX application. It should be called from one locality only (usually 
+    /// the console) and it will notify all connected localities to finish 
+    /// execution. Only after all other localities have exited this function 
+    /// will return, allowing to exit the console locality as well.
+    /// 
+    /// During the execution of this function the runtime system will invoke
+    /// all registered shutdown functions (see \a hpx#init) on all localities.
+    /// 
+    /// \param shutdown_timeout This parameter allows to specify a timeout (in
+    ///           microseconds), specifying how long any of the connected 
+    ///           localities should wait for pending tasks to be executed. 
+    ///           After this timeout, all suspended PX-threads will be aborted.
+    ///           Note, that this function will not abort any running 
+    ///           PX-threads. In any case the shutdown will not proceed as long 
+    ///           as there is at least one pending/running PX-thread. 
+    ///
+    ///           The default value (-1.) will try to find a globally set 
+    ///           timeout value (can be set as the configuration parameter 
+    ///           "hpx.shutdown_timeout"), and if that is not set or `-1.` as 
+    ///           well, it will disable any timeout, each connected
+    ///           locality will wait for all existing PX-threads to terminate.
+    ///
+    /// \param localwait This parameter allows to specify a local wait time
+    ///           (in microseconds) before the connected localities will be 
+    ///           notified and the overall shutdown process starts. 
+    ///
+    ///           The default value (-1.) will try to find a globally set 
+    ///           wait time value (can be set as the configuration parameter
+    ///           "hpx.finalize_wait_time"), and if this is not set or `-1.`
+    ///           as well, it will disable any addition local wait time before
+    ///           proceeding.
+    ///
+    /// This function will block and wait for all connected localities to exit 
+    /// before returning to the caller. It should be the last HPX-function 
+    /// called by any application.
+    ///
+    /// Using this function is an alternative to \a hpx#disconnect, these 
+    /// functions do not need to be called both.
     void finalize(double shutdown_timeout = -1.0, 
         double localwait = -1.0);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The function \a hpx#disconnect can be used to disconnect a locality 
+    /// from a running HPX application. 
+    ///
+    /// During the execution of this function the runtime system will invoke
+    /// all registered shutdown functions (see \a hpx#init) on this locality.
+    //
+    /// \param shutdown_timeout This parameter allows to specify a timeout (in
+    ///           microseconds), specifying how long this locality should wait 
+    ///           for pending tasks to be executed. After this timeout, all 
+    ///           suspended PX-threads will be aborted.
+    ///           Note, that this function will not abort any running 
+    ///           PX-threads. In any case the shutdown will not proceed as long 
+    ///           as there is at least one pending/running PX-thread. 
+    ///
+    ///           The default value (-1.) will try to find a globally set 
+    ///           timeout value (can be set as the configuration parameter 
+    ///           "hpx.shutdown_timeout"), and if that is not set or `-1.` as 
+    ///           well, it will disable any timeout, each connected
+    ///           locality will wait for all existing PX-threads to terminate.
+    ///
+    /// \param localwait This parameter allows to specify a local wait time
+    ///           (in microseconds) before the connected localities will be 
+    ///           notified and the overall shutdown process starts. 
+    ///
+    ///           The default value (-1.) will try to find a globally set 
+    ///           wait time value (can be set as the configuration parameter
+    ///           "hpx.finalize_wait_time"), and if this is not set or `-1.`
+    ///           as well, it will disable any addition local wait time before
+    ///           proceeding.
+    ///
+    /// This function will block and wait for this locality to finish executing
+    /// before returning to the caller. It should be the last HPX-function 
+    /// called by any locality being disconnected.
+    ///
+    /// Using this function is an alternative to \a hpx#finalize, these 
+    /// functions do not need to be called both.
     void disconnect(double shutdown_timeout = -1.0,
         double localwait = -1.0);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \section cmdline_options_sec HPX Application Command Line Options
+    /// 
+    /// The predefined command line options of any application using \a hpx#init
+    /// are described below.
+    /// 
+    /// <code>
+    ///   -h [ --help ]               print out program usage 
+    ///   -v [ --version ]            print out HPX version and copyright information
+    ///   -r [ --run-agas-server ]    run AGAS server as part of this runtime instance
+    ///   --run-hpx-main              run the hpx_main function, regardless of locality
+    ///                               mode
+    ///   -w [ --worker ]             run this instance in worker mode
+    ///   -c [ --console ]            run this instance in console mode
+    ///   --connect                   run this instance in worker mode, but connecting
+    ///                               late
+    ///   --list-counters             list all registered performance counters
+    ///   -p [ --app-config ] arg     load the specified application configuration 
+    ///                               (ini) file
+    ///   --hpx-config arg            load the specified hpx configuration (ini) file
+    ///   -a [ --agas ] arg           the IP address the AGAS server is running on,
+    ///                               expected format: `address:port' (default: 
+    ///                               127.0.0.1:7910)
+    ///   -x [ --hpx ] arg            the IP address the HPX parcelport is listening
+    ///                               on, expected format: `address:port' (default:
+    ///                               127.0.0.1:7910)
+    ///   -l [ --localities ] arg     the number of localities to wait for at
+    ///                               application startup (default: 1)
+    ///   -t [ --threads ] arg        the number of operating system threads to spawn
+    ///                               for this HPX locality (default: 1)
+    ///   --high-priority-threads arg the number of operating system threads
+    ///                               maintaining a high priority queue (default:
+    ///                               number of OS threads), valid for
+    ///                               --queueing=priority_local only
+    ///   -I [ --ini ] arg            add a configuration definition to the default 
+    ///                               runtime configuration
+    ///   -P [ --print-counter ] arg  print the specified performance counter before
+    ///                               shutting down the system
+    ///   --dump-config               print the runtime configuration
+    ///   --exit                      exit after configuring the runtime
+    ///   -q [ --queueing ] arg       the queue scheduling policy to use, options are
+    ///                               `global/g', `local/l', `priority_local/p' and
+    ///                               `abp/a' (default: priority_local/p)
+    ///</code>
 }
 
 #endif // HPX_ABC9B037_3A25_4591_BB60_CD166773D61D
