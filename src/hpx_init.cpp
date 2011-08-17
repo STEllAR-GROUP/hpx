@@ -193,7 +193,6 @@ namespace hpx
             if ('-' == s[0] && s.size() > 1 && std::isdigit(s[1])) {
                 try {
                     // test, whether next argument is an integer
-                    std::size_t node = boost::lexical_cast<std::size_t>(&s[1]);
                     return std::make_pair(std::string("node"), s.substr(1));
                 }
                 catch (boost::bad_lexical_cast const&) {
@@ -1018,3 +1017,4 @@ namespace hpx
         p->shutdown(shutdown_timeout); 
     }
 }
+
