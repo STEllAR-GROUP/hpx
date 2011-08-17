@@ -105,6 +105,7 @@ macro(add_hpx_component name)
       hpx_component_install(${${name}_MODULE} ${target})
     else()
       install(TARGETS ${name}_component
+        RUNTIME DESTINATION lib
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE

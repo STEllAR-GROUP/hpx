@@ -267,11 +267,7 @@ option(HPX_WARNINGS "Enable compiler warnings (default: ON)" ON)
 ################################################################################
 # Backtrace configuration 
 ################################################################################
-if(MSVC)
-  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: OFF)" OFF)
-else()
-  option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
-endif()
+option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
@@ -296,13 +292,13 @@ if(MSVC)
 
   add_definitions(-D_WINDOWS)
   add_definitions(-DBOOST_USE_WINDOWS_H)
-  add_definitions(-D_WIN32_WINNT=0x0501)
+  add_definitions(-D_WIN32_WINNT=0x0600)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
-  add_definitions(-DBOOST_ALL_DYN_LINK)
+  add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
 
   # suppress certain warnings (TODO: Document what warnings these disable)
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)

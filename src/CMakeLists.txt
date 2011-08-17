@@ -7,6 +7,10 @@
 add_subdirectory(components)
 
 add_library(hpx_init STATIC hpx_init.cpp)
+  
+set_property(TARGET hpx_init APPEND
+  PROPERTY COMPILE_DEFINITIONS
+  "HPX_COMPONENT_EXPORTS")
 
 ###############################################################################
 # POSIX 
@@ -244,7 +248,7 @@ else()
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     # AGAS
     set(hpxlib_agas_HEADERS
-        ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits.hpp.hpp
+        ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits.hpp
         ${hpx_SOURCE_DIR}/hpx/runtime/agas/traits_fwd.hpp)
     source_group("Header Files\\Runtime\\AGAS" 
         FILES ${hpxlib_agas_HEADERS})
@@ -456,6 +460,7 @@ else()
       ${hpxlib_config_HEADERS}
       ${hpxlib_include_HEADERS}
       ${hpxlib_lcos_HEADERS}
+      ${hpxlib_agas_HEADERS}
       ${hpxlib_performance_counters_HEADERS}
       ${hpxlib_performance_counters_stubs_HEADERS}
       ${hpxlib_performance_counters_server_HEADERS}
@@ -485,6 +490,7 @@ else()
   # lcos
   set(hpxlib_lcos_SOURCES
       ${hpx_SOURCE_DIR}/src/lcos/local_counting_semaphore.cpp
+      ${hpx_SOURCE_DIR}/src/lcos/barrier/barrier.cpp
       ${hpx_SOURCE_DIR}/src/lcos/base_lco.cpp)
   source_group("Source Files\\LCOs" 
       FILES ${hpxlib_lcos_SOURCES})
@@ -518,14 +524,19 @@ else()
   # AGAS 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(hpxlib_agas_SOURCES
-        ${hpx_SOURCE_DIR}/src/runtime/agas/common_actions.cpp
-        ${hpx_SOURCE_DIR}/src/runtime/agas/symbol_namespace.cpp)
+        ${hpx_SOURCE_DIR}/src/runtime/agas/router/legacy.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/router/big_boot_barrier.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/stdmap_tcpip/component_module.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/stdmap_tcpip/symbol_namespace.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/stdmap_tcpip/component_namespace.cpp
+        ${hpx_SOURCE_DIR}/src/runtime/agas/stdmap_tcpip/primary_namespace.cpp)
     source_group("Source Files\\Runtime\\AGAS" 
         FILES ${hpxlib_agas_SOURCES})
   endif()
 
   # applier
   set(hpxlib_applier_SOURCES
+      ${hpx_SOURCE_DIR}/src/runtime/applier/bind_naming_wrappers.cpp
       ${hpx_SOURCE_DIR}/src/runtime/applier/applier.cpp)
   source_group("Source Files\\Runtime\\Applier" 
       FILES ${hpxlib_applier_SOURCES})
@@ -599,11 +610,20 @@ else()
       ${hpx_SOURCE_DIR}/src/util/performance_counters.cpp
       ${hpx_SOURCE_DIR}/src/util/runtime_configuration.cpp
       ${hpx_SOURCE_DIR}/src/util/serialize_exception.cpp)
+
+  if("${HPX_AGAS_VERSION}" STREQUAL "2")
+    set(hpxlib_util_SOURCES ${hpxlib_util_SOURCES}
+      ${hpx_SOURCE_DIR}/src/util/generate_unique_ids_v2.cpp)
+  else()
+    set(hpxlib_util_SOURCES ${hpxlib_util_SOURCES}
+      ${hpx_SOURCE_DIR}/src/util/generate_unique_ids_v1.cpp)
+  endif()   
+
   source_group("Source Files\\Util" 
       FILES ${hpxlib_util_SOURCES})
-
   set(hpxlib_SOURCES
     ${hpxlib_global_SOURCES}
+    ${hpxlib_agas_SOURCES}
     ${hpxlib_lcos_SOURCES}
     ${hpxlib_performance_counters_SOURCES}
     ${hpxlib_performance_counters_stubs_SOURCES}
@@ -670,6 +690,10 @@ else()
                          ${hpxlib_HEADERS})
 
   target_link_libraries(hpx hpx_serialization)
+
+  if(HPX_STACKTRACES)
+    target_link_libraries(hpx dbghelp)
+  endif()
 
   set_target_properties(hpx PROPERTIES
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
