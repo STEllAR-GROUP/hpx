@@ -567,7 +567,6 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-
 #if HPX_AGAS_VERSION > 0x10
     void runtime_support::load_components()
     {
@@ -581,13 +580,17 @@ namespace hpx { namespace components { namespace server
     void runtime_support::call_startup_functions()
     {
         BOOST_FOREACH(boost::function<void()> const& f, startup_functions_)
-        { f(); } 
+        { 
+            f(); 
+        } 
     }
 
     void runtime_support::call_shutdown_functions()
     {
         BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
-        { f(); } 
+        { 
+            f(); 
+        } 
     }
 #endif
 

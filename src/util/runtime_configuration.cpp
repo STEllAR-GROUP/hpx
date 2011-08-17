@@ -42,16 +42,10 @@ namespace hpx { namespace util
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 
             "[hpx.agas]",
-#if HPX_AGAS_VERSION <= 0x10
-            "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_NAME_RESOLVER_ADDRESS "}",
-            "port = ${HPX_AGAS_SERVER_PORT:" 
-                BOOST_PP_STRINGIZE(HPX_NAME_RESOLVER_PORT) "}",
-#else
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "router_mode = hosted",
-#endif
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
             "locality_cache_size = ${HPX_AGAS_LOCALITY_CACHE_SIZE:"
@@ -76,36 +70,6 @@ namespace hpx { namespace util
         ini.parse("static defaults", lines);
     }
 
-#if HPX_AGAS_VERSION <= 0x10
-    void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
-        std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>())
-    {
-        // add explicit configuration information if its provided
-        util::init_ini_data_base(ini, hpx_ini_file); 
-
-        // let the command line override the config file. 
-        if (!cmdline_ini_defs.empty())
-            ini.parse("command line definitions", cmdline_ini_defs);
-
-        // try to build default ini structure from shared libraries in default 
-        // installation location, this allows to install simple components
-        // without the need to install an ini file
-        std::string component_path(
-            ini.get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
-        util::init_ini_data_default(component_path, ini);
-
-        // merge all found ini files of all components
-        util::merge_component_inis(ini);
-
-        // read system and user ini files _again_, to allow the user to 
-        // overwrite the settings from the default component ini's. 
-        util::init_ini_data_base(ini, hpx_ini_file);
-
-        // let the command line override the config file. 
-        if (!cmdline_ini_defs.empty())
-            ini.parse("command line definitions", cmdline_ini_defs);
-    }
-#else
     void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
         std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>())
     {
@@ -137,13 +101,15 @@ namespace hpx { namespace util
         if (!cmdline_ini_defs.empty())
             parse("command line definitions", cmdline_ini_defs);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
     {
         pre_initialize_ini(*this);
         post_initialize_ini(*this);
+#if HPX_AGAS_VERSION <= 0x10
+        load_components();
+#endif
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -167,6 +133,9 @@ namespace hpx { namespace util
             this->parse("static prefill defaults", prefill);
 
         post_initialize_ini(*this, hpx_ini_file_, cmdline_ini_defs_);
+#if HPX_AGAS_VERSION <= 0x10
+        load_components();
+#endif
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -178,8 +147,8 @@ namespace hpx { namespace util
     // configuration section:
     // 
     //    [hpx.agas]
-    //    address=<ip address>   # this defaults to HPX_NAME_RESOLVER_ADDRESS
-    //    port=<ip port>         # this defaults to HPX_NAME_RESOLVER_PORT
+    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
+    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
     //
     // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality() const
@@ -189,30 +158,16 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 std::string cfg_port(
-#if HPX_AGAS_VERSION <= 0x10
-                    sec->get_entry("port", HPX_NAME_RESOLVER_PORT)
-#else
-                    sec->get_entry("port", HPX_INITIAL_IP_PORT)
-#endif
-                );
+                    sec->get_entry("port", HPX_INITIAL_IP_PORT));
 
                 return naming::locality(
-#if HPX_AGAS_VERSION <= 0x10
-                    sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS),
-#else
                     sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
-#endif
                     boost::lexical_cast<boost::uint16_t>(cfg_port));
             }
         }
-        return naming::locality
-#if HPX_AGAS_VERSION <= 0x10
-            (HPX_NAME_RESOLVER_ADDRESS, HPX_NAME_RESOLVER_PORT);
-#else
-            (HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
-#endif
+        return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
-    
+
 #if HPX_AGAS_VERSION > 0x10
     agas::router_mode runtime_configuration::get_agas_router_mode() const
     {
@@ -241,6 +196,9 @@ namespace hpx { namespace util
 
     std::size_t runtime_configuration::get_num_localities() const
     {
+        // this function should only be called on the AGAS server
+        BOOST_ASSERT(agas::router_mode_bootstrap == get_agas_router_mode());
+
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -292,20 +250,11 @@ namespace hpx { namespace util
 
                 if (default_address.empty()) {
                     default_address = 
-#if HPX_AGAS_VERSION <= 0x10
-                        sec->get_entry("address", HPX_NAME_RESOLVER_ADDRESS);
-#else
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
-#endif
                 }
                 if (0 == default_port) {
                     default_port = boost::lexical_cast<boost::uint16_t>(
-#if HPX_AGAS_VERSION <= 0x10
-                        sec->get_entry("port", HPX_NAME_RESOLVER_PORT)
-#else
-                        sec->get_entry("port", HPX_INITIAL_IP_PORT)
-#endif
-                    );
+                        sec->get_entry("port", HPX_INITIAL_IP_PORT));
                 }
                 return naming::locality(default_address, default_port);
             }
@@ -397,6 +346,5 @@ namespace hpx { namespace util
         }
         return true;
     }
-
 }}
 

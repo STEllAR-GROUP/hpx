@@ -29,11 +29,6 @@
 #define HPX_RANDOM_PORT_MIN         26001
 #define HPX_RANDOM_PORT_MAX         26132
 
-#if HPX_AGAS_VERSION <= 0x10
-    #define HPX_NAME_RESOLVER_ADDRESS   "127.0.0.1"
-    #define HPX_NAME_RESOLVER_PORT      7911
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines if the Intel Thread Building Blocks library will be used
 #if !defined(HPX_USE_TBB)

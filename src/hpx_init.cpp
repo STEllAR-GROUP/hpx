@@ -28,6 +28,7 @@
 #endif
 
 #include <iostream>
+#include <cctype>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -181,12 +182,24 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // Additional command line parser which interprets '@something' as an 
-        // option "options-file" with the value "something".
+        // option "options-file" with the value "something". Additionally we 
+        // map any option -N (where N is a integer) to --node=N.
         inline std::pair<std::string, std::string> 
-        at_option_parser(std::string const&s)
+        option_parser(std::string const& s)
         {
             if ('@' == s[0]) 
                 return std::make_pair(std::string("options-file"), s.substr(1));
+
+            if ('-' == s[0] && s.size() > 1 && std::isdigit(s[1])) {
+                try {
+                    // test, whether next argument is an integer
+                    std::size_t node = boost::lexical_cast<std::size_t>(&s[1]);
+                    return std::make_pair(std::string("node"), s.substr(1));
+                }
+                catch (boost::bad_lexical_cast const&) {
+                    ;   // ignore
+                }
+            }
             return std::pair<std::string, std::string>();
         }
 
@@ -303,6 +316,11 @@ namespace hpx
                     ("options-file", value<std::vector<std::string> >()->composing(), 
                         "specify a file containing command line options "
                         "(alternatively: @filepath)")
+#if HPX_AGAS_VERSION > 0x10
+                        ("node", value<std::size_t>(), 
+                        "number of the node this locality is run on "
+                        "(must be unique, alternatively: -N")
+#endif
                 ;
 
                 switch (mode) {
@@ -386,7 +404,7 @@ namespace hpx
                     .add(hpx_options).add(hidden_options);
 
                 parsed_options opts(parse_command_line(argc, argv, 
-                    desc_cmdline, unix_style, at_option_parser));
+                    desc_cmdline, unix_style, option_parser));
                 store(opts, vm);
                 notify(vm);
 
@@ -702,6 +720,27 @@ namespace hpx
             return run(rt, f, vm, mode, startup_function, 
                 shutdown_function, num_threads, num_localities);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        void set_signal_handlers()
+        {
+#if defined(BOOST_WINDOWS)
+            // Set console control handler to allow server to be stopped.
+            SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
+#else
+            struct sigaction new_action;
+            new_action.sa_handler = hpx::termination_handler;
+            sigemptyset(&new_action.sa_mask);
+            new_action.sa_flags = 0;
+
+            sigaction(SIGBUS, &new_action, NULL);  // Bus error
+            sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
+            sigaction(SIGILL, &new_action, NULL);  // Illegal instruction 
+            sigaction(SIGPIPE, &new_action, NULL); // Bad pipe 
+            sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault 
+            sigaction(SIGSYS, &new_action, NULL);  // Bad syscall 
+#endif
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -711,40 +750,21 @@ namespace hpx
         shutdown_func shutdown_function, hpx::runtime_mode mode)
     {
         int result = 0;
-
-#if defined(BOOST_WINDOWS)
-        // Set console control handler to allow server to be stopped.
-        SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
-#else
-        struct sigaction new_action;
-        new_action.sa_handler = hpx::termination_handler;
-        sigemptyset(&new_action.sa_mask);
-        new_action.sa_flags = 0;
-
-        sigaction(SIGBUS, &new_action, NULL);  // Bus error
-        sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
-        sigaction(SIGILL, &new_action, NULL);  // Illegal instruction 
-        sigaction(SIGPIPE, &new_action, NULL); // Bad pipe 
-        sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault 
-        sigaction(SIGSYS, &new_action, NULL);  // Bad syscall 
-#endif
+        detail::set_signal_handlers();
 
         try {
             using boost::program_options::variables_map; 
+            using namespace boost::assign;
 
             // Analyze the command line.
             variables_map vm;
-            detail::command_line_result r = 
-                detail::parse_commandline(desc_cmdline, argc, argv, vm, mode);
+            detail::command_line_result r = detail::parse_commandline(
+                desc_cmdline, argc, argv, vm, mode);
 
-            switch (r) {
-            case detail::error:
+            if (detail::error == r)
                 return 1;
-            case detail::help:
+            if (detail::help == r)
                 return 0;
-            default:
-                break;
-            }
 
             // Check command line arguments.
             std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
@@ -753,21 +773,31 @@ namespace hpx
             std::size_t num_localities = 1;
             std::string queueing = "priority_local";
             std::vector<std::string> ini_config;
+            bool run_agas_server = vm.count("run-agas-server") ? true : false;
 
+#if HPX_AGAS_VERSION > 0x10
+            // if --node is specified, we initialize certain settings 
+            if (vm.count("node")) {
+                std::size_t node = vm["node"].as<std::size_t>();
+                if (0 == node) {
+                    // console node, by default runs AGAS
+                    run_agas_server = true;
+                    mode = hpx::runtime_mode_console;
+                }
+                else {
+                    hpx_port += node;         // each node gets an unique port
+                    agas_host = hpx_host;             // assume local operation
+                    agas_port = HPX_INITIAL_IP_PORT;
+                    mode = hpx::runtime_mode_worker;
+                }
+            }
+#endif
             if (vm.count("ini"))
                 ini_config = vm["ini"].as<std::vector<std::string> >();
 
             if (vm.count("agas")) {
                 detail::split_ip_address(
                     vm["agas"].as<std::string>(), agas_host, agas_port);
-
-#if HPX_AGAS_VERSION > 0x10
-                // map this command line option to the proper ini-file entries
-                using namespace boost::assign;
-                ini_config += "hpx.agas.address=" + agas_host;
-                ini_config += "hpx.agas.port=" + 
-                    boost::lexical_cast<std::string>(agas_port);
-#endif
             }
 
             if (vm.count("hpx")) {
@@ -786,8 +816,7 @@ namespace hpx
 
             // If the user has not specified an explicit runtime mode we 
             // retrieve it from the command line.
-            if (hpx::runtime_mode_default == mode)
-            {
+            if (hpx::runtime_mode_default == mode) {
                 // The default mode is console, i.e. all workers need to be 
                 // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
@@ -821,37 +850,49 @@ namespace hpx
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
 
-            if (vm.count("run-agas-server") || (num_localities == 1 && !vm.count("agas"))) {
+            // We assume we have to run the AGAS server if
+            //  - it's explicitly specified
+            //  - the number of localities to run on is not specified (or is '1')
+            //    and no additional option (--agas) has been specified.
+            if (run_agas_server || (num_localities == 1 && !vm.count("agas"))) 
+            {
                 agas_server.reset(
                     new detail::agas_server_helper(agas_host, agas_port));
             }
-            else if (vm.count("run-agas-server-only")) {
+            else if (vm.count("run-agas-server-only")) 
+            {
                 agas_server.reset(
                     new detail::agas_server_helper(agas_host, agas_port, true));
                 return 0;
             }
 #else
-            if (vm.count("run-agas-server") || (num_localities == 1 && !vm.count("agas")))  
+            if (!agas_host.empty() && 0 != agas_port) {
+                // map agas command line option parameters to the proper 
+                // ini-file entries
+                ini_config += "hpx.agas.address=" + agas_host;
+                ini_config += "hpx.agas.port=" + 
+                    boost::lexical_cast<std::string>(agas_port);
+            }
+
+            // We assume we have to run the AGAS server if
+            //  - it's explicitly specified
+            //  - the number of localities to run on is not specified (or is '1')
+            //    and no additional option (--agas or --node) has been specified.
+            if (run_agas_server || 
+                (num_localities == 1 && !vm.count("agas") && !vm.count("node")))  
             {
-                using namespace boost::assign;
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
             }
-#endif
 
-#if HPX_AGAS_VERSION > 0x10
-            {
-                using namespace boost::assign;
-                ini_config += "hpx.num_localities=" + 
-                    boost::lexical_cast<std::string>(num_localities);
-            }
+            // Set number of localities in configuration (do it everywhere, 
+            // even if this information is only used by the AGAS server).
+            ini_config += "hpx.num_localities=" + 
+                boost::lexical_cast<std::string>(num_localities);
 
-            // if we connect only temporarily disable loading/registering any 
-            // components
+            // If we connect only, temporarily disable loading/registering of 
+            // any components.
             if (mode == hpx::runtime_mode_connect)
-            {
-                using namespace boost::assign;
                 ini_config += "hpx.components.load_external=0";
-            }
 
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
             //        service only and requests to use 'priority_local' as the
@@ -859,7 +900,6 @@ namespace hpx
 #endif
 
             // Initialize and start the HPX runtime.
-            int result = -1;
             if (0 == std::string("global").find(queueing)) {
                 result = detail::run_global(hpx_host, hpx_port, 
                     agas_host, agas_port, f, vm, mode, ini_config, 
@@ -901,31 +941,34 @@ namespace hpx
             std::cerr << "hpx::init: unexpected exception caught\n";
             return -1;
         }
-
         return result;
     }
 
-    template <typename T>
-    inline T
-    get_option(std::string const& config, T default_ = T())
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
     {
-        if (!config.empty()) {
-            try {
-                return boost::lexical_cast<T>(
-                    get_runtime().get_config().get_entry(config, default_));
+        template <typename T>
+        inline T
+        get_option(std::string const& config, T default_ = T())
+        {
+            if (!config.empty()) {
+                try {
+                    return boost::lexical_cast<T>(
+                        get_runtime().get_config().get_entry(config, default_));
+                }
+                catch (boost::bad_lexical_cast const&) {
+                    ;   // do nothing
+                }
             }
-            catch (boost::bad_lexical_cast const&) {
-                ;   // do nothing
-            }
+            return default_;
         }
-        return default_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void finalize(double shutdown_timeout, double localwait)
     {
         if (localwait == -1.0)
-            localwait = get_option("hpx.finalize_wait_time", -1.0);
+            localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         if (localwait != -1.0) {
             hpx::util::high_resolution_timer t;
@@ -937,7 +980,7 @@ namespace hpx
         }
 
         if (shutdown_timeout == -1.0)
-            shutdown_timeout = get_option("hpx.shutdown_timeout", -1.0);
+            shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p = 
             reinterpret_cast<components::server::runtime_support*>(
@@ -950,7 +993,7 @@ namespace hpx
     void disconnect(double shutdown_timeout, double localwait)
     {
         if (localwait == -1.0)
-            localwait = get_option("hpx.finalize_wait_time", -1.0);
+            localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         if (localwait != -1.0) {
             hpx::util::high_resolution_timer t;
@@ -962,7 +1005,7 @@ namespace hpx
         }
 
         if (shutdown_timeout == -1.0)
-            shutdown_timeout = get_option("hpx.shutdown_timeout", -1.0);
+            shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p = 
             reinterpret_cast<components::server::runtime_support*>(

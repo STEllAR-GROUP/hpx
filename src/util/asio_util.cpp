@@ -26,7 +26,7 @@ namespace hpx { namespace util
             ep = tcp::endpoint(address(addr4), port);
             return true;
         }
-        
+
         address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
         if (!ec) {  // it's an IPV6 address
             ep = tcp::endpoint(address(addr6), port);
@@ -34,7 +34,7 @@ namespace hpx { namespace util
         }
         return false;
     }
-    
+
     boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
     get_random_ports()
     {
@@ -43,10 +43,9 @@ namespace hpx { namespace util
             port_range(HPX_RANDOM_PORT_MIN, HPX_RANDOM_PORT_MAX-1);
 
         boost::uint16_t p = port_range(rng);
-        return boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
-            (p, p+1); 
+        return boost::fusion::vector2<boost::uint16_t, boost::uint16_t>(p, p+1);
     }
-    
+
     boost::uint16_t
     get_random_port()
     {
@@ -56,5 +55,4 @@ namespace hpx { namespace util
 
         return port_range(rng);
     }
-
 }}

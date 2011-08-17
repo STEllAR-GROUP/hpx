@@ -36,11 +36,15 @@ namespace hpx { namespace util
                               std::vector<std::string> const& cmdline_ini_defs_
                                   = std::vector<std::string>());
 
-#if HPX_AGAS_VERSION > 0x10
         void load_components();
 
+#if HPX_AGAS_VERSION > 0x10
+        // Returns the AGAS mode of this locality, returns either hosted (for
+        // localities connecting to a remote AGAS server) or bootstrap for the
+        // locality hosting the AGAS server.
         agas::router_mode get_agas_router_mode() const;
 
+        // AGAS server only: get number of localities served
         std::size_t get_num_localities() const;
 
         std::size_t get_agas_allocate_response_pool_size() const;

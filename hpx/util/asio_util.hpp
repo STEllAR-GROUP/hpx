@@ -22,6 +22,9 @@ namespace hpx { namespace util
     HPX_EXPORT get_random_ports();
 
     boost::uint16_t HPX_EXPORT get_random_port();
+
+    ///////////////////////////////////////////////////////////////////////////
+
 }}
 
 #endif

@@ -288,6 +288,25 @@ namespace hpx { namespace parcelset
         pp_.put_parcel(p, boost::bind(&release_do_undo, _1, _2, f, do_undo));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    parcelhandler::parcelhandler(naming::resolver_client& resolver, 
+            parcelport& pp, threads::threadmanager_base* tm, 
+            parcelhandler_queue_base* policy)
+      : resolver_(resolver), pp_(pp), tm_(tm), parcels_(policy),
+        startup_time_(util::high_resolution_timer::now()), timer_()
+    {
+        BOOST_ASSERT(parcels_);
+
+        // retrieve the prefix to be used for this site
+        resolver_.get_prefix(pp.here(), prefix_); // throws on error
+
+        parcels_->set_parcelhandler(this);
+
+        // register our callback function with the parcelport
+        pp_.register_event_handler
+            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}
 

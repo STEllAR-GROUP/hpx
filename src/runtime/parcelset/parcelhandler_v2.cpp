@@ -145,7 +145,7 @@ namespace hpx { namespace parcelset
         catch (...)
         {
             LPT_(error) 
-                << "decode_parcel: caught unknown exception.";                
+                << "decode_parcel: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
 
@@ -175,7 +175,7 @@ namespace hpx { namespace parcelset
         pp_.register_event_handler
             (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
     }
-        
+
     naming::resolver_client& parcelhandler::get_resolver()
     {
         return resolver_;
@@ -258,7 +258,7 @@ namespace hpx { namespace parcelset
         if (&ec != &throws)
             ec = make_success_code();
     }
-              
+
     void parcelhandler::put_parcel(parcel& p, write_handler_type f)
     {
         // properly initialize parcel

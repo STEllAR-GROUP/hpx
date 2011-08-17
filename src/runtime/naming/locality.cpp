@@ -25,10 +25,10 @@ namespace hpx { namespace naming
         boost::asio::io_service& io_service) const
     {
         using boost::asio::ip::tcp;
-        
+
         // collect errors here
         exception_list errors;
-        
+
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
@@ -71,7 +71,7 @@ namespace hpx { namespace naming
         catch (boost::system::system_error const& e) {
             errors.add(e);
         }
-        
+
         // report errors
         hpx::util::osstream strm;
         strm << errors.get_message() << " (while trying to resolve: " 
@@ -84,7 +84,7 @@ namespace hpx { namespace naming
         boost::asio::io_service& io_service) const
     {
         using boost::asio::ip::tcp;
-        
+
         // collect errors here
         exception_list errors;
 
