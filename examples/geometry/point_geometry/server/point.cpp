@@ -79,8 +79,10 @@ namespace hpx { namespace geometry { namespace server
                   // this is a vertex belonging to poly_
                   // record the point as a slave
                   // find the index of poly_ that corresponds to this point
+                  point_type const& pp = (p.outer())[j];
+                  polygon_type::ring_type const& outer = poly_.outer();
                   for (std::size_t k=0;k<poly_.outer().size();k++) {
-                    if ( boost::geometry::distance( (p.outer())[j],(poly_.outer())[k] ) < 1.e-10 ) {
+                    if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
                       slave_.push_back(k); 
                       break;
                     }
