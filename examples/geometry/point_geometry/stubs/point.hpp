@@ -24,17 +24,17 @@ namespace hpx { namespace geometry { namespace stubs
 
         /// Initialize the server#point instance with the given \a gid
         static lcos::future_value<void> 
-        init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,double velx,double vely,std::size_t numpoints) 
+        init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,double velx,double vely,std::size_t numpoints,std::size_t objectid) 
         {
             typedef server::point::init_action action_type;
-            return lcos::eager_future<action_type>(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints);
+            return lcos::eager_future<action_type>(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
-        static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,double velx, double vely,std::size_t numpoints) 
+        static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,double velx, double vely,std::size_t numpoints,std::size_t objectid) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            init_async(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints).get();
+            init_async(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid).get();
         }
 
         static lcos::future_value<int> 

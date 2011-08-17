@@ -56,19 +56,20 @@ namespace hpx { namespace geometry
         lcos::future_value<void> init_async(double xmin, double xmax,
                                             double ymin, double ymax,
                                             double velx, double vely,
-                                            std::size_t numpoints) 
+                                            std::size_t numpoints,
+                                            std::size_t objectid) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,velx,vely,numpoints);
+            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         void init(double xmin, double xmax,
                   double ymin, double ymax,
                   double velx, double vely,
-                  std::size_t numpoints) 
+                  std::size_t numpoints,std::size_t objectid) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,velx,vely,numpoints);
+            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         /// Initialize the server#point instance with the given \a gid

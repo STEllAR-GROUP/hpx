@@ -49,86 +49,88 @@ namespace hpx { namespace geometry { namespace server
         bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
         {
 
-          // TEST 
-          //std::cout << " TEST search callback " << std::endl;
-          //for (std::size_t j=0;j<poly_.outer().size();j++) {
-          //  std::cout << (poly_.outer())[j].x() << " " << (poly_.outer())[j].y() << std::endl;
-          //}
-          //std::cout << " END TEST search callback " << std::endl << std::endl;
+          std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
 
-          typedef boost::geometry::model::linestring<point_type> linestring_type;
+          if ( i != objectid_ ) {
+            // search for contact
 
-          // Check for contact
-          std::deque<polygon_type> output;
-          boost::geometry::intersection(poly_,poly,output);
-          BOOST_FOREACH(polygon_type const& p, output) {
-            std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
-            std::cout << " contact region size " << p.outer().size() << std::endl;
+            // TEST 
+            //std::cout << " TEST search callback " << std::endl;
+            //for (std::size_t j=0;j<poly_.outer().size();j++) {
+            //  std::cout << (poly_.outer())[j].x() << " " << (poly_.outer())[j].y() << std::endl;
+            //}
+            //std::cout << " END TEST search callback " << std::endl << std::endl;
 
-            linestring_type line;
-            line.resize(2);
+            typedef boost::geometry::model::linestring<point_type> linestring_type;
 
-            for (std::size_t j=0;j<p.outer().size();j++) {
-              double d1 = boost::geometry::distance((p.outer())[j],poly_);
-              double d2 = boost::geometry::distance((p.outer())[j],poly);
-              // Check if there is actual contact
-              if ( d1 > 1.e-10 || d2 > 1.e-10 ) {
-                // there is actual contact -- find the vertices of poly_
-                // which have contact and their corresponding master segments 
-                if ( d1 < 1.e-10 ) {
-                  // this is a vertex belonging to poly_
-                  // record the point as a slave
-                  // find the index of poly_ that corresponds to this point
-                  point_type const& pp = (p.outer())[j];
-                  polygon_type::ring_type const& outer = poly_.outer();
-                  for (std::size_t k=0;k<poly_.outer().size();k++) {
-                    if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
-                      slave_.push_back(k); 
-                      break;
+            // Check for contact
+            std::deque<polygon_type> output;
+            boost::geometry::intersection(poly_,poly,output);
+            BOOST_FOREACH(polygon_type const& p, output) {
+              std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
+              std::cout << " contact region size " << p.outer().size() << std::endl;
+
+              linestring_type line;
+              line.resize(2);
+
+              for (std::size_t j=0;j<p.outer().size();j++) {
+                double d1 = boost::geometry::distance((p.outer())[j],poly_);
+                double d2 = boost::geometry::distance((p.outer())[j],poly);
+                // Check if there is actual contact
+                if ( d1 > 1.e-10 || d2 > 1.e-10 ) {
+                  // there is actual contact -- find the vertices of poly_
+                  // which have contact and their corresponding master segments 
+                  if ( d1 < 1.e-10 ) {
+                    // this is a vertex belonging to poly_
+                    // record the point as a slave
+                    // find the index of poly_ that corresponds to this point
+                    point_type const& pp = (p.outer())[j];
+                    polygon_type::ring_type const& outer = poly_.outer();
+                    for (std::size_t k=0;k<poly_.outer().size();k++) {
+                      if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
+                        slave_.push_back(k); 
+                        break;
+                      }
                     }
-                  }
 
-                  // The following section will be replaced by Barend 
-                  // with the nearest neighbor routine
-                  // but for now, this works
+                    // The following section will be replaced by Barend 
+                    // with the nearest neighbor routine
+                    // but for now, this works
 
-                  // the master segment should belong to poly
-                  object_id_.push_back(i);        
-                  double mindist = 999.;
-                  int min_k = -1;
-                  int final;
-                  for (std::size_t k=0;k<poly_.outer().size();k++) {
-                    final = k+1; 
-                    if ( k+1 >= poly_.outer().size() ) final = 0;
-                    line[0] = (poly_.outer())[k];
-                    line[1] = (poly_.outer())[final];
-                    double testdist = boost::geometry::distance((p.outer())[j],line);    
-                    if ( mindist > testdist ) {
-                      testdist = mindist;
-                      min_k = k;
+                    // the master segment should belong to poly
+                    object_id_.push_back(i);        
+                    double mindist = 999.;
+                    int min_k = -1;
+                    int final;
+                    for (std::size_t k=0;k<poly.outer().size();k++) {
+                      final = k+1; 
+                      if ( k+1 >= poly.outer().size() ) final = 0;
+                      line[0] = (poly.outer())[k];
+                      line[1] = (poly.outer())[final];
+                      double testdist = boost::geometry::distance(pp,line);    
+                      if ( testdist < mindist ) {
+                        mindist = testdist;
+                        min_k = k;
+                      //  std::cout << "        Search slave x : " << pp.x()  << " y " << pp.y() << std::endl;
+                      //  std::cout << "        Search master1 x : " << (poly.outer())[k].x()  << " y " << (poly.outer())[k].y() << std::endl;
+                      //  std::cout << "        Search master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
+                      }
                     }
+                    BOOST_ASSERT(min_k >= 0 );
+                    master_.push_back(min_k); 
                   }
-                  BOOST_ASSERT(min_k >= 0 );
-                  master_.push_back(min_k); 
                 }
               }
             }
+
+            // TEST
+            for (std::size_t j=0;j<slave_.size();j++) {
+              std::cout << " TEST slave : " << slave_[j] << " master " << master_[j] << " object " << object_id_[j] << std::endl; 
+              std::cout << "        Follow up slave x : " << (poly_.outer())[slave_[j]].x()  << " y " << (poly_.outer())[slave_[j]].y() << std::endl;
+              std::cout << "        Follow up master x : " << (poly.outer())[master_[j]].x()  << " y " << (poly.outer())[master_[j]].y() << std::endl;
+            }
+
           }
-
-          // for each node in the polygon, see if there is contact with this polygon
-          //for (std::size_t j=0;j<poly_.outer().size();j++) {
-          //  if ( boost::geometry::within(poly.outer()[j],poly) ) {
-            // Contact!
-            // Find the master segment -- the two nodes of the polygon 
-            //                             nearest the contact node
-
-            // Record pertinent information for contact enforcement
-            //    -Master segment
-            //    -l,A,B,C,delta, R_1, R_2,xsm,zsm
-               
-          //  }
-          //}
-          //std::cout << " TEST poly.outer().size() " << poly.outer().size() << " i " << i << " poly_ " << poly_.outer().size() << std::endl;
 
           // return type says continue or not
           // usually return true
@@ -137,6 +139,10 @@ namespace hpx { namespace geometry { namespace server
 
         void point::move(double dt)
         {
+          // clear out slave nodes and master segments
+          slave_.resize(0);
+          master_.resize(0);
+          object_id_.resize(0);
           for (std::size_t i=0;i<poly_.outer().size();i++) {
             point_type &p = (poly_.outer())[i];
             (poly_.outer())[i].x(p.x() + velx_[i]*dt);

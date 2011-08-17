@@ -53,13 +53,14 @@ namespace hpx { namespace geometry { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(double xmin,double xmax,double ymin,double ymax,double velx, double vely, std::size_t numpoints) 
+        void init(double xmin,double xmax,double ymin,double ymax,double velx, double vely, std::size_t numpoints,std::size_t objectid) 
         {
             xmin_ = xmin;
             xmax_ = xmax;
             ymin_ = ymin;
             ymax_ = ymax;
             numpoints_ = numpoints;
+            objectid_ = objectid;
   
             double dx = (xmax - xmin)/(numpoints-1);
             double dy = (ymax - ymin)/(numpoints-1);
@@ -149,8 +150,8 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_action7<
-            point, point_init, double, double,double,double,double,double,std::size_t, &point::init
+        typedef hpx::actions::direct_action8<
+            point, point_init, double, double,double,double,double,double,std::size_t,std::size_t, &point::init
         > init_action;
 
         typedef hpx::actions::direct_result_action0<
@@ -193,6 +194,7 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> slave_;
         std::vector<std::size_t> master_;
         std::vector<std::size_t> object_id_;
+        std::size_t objectid_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
 

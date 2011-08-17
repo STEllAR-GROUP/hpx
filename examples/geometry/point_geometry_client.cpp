@@ -134,7 +134,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
-          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx[i],vely[i],numpoints));
+          initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx[i],vely[i],numpoints,i));
         }
 
         hpx::components::wait(initial_phase);
@@ -158,13 +158,9 @@ int hpx_main(boost::program_options::variables_map &vm)
               // vector of gids
               std::vector<hpx::naming::id_type> search_objects;
               for (i=0;i<num_bodies;i++) {
-                search_objects.resize(num_bodies-1);
-                std::size_t count = 0;
+                search_objects.resize(num_bodies);
                 for (std::size_t j=0;j<num_bodies;j++) {
-                  if ( j != i ) {
-                    search_objects[count] = accu[j].get_gid();
-                    count++;
-                  }
+                  search_objects[j] = accu[j].get_gid();
                 }
                 search_phase.push_back(accu[i].search_async(search_objects));
               }
