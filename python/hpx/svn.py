@@ -39,11 +39,13 @@ def revision(wc_path=None):
     windows = 1
 
     try:
-      proc = process("svnversion %s" % wc_path)
+      proc = process( "svnversion %s"
+                    % wc_path.replace('\\', '/'))
     except WindowsError, err:
       # We couldn't find svnversion, fallback to subwcrev.exe
       from tempfile import NamedTemporaryFile
       from os import unlink 
+      from os.path import normpath
 
       # Create two temporary files for use with subwcrev.exe
       input = NamedTemporaryFile(delete=False)
@@ -51,18 +53,23 @@ def revision(wc_path=None):
 
       input.write("$WCREV$$WCMODS?M:$\n")
 
+      input.close()
+      output.close()
+
       proc = process( "subwcrev.exe %s %s %s"
-                    % (wc_path, input.name, output.name))
+                    % ( wc_path.replace('\\', '/')
+                      , input.name.replace('\\', '/')
+                      , output.name.replace('\\', '/')))
 
       proc.wait()
 
-      raw = output.read().rstrip()
+      results = open(output.name.replace('\\', '/'))
+      raw = results.read().rstrip()
+      results.close()
 
       # Clean up the temporary files
-      input.close()
-      output.close()
-      unlink(input.name)
-      unlink(output.name)
+      unlink(input.name.replace('\\', '/'))
+      unlink(output.name.replace('\\', '/'))
 
       if 0 == len(raw):
         return None
