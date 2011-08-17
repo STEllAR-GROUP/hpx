@@ -29,7 +29,7 @@
 namespace hpx { namespace geometry { namespace server 
 {
         /// search for contact
-        int point::search(std::vector<hpx::naming::id_type> const& search_objects) const
+        int point::search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
 
