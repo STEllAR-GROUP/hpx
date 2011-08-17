@@ -29,7 +29,50 @@ def revision(wc_path=None):
     from errno import errorcode, ENOENT 
     raise IOError(ENOENT, strerror(ENOENT), wc_path) 
 
-  proc = process("svnversion %s" % wc_path)
+  windows = 0
+  proc = None
+
+  try:
+    from sys import getwindowsversion
+    # On Windows, we might have to fall back to subwcrev.exe (from TortoiseSVN). 
+
+    windows = 1
+
+    try:
+      proc = process("svnversion %s" % wc_path)
+    except WindowsError, err:
+      # We couldn't find svnversion, fallback to subwcrev.exe
+      from tempfile import NamedTemporaryFile
+      from os import unlink 
+
+      # Create two temporary files for use with subwcrev.exe
+      input = NamedTemporaryFile(delete=False)
+      output = NamedTemporaryFile(delete=False)
+
+      input.write("$WCREV$$WCMODS?M:$\n")
+
+      proc = process( "subwcrev.exe %s %s %s"
+                    % (wc_path, input.name, output.name))
+
+      proc.wait()
+
+      raw = output.read().rstrip()
+
+      # Clean up the temporary files
+      input.close()
+      output.close()
+      unlink(input.name)
+      unlink(output.name)
+
+      if 0 == len(raw):
+        return None
+      else:
+        return raw
+
+  except ImportError, err:
+    # On POSIX, svnversion should always be available if SVN is installed.
+    proc = process("svnversion %s" % wc_path)
+
   proc.wait()
 
   raw = proc.read().rstrip()
