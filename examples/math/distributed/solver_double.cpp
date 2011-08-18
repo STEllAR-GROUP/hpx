@@ -39,13 +39,13 @@
 #include <examples/math/distributed/discovery/discovery.hpp>
 #include <examples/math/distributed/integrator/integrator.hpp>
 
-using boost::format;
-
 using boost::program_options::options_description;
 using boost::program_options::value;
 using boost::program_options::variables_map;
 
 using boost::posix_time::milliseconds;
+
+using boost::format;
 
 using hpx::actions::function;
 using hpx::actions::plain_action1;
@@ -126,7 +126,7 @@ HPX_REGISTER_PLAIN_ACTION(math_function_action);
 ///////////////////////////////////////////////////////////////////////////////
 void agas_main(variables_map& vm)
 {
-    const boost::uint32_t rate = vm["monitoring-rate"].as<boost::uint32_t>();
+    const boost::uint32_t pause = vm["monitoring-pause"].as<boost::uint32_t>();
     const std::string name = vm["monitor"].as<std::string>();
 
     std::cout << (format("monitoring %s\n") % name);
@@ -165,10 +165,10 @@ void agas_main(variables_map& vm)
 
         // Live wait.
         //boost::this_thread::sleep(boost::get_system_time() + 
-        //    boost::posix_time::milliseconds(rate));
+        //    boost::posix_time::milliseconds(pause));
 
         // Schedule a wakeup.
-        set_thread_state(get_self_id(), milliseconds(rate)
+        set_thread_state(get_self_id(), milliseconds(pause)
                        , pending, wait_timeout, thread_priority_critical);
         
         get_self().yield(suspended);
@@ -357,7 +357,7 @@ int main(int argc, char* argv[])
         , "symbolic name of the performance counter to monitor on the AGAS "
           "locality")
 
-        ( "monitoring-rate"
+        ( "monitoring-pause"
         , value<boost::uint32_t>()->default_value(100) 
         , "milliseconds between each performance counter query")
 

@@ -7,15 +7,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // include Windows specific performance counter binding
 #include "win_perf_counters.hpp"
@@ -24,10 +21,9 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::format;
+using boost::posix_time::milliseconds;
 
-using hpx::cout;
-using hpx::flush;
+using boost::format;
 
 using hpx::init;
 using hpx::finalize;
@@ -36,10 +32,14 @@ using hpx::runtime_mode_connect;
 
 using hpx::applier::get_applier;
 
-using hpx::actions::plain_action1;
-using hpx::actions::plain_action4;
-
 using hpx::threads::threadmanager_is;
+using hpx::threads::thread_priority_critical;
+using hpx::threads::wait_timeout;
+using hpx::threads::pending;
+using hpx::threads::suspended;
+using hpx::threads::get_self_id;
+using hpx::threads::get_self;
+using hpx::threads::set_thread_state;
 
 using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
@@ -47,14 +47,10 @@ using hpx::performance_counters::status_valid_data;
 
 using hpx::naming::gid_type;
 
-using hpx::util::high_resolution_timer;
-
 ///////////////////////////////////////////////////////////////////////////////
 void monitor(
     std::string const& name
-  , double frequency
-  , double duration
-  , double rate
+  , boost::uint64_t pause
 ) {
     // Resolve the GID of the performance counter using it's symbolic name.
     gid_type gid;
@@ -62,66 +58,36 @@ void monitor(
 
     BOOST_ASSERT(gid); 
 
-    high_resolution_timer t;
-    double current_time(0);
+    boost::int64_t zero_time = 0;
 
-    for (boost::uint64_t segment = 0; true; ++segment)
+    while (true) 
     {
-        // Get the current time at the start of each segment.
-        const double segment_start = t.elapsed();
+        if (!threadmanager_is(running))
+            return;
 
-        // do-while style for loop.
-        for (boost::uint64_t block = 0;
-             block != 0 || current_time - segment_start < frequency;
-             ++block)
+        // Query the performance counter.
+        counter_value value = performance_counter::get_value(gid); 
+
+        if (HPX_LIKELY(status_valid_data == value.status_))
         {
-            // Start the monitoring phase.
-            const double monitor_start = t.elapsed();
+            if (!zero_time)
+                zero_time = value.time_;
 
-            do {
-                current_time = t.elapsed();
+            std::cout << ( format("  %s,%d,%d\n")
+                         % name
+                         % (value.time_ - zero_time)
+                         % value.value_);
 
-                // Query the performance counter.
-                counter_value value = performance_counter::get_value(gid); 
-
-                if (HPX_LIKELY(status_valid_data == value.status_)) {
-                    std::cout << (format("(%s %f %d %d %d)\n")
-                                 % name
-                                 % current_time
-                                 % segment
-                                 % block
-                                 % value.value_);
 #if defined(BOOST_WINDOWS)
-                    update_windows_counters(value.value_);
+            update_windows_counters(value.value_);
 #endif
-                }
-                else {
-                    std::cout << (format("(%s %f %d %d '())\n")
-                                 % name
-                                 % current_time
-                                 % segment
-                                 % block);
-                }
-
-                // Adjust rate of pinging values.
-                const double delay_start = t.elapsed();
-
-                do {
-                    // Stop when the threadmanager is no longer available.
-                    if (!threadmanager_is(running))
-                        return;
-
-                    current_time = t.elapsed();
-                } while (current_time - delay_start < rate);
-            } while (current_time - monitor_start < duration);
         }
 
-        // Adjust rate of monitoring phases.
-        const double pause_start = t.elapsed();
-
-        do {
-            current_time = t.elapsed();
-        } while (current_time - pause_start < (frequency - duration));
+        // Schedule a wakeup.
+        set_thread_state(get_self_id(), milliseconds(pause)
+                       , pending, wait_timeout, thread_priority_critical);
+        
+        get_self().yield(suspended);
     }
 }
 
@@ -132,11 +98,9 @@ int hpx_main(variables_map& vm)
         std::cout << "starting monitor" << std::endl;
 
         const std::string name = vm["name"].as<std::string>();
-        const double frequency = vm["frequency"].as<double>(); 
-        const double duration = vm["duration"].as<double>(); 
-        const double rate = vm["rate"].as<double>();
+        const boost::uint64_t pause = vm["pause"].as<boost::uint64_t>();
 
-        monitor(name, frequency, duration, rate);
+        monitor(name, pause);
     }
 
     finalize();
@@ -156,17 +120,9 @@ int main(int argc, char* argv[])
             ("/pcs/queue([L1]/threadmanager)/length")
         , "symbolic name of the performance counter")
 
-        ( "frequency"
-        , value<double>()->default_value(10, "10") 
-        , "frequency of monitoring")
-
-        ( "duration"
-        , value<double>()->default_value(5, "5") 
-        , "duration of each monitoring block")
-
-        ( "rate"
-        , value<double>()->default_value(0.01, "0.01") 
-        , "rate of polling")
+        ( "pause"
+        , value<boost::uint64_t>()->default_value(100) 
+        , "milliseconds between each performance counter query")
         ;
 
     // Initialize and run HPX, enforce connect mode as we connect to an existing 
