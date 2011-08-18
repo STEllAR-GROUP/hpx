@@ -791,8 +791,15 @@ namespace hpx
             std::size_t retrieve_node_number() const
             {
                 char* pbs_nodenum = std::getenv("PBS_NODENUM");
-                if (pbs_nodenum)
-                    return boost::lexical_cast<std::size_t>(std::string(pbs_nodenum));
+                if (pbs_nodenum) {
+                    try {
+                        std::string value(pbs_nodenum);
+                        return boost::lexical_cast<std::size_t>(value);
+                    }
+                    catch (boost::bad_lexical_cast const&) {
+                        ; // just ignore the error
+                    }
+                }
                 return std::size_t(-1);
             }
 
@@ -806,7 +813,9 @@ namespace hpx
             // host the AGAS server.
             std::string agas_host_name() const
             {
-                return nodes_.empty() ? host_name() : (*nodes_.begin()).first;
+                return nodes_.empty() 
+                    ? std::string(HPX_INITIAL_IP_ADDRESS) 
+                    : (*nodes_.begin()).first;
             }
 
             std::map<std::string, std::size_t> nodes_;
@@ -838,11 +847,12 @@ namespace hpx
 
             // Check command line arguments.
             detail::environment env;
-            std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
+            std::string hpx_host(HPX_INITIAL_IP_ADDRESS);
+            std::string agas_host(env.agas_host_name());
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
             std::size_t num_threads = env.retrieve_number_of_threads();
             std::size_t num_localities = env.retrieve_number_of_localities();
-            std::string queueing = "priority_local";
+            std::string queueing("priority_local");
             std::vector<std::string> ini_config;
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
             std::size_t node = env.retrieve_node_number();
