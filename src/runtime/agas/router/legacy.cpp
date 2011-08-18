@@ -228,6 +228,12 @@ bool legacy_router::get_console_prefix(
     if (status() != running)
         return false;
 
+    if (is_console())
+    {
+        prefix = local_prefix();
+        return true;
+    }
+ 
     if (try_cache && !is_bootstrap())
     {
         if (hosted->console_cache_)

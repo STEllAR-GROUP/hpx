@@ -321,6 +321,14 @@ namespace hpx
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
 
+    enum logging_destination
+    {
+        destination_hpx = 0,
+        destination_timing = 1,
+        destination_agas = 2,
+        destination_app = 3,
+    };
+
     /// \namespace components
     namespace components
     {
@@ -373,6 +381,11 @@ namespace hpx
             class HPX_API_EXPORT memory;
             class HPX_API_EXPORT memory_block;
         }
+
+        HPX_EXPORT void console_logging(logging_destination dest,
+            std::size_t level, std::string const& msg);
+        HPX_EXPORT void cleanup_logging();
+        HPX_EXPORT void activate_logging();
     }
 
     /// \namespace lcos

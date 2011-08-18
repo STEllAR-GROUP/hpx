@@ -307,6 +307,9 @@ namespace hpx { namespace components { namespace server
     // function to be called to terminate this locality immediately
     void runtime_support::terminate(naming::id_type respond_to)
     {
+        // push pending logs
+        components::cleanup_logging();
+
         if (respond_to) {
             // respond synchronously
             typedef lcos::base_lco_with_value<void> void_lco_type;
@@ -487,6 +490,9 @@ namespace hpx { namespace components { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
+            // push pending logs
+            components::cleanup_logging();
+
             BOOST_ASSERT(!terminated_);
 
             stopped_ = true;

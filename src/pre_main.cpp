@@ -68,10 +68,6 @@ void pre_main(runtime_mode mode)
 
     if (runtime_mode_connect == mode)
     {
-        // Load components, so that we can use the barrier LCO.
-        components::stubs::runtime_support::load_components
-            (find_here());
-
         const std::size_t allocate_size = cfg.get_agas_allocate_response_pool_size();
         const std::size_t bind_size = cfg.get_agas_bind_response_pool_size();
 
@@ -79,6 +75,10 @@ void pre_main(runtime_mode mode)
         // future pool semaphores. 
         agas_client.hosted->allocate_response_sema_.signal(allocate_size);
         agas_client.hosted->bind_response_sema_.signal(bind_size);
+
+        // Load components, so that we can use the barrier LCO.
+        components::stubs::runtime_support::load_components
+            (find_here());
 
         // Install performance counter startup functions for core subsystems.
         applier::get_applier().get_thread_manager().install_counters();
@@ -90,6 +90,21 @@ void pre_main(runtime_mode mode)
 
     else
     {
+        // {{{ unblock router 
+        if (!agas_client.is_bootstrap())
+        {
+            const std::size_t allocate_size = cfg.get_agas_allocate_response_pool_size();
+            const std::size_t bind_size = cfg.get_agas_bind_response_pool_size();
+
+            // Unblock the AGAS router by adding the initial pool size to the
+            // future pool semaphores. This ensures that no AGAS requests are 
+            // sent after first-stage AGAS bootstrap and before second-stage
+            // bootstrap.
+            agas_client.hosted->allocate_response_sema_.signal(allocate_size);
+            agas_client.hosted->bind_response_sema_.signal(bind_size);
+        }
+        // }}}
+
         // Load components, so that we can use the barrier LCO.
         components::stubs::runtime_support::load_components
             (find_here());
@@ -106,16 +121,6 @@ void pre_main(runtime_mode mode)
 
         else // Hosted. 
         {
-            const std::size_t allocate_size = cfg.get_agas_allocate_response_pool_size();
-            const std::size_t bind_size = cfg.get_agas_bind_response_pool_size();
-
-            // Unblock the AGAS router by adding the initial pool size to the
-            // future pool semaphores. This ensures that no AGAS requests are 
-            // sent after first-stage AGAS bootstrap and before second-stage
-            // bootstrap.
-            agas_client.hosted->allocate_response_sema_.signal(allocate_size);
-            agas_client.hosted->bind_response_sema_.signal(bind_size);
-
             // Initialize the barrier clients (find them in AGAS)
             second_stage = find_barrier(agas_client, second_barrier);
             third_stage = find_barrier(agas_client, third_barrier);
@@ -140,6 +145,9 @@ void pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
     }
+
+    // Enable logging.
+    components::activate_logging();
 }
 
 }
