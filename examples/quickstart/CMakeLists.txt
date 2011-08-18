@@ -20,6 +20,7 @@ if(NOT MSVC)
       error_handling1
       error_handling2
       error_handling3
+      error_handling4
       quicksort)
 else()
   set(example_programs
@@ -33,7 +34,8 @@ else()
       fibonacci2
       error_handling1
       error_handling2
-      error_handling3)
+      error_handling3
+      error_handling4)
 endif()
 
 foreach(example_program ${example_programs})
