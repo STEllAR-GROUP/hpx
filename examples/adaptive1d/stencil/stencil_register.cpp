@@ -36,7 +36,7 @@ typedef hpx::components::adaptive1d::server::logging adaptive1d_logging_type;
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     hpx::components::simple_component<adaptive1d_stencil_type>, 
-    dataflow_stencil, "adaptive1d_functional_component_type");
+    adaptive1d_dataflow_stencil, "adaptive1d_functional_component_type");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(adaptive1d_stencil_type);
 

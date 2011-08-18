@@ -21,11 +21,11 @@ typedef hpx::components::managed_component<
 > dataflow_stencil_value_out_adaptor_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    dataflow_stencil_value_out_adaptor_type, dataflow_stencil_value_out_adaptor);
+    dataflow_stencil_value_out_adaptor_type, adaptive1d_dataflow_stencil_value_out_adaptor);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
     dataflow_stencil_value_out_adaptor_type::wrapped_type::get_value_action,
-    dataflow_stencil_value_out_get_value_action);
+    adaptive1d_dataflow_stencil_value_out_get_value_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_stencil_value_out_adaptor_type::wrapped_type);
 

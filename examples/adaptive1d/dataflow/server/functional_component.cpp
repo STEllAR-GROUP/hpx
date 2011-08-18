@@ -20,10 +20,10 @@ typedef hpx::components::adaptive1d::server::functional_component dataflow_funct
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
 HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::alloc_data_action, 
-    dataflow_functional_component_alloc_data_action);
+    adaptive1d_dataflow_functional_component_alloc_data_action);
 HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::eval_action, 
-    dataflow_functional_component_eval_action);
+    adaptive1d_dataflow_functional_component_eval_action);
 HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::init_action, 
-    dataflow_functional_component_init_action);
+    adaptive1d_dataflow_functional_component_init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_functional_component_type);
 
