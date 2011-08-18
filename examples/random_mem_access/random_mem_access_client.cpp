@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
     // Configure application-specific options
     boost::program_options::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ("array-size", value<std::size_t>()->default_value(8), 

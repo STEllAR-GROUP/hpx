@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options
     po::options_description 
-        desc_commandline ("usage: fibonacci1 [options]");
+        desc_commandline ("Usage: fibonacci1 [options]");
     desc_commandline.add_options()
         ("value,v", po::value<int>(), 
          "the number to be used as the argument to fib (default is 10)")

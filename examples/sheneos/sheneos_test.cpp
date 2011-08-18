@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     namespace po = boost::program_options;
 
     // Configure application-specific options
-    po::options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+    po::options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
     cmdline.add_options()
         ("num_tests,n", po::value<std::size_t>(), 
             "number of data points to interpolate (default: 10000)")

@@ -538,7 +538,7 @@ def run(options, args):
   distributed_runtime.start(command, options)
 
 def setup_options():
-  usage = "usage: %prog [options] command" 
+  usage = "Usage: %prog [options] command" 
   parser = OptionParser(usage=usage)
   parser.add_option("-a", "--app_logging",
                     action="store", type="int",

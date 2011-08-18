@@ -18,7 +18,7 @@ if exists(join(path[0], "../share/hpx/python/hpx")):
 
 from hpx.environment import identify
 
-usage = "usage: %prog [options] compiler-driver" 
+usage = "Usage: %prog [options] compiler-driver" 
 
 parser = OptionParser(usage=usage)
 

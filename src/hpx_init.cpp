@@ -175,12 +175,13 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         command_line_result print_help(
+            boost::program_options::options_description const& cmdline_options, 
             boost::program_options::options_description const& app_options, 
             boost::program_options::options_description const& hpx_options)
         {
             boost::program_options::options_description visible;
 
-            visible.add(app_options).add(hpx_options);
+            visible.add(app_options).add(cmdline_options).add(hpx_options);
             std::cout << visible;
             return help;
         }
@@ -311,8 +312,10 @@ namespace hpx
             using namespace boost::program_options::command_line_style;
 
             try {
-                options_description cmdline_options("HPX options (command line only)");
-                options_description hpx_options("HPX options");
+                options_description cmdline_options(
+                    "HPX options (allowed on command line only)");
+                options_description hpx_options(
+                    "HPX options (additionally allowed in an options file)");
                 options_description hidden_options("Hidden options");
 
                 cmdline_options.add_options()
@@ -321,11 +324,6 @@ namespace hpx
                     ("options-file", value<std::vector<std::string> >()->composing(), 
                         "specify a file containing command line options "
                         "(alternatively: @filepath)")
-#if HPX_AGAS_VERSION > 0x10
-                        ("node", value<std::size_t>(), 
-                        "number of the node this locality is run on "
-                        "(must be unique, alternatively: -N")
-#endif
                 ;
 
                 switch (mode) {
@@ -356,22 +354,13 @@ namespace hpx
                 }
 
                 hpx_options.add_options()
-#if HPX_AGAS_VERSION <= 0x10
-                    ("run-agas-server-only", "run only the AGAS server")
-#else
-                    ("list-counters", "list all registered performance counters")
-#endif
-                ;
-
-                hpx_options.add_options()
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
+#if HPX_AGAS_VERSION <= 0x10
+                    ("run-agas-server-only", "run only the AGAS server")
+#endif
                     ("run-hpx-main",
                      "run the hpx_main function, regardless of locality mode")
-                    ("app-config,p", value<std::string>(), 
-                     "load the specified application configuration (ini) file")
-                    ("hpx-config", value<std::string>()->default_value(""), 
-                     "load the specified hpx configuration (ini) file")
                     ("agas,a", value<std::string>(), 
                      "the IP address the AGAS server is running on, "
                      "expected format: `address:port' (default: "
@@ -386,21 +375,31 @@ namespace hpx
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to spawn for this "
                      "HPX locality (default: 1)")
+                    ("queueing,q", value<std::string>(),
+                     "the queue scheduling policy to use, options are `global/g', "
+                     "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
                     ("high-priority-threads", value<std::size_t>(), 
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
+                    ("app-config,p", value<std::string>(), 
+                     "load the specified application configuration (ini) file")
+                    ("hpx-config", value<std::string>()->default_value(""), 
+                     "load the specified hpx configuration (ini) file")
                     ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add a configuration definition to the default runtime "
                      "configuration")
+                    ("dump-config", "print the runtime configuration")
+                    ("exit", "exit after configuring the runtime")
+#if HPX_AGAS_VERSION > 0x10
                     ("print-counter,P", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter before shutting "
                      "down the system")
-                    ("dump-config", "print the runtime configuration")
-                    ("exit", "exit after configuring the runtime")
-                    ("queueing,q", value<std::string>(),
-                     "the queue scheduling policy to use, options are `global/g', "
-                     "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
+                    ("list-counters", "list all registered performance counters")
+                    ("node", value<std::size_t>(), 
+                    "number of the node this locality is run on "
+                    "(must be unique, alternatively: -1, -2, etc.)")
+#endif
                 ;
 
                 options_description desc_cmdline;
@@ -426,7 +425,7 @@ namespace hpx
 
                 // print help screen
                 if (vm.count("help")) 
-                    return print_help(app_options, hpx_options);
+                    return print_help(cmdline_options, app_options, hpx_options);
             }
             catch (std::exception const& e) {
                 std::cerr << "hpx::init: exception caught: "
@@ -544,8 +543,7 @@ namespace hpx
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
-            startup_func const& startup_function, 
-            shutdown_func const& shutdown_function, 
+            startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
         {
             if (vm.count("app-config"))
@@ -562,11 +560,11 @@ namespace hpx
                     boost::bind(print_shutdown_counters, counters));
             }
 
-            if (!startup_function.empty())
-                rt.add_startup_function(startup_function);
+            if (!startup.empty())
+                rt.add_startup_function(startup);
 
-            if (!shutdown_function.empty())
-                rt.add_shutdown_function(shutdown_function);
+            if (!shutdown.empty())
+                rt.add_shutdown_function(shutdown);
 
             // Dump the configuration after all components have been loaded.
             if (vm.count("dump-config"))
@@ -613,8 +611,7 @@ namespace hpx
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup_function, 
-            shutdown_func const& shutdown_function, 
+            startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
@@ -632,8 +629,8 @@ namespace hpx
                 global_queue_policy::init_parameter_type(), 
                 vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, f, vm, mode, startup_function, 
-                shutdown_function, num_threads, num_localities);
+            return run(rt, f, vm, mode, startup, shutdown, num_threads, 
+                num_localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -642,8 +639,7 @@ namespace hpx
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup_function, 
-            shutdown_func const& shutdown_function, 
+            startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
@@ -661,8 +657,8 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, f, vm, mode, startup_function, 
-                shutdown_function, num_threads, num_localities);
+            return run(rt, f, vm, mode, startup, shutdown, num_threads, 
+                num_localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -672,8 +668,7 @@ namespace hpx
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup_function, 
-            shutdown_func const& shutdown_function, 
+            startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
         {
             std::size_t num_high_priority_queues = num_threads;
@@ -692,8 +687,8 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, f, vm, mode, startup_function, 
-                shutdown_function, num_threads, num_localities);
+            return run(rt, f, vm, mode, startup, shutdown, num_threads, 
+                num_localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -703,8 +698,7 @@ namespace hpx
             std::string const& agas_host, boost::uint16_t agas_port, 
             hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup_function, 
-            shutdown_func const& shutdown_function, 
+            startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
@@ -722,8 +716,8 @@ namespace hpx
             runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
                 init, vm["hpx-config"].as<std::string>(), ini_config);
 
-            return run(rt, f, vm, mode, startup_function, 
-                shutdown_function, num_threads, num_localities);
+            return run(rt, f, vm, mode, startup, shutdown, num_threads, 
+                num_localities);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -825,8 +819,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int init(hpx_main_func f,
         boost::program_options::options_description& desc_cmdline, 
-        int argc, char* argv[], startup_func startup_function, 
-        shutdown_func shutdown_function, hpx::runtime_mode mode)
+        int argc, char* argv[], std::vector<std::string> ini_config,
+        startup_func startup, shutdown_func shutdown, hpx::runtime_mode mode)
     {
         int result = 0;
         detail::set_signal_handlers();
@@ -853,7 +847,6 @@ namespace hpx
             std::size_t num_threads = env.retrieve_number_of_threads();
             std::size_t num_localities = env.retrieve_number_of_localities();
             std::string queueing("priority_local");
-            std::vector<std::string> ini_config;
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
             std::size_t node = env.retrieve_node_number();
 
@@ -877,8 +870,11 @@ namespace hpx
                 }
             }
 #endif
-            if (vm.count("ini"))
-                ini_config = vm["ini"].as<std::vector<std::string> >();
+            if (vm.count("ini")) {
+                std::vector<std::string> cfg =
+                    vm["ini"].as<std::vector<std::string> >();
+                std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
+            }
 
             if (vm.count("agas")) {
                 detail::split_ip_address(
@@ -983,30 +979,26 @@ namespace hpx
             if (0 == std::string("global").find(queueing)) {
                 result = detail::run_global(hpx_host, hpx_port, 
                     agas_host, agas_port, f, vm, mode, ini_config, 
-                    startup_function, shutdown_function, num_threads, 
-                    num_localities);
+                    startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("local").find(queueing)) {
                 result = detail::run_local(hpx_host, hpx_port, 
                     agas_host, agas_port, f, vm, mode, ini_config, 
-                    startup_function, shutdown_function, num_threads, 
-                    num_localities);
+                    startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
                 result = detail::run_priority_local(hpx_host, hpx_port, 
                     agas_host, agas_port, f, vm, mode, ini_config, 
-                    startup_function, shutdown_function, num_threads, 
-                    num_localities);
+                    startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
                 result = detail::run_abp(hpx_host, hpx_port, 
                     agas_host, agas_port, f, vm, mode, ini_config, 
-                    startup_function, shutdown_function, num_threads, 
-                    num_localities);
+                    startup, shutdown, num_threads, num_localities);
             }
             else {
                 throw std::logic_error("bad value for parameter --queueing/-q");

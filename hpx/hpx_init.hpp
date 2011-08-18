@@ -71,6 +71,12 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this 
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to main()).
+    /// \param cfg          A list of configuration settings which will be added
+    ///                     to the system configuration before the runtime 
+    ///                     instance is run. Each of the entries in this list 
+    ///                     must have the format of a fully defined key/value
+    ///                     pair from an ini-file (for instance 
+    ///                     'hpx.component.enabled=1')
     /// \param startup_function [in] A function to be executed inside a HPX
     ///                     thread before \p f is called. If this parameter
     ///                     is not given no function will be executed.
@@ -98,10 +104,23 @@ namespace hpx
     ///                     parameter\p mode.
     int init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline, 
-        int argc, char* argv[],
-        boost::function<void()> startup_function = boost::function<void()>(),
-        boost::function<void()> shutdown_function = boost::function<void()>(),
+        int argc, char* argv[], std::vector<std::string> cfg,
+        boost::function<void()> startup = boost::function<void()>(),
+        boost::function<void()> shutdown = boost::function<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline int 
+    init(int (*f)(boost::program_options::variables_map& vm),
+        boost::program_options::options_description& desc_cmdline, 
+        int argc, char* argv[],
+        boost::function<void()> startup = boost::function<void()>(),
+        boost::function<void()> shutdown = boost::function<void()>(),
+        hpx::runtime_mode mode = hpx::runtime_mode_default)
+    {
+        std::vector<std::string> cfg;
+        return init(f, desc_cmdline, argc, argv, cfg, startup, shutdown, mode);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// This is a simplified main entry point, which can be used to set up the
@@ -181,6 +200,17 @@ namespace hpx
         hpx::runtime_mode mode = hpx::runtime_mode_default)
     {
         return init(::hpx_main, desc_cmdline, argc, argv, startup, shutdown, mode);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline int 
+    init(boost::program_options::options_description& desc_cmdline, 
+        int argc, char* argv[], std::vector<std::string> const& cfg,
+        boost::function<void()> startup = boost::function<void()>(),
+        boost::function<void()> shutdown = boost::function<void()>(),
+        hpx::runtime_mode mode = hpx::runtime_mode_default)
+    {
+        return init(::hpx_main, desc_cmdline, argc, argv, cfg, startup, shutdown, mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -287,7 +317,7 @@ namespace hpx
         using boost::program_options::options_description; 
 
         options_description desc_commandline(
-            "usage: " + app_name +  " [options]");
+            "Usage: " + app_name +  " [options]");
 
         if (argc == 0 || argv == 0)
         {
@@ -389,21 +419,22 @@ namespace hpx
     /// are described below.
     /// 
     /// <code>
-    ///   -h [ --help ]               print out program usage 
-    ///   -v [ --version ]            print out HPX version and copyright information
-    ///   -r [ --run-agas-server ]    run AGAS server as part of this runtime instance
-    ///   --run-hpx-main              run the hpx_main function, regardless of locality
-    ///                               mode
+    /// HPX options (allowed on command line only):
+    ///   -h [ --help ]         print out program usage (this message)
+    ///   -v [ --version ]      print out HPX version and copyright information
+    ///   --options-file arg    specify a file containing command line options
+    ///                         (alternatively: @filepath)
+    /// 
+    /// HPX options (additionally allowed in an options file):
     ///   -w [ --worker ]             run this instance in worker mode
     ///   -c [ --console ]            run this instance in console mode
     ///   --connect                   run this instance in worker mode, but connecting
     ///                               late
-    ///   --list-counters             list all registered performance counters
-    ///   -p [ --app-config ] arg     load the specified application configuration 
-    ///                               (ini) file
-    ///   --hpx-config arg            load the specified hpx configuration (ini) file
+    ///   -r [ --run-agas-server ]    run AGAS server as part of this runtime instance
+    ///   --run-hpx-main              run the hpx_main function, regardless of locality
+    ///                               mode
     ///   -a [ --agas ] arg           the IP address the AGAS server is running on,
-    ///                               expected format: `address:port' (default: 
+    ///                               expected format: `address:port' (default:
     ///                               127.0.0.1:7910)
     ///   -x [ --hpx ] arg            the IP address the HPX parcelport is listening
     ///                               on, expected format: `address:port' (default:
@@ -412,19 +443,25 @@ namespace hpx
     ///                               application startup (default: 1)
     ///   -t [ --threads ] arg        the number of operating system threads to spawn
     ///                               for this HPX locality (default: 1)
+    ///   -q [ --queueing ] arg       the queue scheduling policy to use, options are
+    ///                               `global/g', `local/l', `priority_local/p' and
+    ///                               `abp/a' (default: priority_local/p)
     ///   --high-priority-threads arg the number of operating system threads
     ///                               maintaining a high priority queue (default:
     ///                               number of OS threads), valid for
     ///                               --queueing=priority_local only
-    ///   -I [ --ini ] arg            add a configuration definition to the default 
+    ///   -p [ --app-config ] arg     load the specified application configuration
+    ///                               (ini) file
+    ///   --hpx-config arg            load the specified hpx configuration (ini) file
+    ///   -I [ --ini ] arg            add a configuration definition to the default
     ///                               runtime configuration
-    ///   -P [ --print-counter ] arg  print the specified performance counter before
-    ///                               shutting down the system
     ///   --dump-config               print the runtime configuration
     ///   --exit                      exit after configuring the runtime
-    ///   -q [ --queueing ] arg       the queue scheduling policy to use, options are
-    ///                               `global/g', `local/l', `priority_local/p' and
-    ///                               `abp/a' (default: priority_local/p)
+    ///   -P [ --print-counter ] arg  print the specified performance counter before
+    ///                               shutting down the system
+    ///   --list-counters             list all registered performance counters
+    ///   --node arg                  number of the node this locality is run on (must
+    ///                               be unique, alternatively: -1, -2, etc.)
     ///</code>
 }
 

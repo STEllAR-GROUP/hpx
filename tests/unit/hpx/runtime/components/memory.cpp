@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options
     boost::program_options::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv), 0,

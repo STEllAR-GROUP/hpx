@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
     catch (std::exception&)
     {
-        std::cerr << (boost::format("usage: %1% Z\n") % argv[0]);
+        std::cerr << (boost::format("Usage: %1% Z\n") % argv[0]);
         return 1;
     }  
 }

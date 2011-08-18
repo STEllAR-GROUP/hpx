@@ -18,7 +18,7 @@ if exists(join(path[0], "../share/hpx/python/hpx")):
 
 from hpx.svn import revision
 
-usage = "usage: %prog [options] [path]" 
+usage = "Usage: %prog [options] [path]" 
 
 parser = OptionParser(usage=usage)
 

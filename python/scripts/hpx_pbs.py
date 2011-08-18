@@ -314,7 +314,7 @@ except:
 # }}}
 
 # {{{ command line handling
-usage = "usage: %prog [options] program [program-arguments]" 
+usage = "Usage: %prog [options] program [program-arguments]" 
 
 parser = OptionParser(usage=usage)
 

@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv);

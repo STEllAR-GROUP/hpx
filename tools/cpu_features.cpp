@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 {
     try {
         options_description visible
-            ("usage: " HPX_APPLICATION_STRING " [options]");
+            ("Usage: " HPX_APPLICATION_STRING " [options]");
         visible.add_options()
             ("help", "produce help message")
             ("quiet,q", "don't print results")

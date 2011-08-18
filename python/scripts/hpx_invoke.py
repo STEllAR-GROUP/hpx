@@ -50,7 +50,7 @@ def rstrip_last(s, chars):
     return s
 
 # {{{ main
-usage = "usage: %prog [options]" 
+usage = "Usage: %prog [options]" 
 
 parser = OptionParser(usage=usage)
 
