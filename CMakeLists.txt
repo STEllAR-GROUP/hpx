@@ -124,6 +124,10 @@ if(NOT BOOST_VERSION_FOUND)
   hpx_error("boost" "Failed to locate Boost.")
 endif()
 
+if(NOT MSVC AND ${BOOST_MINOR_VERSION} LESS 47)
+  hpx_warn("boost" "Applications will segfault at shutdown with this version of Boost, please use 1.47.0 or higher.")
+endif()
+
 if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
   set(BOOST_LIBRARIES chrono
                       date_time
