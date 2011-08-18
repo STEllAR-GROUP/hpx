@@ -11,9 +11,6 @@
 #include <hpx/util/asio_util.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
-    #include <vector>
-    #include <boost/assign/std/vector.hpp>
-    #include <boost/foreach.hpp>
     #include <hpx/lcos/eager_future.hpp>
     #include <hpx/runtime/components/runtime_support.hpp>
     #include <hpx/runtime/actions/function.hpp>
@@ -28,12 +25,20 @@
 #endif
 
 #include <iostream>
+#include <fstream>
 #include <cctype>
+#include <cstdlib>
+#include <vector>
+#include <map>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/foreach.hpp>
+#include <boost/asio/ip/host_name.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     typedef int (*hpx_main_func)(boost::program_options::variables_map& vm);
@@ -193,6 +198,7 @@ namespace hpx
             if ('-' == s[0] && s.size() > 1 && std::isdigit(s[1])) {
                 try {
                     // test, whether next argument is an integer
+                    boost::lexical_cast<std::size_t>(s.substr(1));
                     return std::make_pair(std::string("node"), s.substr(1));
                 }
                 catch (boost::bad_lexical_cast const&) {
@@ -740,6 +746,71 @@ namespace hpx
             sigaction(SIGSYS, &new_action, NULL);  // Bad syscall 
 #endif
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Try to retrieve PBS related settings from the environment
+        struct environment
+        {
+            typedef std::map<std::string, std::size_t> node_map_type;
+
+            // the constructor tries to read from a PBS node-file, filling our
+            // map of nodes and thread counts
+            environment()
+            {
+                // read node file
+                char* pbs_nodefile = std::getenv("PBS_NODEFILE");
+                if (pbs_nodefile) {
+                    std::ifstream ifs(pbs_nodefile);
+                    if (ifs.is_open()) {
+                        std::string line;
+                        while (std::getline(ifs, line))
+                            if (!line.empty())
+                                ++nodes_[line];
+                    }
+                }
+            }
+
+            // The number of threads is either one (if no PBS information was 
+            // found), or it is the same as the number of times this node has 
+            // been listed in the node file.
+            std::size_t retrieve_number_of_threads() const
+            {
+                node_map_type::const_iterator it = nodes_.find(host_name());
+                return it != nodes_.end() ? (*it).second : 1;
+            }
+
+            // The number of localities is either one (if no PBS information 
+            // was found), or it is the same as the number of distinct node 
+            // names listed in the node file.
+            std::size_t retrieve_number_of_localities() const
+            {
+                return nodes_.empty() ? 1 : nodes_.size();
+            }
+
+            // Try to retrieve the node number from the PBS environment
+            std::size_t retrieve_node_number() const
+            {
+                char* pbs_nodenum = std::getenv("PBS_NODENUM");
+                if (pbs_nodenum)
+                    return boost::lexical_cast<std::size_t>(std::string(pbs_nodenum));
+                return std::size_t(-1);
+            }
+
+            // This helper function returns the host name of this node.
+            static std::string host_name() 
+            {
+                return boost::asio::ip::host_name();
+            }
+
+            // We arbitrarily select the first host listed in the node file to
+            // host the AGAS server.
+            std::string agas_host_name() const
+            {
+                return nodes_.empty() ? host_name() : (*nodes_.begin()).first;
+            }
+
+            std::map<std::string, std::size_t> nodes_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -766,18 +837,23 @@ namespace hpx
                 return 0;
 
             // Check command line arguments.
+            detail::environment env;
             std::string hpx_host(HPX_INITIAL_IP_ADDRESS), agas_host;
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
-            std::size_t num_threads = 1;
-            std::size_t num_localities = 1;
+            std::size_t num_threads = env.retrieve_number_of_threads();
+            std::size_t num_localities = env.retrieve_number_of_localities();
             std::string queueing = "priority_local";
             std::vector<std::string> ini_config;
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
+            std::size_t node = env.retrieve_node_number();
 
 #if HPX_AGAS_VERSION > 0x10
-            // if --node is specified, we initialize certain settings 
-            if (vm.count("node")) {
-                std::size_t node = vm["node"].as<std::size_t>();
+            // we initialize certain settings if --node is specified (or data 
+            // has been retrieved from the environment) 
+            if (node != std::size_t(-1) || vm.count("node")) {
+                // command line overwrites the environment
+                if (vm.count("node"))
+                    node = vm["node"].as<std::size_t>();
                 if (0 == node) {
                     // console node, by default runs AGAS
                     run_agas_server = true;
