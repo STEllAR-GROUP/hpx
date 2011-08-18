@@ -8,6 +8,8 @@
 set(subdirs 
     point_geometry)
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
+
 # for all targets specified above
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
