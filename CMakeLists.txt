@@ -532,19 +532,6 @@ endif()
 add_subdirectory(runtime)
 
 ################################################################################
-# test configuration 
-################################################################################
-if(NOT MSVC)
-  set(DART_TESTING_TIMEOUT "60" CACHE STRING
-    "CTest timeout, in seconds (Default: 60).")
-
-  enable_testing()
-  include(CTest)
-  add_hpx_pseudo_target(tests) 
-  add_subdirectory(tests)
-endif()
-
-################################################################################
 # installation instructions
 ################################################################################
 install( # install all hpx header files
