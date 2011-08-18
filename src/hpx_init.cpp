@@ -864,9 +864,12 @@ namespace hpx
                 }
                 else {
                     hpx_port += node;         // each node gets an unique port
-                    agas_host = hpx_host;             // assume local operation
+                    agas_host = hpx_host;     // assume local operation
                     agas_port = HPX_INITIAL_IP_PORT;
                     mode = hpx::runtime_mode_worker;
+                    
+                    if (!vm.count("run-hpx-main"))
+                        f = 0;
                 }
             }
 #endif
@@ -974,6 +977,9 @@ namespace hpx
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.
 #endif
+
+            ini_config += std::string("hpx.runtime_mode=")
+                        + get_runtime_mode_name(mode); 
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
