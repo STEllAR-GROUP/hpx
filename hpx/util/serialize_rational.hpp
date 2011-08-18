@@ -10,7 +10,7 @@
 
 #include <boost/rational.hpp>
 
-#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_free.hpp>
 
 namespace boost { namespace serialization
 {
