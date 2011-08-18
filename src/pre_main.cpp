@@ -123,6 +123,10 @@ void pre_main(runtime_mode mode)
         // populated before user code is executed.
         second_stage.wait();
 
+        // Install performance counter startup functions for core subsystems.
+        applier::get_applier().get_thread_manager().install_counters();
+        applier::get_applier().get_parcel_handler().install_counters();
+
         components::stubs::runtime_support::call_startup_functions
             (find_here());
 

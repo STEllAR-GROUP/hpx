@@ -112,15 +112,16 @@ class transport_raii:
       sock = socket(AF_INET, SOCK_STREAM)
       sock.connect((self.hostname, self.port))
     except Exception, e:
-      report("Connect failed (\"%s\")." % str(e))
+      report("Connect failed with %s (\"%s\")." % (self.hostname, str(e)))
       return None
 
     self.transport = Transport(sock)
 
     try:
       self.transport.start_client()
-    except SSHException:
-      report("SSH negotiation failed.")
+    except SSHException, e:
+      report( "SSH negotiation failed with %s (\"%s\")."
+            % (self.hostname, str(e)))
       return None
 
     return self.transport

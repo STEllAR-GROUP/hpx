@@ -337,10 +337,6 @@ namespace hpx
         // run global pre_main functionality
         hpx::pre_main(mode_);
 
-        // Install performance counter startup functions for core subsystems.
-        thread_manager_.install_counters();
-        parcel_handler_.install_counters();
-
         // now, execute the user supplied thread function
         if (!func.empty()) 
             result = func();

@@ -286,6 +286,12 @@ namespace hpx { namespace threads
         /// object, which in turn will report it to the console, etc.).
         virtual void report_error(std::size_t, boost::exception_ptr const&) = 0;
 
+#if HPX_AGAS_VERSION > 0x10
+        /// install_counters is called during startup to allow registration of 
+        /// performance counters 
+        virtual void install_counters() = 0;
+#endif
+
         static std::size_t get_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
