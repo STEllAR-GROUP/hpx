@@ -21,7 +21,7 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
 project(hpx CXX)
 
 set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 5)
+set(HPX_MINOR_VERSION 6)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -222,35 +222,6 @@ if("${HPX_AGAS_VERSION}" STREQUAL "2")
 else()
   add_definitions(-DHPX_AGAS_VERSION=0x10)
 endif()
-
-################################################################################
-# LISP bindings 
-################################################################################
-find_package(HPX_Phxpr)
-
-################################################################################
-# SDF output 
-################################################################################
-find_package(HPX_RNPL)
-
-################################################################################
-# HDF5 output 
-################################################################################
-find_package(HPX_HDF5)
-
-################################################################################
-# Arbitrary precision math 
-################################################################################
-find_package(HPX_GMP)
-
-#if(GMP_FOUND)
-#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
-#endif()
-
-################################################################################
-# Warning configuration
-################################################################################
-option(HPX_WARNINGS "Enable compiler warnings (default: ON)" ON)
 
 ################################################################################
 # Backtrace configuration 
