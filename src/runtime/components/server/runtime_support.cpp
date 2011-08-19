@@ -26,6 +26,8 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <algorithm>
+
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -338,6 +340,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::gid_type> prefixes;
         applier::applier& appl = hpx::applier::get_applier();
         appl.get_agas_client().get_prefixes(prefixes);
+        std::reverse(prefixes.begin(), prefixes.end());
 
 #if HPX_AGAS_VERSION > 0x10
         // execute registered shutdown functions on all localities
@@ -387,6 +390,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::gid_type> prefixes;
         applier::applier& appl = hpx::applier::get_applier();
         appl.get_agas_client().get_prefixes(prefixes);
+        std::reverse(prefixes.begin(), prefixes.end());
 
         // terminate all localities except the the local one
         {
