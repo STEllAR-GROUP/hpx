@@ -14,53 +14,25 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      dataflow
-      adaptive1d
+      balancing
       hplpx
-      barnes_hut
-      random_mem_access
       queue
       quickstart
-      nqueen)
+     )
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    set(subdirs ${subdirs} iostreams
-                           heartbeat 
-                           globals
-                           throttle
-                           function
-                           math
-                           object_semaphore
-                           timed
-                           balancing)
+    set(subdirs ${subdirs}
+        dataflow
+        throttle
+       )
   endif()
-
-  if(${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} geometry
-                           contact)
-  endif() 
-
-  if(HDF5_FOUND)
-    set(subdirs ${subdirs} sheneos)
-  endif()
-
-# Disabled by wash until Matt can fix this to not break other HPX code
-#  if(CMAKE_Fortran_COMPILER)
-#    set(subdirs ${subdirs} marduk)
-#  endif()
-
-#  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
-#    set(subdirs ${subdirs} hpxi)
-#  endif() 
 else()
   set(subdirs
       accumulator
+      balancing
+      queue
       quickstart
-      queue)
-
-  if(${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} geometry)
-  endif() 
+     )
 endif()
 
 foreach(subdir ${subdirs})
