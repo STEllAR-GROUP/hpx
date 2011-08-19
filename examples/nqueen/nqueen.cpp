@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Vinay C Amatya
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +18,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 typedef hpx::components::managed_component<
-        hpx::components::server::board
+        nqueen::server::board
         > board_type;
 
 
@@ -51,43 +52,15 @@ HPX_REGISTER_ACTION_EX(
 
 HPX_DEFINE_GET_COMPONENT_TYPE(board_type::wrapped_type);
 
-//------------------------------------------------------------------
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<bool>::set_result_action,
-    set_result_action_bool);
+    hpx::lcos::base_lco_with_value<nqueen::list_type>::set_result_action,
+    set_result_action_vector_std_size_t);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<list_t>::set_result_action,
-    set_result_action_list_t);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::size_t>::set_result_action,
-    set_result_action_uint); 
-
-//-------------------------------------------------------------------
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<bool>::get_value_action,
-    get_value_action_bool);
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<list_t>::get_value_action,
-    get_value_action_list_t);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::size_t>::get_value_action,
-    get_value_action_uint);
-
-//--------------------------------------------------------------------
+    hpx::lcos::base_lco_with_value<nqueen::list_type>::get_value_action,
+    get_value_action_vector_std_size_t);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<bool>,
-    hpx::components::component_base_lco_with_value);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<list_t>,
-    hpx::components::component_base_lco_with_value);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::size_t>,
+    hpx::lcos::base_lco_with_value<nqueen::list_type>,
     hpx::components::component_base_lco_with_value);
 

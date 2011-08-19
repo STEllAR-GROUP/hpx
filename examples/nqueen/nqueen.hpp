@@ -12,17 +12,17 @@
 
 #include <examples/nqueen/stubs/nqueen.hpp>
 
-namespace hpx { namespace components
+namespace nqueen
 {
     class board
-        : public client_base<board, stubs::board>
+        : public hpx::components::client_base<board, stubs::board>
     {
-        typedef client_base<board, stubs::board> base_type;
+        typedef hpx::components::client_base<board, stubs::board> base_type;
 
     public:
         board()
         {}
-        board(naming::id_type gid)
+        board(hpx::naming::id_type gid)
             : base_type(gid)
         {}
 
@@ -32,12 +32,12 @@ namespace hpx { namespace components
         }
         //-------------------------------------------------------
 
-        list_t access_board(){
+        list_type access_board(){
             BOOST_ASSERT(gid_);
             return this->base_type::access_board(gid_);
         }
 
-        lcos::future_value<list_t> access_board_async(){
+        hpx::lcos::future_value<list_type> access_board_async(){
             return this->base_type::access_board_async(gid_);
         }
         //------------------------------------------------------
@@ -48,30 +48,31 @@ namespace hpx { namespace components
         }
         //-----------------------------------------------------
 
-        bool check_board(list_t list, std::size_t level){
+        bool check_board(list_type const& list, std::size_t level){
             BOOST_ASSERT(gid_);
             return this->base_type::check_board(gid_, list, level);
         }
 
-        lcos::future_value<bool> check_board_async(list_t list, 
+        hpx::lcos::future_value<bool> check_board_async(list_type const& list, 
             std::size_t level)
         {
             return this->base_type::check_board_async(gid_, list, level);
         }
         //---------------------------------------------------------
 
-        std::size_t solve_board(list_t list, std::size_t size, 
+        std::size_t solve_board(list_type const& list, std::size_t size, 
             std::size_t level, std::size_t col)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::solve_board(gid_, list, size, level, col);
         }
         
-        lcos::future_value<std::size_t> solve_board_async(list_t list, 
-            std::size_t size, std::size_t level, std::size_t col)
+        hpx::lcos::future_value<std::size_t>
+        solve_board_async(list_type const& list, std::size_t size,
+            std::size_t level, std::size_t col)
         {
-            return this->base_type::solve_board_async(gid_, list, size, level,
-            col);
+            return this->base_type::solve_board_async
+                (gid_, list, size, level, col);
         }
         //---------------------------------------------------------
 
@@ -81,7 +82,7 @@ namespace hpx { namespace components
         }
     };
 
-}}
+}
 
 #endif // HPX_527D225B_F1EC_4BC5_9245_3A69C6AE5304
 

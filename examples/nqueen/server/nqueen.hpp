@@ -16,19 +16,17 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#define DS 8         //default size
-
-typedef std::vector<std::size_t> list_t;
-//boost::atomic<int> soln_count = 0;
-
-namespace hpx { namespace components { namespace server
+namespace nqueen
 {
+    typedef std::vector<std::size_t> list_type;
 
+namespace server
+{
     class board
-        : public components::detail::managed_component_base<board>
+        : public hpx::components::managed_component_base<board>
     {
     private:
-        list_t list_;
+        list_type list_;
         std::size_t level_;
         std::size_t size_;
         std::size_t count_;
@@ -46,9 +44,7 @@ namespace hpx { namespace components { namespace server
 
     public:
 
-       //boost::atomic<std::size_t> soln_count;       
-
-       enum{
+       enum actions {
             board_init,
             board_update,
             board_access,
@@ -60,7 +56,7 @@ namespace hpx { namespace components { namespace server
         board():list_(0), level_(0), size_(0), count_(0)
         {}
 
-        board(list_t list, std::size_t size, std::size_t level)
+        board(list_type const& list, std::size_t size, std::size_t level)
             : list_(list), level_(level), size_(size), count_(0)
         {}
 
@@ -78,7 +74,7 @@ namespace hpx { namespace components { namespace server
              }
          }
 
-        bool check_board(list_t list, std::size_t level)
+        bool check_board(list_type const& list, std::size_t level)
         {
             for(std::size_t i = 0 ;i < level; ++i){
                 if((list.at(i) == list.at(level)) 
@@ -89,7 +85,7 @@ namespace hpx { namespace components { namespace server
             return true;
         }
 
-        list_t access_board() 
+        list_type access_board() 
         { 
             return list_;
         }
@@ -104,7 +100,7 @@ namespace hpx { namespace components { namespace server
             board::list_.clear();
         }
 
-        std::size_t solve_board(list_t list, std::size_t size, 
+        std::size_t solve_board(list_type const& list, std::size_t size, 
             std::size_t level, std::size_t col)
         {
 
@@ -146,7 +142,7 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::actions::result_action0<
             board, 
-            list_t, 
+            list_type, 
             board_access,
             &board::access_board
             > access_action;
@@ -163,7 +159,7 @@ namespace hpx { namespace components { namespace server
             board, 
             bool, 
             board_check, 
-            list_t, 
+            list_type const&, 
             std::size_t, 
             &board::check_board
             > check_action;
@@ -172,7 +168,7 @@ namespace hpx { namespace components { namespace server
             board, 
             std::size_t,
             board_solve, 
-            list_t, 
+            list_type const&, 
             std::size_t, 
             std::size_t, 
             std::size_t,
@@ -186,7 +182,7 @@ namespace hpx { namespace components { namespace server
             > clear_action;
     };
 
-}}}
+}}
 
 #endif // HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D
 

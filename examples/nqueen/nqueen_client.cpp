@@ -8,36 +8,18 @@
 //  Parts of this nqueen_client.cpp has been taken from the accumulator example
 //  by Hartmut Kaiser.
 
-//#include <cstring>
-//#include <iostream>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-//#include <boost/lexical_cast.hpp>
-//#include <boost/program_options.hpp>
-
 #include "nqueen.hpp"
-
-//using namespace hpx;
-//using namespace std;
-//using namespace boost;
-
-//namespace po = boost::program_options;
 
 int hpx_main(boost::program_options::variables_map&)
 {
-    //boost::atomic<int> soln_count_total = 0;
+    const std::size_t default_size = 8;
+
     std::size_t soln_count_total;
-    std::vector<hpx::naming::id_type> prefixes;
-    hpx::naming::id_type prefix;
-    hpx::applier::applier& appl = hpx::applier::get_applier();
-    if(appl.get_remote_prefixes(prefixes)) {
-        prefix = prefixes[0];
-    }
-    else {
-        prefix = appl.get_runtime_support_gid();
-    }
+
+    hpx::naming::gid_type prefix = hpx::applier::get_applier().get_prefix();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
     std::cout << "Command Options: size[value] | default | print | quit" 
@@ -49,15 +31,14 @@ int hpx_main(boost::program_options::variables_map&)
     {
         if(cmd == "size")
         {   
-            //using hpx::components::board;
             soln_count_total = 0;
             std::string arg;
             std::cin >> arg;
             std::size_t sz = boost::lexical_cast<std::size_t>(arg);
             
             std::size_t i = 0;
-            std::list<hpx::components::board> b;
-            hpx::components::board bi;
+            std::list<nqueen::board> b;
+            nqueen::board bi;
             while(i != sz)
             {
                 b.push_back(bi);
@@ -65,7 +46,7 @@ int hpx_main(boost::program_options::variables_map&)
             }
     
             i=0;
-            for(std::list<hpx::components::board>::iterator iter = b.begin();
+            for(std::list<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {  
                 iter->create(prefix); 
@@ -79,24 +60,23 @@ int hpx_main(boost::program_options::variables_map&)
         }
         else if(cmd == "default")
         {
-            //using hpx::components::board;
             soln_count_total = 0;
-            hpx::components::board a;
+            nqueen::board a;
             std::size_t i = 0;
-            std::vector<hpx::components::board> b;
-            while(i != DS)
+            std::vector<nqueen::board> b;
+            while(i != default_size)
             {
                 b.push_back(a);
                 ++i;
             }
             i = 0;
-            for(std::vector<hpx::components::board>::iterator iter = b.begin();
+            for(std::vector<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {  
                 iter->create(prefix); 
-                iter->init_board(DS); 
+                iter->init_board(default_size); 
                 soln_count_total+= iter->solve_board(iter->access_board(), 
-                                                     DS, 0, i);
+                                                     default_size, 0, i);
                 ++i;
             }
             std::cout << "soln_count:" << soln_count_total << std::endl;
@@ -118,11 +98,7 @@ int hpx_main(boost::program_options::variables_map&)
         }
         std::cin >> cmd;
     }
-    //b.free();
 
-    //components::stubs::runtime_support::shutdown_all();
-
-    //return threads::terminated;
     hpx::finalize();
     
     return 0;

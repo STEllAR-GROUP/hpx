@@ -15,75 +15,79 @@
 
 #include <examples/nqueen/server/nqueen.hpp>
 
-namespace hpx { namespace components { namespace stubs
+namespace nqueen { namespace stubs
 {
 
-    struct board : stub_base<server::board>
+    struct board : hpx::components::stub_base<server::board>
     {
 
-        static void init_board(naming::id_type gid, std::size_t size )
+        static void init_board(hpx::naming::id_type const& gid, std::size_t size)
         {
-            applier::apply<server::board::init_action>( gid, size );
+            hpx::applier::apply<server::board::init_action>(gid, size);
         }
         //--------------------------------------------------------------
 
-        static lcos::future_value<list_t> access_board_async(naming::id_type gid)
+        static hpx::lcos::future_value<list_type>
+        access_board_async(hpx::naming::id_type const& gid)
         {
             typedef server::board::access_action action_type;
-            return lcos::eager_future<action_type>(gid);
+            return hpx::lcos::eager_future<action_type>(gid);
         }
 
-        static list_t access_board(naming::id_type gid)
+        static list_type access_board(hpx::naming::id_type const& gid)
         {
             return access_board_async(gid).get();
         }
 
         //-------------------------------------------------------------
 
-        static void update_board(naming::id_type gid, std::size_t level, 
-            std::size_t pos )
+        static void update_board(hpx::naming::id_type const& gid, std::size_t level, 
+            std::size_t pos)
         {
-            applier::apply<server::board::update_action>(gid, level, pos);
+            hpx::applier::apply<server::board::update_action>(gid, level, pos);
         }
         
         //------------------------------------------------------------
 
-        static lcos::future_value<bool> check_board_async(naming::id_type gid, 
-            list_t list, std::size_t level)
+        static hpx::lcos::future_value<bool>
+        check_board_async(hpx::naming::id_type const& gid, list_type const& list,
+            std::size_t level)
         {
             typedef server::board::check_action action_type;
-            return lcos::eager_future<action_type>(gid, list, level);
+            return hpx::lcos::eager_future<action_type>(gid, list, level);
         }
 
-        static bool check_board(naming::id_type gid, list_t list, 
-            std::size_t level )
+        static bool check_board(hpx::naming::id_type const& gid,
+            list_type const& list, std::size_t level)
         {
             return check_board_async(gid, list, level).get();
         }
         //-----------------------------------------------------------
 
-        static std::size_t solve_board(naming::id_type gid, list_t list, 
-            std::size_t size, std::size_t level, std::size_t col)
+        static std::size_t solve_board(hpx::naming::id_type const& gid,
+            list_type const& list, std::size_t size, std::size_t level,
+            std::size_t col)
         {
             return solve_board_async(gid, list, size, level, col).get();
         }
 
-        static lcos::future_value<std::size_t> solve_board_async(
-            naming::id_type gid, list_t list, std::size_t size, 
-            std::size_t level, std::size_t col)
+        static hpx::lcos::future_value<std::size_t> solve_board_async(
+            hpx::naming::id_type const& gid, list_type const& list,
+            std::size_t size, std::size_t level, std::size_t col)
         {
             typedef server::board::solve_action action_type;
-            return lcos::eager_future<action_type>(gid, list, size, level, col);
+            return hpx::lcos::eager_future<action_type>
+                (gid, list, size, level, col);
         }
         //----------------------------------------------------------
 
-        static void clear_board(naming::id_type gid)
+        static void clear_board(hpx::naming::id_type const& gid)
         {
-            applier::apply<server::board::clear_action>(gid);
+            hpx::applier::apply<server::board::clear_action>(gid);
         }
 
     };
-}}}
+}}
 
 #endif // HPX_E4B0BA36_0E1C_48F5_928B_CDC78F1D2C40
 
