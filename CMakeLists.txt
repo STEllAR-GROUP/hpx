@@ -569,11 +569,7 @@ set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 # directory structure.
 add_subdirectory(src)
 
-if(MSVC)
-  option(HPX_EXAMPLES "Build HPX examples (default: OFF)" OFF)
-else()
-  option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
-endif()
+option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
 
 if(HPX_EXAMPLES)
   # executables that depend on libraries above
