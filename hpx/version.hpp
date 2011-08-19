@@ -33,7 +33,7 @@
     #define HPX_AGAS_VERSION 0x20
 #endif
 
-#define HPX_VERSION_TAG          " Alpha (codename \"Velociraptor\")"
+#define HPX_VERSION_TAG          " Alpha (codename \"Velociraptor\")" 
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
