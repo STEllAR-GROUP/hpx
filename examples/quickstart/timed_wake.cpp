@@ -16,6 +16,8 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
+using boost::posix_time::seconds;
+
 using hpx::init;
 using hpx::finalize;
 
@@ -26,8 +28,6 @@ using hpx::threads::get_self;
 using hpx::threads::set_thread_state;
 
 using hpx::util::high_resolution_timer;
-
-using boost::posix_time::seconds;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
