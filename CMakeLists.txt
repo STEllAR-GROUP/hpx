@@ -32,11 +32,6 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 include(FindPythonInterp)
 
 ################################################################################
-# Fortran detection (part 1)
-################################################################################
-include(CMakeDetermineFortranCompiler)
-
-################################################################################
 # cmake configuration
 ################################################################################
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
@@ -81,16 +76,6 @@ hpx_check_for_python_with_statement(HPX_PYTHON_WITH_STATEMENT
 # Process control
 hpx_check_for_python_subprocess(HPX_PYTHON_SUBPROCESS
     DEFINITIONS HPX_HAVE_PYTHON_SUBPROCESS)
-
-################################################################################
-# Fortran detection (part 2)
-################################################################################
-if(CMAKE_Fortran_COMPILER)
-  hpx_info("fortran" "Found a Fortran compiler")
-  enable_language(Fortran)
-else()
-  hpx_warn("fortran" "Couldn't find a Fortran compiler")
-endif()
 
 ################################################################################
 # environment detection 
@@ -162,7 +147,6 @@ add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
-add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 
 ################################################################################
 # search path configuration
@@ -170,7 +154,6 @@ add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/move)
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
-include_directories(${hpx_SOURCE_DIR}/external/bigint)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 include_directories(${hpx_SOURCE_DIR}/external/endian)
@@ -243,30 +226,6 @@ if("${HPX_AGAS_VERSION}" STREQUAL "2")
 else()
   add_definitions(-DHPX_AGAS_VERSION=0x10)
 endif()
-
-################################################################################
-# LISP bindings 
-################################################################################
-find_package(HPX_Phxpr)
-
-################################################################################
-# SDF output 
-################################################################################
-find_package(HPX_RNPL)
-
-################################################################################
-# HDF5 output 
-################################################################################
-find_package(HPX_HDF5)
-
-################################################################################
-# Arbitrary precision math 
-################################################################################
-find_package(HPX_GMP)
-
-#if(GMP_FOUND)
-#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
-#endif()
 
 ################################################################################
 # Warning configuration
@@ -548,14 +507,6 @@ else()
 endif()
 
 ################################################################################
-# Mac OS X specific configuration 
-################################################################################
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-  hpx_warn("darwin_config" "HPX will perform poorly on Darwin.")
-  add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
-endif()
-
-################################################################################
 # target specification 
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
@@ -569,11 +520,7 @@ set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
 # directory structure.
 add_subdirectory(src)
 
-if(MSVC)
-  option(HPX_EXAMPLES "Build HPX examples (default: OFF)" OFF)
-else()
-  option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
-endif()
+option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
 
 if(HPX_EXAMPLES)
   # executables that depend on libraries above
