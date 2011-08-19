@@ -23,7 +23,6 @@ if(NOT MSVC)
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs}
         dataflow
-        throttle
        )
   endif()
 else()
