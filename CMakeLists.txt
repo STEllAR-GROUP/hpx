@@ -585,11 +585,6 @@ endif()
 
 add_subdirectory(runtime)
 
-if(NOT MSVC)
-  add_hpx_pseudo_target(tools) 
-  add_subdirectory(tools)
-endif()
-
 ################################################################################
 # installation instructions
 ################################################################################
