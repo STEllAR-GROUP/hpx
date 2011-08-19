@@ -122,10 +122,8 @@ namespace hpx { namespace util
         std::vector<std::string> const& prefill,
         std::string const& hpx_ini_file_,
         std::vector<std::string> const& cmdline_ini_defs_)
-#if HPX_AGAS_VERSION > 0x10
         : hpx_ini_file(hpx_ini_file_)
         , cmdline_ini_defs(cmdline_ini_defs_)
-#endif
     {
         pre_initialize_ini(*this);
 

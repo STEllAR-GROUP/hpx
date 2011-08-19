@@ -23,10 +23,8 @@ namespace hpx { namespace util
     // more convenient way
     class HPX_API_EXPORT runtime_configuration : public section
     {
-#if HPX_AGAS_VERSION > 0x10
     std::string hpx_ini_file;
     std::vector<std::string> cmdline_ini_defs;
-#endif
  
     public:
         // initialize and load configuration information
