@@ -21,10 +21,10 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x000600
+#define HPX_VERSION_FULL         0x000700
 
 #define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        6
+#define HPX_VERSION_MINOR        7
 #define HPX_VERSION_SUBMINOR     0
 
 #define HPX_VERSION_DATE         20110818
@@ -33,7 +33,7 @@
     #define HPX_AGAS_VERSION 0x20
 #endif
 
-#define HPX_VERSION_TAG          " Alpha (codename \"Velociraptor\")"
+#define HPX_VERSION_TAG          "-rc1"
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
