@@ -8,8 +8,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/lcos/future_value.hpp>
 #include <hpx/state.hpp>
 
+#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -24,11 +29,15 @@ using boost::program_options::value;
 using boost::posix_time::milliseconds;
 
 using boost::format;
+using boost::str;
 
 using hpx::init;
-using hpx::finalize;
+using hpx::disconnect;
+using hpx::get_runtime;
+using hpx::register_shutdown_function;
 using hpx::running;
 using hpx::runtime_mode_connect;
+using hpx::network_error;
 
 using hpx::applier::get_applier;
 
@@ -45,10 +54,37 @@ using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_valid_data;
 
+using hpx::naming::resolver_client;
 using hpx::naming::gid_type;
+using hpx::naming::get_prefix_from_gid;
+
+using hpx::lcos::future_value;
+using hpx::lcos::eager_future;
+using hpx::lcos::base_lco;
 
 ///////////////////////////////////////////////////////////////////////////////
-void monitor(
+void stop_monitor(
+    std::string const& name
+) {
+    // Kill the monitor.
+    resolver_client& agas_client = get_runtime().get_agas_client();
+    gid_type gid;
+    
+    if (!agas_client.queryid(name, gid))
+    {
+        HPX_THROW_EXCEPTION(network_error, "stop_monitor",
+            "couldn't find stop flag");
+    } 
+    
+    BOOST_ASSERT(gid);
+    
+    eager_future<base_lco::set_event_action> stop_future(gid);
+    
+    stop_future.get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int monitor(
     std::string const& name
   , boost::uint64_t pause
 ) {
@@ -56,14 +92,40 @@ void monitor(
     gid_type gid;
     get_applier().get_agas_client().queryid(name, gid);
 
-    BOOST_ASSERT(gid); 
+    if (!gid)
+    {
+        std::cout << (format(
+            "error: performance counter not found (%s)")
+            % name) << std::endl;
+        return 1; 
+    }
+
+    const boost::uint32_t prefix = get_applier().get_prefix_id();
+
+    if (prefix == get_prefix_from_gid(gid))
+    {
+        std::cout << (format(
+            "error: cannot query performance counters on its own locality (%s)")
+            % name) << std::endl;
+        return 1;
+    } 
+
+    future_value<void> stop_flag;
+    const std::string stop_flag_name
+        = str(format("/stop_flag([L%d]/heartbeat)") % prefix);
+
+    // Associate the stop flag with a symbolic name.
+    get_applier().get_agas_client().registerid
+        (stop_flag_name, stop_flag.get_gid().get_gid());
+
+    register_shutdown_function(boost::bind(&stop_monitor, stop_flag_name)); 
 
     boost::int64_t zero_time = 0;
 
     while (true) 
     {
-        if (!threadmanager_is(running))
-            return;
+        if (!threadmanager_is(running) || stop_flag.ready())
+            return 0;
 
         // Query the performance counter.
         counter_value value = performance_counter::get_value(gid); 
@@ -94,17 +156,19 @@ void monitor(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
+    int r = 0;
+
     {
         std::cout << "starting monitor" << std::endl;
 
         const std::string name = vm["name"].as<std::string>();
         const boost::uint64_t pause = vm["pause"].as<boost::uint64_t>();
 
-        monitor(name, pause);
+        r = monitor(name, pause);
     }
 
-    finalize();
-    return 0;
+    disconnect();
+    return r;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
