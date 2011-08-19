@@ -848,9 +848,9 @@ namespace hpx
             std::size_t num_localities = env.retrieve_number_of_localities();
             std::string queueing("priority_local");
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
+#if HPX_AGAS_VERSION > 0x10
             std::size_t node = env.retrieve_node_number();
 
-#if HPX_AGAS_VERSION > 0x10
             // we initialize certain settings if --node is specified (or data 
             // has been retrieved from the environment) 
             if (node != std::size_t(-1) || vm.count("node")) {
