@@ -10,8 +10,8 @@ include(HPX_Include)
 hpx_include(Message)
             
 execute_process(
-  COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_svnversion.py" "${hpx_SOURCE_DIR}"
-  OUTPUT_VARIABLE SVN_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+  COMMAND "python" "${hpx_SOURCE_DIR}/python/scripts/hpx_svnversion.py" "${hpx_SOURCE_DIR}"
+  OUTPUT_VARIABLE SVN_REVISION ERROR_VARIABLE SVN_ERROR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if("${SVN_REVISION}" STREQUAL "" OR "${SVN_REVISION}" STREQUAL "None")
   hpx_warn("svn.revision" "SVN revision not found.")
