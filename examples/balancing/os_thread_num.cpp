@@ -111,8 +111,8 @@ int hpx_main(variables_map& vm)
         { sort.insert(sorter::value_type(result.second, result.first)); }  
         
         BOOST_FOREACH(sorter::value_type const& result, sort) {
-            std::cout << std::setfill('0') << std::setw(4)
-                      << result.second << " -> "
+            std::cout << "  " << std::setfill('0') << std::setw(4)
+                      << result.second << ","
                       << result.first << "\n";
         }
 
