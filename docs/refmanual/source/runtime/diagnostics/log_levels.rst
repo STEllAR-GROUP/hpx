@@ -34,7 +34,7 @@ Levels
 
 All HPX logs have seven different logging levels. These levels can be set
 explicitly or through environmental variables in the main HPX ini file using
-|ini_env_var_syntax|_.
+|env_vars|.
 
 The log levels and their associated integral values are shown in the table
 below, ordered from most verbose to least verbose. By default, all HPX logs are

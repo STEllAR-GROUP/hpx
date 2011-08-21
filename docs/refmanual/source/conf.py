@@ -7,11 +7,11 @@ import sys, os
 source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
-project = u'The HPX Reference Manual'
+project = u'HPX Reference Manual'
 copyright = u'2011, Hartmut Kaiser, Bryce Lelbach and others'
-version = '0.5'
-release = '0.5.0'
-today_fmt = '%Y.%m.%d_%H.%M.%S'
+version = '0.6'
+release = '0.6.0'
+today_fmt = '%Y.%m.%d %H.%M.%S'
 add_function_parentheses = True
 pygments_style = 'sphinx'
 show_authors = False
@@ -20,15 +20,23 @@ show_authors = False
 
 html_theme = 'default'
 
+# -- Options for LaTeX output --------------------------------------------------
+
+latex_documents = [
+    ( 'index'
+    , 'refmanual.tex'
+    , ''
+    , 'Hartmut Kaiser, Bryce Lelbach and others'
+    , 'manual'
+    , False) ]
+
 # -- Epilog for all global substitution ----------------------------------------
 
 rst_epilog = """
-.. |amr_only|       replace:: :ref:`AMR only <linux_amr_support_libraries>`
-.. |malloc|         replace:: :ref:`malloc allocator <linux_malloc_allocators>`
-
-.. |env_var_syntax| replace:: :ref:`INI environmental variable syntax <ini_env_var_syntax>`
-
-.. |log_levels|     replace:: :ref:`log levels <diagnostics_log_levels>`
+.. |amr_only|   replace:: :ref:`AMR only <linux_amr_support_libraries>`
+.. |malloc|     replace:: :ref:`malloc allocator <linux_malloc_allocators>`
+.. |env_vars|   replace:: :ref:`INI environmental variable syntax <ini_env_var_syntax>`
+.. |logs|       replace:: :ref:`log levels <diagnostics_log_levels>`
 
 .. |bsl| replace:: Boost Software License
 .. _bsl: http://www.boost.org/LICENSE_1_0.txt
