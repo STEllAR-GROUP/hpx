@@ -41,88 +41,6 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     class HPX_EXPORT runtime_impl;
 
-    struct process 
-    {
-    protected:
-        template <typename SchedulingPolicy, typename NotificationPolicy> 
-        friend class runtime_impl; 
-
-        void set_localities(std::size_t here_lid,
-                            std::vector<naming::id_type>& localities)
-        {
-            BOOST_ASSERT(0 == localities_.size());
-            here_lid_ = here_lid;
-            localities_= localities;
-        }
-
-        void set_num_os_threads(std::size_t num_os_threads)
-        {
-            num_os_threads_ = num_os_threads;
-        }
-
-    public:
-        process() 
-          : num_os_threads_(0)
-        {}
-
-        // Return the set of localities
-        std::vector<naming::id_type>& localities(void)
-        {
-            return localities_;
-        }
-
-        // Return the number of localities allocated to this process
-        std::size_t size() const
-        {
-            return localities_.size();
-        }
-
-        // Return the GID of this locality
-        naming::id_type here() const
-        {
-            return localities_[here_lid_];
-        }
-
-        // Return the index of this locality
-        std::size_t here_index() const
-        {
-            return here_lid_;
-        }
-
-        // Return the GID of the locality with the given logical ID 
-        naming::id_type there(std::size_t lid) const
-        {
-            lid = lid % localities_.size();
-            return localities_[lid];
-        }
-
-        // Return the GID of the "next" locality in the circular list
-        // of localities
-        naming::id_type next(void) const
-        {
-            return there(here_lid_+1);
-        }
-
-        // Return the GID of the "previous" locality in the circular list
-        // of localities
-        naming::id_type prev(void) const
-        {
-            return there(here_lid_ == 0 ? localities_.size()-1 : here_lid_-1);
-        }
-
-        /// \brief Return the number of OS threads running in this threadmanager
-        ///
-        /// This function will return correct results only if is_running() 
-        /// would return true.
-        std::size_t get_num_os_threads() const { return num_os_threads_; }
-
-    private:
-        // Locality information
-        std::size_t here_lid_;
-        std::vector<naming::id_type> localities_;
-        std::size_t num_os_threads_;
-    };
-
     /// \class runtime runtime.hpp hpx/runtime.hpp
     class HPX_EXPORT runtime
     {
@@ -215,11 +133,6 @@ namespace hpx
             return (std::size_t)instance_number_;
         }
 
-        process& get_process(void)
-        {
-            return process_;
-        }
-
         /// \brief Allow access to the registry counter registry instance used 
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
@@ -275,8 +188,6 @@ namespace hpx
         void deinit_tss();
 
     protected:
-        process process_;
-
         // list of functions to call on exit
         typedef std::vector<boost::function<void()> > on_exit_type;
         on_exit_type on_exit_functions_;

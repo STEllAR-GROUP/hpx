@@ -433,47 +433,6 @@ namespace hpx
         // invoke the AGAS v2 notifications, waking up the other localities
         agas::get_big_boot_barrier().trigger();  
 #endif
-
-#if HPX_AGAS_VERSION <= 0x10
-        LRT_(info) << "runtime_impl: setting initial locality prefixes";
-        // Set localities prefixes once per runtime instance. This should
-        // work fine until we support adding and removing localities.
-        {
-            std::size_t here_lid = std::size_t(-1);
-            naming::gid_type tmp_here(applier_.get_runtime_support_raw_gid());
-
-            std::vector<naming::gid_type> tmp_localities;
-            agas_client_.get_prefixes(tmp_localities);
-
-            for (std::size_t i = 0; i < tmp_localities.size(); ++i)
-            {
-                if (tmp_here.get_msb() == tmp_localities[i].get_msb())
-                {
-                    here_lid = i;
-                    break;
-                }
-            }
-
-            if (here_lid == std::size_t(-1))
-            {
-                hpx::util::osstream strm;
-                strm << "failed to find prefix of this locality: " 
-                     << tmp_here;
-                HPX_THROW_EXCEPTION(startup_timed_out, "runtime::run", 
-                    hpx::util::osstream_get_string(strm));
-            }
-
-            // wrap all gid_types into id_types
-            std::vector<naming::id_type> prefixes;
-            BOOST_FOREACH(naming::gid_type& gid, tmp_localities)
-                prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
-
-            this->process_.set_num_os_threads(num_threads);
-            this->process_.set_localities(here_lid, prefixes);
-        }
-#else
-        this->process_.set_num_os_threads(num_threads);
-#endif
         // }}}
 
         // {{{ launch main 

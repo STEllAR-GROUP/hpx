@@ -373,8 +373,8 @@ namespace hpx
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
                     ("threads,t", value<std::size_t>(), 
-                     "the number of operating system threads to spawn for this "
-                     "HPX locality (default: 1)")
+                     "the number of operating system threads to dedicate as "
+                     "shepherd threads for this HPX locality (default: 1)")
                     ("queueing,q", value<std::string>(),
                      "the queue scheduling policy to use, options are `global/g', "
                      "`local/l', `priority_local/p' and `abp/a' (default: priority_local/p)")
@@ -970,15 +970,19 @@ namespace hpx
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
             }
 
+#endif
+            // Set number of shepherds in configuration. 
+            ini_config += "hpx.shepherds=" + 
+                boost::lexical_cast<std::string>(num_threads);
+
             // Set number of localities in configuration (do it everywhere, 
             // even if this information is only used by the AGAS server).
-            ini_config += "hpx.num_localities=" + 
+            ini_config += "hpx.localities=" + 
                 boost::lexical_cast<std::string>(num_localities);
 
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.
-#endif
 
             ini_config += std::string("hpx.runtime_mode=")
                         + get_runtime_mode_name(mode); 

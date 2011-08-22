@@ -77,6 +77,9 @@ namespace hpx { namespace util
 
         // Can be set to true if we want to use the ITT notify tools API 
         bool get_itt_notify_mode() const;
+
+        // Returns the number of shepherd threads this locality is running
+        std::size_t get_num_shepherds() const;
     };
 
 }}

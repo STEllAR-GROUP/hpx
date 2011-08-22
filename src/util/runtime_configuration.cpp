@@ -201,7 +201,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("num_localities", 1));
+                    sec->get_entry("localities", 1));
             }
         }
         return 1;
@@ -323,6 +323,18 @@ namespace hpx { namespace util
         }
 #endif
         return false;
+    }
+
+    std::size_t runtime_configuration::get_num_shepherds() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>
+                    (sec->get_entry("shepherds", 1));
+            }
+        }
+        return 1;
     }
 
     ///////////////////////////////////////////////////////////////////////////
