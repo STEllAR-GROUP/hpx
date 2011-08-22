@@ -14,7 +14,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HPX_APPLICATION_EXPORTS=1;HPX_APPLICATION_NAME="$(ProjectName)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HPX_APPLICATION_EXPORTS=1;HPX_APPLICATION_NAME=$(ProjectName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4503;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <CustomBuildStep>
