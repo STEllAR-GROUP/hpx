@@ -76,7 +76,7 @@ typedef eager_future<hello_world_worker_action> hello_world_worker_future;
 void hello_world_foreman()
 {
     const std::size_t shepherds
-        = get_runtime().get_process().get_num_os_threads();
+        = get_runtime().get_config().get_num_shepherds();
 
     const id_type prefix = get_applier().get_runtime_support_gid();
 

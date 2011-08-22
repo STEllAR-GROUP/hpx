@@ -68,7 +68,7 @@ void print_count()
                              "%4% parcels and completed receiving %5% parcels")
               % a.get_prefix_id()
               % hostname
-              % get_runtime().get_process().get_num_os_threads()
+              % get_runtime().get_config().get_num_shepherds()
               % a.get_parcel_handler().get_parcelport().total_receives_started()
               % a.get_parcel_handler().get_parcelport().total_receives_completed())
            << endl;

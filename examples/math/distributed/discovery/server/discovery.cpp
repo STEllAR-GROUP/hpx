@@ -79,7 +79,7 @@ namespace hpx { namespace balancing { namespace server
 {
 
 boost::uint32_t discovery::report_shepherd_count()
-{ return get_runtime().get_process().get_num_os_threads(); }
+{ return get_runtime().get_config().get_num_shepherds(); }
 
 std::vector<naming::id_type> discovery::build_network()
 {
