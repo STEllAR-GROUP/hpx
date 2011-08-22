@@ -7,36 +7,18 @@
 
 # define build targets for this directory
 
-if(NOT MSVC)
-  set(example_programs
-      basic_example
-      distributed_test
-      distributed_amrtest
-      non_atomic_rma
-      factorial
-      factorial_get
-      fibonacci1
-      fibonacci2
-      error_handling1
-      error_handling2
-      error_handling3
-      error_handling4
-      quicksort)
-else()
-  set(example_programs
-      basic_example
-      distributed_test
-      distributed_amrtest
-      non_atomic_rma
-      factorial
-      factorial_get
-      fibonacci1
-      fibonacci2
-      error_handling1
-      error_handling2
-      error_handling3
-      error_handling4)
-endif()
+set(example_programs
+    basic_example
+    distributed_test
+    distributed_amrtest
+    non_atomic_rma
+    factorial
+    fibonacci
+    error_handling1
+    error_handling2
+    error_handling3
+    error_handling4
+    quicksort)
 
 foreach(example_program ${example_programs})
   set(sources
