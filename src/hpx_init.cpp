@@ -868,6 +868,8 @@ namespace hpx
                     agas_port = HPX_INITIAL_IP_PORT;
                     mode = hpx::runtime_mode_worker;
                     
+                    // do not execute any explicit hpx_main except if asked 
+                    // otherwise
                     if (!vm.count("run-hpx-main"))
                         f = 0;
                 }
