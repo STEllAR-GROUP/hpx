@@ -154,20 +154,39 @@ namespace hpx { namespace geometry { namespace server
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids)
         {
           std::cout << " HELLO WORLD TEST : " << objectid_ << " " << slave_.size() << std::endl;
+
+          typedef std::vector<lcos::future_value<vertex_data> > lazy_results_type;
+
+          lazy_results_type lazy_results;
  
           std::vector<hpx::lcos::future_value<vertex_data> > iterate_phase;
           vertex_data slave;
-          std::size_t master_vertex,master_object;
+          std::size_t master_vertex;
           for (std::size_t i=0;i<slave_.size();i++) {
             slave.x = (poly_.outer())[slave_[i]].x();    
             slave.y = (poly_.outer())[slave_[i]].y();   
             slave.velx = velx_[i];    
             slave.vely = vely_[i];    
             master_vertex = master_[i];
-            master_object = object_id_[i];
-            //iterate_phase.push_back(accu[master_object].iterate_async(slave,master_vertex)); 
+            naming::id_type gid = master_gids[ object_id_[i] ];
+            lazy_results.push_back( stubs::point::iterate_async( gid,slave,master_vertex ) );
           }
-          //hpx::components::wait(iterate_phase);
+
+          // will return the number of invoked futures
+          components::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2));
+        }
+
+        bool point::enforce_callback(std::size_t i, vertex_data const& slave) 
+        {
+          // This is where you update the slave node
+          (poly_.outer())[slave_[i]].x();
+          (poly_.outer())[i].x(slave.x);
+          (poly_.outer())[i].y(slave.y);
+          velx_[i] = slave.velx;
+          vely_[i] = slave.vely;
+          // return type says continue or not
+          // usually return true
+          return true;
         }
 
         vertex_data point::iterate(vertex_data slave,std::size_t master_vertex)

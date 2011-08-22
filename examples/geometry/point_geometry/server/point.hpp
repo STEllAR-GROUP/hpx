@@ -138,6 +138,10 @@ namespace hpx { namespace geometry { namespace server
         // enforce the contact
         void enforce(std::vector<hpx::naming::id_type> const& master_gids);
 
+        // what to do on the slave node when the master segment component finishes
+        // iterating
+        bool enforce_callback(std::size_t i, vertex_data const& slave);
+
         vertex_data iterate(vertex_data slave,std::size_t master_vertex);
 
         // retrieve the polygon object
