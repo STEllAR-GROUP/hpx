@@ -137,6 +137,12 @@ int hpx_main(boost::program_options::variables_map &vm)
           initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx[i],vely[i],numpoints,i));
         }
 
+        // vector of gids
+        std::vector<hpx::naming::id_type> master_objects;
+        for (i=0;i<num_bodies;i++) {
+          master_objects.push_back(accu[i].get_gid());
+        }
+
         hpx::components::wait(initial_phase);
         while (time < stop_time) {
             {
@@ -150,35 +156,34 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             time += dt;
           
+            std::vector<int> search_vector;
             { 
               // Search for Contact------------------------------------
               // vector of futures
               std::vector<hpx::lcos::future_value<int> > search_phase;
     
-              // vector of gids
-              std::vector<hpx::naming::id_type> search_objects;
               for (i=0;i<num_bodies;i++) {
-                search_objects.resize(num_bodies);
-                for (std::size_t j=0;j<num_bodies;j++) {
-                  search_objects[j] = accu[j].get_gid();
-                }
-                search_phase.push_back(accu[i].search_async(search_objects));
+                search_phase.push_back(accu[i].search_async(master_objects));
               }
 
-              std::vector<int> search_vector;
               hpx::components::wait(search_phase,search_vector);
             }
 
             // Contact enforcement ----------------------------------
+            BOOST_ASSERT(search_vector.size() == num_bodies);
 
-        }
+            std::vector<hpx::lcos::future_value<void> > enforcement_phase;
+            for (i=0;i<num_bodies;i++) {
+              if ( search_vector[i] == 1 ) {
+                // contact was discovered  -- enforce the contact
+                enforcement_phase.push_back(accu[i].enforce_async(master_objects));
+              }
+            }
+            hpx::components::wait(enforcement_phase);
 
-#if 0
-        hpx::geometry::point pt5(hpx::find_here(), 0.5, 0.5);
-        bool inside = bg::within(pt5, p);
-        std::cout << "Point is " << (inside ? "inside" : "outside") << std::endl;
-#endif
-    }
+        } // time loop
+
+    } // ensure things are go out of scope 
 
     hpx::finalize();
     return 0;

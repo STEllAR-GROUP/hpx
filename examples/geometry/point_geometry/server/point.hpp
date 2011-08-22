@@ -26,6 +26,23 @@ typedef boost::geometry::model::polygon<point_type> polygon_type;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
 {
+
+    struct vertex_data
+    {
+      double x,y,velx,vely;
+
+      private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & x & y & velx & vely;
+        }
+
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
       : public components::detail::managed_component_base<point> 
@@ -42,7 +59,9 @@ namespace hpx { namespace geometry { namespace server
             point_set_Y = 4,
             point_search = 5,
             point_get_poly = 6,
-            point_move = 7
+            point_move = 7,
+            point_enforce = 8,
+            point_iterate = 9
         };
 
         // constructor: initialize accumulator value
@@ -116,6 +135,11 @@ namespace hpx { namespace geometry { namespace server
         // move the bodies
         void move(double dt);
 
+        // enforce the contact
+        void enforce(std::vector<hpx::naming::id_type> const& master_gids);
+
+        vertex_data iterate(vertex_data slave,std::size_t master_vertex);
+
         // retrieve the polygon object
         polygon_type get_poly() const
         {
@@ -166,6 +190,11 @@ namespace hpx { namespace geometry { namespace server
             point, point_move, double, &point::move
         > move_action;
 
+        typedef hpx::actions::direct_action1<
+            point, point_enforce,std::vector<hpx::naming::id_type> const&,
+            &point::enforce
+        > enforce_action;
+
         typedef hpx::actions::direct_result_action0<
             point const, double, point_get_Y, &point::get_Y
         > get_Y_action;
@@ -182,6 +211,11 @@ namespace hpx { namespace geometry { namespace server
             point, int, point_search, std::vector<hpx::naming::id_type> const&, 
             &point::search
         > search_action;
+
+        typedef hpx::actions::direct_result_action2<
+            point, vertex_data, point_iterate, vertex_data,std::size_t, 
+            &point::iterate
+        > iterate_action;
 
     private:
         plain_point_type pt_;

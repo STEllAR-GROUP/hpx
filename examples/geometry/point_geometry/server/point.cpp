@@ -43,13 +43,14 @@ namespace hpx { namespace geometry { namespace server
             bool redo = false;
             components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
 
-            return 0;
+            if ( slave_.size() > 0 ) return 1;
+            else return 0;
         }
 
         bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
         {
 
-          std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
+          //std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
 
           if ( i != objectid_ ) {
             // search for contact
@@ -67,8 +68,8 @@ namespace hpx { namespace geometry { namespace server
             std::deque<polygon_type> output;
             boost::geometry::intersection(poly_,poly,output);
             BOOST_FOREACH(polygon_type const& p, output) {
-              std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
-              std::cout << " contact region size " << p.outer().size() << std::endl;
+             // std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
+             // std::cout << " contact region size " << p.outer().size() << std::endl;
 
               linestring_type line;
               line.resize(2);
@@ -111,9 +112,9 @@ namespace hpx { namespace geometry { namespace server
                       if ( testdist < mindist ) {
                         mindist = testdist;
                         min_k = k;
-                      //  std::cout << "        Search slave x : " << pp.x()  << " y " << pp.y() << std::endl;
-                      //  std::cout << "        Search master1 x : " << (poly.outer())[k].x()  << " y " << (poly.outer())[k].y() << std::endl;
-                      //  std::cout << "        Search master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
+                    //    std::cout << "        Search slave x : " << pp.x()  << " y " << pp.y() << std::endl;
+                    //    std::cout << "        Search master1 x : " << (poly.outer())[k].x()  << " y " << (poly.outer())[k].y() << std::endl;
+                    //    std::cout << "        Search master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
                       }
                     }
                     BOOST_ASSERT(min_k >= 0 );
@@ -149,5 +150,33 @@ namespace hpx { namespace geometry { namespace server
             (poly_.outer())[i].y(p.y() + vely_[i]*dt);
           }
         }
+
+        void point::enforce(std::vector<hpx::naming::id_type> const& master_gids)
+        {
+          std::cout << " HELLO WORLD TEST : " << objectid_ << " " << slave_.size() << std::endl;
+ 
+          std::vector<hpx::lcos::future_value<vertex_data> > iterate_phase;
+          vertex_data slave;
+          std::size_t master_vertex,master_object;
+          for (std::size_t i=0;i<slave_.size();i++) {
+            slave.x = (poly_.outer())[slave_[i]].x();    
+            slave.y = (poly_.outer())[slave_[i]].y();   
+            slave.velx = velx_[i];    
+            slave.vely = vely_[i];    
+            master_vertex = master_[i];
+            master_object = object_id_[i];
+            //iterate_phase.push_back(accu[master_object].iterate_async(slave,master_vertex)); 
+          }
+          //hpx::components::wait(iterate_phase);
+        }
+
+        vertex_data point::iterate(vertex_data slave,std::size_t master_vertex)
+        {
+          std::cout << " HELLO WORLD TEST iterate master " << objectid_ << std::endl;
+          // iterate on the master vertices, return the updated slave point
+          // This section comes from Eqns 4-29 in the Johnson and Stryk paper
+          return slave;
+        }
+
 }}}
 

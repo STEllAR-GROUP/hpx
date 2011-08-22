@@ -37,6 +37,12 @@ HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::move_action,
     point_geometry_move_action);
 HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::enforce_action,
+    point_geometry_enforce_action);
+HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::iterate_action,
+    point_geometry_iterate_action);
+HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::search_action,
     point_geometry_search_action);
 HPX_REGISTER_ACTION_EX(
@@ -60,4 +66,10 @@ HPX_REGISTER_ACTION_EX(
     set_result_action_polygon_type);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<polygon_type>,
+    hpx::components::component_base_lco_with_value);
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<hpx::geometry::server::vertex_data>::set_result_action, 
+    set_result_action_vertex_data_type);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<hpx::geometry::server::vertex_data>,
     hpx::components::component_base_lco_with_value);
