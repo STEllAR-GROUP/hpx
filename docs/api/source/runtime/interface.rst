@@ -1,21 +1,20 @@
 .. _runtime_interface:
 
-***********
- Interface 
-***********
+*******************
+ Runtime Interface 
+*******************
 
 .. sectionauthor:: Bryce Lelbach
 
-.. cpp:namespace:: hpx
+.. cpp:class:: hpx::runtime
 
-.. cpp:class:: runtime
+.. cpp:function:: void hpx::runtime::start()
 
-.. cpp:function:: void start()
+.. cpp:function:: void hpx::runtime::stop() 
 
-    Test
+--------------------------------------------------------------------------------
 
-.. cpp:function:: void stop() 
+.. cpp:function:: hpx::runtime* get_runtime_ptr()
 
-    Test
-
+.. cpp:function:: hpx::runtime& get_runtime()
  

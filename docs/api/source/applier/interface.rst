@@ -1,8 +1,8 @@
 .. _applier_interface:
 
-***********
- Interface 
-***********
+*******************
+ Applier Interface 
+*******************
 
 .. sectionauthor:: Bryce Lelbach 
 
