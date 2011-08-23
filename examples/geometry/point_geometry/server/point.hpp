@@ -134,10 +134,9 @@ namespace hpx { namespace geometry { namespace server
 
             BOOST_ASSERT(boost::geometry::area(poly_) > 0);
 
-            std::cout << " INIT TEST objectid_ " << objectid_ << std::endl;
-            for (std::size_t i=0;i<poly_.outer().size();i++) {
-              std::cout << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
-            } 
+            //for (std::size_t i=0;i<poly_.outer().size();i++) {
+            //  std::cout << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
+            //} 
 
         }
 
