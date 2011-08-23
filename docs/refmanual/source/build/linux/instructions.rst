@@ -6,7 +6,7 @@
 
 .. sectionauthor:: Bryce Lelbach 
 
-0) Download the latest Subversion release of HPX (or a stable tag):::
+0) Download the latest Subversion revision of HPX (or a stable tag):::
 
     $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
 
