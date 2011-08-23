@@ -1,5 +1,7 @@
 /*****************************************************
 
+    Copyright (c) 1999 Junling Ma
+
     File : parse.c
     Author : Junling Ma
     Date : October 21, 1999

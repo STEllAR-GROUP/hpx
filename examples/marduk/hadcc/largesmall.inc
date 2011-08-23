@@ -1,5 +1,6 @@
 c.......................................................................
 c
+c Copyright (c) 2011 Matthew Anderson
 c
 c largesmall.inc:   Parameters for real*8 number comparison
 c                   when small precision mistakes on different

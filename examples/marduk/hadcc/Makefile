@@ -1,3 +1,4 @@
+# Copyright (c) 2011 Matthew Anderson
 # Makefile
 ########
 #ARCH = `uname -s` . `uname -m`

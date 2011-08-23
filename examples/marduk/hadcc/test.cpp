@@ -1,5 +1,5 @@
 // 2 May 2011
-// Matt Anderson
+// Copyright (c) 2011 Matt Anderson
 // HAD clustering algorithm in C++ 
 
 #include <iostream>

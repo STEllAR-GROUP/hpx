@@ -1,6 +1,5 @@
-c  4 May 2011
-c  Steve Liebling
-c  Matt Anderson
+c  Copyright (c) 2011 Steve Liebling
+c  Copyright (c) 2011 Matt Anderson
 c
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
