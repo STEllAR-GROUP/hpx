@@ -17,6 +17,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
+#include <hpx/lcos/mutex.hpp>
 
 #include "../serialize_geometry.hpp"
 
@@ -87,24 +88,18 @@ namespace hpx { namespace geometry { namespace server
             //typedef bg::model::d2::point_xy<double> point_type;
             //typedef bg::model::polygon<point_type> polygon_type;
 
+            // Add points *CLOCKWISE* -- otherwise intersection routine will not work
             //polygon_type poly;
             // create the rectangle of the mesh object
             for (std::size_t i=0;i<numpoints;i++) {
-              double x = xmin + dx*i;
-              point_type p(x,ymin);
-              poly_.outer().push_back(p);
-              velx_.push_back(velx);
-              vely_.push_back(vely);
-            }
-            for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
-              point_type p(xmax,y);
+              point_type p(xmin,y);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
             for (std::size_t i=0;i<numpoints;i++) {
-              double x = xmax - dx*i;
+              double x = xmin + dx*i;
               point_type p(x,ymax);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
@@ -112,11 +107,28 @@ namespace hpx { namespace geometry { namespace server
             }
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymax - dy*i;
-              point_type p(xmin,y);
+              point_type p(xmax,y);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
+            for (std::size_t i=0;i<numpoints;i++) {
+              double x = xmax - dx*i;
+              point_type p(x,ymin);
+              poly_.outer().push_back(p);
+              velx_.push_back(velx);
+              vely_.push_back(vely);
+            }
+            // Fill in closing point
+            point_type p(xmin,ymin);
+            poly_.outer().push_back(p);
+            velx_.push_back(velx);
+            vely_.push_back(vely);
+
+            // Correct any problems
+            boost::geometry::correct(poly_);
+
+            BOOST_ASSERT(boost::geometry::area(poly_) > 0);
 
             //point_type pt5(0.5, 0.5);
             //bool inside = bg::within(pt5,poly_);
@@ -222,6 +234,7 @@ namespace hpx { namespace geometry { namespace server
         > iterate_action;
 
     private:
+        hpx::lcos::mutex mtx_;    // lock for this data block
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;

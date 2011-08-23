@@ -25,6 +25,9 @@
 #include "../stubs/point.hpp"
 #include "./point.hpp"
 
+#include <iostream>
+#include <fstream>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server 
 {
@@ -68,67 +71,78 @@ namespace hpx { namespace geometry { namespace server
             std::deque<polygon_type> output;
             boost::geometry::intersection(poly_,poly,output);
             BOOST_FOREACH(polygon_type const& p, output) {
-             // std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
-             // std::cout << " contact region size " << p.outer().size() << std::endl;
+              std::cout << i << " Contact region area  " << boost::geometry::area(p) << std::endl;
+              std::cout << " contact region size " << p.outer().size() << " poly " << poly.outer().size() << " poly_ " << poly_.outer().size() << std::endl;
 
               linestring_type line;
               line.resize(2);
 
+              char basename[80];
+              sprintf(basename,"overlap%d_%d.dat",(int) objectid_,(int) i);
+              std::ofstream file;
+              file.open(basename);
               for (std::size_t j=0;j<p.outer().size();j++) {
-                double d1 = boost::geometry::distance((p.outer())[j],poly_);
-                double d2 = boost::geometry::distance((p.outer())[j],poly);
-                // Check if there is actual contact
-                if ( d1 > 1.e-10 || d2 > 1.e-10 ) {
-                  // there is actual contact -- find the vertices of poly_
-                  // which have contact and their corresponding master segments 
-                  if ( d1 < 1.e-10 ) {
-                    // this is a vertex belonging to poly_
-                    // record the point as a slave
-                    // find the index of poly_ that corresponds to this point
-                    point_type const& pp = (p.outer())[j];
-                    polygon_type::ring_type const& outer = poly_.outer();
-                    for (std::size_t k=0;k<poly_.outer().size();k++) {
-                      if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
-                        slave_.push_back(k); 
-                        break;
-                      }
-                    }
+                // TEST
+                std::cout << " TEST contact " << (p.outer())[j].x() << " " 
+                                              << (p.outer())[j].y() << std::endl;
+                file << (p.outer())[j].x() << " " << (p.outer())[j].y() << std::endl;
+                // END TEST
 
-                    // The following section will be replaced by Barend 
-                    // with the nearest neighbor routine
-                    // but for now, this works
+                // see if the intersection point is within poly; if so, that means
+                // the point is part of poly_
+                bool in_poly = boost::geometry::within((p.outer())[j],poly);
 
-                    // the master segment should belong to poly
-                    object_id_.push_back(i);        
-                    double mindist = 999.;
-                    int min_k = -1;
-                    int final;
-                    for (std::size_t k=0;k<poly.outer().size();k++) {
-                      final = k+1; 
-                      if ( k+1 >= poly.outer().size() ) final = 0;
-                      line[0] = (poly.outer())[k];
-                      line[1] = (poly.outer())[final];
-                      double testdist = boost::geometry::distance(pp,line);    
-                      if ( testdist < mindist ) {
-                        mindist = testdist;
-                        min_k = k;
-                    //    std::cout << "        Search slave x : " << pp.x()  << " y " << pp.y() << std::endl;
-                    //    std::cout << "        Search master1 x : " << (poly.outer())[k].x()  << " y " << (poly.outer())[k].y() << std::endl;
-                    //    std::cout << "        Search master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
-                      }
+                if ( in_poly == true ) {
+                  // this is a vertex belonging to poly_
+                  // record the point as a slave
+                  // find the index of poly_ that corresponds to this point
+                  point_type const& pp = (p.outer())[j];
+                  polygon_type::ring_type const& outer = poly_.outer();
+                  for (std::size_t k=0;k<poly_.outer().size();k++) {
+                    if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
+                      slave_.push_back(k); 
+                      break;
                     }
-                    BOOST_ASSERT(min_k >= 0 );
-                    master_.push_back(min_k); 
                   }
+
+                  // The following section will be replaced by Barend 
+                  // with the nearest neighbor routine
+                  // but for now, this works
+
+                  // the master segment should belong to poly
+                  object_id_.push_back(i);        
+                  double mindist = 999.;
+                  int min_k = -1;
+                  int final;
+                  for (std::size_t k=0;k<poly.outer().size();k++) {
+                    final = k+1; 
+                    if ( k+1 >= poly.outer().size() ) final = 0;
+                    line[0] = (poly.outer())[k];
+                    line[1] = (poly.outer())[final];
+                    double testdist = boost::geometry::distance(pp,line);    
+                    if ( testdist < mindist ) {
+                      mindist = testdist;
+                      min_k = k;
+                  //    std::cout << "        Search slave x : " << pp.x()  << " y " << pp.y() << std::endl;
+                  //    std::cout << "        Search master1 x : " << (poly.outer())[k].x()  << " y " << (poly.outer())[k].y() << std::endl;
+                  //    std::cout << "        Search master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
+                    }
+                  }
+                  BOOST_ASSERT(min_k >= 0 );
+                  master_.push_back(min_k); 
                 }
               }
+              file.close();
             }
 
             // TEST
             for (std::size_t j=0;j<slave_.size();j++) {
               std::cout << " TEST slave : " << slave_[j] << " master " << master_[j] << " object " << object_id_[j] << std::endl; 
               std::cout << "        Follow up slave x : " << (poly_.outer())[slave_[j]].x()  << " y " << (poly_.outer())[slave_[j]].y() << std::endl;
-              std::cout << "        Follow up master x : " << (poly.outer())[master_[j]].x()  << " y " << (poly.outer())[master_[j]].y() << std::endl;
+              std::cout << "        Follow up master1 x : " << (poly.outer())[master_[j]].x()  << " y " << (poly.outer())[master_[j]].y() << std::endl;
+              std::size_t final = master_[j] + 1; 
+              if ( final >= poly.outer().size() ) final = 0;
+              std::cout << "        Follow up master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
             }
 
           }
@@ -149,11 +163,20 @@ namespace hpx { namespace geometry { namespace server
             (poly_.outer())[i].x(p.x() + velx_[i]*dt);
             (poly_.outer())[i].y(p.y() + vely_[i]*dt);
           }
+
+          char basename[80];
+          sprintf(basename,"geo%d.dat",(int) objectid_);
+          std::ofstream file;
+          file.open(basename);
+          for (std::size_t i=0;i<poly_.outer().size();i++) {
+            file << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
+          }
+          file.close();
         }
 
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids)
         {
-          std::cout << " TEST : " << objectid_ << " " << slave_.size() << std::endl;
+          std::cout << " TEST ENFORCE objectid : " << objectid_ << " slave size: " << slave_.size() << std::endl;
 
           typedef std::vector<lcos::future_value<vertex_data> > lazy_results_type;
 
@@ -191,7 +214,8 @@ namespace hpx { namespace geometry { namespace server
 
         vertex_data point::iterate(vertex_data slave,std::size_t master_vertex)
         {
-
+          hpx::lcos::mutex::scoped_lock lock(mtx_);
+         
           std::size_t final = master_vertex+1; 
           if ( final >= poly_.outer().size() ) final = 0;
 
@@ -221,8 +245,16 @@ namespace hpx { namespace geometry { namespace server
           double xs = slave.x;
           double zs = slave.y;
           double tdelta = -(A*xs + B*zs + C);
+
+          double xsm = xs + A*tdelta;
+          double zsm = zs + B*tdelta;
            
           std::cout << " TEST iterate master " << objectid_ << " l " << l << " delta " << delta << " tdelta " << tdelta << std::endl;
+          std::cout << " TEST xsm " << xsm << " zsm " << zsm << std::endl;
+          std::cout << " TEST x1 " << x1 << " z1 " << z1 << std::endl;
+          std::cout << " TEST x2 " << x2 << " z2 " << z2 << std::endl;
+          std::cout << " TEST xs " << xs << " zs " << zs << std::endl;
+          std::cout << " TEST A " << A << " B " << B << std::endl;
           // iterate on the master vertices, return the updated slave point
           // This section comes from Eqns 4-29 in the Johnson and Stryk paper
           return slave;

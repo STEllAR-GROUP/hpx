@@ -155,7 +155,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
 
             time += dt;
-          
+
             std::vector<int> search_vector;
             { 
               // Search for Contact------------------------------------
