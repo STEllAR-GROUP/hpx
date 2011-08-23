@@ -153,7 +153,7 @@ namespace hpx { namespace geometry { namespace server
 
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids)
         {
-          std::cout << " HELLO WORLD TEST : " << objectid_ << " " << slave_.size() << std::endl;
+          std::cout << " TEST : " << objectid_ << " " << slave_.size() << std::endl;
 
           typedef std::vector<lcos::future_value<vertex_data> > lazy_results_type;
 
@@ -191,7 +191,38 @@ namespace hpx { namespace geometry { namespace server
 
         vertex_data point::iterate(vertex_data slave,std::size_t master_vertex)
         {
-          std::cout << " HELLO WORLD TEST iterate master " << objectid_ << std::endl;
+
+          std::size_t final = master_vertex+1; 
+          if ( final >= poly_.outer().size() ) final = 0;
+
+          point_type pp;
+
+          pp.x(slave.x);
+          pp.y(slave.y);
+
+          double l = boost::geometry::distance((poly_.outer())[master_vertex],(poly_.outer())[final]);
+
+          typedef boost::geometry::model::linestring<point_type> linestring_type;
+          linestring_type line;
+          line.resize(2);
+          line[0] = (poly_.outer())[master_vertex];
+          line[1] = (poly_.outer())[final];
+          double delta = boost::geometry::distance(pp,line);
+
+          double x1 = (poly_.outer())[master_vertex].x();
+          double x2 = (poly_.outer())[final].x();
+          double z1 = (poly_.outer())[master_vertex].y();
+          double z2 = (poly_.outer())[final].y();
+
+          double A = (z2-z1)/l;
+          double B = (x1-x2)/l;
+          double C = (x2*z1-x1*z2)/l;
+
+          double xs = slave.x;
+          double zs = slave.y;
+          double tdelta = -(A*xs + B*zs + C);
+           
+          std::cout << " TEST iterate master " << objectid_ << " l " << l << " delta " << delta << " tdelta " << tdelta << std::endl;
           // iterate on the master vertices, return the updated slave point
           // This section comes from Eqns 4-29 in the Johnson and Stryk paper
           return slave;
