@@ -7,6 +7,7 @@
 #if !defined(HPX_RUNTIME_JUN_210_2008_1018AM)
 #define HPX_RUNTIME_JUN_210_2008_1018AM
 
+#include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/include/threadmanager.hpp>

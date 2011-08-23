@@ -15,6 +15,8 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

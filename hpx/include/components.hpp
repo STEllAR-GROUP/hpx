@@ -13,8 +13,6 @@
 #include <hpx/runtime/components/component_factory_one.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory_one.hpp>
-#include <hpx/runtime/components/global_component_factory.hpp>
-#include <hpx/runtime/components/global_component_factory_one.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <hpx/runtime/components/component_type.hpp>

@@ -10,12 +10,8 @@
 #include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/runtime/naming/resolver_server.hpp>
-#include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 
 /// \mainpage
 ///

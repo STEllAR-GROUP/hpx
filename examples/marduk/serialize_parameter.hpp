@@ -11,11 +11,11 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/serialization/detail/get_data.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace boost { namespace serialization
 {

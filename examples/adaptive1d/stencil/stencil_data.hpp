@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <hpx/lcos/mutex.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/valarray.hpp>
 
 #include <examples/adaptive1d/parameter.hpp>
