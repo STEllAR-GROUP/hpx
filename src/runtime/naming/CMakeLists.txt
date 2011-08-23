@@ -5,7 +5,6 @@
 
 add_hpx_library_sources(hpx
   address.cpp
-  full_address.cpp
   locality.cpp
   name.cpp
   resolver_server.cpp)

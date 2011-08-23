@@ -102,18 +102,6 @@
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-//     bool apply (naming::full_address& fa, 
-//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa))
-//             return apply_l<Action>(fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
-//     }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool 
@@ -194,18 +182,6 @@
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-//     bool apply (actions::continuation* c, naming::full_address& fa, 
-//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa))
-//             return apply_l<Action>(c, fa.caddr(), BOOST_PP_ENUM_PARAMS(N, arg));
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), c, fa.cgid(), BOOST_PP_ENUM_PARAMS(N, arg));
-//     }
-
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool 
     apply_c_p(naming::address& addr, naming::id_type const& contgid, 
@@ -226,15 +202,6 @@
             gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-//         naming::id_type const& gid,
-//         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-//     {
-//         return apply_r<Action>(addr, new actions::continuation(contaddr), 
-//             gid, BOOST_PP_ENUM_PARAMS(N, arg));
-//     }
-
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool 
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
@@ -253,14 +220,6 @@
         return apply_p<Action>(new actions::continuation(contgid), 
             gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
     }
-
-//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid,
-//          BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-//     {
-//         return apply<Action>(new actions::continuation(contaddr), 
-//             gid, BOOST_PP_ENUM_PARAMS(N, arg));
-//     }
 
 #undef N
 

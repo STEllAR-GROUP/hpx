@@ -40,21 +40,6 @@ namespace hpx { namespace components { namespace detail
             return naming::invalid_gid;
         }
 
-        ///
-//         bool get_full_address(void* p, naming::full_address& fa)
-//         {
-//             typename Mutex::scoped_lock guard (this->mtx_);
-// 
-//             typedef typename base_type::const_iterator iterator;
-//             iterator end = this->heap_list_.end();
-//             for (iterator it = this->heap_list_.begin(); it != end; ++it) 
-//             {
-//                 if ((*it)->did_alloc(p)) 
-//                     return (*it)->get_full_address(id_range_, p, fa);
-//             }
-//             return false;
-//         }
-
         void set_range(
             naming::gid_type const& lower
           , naming::gid_type const& upper

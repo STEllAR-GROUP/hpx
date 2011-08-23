@@ -263,49 +263,6 @@ namespace hpx { namespace components { namespace detail
                  addr);
         }
 
-        /// \brief Get the global id of the managed_component instance 
-        ///        given by the parameter \a p. 
-        ///
-        ///
-        /// \note  The pointer given by the parameter \a p must have been 
-        ///        allocated by this instance of a \a wrapper_heap
-//         template <typename Mutex>
-//         bool get_full_address(util::unique_ids<Mutex>& ids, void* p, 
-//             naming::full_address& fa) 
-//         {
-//             BOOST_ASSERT(did_alloc(p));
-// 
-//             hpx::applier::applier& appl = hpx::applier::get_applier();
-//             value_type* addr = static_cast<value_type*>(pool_->address());
-//             naming::address& localaddr = fa.addr();
-// 
-//             localaddr.locality_ = appl.here();
-//             localaddr.type_ = value_type::get_component_type();
-//             localaddr.address_ = 
-//                 reinterpret_cast<naming::address::address_type>(addr);
-// 
-//             if (!base_gid_) {
-//                 // store a pointer to the AGAS client
-//                 get_agas_client_ = &appl.get_agas_client();
-// 
-//                 // this is the first call to get_gid() for this heap - allocate 
-//                 // a sufficiently large range of global ids
-//                 base_gid_ = ids.get_id(appl.here(), *get_agas_client_, step_);
-// 
-//                 // register the global ids and the base address of this heap
-//                 // with the AGAS
-//                 if (!get_agas_client_->bind_range(
-//                         base_gid_, step_, localaddr, sizeof(value_type))) 
-//                 {
-//                     return false;
-//                 }
-//             }
-// 
-//             localaddr.address_ = reinterpret_cast<naming::address::address_type>(p);
-//             fa.gid() = base_gid_ + (static_cast<value_type*>(p) - addr);
-//             return true;
-//         }
-
     protected:
         bool test_release()
         {

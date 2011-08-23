@@ -94,17 +94,6 @@ namespace hpx { namespace applier
         return apply_p<Action>(gid, action_priority<Action>());
     }
 
-//     template <typename Action>
-//     bool apply (naming::full_address& fa)
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa)) 
-//             return apply_l<Action>(fa.caddr());   // apply locally
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), fa.cgid());
-//     }
-
     /// \note A call to applier's apply function would look like:
     /// \code
     ///    appl_.apply<add_action>(cont, gid, ...);

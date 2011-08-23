@@ -401,12 +401,6 @@ namespace hpx { namespace lcos
             LLCO_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
         }
 
-        /// \brief Return the full address of this \a future instance
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             return impl_->get_full_address(fa);
-//         }
-
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
@@ -490,12 +484,6 @@ namespace hpx { namespace lcos
         {
             LLCO_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
         }
-
-        /// \brief Return the full address of this \a future instance
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             return impl_->get_full_address(fa);
-//         }
 
         /// Reset the future_value to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.

@@ -102,26 +102,6 @@ namespace hpx { namespace components
         naming::id_type get_gid() const
         { return naming::id_type(get_base_gid(), naming::id_type::unmanaged); }
 
-        /// \brief Create a new GID (if called for the first time), assign this 
-        ///        GID to this instance of a component and register this gid 
-        ///        with the AGAS service
-        ///
-        /// \param fa     [out] On return this will hold the full address of 
-        ///               instance (global id (GID), local virtual address)
-        ///
-        /// \returns      This returns \a true if the para,eter \a fa is valid.
-//         bool get_full_address(naming::full_address& fa) const
-//         {
-//             fa.gid() = get_gid();
-//             applier::applier& appl = hpx::applier::get_applier();
-//             naming::address& addr = fa.addr();
-//             addr.locality_ = appl.here();
-//             addr.type_ = this_component_type::get_component_type();
-//             addr.address_ = 
-//                 boost::uint64_t(static_cast<this_component_type const*>(this));
-//             return true;
-//         }
-
         /// \brief  The function \a get_factory_properties is used to 
         ///         determine, whether instances of the derived component can 
         ///         be created in blocks (i.e. more than one instance at once). 
