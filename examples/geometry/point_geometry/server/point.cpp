@@ -67,6 +67,17 @@ namespace hpx { namespace geometry { namespace server
 
             typedef boost::geometry::model::linestring<point_type> linestring_type;
 
+            std::cout << " TEST object : " << objectid_ << std::endl;
+            for (std::size_t j=0;j<poly_.outer().size();j++) {
+              std::cout << (poly_.outer())[j].x() << " " << (poly_.outer())[j].y() << std::endl; 
+            }
+            std::cout << " TEST part II : " << std::endl;
+            for (std::size_t j=0;j<poly.outer().size();j++) {
+              std::cout << (poly.outer())[j].x() << " " << (poly.outer())[j].y() << std::endl; 
+            }
+            std::cout << " TEST END-------------------------------- " << std::endl;
+            
+
             // Check for contact
             std::deque<polygon_type> output;
             boost::geometry::intersection(poly_,poly,output);
@@ -81,22 +92,24 @@ namespace hpx { namespace geometry { namespace server
               sprintf(basename,"overlap%d_%d.dat",(int) objectid_,(int) i);
               std::ofstream file;
               file.open(basename);
-              for (std::size_t j=0;j<p.outer().size();j++) {
+              // note that the first and the last vertices are the same
+              for (std::size_t j=0;j<p.outer().size()-1;j++) {
                 // TEST
                 std::cout << " TEST contact " << (p.outer())[j].x() << " " 
                                               << (p.outer())[j].y() << std::endl;
-                file << (p.outer())[j].x() << " " << (p.outer())[j].y() << std::endl;
+                file << (p.outer())[j].x() << " " << (p.outer())[j].y() << " j " << j << std::endl;
                 // END TEST
+
+                point_type const& pp = (p.outer())[j];
 
                 // see if the intersection point is within poly; if so, that means
                 // the point is part of poly_
-                bool in_poly = boost::geometry::within((p.outer())[j],poly);
+                bool in_poly = boost::geometry::within(pp,poly);
 
                 if ( in_poly == true ) {
                   // this is a vertex belonging to poly_
                   // record the point as a slave
                   // find the index of poly_ that corresponds to this point
-                  point_type const& pp = (p.outer())[j];
                   polygon_type::ring_type const& outer = poly_.outer();
                   for (std::size_t k=0;k<poly_.outer().size();k++) {
                     if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {

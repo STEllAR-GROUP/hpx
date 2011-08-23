@@ -98,44 +98,47 @@ namespace hpx { namespace geometry { namespace server
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
-            for (std::size_t i=0;i<numpoints;i++) {
+            for (std::size_t i=1;i<numpoints;i++) {
               double x = xmin + dx*i;
               point_type p(x,ymax);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
-            for (std::size_t i=0;i<numpoints;i++) {
+            for (std::size_t i=1;i<numpoints;i++) {
               double y = ymax - dy*i;
               point_type p(xmax,y);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
-            for (std::size_t i=0;i<numpoints;i++) {
+            for (std::size_t i=1;i<numpoints-1;i++) {
               double x = xmax - dx*i;
               point_type p(x,ymin);
               poly_.outer().push_back(p);
               velx_.push_back(velx);
               vely_.push_back(vely);
             }
-            // Fill in closing point
-            point_type p(xmin,ymin);
-            poly_.outer().push_back(p);
+
+            // Close the polygon -- this will add one more point
+            boost::geometry::correct(poly_);
+
+            // give a velocity for the last (duplicated) point
             velx_.push_back(velx);
             vely_.push_back(vely);
+
+            BOOST_ASSERT( velx_.size() == vely_.size() && velx_.size() == poly_.outer().size() );
 
             // Correct any problems
             boost::geometry::correct(poly_);
 
             BOOST_ASSERT(boost::geometry::area(poly_) > 0);
 
-            //point_type pt5(0.5, 0.5);
-            //bool inside = bg::within(pt5,poly_);
-            //std::cout << " Point is " << (inside ? "inside" : "outside") << std::endl;
+            std::cout << " INIT TEST objectid_ " << objectid_ << std::endl;
+            for (std::size_t i=0;i<poly_.outer().size();i++) {
+              std::cout << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
+            } 
 
-            //pt_.x(x);
-            //pt_.y(y);
         }
 
         /// search for contact
