@@ -109,13 +109,6 @@ namespace hpx { namespace geometry
             return this->base_type::enforce_async(gid_,master_gids);
         }
 
-        lcos::future_value<hpx::geometry::server::vertex_data> iterate_async(
-                           hpx::geometry::server::vertex_data slave,std::size_t master_vertex) 
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::iterate_async(gid_,slave,master_vertex);
-        }
-
         void move(double dt) 
         {
             BOOST_ASSERT(gid_);
@@ -126,13 +119,6 @@ namespace hpx { namespace geometry
         {
             BOOST_ASSERT(gid_);
             this->base_type::enforce(gid_,master_gids);
-        }
-
-        hpx::geometry::server::vertex_data iterate(hpx::geometry::server::vertex_data slave,
-                                                   std::size_t master_vertex) 
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::iterate(gid_,slave,master_vertex);
         }
 
         /// Query the current coordinate values of the server#point 

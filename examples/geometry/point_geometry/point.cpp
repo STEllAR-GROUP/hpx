@@ -40,9 +40,6 @@ HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::enforce_action,
     point_geometry_enforce_action);
 HPX_REGISTER_ACTION_EX(
-    point_geometry_type::wrapped_type::iterate_action,
-    point_geometry_iterate_action);
-HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::search_action,
     point_geometry_search_action);
 HPX_REGISTER_ACTION_EX(

@@ -159,72 +159,48 @@ namespace hpx { namespace geometry { namespace server
 
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids)
         {
-          typedef std::vector<lcos::future_value<vertex_data> > lazy_results_type;
+          typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
  
-          std::vector<hpx::lcos::future_value<vertex_data> > iterate_phase;
-          vertex_data slave;
-          std::size_t master_vertex;
           for (std::size_t i=0;i<slave_.size();i++) {
-            slave.x = (poly_.outer())[slave_[i]].x();    
-            slave.y = (poly_.outer())[slave_[i]].y();   
-            slave.velx = velx_[i];    
-            slave.vely = vely_[i];    
-            master_vertex = master_[i];
             naming::id_type gid = master_gids[ object_id_[i] ];
-            lazy_results.push_back( stubs::point::iterate_async( gid,slave,master_vertex ) );
+            lazy_results.push_back( stubs::point::get_poly_async( gid ) );
           }
 
           // will return the number of invoked futures
           components::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2));
         }
 
-        bool point::enforce_callback(std::size_t i, vertex_data const& slave) 
+        bool point::enforce_callback(std::size_t i, polygon_type const& poly) 
         {
-          // This is where you update the slave node
-          (poly_.outer())[slave_[i]].x();
-          (poly_.outer())[i].x(slave.x);
-          (poly_.outer())[i].y(slave.y);
-          velx_[i] = slave.velx;
-          vely_[i] = slave.vely;
-          // return type says continue or not
-          // usually return true
-          return true;
-        }
 
-        vertex_data point::iterate(vertex_data slave,std::size_t master_vertex)
-        {
-          hpx::lcos::mutex::scoped_lock lock(mtx_);
-         
-          std::size_t final = master_vertex+1; 
-          if ( final >= poly_.outer().size() ) final = 0;
+          std::size_t master_vertex = master_[i];
+          std::size_t final = master_[i] + 1; 
 
-          point_type pp;
+          // the slave node
+          point_type const& pp = (poly_.outer())[slave_[i]];
 
-          pp.x(slave.x);
-          pp.y(slave.y);
-
-          double l = boost::geometry::distance((poly_.outer())[master_vertex],(poly_.outer())[final]);
+          double l = boost::geometry::distance((poly.outer())[master_vertex],(poly.outer())[final]);
 
           typedef boost::geometry::model::linestring<point_type> linestring_type;
           linestring_type line;
           line.resize(2);
-          line[0] = (poly_.outer())[master_vertex];
-          line[1] = (poly_.outer())[final];
+          line[0] = (poly.outer())[master_vertex];
+          line[1] = (poly.outer())[final];
           double tdelta = boost::geometry::distance(pp,line);
 
-          double x1 = (poly_.outer())[master_vertex].x();
-          double x2 = (poly_.outer())[final].x();
-          double z1 = (poly_.outer())[master_vertex].y();
-          double z2 = (poly_.outer())[final].y();
+          double x1 = (poly.outer())[master_vertex].x();
+          double x2 = (poly.outer())[final].x();
+          double z1 = (poly.outer())[master_vertex].y();
+          double z2 = (poly.outer())[final].y();
 
           double A = (z2-z1)/l;
           double B = (x1-x2)/l;
           double C = (x2*z1-x1*z2)/l;
 
-          double xs = slave.x;
-          double zs = slave.y;
+          double xs = pp.x();
+          double zs = pp.y();
           double delta = -(A*xs + B*zs + C);
 
           double xsm = xs + A*delta;
@@ -238,7 +214,17 @@ namespace hpx { namespace geometry { namespace server
           for (std::size_t n=0;n<N;n++) {
             double alpha1 = 1.0/sqrt(N-(n+1)+1); // Fortran index difference from Eqn. 12
           }
-          return slave;
+
+          // This is where the slave iteration occurs -- this is a local write
+          //(poly_.outer())[slave_[i]].x();
+          //(poly_.outer())[i].x(slave.x);
+          //(poly_.outer())[i].y(slave.y);
+          //velx_[i] = slave.velx;
+          //vely_[i] = slave.vely;
+
+          // return type says continue or not
+          // usually return true
+          return true;
         }
 
 }}}

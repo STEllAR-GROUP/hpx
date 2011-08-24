@@ -61,8 +61,7 @@ namespace hpx { namespace geometry { namespace server
             point_search = 5,
             point_get_poly = 6,
             point_move = 7,
-            point_enforce = 8,
-            point_iterate = 9
+            point_enforce = 8
         };
 
         // constructor: initialize accumulator value
@@ -154,9 +153,7 @@ namespace hpx { namespace geometry { namespace server
 
         // what to do on the slave node when the master segment component finishes
         // iterating
-        bool enforce_callback(std::size_t i, vertex_data const& slave);
-
-        vertex_data iterate(vertex_data slave,std::size_t master_vertex);
+        bool enforce_callback(std::size_t i, polygon_type const& poly);
 
         // retrieve the polygon object
         polygon_type get_poly() const
@@ -229,11 +226,6 @@ namespace hpx { namespace geometry { namespace server
             point, int, point_search, std::vector<hpx::naming::id_type> const&, 
             &point::search
         > search_action;
-
-        typedef hpx::actions::direct_result_action2<
-            point, vertex_data, point_iterate, vertex_data,std::size_t, 
-            &point::iterate
-        > iterate_action;
 
     private:
         hpx::lcos::mutex mtx_;    // lock for this data block

@@ -79,14 +79,6 @@ namespace hpx { namespace geometry { namespace stubs
             return lcos::eager_future<action_type>(gid,master_gids);
         }
 
-        static lcos::future_value<hpx::geometry::server::vertex_data> 
-        iterate_async(naming::id_type gid,hpx::geometry::server::vertex_data slave,
-                        std::size_t master_vertex) 
-        {
-            typedef server::point::iterate_action action_type;
-            return lcos::eager_future<action_type>(gid, slave,master_vertex);
-        }
-
         static void move(naming::id_type const& gid,double dt) 
         {
             // The following get yields control while the action above 
@@ -99,14 +91,6 @@ namespace hpx { namespace geometry { namespace stubs
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
             enforce_async(gid,master_gids).get();
-        }
-
-        static hpx::geometry::server::vertex_data iterate(naming::id_type const& gid,
-                                   hpx::geometry::server::vertex_data slave,std::size_t master_vertex) 
-        {
-            // The following get yields control while the action above 
-            // is executed and the result is returned to the future_value
-            return iterate_async(gid,slave,master_vertex).get();
         }
 
         /// Query the current coordinate values of the server#point 
