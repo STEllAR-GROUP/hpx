@@ -312,9 +312,6 @@ namespace hpx { namespace geometry { namespace server
           // Need to check with Johnson or somebody who knows
           double RM = 1.0;
           double alpha2 = RM/(RM + R_[slave_[i]]);
-          std::cout << " TEST alpha2 " << alpha2 << std::endl;
-
-          std::cout << " TEST i before " << velx_[i] << " " << vely_[i] << std::endl;
 
           // begin contact iteration enforcement
           std::size_t N = 1; // number of contact enforcement iterations -- soon to be a parameter
@@ -329,7 +326,6 @@ namespace hpx { namespace geometry { namespace server
             velx_[i] += -A*dv;
             vely_[i] += -B*dv;
           }
-          std::cout << " TEST i after " << velx_[i] << " " << vely_[i] << std::endl;
 
           // return type says continue or not
           // usually return true
