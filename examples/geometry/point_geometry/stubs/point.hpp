@@ -66,31 +66,31 @@ namespace hpx { namespace geometry { namespace stubs
         }
 
         static lcos::future_value<void> 
-        move_async(naming::id_type gid,double dt) 
+        move_async(naming::id_type gid,double dt,double time) 
         {
             typedef server::point::move_action action_type;
-            return lcos::eager_future<action_type>(gid,dt);
+            return lcos::eager_future<action_type>(gid,dt,time);
         }
 
         static lcos::future_value<void> 
-        enforce_async(naming::id_type gid,std::vector<hpx::naming::id_type> const& master_gids) 
+        enforce_async(naming::id_type gid,std::vector<hpx::naming::id_type> const& master_gids,double dt) 
         {
             typedef server::point::enforce_action action_type;
-            return lcos::eager_future<action_type>(gid,master_gids);
+            return lcos::eager_future<action_type>(gid,master_gids,dt);
         }
 
-        static void move(naming::id_type const& gid,double dt) 
+        static void move(naming::id_type const& gid,double dt,double time) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            move_async(gid,dt).get();
+            move_async(gid,dt,time).get();
         }
 
-        static void enforce(naming::id_type const& gid,std::vector<hpx::naming::id_type> const& master_gids) 
+        static void enforce(naming::id_type const& gid,std::vector<hpx::naming::id_type> const& master_gids,double dt) 
         {
             // The following get yields control while the action above 
             // is executed and the result is returned to the future_value
-            enforce_async(gid,master_gids).get();
+            enforce_async(gid,master_gids,dt).get();
         }
 
         /// Query the current coordinate values of the server#point 

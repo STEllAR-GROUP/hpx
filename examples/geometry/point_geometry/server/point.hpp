@@ -146,14 +146,14 @@ namespace hpx { namespace geometry { namespace server
         bool search_callback(std::size_t idx, polygon_type const& poly,bool &redo);
 
         // move the bodies
-        void move(double dt);
+        void move(double dt,double time);
 
         // enforce the contact
-        void enforce(std::vector<hpx::naming::id_type> const& master_gids);
+        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt);
 
         // what to do on the slave node when the master segment component finishes
         // iterating
-        bool enforce_callback(std::size_t i, polygon_type const& poly);
+        bool enforce_callback(std::size_t i, polygon_type const& poly,double dt);
 
         // retrieve the polygon object
         polygon_type get_poly() const
@@ -201,12 +201,12 @@ namespace hpx { namespace geometry { namespace server
             point const, polygon_type, point_get_poly, &point::get_poly
         > get_poly_action;
 
-        typedef hpx::actions::direct_action1<
-            point, point_move, double, &point::move
+        typedef hpx::actions::direct_action2<
+            point, point_move, double, double, &point::move
         > move_action;
 
-        typedef hpx::actions::direct_action1<
-            point, point_enforce,std::vector<hpx::naming::id_type> const&,
+        typedef hpx::actions::direct_action2<
+            point, point_enforce,std::vector<hpx::naming::id_type> const&,double,
             &point::enforce
         > enforce_action;
 
@@ -239,7 +239,7 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> slave_;
         std::vector<std::size_t> master_;
         std::vector<std::size_t> object_id_;
-        std::vector<std::vector<double> > R_;
+        std::vector<double> R_;
         std::size_t objectid_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };

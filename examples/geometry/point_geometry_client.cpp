@@ -130,7 +130,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
         double dt = 0.1; // guess for start dt
-        double stop_time = 0.05;
+        double stop_time = 0.25;
         double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
@@ -149,7 +149,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               // Move bodies--------------------------------------------
               std::vector<hpx::lcos::future_value<void> > move_phase;
               for (i=0;i<num_bodies;i++) {
-                move_phase.push_back(accu[i].move_async(dt));
+                move_phase.push_back(accu[i].move_async(dt,time));
               }
               hpx::components::wait(move_phase);
             }
@@ -176,7 +176,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             for (i=0;i<num_bodies;i++) {
               if ( search_vector[i] == 1 ) {
                 // contact was discovered  -- enforce the contact
-                enforcement_phase.push_back(accu[i].enforce_async(master_objects));
+                enforcement_phase.push_back(accu[i].enforce_async(master_objects,dt));
               }
             }
             hpx::components::wait(enforcement_phase);

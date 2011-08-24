@@ -97,28 +97,28 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
-        lcos::future_value<void> move_async(double dt) 
+        lcos::future_value<void> move_async(double dt,double time) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::move_async(gid_,dt);
+            return this->base_type::move_async(gid_,dt,time);
         }
 
-        lcos::future_value<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids) 
+        lcos::future_value<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::enforce_async(gid_,master_gids);
+            return this->base_type::enforce_async(gid_,master_gids,dt);
         }
 
-        void move(double dt) 
+        void move(double dt,double time) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::move(gid_,dt);
+            this->base_type::move(gid_,dt,time);
         }
 
-        void enforce(std::vector<hpx::naming::id_type> const& master_gids) 
+        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::enforce(gid_,master_gids);
+            this->base_type::enforce(gid_,master_gids,dt);
         }
 
         /// Query the current coordinate values of the server#point 
