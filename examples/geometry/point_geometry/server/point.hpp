@@ -239,6 +239,7 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> slave_;
         std::vector<std::size_t> master_;
         std::vector<std::size_t> object_id_;
+        std::vector<std::vector<double> > R_;
         std::size_t objectid_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };
