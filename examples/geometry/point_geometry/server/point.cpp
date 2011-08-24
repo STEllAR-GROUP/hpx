@@ -235,13 +235,12 @@ namespace hpx { namespace geometry { namespace server
 
           char basename[80];
           sprintf(basename,"geo%d.dat",(int) objectid_);
-          std::ifstream ifile(basename);
           std::ofstream file;
-          if ( ifile ) {
+          if ( time < 1.e-8 ) {
+            file.open(basename);
+          } else {
             file.open(basename,std::ios::app);
             file << " " << std::endl << std::endl;
-          } else {
-            file.open(basename);
           }
           for (std::size_t i=0;i<poly_.outer().size();i++) {
             file << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
@@ -314,7 +313,7 @@ namespace hpx { namespace geometry { namespace server
           double alpha2 = RM/(RM + R_[slave_[i]]);
 
           // begin contact iteration enforcement
-          std::size_t N = 1; // number of contact enforcement iterations -- soon to be a parameter
+          std::size_t N = 6; // number of contact enforcement iterations -- soon to be a parameter
           for (std::size_t n=0;n<N;n++) {
             double alpha1 = 1.0/sqrt(N-(n+1)+1); // Fortran index difference from Eqn. 12
             double alpha  = alpha1*alpha2;
@@ -323,8 +322,14 @@ namespace hpx { namespace geometry { namespace server
             double dv = -alpha*delta/dt/(1. + pow(R_1,2)*M_s/M_1 + pow(R_2,2)*M_s/M_2);
 
             // Eqn 14-15
-            velx_[i] += -A*dv;
-            vely_[i] += -B*dv;
+            velx_[ slave_[i] ] += -A*dv;
+            vely_[ slave_[i] ] += -B*dv;
+ 
+            // take care of duplicate point
+            if ( slave_[i] == 0 ) {
+              velx_[ (poly_.outer()).size()-1] += -A*dv;
+              vely_[ (poly_.outer()).size()-1] += -B*dv;
+            }
           }
 
           // return type says continue or not
