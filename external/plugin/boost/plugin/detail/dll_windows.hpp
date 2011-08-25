@@ -18,6 +18,7 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/throw_exception.hpp>
 
 #include <boost/plugin/config.hpp>
 
@@ -123,7 +124,8 @@ namespace boost { namespace plugin {
                 str << "Boost.Plugin: Could not open shared library '" 
                     << dll_name << "'";
 
-                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
+                boost::throw_exception(
+                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             BOOST_ASSERT(handle == dll_handle);
 
@@ -135,8 +137,10 @@ namespace boost { namespace plugin {
                 str << "Boost.Plugin: Unable to locate the exported symbol name '" 
                     << symbol_name << "' in the shared library '" 
                     << dll_name << "'";
+
                 ::FreeLibrary(handle);
-                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
+                boost::throw_exception(
+                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }
@@ -161,7 +165,9 @@ namespace boost { namespace plugin {
                 BOOST_PLUGIN_OSSTREAM str;
                 str << "Boost.Plugin: Could not open shared library '" 
                     << dll_name << "'";
-                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
+                
+                boost::throw_exception(
+                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
         }
 
