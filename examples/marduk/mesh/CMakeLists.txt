@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c)      2011 Matthew Anderson
+# Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -54,5 +55,7 @@ source_group("Header Files\\Server" FILES ${server_headers})
 add_hpx_component(marduk_mesh 
   MODULE marduk_mesh
   SOURCES ${sources} 
-  HEADERS ${headers})
+  HEADERS ${headers}
+  DEPENDENCIES distributing_factory_component
+               gfortran)
 

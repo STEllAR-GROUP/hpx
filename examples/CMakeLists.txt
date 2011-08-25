@@ -45,9 +45,9 @@ if(NOT MSVC)
   endif()
 
 # Disabled by wash until Matt can fix this to not break other HPX code
-#  if(CMAKE_Fortran_COMPILER)
-#    set(subdirs ${subdirs} marduk)
-#  endif()
+  if(CMAKE_Fortran_COMPILER)
+    set(subdirs ${subdirs} marduk)
+  endif()
 
 #  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
 #    set(subdirs ${subdirs} hpxi)

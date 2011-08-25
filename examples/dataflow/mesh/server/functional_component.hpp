@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             if (component_invalid == base_type::get_component_type()) {
                 // first call to get_component_type, ask AGAS for a unique id
                 base_type::set_component_type(applier::get_applier().
-                    get_agas_client().get_component_id("marduk_functional_component_type"));
+                    get_agas_client().get_component_id("dataflow_functional_component_type"));
             }
         }
 
