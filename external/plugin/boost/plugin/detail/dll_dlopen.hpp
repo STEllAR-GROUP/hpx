@@ -19,7 +19,6 @@
 #include <boost/thread.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <boost/plugin/config.hpp>
 
@@ -177,9 +176,7 @@ namespace boost { namespace plugin {
                 BOOST_PLUGIN_OSSTREAM str;
                 str << "Boost.Plugin: Could not open shared library '" 
                     << dll_name << "' (dlerror: " << dlerror() << ")";
-
-                boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
 
 #if !defined(__AIX__) 
@@ -199,10 +196,8 @@ namespace boost { namespace plugin {
                 str << "Boost.Plugin: Unable to locate the exported symbol name '" 
                     << symbol_name << "' in the shared library '" 
                     << dll_name << "' (dlerror: " << dlerror () << ")";
-                    
                 MyFreeLibrary(handle);
-                boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             return std::make_pair(address, free_dll<SymbolType>(handle));
         }
@@ -225,8 +220,7 @@ namespace boost { namespace plugin {
                 BOOST_PLUGIN_OSSTREAM str;
                 str << "Boost.Plugin: Could not open shared library '" 
                     << dll_name << "' (dlerror: " << dlerror() << ")";
-                boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
             }
             init_library(dll_handle);    // initialize library
         }
