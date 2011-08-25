@@ -220,6 +220,11 @@ namespace hpx { namespace util
                                << ": " << e.what();
                     continue;   // handle next module
                 }
+                catch (std::exception const& e) {
+                    LRT_(warning) << "dynamic loading failed: " << curr.string() 
+                                  << ": " << e.what();
+                    continue;   // handle next module
+                }
 
             // if something went wrong while reading the registry, just use
             // some default settings

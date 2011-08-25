@@ -630,7 +630,10 @@ namespace hpx { namespace components { namespace server
         //
         util::section* sec = ini.get_section("hpx.components");
         if (NULL == sec)
+        {
+            LRT_(error) << "NULL section found"; 
             return;     // something bad happened
+        }
 
         util::section::section_map const& s = (*sec).get_sections();
 
@@ -682,8 +685,10 @@ namespace hpx { namespace components { namespace server
                         continue;   // next please :-P
                 }
             } 
-            catch (hpx::exception const& /*e*/) {
-                ; // FIXME: use default component location
+            catch (hpx::exception const& e) {
+                LRT_(warning) << "caught exception while loading " << instance
+                              << ", " << get_hpx_category().message(e.get_error())
+                              << ": " << e.what();
             }
         } // for
     }
