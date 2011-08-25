@@ -129,8 +129,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Initial Data -----------------------------------------
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
-        double dt = 0.1; // guess for start dt
-        double stop_time = 0.15;
+        double dt = 0.025; // guess for start dt
+        double stop_time = 0.35;
         double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
@@ -172,14 +172,38 @@ int hpx_main(boost::program_options::variables_map &vm)
             // Contact enforcement ----------------------------------
             BOOST_ASSERT(search_vector.size() == num_bodies);
 
-            std::vector<hpx::lcos::future_value<void> > enforcement_phase;
-            for (i=0;i<num_bodies;i++) {
-              if ( search_vector[i] == 1 ) {
-                // contact was discovered  -- enforce the contact
-                enforcement_phase.push_back(accu[i].enforce_async(master_objects,dt));
+            std::size_t N = 1; // number of iterations; soon to be a parameter
+
+            for (std::size_t n=0;n<N;n++) {
+              std::vector<hpx::lcos::future_value<void> > enforcement_phase;
+              for (i=0;i<num_bodies;i++) {
+                if ( search_vector[i] == 1 ) {
+                  // contact was discovered  -- enforce the contact
+                  enforcement_phase.push_back(accu[i].enforce_async(master_objects,dt,n,N));
+                }
               }
+              hpx::components::wait(enforcement_phase);
+
+              std::vector<hpx::lcos::future_value<void> > adjustment_phase;
+              for (i=0;i<num_bodies;i++) {
+                if ( search_vector[i] == 1 ) {
+                  // adjust the nodes based on the iteration results
+                  adjustment_phase.push_back(accu[i].adjust_async(dt));
+                }
+              }
+              hpx::components::wait(enforcement_phase);
+
+              // Recompute the Rsum quantity------------------------------------
+              std::vector<hpx::lcos::future_value<void> > recompute_phase;
+    
+              for (i=0;i<num_bodies;i++) {
+                if ( search_vector[i] == 1 ) {
+                  recompute_phase.push_back(accu[i].recompute_async(master_objects));
+                }
+              }
+
+              hpx::components::wait(recompute_phase);
             }
-            hpx::components::wait(enforcement_phase);
 
         } // time loop
 

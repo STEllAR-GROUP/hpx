@@ -62,9 +62,6 @@ namespace hpx { namespace geometry { namespace server
             R_[j] = 0.0;
           }
 
-          // The inverse of slave_ and master_ are:
-          std::vector<std::size_t> inv_slave,inv_master;
-
           if ( i != objectid_ ) {
             // search for contact
             typedef boost::geometry::model::linestring<point_type> linestring_type;
@@ -104,7 +101,8 @@ namespace hpx { namespace geometry { namespace server
                   // it may belong to poly
                   for (std::size_t k=0;k<poly.outer().size();k++) {
                     if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
-                      inv_slave.push_back(k); 
+                      inv_slave_.push_back(k); 
+                      inv_object_id_.push_back(i);
                       found = true;
                       break;
                     }
@@ -162,7 +160,7 @@ namespace hpx { namespace geometry { namespace server
                   }
 
                   BOOST_ASSERT(min_k >= 0 );
-                  inv_master.push_back(min_k); 
+                  inv_master_.push_back(min_k); 
                 }
 
               }
@@ -172,10 +170,20 @@ namespace hpx { namespace geometry { namespace server
             BOOST_ASSERT(slave_.size() == master_.size());
             BOOST_ASSERT(slave_.size() == object_id_.size());
 
-            BOOST_ASSERT(inv_slave.size() == inv_master.size());
+            // initialize the change in velocities
+            change_vx_.resize( slave_.size() );
+            change_vy_.resize( slave_.size() );
+            for (std::size_t j=0;j<slave_.size();j++) {
+              change_vx_[j] = 0.0;
+              change_vy_[j] = 0.0;
+            }
+             
 
-            for (std::size_t j=0;j<inv_slave.size();j++) {
-              std::size_t master_vertex = inv_master[j];
+            BOOST_ASSERT(inv_slave_.size() == inv_master_.size());
+            BOOST_ASSERT(inv_slave_.size() == inv_object_id_.size());
+
+            for (std::size_t j=0;j<inv_slave_.size();j++) {
+              std::size_t master_vertex = inv_master_[j];
               std::size_t final = master_vertex + 1; 
               if ( final >= poly_.outer().size() ) final = 0;
 
@@ -189,8 +197,8 @@ namespace hpx { namespace geometry { namespace server
               double B = (x1-x2)/l;
               double C = (x2*z1-x1*z2)/l;
 
-              double xs = (poly.outer())[inv_slave[j]].x();
-              double zs = (poly.outer())[inv_slave[j]].y();
+              double xs = (poly.outer())[inv_slave_[j]].x();
+              double zs = (poly.outer())[inv_slave_[j]].y();
               double delta = -(A*xs + B*zs + C);
     
               double xsm = xs + A*delta;
@@ -227,6 +235,9 @@ namespace hpx { namespace geometry { namespace server
           slave_.resize(0);
           master_.resize(0);
           object_id_.resize(0);
+          inv_slave_.resize(0);
+          inv_master_.resize(0);
+          inv_object_id_.resize(0);
           for (std::size_t i=0;i<poly_.outer().size();i++) {
             point_type &p = (poly_.outer())[i];
             (poly_.outer())[i].x(p.x() + velx_[i]*dt);
@@ -248,7 +259,7 @@ namespace hpx { namespace geometry { namespace server
           file.close();
         }
 
-        void point::enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt)
+        void point::enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,std::size_t n,std::size_t N)
         {
           typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
 
@@ -260,14 +271,15 @@ namespace hpx { namespace geometry { namespace server
           }
 
           // will return the number of invoked futures
-          components::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2,boost::ref(dt)));
+          components::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2,boost::ref(dt),boost::ref(n),boost::ref(N)));
         }
 
-        bool point::enforce_callback(std::size_t i, polygon_type const& poly,double dt) 
+        bool point::enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N) 
         {
 
           std::size_t master_vertex = master_[i];
           std::size_t final = master_[i] + 1; 
+          if ( final >= poly.outer().size() ) final = 0;
 
           // Masses -- equal for now
           double M_s = 1.0;
@@ -312,29 +324,62 @@ namespace hpx { namespace geometry { namespace server
           double RM = 1.0;
           double alpha2 = RM/(RM + R_[slave_[i]]);
 
-          // begin contact iteration enforcement
-          std::size_t N = 6; // number of contact enforcement iterations -- soon to be a parameter
-          for (std::size_t n=0;n<N;n++) {
-            double alpha1 = 1.0/sqrt(N-(n+1)+1); // Fortran index difference from Eqn. 12
-            double alpha  = alpha1*alpha2;
+          double alpha1 = 1.0/sqrt(N-(n+1.0)+1.0); // Fortran index difference from Eqn. 12
+          double alpha  = alpha1*alpha2;
 
-            // Eqn 10
-            double dv = -alpha*delta/dt/(1. + pow(R_1,2)*M_s/M_1 + pow(R_2,2)*M_s/M_2);
+          // Eqn 10
+          double dv = -alpha*delta/dt/(1. + pow(R_1,2)*M_s/M_1 + pow(R_2,2)*M_s/M_2);
 
-            // Eqn 14-15
-            velx_[ slave_[i] ] += -A*dv;
-            vely_[ slave_[i] ] += -B*dv;
- 
-            // take care of duplicate point
-            if ( slave_[i] == 0 ) {
-              velx_[ (poly_.outer()).size()-1] += -A*dv;
-              vely_[ (poly_.outer()).size()-1] += -B*dv;
-            }
-          }
+          // Eqn 14-15
+          change_vx_[ i ] += -A*dv;
+          change_vy_[ i ] += -B*dv;
 
           // return type says continue or not
           // usually return true
           return true;
+        }
+
+        void point::adjust(double dt)
+        {
+          std::size_t duplicate = (poly_.outer()).size()-1;
+          for (std::size_t i=0;i<slave_.size();i++) {
+            point_type &p = (poly_.outer())[ slave_[i] ];
+        //    (poly_.outer())[i].x(p.x() + change_vx_[i]*dt);
+        //    (poly_.outer())[i].y(p.y() + change_vy_[i]*dt);
+
+            velx_[ slave_[i] ] += change_vx_[i];
+            vely_[ slave_[i] ] += change_vy_[i];
+
+            // Take care of the duplicate node
+            if ( slave_[i] == 0 ) {
+        //      (poly_.outer())[duplicate].x(p.x());
+        //      (poly_.outer())[duplicate].y(p.y());
+              velx_[ duplicate ] = velx_[ slave_[i] ];
+              vely_[ duplicate ] = vely_[ slave_[i] ];
+            }
+
+            // reset the change to zero
+            change_vx_[ i ] = 0.0;
+            change_vy_[ i ] = 0.0;
+          }
+        }
+
+        /// Recompute Rsum
+        void point::recompute(std::vector<hpx::naming::id_type> const& search_objects) 
+        {
+#if 0
+            typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+
+            lazy_results_type lazy_results;
+            BOOST_FOREACH(naming::id_type gid, search_objects)
+            {
+              lazy_results.push_back( stubs::point::get_poly_async( gid ) );
+            }
+
+            // will return the number of invoked futures
+            bool redo = false;
+            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
+#endif
         }
 
 }}}

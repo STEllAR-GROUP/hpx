@@ -61,7 +61,9 @@ namespace hpx { namespace geometry { namespace server
             point_search = 5,
             point_get_poly = 6,
             point_move = 7,
-            point_enforce = 8
+            point_enforce = 8,
+            point_adjust = 9,
+            point_recompute = 10
         };
 
         // constructor: initialize accumulator value
@@ -142,18 +144,24 @@ namespace hpx { namespace geometry { namespace server
         /// search for contact
         int search(std::vector<hpx::naming::id_type> const& search_objects);
 
+        /// Recompute Rsum
+        void recompute(std::vector<hpx::naming::id_type> const& search_objects);
+
         /// callback for search-wait
         bool search_callback(std::size_t idx, polygon_type const& poly,bool &redo);
 
         // move the bodies
         void move(double dt,double time);
 
+        // move the bodies
+        void adjust(double dt);
+
         // enforce the contact
-        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt);
+        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,std::size_t n,std::size_t N);
 
         // what to do on the slave node when the master segment component finishes
         // iterating
-        bool enforce_callback(std::size_t i, polygon_type const& poly,double dt);
+        bool enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N);
 
         // retrieve the polygon object
         polygon_type get_poly() const
@@ -205,8 +213,12 @@ namespace hpx { namespace geometry { namespace server
             point, point_move, double, double, &point::move
         > move_action;
 
-        typedef hpx::actions::direct_action2<
-            point, point_enforce,std::vector<hpx::naming::id_type> const&,double,
+        typedef hpx::actions::direct_action1<
+            point, point_adjust, double, &point::adjust
+        > adjust_action;
+
+        typedef hpx::actions::direct_action4<
+            point, point_enforce,std::vector<hpx::naming::id_type> const&,double,std::size_t,std::size_t,
             &point::enforce
         > enforce_action;
 
@@ -227,6 +239,11 @@ namespace hpx { namespace geometry { namespace server
             &point::search
         > search_action;
 
+        typedef hpx::actions::direct_action1<
+            point, point_recompute, std::vector<hpx::naming::id_type> const&, 
+            &point::recompute
+        > recompute_action;
+
     private:
         hpx::lcos::mutex mtx_;    // lock for this data block
         plain_point_type pt_;
@@ -239,7 +256,12 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> slave_;
         std::vector<std::size_t> master_;
         std::vector<std::size_t> object_id_;
+        std::vector<std::size_t> inv_slave_;
+        std::vector<std::size_t> inv_master_;
+        std::vector<std::size_t> inv_object_id_;
         std::vector<double> R_;
+        std::vector<double> change_vx_;
+        std::vector<double> change_vy_;
         std::size_t objectid_;
         //boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > p_;
     };

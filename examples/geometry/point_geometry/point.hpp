@@ -79,10 +79,22 @@ namespace hpx { namespace geometry
             return this->base_type::search_async(gid_, search_objects);
         }
 
+        lcos::future_value<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects) 
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::recompute_async(gid_, search_objects);
+        }
+
         int search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search(gid_, search_objects);
+        }
+
+        void recompute(std::vector<hpx::naming::id_type> const& search_objects) 
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::recompute(gid_, search_objects);
         }
 
         lcos::future_value<polygon_type> get_poly_async() const
@@ -103,10 +115,17 @@ namespace hpx { namespace geometry
             return this->base_type::move_async(gid_,dt,time);
         }
 
-        lcos::future_value<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt) 
+        lcos::future_value<void> adjust_async(double dt) 
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::enforce_async(gid_,master_gids,dt);
+            return this->base_type::adjust_async(gid_,dt);
+        }
+
+        lcos::future_value<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt,
+                                               std::size_t n,std::size_t N) 
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::enforce_async(gid_,master_gids,dt,n,N);
         }
 
         void move(double dt,double time) 
@@ -115,10 +134,17 @@ namespace hpx { namespace geometry
             this->base_type::move(gid_,dt,time);
         }
 
-        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt) 
+        void adjust(double dt) 
         {
             BOOST_ASSERT(gid_);
-            this->base_type::enforce(gid_,master_gids,dt);
+            this->base_type::adjust(gid_,dt);
+        }
+
+        void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,
+                     std::size_t n,std::size_t N) 
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::enforce(gid_,master_gids,dt,n,N);
         }
 
         /// Query the current coordinate values of the server#point 
