@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/pbs_environment.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
     #include <hpx/lcos/eager_future.hpp>
@@ -27,16 +28,13 @@
 #include <iostream>
 #include <fstream>
 #include <cctype>
-#include <cstdlib>
 #include <vector>
-#include <map>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
-#include <boost/asio/ip/host_name.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -740,80 +738,6 @@ namespace hpx
             sigaction(SIGSYS, &new_action, NULL);  // Bad syscall 
 #endif
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Try to retrieve PBS related settings from the environment
-        struct environment
-        {
-            typedef std::map<std::string, std::size_t> node_map_type;
-
-            // the constructor tries to read from a PBS node-file, filling our
-            // map of nodes and thread counts
-            environment()
-            {
-                // read node file
-                char* pbs_nodefile = std::getenv("PBS_NODEFILE");
-                if (pbs_nodefile) {
-                    std::ifstream ifs(pbs_nodefile);
-                    if (ifs.is_open()) {
-                        std::string line;
-                        while (std::getline(ifs, line))
-                            if (!line.empty())
-                                ++nodes_[line];
-                    }
-                }
-            }
-
-            // The number of threads is either one (if no PBS information was 
-            // found), or it is the same as the number of times this node has 
-            // been listed in the node file.
-            std::size_t retrieve_number_of_threads() const
-            {
-                node_map_type::const_iterator it = nodes_.find(host_name());
-                return it != nodes_.end() ? (*it).second : 1;
-            }
-
-            // The number of localities is either one (if no PBS information 
-            // was found), or it is the same as the number of distinct node 
-            // names listed in the node file.
-            std::size_t retrieve_number_of_localities() const
-            {
-                return nodes_.empty() ? 1 : nodes_.size();
-            }
-
-            // Try to retrieve the node number from the PBS environment
-            std::size_t retrieve_node_number() const
-            {
-                char* pbs_nodenum = std::getenv("PBS_NODENUM");
-                if (pbs_nodenum) {
-                    try {
-                        std::string value(pbs_nodenum);
-                        return boost::lexical_cast<std::size_t>(value);
-                    }
-                    catch (boost::bad_lexical_cast const&) {
-                        ; // just ignore the error
-                    }
-                }
-                return std::size_t(-1);
-            }
-
-            // This helper function returns the host name of this node.
-            static std::string host_name() 
-            {
-                return boost::asio::ip::host_name();
-            }
-
-            // We arbitrarily select the first host listed in the node file to
-            // host the AGAS server.
-            std::string agas_host_name() const
-            {
-                return nodes_.empty() 
-                    ? std::string(HPX_INITIAL_IP_ADDRESS) 
-                    : (*nodes_.begin()).first;
-            }
-
-            std::map<std::string, std::size_t> nodes_;
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -840,7 +764,7 @@ namespace hpx
                 return 0;
 
             // Check command line arguments.
-            detail::environment env;
+            util::pbs_environment env;
             std::string hpx_host(HPX_INITIAL_IP_ADDRESS);
             std::string agas_host(env.agas_host_name());
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
