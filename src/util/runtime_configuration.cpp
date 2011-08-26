@@ -36,7 +36,7 @@ namespace hpx { namespace util
             "component_path = $[hpx.location]/lib/hpx",
             "ini_path = $[hpx.location]/share/hpx/ini",
 #if HPX_USE_ITT == 1
-            "use_ittnotify = ${HPX_USE_ITTNOTIFY:0}",
+            "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
@@ -318,7 +318,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("use_ittnotify", "0")) ? true : false;
+                    sec->get_entry("use_itt_notify", "0")) ? true : false;
             }
         }
 #endif
@@ -335,6 +335,17 @@ namespace hpx { namespace util
             }
         }
         return 1;
+    }
+
+    std::string runtime_configuration::get_cmd_line() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return sec->get_entry("cmd_line", "");
+            }
+        }
+        return "";
     }
 
     ///////////////////////////////////////////////////////////////////////////

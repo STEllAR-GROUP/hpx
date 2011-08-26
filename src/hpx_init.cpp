@@ -971,6 +971,19 @@ namespace hpx
             }
 
 #endif
+            std::string cmd_line;
+
+            // Collect the command line for diagnostic purposes.
+            for (int i = 0; i < argc; ++i)
+            {
+                cmd_line += std::string("'") + argv[i] + "'";
+                if ((i + 1) != argc)
+                    cmd_line += " ";
+            }
+
+            // Store the command line.
+            ini_config += "hpx.cmd_line=" + cmd_line; 
+
             // Set number of shepherds in configuration. 
             ini_config += "hpx.shepherds=" + 
                 boost::lexical_cast<std::string>(num_threads);
@@ -983,7 +996,6 @@ namespace hpx
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.
-
             ini_config += std::string("hpx.runtime_mode=")
                         + get_runtime_mode_name(mode); 
 

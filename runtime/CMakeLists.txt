@@ -7,3 +7,7 @@ add_hpx_executable(hpx_runtime
   MODULE core
   SOURCES hpx_runtime.cpp)
 
+add_hpx_pseudo_target(runtime)
+
+add_hpx_pseudo_dependencies(runtime hpx_runtime_exe)
+

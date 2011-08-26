@@ -365,6 +365,8 @@ namespace hpx
         applier_.init_tss();
 #endif
 
+        LRT_(info) << "cmd_line: " << get_config().get_cmd_line(); 
+
         LRT_(info) << "runtime_impl: beginning startup sequence";
 
         LRT_(info) << "runtime_impl: starting services";
