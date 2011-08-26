@@ -24,9 +24,9 @@ namespace throttle { namespace server
     throttle::throttle()
     {
         const std::size_t num_threads = 
-            hpx::get_runtime().get_config().get_num_shepherds();
+            hpx::get_runtime().get_config().get_num_os_threads();
         BOOST_ASSERT(num_threads != std::size_t(-1));
-        blocked_shepherds_.resize(num_threads);
+        blocked_os_threads_.resize(num_threads);
 
         std::cerr << "Created throttle component!" << std::endl;
     }
@@ -49,14 +49,14 @@ namespace throttle { namespace server
 
         mutex_type::scoped_lock l(mtx_);
 
-        if (shepherd >= blocked_shepherds_.size()) {
+        if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::suspend",
                 "invalid thread number");
         }
 
-        bool is_suspended = blocked_shepherds_[shepherd];
+        bool is_suspended = blocked_os_threads_[shepherd];
         if (!is_suspended) {
-            blocked_shepherds_[shepherd] = true;
+            blocked_os_threads_[shepherd] = true;
             register_thread(shepherd);
         }
     }
@@ -65,31 +65,31 @@ namespace throttle { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        if (shepherd >= blocked_shepherds_.size()) {
+        if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::resume",
                 "invalid thread number");
         }
 
-        blocked_shepherds_[shepherd] = false;   // re-activate shepherd
+        blocked_os_threads_[shepherd] = false;   // re-activate shepherd
     }
 
     bool throttle::is_suspended(std::size_t shepherd) const
     {
         mutex_type::scoped_lock l(mtx_);
 
-        if (shepherd >= blocked_shepherds_.size()) {
+        if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::is_suspended",
                 "invalid thread number");
         }
 
-        return blocked_shepherds_[shepherd];
+        return blocked_os_threads_[shepherd];
     }
 
     // do the requested throttling
     void throttle::throttle_controller(std::size_t shepherd)
     {
         mutex_type::scoped_lock l(mtx_);
-        if (!blocked_shepherds_[shepherd]) 
+        if (!blocked_os_threads_[shepherd]) 
             return;     // nothing more to do
 
         {
@@ -104,7 +104,7 @@ namespace throttle { namespace server
         // if this thread still needs to be suspended, re-schedule this routine
         // which will give the thread manager some cycles to tend to the high 
         // priority tasks which might have arrived
-        if (blocked_shepherds_[shepherd])
+        if (blocked_os_threads_[shepherd])
             register_thread(shepherd);
     }
 

@@ -20,16 +20,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-
     typedef boost::fusion::vector3<
         logging_destination, std::size_t, std::string
     > message_type;
 
     typedef std::vector<message_type> messages_type;
+}}
 
-namespace server 
+//////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components { namespace server 
 {
-
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
     void console_logging(messages_type const&);

@@ -363,7 +363,7 @@ namespace hpx { namespace threads
         if (previous_state_val == active) 
         {
             // schedule a new thread to set the state
-            LTM_(warning) << "set_state: thread(" << id << "), "
+            LTM_(fatal) << "set_state: thread(" << id << "), "
                              "is currently active, scheduling new thread...";
 
             thread_init_data data(
@@ -819,7 +819,8 @@ namespace hpx { namespace threads
     inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd, 
         thread_state_enum state, char const* info)
     {
-        LTM_(debug) << "tfunc(" << num_thread << "): "
+        // log this in any case
+        LTM_(fatal) << "tfunc(" << num_thread << "): "
                    << "thread(" << thrd->get_thread_id() << "), "
                    << "description(" << thrd->get_description() << "), "
                    << "new state(" << get_thread_state_name(state) << "), "

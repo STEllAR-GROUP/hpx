@@ -76,7 +76,7 @@ namespace throttle { namespace server
 
         // this is a bit mask where any set bit means the corresponding 
         // shepherd is to be blocked
-        boost::dynamic_bitset<> blocked_shepherds_;
+        boost::dynamic_bitset<> blocked_os_threads_;
         mutable mutex_type mtx_;
     };
 }}

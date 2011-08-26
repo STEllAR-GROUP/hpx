@@ -343,7 +343,7 @@ namespace hpx { namespace threads { namespace policies
 
             if ((queues_.size()-1 == num_thread) && (0 == added)) {
                 // Convert low priority tasks to threads before attempting to
-                // steal from other shepherds.
+                // steal from other OS thread.
                 result = result && low_priority_queue_.wait_or_add_new(
                     num_thread, running, idle_loop_count, added);
             }

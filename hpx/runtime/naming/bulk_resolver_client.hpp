@@ -9,6 +9,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+
+#if HPX_AGAS_VERSION <= 0x10
+
 #include <hpx/runtime/naming/resolver_client.hpp>
 
 #include <vector>
@@ -173,4 +176,5 @@ namespace hpx { namespace naming
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

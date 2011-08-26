@@ -325,13 +325,13 @@ namespace hpx { namespace util
         return false;
     }
 
-    std::size_t runtime_configuration::get_num_shepherds() const
+    std::size_t runtime_configuration::get_num_os_threads() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>
-                    (sec->get_entry("shepherds", 1));
+                    (sec->get_entry("os_threads", 1));
             }
         }
         return 1;
