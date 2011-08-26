@@ -510,7 +510,7 @@ void section::dump(int ind, std::ostream& strm) const
     {
         indent (ind, strm);
         strm << "[" << i->first << "]\n";
-        (*i).second.dump (ind);
+        (*i).second.dump (ind, strm);
     }
 
     if (header)
