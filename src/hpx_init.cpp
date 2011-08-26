@@ -532,7 +532,9 @@ namespace hpx
 
             void operator()() const
             {
-                rt_.get_config().dump();
+                std::cerr << "Configuration after runtime start:\n";
+                std::cerr << "----------------------------------\n";
+                rt_.get_config().dump(0, std::cerr);
             }
 
             Runtime const& rt_;
@@ -565,8 +567,12 @@ namespace hpx
                 rt.add_shutdown_function(shutdown);
 
             // Dump the configuration after all components have been loaded.
-            if (vm.count("dump-config"))
+            if (vm.count("dump-config")) {
+                std::cerr << "Configuration before runtime start:\n";
+                std::cerr << "-----------------------------------\n";
+                rt.get_config().dump(0, std::cerr);
                 rt.add_startup_function(dump_config<Runtime>(rt));
+            }
 
             if (vm.count("exit")) { 
                 if (vm.count("list-counters")) {
@@ -908,8 +914,8 @@ namespace hpx
             // Store the command line.
             ini_config += "hpx.cmd_line=" + cmd_line; 
 
-            // Set number of shepherds in configuration. 
-            ini_config += "hpx.shepherds=" + 
+            // Set number of OS threads in configuration. 
+            ini_config += "hpx.os_threads=" + 
                 boost::lexical_cast<std::string>(num_threads);
 
             // Set number of localities in configuration (do it everywhere, 
