@@ -7,9 +7,11 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include <map>
 #include <cstdlib>
+#include <iostream>
 
 #include <boost/asio/ip/host_name.hpp>
 
@@ -23,31 +25,59 @@ namespace hpx { namespace util
 
         // the constructor tries to read from a PBS node-file, filling our
         // map of nodes and thread counts
-        pbs_environment(std::string pbs_nodefile)
+        pbs_environment(bool debug = false) : debug_(debug) {}
+
+        // this function tries to read from a PBS node-file, filling our
+        // map of nodes and thread counts
+        std::string init_from_file(std::string nodefile)
         {
             // read node file
-            if (pbs_nodefile.empty()) {
+            if (nodefile.empty()) {
                 char* pbs_nodefile_env = std::getenv("PBS_NODEFILE");
                 if (pbs_nodefile_env) 
-                    pbs_nodefile = pbs_nodefile_env;
+                    nodefile = pbs_nodefile_env;
             }
 
-            if (!pbs_nodefile.empty()) {
-                std::ifstream ifs(pbs_nodefile.c_str());
+            if (!nodefile.empty()) {
+                std::ifstream ifs(nodefile.c_str());
                 if (ifs.is_open()) {
-                    std::cerr << "opened: " << pbs_nodefile << std::endl;
+                    if (debug_)
+                        std::cerr << "opened: " << nodefile << std::endl;
                     std::string line;
                     while (std::getline(ifs, line)) {
                         if (!line.empty()) {
-                            std::cerr << "read: " << line << std::endl;
+                            if (debug_)
+                                std::cerr << "read: " << line << std::endl;
                             ++nodes_[line];
                         }
                     }
                 }
-                else {
-                    std::cerr << "failed opening: " << pbs_nodefile << std::endl;
+                else if (debug_) {
+                    std::cerr << "failed opening: " << nodefile << std::endl;
                 }
             }
+
+            return nodefile;
+        }
+
+        // this function initializes the map of nodes from the given (space 
+        // separated) list of nodes
+        std::string const& init_from_nodelist(std::string const& nodes)
+        {
+            if (debug_)
+                std::cerr << "got node list: " << nodes << std::endl;
+
+            util::isstream istr(nodes);
+            std::string node;
+            while (istr >> node) {
+                if (!node.empty()) {
+                    if (debug_)
+                        std::cerr << "extracted: " << node << std::endl;
+                    ++nodes_[node];
+                }
+            }
+
+            return nodes;
         }
 
         // The number of threads is either one (if no PBS information was 
@@ -60,7 +90,10 @@ namespace hpx { namespace util
                 try {
                     std::string value(pbs_num_ppn);
                     std::size_t result = boost::lexical_cast<std::size_t>(value);
-                    std::cerr << "retrieve_number_of_threads: " << result << std::endl;
+                    if (debug_) {
+                        std::cerr << "retrieve_number_of_threads: " << result 
+                                  << std::endl;
+                    }
                     return result;
                 }
                 catch (boost::bad_lexical_cast const&) {
@@ -72,7 +105,10 @@ namespace hpx { namespace util
             // in the node-file
             node_map_type::const_iterator it = nodes_.find(host_name());
             std::size_t result = it != nodes_.end() ? (*it).second : 1;
-            std::cerr << "retrieve_number_of_threads: " << result << std::endl;
+            if (debug_) {
+                std::cerr << "retrieve_number_of_threads: " << result 
+                          << std::endl;
+            }
             return result;
         }
 
@@ -82,7 +118,10 @@ namespace hpx { namespace util
         std::size_t retrieve_number_of_localities() const
         {
             std::size_t result = nodes_.empty() ? 1 : nodes_.size();
-            std::cerr << "retrieve_number_of_localities: " << result << std::endl;
+            if (debug_) {
+                std::cerr << "retrieve_number_of_localities: " << result 
+                          << std::endl;
+            }
             return result;
         }
 
@@ -94,14 +133,18 @@ namespace hpx { namespace util
                 try {
                     std::string value(pbs_nodenum);
                     std::size_t result = boost::lexical_cast<std::size_t>(value);
-                    std::cerr << "retrieve_node_number: " << result << std::endl;
+                    if (debug_) {
+                        std::cerr << "retrieve_node_number: " << result 
+                                  << std::endl;
+                    }
                     return result;
                 }
                 catch (boost::bad_lexical_cast const&) {
                     ; // just ignore the error
                 }
             }
-            std::cerr << "retrieve_node_number: -1" << std::endl;
+            if (debug_)
+                std::cerr << "retrieve_node_number: -1" << std::endl;
             return std::size_t(-1);
         }
 
@@ -116,24 +159,29 @@ namespace hpx { namespace util
 
         static std::string host_name() 
         {
-            std::cerr << "host_name: " << boost::asio::ip::host_name() << std::endl;
-            std::cerr << "stripped host_name: " << strip_local(boost::asio::ip::host_name()) << std::endl;
             return strip_local(boost::asio::ip::host_name());
         }
 
         std::string host_name(std::string const& def_hpx_name) const
         {
-            return nodes_.empty() ? def_hpx_name : host_name();
+            std::string host = nodes_.empty() ? def_hpx_name : host_name();
+            if (debug_) 
+                std::cerr << "host_name: " << host << std::endl;
+            return host;
         }
 
         // We arbitrarily select the first host listed in the node file to
         // host the AGAS server.
-        std::string agas_host_name(std::string const& def_agas_name) const
+        std::string agas_host_name(std::string const& def_agas) const
         {
-            return nodes_.empty() ? def_agas_name : (*nodes_.begin()).first;
+            std::string host = nodes_.empty() ? def_agas : (*nodes_.begin()).first;
+            if (debug_) 
+                std::cerr << "host_name: " << host << std::endl;
+            return host;
         }
 
         std::map<std::string, std::size_t> nodes_;
+        bool debug_;
     };
 }}
 

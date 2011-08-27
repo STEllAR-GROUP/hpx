@@ -367,8 +367,12 @@ namespace hpx
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
                      "127.0.0.1:7910)")
-                    ("pbs_nodefile", value<std::string>(), 
-                      "the file name of the PBS node file to use")
+                    ("nodefile", value<std::string>(), 
+                      "the file name of a node file to use (list of nodes, one "
+                      "node name per line and core)")
+                    ("nodes", value<std::string>(), 
+                      "the (space separated) list of the nodes to use (usually "
+                      "this is extracted from a node file)")
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -776,10 +780,20 @@ namespace hpx
                 return 0;
 
             // Check command line arguments.
-            std::string pbs_nodefile;
-            if (vm.count("pbs_nodefile"))
-                pbs_nodefile = vm["pbs_nodefile"].as<std::string>();
-            util::pbs_environment env(pbs_nodefile);
+            util::pbs_environment env;
+            if (vm.count("nodefile")) {
+                if (vm.count("nodes")) {
+                    throw std::logic_error("Ambiguous command line options. "
+                        "Do not specify more than one of the --nodefile and "
+                        "--nodes options at the same time.\n");
+                }
+                ini_config += "hpx.nodefile=" + 
+                    env.init_from_file(vm["nodefile"].as<std::string>());
+            }
+            else if (vm.count("nodes")) {
+                ini_config += "hpx.nodes=" + 
+                    env.init_from_nodelist(vm["nodes"].as<std::string>());
+            }
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             std::string agas_host(env.agas_host_name(HPX_INITIAL_IP_ADDRESS));
@@ -812,7 +826,7 @@ namespace hpx
                         f = 0;
                 }
                 // store node number in configuration
-                ini_config += "hpx.node=" + node;
+                ini_config += "hpx.locality=" + node;
             }
 #endif
             if (vm.count("ini")) {
