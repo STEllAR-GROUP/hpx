@@ -23,11 +23,16 @@ namespace hpx { namespace util
 
         // the constructor tries to read from a PBS node-file, filling our
         // map of nodes and thread counts
-        pbs_environment()
+        pbs_environment(std::string pbs_nodefile)
         {
             // read node file
-            char* pbs_nodefile = std::getenv("PBS_NODEFILE");
-            if (pbs_nodefile) {
+            if (pbs_nodefile.empty()) {
+                char* pbs_nodefile_env = std::getenv("PBS_NODEFILE");
+                if (pbs_nodefile_env) 
+                    pbs_nodefile = pbs_nodefile_env;
+            }
+
+            if (!pbs_nodefile.empty()) {
                 std::ifstream ifs(pbs_nodefile);
                 if (ifs.is_open()) {
                     std::string line;
@@ -84,23 +89,31 @@ namespace hpx { namespace util
         }
 
         // This helper function returns the host name of this node.
+        static std::string strip_local(std::string const& name)
+        {
+            std::string::size_type pos = name.find(".local");
+            if (pos != std::string::npos)
+                return name.substr(0, pos);
+            return name;
+        }
+
         static std::string host_name() 
         {
-            // some systems append '.local' to the host name
-            std::string hostname(boost::asio::ip::host_name());
-            std::string::size_type pos = hostname.find(".local");
-            if (pos != std::string::npos)
-                return hostname.substr(0, pos);
-            return hostname;
+            return strip_local(boost::asio::ip::host_name());
+        }
+
+        std::string host_name(std::string const& def_hpx_name) const
+        {
+            return nodes_.empty() ? 
+                def_hpx_name : strip_local(boost::asio::ip::host_name());
         }
 
         // We arbitrarily select the first host listed in the node file to
         // host the AGAS server.
-        std::string agas_host_name() const
+        std::string agas_host_name(std::string const& def_agas_name) const
         {
-            return nodes_.empty() 
-                ? std::string(HPX_INITIAL_IP_ADDRESS) 
-                : (*nodes_.begin()).first;
+            return nodes_.empty() ? 
+                def_agas_name : strip_local((*nodes_.begin()).first);
         }
 
         std::map<std::string, std::size_t> nodes_;

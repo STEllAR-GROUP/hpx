@@ -367,6 +367,8 @@ namespace hpx
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
                      "127.0.0.1:7910)")
+                    ("pbs_nodefile", value<std::string>(), 
+                      "the file name of the PBS node file to use")
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -387,7 +389,8 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add a configuration definition to the default runtime "
                      "configuration")
-                    ("dump-config", "print the runtime configuration")
+                    ("dump-config-initial", "print the initial runtime configuration")
+                    ("dump-config", "print the final runtime configuration")
                     ("exit", "exit after configuring the runtime")
 #if HPX_AGAS_VERSION > 0x10
                     ("print-counter,P", value<std::vector<std::string> >()->composing(),
@@ -566,13 +569,16 @@ namespace hpx
             if (!shutdown.empty())
                 rt.add_shutdown_function(shutdown);
 
-            // Dump the configuration after all components have been loaded.
-            if (vm.count("dump-config")) {
+            // Dump the configuration before all components have been loaded.
+            if (vm.count("dump-config-initial")) {
                 std::cerr << "Configuration before runtime start:\n";
                 std::cerr << "-----------------------------------\n";
                 rt.get_config().dump(0, std::cerr);
-                rt.add_startup_function(dump_config<Runtime>(rt));
             }
+
+            // Dump the configuration after all components have been loaded.
+            if (vm.count("dump-config")) 
+                rt.add_startup_function(dump_config<Runtime>(rt));
 
             if (vm.count("exit")) { 
                 if (vm.count("list-counters")) {
@@ -770,13 +776,16 @@ namespace hpx
                 return 0;
 
             // Check command line arguments.
-            util::pbs_environment env;
-            std::string hpx_host(HPX_INITIAL_IP_ADDRESS);
-            std::string agas_host(env.agas_host_name());
+            std::string pbs_nodefile;
+            if (vm.count("pbs_nodefile"))
+                pbs_nodefile = vm["pbs_nodefile"].as<std::string>();
+            util::pbs_environment env(pbs_nodefile);
+
+            std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
+            std::string agas_host(env.agas_host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
             std::size_t num_threads = env.retrieve_number_of_threads();
             std::size_t num_localities = env.retrieve_number_of_localities();
-            std::string queueing("priority_local");
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
 #if HPX_AGAS_VERSION > 0x10
             std::size_t node = env.retrieve_node_number();
@@ -794,10 +803,9 @@ namespace hpx
                 }
                 else {
                     hpx_port += node;         // each node gets an unique port
-                    agas_host = hpx_host;     // assume local operation
                     agas_port = HPX_INITIAL_IP_PORT;
                     mode = hpx::runtime_mode_worker;
-                    
+
                     // do not execute any explicit hpx_main except if asked 
                     // otherwise
                     if (!vm.count("run-hpx-main"))
@@ -827,6 +835,7 @@ namespace hpx
             if (vm.count("threads"))
                 num_threads = vm["threads"].as<std::size_t>();
 
+            std::string queueing("priority_local");
             if (vm.count("queueing"))
                 queueing = vm["queueing"].as<std::string>();
 
@@ -882,6 +891,12 @@ namespace hpx
                 return 0;
             }
 #else
+            if (!hpx_host.empty() && 0 != hpx_port) {
+                // write HPX port parameters to the proper ini-file entries
+                ini_config += "hpx.address=" + hpx_host;
+                ini_config += "hpx.port=" + 
+                    boost::lexical_cast<std::string>(hpx_port);
+            }
             if (!agas_host.empty() && 0 != agas_port) {
                 // map agas command line option parameters to the proper 
                 // ini-file entries
