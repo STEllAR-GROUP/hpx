@@ -811,6 +811,8 @@ namespace hpx
                     if (!vm.count("run-hpx-main"))
                         f = 0;
                 }
+                // store node number in configuration
+                ini_config += "hpx.node=" + node;
             }
 #endif
             if (vm.count("ini")) {
