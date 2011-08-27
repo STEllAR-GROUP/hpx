@@ -515,6 +515,8 @@ void section::dump(int ind, std::ostream& strm) const
 
     if (header)
         strm << "============================\n";
+
+    strm << std::flush;
 }
 
 void section::merge(std::string const& filename)
