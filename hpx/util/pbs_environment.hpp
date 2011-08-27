@@ -33,7 +33,7 @@ namespace hpx { namespace util
             }
 
             if (!pbs_nodefile.empty()) {
-                std::ifstream ifs(pbs_nodefile);
+                std::ifstream ifs(pbs_nodefile.c_str());
                 if (ifs.is_open()) {
                     std::string line;
                     while (std::getline(ifs, line))
