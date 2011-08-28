@@ -826,7 +826,8 @@ namespace hpx
                         f = 0;
                 }
                 // store node number in configuration
-                ini_config += "hpx.locality=" + node;
+                ini_config += "hpx.locality=" + 
+                    boost::lexical_cast<std::string>(node);
             }
 #endif
             if (vm.count("ini")) {
