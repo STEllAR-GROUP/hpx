@@ -370,7 +370,7 @@ namespace hpx
                     ("nodefile", value<std::string>(), 
                       "the file name of a node file to use (list of nodes, one "
                       "node name per line and core)")
-                    ("nodes", value<std::string>(), 
+                    ("nodes", value<std::vector<std::string> >()->multitoken(), 
                       "the (space separated) list of the nodes to use (usually "
                       "this is extracted from a node file)")
                     ("localities,l", value<std::size_t>(), 
@@ -791,8 +791,8 @@ namespace hpx
                     env.init_from_file(vm["nodefile"].as<std::string>());
             }
             else if (vm.count("nodes")) {
-                ini_config += "hpx.nodes=" + 
-                    env.init_from_nodelist(vm["nodes"].as<std::string>());
+                ini_config += "hpx.nodes=" + env.init_from_nodelist(
+                    vm["nodes"].as<std::vector<std::string> >());
             }
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));

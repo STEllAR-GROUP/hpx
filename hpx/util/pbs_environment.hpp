@@ -7,7 +7,6 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/stringstream.hpp>
 
 #include <map>
 #include <cstdlib>
@@ -62,22 +61,23 @@ namespace hpx { namespace util
 
         // this function initializes the map of nodes from the given (space 
         // separated) list of nodes
-        std::string const& init_from_nodelist(std::string const& nodes)
+        std::string init_from_nodelist(std::vector<std::string> const& nodes)
         {
             if (debug_)
-                std::cerr << "got node list: " << nodes << std::endl;
+                std::cerr << "got node list" << std::endl;
 
-            util::isstream istr(nodes);
-            std::string node;
-            while (istr >> node) {
-                if (!node.empty()) {
+            std::string nodes_list;
+            BOOST_FOREACH(std::string const& s, nodes) 
+            {
+                if (!s.empty()) {
                     if (debug_)
-                        std::cerr << "extracted: " << node << std::endl;
-                    ++nodes_[node];
+                        std::cerr << "extracted: " << s << std::endl;
+                    ++nodes_[s];
+                    nodes_list += s + ' ';
                 }
             }
 
-            return nodes;
+            return nodes_list;
         }
 
         // The number of threads is either one (if no PBS information was 
