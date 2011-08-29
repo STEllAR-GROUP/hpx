@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         // Generate new config info
-        stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the left face
-        stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the right face
+        stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the right face coming from the left
+        stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the left face coming from the right
 
         // get all input memory_block_data instances
         typedef std::vector<lcos::future_value<memory_block_data> > 
@@ -122,10 +122,10 @@ namespace hpx { namespace components { namespace adaptive1d
 
         namespace s = hpx::components::stubs;
         lazy_results.push_back(
-            s::memory_block::get_async(gids[0], cfg1.get_memory_block()));
+            s::memory_block::get_async(gids[0], cfg0.get_memory_block()));
         lazy_results.push_back(s::memory_block::get_async(gids[1]));
         lazy_results.push_back(
-            s::memory_block::get_async(gids[2], cfg0.get_memory_block()));
+            s::memory_block::get_async(gids[2], cfg1.get_memory_block()));
 
         //  invoke the operation for the result gid as well
         lazy_results.push_back(s::memory_block::get_async(result));
@@ -133,7 +133,7 @@ namespace hpx { namespace components { namespace adaptive1d
         // then wait for all results to get back to us
         std::vector<access_memory_block<stencil_data> > val;
         BOOST_FOREACH(lcos::future_value<memory_block_data> const& f, lazy_results)
-            val.push_back(f.get());
+          val.push_back(f.get());
 
         // lock all user defined data elements, will be unlocked at function exit
         scoped_values_lock<lcos::mutex> l(val); 

@@ -97,6 +97,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       val->value_[i].phi[0][8] = 0.0;
     }
 
+#if 0
 #if defined(RNPL_FOUND)
     // output initial data
     double datatime = 0.0;
@@ -118,6 +119,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       }
       gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
     }
+#endif
 #endif
 
     return 1;

@@ -130,10 +130,10 @@ namespace hpx { namespace components { namespace adaptive1d
             ar & max_index_ & index_ & timestep_;
             if (config) {
                 if ( config->face_ == 0 ) {
-                  // right face
-                  value_.do_save(ar, value_.size() - config->count_ - 1, value_.size()-1);
+                  // right face -- coming from the left
+                  value_.do_save(ar, value_.size() - config->count_, value_.size());
                 } else if ( config->face_ == 1 ) {
-                  // left face
+                  // left face -- coming from the right
                   value_.do_save(ar, 0, config->count_);
                 } else {
                   BOOST_ASSERT(false);
