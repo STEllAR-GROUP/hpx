@@ -47,9 +47,19 @@
     <Link>
       <GenerateMapFile>false</GenerateMapFile>
     </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp" />
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp" />
     <ClCompile Include="..\..\..\examples\geometry\point_geometry\server\point.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/point1.obj</ObjectFileName>

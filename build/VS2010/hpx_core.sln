@@ -65,18 +65,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "marduk_mesh", "marduk\mardu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread_test", "tests\thread_test\thread_test.vcxproj", "{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}"
 EndProject
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "thread_testd", "tests\thread_test\x64\Debug\thread_testd.exe", "{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}"
-	ProjectSection(DebuggerProjectSystem) = preProject
-		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = C:\CVS\hpx\hpx\build\VS2010\tests\thread_test\x64\Debug\thread_testd.exe
-		RemoteMachine = FIFTYTWO
-		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib\hpx
-		Arguments = -l2 -0
-		Environment = Default
-		LaunchingEngine = 00000000-0000-0000-0000-000000000000
-		LaunchSQLEngine = No
-		AttachLaunchAction = No
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "point_geometry_client", "point_geometry_client\point_geometry_client.vcxproj", "{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -145,6 +134,7 @@ Global
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Debug|Win32.ActiveCfg = Debug|x64
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Debug|x64.ActiveCfg = Debug|x64
+		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Debug|x64.Build.0 = Debug|x64
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Release|Mixed Platforms.Build.0 = Release|x64
 		{E5FF44ED-F22B-1CCC-C7E6-FA7B246A77E7}.Release|Win32.ActiveCfg = Release|x64
@@ -330,12 +320,16 @@ Global
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|Win32.ActiveCfg = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|x64.ActiveCfg = Release|x64
 		{119DA8DE-E1E7-4874-981B-FD17BDA3FB95}.Release|x64.Build.0 = Release|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|Win32.ActiveCfg = Debug|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Debug|x64.ActiveCfg = Debug|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|Mixed Platforms.ActiveCfg = Debug|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|Win32.ActiveCfg = Debug|x64
-		{C6A2B700-CE72-4B57-B3A6-856A30BC56F4}.Release|x64.ActiveCfg = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Debug|Win32.ActiveCfg = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Debug|x64.ActiveCfg = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Debug|x64.Build.0 = Debug|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Release|Mixed Platforms.Build.0 = Release|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Release|Win32.ActiveCfg = Release|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Release|x64.ActiveCfg = Release|x64
+		{8D8BE69B-FD2A-FBF3-BD9B-E0D78B5308EE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

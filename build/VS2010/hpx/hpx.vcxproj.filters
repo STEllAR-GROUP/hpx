@@ -1054,6 +1054,15 @@
     <ClInclude Include="..\..\..\examples\throttle\throttle\throttle.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\stringstream.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

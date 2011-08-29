@@ -23,5 +23,8 @@
     <ClInclude Include="..\..\..\..\hpx\hpx_init.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\hpx\util\pbs_environment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

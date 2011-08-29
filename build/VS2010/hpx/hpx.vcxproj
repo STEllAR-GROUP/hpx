@@ -268,12 +268,15 @@
     <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\msvc.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\stringstream.hpp" />
     <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
