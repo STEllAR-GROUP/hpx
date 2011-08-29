@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/pbs_environment.hpp>
+#include <hpx/util/map_hostnames.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
     #include <hpx/lcos/eager_future.hpp>
@@ -407,6 +408,19 @@ namespace hpx
 #endif
                 ;
 
+#if HPX_AGAS_VERSION > 0x10
+                hidden_options.add_options()
+                    // this option is a quick hack allowing to pre-resolve the 
+                    // given host names to the ip-addresses on machines with 
+                    // several network interfaces
+                    ("resolve-hostnames", value<std::string>(), 
+                        "name of a file describing the hostname->ip-address "
+                        "mappings to use")
+                    // enable debug output from command line handling
+                    ("debug-clp", "debug command line processing")
+                ;
+#endif
+
                 options_description desc_cmdline;
                 desc_cmdline
                     .add(app_options).add(cmdline_options)
@@ -457,12 +471,6 @@ namespace hpx
                 else {
                     addr = v;
                 }
-
-                // map localhost to loopback ip address (that's a quick hack 
-                // which will be removed as soon as we figure out why name 
-                // resolution does not handle this anymore)
-                if (addr == "localhost") 
-                    addr = "127.0.0.1";
             }
             catch (boost::bad_lexical_cast const& /*e*/) {
                 std::cerr << "hpx::init: illegal port number given: "
@@ -781,8 +789,15 @@ namespace hpx
             if (detail::help == r)
                 return 0;
 
+            bool debug_clp = vm.count("debug-clp") ? true : false;
+
+            // create host name mapping
+            util::map_hostnames mapnames(debug_clp);
+            if (vm.count("resolve-hostnames")) 
+                mapnames.init_from_file(vm["resolve-hostnames"].as<std::string>());
+
             // Check command line arguments.
-            util::pbs_environment env;
+            util::pbs_environment env(debug_clp);
             if (vm.count("nodefile")) {
                 if (vm.count("nodes")) {
                     throw std::logic_error("Ambiguous command line options. "
@@ -890,6 +905,10 @@ namespace hpx
                 }
             }
 
+            // map host names to ip addresses, if requested
+            hpx_host = mapnames.map(hpx_host);
+            agas_host = mapnames.map(agas_host);
+
 #if HPX_AGAS_VERSION <= 0x10
             // Initialize and run the AGAS service, if appropriate.
             boost::shared_ptr<detail::agas_server_helper> agas_server;
@@ -935,9 +954,8 @@ namespace hpx
             }
 
 #endif
-            std::string cmd_line;
-
             // Collect the command line for diagnostic purposes.
+            std::string cmd_line;
             for (int i = 0; i < argc; ++i)
             {
                 cmd_line += std::string("'") + argv[i] + "'";
@@ -963,13 +981,13 @@ namespace hpx
             ini_config += std::string("hpx.runtime_mode=")
                         + get_runtime_mode_name(mode); 
 
-            if (vm.count("dump-config-initial")) {
-                std::cout << "Configuration before runtime start:\n";
-                std::cout << "-----------------------------------\n";
+            if (debug_clp) {
+                std::cerr << "Configuration before runtime start:\n";
+                std::cerr << "-----------------------------------\n";
                 BOOST_FOREACH(std::string const& s, ini_config) {
-                    std::cout << s << std::endl;
+                    std::cerr << s << std::endl;
                 }
-                std::cout << "-----------------------------------\n";
+                std::cerr << "-----------------------------------\n";
             }
 
             // Initialize and start the HPX runtime.

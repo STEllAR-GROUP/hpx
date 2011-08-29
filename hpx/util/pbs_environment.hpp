@@ -11,6 +11,7 @@
 #include <map>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 #include <boost/asio/ip/host_name.hpp>
 
