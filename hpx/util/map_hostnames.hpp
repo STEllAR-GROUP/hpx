@@ -51,9 +51,9 @@ namespace hpx { namespace util
                                 if (debug_) {
                                     std::cerr << "inserting mapping: " 
                                               << line.substr(0, p) << ":"
-                                              << line.substr(p) << std::endl;
+                                              << line.substr(p+1) << std::endl;
                                 }
-                                mappings_[line.substr(0, p)] = line.substr(p);
+                                mappings_[line.substr(0, p)] = line.substr(p+1);
                             }
                             else if (debug_) {
                                 std::cerr << "failed to insert mapping: " 
