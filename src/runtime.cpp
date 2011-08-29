@@ -112,19 +112,19 @@ namespace hpx
     {
         char const* const runtime_mode_names[] = 
         {
-            "invalid",
-            "console",
-            "worker",
-            "connect",
-            "default",
+            "invalid",    // -1
+            "console",    // 0
+            "worker",     // 1
+            "connect",    // 2
+            "default",    // 3
         };
     }
 
     char const* get_runtime_mode_name(runtime_mode state)
     {
         if (state < runtime_mode_invalid || state > runtime_mode_last)
-            return "invalid";
-        return strings::runtime_mode_names[state];
+            return "invalid (value out of bounds)";
+        return strings::runtime_mode_names[state+1];
     }
 
     ///////////////////////////////////////////////////////////////////////////
