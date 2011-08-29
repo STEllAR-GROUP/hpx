@@ -393,10 +393,10 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add a configuration definition to the default runtime "
                      "configuration")
+#if HPX_AGAS_VERSION > 0x10
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
                     ("exit", "exit after configuring the runtime")
-#if HPX_AGAS_VERSION > 0x10
                     ("print-counter,P", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter before shutting "
                      "down the system")
@@ -539,9 +539,10 @@ namespace hpx
 
             void operator()() const
             {
-                std::cerr << "Configuration after runtime start:\n";
-                std::cerr << "----------------------------------\n";
-                rt_.get_config().dump(0, std::cerr);
+                std::cout << "Configuration after runtime start:\n";
+                std::cout << "----------------------------------\n";
+                rt_.get_config().dump(0, std::cout);
+                std::cout << "----------------------------------\n";
             }
 
             Runtime const& rt_;
@@ -575,9 +576,10 @@ namespace hpx
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("dump-config-initial")) {
-                std::cerr << "Configuration before runtime start:\n";
-                std::cerr << "-----------------------------------\n";
-                rt.get_config().dump(0, std::cerr);
+                std::cout << "Configuration after runtime construction:\n";
+                std::cout << "-----------------------------------------\n";
+                rt.get_config().dump(0, std::cout);
+                std::cout << "-----------------------------------------\n";
             }
 
             // Dump the configuration after all components have been loaded.
@@ -960,6 +962,15 @@ namespace hpx
             //        scheduler, switch to the 'local' scheduler instead.
             ini_config += std::string("hpx.runtime_mode=")
                         + get_runtime_mode_name(mode); 
+
+            if (vm.count("dump-config-initial")) {
+                std::cout << "Configuration before runtime start:\n";
+                std::cout << "-----------------------------------\n";
+                BOOST_FOREACH(std::string const& s, ini_config) {
+                    std::cout << s << std::endl;
+                }
+                std::cout << "-----------------------------------\n";
+            }
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {

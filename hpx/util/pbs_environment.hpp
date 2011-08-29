@@ -176,7 +176,7 @@ namespace hpx { namespace util
         {
             std::string host = nodes_.empty() ? def_agas : (*nodes_.begin()).first;
             if (debug_) 
-                std::cerr << "host_name: " << host << std::endl;
+                std::cerr << "agas host_name: " << host << std::endl;
             return host;
         }
 
