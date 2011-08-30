@@ -117,8 +117,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Object #2
         bbox[1][0] =   0.001;
         bbox[1][1] =   1.5;
-        bbox[1][2] =   0.5;
-        bbox[1][3] =   1.5;
+        bbox[1][2] =   0.75;
+        bbox[1][3] =   1.25;
 
         velx[1] = -1.0;
         vely[1] =  0.0;
@@ -130,7 +130,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::future_value<void> > initial_phase;
 
         double dt = 0.025; // guess for start dt
-        double stop_time = 0.35;
+        double stop_time = 0.45;
         double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
@@ -172,7 +172,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             // Contact enforcement ----------------------------------
             BOOST_ASSERT(search_vector.size() == num_bodies);
 
-            std::size_t N = 1; // number of iterations; soon to be a parameter
+            std::size_t N = 10; // number of iterations; soon to be a parameter
 
             for (std::size_t n=0;n<N;n++) {
               std::vector<hpx::lcos::future_value<void> > enforcement_phase;

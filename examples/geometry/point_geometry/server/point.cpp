@@ -344,16 +344,16 @@ namespace hpx { namespace geometry { namespace server
           std::size_t duplicate = (poly_.outer()).size()-1;
           for (std::size_t i=0;i<slave_.size();i++) {
             point_type &p = (poly_.outer())[ slave_[i] ];
-        //    (poly_.outer())[i].x(p.x() + change_vx_[i]*dt);
-        //    (poly_.outer())[i].y(p.y() + change_vy_[i]*dt);
+            (poly_.outer())[ slave_[i] ].x(p.x() + change_vx_[i]*dt);
+            (poly_.outer())[ slave_[i] ].y(p.y() + change_vy_[i]*dt);
 
             velx_[ slave_[i] ] += change_vx_[i];
             vely_[ slave_[i] ] += change_vy_[i];
 
             // Take care of the duplicate node
             if ( slave_[i] == 0 ) {
-        //      (poly_.outer())[duplicate].x(p.x());
-        //      (poly_.outer())[duplicate].y(p.y());
+              (poly_.outer())[duplicate].x(p.x());
+              (poly_.outer())[duplicate].y(p.y());
               velx_[ duplicate ] = velx_[ slave_[i] ];
               vely_[ duplicate ] = vely_[ slave_[i] ];
             }
