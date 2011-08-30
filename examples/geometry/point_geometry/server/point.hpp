@@ -163,6 +163,8 @@ namespace hpx { namespace geometry { namespace server
         // iterating
         bool enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N);
 
+        bool recompute_callback(std::size_t i, polygon_type const& poly);
+
         // retrieve the polygon object
         polygon_type get_poly() const
         {

@@ -367,19 +367,57 @@ namespace hpx { namespace geometry { namespace server
         /// Recompute Rsum
         void point::recompute(std::vector<hpx::naming::id_type> const& search_objects) 
         {
-#if 0
-            typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+          typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
 
-            lazy_results_type lazy_results;
-            BOOST_FOREACH(naming::id_type gid, search_objects)
-            {
-              lazy_results.push_back( stubs::point::get_poly_async( gid ) );
-            }
+          lazy_results_type lazy_results;
 
-            // will return the number of invoked futures
-            bool redo = false;
-            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
-#endif
+          // Re-initialize Rsum
+          for (std::size_t i=0;i<R_.size();i++) {
+            R_[i] = 0.0;
+          }
+ 
+          for (std::size_t i=0;i<inv_slave_.size();i++) {
+            naming::id_type gid = search_objects[ inv_object_id_[i] ];
+            lazy_results.push_back( stubs::point::get_poly_async( gid ) );
+          }
+
+          // will return the number of invoked futures
+          components::wait(lazy_results, boost::bind(&point::recompute_callback, this, _1, _2));
+        }
+
+        bool point::recompute_callback(std::size_t i, polygon_type const& poly) 
+        {
+          std::size_t master_vertex = inv_master_[i];
+          std::size_t final = master_vertex + 1; 
+          if ( final >= poly_.outer().size() ) final = 0;
+
+          double x1 = (poly_.outer())[master_vertex].x();
+          double x2 = (poly_.outer())[final].x();
+          double z1 = (poly_.outer())[master_vertex].y();
+          double z2 = (poly_.outer())[final].y();
+
+          double l = boost::geometry::distance((poly_.outer())[master_vertex],(poly_.outer())[final]);
+          double A = (z2-z1)/l;
+          double B = (x1-x2)/l;
+          double C = (x2*z1-x1*z2)/l;
+
+          double xs = (poly.outer())[inv_slave_[i]].x();
+          double zs = (poly.outer())[inv_slave_[i]].y();
+          double delta = -(A*xs + B*zs + C);
+
+          double xsm = xs + A*delta;
+          double zsm = zs + B*delta;
+
+          double D1 = sqrt( (xsm-x1)*(xsm-x1) + (zsm - z1)*(zsm - z1) );
+          double D2 = sqrt( (xsm-x2)*(xsm-x2) + (zsm - z2)*(zsm - z2) );
+          double D3 = D1 + D2;
+
+          R_[master_vertex] += D2/D3;
+          R_[final] += D1/D3;
+
+          // return type says continue or not
+          // usually return true
+          return true;
         }
 
 }}}
