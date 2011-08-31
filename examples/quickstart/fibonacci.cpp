@@ -24,76 +24,69 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::naming::id_type;
-
-using hpx::applier::get_applier;
-
-using hpx::actions::plain_result_action2;
-
+using hpx::actions::plain_result_action1;
 using hpx::lcos::eager_future;
-
 using hpx::util::high_resolution_timer;
-
 using hpx::init;
 using hpx::finalize;
+using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t fibonacci(
-    id_type const& prefix 
-  , boost::uint64_t m
-);
+// forward declaration of the Fibonacci function
+boost::uint64_t fibonacci(boost::uint64_t m);
 
-typedef plain_result_action2<
-    // result type
-    boost::uint64_t
-    // arguments
-  , id_type const&  
-  , boost::uint64_t
-    // function
-  , fibonacci
+// Any global function needs to be wrapped into a plain_action if it should be
+// invoked as a HPX-thread.
+typedef plain_result_action1<
+    boost::uint64_t,          // result type
+    boost::uint64_t,          // argument
+    fibonacci                 // function
 > fibonacci_action;
 
+// this is to generate the required boilerplate we need for the remote 
+// invocation to work
 HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 
+///////////////////////////////////////////////////////////////////////////////
+// An eager_future is a HPX construct exposing the semantics of a Future
+// object. It starts executing the bound action immediately (eagerly).
 typedef eager_future<fibonacci_action> fibonacci_future;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t fibonacci(
-    id_type const& prefix
-  , boost::uint64_t n
-) {
-    if (2 > n)
+boost::uint64_t fibonacci(boost::uint64_t n) 
+{
+    if (n < 2)
         return n;
 
-    fibonacci_future n1(prefix, prefix, n - 1); 
-    fibonacci_future n2(prefix, prefix, n - 2); 
+    // We restrict ourselves to execute the Fibonacci function locally.
+    id_type const prefix = find_here();
 
-    return n1.get() + n2.get();
+    // Invoking the Fibonacci algorithm twice is obviously as stupid as it can 
+    // get. However, we intentionally demonstrate it this way to create some 
+    // heavy workload.
+    fibonacci_future n1(prefix, n - 1); 
+    fibonacci_future n2(prefix, n - 2); 
+
+    return n1.get() + n2.get();   // wait for the Futures to return their values
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    {
-        boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    // extract command line argument, i.e. fib(N)
+    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
 
-        const id_type prefix = get_applier().get_runtime_support_gid();
+    // Keep track of the time required to execute.
+    high_resolution_timer t;
 
-        high_resolution_timer t;
+    // Create a Future for the whole calculation and wait for it.
+    fibonacci_future f(find_here(), n);    // execute locally
+    boost::uint64_t r = f.get();
 
-        fibonacci_future f(prefix, prefix, n);
-
-        boost::uint64_t r = f.get();
-
-        double elapsed = t.elapsed();
-
-        std::cout
-            << ( boost::format("fibonacci(%1%) == %2%\n"
-                               "elapsed time == %3%\n")
-               % n % r % elapsed);
-    }
+    char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
+    std::cout << (boost::format(fmt) % n % r % t.elapsed());
 
     finalize();
-
     return 0;
 }
 
@@ -105,9 +98,8 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ( "n-value"
-        , value<boost::uint64_t>()->default_value(10)
-        , "n value for the Fibonacci function") 
+        ( "n-value" , value<boost::uint64_t>()->default_value(10),
+            "n value for the Fibonacci function") 
         ;
 
     // Initialize and run HPX
