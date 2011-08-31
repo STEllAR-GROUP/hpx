@@ -97,29 +97,29 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       val->value_[i].phi[0][8] = 0.0;
     }
 
-#if 0
 #if defined(RNPL_FOUND)
-    // output initial data
-    double datatime = 0.0;
-    int shape[3];
-    shape[0] = val->value_.size();
-    char cnames[80] = { "x" };
-    char fname[80];
-    applier::applier& appl = applier::get_applier();
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
-    int locality = get_prefix_from_id( this_prefix );
-    std::vector<double> xcoord,value;
-    xcoord.resize(val->value_.size());
-    value.resize(val->value_.size());
-    for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
-      sprintf(fname,"%dfield%d",locality,(int) j);
-      for (std::size_t i=0;i<val->value_.size();i++) {
-        xcoord[i] = val->value_[i].x;
-        value[i] = val->value_[i].phi[0][j];
+    if ( par.out_every > 0 ) {
+      // output initial data
+      double datatime = 0.0;
+      int shape[3];
+      shape[0] = val->value_.size();
+      char cnames[80] = { "x" };
+      char fname[80];
+      applier::applier& appl = applier::get_applier();
+      naming::id_type this_prefix = appl.get_runtime_support_gid();
+      int locality = get_prefix_from_id( this_prefix );
+      std::vector<double> xcoord,value;
+      xcoord.resize(val->value_.size());
+      value.resize(val->value_.size());
+      for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
+        sprintf(fname,"%s/%dfield%d",par.outdir.c_str(),locality,(int) j);
+        for (std::size_t i=0;i<val->value_.size();i++) {
+          xcoord[i] = val->value_[i].x;
+          value[i] = val->value_[i].phi[0][j];
+        }
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
       }
-      gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
     }
-#endif
 #endif
 
     return 1;
@@ -339,7 +339,6 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
 
 #if defined(RNPL_FOUND)
     if ( fmod(val[1]->timestep_,par.out_every) < 1.e-6 ) {
-      // output initial data
       double datatime = t + dt;
       int shape[3];
       shape[0] = val[3]->value_.size();
@@ -352,7 +351,7 @@ int rkupdate(std::vector<access_memory_block<stencil_data> > &val,
       xcoord.resize(val[3]->value_.size());
       value.resize(val[3]->value_.size());
       for (std::size_t j=0;j<NUM_EQUATIONS;j++) {
-        sprintf(fname,"%dfield%d",locality,(int) j);
+        sprintf(fname,"%s/%dfield%d",par.outdir.c_str(),locality,(int) j);
         for (std::size_t i=0;i<val[3]->value_.size();i++) {
           xcoord[i] = val[3]->value_[i].x;
           value[i] = val[3]->value_[i].phi[0][j];

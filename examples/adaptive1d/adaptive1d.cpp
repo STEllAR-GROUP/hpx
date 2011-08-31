@@ -92,6 +92,7 @@ int hpx_main(variables_map& vm)
     par->amp    = 0.0001;
     par->x0     = 10.0;
     par->id_sigma = 0.9;
+    par->outdir = "./";
 
     id_type rt_id = get_applier().get_runtime_support_gid();
 
@@ -109,6 +110,7 @@ int hpx_main(variables_map& vm)
         appconfig_option<std::size_t>("grain_size", pars, par->grain_size);
         appconfig_option<std::size_t>("num_neighbors", pars, par->num_neighbors);
         appconfig_option<double>("out_every", pars, par->out_every);
+        appconfig_option<std::string>("output_directory", pars, par->outdir);
 
         // Application parameters
         appconfig_option<double>("cfl", pars, par->cfl);
@@ -151,6 +153,7 @@ int hpx_main(variables_map& vm)
     std::cout << " grain_size    : " << par->grain_size << std::endl;
     std::cout << " num_neighbors : " << par->num_neighbors << std::endl;
     std::cout << " out_every     : " << par->out_every << std::endl;
+    std::cout << " output_directory : " << par->outdir << std::endl;
     std::cout << " --------------: " << std::endl;
     std::cout << " loglevel      : " << par->loglevel << std::endl;
     std::cout << " --------------: " << std::endl;
