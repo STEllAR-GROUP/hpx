@@ -5,6 +5,7 @@ grain_size = 100
 num_neighbors = 1
 out_every = 5.0
 loglevel     = 2
+output_directory = /fslhome/mwa2/compute/1dtest
 
 cfl = 0.01
 disip = .005
