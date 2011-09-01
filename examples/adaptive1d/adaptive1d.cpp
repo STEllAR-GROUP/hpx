@@ -80,6 +80,7 @@ int hpx_main(variables_map& vm)
     par->allowedl       = 0;
     par->num_neighbors  = 2;
     par->out_every      = 5.0;
+    par->refine_every   = 100;
 
     // application specific parameters
     par->cfl    = 0.01;
@@ -111,6 +112,7 @@ int hpx_main(variables_map& vm)
         appconfig_option<std::size_t>("num_neighbors", pars, par->num_neighbors);
         appconfig_option<double>("out_every", pars, par->out_every);
         appconfig_option<std::string>("output_directory", pars, par->outdir);
+        appconfig_option<std::size_t>("refine_every", pars, par->refine_every);
 
         // Application parameters
         appconfig_option<double>("cfl", pars, par->cfl);
@@ -146,10 +148,33 @@ int hpx_main(variables_map& vm)
             ) % par->grain_size % par->num_neighbors);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     }
+    if ( par->refine_every < 1 ) {
+      // no adaptivity
+      par->refine_every = par->nt0;
+    }
+
+    if ( (par->refine_every % 2) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "refine_every needs to be even: (%1%) "
+            ) % par->refine_every);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    }
+
+    if ( (par->nt0 % par->refine_every ) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "nt0 (%1%) needs to be evenly divisible by refine_every (%2%) "
+            ) % par->nt0 % par->refine_every);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    }
+
+    std::size_t time_grain_size = par->nt0/par->refine_every;
 
     std::cout << " Parameters    : " << std::endl;
     std::cout << " nx0           : " << par->nx0 << std::endl;
     std::cout << " nt0           : " << par->nt0 << std::endl;
+    std::cout << " refine_every  : " << par->refine_every << std::endl;
     std::cout << " grain_size    : " << par->grain_size << std::endl;
     std::cout << " num_neighbors : " << par->num_neighbors << std::endl;
     std::cout << " out_every     : " << par->out_every << std::endl;
@@ -187,14 +212,20 @@ int hpx_main(variables_map& vm)
 
         dataflow_stencil um;
         um.create(here);
-        int numsteps = par->nt0/2;
+        int numsteps = par->refine_every/2;
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
+    
+        for (std::size_t j=0;j<time_grain_size;j++) { 
+          double time = j*par->refine_every*par->cfl*par->h;
 
-        double time = 0.0;
-        result_data = um.init_execute(*result_data,time,function_type, 
-                                      number_stencils, numsteps,
-                              par->loglevel ? logging_type : component_invalid, par);
-
+          result_data = um.init_execute(*result_data,time,function_type, 
+                                        number_stencils, numsteps,
+                                par->loglevel ? logging_type : component_invalid, par);
+      
+          // Regrid
+          time = (j+1)*par->refine_every*par->cfl*par->h;
+          std::cout << " Completed time: " << time << std::endl;
+        }
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
 
         for (std::size_t i = 0; i < result_data->size(); ++i)

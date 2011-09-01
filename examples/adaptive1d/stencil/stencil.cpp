@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace adaptive1d
         //    << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
         //    << std::endl;
 
-        if (val[3]->timestep_ >= par->nt0-1) {
+        if (val[3]->timestep_ >= par->refine_every-1) {
           return 0;
         }
         return 1;
@@ -177,9 +177,20 @@ namespace hpx { namespace components { namespace adaptive1d
             // provide initial data for the given data value 
             access_memory_block<stencil_data> val(
                 components::stubs::memory_block::checkout(result));
+          
+            if ( time < 1.e-8 ) {
+              // call provided (external) function
+              generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+            } else {
+              // use the previous data (or interpolate if necessary)
+              access_memory_block<stencil_data> prev_val(
+                      components::stubs::memory_block::checkout(interp_src_data[item]));
 
-            // call provided (external) function
-            generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
+              val.get() = prev_val.get();
+              val->max_index_ = maxitems;
+              val->index_ = item;
+              val->timestep_ = 0;
+            } 
 
             //if (log_ && par->loglevel > 1)         // send initial value to logging instance
             //    stubs::logging::logentry(log_, val.get(), row,item, par);

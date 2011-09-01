@@ -1,6 +1,8 @@
 [adaptive1d]
 nx0  = 801
 nt0  = 5800
+refine_every = 100
+
 grain_size = 100
 num_neighbors = 1
 out_every = 5.0

@@ -32,6 +32,7 @@ struct HPX_COMPONENT_EXPORT parameter
     std::size_t loglevel;
     std::size_t nt0;
     std::size_t nx0;
+    std::size_t refine_every;
     std::size_t allowedl;
     std::size_t grain_size;
     std::size_t num_neighbors;

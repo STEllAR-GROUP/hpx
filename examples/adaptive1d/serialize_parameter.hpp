@@ -32,6 +32,7 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.num_neighbors;
     ar & par.out_every;
     ar & par.outdir;
+    ar & par.refine_every;
 
     ar & par.cfl;
     ar & par.disip;
