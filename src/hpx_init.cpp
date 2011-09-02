@@ -374,6 +374,9 @@ namespace hpx
                     ("nodes", value<std::vector<std::string> >()->multitoken(), 
                       "the (space separated) list of the nodes to use (usually "
                       "this is extracted from a node file)")
+                    ("ifsuffix", value<std::string>(), 
+                      "suffix to append to host names in order to resolve them "
+                      "to the proper network interconnect")
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -410,12 +413,6 @@ namespace hpx
 
 #if HPX_AGAS_VERSION > 0x10
                 hidden_options.add_options()
-                    // this option is a quick hack allowing to pre-resolve the 
-                    // given host names to the ip-addresses on machines with 
-                    // several network interfaces
-                    ("resolve-hostnames", value<std::string>(), 
-                        "name of a file describing the hostname->ip-address "
-                        "mappings to use")
                     // enable debug output from command line handling
                     ("debug-clp", "debug command line processing")
                 ;
@@ -793,8 +790,8 @@ namespace hpx
 
             // create host name mapping
             util::map_hostnames mapnames(debug_clp);
-            if (vm.count("resolve-hostnames")) 
-                mapnames.init_from_file(vm["resolve-hostnames"].as<std::string>());
+            if (vm.count("ifsuffix")) 
+                mapnames.use_suffix(vm["ifsuffix"].as<std::string>());
 
             // Check command line arguments.
             util::pbs_environment env(debug_clp);
@@ -906,8 +903,8 @@ namespace hpx
             }
 
             // map host names to ip addresses, if requested
-            hpx_host = mapnames.map(hpx_host);
-            agas_host = mapnames.map(agas_host);
+            hpx_host = mapnames.map(hpx_host, hpx_port);
+            agas_host = mapnames.map(agas_host, agas_port);
 
 #if HPX_AGAS_VERSION <= 0x10
             // Initialize and run the AGAS service, if appropriate.
@@ -952,7 +949,6 @@ namespace hpx
             {
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
             }
-
 #endif
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;

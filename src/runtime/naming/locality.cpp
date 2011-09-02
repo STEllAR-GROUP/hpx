@@ -60,7 +60,6 @@ namespace hpx { namespace naming
         // address to enumerate endpoints
         try {
             // resolve the given address
-            boost::asio::io_service io_service;
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(boost::asio::ip::host_name(), 
                 boost::lexical_cast<std::string>(port_));

@@ -18,13 +18,18 @@ namespace hpx { namespace util
     bool HPX_EXPORT get_endpoint(std::string const& addr, boost::uint16_t port,
         boost::asio::ip::tcp::endpoint& ep);
 
+    std::string HPX_EXPORT get_endpoint_name(boost::asio::ip::tcp::endpoint const& ep);
+
     boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
     HPX_EXPORT get_random_ports();
 
     boost::uint16_t HPX_EXPORT get_random_port();
 
     ///////////////////////////////////////////////////////////////////////////
-
+    // properly resolve a give host name to the corresponding IP address
+    boost::asio::ip::tcp::endpoint 
+    HPX_EXPORT resolve_hostname(std::string const& hostname, boost::uint16_t port,
+        boost::asio::io_service& io_service);
 }}
 
 #endif

@@ -21,72 +21,40 @@ namespace hpx { namespace util
     {
         map_hostnames(bool debug = false) 
           : debug_(debug) 
+        {}
+
+        void use_suffix(std::string const& suffix)
         {
-            // map localhost to loopback ip address (that's a quick hack 
-            // which will be removed as soon as we figure out why name 
-            // resolution does not handle this anymore)
-            mappings_["localhost"] = "127.0.0.1";
-            if (debug_) {
-                std::cerr << "inserting mapping: localhost:127.0.0.1" 
-                          << std::endl;
-            }
+            suffix_ = suffix;
         }
 
-        void init_from_file(std::string mappingsfile)
+        std::string map(std::string const& host_name, boost::uint16_t port) const
         {
-            if (!mappingsfile.empty()) {
-                if (debug_)
-                    std::cerr << "opened: " << mappingsfile << std::endl;
-
-                std::ifstream ifs(mappingsfile.c_str());
-                if (ifs.is_open()) {
-                    std::string line;
-                    while (std::getline(ifs, line)) {
-                        if (!line.empty()) {
-                            if (debug_)
-                                std::cerr << "read: " << line << std::endl;
-
-                            std::string::size_type p = line.find_first_of(" \t,:");
-                            if (p != std::string::npos) {
-                                if (debug_) {
-                                    std::cerr << "inserting mapping: " 
-                                              << line.substr(0, p) << ":"
-                                              << line.substr(p+1) << std::endl;
-                                }
-                                mappings_[line.substr(0, p)] = line.substr(p+1);
-                            }
-                            else if (debug_) {
-                                std::cerr << "failed to insert mapping: " 
-                                          << line << std::endl;
-                            }
-                        }
-                    }
-                }
-                else if (debug_) {
-                    std::cerr << "failed opening: " << mappingsfile << std::endl;
-                }
-            }
-        }
-
-        std::string map(std::string const& host_name) const
-        {
-            std::map<std::string, std::string>::const_iterator it = 
-                mappings_.find(host_name);
-
-            if (it != mappings_.end()) {
+            if (host_name == "localhost") {
+                // map local host to loopback ip address (that's a quick hack 
+                // which will be removed as soon as we figure out why name 
+                // resolution does not handle this anymore)
                 if (debug_) {
-                    std::cerr << "found mapping: " << host_name 
-                              << ":" << (*it).second << std::endl;
+                    std::cerr << "resolved: 'localhost' to: 127.0.0.1" 
+                              << std::endl;
                 }
-                return (*it).second;
+                return "127.0.0.1";
             }
 
-            if (debug_) 
-                std::cerr << "no mapping found : " << host_name << std::endl;
-            return host_name;
+            // do full host name resolution
+            boost::asio::io_service io_service;
+            boost::asio::ip::tcp::endpoint ep =
+                util::resolve_hostname(host_name, port, io_service);
+
+            std::string resolved_addr(util::get_endpoint_name(ep));
+            if (debug_) {
+                std::cerr << "resolved: '" << host_name << "' to: " 
+                          << resolved_addr << std::endl;
+            }
+            return resolved_addr;
         }
 
-        std::map<std::string, std::string> mappings_;
+        std::string suffix_;
         bool debug_;
     };
 }}
