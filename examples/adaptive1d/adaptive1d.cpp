@@ -44,6 +44,10 @@ using hpx::components::adaptive1d::stencil;
 using hpx::components::adaptive1d::dataflow_stencil;
 using hpx::components::adaptive1d::server::logging;
 
+int level_refine(int level,parameter &par,
+                 boost::shared_ptr<std::vector<id_type> > &result_data, 
+                 double time);
+
 void appconfig_option(std::string const& name, section const& pars,
                       std::string& data)
 {
@@ -81,6 +85,8 @@ int hpx_main(variables_map& vm)
     par->num_neighbors  = 2;
     par->out_every      = 5.0;
     par->refine_every   = 100;
+    par->ethreshold     = 1.e-4;
+    par->ghostwidth     = 9;
 
     // application specific parameters
     par->cfl    = 0.01;
@@ -113,6 +119,8 @@ int hpx_main(variables_map& vm)
         appconfig_option<double>("out_every", pars, par->out_every);
         appconfig_option<std::string>("output_directory", pars, par->outdir);
         appconfig_option<std::size_t>("refine_every", pars, par->refine_every);
+        appconfig_option<double>("ethreshold", pars, par->ethreshold);
+        appconfig_option<std::size_t>("ghostwidth", pars, par->ghostwidth);
 
         // Application parameters
         appconfig_option<double>("cfl", pars, par->cfl);
@@ -199,7 +207,20 @@ int hpx_main(variables_map& vm)
     std::size_t number_stencils = par->nx0/par->grain_size;
 
     // compute derived parameters
-    par->h = (par->Rout - par->Rmin)/(par->nx0-1);
+    par->minx0 = par->Rmin;
+    par->maxx0 = par->Rout;
+    par->h = (par->maxx0 - par->minx0)/(par->nx0-1);
+
+    par->levelp.resize(par->allowedl+1);
+    par->levelp[0] = 0;
+
+    // Compute the grid sizes
+    boost::shared_ptr<std::vector<id_type> > placeholder;
+    double initial_time = 0.0;
+    int rc = level_refine(-1,par,placeholder,initial_time);
+    for (std::size_t i=0;i<par->allowedl;i++) {
+      rc = level_refine(i,par,placeholder,initial_time);
+    }
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
