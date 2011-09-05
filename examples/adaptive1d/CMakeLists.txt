@@ -23,7 +23,7 @@ endforeach()
 
 # define build target for this directory
 set(sources
-    adaptive1d.cpp)
+    adaptive1d.cpp refine.cpp)
 
 # define basic dependencies
 set(dependencies

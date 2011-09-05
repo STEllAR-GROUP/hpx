@@ -39,6 +39,25 @@ struct HPX_COMPONENT_EXPORT parameter
     double out_every;
     std::string outdir;
 
+    std::vector<int> gr_sibling;
+    std::vector<double_type> gr_t;
+    std::vector<double_type> gr_minx;
+    std::vector<double_type> gr_maxx;
+    std::vector<std::size_t> gr_nx;
+    std::vector<double_type> gr_h;
+    std::vector<std::size_t> levelp;
+    std::vector<std::size_t> item2gi;
+    std::vector<std::size_t> gi2item;
+    std::vector<std::size_t> prev_gi2item;
+    std::vector<int> prev_gi;
+
+    double minx0;
+    double maxx0;
+    double ethreshold;
+    std::size_t ghostwidth;
+    std::size_t num_rows;
+    std::vector<std::size_t> rowsize,level_row;
+
     // Application parameters
     double cfl;
     double disip;

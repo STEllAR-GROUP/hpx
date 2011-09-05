@@ -8,6 +8,8 @@ num_neighbors = 1
 out_every = 5.0
 loglevel     = 2
 output_directory = /fslhome/mwa2/compute/1dtest
+ethreshold = 1.e-4
+ghostwidth = 9
 
 cfl = 0.01
 disip = .005
