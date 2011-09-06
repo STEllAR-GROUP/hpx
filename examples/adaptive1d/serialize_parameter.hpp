@@ -35,7 +35,6 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.refine_every;
     
     ar & par.gr_sibling;
-    ar & par.gr_t;
     ar & par.gr_minx;
     ar & par.gr_maxx;
     ar & par.gr_nx;

@@ -40,7 +40,6 @@ struct HPX_COMPONENT_EXPORT parameter
     std::string outdir;
 
     std::vector<int> gr_sibling;
-    std::vector<double_type> gr_t;
     std::vector<double_type> gr_minx;
     std::vector<double_type> gr_maxx;
     std::vector<std::size_t> gr_nx;

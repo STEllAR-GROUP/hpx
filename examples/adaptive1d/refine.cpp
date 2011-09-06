@@ -42,6 +42,7 @@ int increment_gi(int level,int nx,
 bool intersection(double xmin,double xmax,double xmin2,double xmax2);
 bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
+int level_makeflag_simple(std::vector<int> &flag,std::vector<double> &error,int nxl,double ethreshold);
 
 // level_refine {{{
 int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double time)
@@ -53,9 +54,6 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   double minx0 = par->minx0;
   double maxx0 = par->maxx0;
   double h = par->h;
-  int clusterstyle = 0;
-  double minefficiency = 0.9;
-  int mindim = 6;
   int refine_factor = 2;
 
   // local vars
@@ -63,14 +61,11 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   std::vector<double> tmp_mini,tmp_maxi,tmp_minj,tmp_maxj,tmp_mink,tmp_maxk;
   int numbox;
 
-  // hard coded parameters -- eventually to be made into full parameters
-  int maxbboxsize = 1000000;
-
   int maxlevel = par->allowedl;
   if ( level == maxlevel ) {
     return 0;
   }
- 
+
   double minx,maxx;
   double hl;
   int gi;
@@ -79,7 +74,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
     minx = minx0;
     maxx = maxx0;
     gi = -1;
-    hl = h * refine_factor;
+    hl = h;
   } else {
     // find the bounds of the level
     rc = level_find_bounds(level,minx,maxx,par);
@@ -94,42 +89,39 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   int nxl   =  (int) ((maxx-minx)/hl+0.5);
   nxl++;
 
-  std::vector<double> error,localerror,flag;
+  std::vector<double> error,localerror;
+  std::vector<int> flag;
   error.resize(nxl);
   flag.resize(nxl);
 
   if ( level == -1 ) {
-    b_minx.resize(maxbboxsize);
-    b_maxx.resize(maxbboxsize);
+    int numbox = nxl/par->grain_size;
+    b_minx.resize(numbox);
+    b_maxx.resize(numbox);
 
-    tmp_mini.resize(maxbboxsize);
-    tmp_maxi.resize(maxbboxsize);
-
-    int numbox = 1;
-    b_minx[0] = 1;
-    b_maxx[0] = nxl;
-    //FNAME(level_clusterdd)(&*tmp_mini.begin(),&*tmp_maxi.begin(),
-    //                       &*b_minx.begin(),&*b_maxx.begin(),
-    //                       &numbox,&numprocs,&maxbboxsize,
-    //                       &ghostwidth,&refine_factor,&mindim,
-    //                       &bound_width);
-
-    //std::cout << " numbox post DD " << numbox << std::endl;
+    std::size_t grain_size;
+    grain_size = par->grain_size;
     for (int i=0;i<numbox;i++) {
+      b_minx[i] = i*grain_size; 
+      if ( i == numbox-1 ) { 
+        grain_size = nxl - (numbox-1)*par->grain_size;
+      }
+      b_maxx[i] = b_minx[i] + grain_size;
+
       if (i == numbox-1 ) {
+        // indicate the last of the level -- no more siblings
         par->gr_sibling.push_back(-1);
       } else {
         par->gr_sibling.push_back(i+1);
       }
+      int nx = (b_maxx[i] - b_minx[i]);
 
-      int nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
-
-      double lminx = minx + (b_minx[i]-1)*hl;
-      double lmaxx = minx + (b_maxx[i]-1)*hl;
+      double lminx = minx + b_minx[i]*hl;
+      double lmaxx = lminx + hl*(grain_size-1);
 
       par->gr_minx.push_back(lminx);
       par->gr_maxx.push_back(lmaxx);
-      par->gr_h.push_back(hl/refine_factor);
+      par->gr_h.push_back(hl);
       par->gr_nx.push_back(nx);
     }
 
@@ -168,54 +160,34 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
     }
   }
 
-  double scalar = 1.0;
-  //FNAME(load_scal_mult)(&*error.begin(),&*error.begin(),&scalar,&nxl);
-  int gw = par->ghostwidth;
-  //FNAME(level_makeflag_simple)(&*flag.begin(),&*error.begin(),&level,
-  //                                               &minx,&h,&nxl,&ethreshold,&gw);
-
-  // level_cluster
-  std::vector<double> sigi;
-  std::vector<double> asigi;
-  std::vector<double> lapi;
-  std::vector<double> alapi;
-
-   sigi.resize(nxl);
-  asigi.resize(nxl);
-   lapi.resize(nxl);
-  alapi.resize(nxl);
-
-  b_minx.resize(maxbboxsize);
-  b_maxx.resize(maxbboxsize);
+  level_makeflag_simple(flag,error,nxl,ethreshold);
+  std::cout << " TEST A flagsize " << flag.size() << std::endl;
 #if 0
-  FNAME(level_cluster)(&*flag.begin(),&*sigi.begin(),&*sigj.begin(),&*sigk.begin(),
-                       &*lapi.begin(),&*lapj.begin(),&*lapk.begin(),
-                       &*asigi.begin(),&*asigj.begin(),&*asigk.begin(),
-                       &*alapi.begin(),&*alapj.begin(),&*alapk.begin(),
-                       &time,
-                       &*b_minx.begin(),&*b_maxx.begin(),
-                       &*b_miny.begin(),&*b_maxy.begin(),
-                       &*b_minz.begin(),&*b_maxz.begin(),
-                       &minx,&maxx,
-                       &miny,&maxy,
-                       &minz,&maxz,
-                       &numbox,&nxl,&nyl,&nzl,
-                       &clusterstyle,&minefficiency,&mindim,
-                       &ghostwidth,&refine_factor,
-                       &minx0,&miny0,&minz0,
-                       &maxx0,&maxy0,&maxz0);
-#endif
-  // TEST
+  // level_cluster
   numbox = 0;
-  //std::cout << " pre DD numbox TEST " << numbox << std::endl;
+  int hgw = (ghostwidth+1)/2;
+  int maxfind = 0;
+  for (std::size_t i=0;i<flag.size();i++) {
+    if ( flag[i] == 1 && maxfind == 0 ) {
+      b_minx[numbox] = i;  
+      maxfind = 1;
+    }
+    if ( flag[i] == 0 && maxfind == 1 ) {
+      b_maxx[numbox] = i-1;  
+      maxfind = 0;
+      numbox++;
+    }
+  }
+#endif
+  
+  numbox = 0;
+  std::cout << " pre DD numbox TEST " << numbox << std::endl;
 
    // Figure out the domain decomposition you want here
 
-  //for (int i=0;i<numbox;i++) {
-  //  std::cout << " bbox : " << b_minx[i] << " " << b_maxx[i] << std::endl; 
-  //  std::cout << "      : " << b_miny[i] << " " << b_maxy[i] << std::endl; 
-  //  std::cout << "      : " << b_minz[i] << " " << b_maxz[i] << std::endl; 
-  //}
+  for (int i=0;i<numbox;i++) {
+    std::cout << " bbox : " << b_minx[i] << " " << b_maxx[i] << std::endl; 
+  }
 
   //std::cout << " numbox post DD " << numbox << std::endl;
   int prev_tgi = 0;
@@ -264,24 +236,42 @@ int compute_error(std::vector<double> &error,int nx0,
 {
     // initialize some positive error
     if ( t < 1.e-8 ) {
+
+      double x1 = 0.5*par->x0;
+      double dx_u1;
       for (int i=0;i<nx0;i++) {
         double x = minx0 + i*h;
-
+        if ( -x1 <= x && x <= x1 ) {
+          dx_u1 = par->amp*(1.0-pow(tanh(x/(par->id_sigma*par->id_sigma)),2))/
+                                  (par->id_sigma*par->id_sigma);
+        } else if ( x >= x1 && x <= par->x0 + x1 ) {
+          dx_u1 = -par->amp*(1.0-pow(tanh( (x-par->x0)/(par->id_sigma*par->id_sigma)),2))/
+                                  (par->id_sigma*par->id_sigma);
+        } else if ( x <= -x1 ) {
+          dx_u1 = -par->amp*(1.0-pow(tanh( (x-2*par->x0)/(par->id_sigma*par->id_sigma)),2))/
+                                  (par->id_sigma*par->id_sigma);
+        } else if ( x >= par->x0 + x1 ) {
+          dx_u1 = par->amp*(1.0-pow(tanh( (x-2*par->x0)/(par->id_sigma*par->id_sigma)),2))/
+                                  (par->id_sigma*par->id_sigma);
+        } else {
+          BOOST_ASSERT(false);
+        }
+        
         // Provide initial error
-        double Phi = exp(-x*x);
-        error[i] = Phi;
+        error[i] = fabs(dx_u1);
       }
     } else {
       // This is the old mesh structure; we need the error for the new mesh structure
       // Some re-assembly is necessary
       // go through all of the old mesh gi's; see if they overlap this new mesh
-      for (int step=0;step<par->prev_gi.size();step++) {
+      int prev_size = par->prev_gi.size();
+      for (int step=0;step<prev_size;step++) {
         // see if the new gi is the same as the old
         int gi = par->prev_gi[step];
         if ( gi != -1 ) {
           if ( floatcmp(minx0,par->gr_minx[gi]) && 
                floatcmp(h,par->gr_h[gi]) && 
-               nx0 == par->gr_nx[gi] 
+               nx0 == (int) par->gr_nx[gi] 
              ) {
             hpx::components::access_memory_block<hpx::components::adaptive1d::stencil_data>
                 result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
@@ -309,8 +299,8 @@ int compute_error(std::vector<double> &error,int nx0,
               int i = ii + istart_dst;
   
               int si = ii + istart_src;
-              BOOST_ASSERT(i < error.size());
-              BOOST_ASSERT(si < result->value_.size());
+              BOOST_ASSERT(i < (int) error.size());
+              BOOST_ASSERT(si < (int) result->value_.size());
               error[i] = result->value_[si].error;
             }
 
@@ -572,5 +562,22 @@ int floatcmp(double const& x1, double const& x2) {
   } else {
     return false;
   }
+}
+// }}}
+
+// level_makeflag_simple {{{
+int level_makeflag_simple(std::vector<int> &flag,std::vector<double> &error,int nxl,double ethreshold)
+{
+  double SMALLNUMBER = 1.e-12;
+  int FLAG_REFINE = 1;
+  int FLAG_NOREFINE = 0;
+  for (int i=0;i<nxl;i++) {
+    if ( error[i] >= ethreshold-SMALLNUMBER ) {
+      flag[i] = FLAG_REFINE;
+    } else {
+      flag[i] = FLAG_NOREFINE;
+    }
+  }
+  return 0;
 }
 // }}}

@@ -183,6 +183,7 @@ int hpx_main(variables_map& vm)
     std::cout << " nx0           : " << par->nx0 << std::endl;
     std::cout << " nt0           : " << par->nt0 << std::endl;
     std::cout << " refine_every  : " << par->refine_every << std::endl;
+    std::cout << " allowedl      : " << par->allowedl << std::endl;
     std::cout << " grain_size    : " << par->grain_size << std::endl;
     std::cout << " num_neighbors : " << par->num_neighbors << std::endl;
     std::cout << " out_every     : " << par->out_every << std::endl;
