@@ -4,8 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/hpx.hpp>
 
-const int maxgids = 1000;
-
 #include <examples/adaptive1d/dataflow/dynamic_stencil_value.hpp>
 #include <examples/adaptive1d/dataflow/functional_component.hpp>
 #include <examples/adaptive1d/dataflow/dataflow_stencil.hpp>
@@ -13,43 +11,14 @@ const int maxgids = 1000;
 #include <examples/adaptive1d/stencil/stencil_data.hpp>
 #include <examples/adaptive1d/stencil/stencil_functions.hpp>
 #include <examples/adaptive1d/stencil/logging.hpp>
+#include <examples/adaptive1d/refine.hpp>
 
-using hpx::components::adaptive1d::parameter;
-using hpx::naming::id_type;
-
-int compute_error(std::vector<double> &error,int nx0,
-                                double minx0,
-                                double maxx0,
-                                double h,double t,
-                                int gi,
-                boost::shared_ptr<std::vector<id_type> > &result_data,
-                                parameter &par);
-int level_combine(std::vector<double> &error, std::vector<double> &localerror,
-                  int mini,
-                  int nxl, int nx);
-int grid_return_existence(int gridnum,parameter &par);
-int grid_find_bounds(int gi,double &minx,double &maxx,
-                            parameter &par);
-int level_return_start(int level,parameter &par);
-int level_return_start(int level,parameter &par);
-int level_find_bounds(int level, double &minx, double &maxx,
-                                 parameter &par);
-int compute_numrows(parameter &par);
-int compute_rowsize(parameter &par);
-int increment_gi(int level,int nx,
-                 double lminx, double lmaxx,
-                 double hl,int refine_factor,parameter &par);
-bool intersection(double xmin,double xmax,double xmin2,double xmax2);
-bool floatcmp_le(double const& x1, double const& x2);
-int floatcmp(double const& x1, double const& x2);
-int level_makeflag_simple(std::vector<int> &flag,std::vector<double> &error,int nxl,double ethreshold);
 
 // level_refine {{{
 int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double time)
 {
   int rc;
   int ghostwidth = par->ghostwidth;
-  int bound_width = par->num_neighbors;
   double ethreshold = par->ethreshold;
   double minx0 = par->minx0;
   double maxx0 = par->maxx0;
@@ -57,9 +26,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   int refine_factor = 2;
 
   // local vars
-  std::vector<int> b_minx,b_maxx,b_miny,b_maxy,b_minz,b_maxz;
-  std::vector<double> tmp_mini,tmp_maxi,tmp_minj,tmp_maxj,tmp_mink,tmp_maxk;
-  int numbox;
+  std::vector<int> b_minx,b_maxx;
+  std::vector<int> ddminx,ddmaxx;
 
   int maxlevel = par->allowedl;
   if ( level == maxlevel ) {
@@ -161,45 +129,59 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   }
 
   level_makeflag_simple(flag,error,nxl,ethreshold);
-  std::cout << " TEST A flagsize " << flag.size() << std::endl;
-#if 0
   // level_cluster
-  numbox = 0;
   int hgw = (ghostwidth+1)/2;
   int maxfind = 0;
   for (std::size_t i=0;i<flag.size();i++) {
     if ( flag[i] == 1 && maxfind == 0 ) {
-      b_minx[numbox] = i;  
+      b_minx.push_back(i);  
       maxfind = 1;
     }
     if ( flag[i] == 0 && maxfind == 1 ) {
-      b_maxx[numbox] = i-1;  
+      b_maxx.push_back(i-1);  
       maxfind = 0;
-      numbox++;
     }
   }
-#endif
-  
-  numbox = 0;
-  std::cout << " pre DD numbox TEST " << numbox << std::endl;
 
-   // Figure out the domain decomposition you want here
-
-  for (int i=0;i<numbox;i++) {
-    std::cout << " bbox : " << b_minx[i] << " " << b_maxx[i] << std::endl; 
+  // add in ghostzones
+  for (std::size_t i=0;i<b_maxx.size();i++) {
+    b_minx[i] -= hgw; 
+    b_maxx[i] += hgw; 
   }
+  
+  // Determine the domain decomposition
+  for (std::size_t i=0;i<b_maxx.size();i++) {
+    std::size_t grain_size;
+    grain_size = par->grain_size;
 
-  //std::cout << " numbox post DD " << numbox << std::endl;
+    BOOST_ASSERT(b_maxx[i] > b_minx[i]);
+    std::size_t nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
+    if ( par->grain_size > nx ) {
+      ddminx.push_back(b_minx[i]);
+      ddmaxx.push_back(b_maxx[i]);
+    } else {
+      int numddbox = nx/par->grain_size;
+      // break up b_minx/b_maxx in numddbox portions
+      int tnx = b_maxx[i] - b_minx[i];
+      int grain_size = tnx/numddbox;
+      for (int j=0;j<numddbox;j++) {
+        ddminx.push_back(j*grain_size + b_minx[i]); 
+        if ( j == numddbox-1 ) { 
+          grain_size = tnx - (numddbox-1)*grain_size;
+        }
+        ddmaxx.push_back(ddminx[ddminx.size()-1] + grain_size-1);
+      }
+    }
+  }
+  BOOST_ASSERT(ddmaxx.size() == ddminx.size());
+
   int prev_tgi = 0;
   int tgi = 0;
-  for (int i=0;i<numbox;i++) {
-    //std::cout << " bbox: " << b_minx[i] << " " << b_maxx[i] << std::endl;
-    //std::cout << "       " << b_miny[i] << " " << b_maxy[i] << std::endl;
-    //std::cout << "       " << b_minz[i] << " " << b_maxz[i] << std::endl;
-    int nx = (b_maxx[i] - b_minx[i])*refine_factor+1;
+  for (std::size_t i=0;i<ddmaxx.size();i++) {
+    int nx = (ddmaxx[i] - ddminx[i])*refine_factor+1;
 
-    double lminx = minx + (b_minx[i]-1)*hl;
-    double lmaxx = minx + (b_maxx[i]-1)*hl;
+    double lminx = minx + ddminx[i]*hl;
+    double lmaxx = minx + ddmaxx[i]*hl;
 
     if ( i != 0 ) {
       prev_tgi = tgi;
@@ -212,7 +194,7 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       par->levelp[level+1] = tgi;
     }
 
-    if (i == numbox-1) {
+    if (i == ddmaxx.size()-1) {
       par->gr_sibling[prev_tgi] = tgi;
       par->gr_sibling[tgi] = -1;
     } else if (i != 0 ) {
@@ -238,7 +220,7 @@ int compute_error(std::vector<double> &error,int nx0,
     if ( t < 1.e-8 ) {
 
       double x1 = 0.5*par->x0;
-      double dx_u1;
+      double dx_u1 = 9999.;
       for (int i=0;i<nx0;i++) {
         double x = minx0 + i*h;
         if ( -x1 <= x && x <= x1 ) {

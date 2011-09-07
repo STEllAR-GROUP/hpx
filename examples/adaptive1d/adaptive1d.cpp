@@ -15,6 +15,7 @@
 #include <examples/adaptive1d/stencil/stencil_data.hpp>
 #include <examples/adaptive1d/stencil/stencil_functions.hpp>
 #include <examples/adaptive1d/stencil/logging.hpp>
+#include <examples/adaptive1d/refine.hpp>
 
 #include <boost/format.hpp>
 
@@ -43,10 +44,6 @@ using hpx::components::adaptive1d::parameter;
 using hpx::components::adaptive1d::stencil;
 using hpx::components::adaptive1d::dataflow_stencil;
 using hpx::components::adaptive1d::server::logging;
-
-int level_refine(int level,parameter &par,
-                 boost::shared_ptr<std::vector<id_type> > &result_data, 
-                 double time);
 
 void appconfig_option(std::string const& name, section const& pars,
                       std::string& data)
@@ -222,6 +219,17 @@ int hpx_main(variables_map& vm)
     for (std::size_t i=0;i<par->allowedl;i++) {
       rc = level_refine(i,par,placeholder,initial_time);
     }
+
+    // TEST
+    // Check grid structure
+    //for (std::size_t i=0;i<=par->allowedl;i++) {
+    //  int gi = level_return_start(i,par);
+    //  while ( grid_return_existence(gi,par) ) {
+    //    std::cout << " TEST level : " << i << " nx : " << par->gr_nx[gi] << " minx : " << par->gr_minx[gi] << " maxx : " << par->gr_maxx[gi] << " test dx : " << (par->gr_maxx[gi]-par->gr_minx[gi])/(par->gr_nx[gi]-1) << " actual h " << par->gr_h[gi] << " end: " << par->gr_minx[gi] + (par->gr_nx[gi]-1)*par->gr_h[gi] << std::endl;
+    //    gi = par->gr_sibling[gi];
+    //  }
+    //}
+    // END TEST 
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();

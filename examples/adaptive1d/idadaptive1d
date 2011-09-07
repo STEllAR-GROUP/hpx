@@ -1,15 +1,14 @@
 [adaptive1d]
 nx0  = 801
-nt0  = 5800
+nt0  = 2800
 refine_every = 100
 
-grain_size = 100
+grain_size = 20
 num_neighbors = 1
 out_every = 5.0
 loglevel     = 2
-output_directory = /fslhome/mwa2/compute/1dtest
-ethreshold = 1.e-4
-ghostwidth = 9
+output_directory = .
+allowedl = 2
 
 cfl = 0.01
 disip = .005
