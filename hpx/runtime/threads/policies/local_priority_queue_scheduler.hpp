@@ -344,8 +344,8 @@ namespace hpx { namespace threads { namespace policies
             if ((queues_.size()-1 == num_thread) && (0 == added)) {
                 // Convert low priority tasks to threads before attempting to
                 // steal from other OS thread.
-                result = result && low_priority_queue_.wait_or_add_new(
-                    num_thread, running, idle_loop_count, added);
+                result = low_priority_queue_.wait_or_add_new(
+                    num_thread, running, idle_loop_count, added) && result;
             }
 
             if (0 == added) {
@@ -356,7 +356,7 @@ namespace hpx { namespace threads { namespace policies
 
                 if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
                     std::size_t m = 0x01LL;
-                    for (std::size_t i = 1; (0 == added) && i < queues_.size(); 
+                    for (std::size_t i = 0; (0 == added) && i < queues_.size(); 
                          m <<= 1, ++i)
                     {
                         if (m == core_mask || !(m & node_mask))
@@ -365,16 +365,16 @@ namespace hpx { namespace threads { namespace policies
                         std::size_t idx = least_significant_bit_set(m);
                         BOOST_ASSERT(idx < queues_.size());
 
-                        result = result && queues_[num_thread]->wait_or_add_new(
-                            idx, running, idle_loop_count, added, queues_[idx]);
+                        result = queues_[num_thread]->wait_or_add_new(idx, 
+                            running, idle_loop_count, added, queues_[idx]) && result;
                     }
                 }
 
                 // if nothing found ask everybody else
                 for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
                     std::size_t idx = (i + num_thread) % queues_.size();
-                    result = result && queues_[num_thread]->wait_or_add_new(
-                        idx, running, idle_loop_count, added, queues_[idx]);
+                    result = queues_[num_thread]->wait_or_add_new(idx, running, 
+                        idle_loop_count, added, queues_[idx]) && result;
                 }
 
                 // no new work is available, are we deadlocked?
