@@ -37,7 +37,7 @@ namespace hpx { namespace threads
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace lcos 
 {
     /// The one argument version is special in the sense that it returns the 
     /// expected value directly (without wrapping it into a tuple).
@@ -45,7 +45,8 @@ namespace hpx { namespace components
     inline std::size_t
     wait (lcos::future_value<T1, TR1> const& f1, F f)
     {
-        return f(f1.get()) ? 1 : 0;
+        f(0, f1.get());
+        return 1;
     }
 
     // This overload of wait() will make sure that the passed function will be 
@@ -67,8 +68,7 @@ namespace hpx { namespace components
                     handled[i] = true;
 
                     // get the value from the future, invoke the function
-                    if (!f(i, lazy_values[i].get()))
-                        return handled.count();
+                    f(i, lazy_values[i].get());
 
                     // give thread-manager a chance to look for more work while 
                     // waiting

@@ -8,6 +8,7 @@
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
 #include <cstdlib>
+#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
@@ -94,11 +95,6 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Return the global id representing this locality
-    HPX_API_EXPORT naming::id_type find_here();
-
-    HPX_API_EXPORT naming::gid_type get_next_id();
-
     /// \namespace parcelset
     namespace parcelset
     {
@@ -340,6 +336,8 @@ namespace hpx
             struct managed_component_tag {};
         }
 
+        enum component_type;
+
         template <boost::uint64_t MSB, boost::uint64_t LSB,
                   typename Component = detail::this_type>
         struct fixed_component_base;
@@ -508,6 +506,24 @@ namespace hpx
             counter_info const& info, naming::id_type const& id, 
             error_code& ec = throws);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing this locality
+    HPX_API_EXPORT naming::id_type find_here();
+
+    /// \brief Return the list of prefixes of the localities supporting the 
+    ///        given component type. By default this function will return the 
+    ///        list of all localities.
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+        components::component_type type);
+
+    HPX_API_EXPORT naming::gid_type get_next_id();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of OS-threads running in the runtime instance
+    ///        the current thread is associated with
+    HPX_API_EXPORT std::size_t get_num_os_threads();
 }
 
 #endif

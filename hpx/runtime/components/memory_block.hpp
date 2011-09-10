@@ -332,7 +332,7 @@ namespace hpx { namespace components
     inline boost::tuple<BOOST_PP_REPEAT(N, HPX_ACCESS_ARGUMENT, _)>
     get_memory_block_async(BOOST_PP_REPEAT(N, HPX_GET_ASYNC_ARGUMENT, _))
     {
-        return components::wait(BOOST_PP_REPEAT(N, HPX_WAIT_ARGUMENT, _));
+        return lcos::wait(BOOST_PP_REPEAT(N, HPX_WAIT_ARGUMENT, _));
     }
 
 #undef HPX_WAIT_ARGUMENT

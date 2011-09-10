@@ -95,14 +95,14 @@ int hpx_main(boost::program_options::variables_map& vm)
           barrier.push_back(accu[i].contactsearch_async());
         }
 
-        hpx::components::wait(barrier);
+        hpx::lcos::wait(barrier);
 
         std::vector<hpx::lcos::future_value<void> > barrier2;
         for (std::size_t i=0;i<num_vertices;i++) {
           barrier2.push_back(accu[i].contactenforce_async()); 
         }
 
-        hpx::components::wait(barrier2);
+        hpx::lcos::wait(barrier2);
     }
 
     hpx::finalize();

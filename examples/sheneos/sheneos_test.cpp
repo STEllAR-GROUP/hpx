@@ -45,7 +45,7 @@ void test_sheneos(std::size_t num_test_points)
     double delta_rho = (max_rho - min_rho) / num_points;
 
     // Do the required amount of test calls to the interpolator, using equally 
-    // spaced data points. We want to avoid, that the evaluation sequence of the
+    // spaced data points. We want to avoid that the evaluation sequence of the
     // data points will be the same on all localities. For that reason we first
     // generate vector's of the values, and a sequence vector, which will be 
     // randomly initialized.
@@ -98,7 +98,7 @@ void test_sheneos(std::size_t num_test_points)
             }
         }
     }
-    hpx::components::wait(tests);   // wait for all of the tests to finish
+    hpx::lcos::wait(tests);   // wait for all of the tests to finish
 }
 
 typedef hpx::actions::plain_action1<std::size_t, test_sheneos> test_action;
@@ -131,19 +131,19 @@ int hpx_main(variables_map& vm)
         hpx::components::component_type type = 
             plain_function<test_action>::get_component_type();
 
-        std::vector<hpx::naming::gid_type> prefixes;
-        hpx::naming::get_agas_client().get_prefixes(prefixes, type);
+        std::vector<hpx::naming::id_type> prefixes =
+            hpx::find_all_localities(type);
 
         // execute tests on all localities
         t.restart();
 
         std::vector<hpx::lcos::future_value<void> > tests;
-        BOOST_FOREACH(hpx::naming::gid_type const& gid, prefixes)
+        BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
         {
-            hpx::lcos::eager_future<test_action, void> f(gid, num_test_points);
+            hpx::lcos::eager_future<test_action, void> f(id, num_test_points);
             tests.push_back(f);
         }
-        hpx::components::wait(tests);   // wait for tests to run
+        hpx::lcos::wait(tests);   // wait for tests to run
 
         elapsed = t.elapsed();
         std::cout << "Running tests: " << elapsed << " [s]" << std::endl;

@@ -21,7 +21,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace lcos 
 {
     /// The one argument version is special in the sense that it returns the 
     /// expected value directly (without wrapping it into a tuple).

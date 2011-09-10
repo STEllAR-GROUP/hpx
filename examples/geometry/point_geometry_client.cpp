@@ -143,7 +143,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           master_objects.push_back(accu[i].get_gid());
         }
 
-        hpx::components::wait(initial_phase);
+        hpx::lcos::wait(initial_phase);
         while (time < stop_time) {
             {
               // Move bodies--------------------------------------------
@@ -151,7 +151,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               for (i=0;i<num_bodies;i++) {
                 move_phase.push_back(accu[i].move_async(dt,time));
               }
-              hpx::components::wait(move_phase);
+              hpx::lcos::wait(move_phase);
             }
 
             time += dt;
@@ -166,7 +166,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                 search_phase.push_back(accu[i].search_async(master_objects));
               }
 
-              hpx::components::wait(search_phase,search_vector);
+              hpx::lcos::wait(search_phase,search_vector);
             }
 
             // Contact enforcement ----------------------------------
@@ -182,7 +182,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                   enforcement_phase.push_back(accu[i].enforce_async(master_objects,dt,n,N));
                 }
               }
-              hpx::components::wait(enforcement_phase);
+              hpx::lcos::wait(enforcement_phase);
 
               std::vector<hpx::lcos::future_value<void> > adjustment_phase;
               for (i=0;i<num_bodies;i++) {
@@ -191,7 +191,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                   adjustment_phase.push_back(accu[i].adjust_async(dt));
                 }
               }
-              hpx::components::wait(enforcement_phase);
+              hpx::lcos::wait(enforcement_phase);
 
               // Recompute the Rsum quantity------------------------------------
               std::vector<hpx::lcos::future_value<void> > recompute_phase;
@@ -202,7 +202,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                 }
               }
 
-              hpx::components::wait(recompute_phase);
+              hpx::lcos::wait(recompute_phase);
             }
 
         } // time loop

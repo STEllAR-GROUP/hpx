@@ -356,7 +356,7 @@ namespace hpx { namespace components { namespace server
 
             // wait for all localities to finish executing their registered 
             // shutdown functions
-            components::wait(lazy_actions);
+            lcos::wait(lazy_actions);
         }
 #endif
 
@@ -376,7 +376,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // wait for all localities to be stopped
-            components::wait(lazy_actions);
+            lcos::wait(lazy_actions);
         }
 
         // now make sure this local locality gets shut down as well.
@@ -408,7 +408,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // wait for all localities to be stopped
-            components::wait(lazy_actions);
+            lcos::wait(lazy_actions);
         }
 
         // now make sure this local locality gets terminated as well.

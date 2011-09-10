@@ -245,7 +245,7 @@ namespace interpolate3d
         }
 
         // wait for initialization to finish
-        hpx::components::wait(lazy_sync);
+        hpx::lcos::wait(lazy_sync);
     }
 
     ///////////////////////////////////////////////////////////////////////////

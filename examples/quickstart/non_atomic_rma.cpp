@@ -132,7 +132,7 @@ int hpx_main(po::variables_map &vm)
         //for (int i=0;i<N;i++) {
         //  future_update[i].get();
         //}
-        hpx::components::wait(future_update);
+        hpx::lcos::wait(future_update);
 
         for (int i=0;i<array_length;i++) {
           components::access_memory_block<data> 

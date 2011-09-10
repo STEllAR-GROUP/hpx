@@ -73,7 +73,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // abort all pending workers
         hpx::applier::register_work(boost::bind(&breaker, os.get_gid()));
 
-        hpx::components::wait(barrier);
+        hpx::lcos::wait(barrier);
     }
 
     hpx::finalize();

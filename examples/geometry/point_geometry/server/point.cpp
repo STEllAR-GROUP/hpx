@@ -44,7 +44,7 @@ namespace hpx { namespace geometry { namespace server
 
             // will return the number of invoked futures
             bool redo = false;
-            components::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
+            lcos::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
 
             if ( slave_.size() > 0 ) return 1;
             else return 0;
@@ -271,7 +271,7 @@ namespace hpx { namespace geometry { namespace server
           }
 
           // will return the number of invoked futures
-          components::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2,boost::ref(dt),boost::ref(n),boost::ref(N)));
+          lcos::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2,boost::ref(dt),boost::ref(n),boost::ref(N)));
         }
 
         bool point::enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N) 
@@ -382,7 +382,7 @@ namespace hpx { namespace geometry { namespace server
           }
 
           // will return the number of invoked futures
-          components::wait(lazy_results, boost::bind(&point::recompute_callback, this, _1, _2));
+          lcos::wait(lazy_results, boost::bind(&point::recompute_callback, this, _1, _2));
         }
 
         bool point::recompute_callback(std::size_t i, polygon_type const& poly) 

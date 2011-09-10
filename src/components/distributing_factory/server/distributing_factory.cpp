@@ -99,7 +99,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result const& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.prefix_, type));
-            components::wait(lr.gids_, results.back().gids_);
+            lcos::wait(lr.gids_, results.back().gids_);
         }
 
         return results;
@@ -172,7 +172,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result const& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.prefix_, type));
-            components::wait(lr.gids_, results.back().gids_);
+            lcos::wait(lr.gids_, results.back().gids_);
         }
 
         return results;

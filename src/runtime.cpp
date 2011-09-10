@@ -776,13 +776,34 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
-        return naming::id_type(applier::get_applier().get_prefix()
-                             , naming::id_type::unmanaged);
+        return naming::id_type(hpx::applier::get_applier().get_prefix(), 
+            naming::id_type::unmanaged);
     }
 
+    std::vector<naming::id_type> 
+    find_all_localities(components::component_type type)
+    {
+        std::vector<naming::id_type> prefixes;
+        hpx::applier::get_applier().get_prefixes(prefixes, type);
+        return prefixes;
+    }
+
+    std::vector<naming::id_type> find_all_localities()
+    {
+        std::vector<naming::id_type> prefixes;
+        hpx::applier::get_applier().get_prefixes(prefixes);
+        return prefixes;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id()
     {
         return get_runtime().get_next_id();
+    }
+
+    std::size_t get_num_os_threads()
+    {
+        return get_runtime().get_config().get_num_os_threads();
     }
 
 #if HPX_AGAS_VERSION > 0x10

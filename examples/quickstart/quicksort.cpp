@@ -120,7 +120,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
                 (std::max)(begin + 1, middle_idx), end);
 
             call(prefix, d, begin, middle_idx);
-            ::hpx::components::wait(n);
+            ::hpx::lcos::wait(n);
         }
 
         else
@@ -129,7 +129,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
                 begin, middle_idx);
 
             call(prefix, d, (std::max)(begin + 1, middle_idx), end);
-            ::hpx::components::wait(n);
+            ::hpx::lcos::wait(n);
         }
     }
 }
@@ -193,7 +193,7 @@ int hpx_main(variables_map& vm)
         t.restart();
         eager_future<quicksort_parallel<int>::action_type> n(
             prefix, prefix, mb.get_gid(), 0, elements);
-        ::hpx::components::wait(n);
+        ::hpx::lcos::wait(n);
         elapsed = t.elapsed();
 
         std::cout << "  elapsed=" << elapsed << "\n"
