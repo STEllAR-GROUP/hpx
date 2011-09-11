@@ -391,8 +391,8 @@ namespace hpx { namespace threads
                       "new state(" << get_thread_state_name(new_state) << ")";
 
         // So all what we do here is to set the new state.
-        thrd->set_state(new_state);
         thrd->set_state_ex(new_state_ex);
+        thrd->set_state(new_state);
 
         if (new_state == pending) {
             scheduler_.schedule_thread(thrd, get_thread_num(), priority);

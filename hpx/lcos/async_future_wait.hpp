@@ -13,29 +13,6 @@
 #include <boost/dynamic_bitset.hpp>
 #include <boost/function.hpp>
 
-namespace hpx { namespace threads
-{
-    bool suspend()
-    {
-        // let the thread manager do other things while waiting
-        threads::thread_self& self = threads::get_self();
-        threads::thread_state_ex_enum statex = self.yield(threads::pending);
-
-        if (statex == threads::wait_abort) {
-            threads::thread_id_type id = self.get_thread_id();
-            hpx::util::osstream strm;
-            strm << "thread(" << id << ", " 
-                  << threads::get_thread_description(id)
-                  << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
-                hpx::util::osstream_get_string(strm));
-            return false;
-        }
-
-        return true;
-    }
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
@@ -72,16 +49,14 @@ namespace hpx { namespace lcos
 
                     // give thread-manager a chance to look for more work while 
                     // waiting
-                    if (!threads::suspend())
-                        return handled.count();
-
+                    threads::suspend();
                     suspended = true;
                 }
             }
 
             // suspend after one full loop over all values
-            if (!suspended && !threads::suspend())
-                return handled.count();
+            if (!suspended) 
+                threads::suspend();
         }
         return handled.count();
     }

@@ -4,10 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
+
+#include <boost/dynamic_bitset.hpp>
 
 #include <cstdlib>
 #include <ctime>
@@ -18,6 +19,57 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
 char const* shen_symbolic_name = "/sheneos_test/test";
+
+///////////////////////////////////////////////////////////////////////////////
+// Monitor the test execution
+void monitor_test_sheneos(
+    std::vector<hpx::lcos::future_value<std::vector<double> > > const& tests)
+{
+    boost::dynamic_bitset<> handled(tests.size());
+    std::size_t handled_count = handled.count();
+    while (handled_count < tests.size()) {
+
+        bool suspended = false;
+        for (std::size_t i = 0; i < tests.size(); ++i) {
+
+            // loop over all lazy_values, executing the next as soon as its
+            // value gets available 
+            if (!handled[i] && tests[i].ready()) {
+                handled[i] = true;
+                handled_count = handled.count();
+
+                // give thread-manager a chance to look for more work while 
+                // waiting
+                hpx::threads::suspend();
+                suspended = true;
+            }
+        }
+
+        // suspend after one full loop over all values
+        if (!suspended)
+            hpx::threads::suspend();
+    }
+}
+
+typedef hpx::actions::plain_action1<
+    std::vector<hpx::lcos::future_value<std::vector<double> > > const&, 
+    monitor_test_sheneos> 
+monitor_test_action;
+
+HPX_REGISTER_PLAIN_ACTION(monitor_test_action);
+
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive&, 
+        std::vector<hpx::lcos::future_value<std::vector<double> > >&, 
+        unsigned int const)
+    {
+        // dummy function, will never be called as the monitor is invoked 
+        // locally only
+        BOOST_ASSERT(true);
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is the test function, which will be invoked on all localities this 
@@ -98,7 +150,15 @@ void test_sheneos(std::size_t num_test_points)
             }
         }
     }
-    hpx::lcos::wait(tests);   // wait for all of the tests to finish
+
+    // schedule a monitoring thread
+    hpx::lcos::eager_future<monitor_test_action, void> monitor(hpx::find_here(), tests);
+
+    // wait for all of the tests to finish
+    hpx::lcos::wait(tests);
+
+    // wait for the monitor to exit
+    hpx::lcos::wait(monitor);
 }
 
 typedef hpx::actions::plain_action1<std::size_t, test_sheneos> test_action;

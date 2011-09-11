@@ -9,6 +9,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -197,6 +198,29 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         return app->get_thread_manager().get_thread_gid(id);
+    }
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to the thread state passed as the parameter.
+    ///
+    /// Normally, the return value is true. If the suspension was aborted, this 
+    /// function will throw a \a no_success exception.
+    void suspend(thread_state_enum state)
+    {
+        // let the thread manager do other things while waiting
+        threads::thread_self& self = threads::get_self();
+        threads::thread_state_ex_enum statex = self.yield(state);
+
+        if (statex == threads::wait_abort) {
+            threads::thread_id_type id = self.get_thread_id();
+            hpx::util::osstream strm;
+            strm << "thread(" << id << ", " 
+                  << threads::get_thread_description(id)
+                  << ") aborted (yield returned wait_abort)";
+            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+                hpx::util::osstream_get_string(strm));
+        }
     }
 }}
 

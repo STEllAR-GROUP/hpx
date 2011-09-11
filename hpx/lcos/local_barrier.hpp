@@ -39,11 +39,10 @@ namespace hpx { namespace lcos
             > hook_type;
 
             local_barrier_queue_entry(threads::thread_id_type id)
-              : id_(id), aborted_waiting_(false)
+              : id_(id)
             {}
 
             threads::thread_id_type id_;
-            bool aborted_waiting_;
             hook_type slist_hook_;
         };
 
@@ -72,7 +71,6 @@ namespace hpx { namespace lcos
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
-                    queue_.front().aborted_waiting_ = true;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -127,12 +125,6 @@ namespace hpx { namespace lcos
 
                 if (e.id_)
                     queue_.erase(last);     // remove entry from queue
-
-                if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, "local_barrier::wait",
-                        "aborted wait on local_barrier");
-                    return;
-                }
             }
             else {
             // slist::swap has a bug in Boost 1.35.0

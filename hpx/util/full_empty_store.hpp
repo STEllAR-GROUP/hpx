@@ -51,11 +51,10 @@ namespace hpx { namespace util { namespace detail
             > hook_type;
 
             queue_entry(thread_id_type id)
-              : id_(id), aborted_waiting_(false)
+              : id_(id)
             {}
 
             thread_id_type id_;
-            bool aborted_waiting_;
             hook_type list_hook_;
         };
 
@@ -157,7 +156,7 @@ namespace hpx { namespace util { namespace detail
             if (state_ == empty) {
                 // enqueue the request and block this thread
                 threads::set_thread_lco_description(id, "enqueue_full_full");
-                
+
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
@@ -177,12 +176,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     read_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_full_full",
-                        "aborted wait on read_queue");
-                }
             }
 
             // copy the data to the destination
@@ -222,12 +215,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     read_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_full_full",
-                        "aborted wait on read_queue");
-                }
             }
         }
 
@@ -265,12 +252,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     read_and_empty_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_full_empty",
-                        "aborted wait on read_and_empty_queue");
-                }
 
                 // copy the data to the destination
                 if (get_address() != &dest) 
@@ -316,12 +297,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     read_and_empty_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_full_empty",
-                        "aborted wait on read_and_empty_queue");
-                }
             }
             else {
                 set_empty_locked();   // state_ = empty
@@ -362,12 +337,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     write_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_if_full",
-                        "aborted wait on write_queue");
-                }
             }
 
             // set the data
@@ -410,12 +379,6 @@ namespace hpx { namespace util { namespace detail
                 }
                 if (f.id_) 
                     write_queue_.erase(last);     // remove entry from queue
-
-                if (f.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, 
-                        "full_empty_entry::enqueue_if_full",
-                        "aborted wait on write_queue");
-                }
             }
 
             // make sure the entry is full

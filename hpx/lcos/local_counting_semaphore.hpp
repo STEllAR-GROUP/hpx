@@ -49,11 +49,10 @@ namespace hpx { namespace lcos
             > hook_type;
 
             queue_entry(threads::thread_id_type id)
-              : id_(id), aborted_waiting_(false)
+              : id_(id)
             {}
 
             threads::thread_id_type id_;
-            bool aborted_waiting_;
             hook_type list_hook_;
         };
 

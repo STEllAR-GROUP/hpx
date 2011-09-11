@@ -401,8 +401,8 @@ namespace hpx { namespace threads { namespace policies
                  it != end; ++it)
             {
                 if ((*it).second->get_state() == suspended) {
-                    (*it).second->set_state(pending);
                     (*it).second->set_state_ex(wait_abort);
+                    (*it).second->set_state(pending);
                     schedule_thread((*it).second, num_thread);
                 }
             }
