@@ -247,22 +247,22 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t sheneos::get_index(int d, double value)
+    std::size_t sheneos::get_partition_index(int d, double value)
     {
         std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
-        std::size_t index = (value - minval_[d]) / (delta_[d] * partition_size);
-        if (index == num_partitions_per_dim_) 
-            --index;
-        BOOST_ASSERT(index < num_partitions_per_dim_);
-        return index;
+        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
+        if (partition_index == num_partitions_per_dim_) 
+            --partition_index;
+        BOOST_ASSERT(partition_index < num_partitions_per_dim_);
+        return partition_index;
     }
 
     hpx::naming::id_type 
     sheneos::get_gid(double ye, double temp, double rho)
     {
-        std::size_t x = get_index(dimension::ye, ye);
-        std::size_t y = get_index(dimension::temp, std::log10(temp));
-        std::size_t z = get_index(dimension::rho, std::log10(rho));
+        std::size_t x = get_partition_index(dimension::ye, ye);
+        std::size_t y = get_partition_index(dimension::temp, std::log10(temp));
+        std::size_t z = get_partition_index(dimension::rho, std::log10(rho));
 
         std::size_t index = 
             x + (y + z * num_partitions_per_dim_) * num_partitions_per_dim_;

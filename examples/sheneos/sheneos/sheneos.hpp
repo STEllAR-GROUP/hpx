@@ -81,7 +81,7 @@ namespace sheneos
 
         void fill_partitions(std::string const& datafilename,
             std::string symbolic_name_base, async_create_result_type future);
-        std::size_t get_index(int d, double value);
+        std::size_t get_partition_index(int d, double value);
 
     private:
         std::vector<hpx::naming::id_type> partitions_;

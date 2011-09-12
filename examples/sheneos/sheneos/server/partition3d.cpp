@@ -40,8 +40,11 @@ namespace sheneos { namespace server
         // Account for necessary overlap on the right hand end of the data 
         // interval (the interpolation algorithm used does not go beyond the
         // left hand end).
-        if (dim.offset_ + dim.count_ < dim.size_-1) 
-            ++dim_[d].count_;
+        std::size_t count = dim.count_;
+        if (dim.offset_ + dim.count_ < dim.size_-2) {
+            dim_[d].count_ += 2;
+            ++count;
+        }
 
         // read the full data range
         values.reset(new double[dim_[d].count_]);
@@ -49,7 +52,7 @@ namespace sheneos { namespace server
 
         // extract range (without ghost-zones)
         min_value_[d] = values[0];
-        max_value_[d] = values[dim.count_-1];
+        max_value_[d] = values[count-1];
         delta_[d] = values[1] - values[0];
     }
 
