@@ -14,8 +14,8 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      #dataflow
-      #adaptive1d
+      dataflow
+      adaptive1d
       hplpx
       barnes_hut
       random_mem_access
@@ -44,9 +44,9 @@ if(NOT MSVC)
     set(subdirs ${subdirs} sheneos)
   endif()
 
-#if(CMAKE_Fortran_COMPILER)
-#  set(subdirs ${subdirs} marduk)
-#endif()
+if(CMAKE_Fortran_COMPILER)
+  set(subdirs ${subdirs} marduk)
+endif()
 
 #  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
 #    set(subdirs ${subdirs} hpxi)
