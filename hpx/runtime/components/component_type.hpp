@@ -7,51 +7,16 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
-#include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    enum component_type
-    {
-        component_invalid = -1,
-        component_runtime_support = 0,  // runtime support (needed to create components, etc.)
-        component_memory = 1,           // general memory address
-        component_memory_block = 2,     // general memory block
-
-        // LCO's
-        component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
-        component_base_lco_with_value = 4,
-//             ((4 << 8) | component_base_lco),
-                                        ///< base LCO's blocking on a value
-        component_future =              ///< a future executing the action and 
-                                        ///< allowing to wait for the result
-            ((5 << 16) | component_base_lco_with_value),
-        component_value_adaptor = 6,    ///< an adaptor to access specific slot of an LCO
-        component_barrier =             ///< a LCO implementing a barrier
-            ((7 << 16) | component_base_lco),
-        component_thread =              ///< a ParalleX thread
-            ((8 << 16) | component_base_lco_with_value),
-        component_dataflow_variable =   ///< a LCO implementing dataflow var.
-            ((9 << 16) | component_base_lco_with_value),
-        component_thunk =               ///< a LCO implementing a thunk
-            ((10 << 16) | component_base_lco_with_value),
-
-        component_dataflow_block = 11,  ///< a dataflow block
-
-        component_agas_primary_namespace = 12,
-        component_agas_component_namespace = 13,
-        component_agas_symbol_namespace = 14,
-
-        component_last,
-        component_first_dynamic = component_last
-    };
-
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(int type);
 

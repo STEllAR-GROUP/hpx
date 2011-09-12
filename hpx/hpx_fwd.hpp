@@ -341,10 +341,44 @@ namespace hpx
             struct managed_component_tag {};
         }
 
-        enum component_type;
+        ///////////////////////////////////////////////////////////////////////
+        enum component_type
+        {
+            component_invalid = -1,
+            component_runtime_support = 0,  // runtime support (needed to create components, etc.)
+            component_memory = 1,           // general memory address
+            component_memory_block = 2,     // general memory block
 
+            // LCO's
+            component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
+            component_base_lco_with_value = 4,
+                                            ///< base LCO's blocking on a value
+            component_future =              ///< a future executing the action and 
+                                            ///< allowing to wait for the result
+                ((5 << 16) | component_base_lco_with_value),
+            component_value_adaptor = 6,    ///< an adaptor to access specific slot of an LCO
+            component_barrier =             ///< a LCO implementing a barrier
+                ((7 << 16) | component_base_lco),
+            component_thread =              ///< a ParalleX thread
+                ((8 << 16) | component_base_lco_with_value),
+            component_dataflow_variable =   ///< a LCO implementing dataflow var.
+                ((9 << 16) | component_base_lco_with_value),
+            component_thunk =               ///< a LCO implementing a thunk
+                ((10 << 16) | component_base_lco_with_value),
+
+            component_dataflow_block = 11,  ///< a dataflow block
+
+            component_agas_primary_namespace = 12,
+            component_agas_component_namespace = 13,
+            component_agas_symbol_namespace = 14,
+
+            component_last,
+            component_first_dynamic = component_last
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <boost::uint64_t MSB, boost::uint64_t LSB,
-                  typename Component = detail::this_type>
+            typename Component = detail::this_type>
         struct fixed_component_base;
 
         template <typename Component> 
