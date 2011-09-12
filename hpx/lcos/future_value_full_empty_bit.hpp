@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // no error has been reported, return the result
             return boost::get<result_type>(d);
-        };
+        }
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
@@ -242,7 +242,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // no error has been reported, return the result
             return boost::get<naming::id_type>(d);
-        };
+        }
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
