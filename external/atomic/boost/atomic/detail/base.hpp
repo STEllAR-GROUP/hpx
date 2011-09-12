@@ -52,8 +52,8 @@ static inline void platform_atomic_thread_fence(T order)
     /* FIXME: this does not provide
     sequential consistency, need one global
     variable for that... */
-    platform_atomic<int> a;
-    a.exchange(0, order);
+    platform_atomic<T> a;
+    a.exchange(T(), order);
 }
 
 template<typename T, unsigned short Size=sizeof(T), typename Int=typename is_integral_type<T>::test>
