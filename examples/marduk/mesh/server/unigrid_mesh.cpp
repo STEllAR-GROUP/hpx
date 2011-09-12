@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 init_async(*function, numsteps, log));
         }
 
-        wait(lazyvals);   // now wait for the initialization to happen
+        lcos::wait(lazyvals);   // now wait for the initialization to happen
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         }
         //BOOST_ASSERT(function == functions.second);
 
-        wait(lazyvals);   // now wait for the results
+        lcos::wait(lazyvals);   // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 get_output_ports_async(*stencil));
         }
 
-        wait(lazyvals, outputs);      // now wait for the results
+        lcos::wait(lazyvals, outputs);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             }
         }
 
-        wait (lazyvals);      // now wait for the results
+        lcos::wait (lazyvals);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 alloc_data_async(*function, i, numvalues, 0,interp_src_data,time,par));
         }
 
-        wait (lazyvals, initial_data);      // now wait for the results
+        lcos::wait (lazyvals, initial_data);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ namespace hpx { namespace components { namespace amr { namespace server
           //      call_async(*stencil, initial_data[i]));
         }
 
-        wait (lazyvals, result_data);      // now wait for the results
+        lcos::wait (lazyvals, result_data);      // now wait for the results
     }
     
     ///////////////////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@ namespace hpx { namespace components { namespace amr { namespace server
                 start_async(*stencil));
         }
 
-        wait (lazyvals);      // now wait for the results
+        lcos::wait (lazyvals);      // now wait for the results
     }
 
     ///////////////////////////////////////////////////////////////////////////
