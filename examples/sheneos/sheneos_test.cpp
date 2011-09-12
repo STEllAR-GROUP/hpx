@@ -26,7 +26,7 @@ void monitor_test_sheneos(
     std::vector<hpx::lcos::future_value<std::vector<double> > > const& tests)
 {
     boost::dynamic_bitset<> handled(tests.size());
-    std::size_t handled_count = handled.count();
+    std::size_t handled_count = 0;
     while (handled_count < tests.size()) {
 
         bool suspended = false;
@@ -36,7 +36,7 @@ void monitor_test_sheneos(
             // value gets available 
             if (!handled[i] && tests[i].ready()) {
                 handled[i] = true;
-                handled_count = handled.count();
+                ++handled_count;
 
                 // give thread-manager a chance to look for more work while 
                 // waiting
@@ -155,7 +155,8 @@ void test_sheneos(std::size_t num_test_points)
     hpx::lcos::eager_future<monitor_test_action, void> monitor(hpx::find_here(), tests);
 
     // wait for all of the tests to finish
-    hpx::lcos::wait(tests);
+    int count = 0;
+    hpx::lcos::wait(tests, [&](int, std::vector<double> const&) { ++count; });
 
     // wait for the monitor to exit
     hpx::lcos::wait(monitor);

@@ -1165,6 +1165,10 @@ namespace hpx { namespace threads
                     // thread should be re-scheduled. If the PX thread is suspended 
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
+                        // schedule other work
+                        scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count);
+
+                        // schedule this thread again
                         scheduler_.schedule_thread(thrd, num_thread);
                         do_some_work(num_thread);
                     }
@@ -1195,12 +1199,12 @@ namespace hpx { namespace threads
                 queue_length_counter.uninstall();
 #endif
                 count.exit();
-
-                // Before tfunc loop breaks, record total time elapsed
-                tfunc_time = util::hardware::timestamp() - overall_timestamp;
                 break;
             }
         }
+
+        // after tfunc loop broke, record total time elapsed
+        tfunc_time = util::hardware::timestamp() - overall_timestamp;
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist

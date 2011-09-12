@@ -34,7 +34,8 @@ namespace hpx { namespace lcos
     wait (std::vector<lcos::future_value<T1, TR1> > const& lazy_values, F f)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
-        while (handled.count() < lazy_values.size()) {
+        std::size_t handled_count = 0;
+        while (handled_count < lazy_values.size()) {
 
             bool suspended = false;
             for (std::size_t i = 0; i < lazy_values.size(); ++i) {
@@ -42,10 +43,11 @@ namespace hpx { namespace lcos
                 // loop over all lazy_values, executing the next as soon as its
                 // value gets available 
                 if (!handled[i] && lazy_values[i].ready()) {
-                    handled[i] = true;
-
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
+
+                    handled[i] = true;
+                    ++handled_count;
 
                     // give thread-manager a chance to look for more work while 
                     // waiting

@@ -205,6 +205,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Count number of empty (no PX thread available) thread manager loop executions 
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 20000
 #endif
