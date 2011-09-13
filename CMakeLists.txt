@@ -371,25 +371,38 @@ else()
     hpx_use_flag_if_available(Wall)
     hpx_use_flag_if_available(Wno-strict-aliasing)
     hpx_use_flag_if_available(Wsign-promo)
+
+    # FIXME: too noisy for now
+    # Warn about floating point equality comparisons
+    # hpx_use_flag_if_available(Wfloat-equal)
   endif()
 
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
+  # Show the flags that toggle each warning
+  hpx_use_flag_if_available(fdiagnostics-show-option)
+
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
-    # Show the flags that toggle each warning
-    hpx_use_flag_if_available(fdiagnostics-show-option)
-
     # I'm aware that __sync_fetch_and_nand changed semantics
     hpx_use_flag_if_gcc_version(Wno-sync-nand 040400)
+
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+      option(HPX_LTO "Use -flto for Release and MinSizeRel builds (default: ON)" ON)
+
+      if(HPX_LTO) 
+        hpx_use_flag_if_available(flto)
+      endif()
+    endif()
 
     if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
       hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
     else()
       option(HPX_ELF_HIDDEN_VISIBILITY
-        "Use -fvisibility=hidden for Release, MinSizeRel builds (default: ON)" ON)
+        "Use -fvisibility=hidden for Release and MinSizeRel builds (default: ON)" ON)
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR

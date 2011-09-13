@@ -47,21 +47,33 @@ if(UNIX)
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(Wextra)
 
-    # these are usually benign and can't be suppressed because of
+    # We never want trampolines
+    hpx_use_flag_if_available(Wtrampolines)
+
+    # These are usually benign and can't be suppressed because of
     # interface requirements
     hpx_use_flag_if_available(Wno-unused-parameter)
+    hpx_use_flag_if_available(Wno-unused-but-set-parameter)
 
-    # there are ignored qualifiers in Boost, so we have to ignore them
+    # There are ignored qualifiers in Boost, so we have to ignore them
     hpx_use_flag_if_available(Wno-ignored-qualifiers)
 
-    # be extra strict about format checks
-    # Boost.Logging is built on this, sadly
+    # Be extra strict about format checks
+    # Boost.Logging is built on fprintf, sadly
     hpx_use_flag_if_available(Wformat=2 NAME Wformat_2)
     hpx_use_flag_if_available(Wno-format-nonliteral) 
 
-    # self initialization is dangerous
+    # Self initialization is dangerous
     hpx_use_flag_if_available(Winit-self)
 
+    # For portability
+    hpx_use_flag_if_available(Wdouble-promotion)
+
+    # Warn about casting that violates qualifiers or alignment
+    hpx_use_flag_if_available(Wcast-qual)
+    hpx_use_flag_if_available(Wcast-align)
+
+    hpx_use_flag_if_available(Werror=trampolines NAME Werror_trampolines)
     hpx_use_flag_if_available(Werror=parentheses NAME Werror_parentheses)
     hpx_use_flag_if_available(Werror=reorder NAME Werror_reorder)
     hpx_use_flag_if_available(Werror=return-type NAME Werror_return-type)
