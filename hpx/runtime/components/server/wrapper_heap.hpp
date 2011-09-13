@@ -177,6 +177,8 @@ namespace hpx { namespace components { namespace detail
 #else
             scoped_lock l(mtx_);
 #endif
+
+#if HPX_DEBUG_WRAPPER_HEAP != 0
             storage_type* p1 = 0;
             p1 = static_cast<storage_type*>(p);
 
@@ -184,7 +186,6 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
             BOOST_ASSERT(free_size_ + count <= size_);
-#if HPX_DEBUG_WRAPPER_HEAP != 0
             // make sure this has not been freed yet
             BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value, 
                 count*sizeof(storage_type)));
