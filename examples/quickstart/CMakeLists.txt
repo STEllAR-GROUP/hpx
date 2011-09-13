@@ -42,7 +42,7 @@ foreach(example_program ${example_programs})
                               ${example_program}_exe)
 endforeach() 
 
-if("${HPX_AGAS_VERSION}" STREQUAL "2")
+if("${HPX_AGAS_VERSION}" STREQUAL "2" AND HPX_CXX11_LAMBDAS)
   set(example_programs
       hello_world
      )

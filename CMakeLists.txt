@@ -234,6 +234,15 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
+# C++11 configuration
+################################################################################
+option(HPX_CXX11 "Use C++11 support (default: ON)" ON)
+
+if(HPX_CXX11)
+  add_definitions(-DHPX_HAVE_CXX11)
+endif()
+
+################################################################################
 # AGAS configuration
 ################################################################################
 set(HPX_AGAS_VERSION "2" CACHE STRING "AGAS subsystem version")
@@ -294,6 +303,21 @@ if(MSVC)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
   endif()
 
+  if(MSVC10)
+    if(HPX_CXX11)
+      # C++11 support
+      if(HPX_CXX11)
+        set(HPX_CXX11_RVALUE_REFERENCES)
+        add_definitions(HPX_CXX11_HAVE_RVALUE_REFERENCES)
+
+        set(HPX_CXX11_LAMBDAS)
+        add_definitions(HPX_CXX11_HAVE_LAMBDAS)
+      endif()
+    endif()
+  else()
+    hpx_error("msvc_config" "MSVC 2010 or higher is required.")
+  endif()
+    
   set(CMAKE_DEBUG_POSTFIX "d")
 
   # we auto-link Boost on Windows, so don't specify boost libraries explicitly
@@ -329,15 +353,19 @@ if(MSVC)
 # POSIX specific configuration 
 ################################################################################
 else()
-  if(HPX_STACKTRACES)
-    hpx_use_flag_if_available(rdynamic)
-  endif()
-
   # clear CMake defaults
   set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Release flags (C++)" FORCE)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+
+  if(HPX_STACKTRACES)
+    hpx_use_flag_if_available(rdynamic)
+  endif()
+
+  if(HPX_CXX11)
+    hpx_use_flag_if_available(std=c++0x NAME std_c++0x)
+  endif()
 
   # non-standard C++ extensions that we forbid
   hpx_use_flag_if_available(Werror=vla NAME Werror_vla)
@@ -505,6 +533,18 @@ else()
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
+
+  # C++11 support
+  if(HPX_CXX11)
+    hpx_check_for_cxx11_rvalue_references(HPX_CXX11_RVALUE_REFERENCES
+      DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
+
+    hpx_check_for_cxx11_variadic_templates(HPX_CXX11_VARIADIC_TEMPLATES
+      DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+
+    hpx_check_for_cxx11_lambdas(HPX_CXX11_LAMBDAS
+      DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+  endif()
 
   add_definitions(-D_GNU_SOURCE)
   hpx_append_flag(-pthread)

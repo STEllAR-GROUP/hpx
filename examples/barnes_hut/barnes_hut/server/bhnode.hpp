@@ -85,45 +85,45 @@ namespace hpx { namespace components { namespace server
 
         //actions
         //first constructor action(particles and root)
-        typedef actions::result_action3<bhnode, int, hpl_constNode,
+        typedef hpx::actions::result_action3<bhnode, int, hpl_constNode,
             id_type, vector<double>, bool, &bhnode::construct_node>
             constNodeAction;
         //second constructor action(intermediate nodes)
-        typedef actions::result_action3<bhnode, int, hpl_cnstNode2, id_type,
+        typedef hpx::actions::result_action3<bhnode, int, hpl_cnstNode2, id_type,
             id_type, vector<double>, &bhnode::construct_node> cnstNodeAction2;
         //setting bounds action
-        typedef actions::result_action2<bhnode, int, hpl_setBounds, id_type,
+        typedef hpx::actions::result_action2<bhnode, int, hpl_setBounds, id_type,
             vector<double>, &bhnode::set_boundaries> setBoundsAction;
         //find insert point action
-        typedef actions::result_action3<bhnode, vector<double>, hpl_findPoint,
+        typedef hpx::actions::result_action3<bhnode, vector<double>, hpl_findPoint,
             vector<double>, double, id_type, &bhnode::find_insert_point>
             findInPntAction;
         //inserting node action
-        typedef actions::result_action4<bhnode, vector<double>, hpl_insrtNode,
+        typedef hpx::actions::result_action4<bhnode, vector<double>, hpl_insrtNode,
             vector<double>, double, id_type, int, &bhnode::insert_node>
             insrtNodeAction;
         //update child action
-        typedef actions::result_action4<bhnode, int, hpl_updateChd,
+        typedef hpx::actions::result_action4<bhnode, int, hpl_updateChd,
             int, id_type, bool, vector<double>, 
             &bhnode::update_child> updatChldAction;
         //run the simulation action
-        typedef actions::result_action2<bhnode, int, hpl_simulate,
+        typedef hpx::actions::result_action2<bhnode, int, hpl_simulate,
             id_type, vector<double>, &bhnode::run> runSimAction;
 
         //for debugging
-        typedef actions::result_action2<bhnode, int, hpl_printTree,
+        typedef hpx::actions::result_action2<bhnode, int, hpl_printTree,
             int, int, &bhnode::print_tree> printTreeAction;
 
         //futures
-        typedef lcos::eager_future<server::bhnode::constNodeAction> constFuture;
-        typedef lcos::eager_future<server::bhnode::cnstNodeAction2> cnstFuture2;
-        typedef lcos::eager_future<server::bhnode::setBoundsAction> boundFuture;
-        typedef lcos::eager_future<server::bhnode::insrtNodeAction> iNodeFuture;
-        typedef lcos::eager_future<server::bhnode::findInPntAction> inPntFuture;
-        typedef lcos::eager_future<server::bhnode::updatChldAction> childFuture;
-        typedef lcos::eager_future<server::bhnode::runSimAction>    runFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::constNodeAction> constFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::cnstNodeAction2> cnstFuture2;
+        typedef hpx::lcos::eager_future<server::bhnode::setBoundsAction> boundFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::insrtNodeAction> iNodeFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::findInPntAction> inPntFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::updatChldAction> childFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::runSimAction>    runFuture;
         //for debugging
-        typedef lcos::eager_future<server::bhnode::printTreeAction> printFuture;
+        typedef hpx::lcos::eager_future<server::bhnode::printTreeAction> printFuture;
 
         iNodeFuture* insertFuture[8];
     };

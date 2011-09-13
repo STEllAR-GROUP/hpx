@@ -73,7 +73,7 @@ public:
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { 
         LLCO_(info) << "lazy_future::lazy_future("
-                    << actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -89,7 +89,7 @@ public:
             BOOST_PP_ENUM_PARAMS(N, arg)))
     { 
         LLCO_(info) << "lazy_future::lazy_future("
-                    << actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";

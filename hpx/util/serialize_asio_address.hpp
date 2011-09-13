@@ -13,6 +13,8 @@
 
 // add serialization support for std::array
 #if defined(BOOST_ASIO_HAS_STD_ARRAY)
+#include <boost/serialization/array.hpp>
+
 namespace boost { namespace serialization
 {
     template <class Archive, class T, std::size_t N>

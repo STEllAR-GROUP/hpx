@@ -129,4 +129,30 @@ macro(hpx_cpuid target variable)
     FILE ARGS "${target}" ${ARGN})
 endmacro()
 
+###############################################################################
+macro(hpx_check_for_cxx11_rvalue_references variable)
+  hpx_get_include_directory(include_dir)
+ 
+  add_hpx_config_test("cxx11_rvalue_references" ${variable} LANGUAGE CXX 
+    SOURCE cmake/tests/cxx11_rvalue_references.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_variadic_templates variable)
+  hpx_get_include_directory(include_dir)
+ 
+  add_hpx_config_test("cxx11_variadic_templates" ${variable} LANGUAGE CXX 
+    SOURCE cmake/tests/cxx11_variadic_templates.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_lambdas variable)
+  hpx_get_include_directory(include_dir)
+ 
+  add_hpx_config_test("cxx11_lambdas" ${variable} LANGUAGE CXX 
+    SOURCE cmake/tests/cxx11_lambdas.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
 
