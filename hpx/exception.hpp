@@ -339,11 +339,11 @@ namespace hpx
 
         // If backtrace support is enabled, this function returns the current 
         // stack backtrace, otherwise it will return an empty string.
-        std::string backtrace();
+        HPX_EXPORT std::string backtrace();
 
         // Extract the diagnostic information embedded in the given exception and
         // return a string holding a formatted message.
-        std::string diagnostic_information(boost::exception const& e);
+        HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
     }
 }
 
