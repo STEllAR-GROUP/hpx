@@ -24,14 +24,12 @@ if(NOT MSVC)
       nqueen)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    set(subdirs ${subdirs} iostreams
-                           heartbeat 
+    set(subdirs ${subdirs} heartbeat 
                            globals
                            throttle
                            function
                            math
                            object_semaphore
-                           timed
                            balancing)
   endif()
 
