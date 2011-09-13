@@ -119,17 +119,23 @@ namespace hpx { namespace util
                         index_.equal_range(*(condemmed->second.first));
                     BOOST_ASSERT(mpos.first != mpos.second);
 
+#if defined(HPX_DEBUG)
                     bool found = false;
+#endif
                     for(/**/; mpos.first != mpos.second; ++mpos.first)
                     {
                         if (mpos.first->second.second == generational_count)
                         {
                             index_.erase(mpos.first);
+#if defined(HPX_DEBUG)
                             found = true;
+#endif
                             break;
                         }
                     }
+#if defined(HPX_DEBUG)
                     BOOST_ASSERT(found);
+#endif
 
                     cont_.erase(condemmed); 
                     --s;
