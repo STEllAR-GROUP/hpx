@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Vinay C Amatya
 #
@@ -18,6 +18,7 @@ set(example_programs
     error_handling2
     error_handling3
     error_handling4
+    hello_world
     quicksort)
 
 foreach(example_program ${example_programs})
