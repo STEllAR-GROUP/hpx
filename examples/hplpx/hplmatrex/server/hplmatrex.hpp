@@ -91,43 +91,43 @@ namespace hpx { namespace components { namespace server
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef actions::result_action4<hplmatrex, int, hpl_construct, 
+    typedef hpx::actions::result_action4<hplmatrex, int, hpl_construct, 
         naming::id_type, int, int, int, &hplmatrex::construct> 
         construct_action;
     //the assign function
-    typedef actions::result_action4<hplmatrex, int, hpl_assign, int,
+    typedef hpx::actions::result_action4<hplmatrex, int, hpl_assign, int,
         int, bool, int, &hplmatrex::assign> assign_action;
     //the solve function
-    typedef actions::result_action0<hplmatrex, double, hpl_solve,
+    typedef hpx::actions::result_action0<hplmatrex, double, hpl_solve,
         &hplmatrex::lusolve> solve_action;
     //the search_pivots function
-    typedef actions::result_action1<hplmatrex, int, hpl_search, int,
+    typedef hpx::actions::result_action1<hplmatrex, int, hpl_search, int,
         &hplmatrex::search_pivots> search_action;
     //the swap function
-    typedef actions::result_action2<hplmatrex, int, hpl_swap, int,
+    typedef hpx::actions::result_action2<hplmatrex, int, hpl_swap, int,
         int, &hplmatrex::swap> swap_action;
     //part_bsub function
-    typedef actions::result_action2<hplmatrex, int, hpl_partbsub, int,
+    typedef hpx::actions::result_action2<hplmatrex, int, hpl_partbsub, int,
         int, &hplmatrex::part_bsub> partbsub_action;
     //checksolve function
-    typedef actions::result_action3<hplmatrex, double, hpl_check, int,
+    typedef hpx::actions::result_action3<hplmatrex, double, hpl_check, int,
         int, bool, &hplmatrex::checksolve> check_action;
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
-    typedef lcos::eager_future<server::hplmatrex::assign_action> assign_future;
+    typedef hpx::lcos::eager_future<server::hplmatrex::assign_action> assign_future;
     //the search pivots future
-    typedef lcos::eager_future<server::hplmatrex::search_action> search_future;
+    typedef hpx::lcos::eager_future<server::hplmatrex::search_action> search_future;
     //Here is the swap future
-    typedef lcos::eager_future<server::hplmatrex::swap_action> swap_future;
+    typedef hpx::lcos::eager_future<server::hplmatrex::swap_action> swap_future;
     //the backsubst future is used to make sure all computations are complete
     //before returning from lusolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
     typedef
-        lcos::eager_future<server::hplmatrex::partbsub_action> partbsub_future;
+        hpx::lcos::eager_future<server::hplmatrex::partbsub_action> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the lu decomposition
-    typedef lcos::eager_future<server::hplmatrex::check_action> check_future;
+    typedef hpx::lcos::eager_future<server::hplmatrex::check_action> check_future;
     };
 ///////////////////////////////////////////////////////////////////////////////
 

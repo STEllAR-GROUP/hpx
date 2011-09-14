@@ -97,51 +97,51 @@ namespace hpx { namespace components { namespace server
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef actions::result_action4<smphplmatrex, int, hpl_construct, 
+    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_construct, 
         naming::id_type, int, int, int, &smphplmatrex::construct> 
         construct_action;
     //the destruct function
-    typedef actions::action0<smphplmatrex, hpl_destruct,
+    typedef hpx::actions::action0<smphplmatrex, hpl_destruct,
         &smphplmatrex::destruct> destruct_action;
     //the assign function
-    typedef actions::result_action4<smphplmatrex, int, hpl_assign, int,
+    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_assign, int,
         int, bool, int, &smphplmatrex::assign> assign_action;
     //the solve function
-    typedef actions::result_action0<smphplmatrex, double, hpl_solve,
+    typedef hpx::actions::result_action0<smphplmatrex, double, hpl_solve,
         &smphplmatrex::LUsolve> solve_action;
     //the search_pivots function
-    typedef actions::result_action1<smphplmatrex, int, hpl_search, int,
+    typedef hpx::actions::result_action1<smphplmatrex, int, hpl_search, int,
         &smphplmatrex::search_pivots> search_action;
     //the swap function
-    typedef actions::result_action2<smphplmatrex, int, hpl_swap, int,
+    typedef hpx::actions::result_action2<smphplmatrex, int, hpl_swap, int,
         int, &smphplmatrex::swap> swap_action;
     //the main gaussian function
-    typedef actions::result_action4<smphplmatrex, int, hpl_gmain, int,
+    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_gmain, int,
         int, int, int, &smphplmatrex::LU_gauss_main> gmain_action;
     //part_bsub function
-    typedef actions::result_action2<smphplmatrex, int, hpl_partbsub, int,
+    typedef hpx::actions::result_action2<smphplmatrex, int, hpl_partbsub, int,
         int, &smphplmatrex::part_bsub> partbsub_action;
     //checksolve function
-    typedef actions::result_action3<smphplmatrex, double, hpl_check, int,
+    typedef hpx::actions::result_action3<smphplmatrex, double, hpl_check, int,
         int, bool, &smphplmatrex::checksolve> check_action;
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
-    typedef lcos::eager_future<server::smphplmatrex::assign_action> assign_future;
+    typedef hpx::lcos::eager_future<server::smphplmatrex::assign_action> assign_future;
     //the search pivots future
-    typedef lcos::eager_future<server::smphplmatrex::search_action> search_future;
+    typedef hpx::lcos::eager_future<server::smphplmatrex::search_action> search_future;
     //Here is the swap future, which works the same way as the assign future
-    typedef lcos::eager_future<server::smphplmatrex::swap_action> swap_future;
+    typedef hpx::lcos::eager_future<server::smphplmatrex::swap_action> swap_future;
     //This future corresponds to the Gaussian elimination functions
-    typedef lcos::eager_future<server::smphplmatrex::gmain_action> gmain_future;
+    typedef hpx::lcos::eager_future<server::smphplmatrex::gmain_action> gmain_future;
     //the backsubst future is used to make sure all computations are complete
     //before returning from LUsolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
     typedef
-        lcos::eager_future<server::smphplmatrex::partbsub_action> partbsub_future;
+        hpx::lcos::eager_future<server::smphplmatrex::partbsub_action> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
-    typedef lcos::eager_future<server::smphplmatrex::check_action> check_future;
+    typedef hpx::lcos::eager_future<server::smphplmatrex::check_action> check_future;
 
     //right here are special arrays of futures
     gmain_future*** leftFutures, topFutures;

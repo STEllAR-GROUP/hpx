@@ -60,44 +60,44 @@ namespace hpx { namespace components { namespace server
         vector<vector<id_type> > gidList;
 
         //actions
-        typedef actions::result_action7<lublock, int, hpl_constructBlock, int,
+        typedef hpx::actions::result_action7<lublock, int, hpl_constructBlock, int,
             int, int, int, int,vector<vector<id_type> >,vector<vector<double> >,
             &lublock::construct_block> constructBlock_action;
 
-        typedef actions::result_action1<lublock, int, hpl_gcorner, int,
+        typedef hpx::actions::result_action1<lublock, int, hpl_gcorner, int,
             &lublock::lu_gauss_corner> gcorner_action;
 
-        typedef actions::result_action1<lublock, int, hpl_gtop, int,
+        typedef hpx::actions::result_action1<lublock, int, hpl_gtop, int,
             &lublock::lu_gauss_top> gtop_action;
 
-        typedef actions::result_action1<lublock, int, hpl_gleft, int,
+        typedef hpx::actions::result_action1<lublock, int, hpl_gleft, int,
             &lublock::lu_gauss_left> gleft_action;
 
-        typedef actions::result_action1<lublock, int, hpl_gtrail, int,
+        typedef hpx::actions::result_action1<lublock, int, hpl_gtrail, int,
             &lublock::lu_gauss_trail> gtrail_action;
 
-        typedef actions::result_action0<lublock, int, hpl_getRows,
+        typedef hpx::actions::result_action0<lublock, int, hpl_getRows,
             &lublock::get_rows> getRows_action;
 
-        typedef actions::result_action0<lublock, int, hpl_getColumns,
+        typedef hpx::actions::result_action0<lublock, int, hpl_getColumns,
             &lublock::get_columns> getColumns_action;
 
-        typedef actions::result_action0<lublock, vector<vector<double> >,
+        typedef hpx::actions::result_action0<lublock, vector<vector<double> >,
             hpl_getData, &lublock::get_data> getData_action;
 
-        typedef actions::result_action2<lublock, int, hpl_getFuture, int, int,
+        typedef hpx::actions::result_action2<lublock, int, hpl_getFuture, int, int,
             &lublock::get_needed_future> getFuture_action;
 
         //futures
-        typedef lcos::eager_future<server::lublock::getData_action> dataFuture;
-        typedef lcos::eager_future<server::lublock::getRows_action> rowFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
         typedef 
-            lcos::eager_future<server::lublock::getColumns_action> columnFuture;
-        typedef lcos::eager_future<server::lublock::getFuture_action> getFuture;
-        typedef lcos::eager_future<server::lublock::gcorner_action> gcFuture;
-        typedef lcos::eager_future<server::lublock::gleft_action> glFuture;
-        typedef lcos::eager_future<server::lublock::gtop_action> gtoFuture;
-        typedef lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
+            hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gleft_action> glFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gtop_action> gtoFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
 
         //the following variables require the above typedefs
         glFuture*  nextLeft;

@@ -68,9 +68,9 @@ namespace hpx { namespace components { namespace server
 
     public:
     //here we define the actions that will be used
-    typedef actions::result_action2<bhcontroller, int, hpl_construct,
+    typedef hpx::actions::result_action2<bhcontroller, int, hpl_construct,
         id_type, std::string, &bhcontroller::construct> constructAction;
-    typedef actions::result_action0<bhcontroller, int, hpl_run,
+    typedef hpx::actions::result_action0<bhcontroller, int, hpl_run,
         &bhcontroller::run_simulation> runAction;
 
     //here begins the definitions of most of the future types that will be used
