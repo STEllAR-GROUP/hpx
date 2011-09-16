@@ -67,6 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificDiagnostics>2586</DisableSpecificDiagnostics>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
