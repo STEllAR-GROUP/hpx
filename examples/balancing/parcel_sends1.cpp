@@ -64,7 +64,7 @@ void print_count()
 
     gethostname(hostname, sizeof(hostname));
 
-    cout() << (boost::format("locality %1% (%2%, %3% shepherds) start sending "
+    cout << (boost::format("locality %1% (%2%, %3% shepherds) start sending "
                              "%4% parcels and completed sending %5% parcels")
               % a.get_prefix_id()
               % hostname
@@ -93,7 +93,7 @@ int hpx_main(variables_map& vm)
 
         BOOST_FOREACH(gid_type const& node, localities)
         {
-            cout() << (boost::format("starting %1% futures on locality %2%")
+            cout << (boost::format("starting %1% futures on locality %2%")
                       % count % get_prefix_from_gid(node))
                    << endl;
             for (boost::uint64_t i = 0; i < count; ++i)

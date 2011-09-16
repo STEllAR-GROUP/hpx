@@ -60,8 +60,8 @@ HPX_REGISTER_PLAIN_ACTION(tan_action);
 ///////////////////////////////////////////////////////////////////////////////
 void print(std::string const& name, function<double(double)> f, double x)
 {
-    cout() << std::setprecision(12)
-           << name << "(" << x << ") == " << f(x) << endl;
+    cout << std::setprecision(12)
+         << name << "(" << x << ") == " << f(x) << endl;
 } 
 
 typedef plain_action3<

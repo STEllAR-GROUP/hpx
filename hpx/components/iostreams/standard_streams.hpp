@@ -22,8 +22,27 @@ namespace hpx
         HPX_COMPONENT_EXPORT lazy_ostream& cerr();
     }
 
-    using iostreams::cout;
-    using iostreams::cerr;
+    ///////////////////////////////////////////////////////////////////////////
+    struct cout_wrapper {};
+    struct cerr_wrapper {};
+
+    HPX_COMPONENT_EXPORT extern cout_wrapper cout;
+    HPX_COMPONENT_EXPORT extern cerr_wrapper cerr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline cout_wrapper& operator<< (cout_wrapper& s, T const& t)
+    {
+        iostreams::cout() << t;
+        return s;
+    }
+
+    template <typename T>
+    inline cerr_wrapper& operator<< (cerr_wrapper& s, T const& t)
+    {
+        iostreams::cerr() << t;
+        return s;
+    }
 }
 
 #endif // HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057

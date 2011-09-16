@@ -57,7 +57,7 @@ std::size_t hello_world_worker(std::size_t desired)
 
     if (current == desired)
     {
-        cout() << ( format("hello world from shepherd %1% on locality %2%")
+        cout << ( format("hello world from shepherd %1% on locality %2%")
                   % desired 
                   % get_prefix_id())
             << endl;

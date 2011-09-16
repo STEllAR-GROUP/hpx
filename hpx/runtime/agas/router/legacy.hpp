@@ -262,8 +262,34 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
 
     bool remove_prefix(naming::locality const& l, error_code& ec = throws);
 
-    bool get_console_prefix(naming::gid_type& prefix,
-                            bool try_cache = true, error_code& ec = throws);
+    /// \brief Get locality prefix of the console locality
+    ///
+    /// \param prefix     [out] The prefix value uniquely identifying the
+    ///                   console locality. This is valid only, if the 
+    ///                   return value of this function is true.
+    /// \param try_cache  [in] If this is set to true the console is first
+    ///                   tried to be found in the local cache. Otherwise
+    ///                   this function will always query AGAS, even if the 
+    ///                   console prefix is already known locally.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \returns          This function returns \a true if a console prefix 
+    ///                   exists and returns \a false otherwise.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   of hpx#exception.
+    bool get_console_prefix(naming::gid_type& prefix, bool try_cache, 
+        error_code& ec = throws);
+
+    bool get_console_prefix(naming::gid_type& prefix, error_code& ec = throws)
+    {
+        return get_console_prefix(prefix, true, ec);
+    }
 
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       components::component_type type, error_code& ec = throws);

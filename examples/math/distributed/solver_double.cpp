@@ -195,12 +195,12 @@ int console_main(variables_map& vm)
     // Create the first discovery component on this locality.
     disc_root.create(find_here());
 
-    cout() << "deploying discovery infrastructure" << endl;
+    cout << "deploying discovery infrastructure" << endl;
 
     // Deploy the scheduling infrastructure.
     std::vector<id_type> discovery_network = disc_root.build_network_sync(); 
 
-    cout() << ( format("root discovery server is at %1%")
+    cout << ( format("root discovery server is at %1%")
               % disc_root.get_gid())
            << endl;
 
@@ -214,17 +214,17 @@ int console_main(variables_map& vm)
     boost::uint32_t total_shepherds = 0;
     BOOST_FOREACH(topology_map::value_type const& kv, topology)
     {
-        cout() << ( format("locality %1% has %2% shepherds")
+        cout << ( format("locality %1% has %2% shepherds")
                   % kv.first 
                   % kv.second)
                << endl;
         total_shepherds += kv.second; 
     }
 
-    cout() << ( format("%1% localities, %2% shepherds total")
+    cout << ( format("%1% localities, %2% shepherds total")
               % topology.size()
               % total_shepherds)
-           << endl;
+         << endl;
 
     // Create the function that we're integrating.
     function<double(double const&)> f(new math_function_action);
@@ -235,7 +235,7 @@ int console_main(variables_map& vm)
     // Create the initial integrator component on this locality. 
     integ_root.create(find_here());
 
-    cout() << "deploying integration infrastructure" << endl;
+    cout << "deploying integration infrastructure" << endl;
 
     const double eps(DBL_EPSILON);
 
@@ -244,21 +244,21 @@ int console_main(variables_map& vm)
         integ_root.build_network_sync
             (discovery_network, f, tolerance, regrid_segs, eps); 
 
-    cout() << ( format("root integration server is at %1%")
+    cout << ( format("root integration server is at %1%")
               % integ_root.get_gid())
-           << endl;
+         << endl;
 
     // Print out the GIDs of the discovery and integrator servers.
     for (std::size_t i = 0; i < integrator_network.size(); ++i)
     {
         // These vectors are sorted from lowest prefix to highest prefix.
-        cout() << ( format("locality %1% infrastructure\n"
+        cout << ( format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
                                   "  integration server at %3%")
                   % get_prefix_from_id(discovery_network[i])
                   % discovery_network[i]
                   % integrator_network[i])
-               << endl; 
+             << endl; 
     }
 
     // Start the timer.
@@ -269,13 +269,13 @@ int console_main(variables_map& vm)
 
     double elapsed = t.elapsed();
 
-    cout() << ( format("integral from %.12f to %.12f is %.12f\n"
+    cout << ( format("integral from %.12f to %.12f is %.12f\n"
                        "computation took %f seconds")
               % lower_bound
               % upper_bound
               % r
               % elapsed)
-           << endl;
+         << endl;
 
     if (!vm.count("disable-monitoring"))
     {

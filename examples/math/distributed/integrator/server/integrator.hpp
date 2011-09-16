@@ -353,7 +353,7 @@ struct HPX_COMPONENT_EXPORT integrator
             if (0 >= depth)
             {
                 if (1 == points)
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] started segment %d at %f on L%d")
                         % (lower_bound + (increment * first_round))
                         % upper_bound
@@ -362,7 +362,7 @@ struct HPX_COMPONENT_EXPORT integrator
                         % t->elapsed()
                         % top_it->first) << hpx::endl;
                 else 
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] started segments %d-%d at %f on L%d")
                         % (lower_bound + (increment * first_round))
                         % upper_bound
@@ -398,7 +398,7 @@ struct HPX_COMPONENT_EXPORT integrator
             if (0 >= depth)
             {
                 if (1 == shepherds)
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] started segment %d at %f on L%d")
                         % (lower_bound + (increment * i))
                         % upper_bound
@@ -407,7 +407,7 @@ struct HPX_COMPONENT_EXPORT integrator
                         % t->elapsed()
                         % cs.prefix) << hpx::endl;
                 else 
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] started segments %d-%d at %f on L%d")
                         % (lower_bound + (increment * i))
                         % upper_bound
@@ -442,7 +442,7 @@ struct HPX_COMPONENT_EXPORT integrator
             if (0 >= depth)
             {
                 if (1 == at_c<1>(*it).shepherd)
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] segment %d on L%d completed at %f")
                         % (lower_bound + (increment * i))
                         % upper_bound
@@ -451,7 +451,7 @@ struct HPX_COMPONENT_EXPORT integrator
                         % at_c<1>(*it).prefix  
                         % t->elapsed()) << hpx::endl;
                 else
-                    hpx::cout() << (boost::format(
+                    hpx::cout << (boost::format(
                         "[%.12f/%.12f:%d] segments %d-%d on L%d completed at %f")
                         % (lower_bound + (increment * i))
                         % upper_bound

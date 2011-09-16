@@ -100,14 +100,14 @@ int master(variables_map& vm)
     // Create the first discovery component on this locality.
     disc_root.create(find_here());
 
-    cout() << "deploying discovery infrastructure" << endl;
+    cout << "deploying discovery infrastructure" << endl;
 
     // Deploy the scheduling infrastructure.
     std::vector<id_type> discovery_network = disc_root.build_network_sync(); 
 
-    cout() << ( boost::format("root discovery server is at %1%")
+    cout << ( boost::format("root discovery server is at %1%")
               % disc_root.get_gid())
-           << endl;
+         << endl;
 
     // Get this localities topology map LVA.
     topology_map* topology_ptr
@@ -119,17 +119,17 @@ int master(variables_map& vm)
     boost::uint32_t total_shepherds = 0;
     for (std::size_t i = 1; i <= topology.size(); ++i)
     {
-        cout() << ( boost::format("locality %1% has %2% shepherds")
+        cout << ( boost::format("locality %1% has %2% shepherds")
                   % i 
                   % topology[i])
-               << endl;
+             << endl;
         total_shepherds += topology[i]; 
     }
 
-    cout() << ( boost::format("%1% localities, %2% shepherds total")
+    cout << ( boost::format("%1% localities, %2% shepherds total")
               % topology.size()
               % total_shepherds)
-           << endl;
+         << endl;
 
     // Create the function that we're integrating.
     function<rational64(rational64 const&)> f(new math_function_action);
@@ -140,7 +140,7 @@ int master(variables_map& vm)
     // Create the initial integrator component on this locality. 
     integ_root.create(find_here());
 
-    cout() << "deploying integration infrastructure" << endl;
+    cout << "deploying integration infrastructure" << endl;
 
     const rational64 eps(1, boost::integer_traits<boost::int64_t>::const_max);
 
@@ -149,21 +149,21 @@ int master(variables_map& vm)
         integ_root.build_network_sync
             (discovery_network, f, tolerance, regrid_segs, eps); 
 
-    cout() << ( boost::format("root integration server is at %1%")
+    cout << ( boost::format("root integration server is at %1%")
               % integ_root.get_gid())
-           << endl;
+         << endl;
 
     // Print out the GIDs of the discovery and integrator servers.
     for (std::size_t i = 0; i < integrator_network.size(); ++i)
     {
         // These vectors are sorted from lowest prefix to highest prefix.
-        cout() << ( boost::format("locality %1% infrastructure\n"
+        cout << ( boost::format("locality %1% infrastructure\n"
                                   "  discovery server at %2%\n" 
                                   "  integration server at %3%")
                   % (i + 1)
                   % discovery_network[i]
                   % integrator_network[i])
-               << endl; 
+             << endl; 
     }
 
     // Start the timer.
@@ -174,13 +174,13 @@ int master(variables_map& vm)
 
     double elapsed = t.elapsed();
 
-    cout() << ( boost::format("integral from %1% to %2% is %3%\n"
+    cout << ( boost::format("integral from %1% to %2% is %3%\n"
                               "computation took %4% seconds")
               % boost::rational_cast<long double>(lower_bound)
               % boost::rational_cast<long double>(upper_bound)
               % boost::rational_cast<long double>(r)
               % elapsed)
-           << endl;
+         << endl;
 
     return 0;
 }

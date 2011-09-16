@@ -67,9 +67,8 @@ int hpx_main(variables_map& vm)
         agas.queryid(receives_started, receives_started_gid);
         agas.queryid(receives_completed, receives_completed_gid);
 
-        cout()
-            << receives_started << " -> " << receives_started_gid << "\n"
-            << receives_completed << " -> " << receives_completed_gid << endl; 
+        cout << receives_started << " -> " << receives_started_gid << "\n"
+             << receives_completed << " -> " << receives_completed_gid << endl; 
 
         counter_value total_started
             = performance_counter::get_value(receives_started_gid);
@@ -77,9 +76,8 @@ int hpx_main(variables_map& vm)
         counter_value total_completed
             = performance_counter::get_value(receives_completed_gid);
 
-        cout()
-            << receives_started << " -> " << total_started.value_ << "\n"
-            << receives_completed << " -> " << total_completed.value_ << endl; 
+        cout << receives_started << " -> " << total_started.value_ << "\n"
+             << receives_completed << " -> " << total_completed.value_ << endl; 
     }
 
     // Do nothing.

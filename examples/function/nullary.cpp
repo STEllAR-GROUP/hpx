@@ -48,7 +48,9 @@ HPX_REGISTER_PLAIN_ACTION(false_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void print(function<bool()> f)
-{ cout() << "f() == " << f() << endl; } 
+{ 
+    cout << "f() == " << f() << endl; 
+} 
 
 typedef plain_action1<function<bool()>, print> print_action;
 

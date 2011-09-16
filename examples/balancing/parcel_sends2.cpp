@@ -67,7 +67,7 @@ void print_count()
 
     gethostname(hostname, sizeof(hostname));
 
-    cout() << (boost::format("locality %1% (%2%, %3% shepherds) start sending "
+    cout << (boost::format("locality %1% (%2%, %3% shepherds) start sending "
                              "%4% parcels and completed sending %5% parcels")
               % a.get_prefix_id()
               % hostname

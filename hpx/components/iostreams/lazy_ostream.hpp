@@ -66,8 +66,8 @@ struct lazy_ostream
     } // }}}
 
     // Performs an asynchronous streaming operation.
-    template <typename T>
-    lazy_ostream& streaming_operator_async(T const& subject)
+    template <typename T, typename Lock>
+    lazy_ostream& streaming_operator_async(T const& subject, Lock& l)
     { // {{{
         // apply the subject to the local stream
         data->stream << subject;
@@ -96,8 +96,8 @@ struct lazy_ostream
     } // }}}
 
     // Performs a synchronous streaming operation.
-    template <typename T>
-    lazy_ostream& streaming_operator_sync(T const& subject)
+    template <typename T, typename Lock>
+    lazy_ostream& streaming_operator_sync(T const& subject, Lock& l)
     { // {{{
         // apply the subject to the local stream
         data->stream << subject;
@@ -116,7 +116,7 @@ struct lazy_ostream
             this->base_type::write_sync(gid_, next->out_buffer);
 
             // Unlock the mutex before we cleanup.
-            mtx.unlock();
+            l.unlock();
 
             delete next;
             next = 0;
@@ -133,74 +133,77 @@ struct lazy_ostream
 
     lazy_ostream(BOOST_RV_REF(lazy_ostream) other)
     {
-        if (other.mtx.try_lock())
+        mutex_type::scoped_lock l(other.mtx, boost::try_to_lock);
+        if (l)
         {
-            if (!other.data)
+            if (!other.data) {
                 HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
-                                  , "acquired dead rvalue");
+                    , "acquired dead rvalue");
+            }
             data = other.data;
             other.data = 0;
-            other.mtx.unlock();
         }
 
-        else
+        else {
             HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
-                              , "couldn't acquire lock in move constructor");
+                , "couldn't acquire lock in move constructor");
+        }
     }
 
     ~lazy_ostream()
     {
         if (threads::threadmanager_is(running))
         {
-            if (mtx.try_lock() && data)   
+            mutex_type::scoped_lock l(mtx, boost::try_to_lock);
+            if (l && data)   
             {
-                streaming_operator_sync(hpx::sync_flush);
-                delete data;
-                data = 0;
+                streaming_operator_sync(hpx::sync_flush, l);
             }
+            delete data;
+            data = 0;
         }
     }
 
     // hpx::flush manipulator (alias for hpx::sync_flush)
     lazy_ostream& operator<<(hpx::iostreams::flush_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_sync(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_sync(m, l);
     }
 
     // hpx::endl manipulator (alias for hpx::sync_endl)
     lazy_ostream& operator<<(hpx::iostreams::endl_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_sync(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_sync(m, l);
     }
 
     // hpx::sync_flush manipulator
     lazy_ostream& operator<<(hpx::iostreams::sync_flush_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_sync(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_sync(m, l);
     }
 
     // hpx::sync_endl manipulator
     lazy_ostream& operator<<(hpx::iostreams::sync_endl_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_sync(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_sync(m, l);
     }
 
     // hpx::async_flush manipulator
     lazy_ostream& operator<<(hpx::iostreams::async_flush_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_async(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_async(m, l);
     }
 
     // hpx::async_endl manipulator
     lazy_ostream& operator<<(hpx::iostreams::async_endl_type const& m)
     {
-        mtx.lock(); 
-        return streaming_operator_async(m);
+        mutex_type::scoped_lock l(mtx);
+        return streaming_operator_async(m, l);
     }
 
     template <typename T>

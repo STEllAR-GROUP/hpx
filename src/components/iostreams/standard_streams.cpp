@@ -18,158 +18,123 @@
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
     create_cout_action;
-
-HPX_REGISTER_PLAIN_ACTION(create_cout_action);
-
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cerr>
     create_cerr_action;
 
+HPX_REGISTER_PLAIN_ACTION(create_cout_action);
 HPX_REGISTER_PLAIN_ACTION(create_cerr_action);
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace iostreams
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Tag types to be used for the RAII wrappers below
+    struct raii_cout_tag {};
+    struct raii_cerr_tag {};
 
-struct cout_raii
-{
-    typedef components::managed_component<server::output_stream> ostream_type;
-
-    struct tag {};
-
-    cout_raii()
+    namespace detail
     {
-        naming::resolver_client& agas_client = get_runtime().get_agas_client();
-
-        if (agas_client.is_console())
+        std::ostream& get_outstream(raii_cout_tag)
         {
-            client.reset(new lazy_ostream(naming::id_type
-                ( components::server::create_one<ostream_type>
-                    (boost::ref(std::cout))
-                , naming::id_type::managed)));
-            agas_client.registerid
-                ( "/locality(console)/output_stream(cout)"
-                , naming::strip_credit_from_gid(client->get_raw_gid())); 
+            return std::cout;
         }
 
-        else
+        std::ostream& get_outstream(raii_cerr_tag)
         {
-            naming::gid_type gid;
-
-            if (!agas_client.queryid("/locality(console)/output_stream(cout)"
-                                   , gid))
-            {
-                naming::gid_type console;
-
-                agas_client.get_console_prefix(console);
-
-                if (HPX_UNLIKELY(!console))
-                {
-                    HPX_THROW_EXCEPTION(no_registered_console,
-                        "cout_raii::cout_raii",
-                        "couldn't contact console");
-                }
-
-                lcos::eager_future<create_cout_action>(console).get();
-
-                bool r = agas_client.queryid
-                    ("/locality(console)/output_stream(cout)", gid);
-
-                if (HPX_UNLIKELY(!r || !gid))
-                {
-                    HPX_THROW_EXCEPTION(service_unavailable,
-                        "cout_raii::cout_raii",
-                        "couldn't create cout stream on the console locality");
-                } 
-            }
-
-            client.reset(new lazy_ostream(naming::id_type
-                (gid, naming::id_type::unmanaged))); 
+            return std::cerr;
         }
     }
 
-    boost::shared_ptr<lazy_ostream> client;
-};
-
-lazy_ostream& cout()
-{
-    util::static_<cout_raii, cout_raii::tag> cout_;
-    return *cout_.get().client;  
-}
-
-void create_cout()
-{ cout(); }
-
-struct cerr_raii
-{
-    typedef components::managed_component<server::output_stream> ostream_type;
-
-    struct tag {};
-
-    cerr_raii()
+    ///////////////////////////////////////////////////////////////////////////
+    // This is a RAII wrapper managing the output stream objects (or their
+    // references) for a particular locality
+    template <typename Tag>
+    struct stream_raii
     {
-        naming::resolver_client& agas_client = get_runtime().get_agas_client();
+        typedef components::managed_component<server::output_stream> ostream_type;
 
-        if (agas_client.is_console())
+        stream_raii(char const* cout_name)
         {
-            client.reset(new lazy_ostream(naming::id_type
-                ( components::server::create_one<ostream_type>
-                    (boost::ref(std::cerr))
-                , naming::id_type::managed)));
-            agas_client.registerid
-                ( "/locality(console)/output_stream(cerr)"
-                , naming::strip_credit_from_gid(client->get_raw_gid())); 
-        }
-
-        else
-        {
-            naming::gid_type gid;
-
-            if (!agas_client.queryid("/locality(console)/output_stream(cerr)"
-                                   , gid))
+            naming::resolver_client& agas_client = get_runtime().get_agas_client();
+            if (agas_client.is_console())
             {
-                naming::gid_type console;
-
-                agas_client.get_console_prefix(console);
-
-                if (HPX_UNLIKELY(!console))
-                {
-                    HPX_THROW_EXCEPTION(no_registered_console,
-                        "cerr_raii::cerr_raii",
-                        "couldn't contact console");
-                }
-
-                lcos::eager_future<create_cerr_action>(console).get();
-
-                bool r = agas_client.queryid
-                    ("/locality(console)/output_stream(cerr)", gid);
-
-                if (HPX_UNLIKELY(!r || !gid))
-                {
-                    HPX_THROW_EXCEPTION(service_unavailable,
-                        "cerr_raii::cerr_raii",
-                        "couldn't create cerr stream on the console locality");
-                } 
+                naming::id_type cout_id(
+                    components::server::create_one<ostream_type>(
+                        boost::ref(detail::get_outstream(Tag()))),
+                    naming::id_type::managed);
+                client.reset(new lazy_ostream(cout_id));
+                agas_client.registerid (cout_name, client->get_raw_gid()); 
             }
 
-            client.reset(new lazy_ostream(naming::id_type
-                (gid, naming::id_type::unmanaged))); 
+            else
+            {
+                naming::gid_type gid;
+                if (!agas_client.queryid(cout_name, gid))
+                {
+                    naming::gid_type console;
+                    error_code ec;
+                    agas_client.get_console_prefix(console, ec);
+                    if (HPX_UNLIKELY(ec || !console))
+                    {
+                        HPX_THROW_EXCEPTION(no_registered_console,
+                            "stream_raii::stream_raii", "couldn't contact console");
+                    }
+
+                    lcos::eager_future<create_cout_action>(console).get();
+
+                    bool r = agas_client.queryid(cout_name, gid, ec);
+                    if (HPX_UNLIKELY(ec || !r || !gid))
+                    {
+                        HPX_THROW_EXCEPTION(service_unavailable,
+                            "stream_raii::stream_raii",
+                            "couldn't create cout stream on the console locality");
+                    } 
+                }
+
+                client.reset(new lazy_ostream(
+                    naming::id_type(gid, naming::id_type::managed))); 
+            }
         }
+
+        boost::shared_ptr<lazy_ostream> client;
+    };
+
+    // return the singleton stream objects
+    lazy_ostream& cout()
+    {
+        util::static_<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
+            "/locality(console)/output_stream(cout)");
+        return *cout_.get().client;  
     }
 
-    boost::shared_ptr<lazy_ostream> client;
-};
+    lazy_ostream& cerr()
+    {
+        util::static_<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
+            "/locality(console)/output_stream(cerr)");
+        return *cerr_.get().client;  
+    }
 
-lazy_ostream& cerr()
-{
-    util::static_<cerr_raii, cerr_raii::tag> cerr_;
-    return *cerr_.get().client;  
-}
+    // force the creation of the singleton stream objects
+    void create_cout()
+    { 
+        cout(); 
+    }
 
-void create_cerr()
-{ cerr(); }
-
+    void create_cerr()
+    { 
+        cerr(); 
+    }
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    cout_wrapper cout = {};
+    cerr_wrapper cerr = {};
+}
 
 #endif
 
