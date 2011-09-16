@@ -289,7 +289,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
                     bool self = true, bool try_cache = true,
@@ -319,12 +319,13 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_console_prefix(naming::gid_type& prefix, bool try_cache, 
+    bool get_console_prefix(naming::gid_type& prefix, bool try_cache = true, 
         error_code& ec = throws);
 
-    bool get_console_prefix(naming::gid_type& prefix, error_code& ec = throws)
+    bool get_console_prefix_cached(naming::gid_type& prefix, 
+        error_code& ec = throws)
     {
         return get_console_prefix(prefix, true, ec);
     }
@@ -352,7 +353,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool get_prefixes(std::vector<naming::gid_type>& prefixes,
                       components::component_type type, error_code& ec = throws);
@@ -381,7 +382,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     components::component_type
     get_component_id(std::string const& name, error_code& ec = throws);
@@ -410,7 +411,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     components::component_type
     register_factory(naming::gid_type const& prefix, std::string const& name,
@@ -457,7 +458,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool get_id_range(naming::locality const& l, count_type count, 
                       naming::gid_type& lower_bound,
@@ -490,7 +491,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             Binding a gid to a local address sets its global
@@ -529,7 +530,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             Binding a gid to a local address sets its global
@@ -549,6 +550,12 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   the function will throw on error instead.
     /// 
     /// \returns          The global reference count after the increment. 
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception. 
     count_type
     incref(naming::gid_type const& id, count_type credits = 1,
            error_code& ec = throws);
@@ -569,6 +576,12 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   the function will throw on error instead.
     /// 
     /// \returns          The global reference count after the decrement. 
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception. 
     count_type
     decref(naming::gid_type const& id, components::component_type& t,
            count_type credits = 1, error_code& ec = throws);
@@ -598,7 +611,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             This function will raise an error if the global 
@@ -635,7 +648,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             This function will raise an error if the global 
@@ -673,7 +686,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             This function will raise an error if the global 
@@ -717,7 +730,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     /// 
     /// \note             This function will raise an error if the global 
@@ -752,7 +765,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool resolve(naming::gid_type const& id, naming::address& addr,
                  bool try_cache = true, error_code& ec = throws);
@@ -790,7 +803,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool registerid(std::string const& name, naming::gid_type const& id,
                     error_code& ec = throws);
@@ -815,7 +828,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool unregisterid(std::string const& name, error_code& ec = throws);
 
@@ -824,10 +837,10 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// This function returns the global address associated with the given 
     /// global name.
     ///
-    /// string name:      [in] The global name (string) for which the 
+    /// \param name       [in] The global name (string) for which the 
     ///                   currently associated global address has to be 
     ///                   retrieved.
-    /// id_type& id:      [out] The id currently associated with the given 
+    /// \param id         [out] The id currently associated with the given 
     ///                   global name (valid only if the return value is 
     ///                   true).
     /// \param ec         [in,out] this represents the error status on exit,
@@ -842,12 +855,30 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// \note             As long as \a ec is not pre-initialized to 
     ///                   \a hpx#throws this function doesn't 
     ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws and instance
+    ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool queryid(std::string const& ns_name, naming::gid_type& id,
                  error_code& ec = throws);
 
-    bool iterateids(iterateids_function_type const& f);
+    /// Invoke the supplied \a hpx#function for every registered global name
+    ///
+    /// This function iterates over all registered global ids and 
+    /// unconditionally invokes the supplied hpx#function for ever found entry.
+    /// Any error results in an exception thrown (or reported) from this 
+    /// function.
+    /// 
+    /// \param f          [in] a \a hpx#function encapsulating an action to be
+    ///                   invoked for every currently registered global name.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    void iterateids(iterateids_function_type const& f, error_code& ec = throws);
 };
 
 }}

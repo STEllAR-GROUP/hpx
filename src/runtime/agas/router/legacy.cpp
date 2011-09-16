@@ -685,20 +685,32 @@ bool legacy_router::queryid(
         return false;
 } // }}}
 
-bool legacy_router::iterateids(
+/// Invoke the supplied hpx::function for every registered global name
+void legacy_router::iterateids(
     iterateids_function_type const& f
-) { // {{{
-    response_type r;
+  , error_code& ec
+) 
+{ // {{{
+    try {
+        response_type r;
 
-    if (is_bootstrap())
-        r = bootstrap->symbol_ns_server.iterate(f);
-    else
-        r = hosted->symbol_ns_.iterate(f);
+        if (is_bootstrap())
+            r = bootstrap->symbol_ns_server.iterate(f);
+        else
+            r = hosted->symbol_ns_.iterate(f);
 
-    if (r.get_status() == success)
-        return true;
-    else
-        return false;
+        if (&ec != &throws)
+            ec = make_error_code(r.get_status());
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::iterateids", 
+                e.what());
+        }
+        else {
+            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+        }
+    }
 } // }}}
 
 }}
