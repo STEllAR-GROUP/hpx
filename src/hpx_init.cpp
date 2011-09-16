@@ -67,19 +67,22 @@ namespace hpx { namespace detail
     // print counter value on the console
     void print_counter(std::string const& name)
     {
-        std::cout << "  " << name << std::endl;
+        std::cout << name << std::endl;
     }
 
     // redirect the printing of the given value to the console
     void list_counter(std::string const& name, naming::gid_type const& gid)
     {
-        typedef lcos::eager_future<print_counter_action> future_type;
+        char const prefix[] = "/counters";
+        std::size_t const prefix_len = sizeof(prefix)-1;
+        if (prefix_len <= name.size() && 0 == name.find(prefix_len))
+        {
+            typedef lcos::eager_future<print_counter_action> future_type;
 
-        const naming::id_type console(naming::get_gid_from_prefix(1), 
-            naming::id_type::unmanaged);
-
-        if ((4 <= name.size()) && (name.substr(0, 4) == "/pcs"))
+            naming::gid_type console;
+            naming::get_agas_client().get_console_prefix(console);
             future_type(console, name).get();
+        }
     }
 
     // iterate all registered performance counters and invoke printing their
@@ -89,14 +92,16 @@ namespace hpx { namespace detail
     {
         {
             std::cout << "registered performance counters" << std::endl; 
-            actions::function<void(std::string const&, naming::gid_type const&)>
-                cb(new list_counter_action);
-            applier::get_applier().get_agas_client().iterateids(cb);
+            typedef void iter_func(std::string const&, naming::gid_type const&);
+
+            hpx::actions::function<iter_func> cb(new list_counter_action);
+            naming::get_agas_client().iterateids(cb);
         }
 
         if (0 != f)
             return f(vm);
 
+        // we assume that we need to exit execution if no hpx_main is given
         finalize();
         return 0;
     }
@@ -505,33 +510,33 @@ namespace hpx
 #if HPX_AGAS_VERSION > 0x10
         void print_shutdown_counters(std::vector<std::string> const& names)
         {
-            std::cout << "shutdown performance counter queries\n";
+            std::cout << "performance counter values (at shutdown):\n";
 
             BOOST_FOREACH(std::string const& name, names)
             {
+                error_code ec;
                 naming::gid_type gid;
-                applier::get_applier().get_agas_client().queryid(name, gid);
+                applier::get_applier().get_agas_client().queryid(name, gid, ec);
 
-                if (HPX_UNLIKELY(!gid))
+                if (HPX_UNLIKELY(ec || !gid))
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "print_shutdown_counters",
                         boost::str(boost::format(
-                            "invalid performance counter '%s'")
-                            % name))
+                            "unknown performance counter: '%s'") % name))
                 }
 
                 using hpx::performance_counters::stubs::performance_counter;
                 using hpx::performance_counters::status_valid_data;
 
                 // Query the performance counter.
-                performance_counters::counter_value value
-                    = performance_counter::get_value(gid);
+                performance_counters::counter_value value = 
+                    performance_counter::get_value(gid);
 
                 if (HPX_LIKELY(status_valid_data == value.status_))
-                    std::cout << "  " << name << "," << value.value_ << "\n"; 
+                    std::cout << name << "," << value.value_ << "\n"; 
                 else
-                    std::cout << "  " << name << ",invalid\n"; 
+                    std::cout << name << ",invalid\n"; 
             }
         }
 #endif
@@ -594,9 +599,11 @@ namespace hpx
             if (vm.count("exit")) { 
                 if (vm.count("list-counters")) {
                     // Call list_counters, which will print out all available
-                    // performance counters and then return 0.
-                  return rt.run(boost::bind(&detail::list_counters, vm, hpx::hpx_main_func(0)),
-                        num_threads, num_localities);
+                    // performance counters and then call hpx::finalize() and 
+                    // return 0.
+                    return rt.run(boost::bind(
+                          &list_counters, vm, hpx::hpx_main_func(0)),
+                      num_threads, num_localities);
                 }
                 return 0;
             }
@@ -607,20 +614,15 @@ namespace hpx
                 return rt.run(boost::bind(&list_counters, vm, f),
                     num_threads, num_localities);
             }
-
-            if (0 != f) {
-                // Run this runtime instance using the given function f.
-                return rt.run(boost::bind(f, vm), num_threads, num_localities);
-            }
 #else
             if (vm.count("exit"))
                 return 0;
+#endif
 
             if (0 != f) {
                 // Run this runtime instance using the given function f.
                 return rt.run(boost::bind(f, vm), num_threads, num_localities);
             }
-#endif
 
             // Run this runtime instance without an hpx_main
             return rt.run(num_threads, num_localities);

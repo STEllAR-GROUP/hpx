@@ -989,14 +989,14 @@ namespace hpx { namespace threads
         std::size_t const shepherd_count = threads_.size(); 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
 
-        boost::format total_queue_length("/queue([L%d]/total)/length");
-        boost::format total_avg_maint("/time([L%d]/total)/idle-rate");
-        boost::format total_thread_cumulative("/threads([L%d]/total)/count/cumulative/all");
-        boost::format total_thread_instant("/threads([L%d]/total)/count/instantaneous/%s");
-        boost::format queue_length("/queue([L%d]/os-thread%d)/length");
-        boost::format avg_maint("/time([L%d]/os-thread#%d)/idle-rate");
-        boost::format thread_cumulative("/threads([L%d]/os-thread#%d)/count/cumulative/all");
-        boost::format thread_instant("/threads([L%d]/os-thread#%d)/count/instantaneous/%s");
+        boost::format total_queue_length("/queue([locality#%d]/total)/length");
+        boost::format total_avg_maint("/time([locality#%d]/total)/idle-rate");
+        boost::format total_thread_cumulative("/threads([locality#%d]/total)/count/cumulative/all");
+        boost::format total_thread_instant("/threads([locality#%d]/total)/count/instantaneous/%s");
+        boost::format queue_length("/queue([locality#%d]/os-thread%d)/length");
+        boost::format avg_maint("/time([locality#%d]/os-thread#%d)/idle-rate");
+        boost::format thread_cumulative("/threads([locality#%d]/os-thread#%d)/count/cumulative/all");
+        boost::format thread_instant("/threads([locality#%d]/os-thread#%d)/count/instantaneous/%s");
 
         performance_counters::counter_data counters[] = 
         {

@@ -306,7 +306,7 @@ namespace hpx { namespace parcelset
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format parcel_count("/parcels([L%d]/total)/count/%s");
+        boost::format parcel_count("/parcels([locality#%d]/total)/count/%s");
 
         performance_counters::counter_data counters[] = 
         {
