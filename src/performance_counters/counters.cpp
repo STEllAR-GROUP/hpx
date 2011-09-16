@@ -171,11 +171,13 @@ namespace hpx { namespace performance_counters
                     "empty counter name");
             return status_invalid_data;
         }
-        if (path.countername_.find_first_of("/") != std::string::npos) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "more than one path element in counter name");
-            return status_invalid_data;
-        }
+
+        // we now allow the countername to be hierarchical 
+//         if (path.countername_.find_first_of("/") != std::string::npos) {
+//             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
+//                     "more than one path element in counter name");
+//             return status_invalid_data;
+//         }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -298,11 +300,13 @@ namespace hpx { namespace performance_counters
                     "empty counter name");
             return status_invalid_data;
         }
-        if (path.countername_.find_first_of("/") != std::string::npos) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "more than one path element in counter name");
-            return status_invalid_data;
-        }
+
+        // we now allow the countername to be hierarchical 
+//         if (path.countername_.find_first_of("/") != std::string::npos) {
+//             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
+//                     "more than one path element in counter name");
+//             return status_invalid_data;
+//         }
 
         if (&ec != &throws)
             ec = make_success_code();

@@ -972,9 +972,13 @@ namespace hpx { namespace threads
         performance_counters::counter_type_data counter_types[] = 
         {
             { "/queue/length", performance_counters::counter_raw },
-            { "/threads/cumulative", performance_counters::counter_raw },
-            { "/threads/instantaneous", performance_counters::counter_raw },
-            { "/time/maintenance", performance_counters::counter_raw }
+            { "/threads/count/cumulative/all", performance_counters::counter_raw },
+            { "/threads/count/instantaneous/all", performance_counters::counter_raw },
+            { "/threads/count/instantaneous/active", performance_counters::counter_raw },
+            { "/threads/count/instantaneous/pending", performance_counters::counter_raw },
+            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw },
+            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw },
+            { "/time/idle-rate", performance_counters::counter_raw }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -982,17 +986,17 @@ namespace hpx { namespace threads
         typedef scheduling_policy_type spt;
         typedef threadmanager_impl ti;
 
-        const std::size_t shepherd_count = threads_.size(); 
-        const boost::uint32_t prefix = applier::get_applier().get_prefix_id();
+        std::size_t const shepherd_count = threads_.size(); 
+        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
 
-        boost::format total_queue_length("/queue([L%d]/threadmanager)/length");
-        boost::format total_avg_maint("/time([L%d]/threadmanager)/maintenance");
-        boost::format total_thread_cumulative("/threads([L%d]/total/%s)/cumulative");
-        boost::format total_thread_instant("/threads([L%d]/total/%s)/instantaneous");
-        boost::format queue_length("/queue([L%d]/shepherd#%d)/length");
-        boost::format avg_maint("/time([L%d]/shepherd#%d)/maintenance");
-        boost::format thread_cumulative("/threads([L%d]/shepherd#%d/%s)/cumulative");
-        boost::format thread_instant("/threads([L%d]/shepherd#%d/%s)/instantaneous");
+        boost::format total_queue_length("/queue([L%d]/total)/length");
+        boost::format total_avg_maint("/time([L%d]/total)/idle-rate");
+        boost::format total_thread_cumulative("/threads([L%d]/total)/count/cumulative/all");
+        boost::format total_thread_instant("/threads([L%d]/total)/count/instantaneous/%s");
+        boost::format queue_length("/queue([L%d]/os-thread%d)/length");
+        boost::format avg_maint("/time([L%d]/os-thread#%d)/idle-rate");
+        boost::format thread_cumulative("/threads([L%d]/os-thread#%d)/count/cumulative/all");
+        boost::format thread_instant("/threads([L%d]/os-thread#%d)/count/instantaneous/%s");
 
         performance_counters::counter_data counters[] = 
         {
@@ -1001,9 +1005,9 @@ namespace hpx { namespace threads
               boost::bind(&spt::get_queue_length, &scheduler_, -1) },
             // Locality-wide % time spent in maintenance
             { boost::str(total_avg_maint % prefix),
-              boost::bind(&ti::avg_maint_ratio, this) },
+              boost::bind(&ti::avg_idle_rate, this) },
             // Locality-wide thread count (cumulative)
-            { boost::str(total_thread_cumulative % prefix % "all"),
+            { boost::str(total_thread_cumulative % prefix),
               boost::bind(&ti::get_executed_threads, this, -1) },
             // Locality-wide thread count (instantaneous)
             { boost::str(total_thread_instant % prefix % "all"),
@@ -1033,9 +1037,9 @@ namespace hpx { namespace threads
                   boost::bind(&spt::get_queue_length, &scheduler_, i) },
                 // % time spent in maintenance 
                 { boost::str(avg_maint % prefix % i),
-                  boost::bind(&ti::avg_maint_ratio, this, i) },
+                  boost::bind(&ti::avg_idle_rate, this, i) },
                 // Thread count (instantaneous)
-                { boost::str(thread_cumulative % prefix % i % "all"),
+                { boost::str(thread_cumulative % prefix % i),
                   boost::bind(&ti::get_executed_threads, this, i) },
                 // Thread count (instantaneous)
                 { boost::str(thread_instant % prefix % i % "all"),
@@ -1334,12 +1338,15 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        avg_maint_ratio() const
+        avg_idle_rate() const
     {
         boost::uint64_t const exec_total = 
-          std::accumulate(exec_times.begin(), exec_times.end(), 0ULL);
+            std::accumulate(exec_times.begin(), exec_times.end(), 0ULL);
         boost::uint64_t const tfunc_total = 
-          std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0ULL);
+            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0ULL);
+
+        if (0 == tfunc_total)   // avoid division by zero
+            return 1000LL;
 
         double const percent = 1. - (double(exec_total) / tfunc_total);
         return boost::int64_t(1000. * percent);    // 0.1 percent
@@ -1347,8 +1354,11 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        avg_maint_ratio(std::size_t num_thread) const
+        avg_idle_rate(std::size_t num_thread) const
     {
+        if (0 == tfunc_times[num_thread])   // avoid division by zero
+            return 1000LL;
+
         double const percent = 
             1. - (double(exec_times[num_thread]) / tfunc_times[num_thread]);
         return boost::int64_t(1000. * percent);   // 0.1 percent

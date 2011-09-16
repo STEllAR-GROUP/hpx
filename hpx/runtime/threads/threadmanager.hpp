@@ -581,8 +581,8 @@ namespace hpx { namespace threads
         void set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// Get percent maintenance time in main thread-manager loop.
-        boost::int64_t avg_maint_ratio() const;
-        boost::int64_t avg_maint_ratio(std::size_t num_thread) const;
+        boost::int64_t avg_idle_rate() const;
+        boost::int64_t avg_idle_rate(std::size_t num_thread) const;
 
     protected:
         // this is the thread function executing the work items in the queue
