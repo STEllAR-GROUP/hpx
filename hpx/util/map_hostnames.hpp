@@ -44,7 +44,7 @@ namespace hpx { namespace util
             // do full host name resolution
             boost::asio::io_service io_service;
             boost::asio::ip::tcp::endpoint ep =
-                util::resolve_hostname(host_name, port, io_service);
+                util::resolve_hostname(host_name + suffix_, port, io_service);
 
             std::string resolved_addr(util::get_endpoint_name(ep));
             if (debug_) {

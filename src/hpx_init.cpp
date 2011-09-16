@@ -959,8 +959,9 @@ namespace hpx
                     cmd_line += " ";
             }
 
-            // Store the command line.
-            ini_config += "hpx.cmd_line=" + cmd_line; 
+            // Store the program name and the command line.
+            ini_config += "hpx.program_name=" + std::string(argv[0]);
+            ini_config += "hpx.cmd_line=" + cmd_line;
 
             // Set number of OS threads in configuration. 
             ini_config += "hpx.os_threads=" + 
@@ -974,8 +975,8 @@ namespace hpx
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS 
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.
-            ini_config += std::string("hpx.runtime_mode=")
-                        + get_runtime_mode_name(mode); 
+            ini_config += std::string("hpx.runtime_mode=") +
+                get_runtime_mode_name(mode); 
 
             if (debug_clp) {
                 std::cerr << "Configuration before runtime start:\n";
