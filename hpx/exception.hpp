@@ -349,7 +349,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// Extract the diagnostic information embedded in the given exception and
     /// return a string holding a formatted message.
-    inline std::string diagnostic_information(boost::exception const& e);
+    inline std::string diagnostic_information(boost::exception const& e)
     {
         return detail::diagnostic_information(e);
     }
