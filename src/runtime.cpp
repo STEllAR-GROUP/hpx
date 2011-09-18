@@ -22,6 +22,7 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
+#include <hpx/include/performance_counters.hpp>
 
 #if HPX_AGAS_VERSION > 0x10
     #include <hpx/runtime/agas/router/big_boot_barrier.hpp>
@@ -718,6 +719,28 @@ namespace hpx
         runtime::runtime_.reset();
     }
 
+    /// \brief Install all performance counters related to this runtime 
+    ///        instance
+    void runtime::install_counters()
+    {
+        performance_counters::counter_type_data counter_types[] = 
+        {
+            { "/runtime/uptime", performance_counters::counter_elapsed_time }
+        };
+        performance_counters::install_counter_types(
+            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+
+        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
+        boost::format runtime_uptime("/runtime([locality#%d]/total)/uptime");
+        performance_counters::counter_data counters[] = 
+        {
+            { boost::str(runtime_uptime % prefix) }
+        };
+        performance_counters::install_counters(
+            counters, sizeof(counters)/sizeof(counters[0]));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
         BOOST_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized

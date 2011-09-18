@@ -74,8 +74,7 @@ namespace hpx { namespace detail
     void list_counter(std::string const& name, naming::gid_type const& gid)
     {
         char const prefix[] = "/counters";
-        std::size_t const prefix_len = sizeof(prefix)-1;
-        if (prefix_len <= name.size() && 0 == name.find(prefix_len))
+        if (sizeof(prefix)-1 <= name.size() && 0 == name.find(prefix))
         {
             typedef lcos::eager_future<print_counter_action> future_type;
 
@@ -516,7 +515,7 @@ namespace hpx
             {
                 error_code ec;
                 naming::gid_type gid;
-                applier::get_applier().get_agas_client().queryid(name, gid, ec);
+                naming::get_agas_client().queryid(name, gid, ec);
 
                 if (HPX_UNLIKELY(ec || !gid))
                 {
@@ -530,11 +529,9 @@ namespace hpx
                 using hpx::performance_counters::status_valid_data;
 
                 // Query the performance counter.
-                performance_counters::counter_value value = 
-                    performance_counter::get_value(gid);
-
-                if (HPX_LIKELY(status_valid_data == value.status_))
-                    std::cout << name << "," << value.value_ << "\n"; 
+                double value = performance_counter::get_typed_value<double>(gid, ec);
+                if (!ec)
+                    std::cout << name << "," << value << "\n"; 
                 else
                     std::cout << name << ",invalid\n"; 
             }

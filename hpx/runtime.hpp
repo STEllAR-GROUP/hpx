@@ -155,6 +155,10 @@ namespace hpx
 #endif
         }
 
+        /// \brief Install all performance counters related to this runtime 
+        ///        instance
+        void install_counters();
+
 #if HPX_AGAS_VERSION > 0x10
         virtual util::io_service_pool& get_io_pool() = 0; 
 #endif

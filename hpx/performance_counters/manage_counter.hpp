@@ -22,6 +22,7 @@ namespace hpx { namespace performance_counters
             uninstall();
         }
 
+        // install a counter which extracts the value fro a given function
         counter_status install(std::string const& name,
             boost::function<boost::int64_t()> const& f, error_code& ec = throws)
         {
@@ -33,6 +34,19 @@ namespace hpx { namespace performance_counters
  
             info_.fullname_ = name;
             return add_counter(info_, f, counter_, ec);
+        }
+
+        // install a self-contained counter
+        counter_status install(std::string const& name, error_code& ec = throws)
+        {
+            if (0 != counter_) {
+                HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install", 
+                    "counter has been already installed");
+                return status_invalid_data;
+            }
+ 
+            info_.fullname_ = name;
+            return add_counter(info_, counter_, ec);
         }
 
         void uninstall()
@@ -55,6 +69,9 @@ namespace hpx { namespace performance_counters
     /// automatically during shutdown.
     HPX_EXPORT void install_counter(std::string const& name,
         boost::function<boost::int64_t()> const& f, error_code& ec = throws); 
+
+    HPX_EXPORT void install_counter(std::string const& name,
+        error_code& ec = throws); 
 
     /// A small data structure holding all data needed to install a counter 
     struct counter_data

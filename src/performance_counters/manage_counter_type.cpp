@@ -29,8 +29,8 @@ namespace hpx { namespace performance_counters
         p->install(name, type, ec);  
 
         // Register the shutdown function which will clean up this counter type.
-        get_runtime().add_shutdown_function
-            (boost::bind(&counter_type_shutdown, p));
+        get_runtime().add_shutdown_function(
+            boost::bind(&counter_type_shutdown, p));
     }
 
     void install_counter_types(counter_type_data const* data, std::size_t count, 

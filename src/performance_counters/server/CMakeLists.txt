@@ -4,5 +4,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_library_sources(hpx
-  raw_counter.cpp)
+  raw_counter.cpp
+  elapsed_time_counter.cpp)
 

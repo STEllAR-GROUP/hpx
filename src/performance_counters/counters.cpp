@@ -18,7 +18,7 @@
 #include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the performance counter  actions
+// Initialization support for the performance counter actions
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action, 
     performance_counter_get_counter_info_action);
@@ -32,6 +32,19 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_result_action, 
     set_result_action_counter_value);
+
+HPX_DEFINE_GET_COMPONENT_TYPE(
+    hpx::performance_counters::server::base_performance_counter);
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace actions
+{
+    template hpx::performance_counters::counter_info const& 
+    continuation::trigger(hpx::performance_counters::counter_info const& arg0);
+
+    template hpx::performance_counters::counter_value const& 
+    continuation::trigger(hpx::performance_counters::counter_value const& arg0);
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -338,16 +351,27 @@ namespace hpx { namespace performance_counters
     }
 
     /// \brief Complement the counter info if parent instance name is missing
-    counter_status complement_counter_info(counter_info& info, error_code& ec)
+    counter_status complement_counter_info(counter_info& info, 
+        counter_info const& type_info, error_code& ec)
+    {
+        info.type_ = type_info.type_;
+        if (info.helptext_.empty())
+            info.helptext_ = type_info.helptext_;
+        return complement_counter_info(info, ec);
+    }
+
+    counter_status complement_counter_info(counter_info& info, 
+        error_code& ec)
     {
         counter_path_elements p;
 
         counter_status status = get_counter_path_elements(info.fullname_, p, ec);
         if (status_valid_data != status) return status;
 
-        if (p.parentinstancename_.empty())
-            p.parentinstancename_ = boost::str(boost::format("[L%d]")
-                                  % applier::get_applier().get_prefix_id());
+        if (p.parentinstancename_.empty()) {
+            p.parentinstancename_ = boost::str(boost::format("[locality#%d]") % 
+                applier::get_applier().get_prefix_id());
+        }
 
         return get_counter_name(p, info.fullname_, ec);
     }

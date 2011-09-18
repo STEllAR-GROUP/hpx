@@ -43,6 +43,13 @@ namespace hpx { namespace performance_counters
             info, f, id, ec);
     }
 
+    performance_counters::counter_status add_counter(
+        performance_counters::counter_info const& info, 
+        naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().add_counter(info, id, ec);
+    }
+
     performance_counters::counter_status remove_counter(
         performance_counters::counter_info const& info, 
         naming::id_type const& id, error_code& ec)

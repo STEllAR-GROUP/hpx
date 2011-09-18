@@ -87,13 +87,13 @@ namespace hpx { namespace performance_counters
         /// elapse in one second. The value of F is factored into the equation 
         /// so that the result is displayed in seconds.
         ///
-        /// Formula:  (D0 - N0) / F, where the denominator (D) represents the 
+        /// Formula:  (D0 - N0) / F, where the nominator (D) represents the 
         ///           current time, the numerator (N) represents the time the 
         ///           object was started, and the variable F represents the 
         ///           number of time units that elapse in one second.
         /// Average:  (Dx - N0) / F
         /// Type:     Difference
-        counter_elapsed_time,
+        counter_elapsed_time
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -238,18 +238,27 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Complement the counter info if parent instance name is missing
     HPX_API_EXPORT counter_status complement_counter_info(counter_info& info, 
+        counter_info const& type_info, error_code& ec = throws);
+
+    HPX_API_EXPORT counter_status complement_counter_info(counter_info& info, 
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     struct counter_value
     {
-        counter_value(boost::int64_t value = 0)
-          : status_(status_new_data), time_(), value_(value)
+        counter_value(boost::int64_t value = 0, boost::int64_t scaling = 1, 
+                bool scale_inverse = false)
+          : status_(status_new_data), time_(), 
+            value_(value), scaling_(scaling), scale_inverse_(scale_inverse)
         {}
 
         counter_status status_;     ///< The status of the counter value
         boost::int64_t time_;       ///< The local time when data was collected
         boost::int64_t value_;      ///< The current counter value
+        boost::int64_t scaling_;    ///< The scaling of the current counter value
+        bool scale_inverse_;        ///< If true, value_ needs to be deleted by 
+                                    ///< scaling_, otherwise it has to be 
+                                    ///< multiplied.
 
     private:
         // serialization support
@@ -258,10 +267,9 @@ namespace hpx { namespace performance_counters
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & status_ & time_ & value_;
+            ar & status_ & time_ & value_ & scaling_ & scale_inverse_;
         }
     };
-
 }}
 
 #endif

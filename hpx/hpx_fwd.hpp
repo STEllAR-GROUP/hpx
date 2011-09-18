@@ -539,6 +539,12 @@ namespace hpx
             counter_info const& info, boost::function<boost::int64_t()> f, 
             naming::id_type& id, error_code& ec = throws);
 
+        /// \brief Create a new performance counter instance based on given
+        ///        counter info
+        HPX_API_EXPORT counter_status add_counter(
+            counter_info const& info, naming::id_type& id, 
+            error_code& ec = throws);
+
          /// \brief Remove an existing performance counter instance with the 
          ///        given id (as returned from \a add_counter)
          HPX_API_EXPORT counter_status remove_counter(

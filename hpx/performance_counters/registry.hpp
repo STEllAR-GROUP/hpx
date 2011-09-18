@@ -47,6 +47,11 @@ namespace hpx { namespace performance_counters
             boost::function<boost::int64_t()> f, naming::id_type& id, 
             error_code& ec = throws);
 
+        /// \brief Create a new performance counter instance based on given
+        ///        counter info
+        counter_status add_counter(counter_info const& info, 
+            naming::id_type& id, error_code& ec = throws);
+
         /// 
         counter_status remove_counter(counter_info const& info, 
             naming::id_type const& id, error_code& ec = throws);

@@ -7,7 +7,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/server/raw_counter.hpp>
+#include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 
 #include <boost/version.hpp>
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
@@ -18,38 +18,37 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
-    hpx::performance_counters::server::raw_counter
-> raw_counter_type;
+    hpx::performance_counters::server::elapsed_time_counter
+> elapsed_time_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    raw_counter_type, raw_counter, "base_performance_counter");
+    elapsed_time_counter_type, elapsed_time_counter, "base_performance_counter");
 HPX_DEFINE_GET_COMPONENT_TYPE(
-    hpx::performance_counters::server::raw_counter);
+    hpx::performance_counters::server::elapsed_time_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    raw_counter::raw_counter(counter_info const& info, 
-            boost::function<boost::int64_t()> f)
-      : info_(info), f_(f)
+    elapsed_time_counter::elapsed_time_counter(counter_info const& info)
+      : info_(info)
     {
-        if (info.type_ != counter_raw) {
+        if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter, 
-                "raw_counter::raw_counter",
-                "unexpected counter type specified for raw_counter");
+                "elapsed_time_counter::elapsed_time_counter",
+                "unexpected counter type specified for elapsed_time_counter");
         }
     }
 
-    void raw_counter::get_counter_info(counter_info& info)
+    void elapsed_time_counter::get_counter_info(counter_info& info)
     {
         info = info_;
     }
 
-    void raw_counter::get_counter_value(counter_value& value)
+    void elapsed_time_counter::get_counter_value(counter_value& value)
     {
-        value.value_ = f_();                // gather the current value
-        value.scaling_ = 1;
-        value.scale_inverse_ = false;
+        value.value_ = timer_.elapsed() * 10e8;     // gather the current value
+        value.scaling_ = 10e8;
+        value.scale_inverse_ = true;
         value.status_ = status_valid_data;
         value.time_ = boost::chrono::high_resolution_clock::now().
             time_since_epoch().count();

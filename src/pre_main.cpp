@@ -63,7 +63,7 @@ const char* third_barrier = "/barrier(agas#0)/third_stage";
 ///////////////////////////////////////////////////////////////////////////////
 void pre_main(runtime_mode mode)
 {
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    naming::resolver_client& agas_client = naming::get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
     if (runtime_mode_connect == mode)
@@ -81,11 +81,11 @@ void pre_main(runtime_mode mode)
             (find_here());
 
         // Install performance counter startup functions for core subsystems.
-        applier::get_applier().get_thread_manager().install_counters();
+        get_runtime().install_counters();
+        threads::get_thread_manager().install_counters();
         applier::get_applier().get_parcel_handler().install_counters();
 
-        components::stubs::runtime_support::call_startup_functions
-            (find_here());
+        components::stubs::runtime_support::call_startup_functions(find_here());
     }
 
     else
@@ -133,11 +133,11 @@ void pre_main(runtime_mode mode)
         second_stage.wait();
 
         // Install performance counter startup functions for core subsystems.
-        applier::get_applier().get_thread_manager().install_counters();
+        get_runtime().install_counters();
+        threads::get_thread_manager().install_counters();
         applier::get_applier().get_parcel_handler().install_counters();
 
-        components::stubs::runtime_support::call_startup_functions
-            (find_here());
+        components::stubs::runtime_support::call_startup_functions(find_here());
 
         // Third stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
