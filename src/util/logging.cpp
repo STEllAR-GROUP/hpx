@@ -30,14 +30,18 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        int get_log_level(std::string const& env)
+        int get_log_level(std::string const& env, bool allow_always = false)
         {
             try {
                 int env_val = boost::lexical_cast<int>(env);
-                if (env_val <= 0)
+                if (env_val < 0)
                     return boost::logging::level::disable_all;
 
                 switch (env_val) {
+                case 0:
+                    return allow_always ? 
+                        boost::logging::level::always :
+                        boost::logging::level::disable_all;
                 case 1:   return boost::logging::level::fatal;
                 case 2:   return boost::logging::level::error;
                 case 3:   return boost::logging::level::warning;
@@ -105,6 +109,8 @@ namespace hpx { namespace util
             return "   <error>";
         case boost::logging::level::fatal:
             return "   <fatal>";
+        case boost::logging::level::always:
+            return "  <always>";
         }
         // FIXME: This one will screw up the formatting.
         //return "<" + boost::lexical_cast<std::string>(level) + ">";
@@ -449,7 +455,7 @@ namespace hpx { namespace util
 
         unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
-            lvl = detail::get_log_level(loglevel);
+            lvl = detail::get_log_level(loglevel, true);
 
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
@@ -581,7 +587,7 @@ namespace hpx { namespace util
 
         unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
-            lvl = detail::get_log_level(loglevel);
+            lvl = detail::get_log_level(loglevel, true);
 
         if (boost::logging::level::disable_all != lvl) 
         {
@@ -618,7 +624,7 @@ namespace hpx { namespace util
 
         unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
-            lvl = detail::get_log_level(loglevel);
+            lvl = detail::get_log_level(loglevel, true);
 
         if (boost::logging::level::disable_all != lvl) 
         {
@@ -655,7 +661,7 @@ namespace hpx { namespace util
 
         unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
-            lvl = detail::get_log_level(loglevel);
+            lvl = detail::get_log_level(loglevel, true);
 
         if (logdest.empty())      // ensure minimal defaults
             logdest = "cerr";
@@ -691,7 +697,7 @@ namespace hpx { namespace util
 
         unsigned lvl = boost::logging::level::disable_all;
         if (!loglevel.empty()) 
-            lvl = detail::get_log_level(loglevel);
+            lvl = detail::get_log_level(loglevel, true);
 
         if (boost::logging::level::disable_all != lvl) 
         {
@@ -723,7 +729,7 @@ namespace hpx { namespace util { namespace detail
 #if defined(BOOST_WINDOWS)
 #define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
 #else
-#define HPX_TIMEFORMAT "$hh:$mm.$ss"
+#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
 #endif
 
     logging_configuration::logging_configuration()
@@ -734,66 +740,66 @@ namespace hpx { namespace util { namespace detail
             using namespace boost::assign;
             prefill_ +=
                 // general logging
-                    "[hpx.logging]",
-                    "level = ${HPX_LOGLEVEL:0}",
-                    "destination = ${HPX_LOGDESTINATION:console}",
-                    "format = ${HPX_LOGFORMAT:"
-                        "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
-                        ") [%idx%]|\\n}",
+                "[hpx.logging]",
+                "level = ${HPX_LOGLEVEL:0}",
+                "destination = ${HPX_LOGDESTINATION:console}",
+                "format = ${HPX_LOGFORMAT:"
+                    "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    ") [%idx%]|\\n}",
 
                 // general console logging
-                    "[hpx.logging.console]",
-                    "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
-                    "destination = ${HPX_CONSOLE_LOGDESTINATION:file(hpx.$[system.pid].log)}",
-                    "format = ${HPX_CONSOLE_LOGFORMAT:|}",
+                "[hpx.logging.console]",
+                "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
+                "destination = ${HPX_CONSOLE_LOGDESTINATION:file(hpx.$[system.pid].log)}",
+                "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
                 // logging related to timing
-                    "[hpx.logging.timing]",
-                    "level = ${HPX_TIMING_LOGLEVEL:0}",
-                    "destination = ${HPX_TIMING_LOGDESTINATION:console}",
-                    "format = ${HPX_TIMING_LOGFORMAT:"
-                        "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
-                        ") [%idx%] [TIM] |\\n}",
+                "[hpx.logging.timing]",
+                "level = ${HPX_TIMING_LOGLEVEL:-1}",
+                "destination = ${HPX_TIMING_LOGDESTINATION:console}",
+                "format = ${HPX_TIMING_LOGFORMAT:"
+                    "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
-                    "[hpx.logging.console.timing]",
-                    "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
-                    "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
-                    "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
+                "[hpx.logging.console.timing]",
+                "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
+                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
                 // logging related to AGAS
-                    "[hpx.logging.agas]",
-                    "level = ${HPX_AGAS_LOGLEVEL:0}",
+                "[hpx.logging.agas]",
+                "level = ${HPX_AGAS_LOGLEVEL:-1}",
 //                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
-                    "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
-                    "format = ${HPX_AGAS_LOGFORMAT:"
-                        "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                        "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
-                        ") [%idx%][AGAS] |\\n}",
+                "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "format = ${HPX_AGAS_LOGFORMAT:"
+                    "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
-                    "[hpx.logging.console.agas]",
-                    "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
-                    "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
-                    "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+                "[hpx.logging.console.agas]",
+                "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
+                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to applications
-                    "[hpx.logging.application]",
-                    "level = ${HPX_APP_LOGLEVEL:0}",
-                    "destination = ${HPX_APP_LOGDESTINATION:console}",
-                    "format = ${HPX_APP_LOGFORMAT:"
-                      "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                      "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
-                      ") [%idx%] [APP] |\\n}",
+                "[hpx.logging.application]",
+                "level = ${HPX_APP_LOGLEVEL:-1}",
+                "destination = ${HPX_APP_LOGDESTINATION:console}",
+                "format = ${HPX_APP_LOGFORMAT:"
+                    "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
-                    "[hpx.logging.console.application]",
-                    "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
-                    "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
-                    "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}"
-                ;
+                "[hpx.logging.console.application]",
+                "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
+                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}"
+            ;
         }
         catch (std::exception const&) {
             // just in case something goes wrong

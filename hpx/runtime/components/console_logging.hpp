@@ -31,7 +31,8 @@ namespace hpx { namespace components
         enum { max_pending = 128 };
 
         pending_logs()
-            : prefix_(naming::invalid_id), activated_(false), queue_size_(0) {}
+          : prefix_(naming::invalid_id), activated_(false), queue_size_(0) 
+        {}
 
         void add(message_type const& msg);
 
@@ -43,6 +44,7 @@ namespace hpx { namespace components
         }
 
       private:
+        bool ensure_prefix();
         void send();
 
         prefix_mutex_type prefix_mtx_;

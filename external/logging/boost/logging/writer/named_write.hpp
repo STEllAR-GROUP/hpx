@@ -32,20 +32,20 @@
 #include <boost/logging/format/formatter/named_spacer.hpp>
 #include <boost/logging/format/formatter/thread_id.hpp>
 
-#ifndef __GNUC__
-// Boost 1.33.1 - GCC has error compiling microsec_clock
+// #ifndef __GNUC__
+// // Boost 1.33.1 - GCC has error compiling microsec_clock
 #include <boost/logging/format/formatter/high_precision_time.hpp>
 namespace boost { namespace logging { namespace detail { 
     typedef formatter::high_precision_time formatter_time_type ; 
     typedef formatter::high_precision_time_t<formatter::do_convert_format::append> formatter_time_type_append ; 
 }}}
-#else
-#include <boost/logging/format/formatter/time.hpp>
-namespace boost { namespace logging { namespace detail { 
-    typedef formatter::time formatter_time_type ; 
-    typedef formatter::time_t<formatter::do_convert_format::append> formatter_time_type_append ; 
-}}}
-#endif
+// #else
+// #include <boost/logging/format/formatter/time.hpp>
+// namespace boost { namespace logging { namespace detail { 
+//     typedef formatter::time formatter_time_type ; 
+//     typedef formatter::time_t<formatter::do_convert_format::append> formatter_time_type_append ; 
+// }}}
+// #endif
 
 
 namespace boost { namespace logging { namespace writer {

@@ -69,23 +69,31 @@ void pending_logs::add(message_type const& msg)
     {
         queue_mutex_type::scoped_lock l(queue_mtx_); 
         queue_.push_back(msg);
+        ++queue_size_;
     }
 
-    ++queue_size_;
-
-    if (threads::threadmanager_is(running) && threads::get_self_ptr()
-       && activated_.load() && (max_pending < queue_size_.load())) 
+    // invoke actual logging immediately if we're on the console
+    if (naming::get_agas_client().is_console()) 
+    {
         send();
+    }
+    else if (threads::threadmanager_is(running) && threads::get_self_ptr() && 
+        activated_.load() && (max_pending < queue_size_.load())) 
+    {
+        send();
+    }
 }
 
 void pending_logs::cleanup()
 {
-    if (threads::threadmanager_is(running) && threads::get_self_ptr()
-       && activated_.load() && (0 < queue_size_.load())) 
+    if (threads::threadmanager_is(running) && threads::get_self_ptr() && 
+        activated_.load() && (0 < queue_size_.load())) 
+    {
         send();
+    }
 }
 
-void pending_logs::send()
+bool pending_logs::ensure_prefix()
 {
     // Resolve the console prefix if it's still invalid.
     if (HPX_UNLIKELY(naming::invalid_id == prefix_))
@@ -95,23 +103,31 @@ void pending_logs::send()
         if (l.owns_lock() && (naming::invalid_id == prefix_))
         {
             naming::gid_type raw_prefix;
-            get_runtime().get_agas_client().get_console_prefix(raw_prefix);
+            naming::get_agas_client().get_console_prefix(raw_prefix);
             BOOST_ASSERT(naming::invalid_gid != raw_prefix);
             prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
         }
 
         // Someone else started getting the console prefix.
-        else
-            return;
+        else {
+            return false;
+        }
     }
+    return true;
+}
+
+void pending_logs::send()
+{
+    if (!ensure_prefix())
+        return;
+
     messages_type msgs;
-    
     {
         queue_mutex_type::scoped_lock l(queue_mtx_);
         queue_.swap(msgs);
+        queue_size_.store(0);
     }
 
-    queue_size_.store(0);
 
     if (!msgs.empty())
         console_logging_locked(prefix_, msgs);

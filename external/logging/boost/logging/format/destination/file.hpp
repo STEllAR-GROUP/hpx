@@ -73,12 +73,16 @@ namespace detail {
     struct file_info {
         file_info(const std::string& name_, file_settings settings_) 
             : name(name_), 
-              out( new std::basic_ofstream<char_type>
-                  ( name_.c_str(), open_flags(settings_) )), 
+//               out( new std::basic_ofstream<char_type>
+//                   ( name_.c_str(), open_flags(settings_) )), 
               settings(settings_) {}
 
-        void reopen() {
-            out = boost::shared_ptr< std::basic_ofstream<char_type> > ( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) ) );
+        void open() {
+            out.reset( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) ) );
+        }
+
+        void close() {
+            out.reset();
         }
 
         std::string name;
@@ -101,6 +105,8 @@ template<class convert_dest = do_convert_destination > struct file_t : is_generi
     */
     file_t(const std::string & file_name, file_settings set = file_settings() ) : non_const_context_base(file_name,set) {}
     template<class msg_type> void operator()(const msg_type & msg) const {
+        if (!non_const_context_base::context().out)
+            non_const_context_base::context().open();   // make sure file is opened
         convert_dest::write(msg, *( non_const_context_base::context().out) );
         if ( non_const_context_base::context().settings.flush_each_time() )
             non_const_context_base::context().out->flush();
@@ -115,8 +121,8 @@ template<class convert_dest = do_convert_destination > struct file_t : is_generi
     */
     void configure(const hold_string_type & str) {
         // configure - the file name, for now
+        non_const_context_base::context().close();
         non_const_context_base::context().name.assign( str.begin(), str.end() );
-        non_const_context_base::context().reopen();
     }
 };
 

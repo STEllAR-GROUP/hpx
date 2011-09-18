@@ -38,16 +38,26 @@ namespace hpx { namespace detail
         boost::uint32_t node, boost::int64_t shepherd, std::size_t thread_id,
         std::string const& thread_name)
     {
-        throw boost::enable_current_exception(
-            boost::enable_error_info(e) 
-                << throw_stacktrace(back_trace)
-                << throw_locality(node)
-                << throw_shepherd(shepherd)
-                << throw_thread_id(thread_id)
-                << throw_thread_name(thread_name)
-                << throw_function(func) 
-                << throw_file(file)
-                << throw_line(line));
+        try {
+            // create a boost::exception object encapsulating the Exception to 
+            // be thrown and annotate it with all the local information we have
+            throw boost::enable_current_exception(
+                boost::enable_error_info(e) 
+                    << throw_stacktrace(back_trace)
+                    << throw_locality(node)
+                    << throw_shepherd(shepherd)
+                    << throw_thread_id(thread_id)
+                    << throw_thread_name(thread_name)
+                    << throw_function(func) 
+                    << throw_file(file)
+                    << throw_line(line));
+        }
+        catch (boost::exception const& e) {
+            // log the exception information in any case
+            LERR_(always) << "rethrow_exception: throwing exception: " 
+                << diagnostic_information(e);
+            throw;      // rethrow whatever has been caught
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -169,7 +179,6 @@ namespace hpx { namespace detail
                 hpx::exception(hpx::assertion_failure, str), 
                 function, p.string(), line);
         }
-
         catch (...) {
             threw = true;
 
@@ -179,7 +188,7 @@ namespace hpx { namespace detail
                 get_runtime().report_error(boost::current_exception());
             }
             else {
-                std::cerr << "Runtime is not available, reporting error locally\n"
+                std::cerr << "Runtime is not available, reporting error locally. "
                     << diagnostic_information(boost::current_exception())
                     << std::flush; 
             }
@@ -187,10 +196,12 @@ namespace hpx { namespace detail
 
         // If the exception wasn't thrown, then print out the assertion message,
         // so that the program doesn't abort without any diagnostics.
-        if (!threw)
+        // 
+        // FIXME: why should the exception be not thrown above?
+        if (!threw) {
             std::cerr << "Runtime is not available, reporting error locally\n"
                          "[what]: " << str << std::endl; 
-
+        }
         std::abort();
     }
 
@@ -200,130 +211,80 @@ namespace hpx { namespace detail
     std::string diagnostic_information(boost::exception const& e)
     {
         util::osstream strm;
-
-        bool done_first = false;
+        strm << "\n";
 
         std::string const* back_trace = 
             boost::get_error_info<hpx::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[stack_trace]: " << *back_trace;
+            strm << "[stack_trace]: " << *back_trace << "\n";
         }
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        if (se)
-        {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[what]: " << se->what();
-        }
+        if (se) 
+            strm << "[what]: " << se->what() << "\n";
 
         boost::uint32_t const* locality = 
             boost::get_error_info<hpx::throw_locality>(e);
         if (locality && 0 != *locality) 
-        {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[locality]: " << *locality;
-        }
+            strm << "[locality]: " << *locality << "\n";
 
         char const* const* func =
             boost::get_error_info<boost::throw_function>(e);
         if (func) {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[function]: " << *func;
+            strm << "[function]: " << *func << "\n";
         }
         else {
             std::string const* s = 
                 boost::get_error_info<hpx::throw_function>(e);
-            if (s)
-            {
-                if (done_first)
-                    strm << "\n";
-
-                done_first = true;
-                strm << "[function]: " << *s;
-            }
+            if (s) 
+                strm << "[function]: " << *s << "\n";
         }
 
         char const* const* file =
             boost::get_error_info<boost::throw_file>(e);
         if (file) {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[file]: " << *file;
+            strm << "[file]: " << *file << "\n";
         }
         else {
             std::string const* s = 
                 boost::get_error_info<hpx::throw_file>(e);
-            if (s)
-            {
-                if (done_first)
-                    strm << "\n";
-
-                done_first = true;
-                strm << "[file]: " << *s; 
-            }
+            if (s) 
+                strm << "[file]: " << *s << "\n"; 
         }
 
         int const* line = 
             boost::get_error_info<boost::throw_line>(e);
         if (line) 
-        {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[line]: " << *line;
-        }
+            strm << "[line]: " << *line << "\n";
 
         boost::int64_t const* shepherd = 
             boost::get_error_info<hpx::throw_shepherd>(e);
         if (shepherd && -1 != *shepherd) 
-        {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << "[shepherd]: " << *shepherd;
-        }
+            strm << "[os-thread]: " << *shepherd << "\n";
 
         std::size_t const* thread_id = 
             boost::get_error_info<hpx::throw_thread_id>(e);
         if (thread_id && *thread_id) 
-        {
-            if (done_first)
-                strm << "\n";
-
-            done_first = true;
-            strm << (boost::format("[thread_id]: %016x") % *thread_id);
-        }
+            strm << (boost::format("[thread_id]: %016x\n") % *thread_id);
 
         std::string const* thread_name = 
             boost::get_error_info<hpx::throw_thread_name>(e);
         if (thread_name && !thread_name->empty()) 
-        {
-            if (done_first)
-                strm << "\n";
+            strm << "[thread_name]: " << *thread_name << "\n";
 
-            done_first = true;
-            strm << "[thread_name]: " << *thread_name;
-        }
+        // add system information
+        strm << "[version]: " << boost::str(boost::format("%d.%d.%d%s (%s)\n") % 
+                HPX_VERSION_MAJOR % HPX_VERSION_MINOR % 
+                HPX_VERSION_SUBMINOR % HPX_VERSION_TAG % HPX_SVN_REVISION); 
+        strm << "[boost]: " << boost::str(boost::format("%d.%d.%d\n") % 
+                (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) % 
+                (BOOST_VERSION % 100));
+        strm << "[platform]: " << BOOST_PLATFORM << "\n"; 
+        strm << "[compiler]: " << BOOST_COMPILER << "\n"; 
+        strm << "[stdlib]: " << BOOST_STDLIB << "\n"; 
 
         return util::osstream_get_string(strm);
     }
