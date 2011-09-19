@@ -105,6 +105,7 @@
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\server\elapsed_time_counter.cpp" />
     <ClCompile Include="..\..\..\src\pre_main.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
@@ -203,6 +204,7 @@
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\elapsed_time_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\function.hpp" />

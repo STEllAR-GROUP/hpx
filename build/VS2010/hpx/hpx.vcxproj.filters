@@ -395,6 +395,9 @@
     <ClCompile Include="..\..\..\src\runtime\components\console_error_sink.cpp">
       <Filter>Source Files\Runtime\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\server\elapsed_time_counter.cpp">
+      <Filter>Source Files\Performance Counters\Server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -1062,6 +1065,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\elapsed_time_counter.hpp">
+      <Filter>Header Files\Performance Counters\Server</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
