@@ -16,7 +16,7 @@ namespace hpx { namespace performance_counters
     struct manage_counter_type
     {
         manage_counter_type(counter_info const& info) 
-          : info_(info), status_(status_invalid_data) 
+          : status_(status_invalid_data), info_(info)
         {}
 
         ~manage_counter_type()
