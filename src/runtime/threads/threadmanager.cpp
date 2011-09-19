@@ -969,15 +969,27 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         install_counters()
     {
-        performance_counters::counter_type_data counter_types[] = 
+        performance_counters::counter_type_data const counter_types[] = 
         {
-            { "/queue/length", performance_counters::counter_raw },
-            { "/threads/count/cumulative/all", performance_counters::counter_raw },
-            { "/threads/count/instantaneous/all", performance_counters::counter_raw },
-            { "/threads/count/instantaneous/active", performance_counters::counter_raw },
-            { "/threads/count/instantaneous/pending", performance_counters::counter_raw },
-            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw },
-            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw },
+            // queue length
+            { "/queue/length", performance_counters::counter_raw,
+              "returns the current queue length for the referenced queue" },
+            // thread counts
+            { "/threads/count/cumulative/all", performance_counters::counter_raw,
+              "returns the overall number of executed (retired) px-threads for "
+              "the referenced locality" },
+            { "/threads/count/instantaneous/all", performance_counters::counter_raw,
+              "returns the overall current number of px-threads instantiated at the "
+              "referenced locality" },
+            { "/threads/count/instantaneous/active", performance_counters::counter_raw, 
+              "returns the current number of active px-threads at the referenced locality" },
+            { "/threads/count/instantaneous/pending", performance_counters::counter_raw, 
+              "returns the current number of pending px-threads at the referenced locality" },
+            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw, 
+              "returns the current number of suspended px-threads at the referenced locality" },
+            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw, 
+              "returns the current number of terminated px-threads at the referenced locality" },
+            //
             { "/time/idle-rate", performance_counters::counter_raw }
         };
         performance_counters::install_counter_types(
@@ -998,7 +1010,7 @@ namespace hpx { namespace threads
         boost::format thread_cumulative("/threads([locality#%d]/os-thread#%d)/count/cumulative/all");
         boost::format thread_instant("/threads([locality#%d]/os-thread#%d)/count/instantaneous/%s");
 
-        performance_counters::counter_data counters[] = 
+        performance_counters::counter_data const counters[] = 
         {
             // Locality-wide queue length
             { boost::str(total_queue_length % prefix), 
@@ -1030,7 +1042,7 @@ namespace hpx { namespace threads
 
         for (std::size_t i = 0; i < shepherd_count; ++i)
         {
-            performance_counters::counter_data counters[] = 
+            performance_counters::counter_data const counters[] = 
             {
                 // Queue length
                 { boost::str(queue_length % prefix % i),

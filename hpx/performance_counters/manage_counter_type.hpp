@@ -15,39 +15,35 @@ namespace hpx { namespace performance_counters
 {
     struct manage_counter_type
     {
-        manage_counter_type() : status_(status_invalid_data) {}
+        manage_counter_type(counter_info const& info) 
+          : info_(info), status_(status_invalid_data) 
+        {}
 
         ~manage_counter_type()
         {
             uninstall(); 
         }
 
-        counter_status install(std::string const& name, counter_type type,
-            error_code& ec = throws)
+        counter_status install(error_code& ec = throws)
         {
             if (status_invalid_data != status_) {
                 HPX_THROWS_IF(ec, hpx::invalid_status, 
                     "manage_counter_type::install", 
-                    "counter type " + name + " has been already installed.");
+                    "counter type " + info_.fullname_ + 
+                    " has been already installed.");
                 return status_invalid_data;
             }
 
-            info_.fullname_ = name;
-            info_.type_ = type;
-            status_ = add_counter_type(info_, ec);
-            return status_;
+            return status_ = add_counter_type(info_, ec);
         }
 
-        void uninstall()
+        void uninstall(error_code& ec = throws)
         { 
             if (status_invalid_data != status_)
-            {
-                error_code ec;
                 remove_counter_type(info_, ec); // ignore errors
-            }
         }
 
-      private:
+    private:
         counter_status status_;
         counter_info info_;
     };
@@ -61,8 +57,13 @@ namespace hpx { namespace performance_counters
     /// A small data structure holding all data needed to install a counter type
     struct counter_type_data
     {
-        std::string name_;
-        counter_type type_;
+        std::string name_;          ///< Name of teh counter type
+        counter_type type_;         ///< Type of the counter instances of this 
+                                    ///< counter type
+        std::string helptext_;      ///< Longer descriptive text explaining the 
+                                    ///< counter type
+        boost::uint32_t version_;   ///< Version of this counter type definition 
+                                    ///< (default: 0x01000000)
     };
 
     /// Install several new performance counter types in a way, which will 

@@ -40,21 +40,14 @@ namespace hpx { namespace parcelset
         private boost::noncopyable
     {
     public:
-        
-
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 boost::uint32_t prefix, 
                 util::connection_cache<parcelport_connection>& cache,
-                boost::atomic<boost::int64_t>& started,
-                boost::atomic<boost::int64_t>& completed,
                 util::high_resolution_timer& timer,
-                performance_counters::parcels::data_point& send_data,
                 performance_counters::parcels::gatherer& parcels_sent)
           : socket_(io_service), out_priority_(0), out_size_(0), there_(prefix),
-            connection_cache_(cache), sends_started_(started),
-            sends_completed_(completed), send_timer_(timer),
-            send_data_(send_data), parcels_sent_(parcels_sent)
+            connection_cache_(cache), timer_(timer), parcels_sent_(parcels_sent)
         {
         }
 
@@ -68,10 +61,7 @@ namespace hpx { namespace parcelset
         void async_write(Handler handler)
         {
             /// Increment sends and begin timer.
-            ++sends_started_;
-            send_timer_.restart();
-            send_data_.start = 0;
-            send_data_.parcel = sends_started_;
+            send_data_.timer_ = timer_.elapsed_microseconds();
 
             // Write the serialized data to the socket. We use "gather-write" 
             // to send both the header and the data in a single write operation.
@@ -81,7 +71,7 @@ namespace hpx { namespace parcelset
             buffers.push_back(boost::asio::buffer(out_buffer_));
 
             // record size of parcel
-            send_data_.bytes = out_size_;
+            send_data_.bytes_ = out_size_;
 
             // this additional wrapping of the handler into a bind object is 
             // needed to keep  this parcelport_connection object alive for the whole
@@ -115,16 +105,17 @@ namespace hpx { namespace parcelset
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
 
+            // complete data point and push back onto gatherer
+            send_data_.timer_ = timer_.elapsed_microseconds() - send_data_.timer_;
+            parcels_sent_.push_back(send_data_);
+
             // now we can give this connection back to the cache
             out_buffer_.clear();
             out_priority_ = 0;
             out_size_ = 0;
-            connection_cache_.add(there_, shared_from_this());
+            send_data_.timer_ = 0;
 
-            // complete data point and push back onto gatherer
-            send_data_.end = send_timer_.elapsed_microseconds();
-            parcels_sent_.push_back(send_data_);
-            ++sends_completed_;
+            connection_cache_.add(there_, shared_from_this());
         }
 
     private:
@@ -143,16 +134,12 @@ namespace hpx { namespace parcelset
         util::connection_cache<parcelport_connection>& connection_cache_;
 
         /// Counters and their data containers.
-        boost::atomic<boost::int64_t>& sends_started_;
-        boost::atomic<boost::int64_t>& sends_completed_;
-        util::high_resolution_timer& send_timer_;
-        performance_counters::parcels::data_point& send_data_;
+        util::high_resolution_timer& timer_;
+        performance_counters::parcels::data_point send_data_;
         performance_counters::parcels::gatherer& parcels_sent_;
-     };
+    };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
-
-///////////////////////////////////////////////////////////////////////////////
 }}
 
 #endif

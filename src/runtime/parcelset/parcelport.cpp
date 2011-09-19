@@ -31,13 +31,7 @@ namespace hpx { namespace parcelset
         acceptor_(NULL),
         parcels_(This()),
         connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
-        here_(here),
-        sends_started_(0),
-        sends_completed_(0),
-        receives_started_(0),
-        receives_completed_(0),
-        send_timer_(0),
-        receive_timer_(0)
+        here_(here)
     {}
 
     parcelport::~parcelport()
@@ -68,8 +62,7 @@ namespace hpx { namespace parcelset
                 server::parcelport_connection_ptr conn(
                     new server::parcelport_connection(
                         io_service_pool_.get_io_service(), parcels_,
-                        receives_started_, receive_timer_, receive_data_,
-                        parcels_received_)
+                        timer_, parcels_received_)
                 );
 
                 tcp::endpoint ep = *it;
@@ -124,7 +117,7 @@ namespace hpx { namespace parcelset
         // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
                 io_service_pool_.get_io_service(), parcels_,
-                receives_started_, receive_timer_, receive_data_, parcels_received_));
+                timer_, parcels_received_));
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
@@ -132,26 +125,24 @@ namespace hpx { namespace parcelset
         // now accept the incoming connection by starting to read from the 
         // socket
             c->async_read(
-                boost::bind(&parcelport::handle_read_completion, this,
-                boost::asio::placeholders::error));
+                boost::bind(&parcelport::handle_read_completion, this, 
+                boost::asio::placeholders::error, c));
         }
     }
 
     /// Handle completion of a read operation.
-    void parcelport::handle_read_completion(boost::system::error_code const& e)
+    void parcelport::handle_read_completion(boost::system::error_code const& e,
+        server::parcelport_connection_ptr c)
     {
-        if (e && e != boost::asio::error::operation_aborted)
-        {
+        if (e && e != boost::asio::error::operation_aborted) {
             LPT_(error) << "handle read operation completion: error: " 
                         << e.message();
         }
-        else
-        {
+        else {
             // complete data point and push back 
-            receive_data_.end = receive_timer_.elapsed();
-            parcels_received_.push_back(receive_data_);
-            ++receives_completed_;
-            
+            performance_counters::parcels::data_point& data = c->get_receive_data();
+            data.timer_ = timer_.elapsed_microseconds() - data.timer_;
+            parcels_received_.push_back(data);
         }
     }
 
@@ -159,11 +150,9 @@ namespace hpx { namespace parcelset
     void parcelport::send_parcel(parcel const& p, naming::address const& addr, 
         write_handler_type f)
     {
-        const boost::uint32_t prefix
-            = naming::get_prefix_from_gid(p.get_destination()); 
-
-        parcelport_connection_ptr client_connection
-            (connection_cache_.get(prefix));
+        const boost::uint32_t prefix = 
+            naming::get_prefix_from_gid(p.get_destination()); 
+        parcelport_connection_ptr client_connection(connection_cache_.get(prefix));
 
         if (!client_connection) {
 //                 LPT_(info) << "parcelport: creating new connection to: " 
@@ -172,9 +161,8 @@ namespace hpx { namespace parcelset
         // The parcel gets serialized inside the connection constructor, no 
         // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                    io_service_pool_.get_io_service(), prefix, 
-                    connection_cache_, sends_started_,
-                    sends_completed_, send_timer_, send_data_, parcels_sent_)); 
+                io_service_pool_.get_io_service(), prefix, 
+                connection_cache_, timer_, parcels_sent_)); 
 
             client_connection->set_parcel(p);
 
@@ -234,6 +222,4 @@ namespace hpx { namespace parcelset
             client_connection->async_write(f);
         }
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}

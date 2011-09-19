@@ -664,10 +664,9 @@ void big_boot_barrier::apply(
     {
         // The parcel gets serialized inside the connection constructor, no 
         // need to keep the original parcel alive after this call returned.
-        client_connection.reset(new parcelset::parcelport_connection
-            (io_service_pool_.get_io_service(), prefix,
-                connection_cache_, pp.sends_started_, pp.sends_completed_,
-                pp.send_timer_, pp.send_data_, pp.parcels_sent_)); 
+        client_connection.reset(new parcelset::parcelport_connection(
+            io_service_pool_.get_io_service(), prefix,
+            connection_cache_, pp.timer_, pp.parcels_sent_)); 
         client_connection->set_parcel(p);
 
         // Connect to the target locality, retry if needed

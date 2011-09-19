@@ -14,51 +14,19 @@
 
 namespace hpx { namespace performance_counters { namespace parcels
 {
-
-class data_point {
-
-    friend class parcelset::parcelport;
-    friend class parcelset::parcelport_connection;
-
-    public:
-
-    data_point(boost::int64_t start_, boost::int64_t end_, std::size_t bytes_,
-        naming::gid_type const& parcel_):
-
-        bytes(bytes_)
-      , parcel(parcel_)
-      , start(start_)
-      , end(end_)
-      {}
-
-    data_point():
-
-        bytes(0)
-      , parcel(0)
-      , start(0)
-      , end(0)
-      {}
-
-    data_point(data_point const& x):
-
-        bytes(x.bytes)
-      , parcel(x.parcel)
-      , start(x.start)
-      , end(x.end)
-      {}
-
-    boost::int64_t elapsed() const
+    /// \brief A \a data_point collects all timing and statistical information     
+    ///        for a single parcel (either sent or received).
+    struct data_point 
     {
-        return end - start;
-    }
+        data_point()
+          : bytes_(0)
+          , timer_(0)
+        {}
 
-    std::size_t bytes;
-    naming::gid_type parcel;
-
-    boost::int64_t start;
-    boost::int64_t end;
-};
-
+        std::size_t bytes_;       ///< number of bytes processed for this parcel
+        boost::int64_t timer_;    ///< during processing holds start timestamp
+                                  ///< after processing holds elapsed time
+    };
 }}}
 
 #endif // HPX_76311D67_43DA_4B3A_8A2A_14B8A1A266D9

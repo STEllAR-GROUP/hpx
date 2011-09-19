@@ -152,16 +152,13 @@ namespace hpx { namespace parcelset
         return threads::thread_state(threads::terminated);
     }
         
-    parcelhandler::parcelhandler(
-        naming::resolver_client& resolver
-      , parcelport& pp
-      , threads::threadmanager_base* tm
-      , parcelhandler_queue_base* policy
-    )
-        : resolver_(resolver)
-        , pp_(pp)
-        , tm_(tm)
-        , parcels_(policy)
+    parcelhandler::parcelhandler(naming::resolver_client& resolver, 
+            parcelport& pp, threads::threadmanager_base* tm, 
+            parcelhandler_queue_base* policy)
+      : resolver_(resolver)
+      , pp_(pp)
+      , tm_(tm)
+      , parcels_(policy)
     {
         BOOST_ASSERT(parcels_);
 
@@ -172,8 +169,8 @@ namespace hpx { namespace parcelset
         parcels_->set_parcelhandler(this);
 
         // register our callback function with the parcelport
-        pp_.register_event_handler
-            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
+        pp_.register_event_handler(
+            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -293,14 +290,15 @@ namespace hpx { namespace parcelset
         pp_.put_parcel(p, f);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::install_counters()
     {
-        performance_counters::counter_type_data counter_types[] = 
+        performance_counters::counter_type_data const counter_types[] = 
         {
-            { "/parcels/count/sent/started", performance_counters::counter_raw },
-            { "/parcels/count/sent/completed", performance_counters::counter_raw },
-            { "/parcels/count/received/started", performance_counters::counter_raw },
-            { "/parcels/count/received/completed", performance_counters::counter_raw }
+            { "/parcels/count/sent", performance_counters::counter_raw,
+              "returns the number of sent parcels for the referenced locality" },
+            { "/parcels/count/received", performance_counters::counter_raw,
+              "returns the number of received parcels for the referenced locality" }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -308,26 +306,18 @@ namespace hpx { namespace parcelset
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format parcel_count("/parcels([locality#%d]/total)/count/%s");
 
-        performance_counters::counter_data counters[] = 
+        performance_counters::counter_data const counters[] = 
         {
-            // Total parcels sent (started)
-            { boost::str(parcel_count % prefix % "sent/started"),
-              boost::bind(&parcelport::total_sends_started, &pp_) },
             // Total parcels sent (completed)
-            { boost::str(parcel_count % prefix % "sent/completed"),
+            { boost::str(parcel_count % prefix % "sent"),
               boost::bind(&parcelport::total_sends_completed, &pp_) },
-            // Total parcels received (started)
-            { boost::str(parcel_count % prefix % "received/started"),
-              boost::bind(&parcelport::total_receives_started, &pp_) },
             // Total parcels received (completed)
-            { boost::str(parcel_count % prefix % "received/completed"),
+            { boost::str(parcel_count % prefix % "received"),
               boost::bind(&parcelport::total_receives_completed, &pp_) }
         };
         performance_counters::install_counters(
             counters, sizeof(counters)/sizeof(counters[0]));
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}
 
 #endif // HPX_AGAS_VERSION

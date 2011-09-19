@@ -217,6 +217,12 @@ namespace hpx { namespace performance_counters
           : type_(type), version_(0x01000000), status_(status_valid_data)
         {}
 
+        counter_info(counter_type type, std::string const& name, 
+          std::string const& helptext, boost::uint32_t version = 0x01000000)
+          : type_(type), version_(version), status_(status_valid_data),
+            fullname_(name), helptext_(helptext)
+        {}
+
         counter_type type_;         ///< The type of the described counter
         boost::uint32_t version_;   ///< The version of the described counter
                                     ///< using the 0xMMmmSSSS scheme

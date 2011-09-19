@@ -43,15 +43,12 @@ namespace hpx { namespace parcelset { namespace server
     public:
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-            parcelport_queue& handler,
-            boost::atomic<boost::int64_t>& receives_started,
-            util::high_resolution_timer& receive_timer,
-            performance_counters::parcels::data_point& receive_data,
-            performance_counters::parcels::gatherer& parcels_received)
+                parcelport_queue& handler,
+                util::high_resolution_timer& timer,
+                performance_counters::parcels::gatherer& parcels_received)
           : socket_(io_service), in_priority_(0), in_size_(0), 
             in_buffer_(new std::vector<char>()), parcels_(handler),
-            receives_started_(receives_started), receive_timer_(receive_timer),
-            receive_data_(receive_data), parcels_received_(parcels_received)
+            timer_(timer), parcels_received_(parcels_received)
         {
         }
 
@@ -63,10 +60,7 @@ namespace hpx { namespace parcelset { namespace server
         void async_read(Handler handler)
         {
             // Increment number of receives started.
-            ++receives_started_;
-            receive_timer_.restart();
-            receive_data_.start = 0;
-            receive_data_.parcel = receives_started_;
+            receive_data_.timer_ = timer_.elapsed_microseconds();
 
             // Issue a read operation to read the parcel priority and size. 
             void (parcelport_connection::*f)(boost::system::error_code const&, 
@@ -87,6 +81,11 @@ namespace hpx { namespace parcelset { namespace server
                     boost::asio::placeholders::error, boost::make_tuple(handler)));
         }
 
+        performance_counters::parcels::data_point& get_receive_data()
+        {
+            return receive_data_;
+        }
+
     protected:
         /// Handle a completed read of the message priority and size from the 
         /// message header.
@@ -103,7 +102,7 @@ namespace hpx { namespace parcelset { namespace server
             else {
                 // Determine the length of the serialized data.
                 boost::uint64_t inbound_data_size = in_size_;
-                receive_data_.bytes = std::size_t(inbound_data_size);
+                receive_data_.bytes_ = std::size_t(inbound_data_size);
 
                 // Start an asynchronous call to receive the data.
                 in_buffer_->resize(inbound_data_size);
@@ -168,9 +167,8 @@ namespace hpx { namespace parcelset { namespace server
         parcelport_queue& parcels_;
 
         /// Counters and timers for parcels received.
-        boost::atomic<boost::int64_t>& receives_started_;
-        util::high_resolution_timer& receive_timer_;
-        performance_counters::parcels::data_point& receive_data_;
+        util::high_resolution_timer& timer_;
+        performance_counters::parcels::data_point receive_data_;
         performance_counters::parcels::gatherer& parcels_received_;
     };
 

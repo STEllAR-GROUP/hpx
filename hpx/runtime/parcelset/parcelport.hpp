@@ -173,35 +173,24 @@ namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
-        /// return sends started
-        boost::int64_t total_sends_started() const
-        {
-            return sends_started_.load();
-        }
-
         /// return sends completed
         boost::int64_t total_sends_completed() const
         {
-            return sends_completed_.load();
-        }
-
-        /// return receives started
-        boost::int64_t total_receives_started() const
-        { 
-            return receives_started_.load();
+            return parcels_sent_.size();
         }
 
         /// return receives completed
         boost::int64_t total_receives_completed() const
         {
-            return receives_completed_.load();
+            return parcels_received_.size();
         }
 
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
             server::parcelport_connection_ptr);
-        void handle_read_completion(boost::system::error_code const& e);
+        void handle_read_completion(boost::system::error_code const& e,
+            server::parcelport_connection_ptr);
 
         /// send the parcel to the specified address
         void send_parcel(parcel const& p, naming::address const& addr, 
@@ -226,23 +215,11 @@ namespace parcelset
         /// The local locality
         naming::locality here_;
 
-        /// Counters for parcels sent.
-        boost::atomic<boost::int64_t> sends_started_;
-        boost::atomic<boost::int64_t> sends_completed_;
-
-        /// Counters for parcels received.
-        boost::atomic<boost::int64_t> receives_started_;
-        boost::atomic<boost::int64_t> receives_completed_;
-        
         /// Parcel timers and their data containers.
-        double elapsed_send_time_, elapsed_receive_time_;
-        util::high_resolution_timer send_timer_, receive_timer_;
+        util::high_resolution_timer timer_;
  
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
-
-        performance_counters::parcels::data_point send_data_;
-        performance_counters::parcels::data_point receive_data_;       
     };
 
 ///////////////////////////////////////////////////////////////////////////////

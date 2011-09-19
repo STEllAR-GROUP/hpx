@@ -16,17 +16,19 @@ namespace hpx { namespace performance_counters
 {
     void counter_type_shutdown(boost::shared_ptr<manage_counter_type> const& p)
     {
-        BOOST_ASSERT(p); 
-        p->uninstall();
+        error_code ec;
+        p->uninstall(ec);
     }
 
     void install_counter_type(std::string const& name,
-        counter_type type, error_code& ec)
+        counter_type type, std::string const& helptext, boost::uint32_t version,
+        error_code& ec)
     {
-        boost::shared_ptr<manage_counter_type> p(new manage_counter_type);
+        counter_info info(type, name, helptext, version ? version : 0x01000000);
+        boost::shared_ptr<manage_counter_type> p(new manage_counter_type(info));
 
         // Install the counter type.
-        p->install(name, type, ec);  
+        p->install(ec);  
 
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
@@ -38,7 +40,8 @@ namespace hpx { namespace performance_counters
     {
         for (std::size_t i = 0; i < count; ++i) 
         {
-            install_counter_type(data[i].name_, data[i].type_, ec);
+            install_counter_type(data[i].name_, data[i].type_, 
+                data[i].helptext_, data[i].version_, ec);
             if (ec) break;
         }
     } 

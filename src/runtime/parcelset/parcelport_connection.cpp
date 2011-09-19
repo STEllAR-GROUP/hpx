@@ -45,9 +45,9 @@ namespace hpx { namespace parcelset
                 hpx::util::osstream_get_string(strm));
             return;
         }
+
         out_priority_ = boost::integer::ulittle8_t(p.get_thread_priority());
         out_size_ = out_buffer_.size();
     }
-
 }}
 
