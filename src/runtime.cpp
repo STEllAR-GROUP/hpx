@@ -731,7 +731,7 @@ namespace hpx
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format runtime_uptime("/runtime([locality#%d]/total)/uptime");
+        boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
         performance_counters::counter_data counters[] = 
         {
             { boost::str(runtime_uptime % prefix) }

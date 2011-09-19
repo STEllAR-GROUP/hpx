@@ -17,6 +17,9 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions
 HPX_REGISTER_ACTION_EX(
@@ -80,19 +83,21 @@ namespace hpx { namespace performance_counters
             if (!path.parentinstancename_.empty())
             {
                 result += path.parentinstancename_;
-                result += "/";
+                if (-1 != path.parentinstanceindex_)
+                {
+                    result += "#";
+                    result += boost::lexical_cast<std::string>(path.parentinstanceindex_);
+                }
+                if (!path.instancename_.empty())
+                    result += "/";
             }
-            if (path.instancename_.empty()) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_counter_name", 
-                        "empty instance name");
-                return status_invalid_data;
-            }
-
-            result += path.instancename_;
-            if (-1 != path.instanceindex_)
-            {
-                result += "#";
-                result += boost::lexical_cast<std::string>(path.instanceindex_);
+            if (!path.instancename_.empty()) {
+                result += path.instancename_;
+                if (-1 != path.instanceindex_)
+                {
+                    result += "#";
+                    result += boost::lexical_cast<std::string>(path.instanceindex_);
+                }
             }
             result += ")";
         }
@@ -142,7 +147,8 @@ namespace hpx { namespace performance_counters
     /// \brief Fill the given \a counter_type_path_elements instance from the 
     ///        given full name of a counter
     ///
-    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    ///    /objectname(...)/countername
+    ///    
     counter_status get_counter_path_elements(std::string const& name, 
         counter_type_path_elements& path, error_code& ec)
     {
@@ -185,144 +191,107 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        // we now allow the countername to be hierarchical 
-//         if (path.countername_.find_first_of("/") != std::string::npos) {
-//             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-//                     "more than one path element in counter name");
-//             return status_invalid_data;
-//         }
-
         if (&ec != &throws)
             ec = make_success_code();
         return status_valid_data;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct instance_name
+    {
+        instance_name() : index_(-1) {}
+
+        std::string name_;
+        boost::uint32_t index_;
+    };
+
+    struct instance_elements
+    {
+        instance_name parent_;
+        instance_name child_;
+    };
+
+    struct path_elements
+    {
+        std::string object_;
+        instance_elements instance_;
+        std::string counter_;
+    };
+}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+    hpx::performance_counters::instance_name,
+    (std::string, name_)
+    (boost::uint32_t, index_)
+);
+
+BOOST_FUSION_ADAPT_STRUCT(
+    hpx::performance_counters::instance_elements,
+    (hpx::performance_counters::instance_name, parent_)
+    (hpx::performance_counters::instance_name, child_)
+);
+
+BOOST_FUSION_ADAPT_STRUCT(
+    hpx::performance_counters::path_elements,
+    (std::string, object_)
+    (hpx::performance_counters::instance_elements, instance_)
+    (std::string, counter_)
+);
+
+namespace hpx { namespace performance_counters 
+{
+    ///
+    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername
+    ///
+    namespace qi = boost::spirit::qi;
+
+    template <typename Iterator>
+    struct path_parser : qi::grammar<Iterator, path_elements()>
+    {
+        path_parser() 
+          : path_parser::base_type(start)
+        {
+            start = '/' >> +~qi::char_("(/") >> -instance >> '/' >> +qi::char_;
+            instance = '(' >> parent >> -('/' >> child) >> ')';
+            parent = +~qi::char_("#/)") >> -('#' >> qi::uint_);
+            child = +~qi::char_("#)") >> -('#' >> qi::uint_);
+        }
+
+        qi::rule<Iterator, path_elements()> start;
+        qi::rule<Iterator, instance_elements()> instance;
+        qi::rule<Iterator, instance_name()> parent;
+        qi::rule<Iterator, instance_name()> child;
+    };
+
     /// \brief Fill the given \a counter_path_elements instance from the given 
     ///        full name of a counter
     ///
-    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername
+    ///    
     counter_status get_counter_path_elements(std::string const& name, 
         counter_path_elements& path, error_code& ec)
     {
-        if (name.empty() || name[0] != '/') {
+        path_elements elements;
+        path_parser<std::string::const_iterator> p;
+
+        std::string::const_iterator begin = name.begin();
+        if (!qi::parse(begin, name.end(), p, elements) || begin != name.end()) 
+        {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "empty name parameter");
+                    "invalid counter name format");
             return status_invalid_data;
         }
 
-        std::string::size_type p = name.find_first_of("(/", 1);
-        if (p == std::string::npos) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "expected delimiter: '(' or '/'");
-            return status_invalid_data;
-        }
-
-        // object name is the first part of the full name
-        path.objectname_ = name.substr(1, p-1);
-        if (path.objectname_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "empty object name");
-            return status_invalid_data;
-        }
-
-        if (name[p] == '(') {
-            std::string::size_type p1 = name.find_first_of(")", p);
-            if (p1 == std::string::npos || p1 >= name.size()) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                        "mismatched parenthesis, expected: ')'");
-                return status_invalid_data;
-            }
-
-            // instance name is in between p and p1
-            std::string::size_type p2 = name.find_last_of("/#", p1);
-            if (p2 == std::string::npos) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                        "expected delimiter: '/' or '#'");
-                return status_invalid_data;
-            }
-
-            if (name[p2] == '#') {
-                // instance index
-                try {
-                    path.instanceindex_ = 
-                        boost::lexical_cast<boost::uint32_t>(name.substr(p2+1, p1-p2-1));
-                }
-                catch (boost::bad_lexical_cast const& /*e*/) {
-                    HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                            "bogus instance index, expected: integer");
-                    return status_invalid_data;
-                }
-
-                std::string::size_type p3 = name.find_last_of("/", p2);
-                if (p3 != std::string::npos && p3 > p) {
-                    // instance name and parent instance name
-                    path.parentinstancename_ = name.substr(p+1, p3-p-1);
-                    if (path.parentinstancename_.empty()) {
-                        HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                                "empty parent instance name");
-                        return status_invalid_data;
-                    }
-                    path.instancename_ = name.substr(p3+1, p2-p3-1);
-                    if (path.instancename_.empty()) {
-                        HPX_THROWS_IF(ec, bad_parameter, 
-                            "get_counter_path_elements", "empty instance name");
-                        return status_invalid_data;
-                    }
-                }
-                else {
-                    // instance name only
-                    path.instancename_ = name.substr(p+1, p2-p-1);
-                    if (path.instancename_.empty()) {
-                        HPX_THROWS_IF(ec, bad_parameter, 
-                            "get_counter_path_elements", "empty instance name");
-                        return status_invalid_data;
-                    }
-                }
-            }
-            else if (p2 > p) {
-                // instance name and parent instance name
-                path.parentinstancename_ = name.substr(p+1, p2-p-1);
-                if (path.parentinstancename_.empty()) {
-                    HPX_THROWS_IF(ec, bad_parameter, 
-                        "get_counter_path_elements", "empty parent instance name");
-                    return status_invalid_data;
-                }
-                path.instancename_ = name.substr(p2+1, p1-p2-1);
-                if (path.instancename_.empty()) {
-                    HPX_THROWS_IF(ec, bad_parameter, 
-                        "get_counter_path_elements", "empty instance name");
-                    return status_invalid_data;
-                }
-            }
-            else {
-                // just instance name
-                path.instancename_ = name.substr(p+1, p1-p-1);
-                if (path.instancename_.empty()) {
-                    HPX_THROWS_IF(ec, bad_parameter, 
-                        "get_counter_path_elements", "empty instance name");
-                    return status_invalid_data;
-                }
-            }
-            p = p1+1;
-        }
-
-        // counter name is always the last part of the full name
-        path.countername_ = name.substr(p+1);
-        if (path.countername_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-                    "empty counter name");
-            return status_invalid_data;
-        }
-
-        // we now allow the countername to be hierarchical 
-//         if (path.countername_.find_first_of("/") != std::string::npos) {
-//             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements", 
-//                     "more than one path element in counter name");
-//             return status_invalid_data;
-//         }
+        path.objectname_ = elements.object_;
+        path.countername_ = elements.counter_;
+        path.parentinstancename_ = elements.instance_.parent_.name_;
+        path.parentinstanceindex_ = elements.instance_.parent_.index_;
+        path.instancename_ = elements.instance_.child_.name_;
+        path.instanceindex_ = elements.instance_.child_.index_;
 
         if (&ec != &throws)
             ec = make_success_code();
+
         return status_valid_data;
     }
 
@@ -369,11 +338,33 @@ namespace hpx { namespace performance_counters
         if (status_valid_data != status) return status;
 
         if (p.parentinstancename_.empty()) {
-            p.parentinstancename_ = boost::str(boost::format("[locality#%d]") % 
+            p.parentinstancename_ = boost::str(boost::format("locality#%d") % 
                 applier::get_applier().get_prefix_id());
         }
 
         return get_counter_name(p, info.fullname_, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Get the name for a given counter type
+    namespace strings
+    {
+        char const* const counter_type_names[] = 
+        {
+            "counter_text",
+            "counter_raw",
+            "counter_average_base",
+            "counter_average_count",
+            "counter_average_timer",
+            "counter_elapsed_time"
+        };
+    }
+
+    char const* get_counter_type_name(counter_type type)
+    {
+        if (type < counter_text || type > counter_elapsed_time)
+            return "unknown";
+        return strings::counter_type_names[type];
     }
 }}
 

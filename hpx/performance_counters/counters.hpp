@@ -97,6 +97,10 @@ namespace hpx { namespace performance_counters
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the readable name of a given counter type
+    HPX_API_EXPORT char const* get_counter_type_name(counter_type state);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// A counter_type_path_elements holds the elements of a full name for a 
     /// counter type. Generally, a full name of a counter type has the 
     /// structure:
@@ -135,7 +139,7 @@ namespace hpx { namespace performance_counters
     /// instance. Generally, a full name of a counter instance has the 
     /// structure:
     ///
-    ///    /objectname(parentinstancename/instancename#instanceindex)/countername
+    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername
     ///
     /// i.e.
     ///    /queue(localityprefix/thread#2)/length
@@ -145,19 +149,21 @@ namespace hpx { namespace performance_counters
         typedef counter_type_path_elements base_type;
 
         counter_path_elements() 
-          : instanceindex_(-1)
+          : parentinstanceindex_(-1), instanceindex_(-1)
         {}
 
         template <typename S1, typename S2, typename S3, typename S4>
         counter_path_elements(S1 const& obj, S2 const& counter, 
-                S3 const& parent, S4 const& instance, boost::int32_t index = -1) 
+                S3 const& parent, S4 const& instance, 
+                boost::int32_t parentindex = -1, boost::int32_t index = -1) 
           : base_type(obj, counter), 
             parentinstancename_(parent), instancename_(instance),
-            instanceindex_(index)
+            parentinstanceindex_(parentindex), instanceindex_(index)
         {}
 
         std::string parentinstancename_;  ///< the name of the parent instance 
         std::string instancename_;        ///< the name of the object instance 
+        boost::int32_t parentinstanceindex_;    ///< the parent instance index 
         boost::int32_t instanceindex_;    ///< the instance index 
 
     private:
@@ -169,7 +175,7 @@ namespace hpx { namespace performance_counters
         {
             typedef counter_type_path_elements base_type;
             ar & boost::serialization::base_object<base_type>(*this);
-            ar & parentinstancename_ & instancename_ & instanceindex_;
+            ar & parentinstancename_ & instancename_ & parentinstanceindex_ & instanceindex_;
         }
     };
 

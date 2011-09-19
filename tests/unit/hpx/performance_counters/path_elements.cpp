@@ -16,6 +16,26 @@ struct testdata_good
 
 testdata_good data[] = 
 {
+    {   "/objectname(parentinstancename#2/instancename#1)/countername",
+        "/objectname/countername",
+        hpx::performance_counters::counter_path_elements(
+            "objectname",
+            "countername",
+            "parentinstancename",
+            "instancename",
+            2, 1
+        )
+    },
+    {   "/objectname(parentinstancename#2/instancename#1)/countername/morecountername",
+        "/objectname/countername/morecountername",
+        hpx::performance_counters::counter_path_elements(
+            "objectname",
+            "countername/morecountername",
+            "parentinstancename",
+            "instancename",
+            2, 1
+        )
+    },
     {   "/objectname(parentinstancename/instancename#1)/countername",
         "/objectname/countername",
         hpx::performance_counters::counter_path_elements(
@@ -23,7 +43,7 @@ testdata_good data[] =
             "countername",
             "parentinstancename",
             "instancename",
-            1
+            -1, 1
         )
     },
     {   "/objectname(parentinstancename/moreparent/instancename#1)/countername",
@@ -31,9 +51,9 @@ testdata_good data[] =
         hpx::performance_counters::counter_path_elements(
             "objectname",
             "countername",
-            "parentinstancename/moreparent",
-            "instancename",
-            1
+            "parentinstancename",
+            "moreparent/instancename",
+            -1, 1
         )
     },
     {   "/objectname(parentinstancename/instancename)/countername",
@@ -43,7 +63,7 @@ testdata_good data[] =
             "countername",
             "parentinstancename",
             "instancename",
-            0
+            -1, -1
         )
     },
     {   "/objectname(parentinstancename/moreparent/instancename)/countername",
@@ -51,29 +71,29 @@ testdata_good data[] =
         hpx::performance_counters::counter_path_elements(
             "objectname",
             "countername",
-            "parentinstancename/moreparent",
-            "instancename",
-            0
+            "parentinstancename",
+            "moreparent/instancename",
+            -1, -1
         )
     },
-    {   "/objectname(instancename#1)/countername",
+    {   "/objectname(parentinstancename#1)/countername",
         "/objectname/countername",
         hpx::performance_counters::counter_path_elements(
             "objectname",
             "countername",
+            "parentinstancename",
             "",
-            "instancename",
-            1
+            1, -1
         )
     },
-    {   "/objectname(instancename)/countername",
+    {   "/objectname(parentinstancename)/countername",
         "/objectname/countername",
         hpx::performance_counters::counter_path_elements(
             "objectname",
             "countername",
+            "parentinstancename",
             "",
-            "instancename",
-            0
+            -1, -1
         )
     },
     {   "/objectname/countername",
@@ -83,7 +103,7 @@ testdata_good data[] =
             "countername",
             "",
             "",
-            0
+            -1, -1
         )
     },
     {   "", "", hpx::performance_counters::counter_path_elements() }
@@ -108,7 +128,6 @@ void test_good()
         HPX_TEST(type_name == t->typename_);
 
         counter_path_elements p;
-        p.instanceindex_ = 0;
 
         HPX_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p, ec));
         HPX_TEST(ec.value() == hpx::success);
@@ -136,7 +155,7 @@ char const* const testdata_bad[] =
 {
     "/(parentinstancename/instancename#1)/countername",
     "/objectname(parentinstancename/instancename#1/countername",
-    "/objectname(parentinstancename/instancename#1)/countername/badname",
+    "/objectname(parentinstancename#/instancename#1)/countername",
     "/objectname(parentinstancename/instancename#1/badindex)/countername/badname",
     "//countername",
     "/objectname()/countername",
@@ -146,7 +165,6 @@ char const* const testdata_bad[] =
     "/objectname(parentinstancename/instancename#)/countername",
     "/objectname(parentinstancename/instancename#1)/",
     "/objectname",
-    "/objectname/countername/badname",
     NULL
 };
 
