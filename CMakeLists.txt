@@ -332,6 +332,7 @@ if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
+  add_definitions(-DHPX_USE_UNIQUE_PTR=1)
 
   # suppress certain warnings (TODO: Document what warnings these disable)
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
