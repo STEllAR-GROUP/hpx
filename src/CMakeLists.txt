@@ -112,7 +112,7 @@ if(UNIX)
     "HPX_COMPONENT_NAME=hpx"
     "HPX_EXPORTS"
     "BOOST_COROUTINE_EXPORTS")
-  
+
   #############################################################################
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES})
@@ -135,6 +135,17 @@ if(UNIX)
     "HPX_EXPORTS"
     "BOOST_ENABLE_ASSERT_HANDLER"
     "BOOST_COROUTINE_EXPORTS")
+
+  # libhpx is a component
+  set_property(TARGET hpx 
+               PROPERTY LIBRARY_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY RUNTIME_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
 
   foreach(lib ${hpx_CORE})
     get_target_property(path ${lib} LOCATION)
@@ -732,9 +743,19 @@ else()
     "BOOST_ENABLE_ASSERT_HANDLER"
     "BOOST_COROUTINE_EXPORTS")
 
+  set_property(TARGET hpx 
+               PROPERTY LIBRARY_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET hpx 
+               PROPERTY RUNTIME_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+
   install(TARGETS hpx
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib/hpx
+      LIBRARY DESTINATION lib/hpx
       COMPONENT core
       PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                   GROUP_READ GROUP_EXECUTE

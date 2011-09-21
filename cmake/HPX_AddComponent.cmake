@@ -83,17 +83,16 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
-  if(NOT MSVC)
-    set_property(TARGET ${name}_component
-                 PROPERTY LIBRARY_OUTPUT_DIRECTORY
+
+  set_property(TARGET ${name}_component
+               PROPERTY LIBRARY_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
+  set_property(TARGET ${name}_component
+               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
                  "${CMAKE_BINARY_DIR}/lib/hpx")
-    set_property(TARGET ${name}_component
-                 PROPERTY ARCHIVE_OUTPUT_DIRECTORY
-                 "${CMAKE_BINARY_DIR}/lib/hpx")
-    set_property(TARGET ${name}_component
-                 PROPERTY RUNTIME_OUTPUT_DIRECTORY
-                 "${CMAKE_BINARY_DIR}/lib/hpx")
-  endif()
+  set_property(TARGET ${name}_component
+               PROPERTY RUNTIME_OUTPUT_DIRECTORY
+               "${CMAKE_BINARY_DIR}/lib/hpx")
    
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
