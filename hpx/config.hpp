@@ -243,6 +243,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Enable usage of std::unique_ptr instead of std::auto_ptr
+#if !defined(HPX_USE_UNIQUE_PTR)
+  #define HPX_USE_UNIQUE_PTR 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_AGAS_BOOTSTRAP_PREFIX   1U 
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
