@@ -736,7 +736,8 @@ namespace hpx
         boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
         performance_counters::counter_data counters[] = 
         {
-            { boost::str(runtime_uptime % prefix) }
+            { boost::str(runtime_uptime % prefix), 
+              boost::function<boost::int64_t()>() }
         };
         performance_counters::install_counters(
             counters, sizeof(counters)/sizeof(counters[0]));
