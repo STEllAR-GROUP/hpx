@@ -92,7 +92,7 @@ if(UNIX)
   add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES})
 
   set_target_properties(hpx_serialization PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -117,7 +117,7 @@ if(UNIX)
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES})
   set_target_properties(hpx PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -682,7 +682,7 @@ else()
                                        ${hpxserializationlib_HEADERS})
 
   set_target_properties(hpx_serialization PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -708,7 +708,7 @@ else()
   endif()
 
   set_target_properties(hpx PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
