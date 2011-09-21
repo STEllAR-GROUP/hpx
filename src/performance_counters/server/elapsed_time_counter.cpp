@@ -30,18 +30,13 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
-      : info_(info)
+      : base_type_holder(info)
     {
         if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "elapsed_time_counter::elapsed_time_counter",
                 "unexpected counter type specified for elapsed_time_counter");
         }
-    }
-
-    void elapsed_time_counter::get_counter_info(counter_info& info)
-    {
-        info = info_;
     }
 
     void elapsed_time_counter::get_counter_value(counter_value& value)

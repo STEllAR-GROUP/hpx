@@ -31,10 +31,14 @@ namespace hpx { namespace performance_counters { namespace server
         /// derived objects
         virtual ~base_performance_counter() {}
 
-        virtual void get_counter_info(counter_info& info) = 0;
         virtual void get_counter_value(counter_value& value) = 0;
 
     public:
+        base_performance_counter() {}
+        base_performance_counter(counter_info const& info)
+          : info_(info)
+        {}
+
         // components must contain a typedef for wrapping_type defining the
         // simple_component type used to encapsulate instances of this 
         // component
@@ -57,9 +61,7 @@ namespace hpx { namespace performance_counters { namespace server
         ///////////////////////////////////////////////////////////////////////
         counter_info get_counter_info_nonvirt()
         {
-            counter_info info;
-            get_counter_info(info);
-            return info;
+            return info_;
         }
 
         counter_value get_counter_value_nonvirt()
@@ -90,6 +92,9 @@ namespace hpx { namespace performance_counters { namespace server
             &base_performance_counter::get_counter_value_nonvirt,
             threads::thread_priority_critical
         > get_counter_value_action;
+
+    protected:
+        hpx::performance_counters::counter_info info_;
     };
 
 }}}

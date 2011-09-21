@@ -31,18 +31,13 @@ namespace hpx { namespace performance_counters { namespace server
 {
     raw_counter::raw_counter(counter_info const& info, 
             boost::function<boost::int64_t()> f)
-      : info_(info), f_(f)
+      : base_type_holder(info), f_(f)
     {
         if (info.type_ != counter_raw) {
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "raw_counter::raw_counter",
                 "unexpected counter type specified for raw_counter");
         }
-    }
-
-    void raw_counter::get_counter_info(counter_info& info)
-    {
-        info = info_;
     }
 
     void raw_counter::get_counter_value(counter_value& value)

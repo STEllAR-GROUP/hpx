@@ -26,7 +26,6 @@ namespace hpx { namespace performance_counters { namespace server
         elapsed_time_counter() {}
         elapsed_time_counter(counter_info const& info);
 
-        void get_counter_info(counter_info& info);
         void get_counter_value(counter_value& value);
 
         /// \brief finalize() will be called just before the instance gets 
@@ -47,7 +46,6 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     private:
-        counter_info info_;
         util::high_resolution_timer timer_;
     };
 }}}

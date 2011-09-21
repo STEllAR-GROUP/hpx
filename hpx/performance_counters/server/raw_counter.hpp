@@ -27,7 +27,6 @@ namespace hpx { namespace performance_counters { namespace server
         raw_counter() {}
         raw_counter(counter_info const& info, boost::function<boost::int64_t()> f);
 
-        void get_counter_info(counter_info& info);
         void get_counter_value(counter_value& value);
 
         /// \brief finalize() will be called just before the instance gets 
@@ -48,10 +47,8 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     private:
-        counter_info info_;
         boost::function<boost::int64_t()> f_;
     };
-
 }}}
 
 #endif
