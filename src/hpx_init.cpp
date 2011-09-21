@@ -221,19 +221,6 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        command_line_result print_help(
-            boost::program_options::options_description const& cmdline_options, 
-            boost::program_options::options_description const& app_options, 
-            boost::program_options::options_description const& hpx_options)
-        {
-            boost::program_options::options_description visible;
-
-            visible.add(app_options).add(cmdline_options).add(hpx_options);
-            std::cout << visible;
-            return help;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         // Additional command line parser which interprets '@something' as an 
         // option "options-file" with the value "something". Additionally we 
         // map any option -N (where N is a integer) to --node=N.
@@ -361,10 +348,6 @@ namespace hpx
             try {
                 options_description cmdline_options(
                     "HPX options (allowed on command line only)");
-                options_description hpx_options(
-                    "HPX options (additionally allowed in an options file)");
-                options_description hidden_options("Hidden options");
-
                 cmdline_options.add_options()
                     ("help,h", "print out program usage (this message)")
                     ("version,v", "print out HPX version and copyright information")
@@ -372,6 +355,10 @@ namespace hpx
                         "specify a file containing command line options "
                         "(alternatively: @filepath)")
                 ;
+
+                options_description hpx_options(
+                    "HPX options (additionally allowed in an options file)");
+                options_description hidden_options("Hidden options");
 
                 switch (mode) {
                 case runtime_mode_default:
@@ -400,6 +387,7 @@ namespace hpx
                     throw std::logic_error("invalid runtime mode specified");
                 }
 
+                // general options definitions
                 hpx_options.add_options()
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
@@ -428,6 +416,11 @@ namespace hpx
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
+#if HPX_AGAS_VERSION > 0x10
+                    ("node", value<std::size_t>(), 
+                     "number of the node this locality is run on "
+                     "(must be unique, alternatively: -1, -2, etc.)")
+#endif
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to dedicate as "
                      "shepherd threads for this HPX locality (default: 1)")
@@ -438,6 +431,10 @@ namespace hpx
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
+                ;
+
+                options_description config_options("HPX configuration options");
+                config_options.add_options()
                     ("app-config,p", value<std::string>(), 
                      "load the specified application configuration (ini) file")
                     ("hpx-config", value<std::string>()->default_value(""), 
@@ -448,32 +445,32 @@ namespace hpx
 #if HPX_AGAS_VERSION > 0x10
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
+                    // enable debug output from command line handling
+                    ("debug-clp", "debug command line processing")
                     ("exit", "exit after configuring the runtime")
-                    ("print-counter,P", value<std::vector<std::string> >()->composing(),
+#endif
+                ;
+                
+                options_description counter_options(
+                    "HPX options related to performance counters");
+                counter_options.add_options()
+                    ("print-counter", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter before shutting "
                      "down the system")
                     ("list-counters", "list the names of all registered performance "
                      "counters")
                     ("list-counter-infos", "list the description of all registered "
                      "performance counters")
-                    ("node", value<std::size_t>(), 
-                    "number of the node this locality is run on "
-                    "(must be unique, alternatively: -1, -2, etc.)")
-#endif
                 ;
 
-#if HPX_AGAS_VERSION > 0x10
-                hidden_options.add_options()
-                    // enable debug output from command line handling
-                    ("debug-clp", "debug command line processing")
-                ;
-#endif
-
+                // construct the overall options description and parse the 
+                // command line
                 options_description desc_cmdline;
                 desc_cmdline
                     .add(app_options).add(cmdline_options)
-                    .add(hpx_options).add(hidden_options);
-
+                    .add(hpx_options).add(counter_options)
+                    .add(config_options).add(hidden_options)
+                ;
                 parsed_options opts(parse_command_line(argc, argv, 
                     desc_cmdline, unix_style, option_parser));
                 store(opts, vm);
@@ -481,7 +478,9 @@ namespace hpx
 
                 options_description desc_cfgfile;
                 desc_cfgfile
-                    .add(app_options).add(hpx_options).add(hidden_options);
+                    .add(app_options).add(hpx_options)
+                    .add(counter_options).add(config_options)
+                    .add(hidden_options);
 
                 handle_generic_config_options(argv[0], vm, desc_cfgfile);
                 handle_config_options(vm, desc_cfgfile);
@@ -491,8 +490,16 @@ namespace hpx
                     return print_version();
 
                 // print help screen
-                if (vm.count("help")) 
-                    return print_help(cmdline_options, app_options, hpx_options);
+                if (vm.count("help")) {
+                    boost::program_options::options_description visible;
+                    visible
+                        .add(app_options).add(cmdline_options)
+                        .add(hpx_options).add(counter_options)
+                        .add(config_options)
+                    ;
+                    std::cout << visible;
+                    return help;
+                }
             }
             catch (std::exception const& e) {
                 std::cerr << "hpx::init: exception caught: "
