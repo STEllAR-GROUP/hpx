@@ -57,7 +57,7 @@ namespace hpx { namespace performance_counters
     /// A small data structure holding all data needed to install a counter type
     struct counter_type_data
     {
-        std::string name_;          ///< Name of teh counter type
+        std::string name_;          ///< Name of the counter type
         counter_type type_;         ///< Type of the counter instances of this 
                                     ///< counter type
         std::string helptext_;      ///< Longer descriptive text explaining the 
