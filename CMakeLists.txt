@@ -420,11 +420,12 @@ else()
 
     if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-      option(HPX_LTO "Use -flto for Release and MinSizeRel builds (default: ON)" ON)
+      # option(HPX_LTO "Use -flto for Release and MinSizeRel builds (default: ON)" ON)
 
-      if(HPX_LTO) 
-        hpx_use_flag_if_available(flto)
-      endif()
+      # ld.bfd can't handle HPX yet.
+      # if(HPX_LTO) 
+      #  hpx_use_flag_if_available(flto)
+      # endif()
     endif()
 
     if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
