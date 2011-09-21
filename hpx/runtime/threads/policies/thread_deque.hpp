@@ -17,7 +17,6 @@
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/atomic.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/deque.hpp>
 #include <boost/lockfree/fifo.hpp>
@@ -93,7 +92,7 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = boost::get<1>(*task);
-            boost::scoped_ptr<threads::thread> thrd(
+            std::auto_ptr<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     boost::get<0>(*task), memory_pool_, state));
 
@@ -149,7 +148,7 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = boost::get<1>(*task);
-            boost::scoped_ptr<threads::thread> thrd(
+            std::auto_ptr<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     boost::get<0>(*task), memory_pool_, state));
 
@@ -277,7 +276,7 @@ struct thread_deque
         if (run_now) {
             mutex_type::scoped_lock lk(mtx_);
 
-            boost::scoped_ptr<threads::thread> thrd (
+            std::auto_ptr<threads::thread> thrd (
                 new (memory_pool_) threads::thread(
                     data, memory_pool_, initial_state));
 
