@@ -241,6 +241,8 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_startup_shutdown.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_startup_shutdown_base.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
@@ -255,9 +257,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\allocator.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\default_malloc.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\default_vector.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp" />
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp" />
@@ -280,7 +279,7 @@
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
     <ClInclude Include="..\..\..\hpx\util\stringstream.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\system_allocator.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\unmangle_name.hpp" />
     <ClInclude Include="..\..\..\hpx\version.hpp" />
     <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
     <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />
