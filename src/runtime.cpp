@@ -725,7 +725,9 @@ namespace hpx
     {
         performance_counters::counter_type_data counter_types[] = 
         {
-            { "/runtime/uptime", performance_counters::counter_elapsed_time }
+            { "/runtime/uptime", performance_counters::counter_elapsed_time,
+              "returns the up time of the runtime instance for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));

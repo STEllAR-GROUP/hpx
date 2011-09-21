@@ -296,9 +296,11 @@ namespace hpx { namespace parcelset
         performance_counters::counter_type_data const counter_types[] = 
         {
             { "/parcels/count/sent", performance_counters::counter_raw,
-              "returns the number of sent parcels for the referenced locality" },
+              "returns the number of sent parcels for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
             { "/parcels/count/received", performance_counters::counter_raw,
-              "returns the number of received parcels for the referenced locality" }
+              "returns the number of received parcels for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));

@@ -973,24 +973,31 @@ namespace hpx { namespace threads
         {
             // queue length
             { "/queue/length", performance_counters::counter_raw,
-              "returns the current queue length for the referenced queue" },
+              "returns the current queue length for the referenced queue",
+              HPX_PERFORMANCE_COUNTER_V1 },
             // thread counts
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
               "returns the overall number of executed (retired) px-threads for "
-              "the referenced locality" },
+              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of px-threads instantiated at the "
-              "referenced locality" },
+              "referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/active", performance_counters::counter_raw, 
-              "returns the current number of active px-threads at the referenced locality" },
+              "returns the current number of active px-threads at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/pending", performance_counters::counter_raw, 
-              "returns the current number of pending px-threads at the referenced locality" },
+              "returns the current number of pending px-threads at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/suspended", performance_counters::counter_raw, 
-              "returns the current number of suspended px-threads at the referenced locality" },
+              "returns the current number of suspended px-threads at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/terminated", performance_counters::counter_raw, 
-              "returns the current number of terminated px-threads at the referenced locality" },
-            //
-            { "/time/idle-rate", performance_counters::counter_raw }
+              "returns the current number of terminated px-threads at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
+            // Idle rate of either a thread or the averaging over all threads of a locality
+            { "/time/idle-rate", performance_counters::counter_raw,
+              "returns the idle rate for the referenced object - thread or locality (in "
+              "0.1%)", HPX_PERFORMANCE_COUNTER_V1 }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));

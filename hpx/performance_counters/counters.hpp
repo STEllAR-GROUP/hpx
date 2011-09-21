@@ -216,15 +216,20 @@ namespace hpx { namespace performance_counters
         std::string const& name, std::string& type_name, 
         error_code& ec = throws);
 
+    // default version of performance counter structures
+    #define HPX_PERFORMANCE_COUNTER_V1 0x01000000
+
     ///////////////////////////////////////////////////////////////////////////
     struct counter_info
     {
         counter_info(counter_type type = counter_raw)
-          : type_(type), version_(0x01000000), status_(status_valid_data)
+          : type_(type), version_(HPX_PERFORMANCE_COUNTER_V1), 
+            status_(status_valid_data)
         {}
 
         counter_info(counter_type type, std::string const& name, 
-          std::string const& helptext, boost::uint32_t version = 0x01000000)
+                std::string const& helptext, 
+                boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
           : type_(type), version_(version), status_(status_valid_data),
             fullname_(name), helptext_(helptext)
         {}
