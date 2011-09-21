@@ -48,6 +48,8 @@ namespace hpx { namespace util
                         if (!line.empty()) {
                             if (debug_)
                                 std::cerr << "read: " << line << std::endl;
+                            if (nodes_.empty())
+                                agas_node_ = line;
                             ++nodes_[line];
                         }
                     }
@@ -73,6 +75,8 @@ namespace hpx { namespace util
                 if (!s.empty()) {
                     if (debug_)
                         std::cerr << "extracted: " << s << std::endl;
+                    if (nodes_.empty())
+                        agas_node_ = s;
                     ++nodes_[s];
                     nodes_list += s + ' ';
                 }
@@ -175,12 +179,13 @@ namespace hpx { namespace util
         // host the AGAS server.
         std::string agas_host_name(std::string const& def_agas) const
         {
-            std::string host = nodes_.empty() ? def_agas : (*nodes_.begin()).first;
+            std::string host = agas_node_.empty() ? def_agas : agas_node_; 
             if (debug_) 
                 std::cerr << "agas host_name: " << host << std::endl;
             return host;
         }
-
+        
+        std::string agas_node_;
         std::map<std::string, std::size_t> nodes_;
         bool debug_;
     };
