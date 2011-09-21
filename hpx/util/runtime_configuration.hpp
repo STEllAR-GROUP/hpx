@@ -17,7 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-
+    ///////////////////////////////////////////////////////////////////////////
     // The runtime_configuration class is a wrapper for the runtime 
     // configuration data allowing to extract configuration information in a 
     // more convenient way
@@ -84,7 +84,6 @@ namespace hpx { namespace util
         // Returns the command line that this locality was invoked with.
         std::string get_cmd_line() const;
     };
-
 }}
 
 #endif

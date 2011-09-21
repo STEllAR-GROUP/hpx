@@ -38,7 +38,7 @@ namespace hpx { namespace components
 
         /// \brief Return the ini-information for all contained components
         ///
-        /// \param fillini  [in] The module is expected to fill this vector 
+        /// \param fillini  [in, out] The module is expected to fill this vector 
         ///                 with the ini-information (one line per vector 
         ///                 element) for all components implemented in this
         ///                 module.

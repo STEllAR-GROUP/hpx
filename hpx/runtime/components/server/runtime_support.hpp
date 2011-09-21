@@ -266,6 +266,8 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& prefix, naming::resolver_client& agas_client, 
             bool isdefault);
 
+        bool load_startup_shutdown_functions(boost::plugin::dll& d);
+
     private:
         mutex_type mtx_;
         boost::condition wait_condition_;

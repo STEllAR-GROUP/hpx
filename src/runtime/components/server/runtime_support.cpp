@@ -20,6 +20,9 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
@@ -693,6 +696,40 @@ namespace hpx { namespace components { namespace server
         } // for
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_startup_shutdown_functions(boost::plugin::dll& d)
+    {
+        try {
+            // get the factory, may fail
+            boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d, 
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(startup_shutdown)));
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_startup_shutdown_base> 
+                startup_shutdown(pf.create("startup_shutdown")); 
+
+            startup_function_type startup;
+            if (startup_shutdown->get_startup_function(startup))
+                startup_functions_.push_back(startup);
+
+            shutdown_function_type shutdown;
+            if (startup_shutdown->get_shutdown_function(shutdown))
+                shutdown_functions_.push_back(shutdown);
+        }
+        catch (std::logic_error const& e) {
+            LRT_(warning) << "loading of startup/shutdown functions failed: " 
+                          << d.get_name() << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(warning) << "loading of startup/shutdown functions failed: " 
+                          << d.get_name() << ": " << e.what();
+            return false;
+        }
+        return true;    // component got loaded
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
         boost::filesystem::path lib, naming::gid_type const& prefix, 
@@ -747,33 +784,31 @@ namespace hpx { namespace components { namespace server
                             components::get_derived_type(t), data));
                 }
                 if (p.second) {
-                    p = components_.insert(component_map_type::value_type(
+                    components_.insert(component_map_type::value_type(
                             components::get_base_type(t), data));
                 }
             }
 
             if (!p.second) {
                 LRT_(error) << "duplicate component id: " << instance
-                           << ": " << components::get_component_type_name(t);
+                    << ": " << components::get_component_type_name(t);
                 return false;   // duplicate component id?
             }
+
+            load_startup_shutdown_functions(d);
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string() 
                        << ": " << instance << ": " 
                        << components::get_component_type_name(t);
         }
         catch (std::logic_error const& e) {
-            //if (!isdefault) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string() 
-                              << ": " << instance << ": " << e.what();
-            //}
+            LRT_(warning) << "dynamic loading failed: " << lib.string() 
+                          << ": " << instance << ": " << e.what();
             return false;
         }
         catch (std::exception const& e) {
-            //if (!isdefault) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string() 
-                              << ": " << instance << ": " << e.what();
-            //}
+            LRT_(warning) << "dynamic loading failed: " << lib.string() 
+                          << ": " << instance << ": " << e.what();
             return false;
         }
         return true;    // component got loaded

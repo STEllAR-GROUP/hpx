@@ -335,18 +335,23 @@ else()
   set(hpxlib_components_HEADERS
       ${hpx_SOURCE_DIR}/hpx/runtime/components/client_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/component_type.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory_one.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_registry_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/component_registry.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_registry_base.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_startup_shutdown.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/component_startup_shutdown_base.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/constructor_argument.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/console_error_sink.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/console_logging.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/constructor_argument.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/derived_component_factory_one.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/memory_block.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/components/plain_component_factory.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp)
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/runtime_support.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/components/unique_component_name.hpp)
   source_group("Header Files\\runtime\\components" 
       FILES ${hpxlib_components_HEADERS})
 
@@ -432,8 +437,6 @@ else()
   # util
   set(hpxlib_util_HEADERS
       ${hpx_SOURCE_DIR}/hpx/util/asio_util.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/binary_portable_iarchive.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/binary_portable_oarchive.hpp
       ${hpx_SOURCE_DIR}/hpx/util/block_profiler.hpp
       ${hpx_SOURCE_DIR}/hpx/util/connection_cache.hpp
       ${hpx_SOURCE_DIR}/hpx/util/container_device.hpp
@@ -441,7 +444,8 @@ else()
       ${hpx_SOURCE_DIR}/hpx/util/full_empty_memory.hpp
       ${hpx_SOURCE_DIR}/hpx/util/full_empty_store.hpp
       ${hpx_SOURCE_DIR}/hpx/util/future.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/generate_unique_ids.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/generate_unique_ids_v1.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/generate_unique_ids_v2.hpp
       ${hpx_SOURCE_DIR}/hpx/util/high_resolution_timer.hpp
       ${hpx_SOURCE_DIR}/hpx/util/ini.hpp
       ${hpx_SOURCE_DIR}/hpx/util/init_ini_data.hpp
@@ -449,19 +453,23 @@ else()
       ${hpx_SOURCE_DIR}/hpx/util/io_service_pool.hpp
       ${hpx_SOURCE_DIR}/hpx/util/locking_helpers.hpp
       ${hpx_SOURCE_DIR}/hpx/util/logging.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/map_hostnames.hpp
       ${hpx_SOURCE_DIR}/hpx/util/one_size_heap_list.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/portable_binary_archive.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/portable_binary_iarchive.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/portable_binary_oarchive.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/pbs_environment.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/performance_counters.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/random.hpp
       ${hpx_SOURCE_DIR}/hpx/util/runtime_configuration.hpp
       ${hpx_SOURCE_DIR}/hpx/util/safe_bool.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/serialize_asio_address_v4.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/serialize_asio_address_v6.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/serialize_asio_basic_endpoint.hpp
       ${hpx_SOURCE_DIR}/hpx/util/serialize_exception.hpp
       ${hpx_SOURCE_DIR}/hpx/util/serialize_sequence.hpp
       ${hpx_SOURCE_DIR}/hpx/util/spinlock_pool.hpp
       ${hpx_SOURCE_DIR}/hpx/util/static.hpp
+      ${hpx_SOURCE_DIR}/hpx/util/stringstream.hpp
       ${hpx_SOURCE_DIR}/hpx/util/time_logger.hpp
       ${hpx_SOURCE_DIR}/hpx/util/unlock_lock.hpp
-      ${hpx_SOURCE_DIR}/hpx/util/stringstream.hpp
       ${hpx_SOURCE_DIR}/hpx/util/unmangle_name.hpp
       ${hpx_SOURCE_DIR}/hpx/util/value_logger.hpp)
   source_group("Header Files\\util" 
