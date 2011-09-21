@@ -29,30 +29,3 @@ foreach(example_program ${example_programs})
                               ${example_program}_exe)
 endforeach() 
 
-set(example_programs
-    parcel_sends1
-    parcel_sends2
-    parcel_receives1)
-
-foreach(example_program ${example_programs})
-  set(sources ${example_program}.cpp)
-
-  source_group("Source Files" FILES ${sources})
-
-  # add example executable
-  add_hpx_executable(${example_program}
-                     MODULE balancing
-                     SOURCES ${sources}
-                     DEPENDENCIES iostreams_component)
-
-  # add a custom target for this example 
-  add_hpx_pseudo_target(examples.balancing.${example_program})
-
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.balancing
-                              examples.balancing.${example_program})
-
-  # add dependencies to pseudo-target 
-  add_hpx_pseudo_dependencies(examples.balancing.${example_program}
-                              ${example_program}_exe)
-endforeach() 
