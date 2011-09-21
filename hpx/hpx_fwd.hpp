@@ -291,10 +291,12 @@ namespace hpx
 #if HPX_AGAS_VERSION > 0x10
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
-    HPX_API_EXPORT void register_startup_function(boost::function<void()> const&);
+    typedef boost::function<void()> startup_function_type;
+    HPX_API_EXPORT void register_startup_function(startup_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
-    HPX_API_EXPORT void register_shutdown_function(boost::function<void()> const&);
+    typedef boost::function<void()> shutdown_function_type;
+    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
 #endif
 
     template <
