@@ -10,6 +10,15 @@ set(HPX_INSTALL_LOADED TRUE)
 
 hpx_include(ParseArguments)
 
+macro(hpx_symlink source destination)
+  install(CODE
+    "set(symlink_root \"${CMAKE_INSTALL_PREFIX}\")
+     execute_process(
+       COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+               \"${source}\" \"${destination}\"
+       WORKING_DIRECTORY \"\${symlink_root}\")")
+endmacro()
+
 macro(hpx_executable_install name)
   hpx_parse_arguments(${name} "MODULE" "ESSENTIAL" ${ARGN})
 

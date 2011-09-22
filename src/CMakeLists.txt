@@ -92,7 +92,6 @@ if(UNIX)
   add_library(hpx_serialization SHARED ${hpx_serialization_SOURCES})
 
   set_target_properties(hpx_serialization PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -113,11 +112,14 @@ if(UNIX)
     "HPX_EXPORTS"
     "BOOST_COROUTINE_EXPORTS")
 
+  hpx_library_install(core ${name})
+  hpx_library_install(core ${name}.${HPX_SOVERSION})
+  hpx_library_install(core ${name}.${HPX_VERSION})
+
   #############################################################################
   # libhpx
   add_library(hpx SHARED ${hpx_SOURCES})
   set_target_properties(hpx PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/hpx"
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -147,13 +149,13 @@ if(UNIX)
                PROPERTY RUNTIME_OUTPUT_DIRECTORY
                "${CMAKE_BINARY_DIR}/lib/hpx")
 
-  foreach(lib ${hpx_CORE})
-    get_target_property(path ${lib} LOCATION)
-    get_filename_component(name "${path}" NAME)
-    hpx_library_install(core ${name})
-    hpx_library_install(core ${name}.${HPX_SOVERSION})
-    hpx_library_install(core ${name}.${HPX_VERSION})
-  endforeach()
+  hpx_component_install(core ${name})
+  hpx_component_install(core ${name}.${HPX_SOVERSION})
+  hpx_component_install(core ${name}.${HPX_VERSION})
+
+  hpx_symlink(lib/hpx/${name} lib/${name})
+  hpx_symlink(lib/${name} lib/${name}.${HPX_SOVERSION})
+  hpx_symlink(lib/${name} lib/${name}.${HPX_VERSION})
 else()
 ###############################################################################
 # MSVC 
