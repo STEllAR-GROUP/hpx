@@ -156,3 +156,12 @@ macro(hpx_check_for_cxx11_lambdas variable)
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
+###############################################################################
+macro(hpx_check_for_cxx11_unique_ptr variable)
+  hpx_get_include_directory(include_dir)
+ 
+  add_hpx_config_test("cxx11_unique_ptr" ${variable} LANGUAGE CXX 
+    SOURCE cmake/tests/cxx11_unique_ptr.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
