@@ -15,6 +15,8 @@
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+// FIXME: Error codes?
+
 namespace hpx { namespace applier 
 {
     template <typename Action>
@@ -149,7 +151,7 @@ namespace hpx { namespace applier
         return apply_r_sync_p<Action>(addr, gid, action_priority<Action>());
     }
 
-    // we  know, it's local and has to be directly executed
+    // we know, it's local and has to be directly executed
     template <typename Action>
     inline bool apply_l_p(actions::continuation* c, 
         naming::address const& addr, threads::thread_priority priority)
@@ -186,17 +188,6 @@ namespace hpx { namespace applier
         return apply_p<Action>(c, gid, action_priority<Action>());
     }
 
-//     template <typename Action>
-//     bool apply (actions::continuation* c, naming::full_address& fa)
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa)) 
-//             return apply_l<Action>(c, fa.caddr());
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), c, fa.cgid());
-//     }
-
     template <typename Action>
     inline bool 
     apply_c_p(naming::address& addr, naming::id_type const& contgid, 
@@ -214,13 +205,6 @@ namespace hpx { namespace applier
         return apply_r<Action>(addr, new actions::continuation(contgid), gid);
     }
 
-//     template <typename Action>
-//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-//         naming::id_type const& gid)
-//     {
-//         return apply_r<Action>(addr, new actions::continuation(contaddr), gid);
-//     }
-
     template <typename Action>
     inline bool 
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
@@ -235,12 +219,6 @@ namespace hpx { namespace applier
     {
         return apply<Action>(new actions::continuation(contgid), gid);
     }
-
-//     template <typename Action>
-//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid)
-//     {
-//         return apply<Action>(new actions::continuation(contaddr), gid);
-//     }
 
     ///////////////////////////////////////////////////////////////////////////
     // one parameter version
@@ -333,17 +311,6 @@ namespace hpx { namespace applier
         return apply_p<Action>(gid, action_priority<Action>(), arg0);
     }
 
-//     template <typename Action, typename Arg0>
-//     bool apply (naming::full_address& fa, Arg0 const& arg0)
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa)) 
-//             return apply_l<Action>(fa.caddr(), arg0);   // apply locally
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), fa.cgid(), arg0);
-//     }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Arg0>
     inline bool 
@@ -415,18 +382,9 @@ namespace hpx { namespace applier
         return apply_p<Action>(c, gid, action_priority<Action>(), arg0);
     }
 
-//     template <typename Action, typename Arg0>
-//     bool apply (actions::continuation* c, naming::full_address& fa, 
-//         Arg0 const& arg0)
-//     {
-//         // Determine whether the gid is local or remote
-//         if (hpx::applier::get_applier().address_is_local(fa)) 
-//             return apply_l<Action>(c, fa.caddr(), arg0);    // apply locally
-// 
-//         // apply remotely
-//         return apply_r<Action>(fa.addr(), c, fa.cgid(), arg0);
-//     }
-
+    /// \brief Invoke an unary action with a \b actions::continuation
+    ///        at a specific priority using a pre-resolved remote
+    ///        \b naming::address. Takes a continuation by GID.
     template <typename Action, typename Arg0>
     inline bool 
     apply_c_p(naming::address& addr, naming::id_type const& contgid, 
@@ -437,6 +395,9 @@ namespace hpx { namespace applier
             action_priority<Action>(), arg0);
     }
 
+    /// \brief Invoke an unary action with a \b actions::continuation
+    ///        using a pre-resolved remote \b naming::address. Takes a
+    ///        continuation by GID. 
     template <typename Action, typename Arg0>
     inline bool 
     apply_c (naming::address& addr, naming::id_type const& contgid, 
@@ -445,13 +406,9 @@ namespace hpx { namespace applier
         return apply_r<Action>(addr, new actions::continuation(contgid), gid, arg0);
     }
 
-//     template <typename Action, typename Arg0>
-//     bool apply_c (naming::address& addr, naming::full_address const& contaddr, 
-//         naming::id_type const& gid, Arg0 const& arg0)
-//     {
-//         return apply_r<Action>(addr, new actions::continuation(contaddr), gid, arg0);
-//     }
-
+    /// \brief Invoke an unary action with a \b actions::continuation at a
+    ///        specific priority on a local or remote GID. Takes a continuation
+    ///        by GID.
     template <typename Action, typename Arg0>
     inline bool 
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid, 
@@ -461,6 +418,13 @@ namespace hpx { namespace applier
             priority, arg0);
     }
 
+    /// \brief Invoke an unary action with a \b actions::continuation on a
+    ///        local or remote GID. Takes a continuation by GID.
+    ///
+    /// \param contgid      [in] The GID of the continuation.
+    /// \param gid          [in] The target of the action.
+    /// \param arg0         [in] Value to bind to the first argument of the
+    ///                     action.  
     template <typename Action, typename Arg0>
     inline bool 
     apply_c (naming::id_type const& contgid, naming::id_type const& gid, 
@@ -469,14 +433,7 @@ namespace hpx { namespace applier
         return apply<Action>(new actions::continuation(contgid), gid, arg0);
     }
 
-//     template <typename Action, typename Arg0>
-//     bool apply_c (naming::full_address const& contaddr, naming::id_type const& gid, 
-//         Arg0 const& arg0)
-//     {
-//         return apply<Action>(new actions::continuation(contaddr), gid, arg0);
-//     }
-
-    // bring in the rest of the apply<> overloads
+    // bring in the rest of the apply<> overloads (arity 2+)
     #include <hpx/runtime/applier/apply_implementations.hpp>
 
 }}
