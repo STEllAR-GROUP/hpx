@@ -16,6 +16,12 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
     "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
+# Fortran overrides 
+################################################################################
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
+    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
+
+################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -184,8 +190,15 @@ link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 ################################################################################
 # Compiler configuration code
 ################################################################################
-include(HPX_GCCVersion)
-include(HPX_CompilerFlags)
+hpx_include(GCCVersion)
+hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
+
+if(CMAKE_Fortran_COMPILER)
+  hpx_include(GFortranVersion)
+  hpx_info("gfortran_config" "Compiler reports compatibility with gfortran version ${GFORTRAN_VERSION_STR}")
+endif()
+
+hpx_include(CompilerFlags)
 
 ################################################################################
 # SVN revision detection 
@@ -356,78 +369,68 @@ if(MSVC)
 ################################################################################
 else()
   # clear CMake defaults
-  set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Release flags (C++)" FORCE)
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (C++)" FORCE)
+  foreach(language CXX Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
+    set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
+    set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
+  endforeach()
 
   if(HPX_STACKTRACES)
-    hpx_use_flag_if_available(rdynamic)
+    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX Fortran)
   endif()
 
   if(HPX_CXX11)
-    hpx_use_flag_if_available(std=c++0x NAME std_c++0x)
+    hpx_use_flag_if_available(-std=c++0x)
   endif()
 
   # non-standard C++ extensions that we forbid
-  hpx_use_flag_if_available(Werror=vla NAME Werror_vla)
+  hpx_use_flag_if_available(-Werror=vla)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
-    hpx_use_flag_if_available(g)
-    hpx_use_flag_if_available(fno-omit-frame-pointer)
-    hpx_use_flag_if_available(fno-inline)
+    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     add_definitions(-DDEBUG)
-    hpx_use_flag_if_available(g)
-    hpx_use_flag_if_available(O3)
-    hpx_use_flag_if_available(fno-omit-frame-pointer)
-    hpx_use_flag_if_available(fno-inline)
-    hpx_use_flag_if_available(fno-optimize-sibling-calls)
-    hpx_use_flag_if_available(fno-web)
-    hpx_use_flag_if_available(fno-rename-registers)
+    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_definitions(-DNDEBUG)
-    hpx_use_flag_if_available(Os)
+    hpx_use_flag_if_available(-Os)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    hpx_use_flag_if_available(O3)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
   else()
     hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
   endif()
 
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(Wall)
-    hpx_use_flag_if_available(Wno-strict-aliasing)
-    hpx_use_flag_if_available(Wsign-promo)
+    hpx_use_flag_if_available(-Wall)
+    hpx_use_flag_if_available(-Wno-strict-aliasing)
+    hpx_use_flag_if_available(-Wsign-promo)
 
     # FIXME: too noisy for now
     # Warn about floating point equality comparisons
-    # hpx_use_flag_if_available(Wfloat-equal)
+    # hpx_use_flag_if_available(-Wfloat-equal)
   endif()
 
   ##############################################################################
   # GNU specific configuration
   ##############################################################################
   # Show the flags that toggle each warning
-  hpx_use_flag_if_available(fdiagnostics-show-option)
+  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
-
     # I'm aware that __sync_fetch_and_nand changed semantics
-    hpx_use_flag_if_gcc_version(Wno-sync-nand 040400)
-
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
-       "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-      # option(HPX_LTO "Use -flto for Release and MinSizeRel builds (default: ON)" ON)
-
-      # ld.bfd can't handle HPX yet.
-      # if(HPX_LTO) 
-      #  hpx_use_flag_if_available(flto)
-      # endif()
-    endif()
+    hpx_use_flag_if_available(-Wno-sync-nand)
 
     if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
       hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
@@ -465,13 +468,11 @@ else()
     add_definitions(-diag-disable 1125) 
 
     if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-      hpx_use_flag_if_available(ipo)
+      hpx_use_flag_if_available(-ipo)
     elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-      hpx_use_flag_if_available(ipo)
+      hpx_use_flag_if_available(-ipo)
     elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-      hpx_use_flag_if_available(ipo)
-    else()
-      hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+      hpx_use_flag_if_available(-ipo)
     endif()
   endif()
 
@@ -480,32 +481,25 @@ else()
   ##############################################################################
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
-  # this flag is used, the generated binaries will be less portable. This is why
-  # we define the HPX_COMPILER_AUTO_TUNED macro.
-  hpx_check_for_compiler_auto_tune(HPX_COMPILER_AUTO_TUNE
-     DEFINITIONS HPX_COMPILER_AUTO_TUNED) 
-  
-  if(HPX_COMPILER_AUTO_TUNE)
-    hpx_append_flag("-march=native")
-  endif() 
+  # this flag is used, the generated binaries will be less portable.
+  hpx_use_flag_if_available(-march=native LANGUAGES CXX Fortran)
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
-  hpx_check_for_gnu_mcx16(HPX_GNU_MCX16
-    DEFINITIONS HPX_HAVE_GNU_SYNC_16
-                BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX Fortran)
 
-  if(HPX_GNU_MCX16)
-    hpx_append_flag("-mcx16")
+  if(HPX_CXX_FLAG_MCX16)
+    add_definitions(-DHPX_HAVE_GNU_SYNC_16)
+    add_definitions(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
   endif() 
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
   # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
   # and some versions don't warn if you ask for an alignment above said limit.
   # Instead, they'll just silently use the maximum, which can be problematical. 
-  hpx_check_for_gnu_mcx16(HPX_GNU_ALIGNED_16
+  hpx_check_for_gnu_aligned_16(HPX_GNU_ALIGNED_16
     DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
                 BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
 
@@ -523,7 +517,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
   
   if(HPX_SSE2)
-    hpx_append_flag("-msse2")
+    hpx_use_flag_if_available(-msse2 LANGUAGES CXX Fortran)
   endif() 
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -554,7 +548,6 @@ else()
   endif()
 
   add_definitions(-D_GNU_SOURCE)
-  hpx_append_flag(-pthread)
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
@@ -588,15 +581,15 @@ else()
         add_definitions(-DHPX_JEMALLOC)
       endif()
  
-      hpx_use_flag_if_available(fno-builtin-cfree)
-      hpx_use_flag_if_available(fno-builtin-pvalloc)
-      hpx_use_flag_if_available(fno-builtin-malloc)
-      hpx_use_flag_if_available(fno-builtin-free)
-      hpx_use_flag_if_available(fno-builtin-calloc)
-      hpx_use_flag_if_available(fno-builtin-realloc)
-      hpx_use_flag_if_available(fno-builtin-valloc)
-      hpx_use_flag_if_available(fno-builtin-memalign)
-      hpx_use_flag_if_available(fno-builtin-posix_memalign)
+      hpx_use_flag_if_available(-fno-builtin-cfree)
+      hpx_use_flag_if_available(-fno-builtin-pvalloc)
+      hpx_use_flag_if_available(-fno-builtin-malloc)
+      hpx_use_flag_if_available(-fno-builtin-free)
+      hpx_use_flag_if_available(-fno-builtin-calloc)
+      hpx_use_flag_if_available(-fno-builtin-realloc)
+      hpx_use_flag_if_available(-fno-builtin-valloc)
+      hpx_use_flag_if_available(-fno-builtin-memalign)
+      hpx_use_flag_if_available(-fno-builtin-posix_memalign)
     else()
       hpx_info("malloc" "Using system allocator.")
       hpx_warn("malloc"

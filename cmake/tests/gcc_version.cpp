@@ -8,7 +8,8 @@
 #include <iostream>
 #include <boost/format.hpp>
 
-int main() {
+int main()
+{
   std::cout << (boost::format("%02d%02d%02d")
                 % __GNUC__ % __GNUC_MINOR__ % __GNUC_PATCHLEVEL__);
 }

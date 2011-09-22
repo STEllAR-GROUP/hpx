@@ -96,12 +96,6 @@ macro(hpx_check_for_gnu_aligned_16 variable)
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
 endmacro()
 
-macro(hpx_check_for_gnu_mcx16 variable)
-  add_hpx_config_test("gnu_mcx16" ${variable} LANGUAGE CXX 
-    SOURCE cmake/tests/flag.cpp
-    FLAGS -mcx16 FILE ${ARGN})
-endmacro()
-
 ###############################################################################
 macro(hpx_check_for_pthread_affinity_np variable)
   hpx_get_include_directory(include_dir)
@@ -109,14 +103,6 @@ macro(hpx_check_for_pthread_affinity_np variable)
   add_hpx_config_test("pthread_affinity_np" ${variable} LANGUAGE CXX 
     SOURCE cmake/tests/pthread_affinity_np.cpp
     FLAGS -pthread -I${BOOST_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_compiler_auto_tune variable)
-  # TODO: add support for MSVC-esque compilers
-  add_hpx_config_test("compiler_auto_tune" ${variable} LANGUAGE CXX 
-    SOURCE cmake/tests/flag.cpp
-    FLAGS -march=native FILE ${ARGN})
 endmacro()
 
 ###############################################################################

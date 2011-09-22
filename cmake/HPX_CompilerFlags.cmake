@@ -12,12 +12,32 @@ hpx_include(Message
             AddConfigTest
             ParseArguments)
 
+macro(hpx_language_suffix var language)
+  if(${language} STREQUAL "CXX")
+    set(${var} .cpp)
+  elseif(${language} STREQUAL "Fortran")
+    set(${var} .fpp)
+  else()
+    hpx_error("language_suffix" "${language} is unsupported") 
+  endif()
+endmacro()
+
 macro(hpx_append_flag flag)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+  hpx_parse_arguments(APPEND "LANGUAGES" "" ${ARGN})
+
+  set(languages "CXX")
+ 
+  if(APPEND_LANGUAGES)
+    set(languages ${APPEND_LANGUAGES}) 
+  endif()
+
+  foreach(language ${languages})
+    set(CMAKE_${language}_FLAGS "${CMAKE_${language}_FLAGS} ${flag}")
+  endforeach()
 endmacro()
 
 macro(hpx_use_flag_if_available flag)
-  hpx_parse_arguments(FLAG "NAME" "" ${ARGN})
+  hpx_parse_arguments(FLAG "NAME;LANGUAGES" "" ${ARGN})
 
   set(uppercase_name "")
 
@@ -26,45 +46,58 @@ macro(hpx_use_flag_if_available flag)
   else()
     string(TOUPPER ${flag} uppercase_name)
   endif()
+
+  string(REGEX REPLACE "^-+" "" uppercase_name ${uppercase_name})
+  string(REGEX REPLACE "[=\\-]" "_" uppercase_name ${uppercase_name})
+  string(REGEX REPLACE "\\+" "X" uppercase_name ${uppercase_name})
+
+  string(TOLOWER ${uppercase_name} lowercase_name)
+
+  # C++ is the only language tested by default
+  set(languages "CXX")
+ 
+  if(FLAG_LANGUAGES)
+    set(languages ${FLAG_LANGUAGES}) 
+  endif()
+
+  foreach(language ${languages})
+    if(CMAKE_${language}_COMPILER)
+      hpx_language_suffix(language_suffix ${language})
+      string(TOUPPER ${language} uppercase_language)
   
-  if(HPX_ROOT)
-    set(source_dir "${HPX_ROOT}")
-    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
-      ROOT ${source_dir}
-      SOURCE cmake/tests/flag.cpp
-      FLAGS "-${flag}" FILE)
-  elseif($ENV{HPX_ROOT})
-    set(source_dir "$ENV{HPX_ROOT}")
-    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
-      ROOT ${source_dir}
-      SOURCE cmake/tests/flag.cpp
-      FLAGS "-${flag}" FILE)
-  else()
-    add_hpx_config_test(${uppercase_name} HPX_FLAG_${uppercase_name} LANGUAGE CXX 
-      SOURCE cmake/tests/flag.cpp
-      FLAGS "-${flag}" FILE)
-  endif()
-
-  if(HPX_FLAG_${uppercase_name})
-    hpx_append_flag("-${flag}")
-  else()
-    hpx_warn("use_flag_if_available" "${flag} is unavailable") 
-  endif()
-endmacro()
-
-macro(hpx_use_flag_if_gcc_version flag version)
-  if(${version} GREATER ${GCC_VERSION})
-    hpx_warn("use_flag_if_gcc_version" "${flag} is unavailable") 
-  else()
-    hpx_append_flag("-${flag}")
-  endif()
-endmacro()
-
-macro(hpx_use_flag_if_msvc_version flag version)
-  if(${version} GREATER ${MSVC_VERSION})
-    hpx_warn("use_flag_if_msvc_version" "${flag} is unavailable") 
-  else()
-    hpx_append_flag("-${flag}")
-  endif()
+      if(HPX_ROOT)
+        set(source_dir "${HPX_ROOT}")
+        add_hpx_config_test(${lowercase_name}
+          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
+          LANGUAGE ${language} 
+          ROOT ${source_dir}
+          SOURCE cmake/tests/flag${language_suffix}
+          FLAGS "${flag}" FILE)
+      elseif($ENV{HPX_ROOT})
+        set(source_dir "$ENV{HPX_ROOT}")
+        add_hpx_config_test(${lowercase_name}
+          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
+          LANGUAGE ${language} 
+          ROOT ${source_dir}
+          SOURCE cmake/tests/flag${language_suffix}
+          FLAGS "${flag}" FILE)
+      else()
+        add_hpx_config_test(${lowercase_name}
+          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
+          LANGUAGE ${language} 
+          SOURCE cmake/tests/flag${language_suffix}
+          FLAGS "${flag}" FILE)
+      endif()
+  
+      if(HPX_${uppercase_language}_FLAG_${uppercase_name})
+        hpx_append_flag("${flag}" LANGUAGES ${language})
+      else()
+        hpx_warn("use_flag_if_available" "${flag} is unavailable for ${language}") 
+      endif()
+    endif()
+  endforeach()
 endmacro()
 

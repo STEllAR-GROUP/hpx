@@ -45,44 +45,47 @@ if(UNIX)
   endif()
 
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(Wextra)
+    hpx_use_flag_if_available(-Wextra)
 
     # We never want trampolines
-    hpx_use_flag_if_available(Wtrampolines)
+    hpx_use_flag_if_available(-Wtrampolines)
 
     # These are usually benign and can't be suppressed because of
     # interface requirements
-    hpx_use_flag_if_available(Wno-unused-parameter)
-    hpx_use_flag_if_available(Wno-unused-but-set-parameter)
+    hpx_use_flag_if_available(-Wno-unused-parameter)
+    hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
 
     # There are ignored qualifiers in Boost, so we have to ignore them
-    hpx_use_flag_if_available(Wno-ignored-qualifiers)
+    hpx_use_flag_if_available(-Wno-ignored-qualifiers)
 
     # Be extra strict about format checks
     # Boost.Logging is built on fprintf, sadly
-    hpx_use_flag_if_available(Wformat=2 NAME Wformat_2)
-    hpx_use_flag_if_available(Wno-format-nonliteral) 
+    hpx_use_flag_if_available(-Wformat=2)
+    hpx_use_flag_if_available(-Wno-format-nonliteral) 
 
     # Self initialization is dangerous
-    hpx_use_flag_if_available(Winit-self)
+    hpx_use_flag_if_available(-Winit-self)
 
     # For portability
-    hpx_use_flag_if_available(Wdouble-promotion)
+    hpx_use_flag_if_available(-Wdouble-promotion)
 
     # Warn about casting that violates qualifiers or alignment
-    hpx_use_flag_if_available(Wcast-qual)
-    hpx_use_flag_if_available(Wcast-align)
+    hpx_use_flag_if_available(-Wcast-qual)
+    hpx_use_flag_if_available(-Wcast-align)
 
-    hpx_use_flag_if_available(Werror=trampolines NAME Werror_trampolines)
-    hpx_use_flag_if_available(Werror=parentheses NAME Werror_parentheses)
-    hpx_use_flag_if_available(Werror=reorder NAME Werror_reorder)
-    hpx_use_flag_if_available(Werror=return-type NAME Werror_return-type)
-    hpx_use_flag_if_available(Werror=sequence-point NAME Werror_sequence-point)
-    hpx_use_flag_if_available(Werror=uninitialized NAME Werror_uninitialized)
-    hpx_use_flag_if_available(Werror=format NAME Werror_format)
-    hpx_use_flag_if_available(Werror=missing-braces NAME Werror_missing-braces)
-    hpx_use_flag_if_available(Werror=sign-compare NAME Werror_sign-compare)
+    hpx_use_flag_if_available(-Werror=trampolines)
+    hpx_use_flag_if_available(-Werror=parentheses)
+    hpx_use_flag_if_available(-Werror=reorder)
+    hpx_use_flag_if_available(-Werror=return-type)
+    hpx_use_flag_if_available(-Werror=sequence-point)
+    hpx_use_flag_if_available(-Werror=uninitialized)
+    hpx_use_flag_if_available(-Werror=missing-field-initializers) 
+    hpx_use_flag_if_available(-Werror=format) 
+    hpx_use_flag_if_available(-Werror=missing-braces)
+    hpx_use_flag_if_available(-Werror=sign-compare)
   endif()
+
+  hpx_use_flag_if_available(-pthread)
 
   add_hpx_library_sources(hpx
     ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
@@ -153,9 +156,9 @@ if(UNIX)
   hpx_component_install(core ${name}.${HPX_SOVERSION})
   hpx_component_install(core ${name}.${HPX_VERSION})
 
-  hpx_symlink(lib/hpx/${name} lib/${name})
-  hpx_symlink(lib/${name} lib/${name}.${HPX_SOVERSION})
-  hpx_symlink(lib/${name} lib/${name}.${HPX_VERSION})
+  hpx_symlink(hpx/${name} lib/${name})
+  hpx_symlink(${name} lib/${name}.${HPX_SOVERSION})
+  hpx_symlink(${name} lib/${name}.${HPX_VERSION})
 else()
 ###############################################################################
 # MSVC 
