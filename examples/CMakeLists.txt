@@ -17,7 +17,8 @@ if(NOT MSVC)
       dataflow
       adaptive1d
       hplpx
-      barnes_hut
+      # Disabled by wash as this is randomly breaking things.
+      # barnes_hut
       random_mem_access
       queue
       quickstart
