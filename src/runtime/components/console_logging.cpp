@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Hartmut Kaiser, Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
@@ -20,6 +21,16 @@ namespace hpx { namespace components
 void console_logging_locked(naming::id_type const& prefix,
     messages_type const& msgs)
 {
+    // If we're not in an HPX thread, we cannot call apply as it may access
+    // the AGAS components. We just throw an exception here - there's no
+    // threadmanager, so the exception will probably be unhandled. This is
+    // desirable in this situation, as we can't trust the logging system to
+    // report this error. 
+    if (HPX_UNLIKELY(!threads::get_self_ptr()))
+        HPX_THROW_EXCEPTION(null_thread_id
+          , "components::console_logging_locked"
+          , "console_logging_locked was not called from a pxthread"); 
+
     try {
         applier::apply<server::console_logging_action<> >(prefix, msgs);
     }
@@ -72,15 +83,15 @@ void pending_logs::add(message_type const& msg)
         ++queue_size_;
     }
 
-    // invoke actual logging immediately if we're on the console
-    if (naming::get_agas_client().is_console()) 
+    // we can only invoke send from within a pxthread
+    if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
+        activated_.load()) 
     {
-        send();
-    }
-    else if (threads::threadmanager_is(running) && threads::get_self_ptr() && 
-        activated_.load() && (max_pending < queue_size_.load())) 
-    {
-        send();
+        // invoke actual logging immediately if we're on the console
+        if (naming::get_agas_client().is_console()) 
+            send();
+        else if (max_pending < queue_size_.load()) 
+            send();
     }
 }
 
