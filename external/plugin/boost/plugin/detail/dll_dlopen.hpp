@@ -59,6 +59,7 @@ namespace boost { namespace plugin {
         static void init_library(HMODULE dll_handle)
         {
 #if defined(__AIX__) && defined(__GNUC__)
+            dlerror();              // Clear the error state.
             typedef void (*init_proc_type)();
             init_proc_type init_proc = 
                 (init_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DI");
@@ -70,6 +71,7 @@ namespace boost { namespace plugin {
         static void deinit_library(HMODULE dll_handle)
         {
 #if defined(__AIX__) && defined(__GNUC__)
+            dlerror();              // Clear the error state.
             typedef void (*free_proc_type)();
             free_proc_type free_proc = 
                 (free_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DD");
@@ -92,6 +94,7 @@ namespace boost { namespace plugin {
                     boost::mutex::scoped_lock lock(dll::mutex_instance());
 
                     dll::deinit_library(h);
+                    dlerror();
                     MyFreeLibrary(h);
                 }
             }
@@ -166,12 +169,13 @@ namespace boost { namespace plugin {
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
             typedef typename remove_pointer<SymbolType>::type PointedType;
-            dlerror();
 
             // Open the library. Yes, we do it on every access to 
             // a symbol, the LoadLibrary function increases the refcnt of the dll
             // so in the end the dll class holds one refcnt and so does every 
             // symbol.
+
+            dlerror();              // Clear the error state.
             HMODULE handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             if (!handle) {
                 BOOST_PLUGIN_OSSTREAM str;
@@ -188,10 +192,10 @@ namespace boost { namespace plugin {
             BOOST_ASSERT(handle == dll_handle);
 #endif
 
-            dlerror();              // Clear the error state.
             init_library(handle);   // initialize library
 
             // Cast the to right type.
+            dlerror();              // Clear the error state.
             SymbolType address = (SymbolType)MyGetProcAddress(dll_handle, symbol_name.c_str());
             if (NULL == address) 
             {
@@ -200,6 +204,7 @@ namespace boost { namespace plugin {
                     << symbol_name << "' in the shared library '" 
                     << dll_name << "' (dlerror: " << dlerror () << ")";
                     
+                dlerror();
                 MyFreeLibrary(handle);
                 boost::throw_exception(
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
@@ -218,7 +223,7 @@ namespace boost { namespace plugin {
             initialize_mutex();
             boost::mutex::scoped_lock lock(mutex_instance());
 
-            dlerror();
+            dlerror();              // Clear the error state.
             dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             // std::cout << "open\n";
             if (!dll_handle) {
@@ -239,6 +244,7 @@ namespace boost { namespace plugin {
                 boost::mutex::scoped_lock lock(mutex_instance());
 
                 deinit_library(dll_handle);                
+                dlerror();
                 MyFreeLibrary(dll_handle); 
             }
         }
