@@ -547,6 +547,7 @@ else()
                   BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
+  hpx_use_flag_if_available(-pthread)
   add_definitions(-D_GNU_SOURCE)
 
   set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)

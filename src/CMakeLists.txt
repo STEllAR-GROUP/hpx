@@ -85,8 +85,6 @@ if(UNIX)
     hpx_use_flag_if_available(-Werror=sign-compare)
   endif()
 
-  hpx_use_flag_if_available(-pthread)
-
   add_hpx_library_sources(hpx
     ${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp)
 
