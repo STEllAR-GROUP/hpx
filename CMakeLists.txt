@@ -333,6 +333,7 @@ if(MSVC)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
   add_definitions(-DHPX_HAVE_CXX11_UNIQUE_PTR)
+  add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
 
   # suppress certain warnings (TODO: Document what warnings these disable)
   add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
@@ -548,7 +549,8 @@ else()
       DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
 
     hpx_check_for_cxx11_unique_ptr(HPX_CXX11_UNIQUE_PTR
-      DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR)
+      DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR
+                  BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
   add_definitions(-D_GNU_SOURCE)

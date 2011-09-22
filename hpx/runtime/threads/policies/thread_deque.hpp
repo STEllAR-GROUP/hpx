@@ -92,11 +92,7 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = boost::get<1>(*task);
-#if HPX_USE_UNIQUE_PTR != 0
-            std::unique_ptr<threads::thread> thrd(
-#else
-            std::auto_ptr<threads::thread> thrd(
-#endif
+            HPX_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     boost::get<0>(*task), memory_pool_, state));
 
@@ -152,11 +148,7 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = boost::get<1>(*task);
-#if HPX_USE_UNIQUE_PTR != 0
-            std::unique_ptr<threads::thread> thrd(
-#else
-            std::auto_ptr<threads::thread> thrd(
-#endif
+            HPX_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     boost::get<0>(*task), memory_pool_, state));
 
@@ -284,11 +276,7 @@ struct thread_deque
         if (run_now) {
             mutex_type::scoped_lock lk(mtx_);
 
-#if HPX_USE_UNIQUE_PTR != 0
-            std::unique_ptr<threads::thread> thrd(
-#else
-            std::auto_ptr<threads::thread> thrd(
-#endif
+            HPX_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     data, memory_pool_, initial_state));
 

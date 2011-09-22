@@ -262,7 +262,13 @@ public:
     bool enqueue(T * t);
 
     bool dequeue (T ** ret);
-    bool dequeue (std::auto_ptr<T> & ret);
+
+    #if defined(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+        bool dequeue (std::unique_ptr<T> & ret);
+    #else
+        bool dequeue (std::auto_ptr<T> & ret);
+    #endif
+
     bool dequeue (boost::scoped_ptr<T> & ret);
     bool dequeue (boost::shared_ptr<T> & ret);
 };
@@ -334,7 +340,11 @@ Effect: if dequeue operation is successful, object is written to memory location
 
 [note Thread-safe and non-blocking]
 
-    bool dequeue (std::auto_ptr<T> & ret);
+    #if defined(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+        bool dequeue (std::unique_ptr<T> & ret);
+    #else
+        bool dequeue (std::auto_ptr<T> & ret);
+    #endif
     bool dequeue (boost::scoped_ptr<T> & ret);
     bool dequeue (boost::shared_ptr<T> & ret);
 

@@ -57,7 +57,11 @@ BOOST_AUTO_TEST_CASE( fifo_specialization_test )
 
 
     {
+#if defined(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+        unqiue_ptr<int> i2;
+#else
         auto_ptr<int> i2;
+#endif
         BOOST_REQUIRE(f.dequeue(i2));
         BOOST_REQUIRE_EQUAL(*i2, 2);
     }

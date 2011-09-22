@@ -245,7 +245,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Enable usage of std::unique_ptr instead of std::auto_ptr
 #if !defined(HPX_USE_UNIQUE_PTR)
-  #define HPX_USE_UNIQUE_PTR 0
+  #define HPX_UNIQUE_PTR ::std::unique_ptr
+#else
+  #define HPX_UNIQUE_PTR ::std::auto_ptr
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

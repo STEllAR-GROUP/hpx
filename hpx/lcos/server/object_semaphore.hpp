@@ -140,7 +140,7 @@ struct object_semaphore
     void signal(ValueType const& val, boost::uint64_t count)
     { // {{{
         // push back the new value onto the queue
-        std::auto_ptr<queue_value_entry> node
+        HPX_UNIQUE_PTR<queue_value_entry> node
             (new queue_value_entry(val, count));
 
         typename mutex_type::scoped_lock l(this);
@@ -154,7 +154,7 @@ struct object_semaphore
     void get(naming::id_type const& lco)
     { // {{{
         // push the LCO's GID onto the queue
-        std::auto_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
+        HPX_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
         
         typename mutex_type::scoped_lock l(this);
 

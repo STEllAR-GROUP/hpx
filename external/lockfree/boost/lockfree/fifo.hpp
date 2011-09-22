@@ -22,7 +22,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_pod.hpp>
 
-#include <memory>               /* std::auto_ptr */
+#include <memory>               /* std::auto_ptr / std::unique_ptr */
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
@@ -320,7 +320,7 @@ public:
         return fifo_t::dequeue(ret);
     }
 
-    /** Dequeue object from fifo to std::auto_ptr
+    /** Dequeue object from fifo to std::auto_ptr / unique_ptr
      *
      * if dequeue operation is successful, object is written to memory location denoted by ret.
      *
@@ -329,7 +329,11 @@ public:
      * \note Thread-safe and non-blocking
      *
      * */
+#if defined(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+    bool dequeue (std::unique_ptr<T> & ret)
+#else
     bool dequeue (std::auto_ptr<T> & ret)
+#endif
     {
         return dequeue_smart_ptr(ret);
     }
