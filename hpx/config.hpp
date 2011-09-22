@@ -244,7 +244,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Enable usage of std::unique_ptr instead of std::auto_ptr
-#if !defined(HPX_HAVE_UNIQUE_PTR)
+#if !defined(HPX_HAVE_CXX11_UNIQUE_PTR)
   #define HPX_UNIQUE_PTR ::std::auto_ptr
 #else
   #define HPX_UNIQUE_PTR ::std::unique_ptr
