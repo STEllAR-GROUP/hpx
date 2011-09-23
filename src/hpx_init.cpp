@@ -879,8 +879,9 @@ namespace hpx
             }
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
+            boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
             std::string agas_host(env.agas_host_name(HPX_INITIAL_IP_ADDRESS));
-            boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT, agas_port = 0;
+            boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
             std::size_t num_threads = env.retrieve_number_of_threads();
             std::size_t num_localities = env.retrieve_number_of_localities();
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
@@ -900,7 +901,6 @@ namespace hpx
                 }
                 else {
                     hpx_port += node;         // each node gets an unique port
-                    agas_port = HPX_INITIAL_IP_PORT;
                     mode = hpx::runtime_mode_worker;
 
                     // do not execute any explicit hpx_main except if asked 
@@ -919,14 +919,20 @@ namespace hpx
                 std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
             }
 
-            if (vm.count("agas")) {
-                detail::split_ip_address(
-                    vm["agas"].as<std::string>(), agas_host, agas_port);
+            if (vm.count("hpx")) {
+                std::string host;
+                boost::uint16_t port = HPX_INITIAL_IP_PORT;
+                detail::split_ip_address(vm["hpx"].as<std::string>(), host, port);
+                if (!host.empty()) hpx_host = host;
+                if (!port) hpx_port = port;
             }
 
-            if (vm.count("hpx")) {
-                detail::split_ip_address(
-                    vm["hpx"].as<std::string>(), hpx_host, hpx_port);
+            if (vm.count("agas")) {
+                std::string host;
+                boost::uint16_t port = HPX_INITIAL_IP_PORT;
+                detail::split_ip_address(vm["agas"].as<std::string>(), host, port);
+                if (!host.empty()) agas_host = host;
+                if (!port) agas_port = port;
             }
 
             if (vm.count("localities"))
@@ -995,20 +1001,11 @@ namespace hpx
                 return 0;
             }
 #else
-            if (!hpx_host.empty()) {
-                // write HPX port parameters to the proper ini-file entries
-                ini_config += "hpx.address=" + hpx_host;
-            }
-            if (!agas_host.empty()) {
-                // map agas command line option parameters to the proper 
-                // ini-file entries
-                ini_config += "hpx.agas.address=" + agas_host;
-            }
-
-            ini_config += "hpx.port=" + boost::lexical_cast<std::string>
-                ((hpx_port ? hpx_port : HPX_INITIAL_IP_PORT));
-            ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>
-                ((agas_port ? agas_port : HPX_INITIAL_IP_PORT));
+            // write HPX and AGAS network parameters to the proper ini-file entries
+            ini_config += "hpx.address=" + hpx_host;
+            ini_config += "hpx.port=" + boost::lexical_cast<std::string>(hpx_port);
+            ini_config += "hpx.agas.address=" + agas_host;
+            ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>(agas_port);
 
             // We assume we have to run the AGAS server if
             //  - it's explicitly specified
