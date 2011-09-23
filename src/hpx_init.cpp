@@ -868,7 +868,7 @@ namespace hpx
                 if (vm.count("nodes")) {
                     throw std::logic_error("Ambiguous command line options. "
                         "Do not specify more than one of the --nodefile and "
-                        "--nodes options at the same time.\n");
+                        "--nodes options at the same time.");
                 }
                 ini_config += "hpx.nodefile=" + 
                     env.init_from_file(vm["nodefile"].as<std::string>());
@@ -892,8 +892,14 @@ namespace hpx
             // has been retrieved from the environment) 
             if (node != std::size_t(-1) || vm.count("node")) {
                 // command line overwrites the environment
-                if (vm.count("node"))
+                if (vm.count("node")) {
                     node = vm["node"].as<std::size_t>();
+                    if (!vm.count("localities")) {
+                        throw std::logic_error("Command line option --node "
+                            "requires to specify the number of localities as "
+                            "well (--localities/-l)");
+                    }
+                }
                 if (0 == node) {
                     // console node, by default runs AGAS
                     run_agas_server = true;
@@ -954,7 +960,7 @@ namespace hpx
                 if (vm.count("console") + vm.count("worker") + vm.count("connect") > 1) {
                     throw std::logic_error("Ambiguous command line options. "
                         "Do not specify more than one of --console/-c, "
-                        "--worker/-w, or --connect\n");
+                        "--worker/-w, or --connect");
                 }
 
                 // In these cases we default to executing with an empty 
