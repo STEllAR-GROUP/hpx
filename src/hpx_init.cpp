@@ -995,19 +995,20 @@ namespace hpx
                 return 0;
             }
 #else
-            if (!hpx_host.empty() && 0 != hpx_port) {
+            if (!hpx_host.empty()) {
                 // write HPX port parameters to the proper ini-file entries
                 ini_config += "hpx.address=" + hpx_host;
-                ini_config += "hpx.port=" + 
-                    boost::lexical_cast<std::string>(hpx_port);
             }
-            if (!agas_host.empty() && 0 != agas_port) {
+            if (!agas_host.empty()) {
                 // map agas command line option parameters to the proper 
                 // ini-file entries
                 ini_config += "hpx.agas.address=" + agas_host;
-                ini_config += "hpx.agas.port=" + 
-                    boost::lexical_cast<std::string>(agas_port);
             }
+
+            ini_config += "hpx.port=" + boost::lexical_cast<std::string>
+                ((hpx_port ? hpx_port : HPX_INITIAL_IP_PORT));
+            ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>
+                ((agas_port ? agas_port : HPX_INITIAL_IP_PORT));
 
             // We assume we have to run the AGAS server if
             //  - it's explicitly specified
