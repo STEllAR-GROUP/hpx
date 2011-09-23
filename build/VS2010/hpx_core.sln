@@ -46,6 +46,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread_test", "tests\thread
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sine", "components\performance_counters\sine\sine.vcxproj", "{97D176F8-DF75-4CCB-8BAF-94C74974611E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sine_client", "components\performance_counters\sine\sine_client\sine_client.vcxproj", "{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -239,6 +241,16 @@ Global
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|Win32.ActiveCfg = Release|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|x64.ActiveCfg = Release|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|x64.Build.0 = Release|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Debug|Win32.ActiveCfg = Debug|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Debug|x64.ActiveCfg = Debug|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Debug|x64.Build.0 = Debug|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|Mixed Platforms.Build.0 = Release|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|Win32.ActiveCfg = Release|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|x64.ActiveCfg = Release|x64
+		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

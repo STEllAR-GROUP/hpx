@@ -111,7 +111,9 @@
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
@@ -184,7 +186,6 @@
     <ClCompile Include="..\..\..\src\util\serialize_exception.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\examples\throttle\throttle\throttle.hpp" />
     <ClInclude Include="..\..\..\hpx\config.hpp" />
     <ClInclude Include="..\..\..\hpx\exception.hpp" />
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
@@ -200,6 +201,8 @@
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter_type.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp" />
@@ -342,7 +345,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\thread_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\thread_init_data.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\threadmanager.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\threads\threadmanager_impl.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\callback_notifier.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\global_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_queue_scheduler.hpp" />

@@ -715,9 +715,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\threadmanager.hpp">
       <Filter>Header Files\Runtime\Threads</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\threads\threadmanager_impl.hpp">
-      <Filter>Header Files\Runtime\Threads</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\threads\thread_affinity.hpp">
       <Filter>Header Files\Runtime\Threads</Filter>
     </ClInclude>
@@ -1042,9 +1039,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\examples\throttle\throttle\throttle.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\stringstream.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -1065,6 +1059,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\unmangle_name.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter_type.hpp">
+      <Filter>Header Files\Performance Counters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp">
+      <Filter>Header Files\Performance Counters</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
