@@ -17,6 +17,14 @@
 namespace hpx { namespace performance_counters 
 {
     ///////////////////////////////////////////////////////////////////////////
+    inline std::string& ensure_counter_prefix(std::string& name)
+    {
+        if (name.find("/counters") != 0)
+            name = "/counters" + name;
+        return name;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     enum counter_type
     {
         /// \a counter_text shows a variable-length text string. It does not 
@@ -99,6 +107,20 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the readable name of a given counter type
     HPX_API_EXPORT char const* get_counter_type_name(counter_type state);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Status and error codes used by the functions related to 
+    ///        performance counters.
+    enum counter_status
+    {
+        status_valid_data,      ///< No error occurred, data is valid
+        status_new_data,        ///< Data is valid and different from last call
+        status_invalid_data,    ///< Some error occurred, data is not value
+        status_already_defined, ///< The type or instance already has been defined
+        status_counter_unknown, ///< The counter instance is unknown
+        status_counter_type_unknown,  ///< The counter type is unknown
+        status_generic_error,   ///< A unknown error occurred
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     /// A counter_type_path_elements holds the elements of a full name for a 
@@ -228,7 +250,7 @@ namespace hpx { namespace performance_counters
         {}
 
         counter_info(counter_type type, std::string const& name, 
-                std::string const& helptext, 
+                std::string const& helptext = "", 
                 boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
           : type_(type), version_(version), status_(status_valid_data),
             fullname_(name), helptext_(helptext)
@@ -277,6 +299,35 @@ namespace hpx { namespace performance_counters
                                     ///< scaling_, otherwise it has to be 
                                     ///< multiplied.
 
+        /// \brief Retrieve the 'real' value of the counter_value, converted to 
+        ///        the requested type \a T
+        template <typename T>
+        T get_value(error_code& ec = throws)
+        {
+            if (status_valid_data != status_) {
+                HPX_THROWS_IF(ec, invalid_status,
+                    "counter_value::get_value<T>", 
+                    "counter value is in invalid status");
+                return T();
+            }
+
+            if (scaling_ != 1) {
+                if (scaling_ == 0) {
+                    HPX_THROWS_IF(ec, uninitialized_value,
+                        "counter_value::get_value<T>", 
+                        "scaling should not be zero");
+                    return T();
+                }
+
+                // calculate and return the real counter value
+                if (scale_inverse_) 
+                    return T(value_) / scaling_;
+
+                return T(value_) * scaling_;
+            }
+            return value_;
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -287,6 +338,50 @@ namespace hpx { namespace performance_counters
             ar & status_ & time_ & value_ & scaling_ & scale_inverse_;
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////
+    /// \brief Add a new performance counter type to the (local) registry
+    HPX_API_EXPORT counter_status add_counter_type(
+        counter_info const& info, error_code& ec = throws);
+
+    /// \brief Remove an existing counter type from the (local) registry
+    ///
+    /// \note This doesn't remove existing counters of this type, it just
+    ///       inhibits defining new counters using this type.
+    HPX_API_EXPORT counter_status remove_counter_type(
+        counter_info const& info, error_code& ec = throws);
+
+    /// \brief Create a new performance counter instance based on given
+    ///        counter value
+    HPX_API_EXPORT counter_status create_counter(
+        counter_info const& info, boost::int64_t* countervalue, 
+        naming::id_type& id, error_code& ec = throws);
+
+    /// \brief Create a new performance counter instance based on given
+    ///        function returning the counter value
+    HPX_API_EXPORT counter_status create_counter(
+        counter_info const& info, boost::function<boost::int64_t()> f, 
+        naming::id_type& id, error_code& ec = throws);
+
+    /// \brief Create a new performance counter instance based on given
+    ///        counter info
+    HPX_API_EXPORT counter_status create_counter(
+        counter_info const& info, naming::id_type& id, 
+        error_code& ec = throws);
+
+    /// \brief Add an existing performance counter instance to the registry
+    HPX_API_EXPORT counter_status add_counter(naming::id_type const& id, 
+        counter_info const& info, error_code& ec = throws);
+
+    /// \brief Remove an existing performance counter instance with the 
+    ///        given id (as returned from \a create_counter)
+    HPX_API_EXPORT counter_status remove_counter(
+        counter_info const& info, naming::id_type const& id, 
+        error_code& ec = throws);
+
+    /// \brief Get the global id of an existing performance counter
+    HPX_API_EXPORT naming::id_type get_counter(std::string name,
+        error_code& ec = throws);
 }}
 
 #endif

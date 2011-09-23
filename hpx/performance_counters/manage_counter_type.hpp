@@ -49,10 +49,70 @@ namespace hpx { namespace performance_counters
     };
 
 #if HPX_AGAS_VERSION > 0x10
-    /// Install a new performance counter type in a way, which will uninstall 
-    /// it automatically during shutdown.
+    /// \brief Install a new performance counter type in a way, which will 
+    ///        uninstall it automatically during shutdown.
+    ///        
+    /// The function \a install_counter_type will register a new counter type
+    /// based on the provided \a counter_type_info. The counter type will be
+    /// automatically unregistered during system shutdown.
+    /// 
+    /// \param name   [in] The global virtual name of the counter type. This 
+    ///               name is expected to have the format /objectname/countername.
+    /// \param type   [in] The type of the counters of  this counter_type.
+    /// \param ec     [in,out] this represents the error status on exit,
+    ///               if this is pre-initialized to \a hpx#throws
+    ///               the function will throw on error instead.
+    /// 
+    /// \returns      If successful, this function returns \a status_valid_data,
+    ///               otherwise it will either throw an exception or return an
+    ///               error_code from the enum \a counter_status (also, see 
+    ///               note related to parameter \a ec).
+    /// 
+    /// \note The counter type registry is a locality based service. You will 
+    ///       have to register each counter type on every locality a 
+    ///       corresponding performance counter will be created.
+    ///
+    /// \note As long as \a ec is not pre-initialized to \a hpx#throws this 
+    ///       function doesn't throw but returns the result code using the 
+    ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
     HPX_EXPORT void install_counter_type(std::string const& name,
         counter_type type, error_code& ec = throws); 
+
+    /// \brief Install a new performance counter type in a way, which will 
+    ///        uninstall it automatically during shutdown.
+    ///        
+    /// The function \a install_counter_type will register a new counter type
+    /// based on the provided \a counter_type_info. The counter type will be
+    /// automatically unregistered during system shutdown.
+    /// 
+    /// \param name   [in] The global virtual name of the counter type. This 
+    ///               name is expected to have the format /objectname/countername.
+    /// \param type   [in] The type of the counters of  this counter_type.
+    /// \param helptext [in] A longer descriptive  text shown to the user to
+    ///               explain the nature of the counters craeted from this 
+    ///               type.
+    /// \param version [in] The version of the counter type. This is currently 
+    ///               expected to be set to HPX_PERFORMANCE_COUNTER_V1.
+    /// \param ec     [in,out] this represents the error status on exit,
+    ///               if this is pre-initialized to \a hpx#throws
+    ///               the function will throw on error instead.
+    /// 
+    /// \returns      If successful, this function returns \a status_valid_data,
+    ///               otherwise it will either throw an exception or return an
+    ///               error_code from the enum \a counter_status (also, see 
+    ///               note related to parameter \a ec).
+    /// 
+    /// \note The counter type registry is a locality based service. You will 
+    ///       have to register each counter type on every locality a 
+    ///       corresponding performance counter will be created.
+    ///
+    /// \note As long as \a ec is not pre-initialized to \a hpx#throws this 
+    ///       function doesn't throw but returns the result code using the 
+    ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
+    HPX_EXPORT void install_counter_type(std::string const& name,
+        counter_type type, std::string const& helptext, 
+        boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1, 
+        error_code& ec = throws);
 
     /// A small data structure holding all data needed to install a counter type
     struct counter_type_data

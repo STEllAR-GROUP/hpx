@@ -10,10 +10,6 @@
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 
 #include <boost/version.hpp>
-#if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
-#define BOOST_CHRONO_NO_LIB
-#endif
-
 #include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -501,59 +501,6 @@ namespace hpx
     // predefined error_code object used as "throw on error" tag
     HPX_EXCEPTION_EXPORT extern error_code throws;
 
-    namespace performance_counters
-    {
-        ///////////////////////////////////////////////////////////////////////
-        enum counter_status
-        {
-            status_valid_data,      ///< No error occurred, data is valid
-            status_new_data,        ///< Data is valid and different from last call
-            status_invalid_data,    ///< Some error occurred, data is not value
-            status_already_defined, ///< The type or instance already has been defined
-            status_counter_unknown, ///< The counter instance is unknown
-            status_counter_type_unknown,  ///< The counter type is unknown
-            status_generic_error,   ///< A unknown error occurred
-        };
-
-        struct counter_info;
-
-        ///////////////////////////////////////////////////////////////////////
-        /// \brief Add a new performance counter type to the (local) registry
-        HPX_API_EXPORT counter_status add_counter_type(
-            counter_info const& info, error_code& ec = throws);
-
-        /// \brief Remove an existing counter type from the (local) registry
-        ///
-        /// \note This doesn't remove existing counters of this type, it just
-        ///       inhibits defining new counters using this type.
-        HPX_API_EXPORT counter_status remove_counter_type(
-            counter_info const& info, error_code& ec = throws);
-
-        /// \brief Create a new performance counter instance based on given
-        ///        counter value
-        HPX_API_EXPORT counter_status add_counter(
-            counter_info const& info, boost::int64_t* countervalue, 
-            naming::id_type& id, error_code& ec = throws);
-
-        /// \brief Create a new performance counter instance based on given
-        ///        function returning the counter value
-        HPX_API_EXPORT counter_status add_counter(
-            counter_info const& info, boost::function<boost::int64_t()> f, 
-            naming::id_type& id, error_code& ec = throws);
-
-        /// \brief Create a new performance counter instance based on given
-        ///        counter info
-        HPX_API_EXPORT counter_status add_counter(
-            counter_info const& info, naming::id_type& id, 
-            error_code& ec = throws);
-
-         /// \brief Remove an existing performance counter instance with the 
-         ///        given id (as returned from \a add_counter)
-         HPX_API_EXPORT counter_status remove_counter(
-            counter_info const& info, naming::id_type const& id, 
-            error_code& ec = throws);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();

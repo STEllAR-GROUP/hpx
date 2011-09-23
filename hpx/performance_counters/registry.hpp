@@ -37,22 +37,26 @@ namespace hpx { namespace performance_counters
 
         /// \brief Create a new performance counter instance based on given
         ///        counter value
-        counter_status add_counter(counter_info const& info, 
+        counter_status create_counter(counter_info const& info, 
             boost::int64_t* countervalue, naming::id_type& id, 
             error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
         ///        function returning the counter value
-        counter_status add_counter(counter_info const& info, 
+        counter_status create_counter(counter_info const& info, 
             boost::function<boost::int64_t()> f, naming::id_type& id, 
             error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
         ///        counter info
-        counter_status add_counter(counter_info const& info, 
+        counter_status create_counter(counter_info const& info, 
             naming::id_type& id, error_code& ec = throws);
 
-        /// 
+        /// \brief Add an existing performance counter instance to the registry
+        counter_status add_counter(naming::id_type const& id, 
+            counter_info const& info, error_code& ec = throws);
+
+        /// \brief remove the existing performance counter from the registry
         counter_status remove_counter(counter_info const& info, 
             naming::id_type const& id, error_code& ec = throws);
 
@@ -60,7 +64,6 @@ namespace hpx { namespace performance_counters
         naming::resolver_client& agas_client_;
         counter_type_map_type countertypes_;
     };
-
 }}
 
 #endif

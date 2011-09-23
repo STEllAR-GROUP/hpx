@@ -43,6 +43,9 @@ namespace hpx { namespace performance_counters
         if (p.second) {
             LPCS_(info) 
                 << (boost::format("counter type %s created") % type_name);
+
+            if (&ec != &throws)
+                ec = make_success_code();
             return status_valid_data;
         }
 
@@ -71,6 +74,9 @@ namespace hpx { namespace performance_counters
             << (boost::format("counter type %s destroyed") % type_name);
 
         countertypes_.erase(it);
+
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
@@ -81,13 +87,13 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    counter_status registry::add_counter(counter_info const& info, 
+    counter_status registry::create_counter(counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, error_code& ec)
     {
-        return add_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
+        return create_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
     }
 
-    counter_status registry::add_counter(counter_info const& info, 
+    counter_status registry::create_counter(counter_info const& info, 
         boost::function<boost::int64_t()> f, naming::id_type& id, error_code& ec)
     {
         // create canonical type name
@@ -97,7 +103,7 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
                 boost::str(boost::format("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
@@ -105,7 +111,7 @@ namespace hpx { namespace performance_counters
         // make sure the counter type requested is supported
         if (counter_raw != (*it).second.type_ || counter_raw != info.type_) 
         {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
                 "invalid counter type requested (only counter_raw is supported)");
             return status_counter_type_unknown;
         }
@@ -122,8 +128,9 @@ namespace hpx { namespace performance_counters
             newid = components::server::create_one<counter_type>(complemented_info, f);
 
             // register the canonical name with AGAS
-            agas_client_.registerid(
-                std::string("/counters") + complemented_info.fullname_, newid);
+            std::string name(complemented_info.fullname_);
+            ensure_counter_prefix(name);      // prepend prefix, if necessary
+            agas_client_.registerid(name, newid);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -138,11 +145,14 @@ namespace hpx { namespace performance_counters
             % complemented_info.fullname_ % newid);
 
         id = naming::id_type(newid, naming::id_type::managed);
+
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    counter_status registry::add_counter(counter_info const& info, 
+    counter_status registry::create_counter(counter_info const& info, 
         naming::id_type& id, error_code& ec)
     {
         // create canonical type name
@@ -152,7 +162,7 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
                 boost::str(boost::format("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
@@ -174,19 +184,20 @@ namespace hpx { namespace performance_counters
                 break;
 
             case counter_raw:
-                HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+                HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
                     "need function parameter for raw_counter");
                 return status_counter_type_unknown;
 
             default:
-                HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+                HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
                     "invalid counter type requested");
                 return status_counter_type_unknown;
             }
 
             // register the canonical name with AGAS
-            agas_client_.registerid(
-                std::string("/counters") + complemented_info.fullname_, newid);
+            std::string name(complemented_info.fullname_);
+            ensure_counter_prefix(name);      // prepend prefix, if necessary
+            agas_client_.registerid(name, newid);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -201,6 +212,44 @@ namespace hpx { namespace performance_counters
             % complemented_info.fullname_ % newid);
 
         id = naming::id_type(newid, naming::id_type::managed);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Add an existing performance counter instance to the registry
+    counter_status registry::add_counter(naming::id_type const& id, 
+        counter_info const& info, error_code& ec)
+    {
+        // complement counter info data
+        counter_info complemented_info = info;
+        complement_counter_info(complemented_info, ec);
+        if (ec) return status_invalid_data;
+
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(
+            complemented_info.fullname_, type_name, ec);
+        if (status_valid_data != status) return status;
+
+        // make sure the type of the new counter is known to the registry
+        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter", 
+                boost::str(boost::format("unknown counter type %s") % type_name));
+            return status_counter_type_unknown;
+        }
+
+        // register the canonical name with AGAS
+        std::string name(complemented_info.fullname_);
+        ensure_counter_prefix(name);      // prepend prefix, if necessary
+        agas_client_.registerid(name, id.get_gid(), ec);
+        if (ec) return status_invalid_data;
+
+        if (&ec != &throws)
+            ec = make_success_code();
         return status_valid_data;
     }
 
@@ -220,7 +269,8 @@ namespace hpx { namespace performance_counters
         if (status_valid_data != status) return status;
 
         // unregister this counter from AGAS
-        agas_client_.unregisterid(std::string("/counters") + name, ec);
+        ensure_counter_prefix(name);      // prepend prefix, if necessary
+        agas_client_.unregisterid(name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to destroy counter %s")
                 % complemented_info.fullname_);

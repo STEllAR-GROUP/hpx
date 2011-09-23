@@ -43,6 +43,18 @@ namespace hpx { namespace performance_counters
         get_runtime().add_shutdown_function(boost::bind(&counter_shutdown, p));
     }
 
+    void install_counter(naming::id_type const& id, counter_info const& info, 
+        error_code& ec)
+    {
+        boost::shared_ptr<manage_counter> p(new manage_counter);
+
+        // Install the counter instance.
+        p->install(id, info, ec);  
+
+        // Register the shutdown function which will clean up this counter.
+        get_runtime().add_shutdown_function(boost::bind(&counter_shutdown, p));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void install_counters(counter_data const* data, std::size_t count, 
         error_code& ec)

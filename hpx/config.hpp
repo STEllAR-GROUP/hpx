@@ -251,6 +251,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// make sure Chrono is handled properly
+#if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
+#define BOOST_CHRONO_NO_LIB
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_AGAS_BOOTSTRAP_PREFIX   1U 
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
