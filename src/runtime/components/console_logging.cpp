@@ -23,7 +23,7 @@ void console_logging_locked(naming::id_type const& prefix,
 {
     // If we're not in an HPX thread, we cannot call apply as it may access
     // the AGAS components. We just throw an exception here - there's no
-    // threadmanager, so the exception will probably be unhandled. This is
+    // thread-manager, so the exception will probably be unhandled. This is
     // desirable in this situation, as we can't trust the logging system to
     // report this error. 
     if (HPX_UNLIKELY(!threads::get_self_ptr()))
@@ -138,7 +138,6 @@ void pending_logs::send()
         queue_.swap(msgs);
         queue_size_.store(0);
     }
-
 
     if (!msgs.empty())
         console_logging_locked(prefix_, msgs);

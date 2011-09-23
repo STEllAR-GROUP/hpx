@@ -57,6 +57,7 @@ using hpx::performance_counters::status_valid_data;
 using hpx::naming::resolver_client;
 using hpx::naming::gid_type;
 using hpx::naming::get_prefix_from_gid;
+using hpx::naming::get_agas_client;
 
 using hpx::lcos::future_value;
 using hpx::lcos::eager_future;
@@ -67,7 +68,7 @@ void stop_monitor(
     std::string const& name
 ) {
     // Kill the monitor.
-    resolver_client& agas_client = get_runtime().get_agas_client();
+    resolver_client& agas_client = get_agas_client();
     gid_type gid;
     
     if (!agas_client.queryid(name, gid))
@@ -90,7 +91,7 @@ int monitor(
 ) {
     // Resolve the GID of the performance counter using it's symbolic name.
     gid_type gid;
-    get_applier().get_agas_client().queryid(name, gid);
+    get_agas_client().queryid(name, gid);
 
     if (!gid)
     {
@@ -112,11 +113,10 @@ int monitor(
 
     future_value<void> stop_flag;
     const std::string stop_flag_name
-        = str(format("/stop_flag([L%d]/heartbeat)") % prefix);
+        = str(format("/stop_flag(locality#%d]/heartbeat)") % prefix);
 
     // Associate the stop flag with a symbolic name.
-    get_applier().get_agas_client().registerid
-        (stop_flag_name, stop_flag.get_gid().get_gid());
+    get_agas_client().registerid(stop_flag_name, stop_flag.get_gid().get_gid());
 
     register_shutdown_function(boost::bind(&stop_monitor, stop_flag_name)); 
 
@@ -181,11 +181,11 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "name"
         , value<std::string>()->default_value
-            ("/pcs/queue([L1]/threadmanager)/length")
+            ("/counter/queue(locality#0/total)/length")
         , "symbolic name of the performance counter")
 
         ( "pause"
-        , value<boost::uint64_t>()->default_value(100) 
+        , value<boost::uint64_t>()->default_value(500) 
         , "milliseconds between each performance counter query")
         ;
 
