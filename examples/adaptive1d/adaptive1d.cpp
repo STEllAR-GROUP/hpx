@@ -76,7 +76,7 @@ int hpx_main(variables_map& vm)
     par->loglevel       = 2;
 
     par->nt0            = 4;
-    par->nx0            = 3;
+    par->nx0            = 101;
     par->grain_size     = 10;
     par->allowedl       = 0;
     par->num_neighbors  = 2;
