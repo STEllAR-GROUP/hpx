@@ -75,7 +75,7 @@ int hpx_main(variables_map& vm)
     // default pars
     par->loglevel       = 2;
 
-    par->nt0            = 4;
+    par->nt0            = 100;
     par->nx0            = 101;
     par->grain_size     = 10;
     par->allowedl       = 0;
