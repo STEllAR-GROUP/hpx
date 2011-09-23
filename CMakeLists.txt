@@ -321,10 +321,10 @@ if(MSVC)
       # C++11 support
       if(HPX_CXX11)
         set(HPX_CXX11_RVALUE_REFERENCES)
-        add_definitions(HPX_CXX11_HAVE_RVALUE_REFERENCES)
+        add_definitions(-DHPX_CXX11_HAVE_RVALUE_REFERENCES)
 
         set(HPX_CXX11_LAMBDAS)
-        add_definitions(HPX_CXX11_HAVE_LAMBDAS)
+        add_definitions(-DHPX_CXX11_HAVE_LAMBDAS)
       endif()
     endif()
   else()
