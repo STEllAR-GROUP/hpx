@@ -85,7 +85,7 @@ namespace performance_counters { namespace sine
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Register a startup function which will be called as px-threads during 
+// Register a startup function which will be called as a px-thread during 
 // runtime startup. We use this function to register our performance counter 
 // type and performance counter instances.
 // 
