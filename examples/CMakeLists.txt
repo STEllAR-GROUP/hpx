@@ -14,15 +14,16 @@
 if(NOT MSVC)
   set(subdirs
       accumulator
-      dataflow
       adaptive1d
-      hplpx
       # Disabled by wash as this is randomly breaking things.
       # barnes_hut
-      random_mem_access
+      dataflow
+      hplpx
+      nqueen
+      performance_counters
       queue
       quickstart
-      nqueen)
+      random_mem_access)
 
   if("${HPX_AGAS_VERSION}" STREQUAL "2")
     set(subdirs ${subdirs} heartbeat 
