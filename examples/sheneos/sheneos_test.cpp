@@ -170,19 +170,22 @@ HPX_REGISTER_PLAIN_ACTION(test_action);
 int hpx_main(variables_map& vm)
 {
     std::string datafilename("myshen_test_220r_180t_50y_extT_analmu_20100322_SVNr28.h5");
-    std::size_t num_localities = 27;
-    std::size_t num_test_points = 10000;
 
+    std::size_t num_test_points = 10000;
     if (vm.count("num_tests"))
         num_test_points = vm["num_tests"].as<std::size_t>();
+
+    std::size_t num_partitions = 27;
+    if (vm.count("num_partitions"))
+        num_partitions = vm["num_partitions"].as<std::size_t>();
 
     {
         hpx::util::high_resolution_timer t;
 
-        // create the distributed interpolation object with 'num_localities'
+        // create the distributed interpolation object with 'num_partitions'
         // partitions
         sheneos::sheneos shen;
-        shen.create(datafilename, shen_symbolic_name, num_localities);
+        shen.create(datafilename, shen_symbolic_name, num_partitions);
 
         double elapsed = t.elapsed();
         std::cout << "Create interpolator: " << elapsed << " [s]" << std::endl;
@@ -224,6 +227,8 @@ int main(int argc, char* argv[])
     cmdline.add_options()
         ("num_tests,n", po::value<std::size_t>(), 
             "number of data points to interpolate (default: 10000)")
+        ("num_partitions,p", po::value<std::size_t>(), 
+            "number of partitions to create (default: 27)")
     ;
 
     // Initialize and run HPX
