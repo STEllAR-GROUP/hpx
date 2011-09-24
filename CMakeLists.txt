@@ -33,11 +33,6 @@ set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 ################################################################################
-# Python detection (part 1)
-################################################################################
-include(FindPythonInterp)
-
-################################################################################
 # Fortran detection (part 1)
 ################################################################################
 include(CMakeDetermineFortranCompiler)
@@ -54,39 +49,9 @@ include(HPX_Distclean)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
-# be pedantic and annoying by default
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
-
-################################################################################
-# Python detection (part 2)
-################################################################################
-if(PYTHONINTERP_FOUND)
-  hpx_info("python" "Found a Python interpreter")
-else()
-  hpx_warn("python" "Couldn't find a Python interpreter")
-endif()
-
-# SSH
-hpx_check_for_python_paramiko(HPX_PYTHON_PARAMIKO
-    DEFINITIONS HPX_HAVE_PYTHON_PARAMIKO) 
-
-# Command-line parsing
-hpx_check_for_python_optparse(HPX_PYTHON_OPTPARSE
-    DEFINITIONS HPX_HAVE_PYTHON_OPTPARSE)
-
-# Async networking
-hpx_check_for_python_threading(HPX_PYTHON_THREADING
-    DEFINITIONS HPX_HAVE_PYTHON_THREADING)
-
-# RAII
-hpx_check_for_python_with_statement(HPX_PYTHON_WITH_STATEMENT
-    DEFINITIONS HPX_HAVE_PYTHON_WITH_STATEMENT)
-
-# Process control
-hpx_check_for_python_subprocess(HPX_PYTHON_SUBPROCESS
-    DEFINITIONS HPX_HAVE_PYTHON_SUBPROCESS)
 
 ################################################################################
 # Fortran detection (part 2)
@@ -96,23 +61,6 @@ if(CMAKE_Fortran_COMPILER)
   enable_language(Fortran)
 else()
   hpx_warn("fortran" "Couldn't find a Fortran compiler")
-endif()
-
-################################################################################
-# environment detection 
-################################################################################
-# FIXME: broken for MSVC
-if(NOT MSVC)
-  execute_process(COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_environment.py" "${CMAKE_CXX_COMPILER}"
-                  OUTPUT_VARIABLE build_environment
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-  if(build_environment)
-    set(BUILDNAME "${build_environment}" CACHE INTERNAL "A string describing the build environment.")
-    hpx_info("environment" "Build environment is ${BUILDNAME}.")
-  else()
-    hpx_warn("environment" "Couldn't determine build environment (install python).") 
-  endif()
 endif()
 
 ################################################################################
@@ -184,7 +132,6 @@ include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
 include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-link_directories(${CMAKE_BINARY_DIR}/lib)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
@@ -232,18 +179,16 @@ hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
 add_definitions("-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
-if(NOT MSVC)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ################################################################################
 # RPATH configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib:${CMAKE_BINARY_DIR}/lib/hpx")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ################################################################################
@@ -267,11 +212,6 @@ else()
 endif()
 
 ################################################################################
-# LISP bindings 
-################################################################################
-find_package(HPX_Phxpr)
-
-################################################################################
 # SDF output 
 ################################################################################
 find_package(HPX_RNPL)
@@ -280,15 +220,6 @@ find_package(HPX_RNPL)
 # HDF5 output 
 ################################################################################
 find_package(HPX_HDF5)
-
-################################################################################
-# Arbitrary precision math 
-################################################################################
-find_package(HPX_GMP)
-
-#if(GMP_FOUND)
-#  add_definitions(-DBOOST_BIGINT_HAS_GMP_SUPPORT)
-#endif()
 
 ################################################################################
 # Warning configuration
@@ -311,6 +242,7 @@ endif()
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
+    add_definitions(-DHPX_EMULATE_SWAP_CONTEXT=1)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
@@ -358,11 +290,11 @@ if(MSVC)
   # multiproccessor build
   add_definitions(-MP) 
 
-  # TODO: implement
-  #hpx_check_for_msvc_128bit_interlocked(hpx_HAVE_MSVC_128BIT_INTERLOCKED
-  #  DEFINITIONS HPX_HAVE_CMPXCHG16B
-  #              BOOST_ATOMIC_HAVE_MSVC_128BIT_INTERLOCKED # for the msvc code
-  #              BOOST_ATOMIC_HAVE_CMPXCHG16B)             # for the fallback 
+  add_definitions(-bigobj)
+
+  if(HPX_STACKTRACES)
+    set(hpx_RUNTIME_LIBRARIES dbghelp)
+  endif()
 
 ################################################################################
 # POSIX specific configuration 
@@ -416,10 +348,6 @@ else()
     hpx_use_flag_if_available(-Wall)
     hpx_use_flag_if_available(-Wno-strict-aliasing)
     hpx_use_flag_if_available(-Wsign-promo)
-
-    # FIXME: too noisy for now
-    # Warn about floating point equality comparisons
-    # hpx_use_flag_if_available(-Wfloat-equal)
   endif()
 
   ##############################################################################
@@ -432,7 +360,7 @@ else()
     # I'm aware that __sync_fetch_and_nand changed semantics
     hpx_use_flag_if_available(-Wno-sync-nand)
 
-    if(0404 GREATER ${GCC_VERSION} OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+    if(0404 GREATER ${GCC_VERSION})
       hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
     else()
       option(HPX_ELF_HIDDEN_VISIBILITY
@@ -466,14 +394,6 @@ else()
     
     # warning #1125: virtual function override intended 
     add_definitions(-diag-disable 1125) 
-
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-      hpx_use_flag_if_available(-ipo)
-    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-      hpx_use_flag_if_available(-ipo)
-    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-      hpx_use_flag_if_available(-ipo)
-    endif()
   endif()
 
   ##############################################################################
@@ -547,10 +467,10 @@ else()
                   BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
+  set(hpx_RUNTIME_LIBRARIES dl rt)
+
   hpx_use_flag_if_available(-pthread)
   add_definitions(-D_GNU_SOURCE)
-
-  set(hpx_LIBRARIES ${hpx_LIBRARIES} dl rt)
 
   set(HPX_MALLOC "TCMalloc" CACHE STRING
     "HPX malloc allocator (default: tcmalloc)" FORCE)
@@ -604,21 +524,11 @@ else()
 endif()
 
 ################################################################################
-# Mac OS X specific configuration 
-################################################################################
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-  hpx_warn("darwin_config" "HPX will perform poorly on Darwin.")
-  add_definitions(-D_XOPEN_SOURCE=1) # for some reason Darwin whines without this
-endif()
-
-################################################################################
 # target specification 
 ################################################################################
 # hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
-# default. There may be more for individual modules, but this is the mandatory
-# set.
-set(hpx_CORE hpx hpx_serialization)
-set(hpx_LIBRARIES ${hpx_LIBRARIES} hpx hpx_serialization)
+# default. 
+set(hpx_LIBRARIES hpx hpx_serialization)
 
 # Recurse into some subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's entire 
@@ -628,31 +538,26 @@ add_subdirectory(src)
 option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
 
 if(HPX_EXAMPLES)
-  # executables that depend on libraries above
   add_hpx_pseudo_target(examples)
 
   include_directories(examples)
   add_subdirectory(examples)
 endif()
 
-add_subdirectory(runtime)
+option(HPX_RUNTIME "Build HPX runtime (default: ON)" ON)
 
-if(NOT MSVC)
-  add_hpx_pseudo_target(tools) 
-  add_subdirectory(tools)
+if(HPX_RUNTIME)
+  add_hpx_pseudo_target(runtime)
+
+  add_subdirectory(runtime)
 endif()
 
-################################################################################
-# test configuration 
-################################################################################
-if(NOT MSVC)
-  set(DART_TESTING_TIMEOUT "60" CACHE STRING
-    "CTest timeout, in seconds (Default: 60).")
+option(HPX_TOOLS "Build HPX tools (default: OFF)" OFF)
 
-  enable_testing()
-  include(CTest)
-  add_hpx_pseudo_target(tests) 
-  add_subdirectory(tests)
+if(HPX_TOOLS)
+  add_hpx_pseudo_target(tools)
+
+  add_subdirectory(tools)
 endif()
 
 ################################################################################
@@ -662,7 +567,7 @@ install( # install all hpx header files
   DIRECTORY hpx/ 
   DESTINATION include/hpx 
   COMPONENT core
-  FILES_MATCHING PATTERN "*.h*"
+  FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE
   PATTERN "CMakeFiles" EXCLUDE
@@ -718,7 +623,7 @@ install( # install external dependencies
             external/plugin/boost
   DESTINATION include
   COMPONENT core
-  FILES_MATCHING PATTERN "*.h*"
+  FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
@@ -727,7 +632,7 @@ if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     DIRECTORY external/chrono/boost
     DESTINATION include
     COMPONENT core
-    FILES_MATCHING PATTERN "*.h*"
+    FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 endif()

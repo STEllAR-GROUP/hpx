@@ -56,9 +56,7 @@ macro(add_hpx_component name)
     # this component need to be installed
     set(main_target lib${prefix}${name}.so)
     set(install_targets
-      lib${prefix}${name}.so
-      lib${prefix}${name}.so.${HPX_SOVERSION}
-      lib${prefix}${name}.so.${HPX_VERSION})
+      lib${prefix}${name}.so)
     set_target_properties(${name}_component PROPERTIES
       COMPILE_FLAGS "-fno-use-cxa-atexit"
       LINK_FLAGS "-fno-use-cxa-atexit")
@@ -83,16 +81,6 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
-
-  set_property(TARGET ${name}_component
-               PROPERTY LIBRARY_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY ARCHIVE_OUTPUT_DIRECTORY
-                 "${CMAKE_BINARY_DIR}/lib/hpx")
-  set_property(TARGET ${name}_component
-               PROPERTY RUNTIME_OUTPUT_DIRECTORY
-               "${CMAKE_BINARY_DIR}/lib/hpx")
    
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
@@ -100,23 +88,11 @@ macro(add_hpx_component name)
   endif()
 
   foreach(target ${install_targets})
-    if(NOT MSVC)
-      hpx_component_install(${${name}_MODULE} ${target})
-    else()
-      install(TARGETS ${name}_component
-        RUNTIME DESTINATION lib
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                  GROUP_READ GROUP_EXECUTE
-                  WORLD_READ WORLD_EXECUTE)
-    endif()
+    hpx_library_install(${${name}_MODULE} ${target})
   endforeach()
 
   foreach(target ${${name}_INI})
-    if(NOT MSVC)
-      hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
-    endif()
+    hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
   endforeach()
 endmacro()
 

@@ -1,24 +1,21 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2007      Richard D Guidry Jr
-//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl 
+//  Copyright (c) 2007 Richard D Guidry Jr
+//  Copyright (c) 2011      Bryce Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
 
-#if HPX_AGAS_VERSION > 0x10
+#if HPX_AGAS_VERSION <= 0x10
 
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/container_device.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/naming/detail/resolver_do_undo.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
-#include <hpx/include/performance_counters.hpp>
 
 #include <string>
 #include <algorithm>
@@ -29,12 +26,10 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/ref.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/lambda/lambda.hpp>
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -46,29 +41,67 @@ namespace hpx { namespace parcelset
 
     struct wait_for_put_parcel
     {
-        wait_for_put_parcel() : sema_(new lcos::local_counting_semaphore) {}
+        typedef boost::mutex mutex_type;
+        typedef boost::condition condition_type;
 
-        wait_for_put_parcel(wait_for_put_parcel const& other)
-            : sema_(other.sema_) {}
+        wait_for_put_parcel(mutex_type& mtx, condition_type& cond,
+              boost::system::error_code& saved_error, 
+              bool& waiting, bool& finished)
+          : mtx_(mtx), cond_(cond), saved_error_(saved_error),
+            waiting_(waiting), finished_(finished)
+        {}
 
-        void operator()(boost::system::error_code const&, std::size_t)
+        void operator()(boost::system::error_code const& e, std::size_t size)
         {
-            sema_->signal();
+            mutex_type::scoped_lock l(mtx_);
+            if (e) 
+                saved_error_ = e;
+
+            if (waiting_)
+                cond_.notify_one();
+            finished_ = true;
         }
 
-        void wait()
+        bool wait()
         {
-            sema_->wait();
+            mutex_type::scoped_lock l(mtx_);
+
+            if (finished_) 
+                return true;
+
+            boost::xtime xt;
+            boost::xtime_get(&xt, boost::TIME_UTC);
+            xt.sec += 5;        // wait for max. 5sec
+
+            waiting_ = true;
+            return cond_.timed_wait(l, xt);
         }
 
-        boost::shared_ptr<lcos::local_counting_semaphore> sema_;
+        mutex_type& mtx_;
+        condition_type& cond_;
+        boost::system::error_code& saved_error_;
+        bool& waiting_;
+        bool& finished_;
     };
 
     void parcelhandler::sync_put_parcel(parcel& p)
     {
-        wait_for_put_parcel wfp;
+        wait_for_put_parcel::mutex_type mtx;
+        wait_for_put_parcel::condition_type cond;
+        boost::system::error_code saved_error;
+        bool waiting = false, finished = false;
+
+        wait_for_put_parcel wfp(mtx, cond, saved_error, waiting, finished);
         put_parcel(p, wfp);  // schedule parcel send
-        wfp.wait();          // wait for the parcel to be sent
+        if (!wfp.wait())     // wait for the parcel being sent
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , "synchronous parcel send timed out");
+
+        if (saved_error) 
+            HPX_THROW_EXCEPTION(network_error
+              , "parcelhandler::sync_put_parcel"
+              , saved_error.message()); 
     }
 
     void parcelhandler::parcel_sink(parcelport& pp, 
@@ -96,8 +129,7 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
-        try
-        {
+        try {
             parcel p;
             {
                 // create a special io stream on top of in_buffer_
@@ -106,7 +138,7 @@ namespace hpx { namespace parcelset
 
                 // De-serialize the parcel data
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-                util::portable_binary_iarchive archive(io);
+                hpx::util::portable_binary_iarchive archive(io);
 #else
                 boost::archive::binary_iarchive archive(io);
 #endif
@@ -116,66 +148,12 @@ namespace hpx { namespace parcelset
             // add parcel to incoming parcel queue
             parcels_->add_parcel(p);
         }
-
-        catch (hpx::exception const& e)
-        {
+        catch (hpx::exception const& e) {
             LPT_(error) 
-                << "decode_parcel: caught hpx::exception: "
+                << "Unhandled exception while executing decode_parcel: "
                 << e.what();
-            hpx::report_error(boost::current_exception());
         }
-
-        catch (boost::system::system_error const& e)
-        {
-            LPT_(error) 
-                << "decode_parcel: caught boost::system::error: "
-                << e.what();
-            hpx::report_error(boost::current_exception());
-        }
-
-        catch (std::exception const& e)
-        {
-            LPT_(error) 
-                << "decode_parcel: caught std::exception: "
-                << e.what();
-            hpx::report_error(boost::current_exception());
-        }
-
-        // Prevent exceptions from boiling up into the threadmanager.
-        catch (...)
-        {
-            LPT_(error) 
-                << "decode_parcel: caught unknown exception.";
-            hpx::report_error(boost::current_exception());
-        }
-
         return threads::thread_state(threads::terminated);
-    }
-        
-    parcelhandler::parcelhandler(naming::resolver_client& resolver, 
-            parcelport& pp, threads::threadmanager_base* tm, 
-            parcelhandler_queue_base* policy)
-      : resolver_(resolver)
-      , pp_(pp)
-      , tm_(tm)
-      , parcels_(policy)
-    {
-        BOOST_ASSERT(parcels_);
-
-        // AGAS v2 registers itself in the client before the parcelhandler
-        // is booted.
-        prefix_ = resolver_.local_prefix();
-
-        parcels_->set_parcelhandler(this);
-
-        // register our callback function with the parcelport
-        pp_.register_event_handler(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
-    }
-
-    naming::resolver_client& parcelhandler::get_resolver()
-    {
-        return resolver_;
     }
 
     bool parcelhandler::get_raw_remote_prefixes(
@@ -205,9 +183,20 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // this handler is called whenever the parcel has been sent
+    void release_do_undo(boost::system::error_code const& e, 
+            std::size_t size, parcelhandler::write_handler_type f,
+            boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo)
+    {
+        if (e)
+            do_undo->undo();
+        f(e, size);   // call supplied handler in any case
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // prepare the given gid, note: this function modifies the passed id
     void prepare_gid(
-        naming::resolver_client& resolver_,
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
         naming::id_type const& id)
     {
         // request new credits from AGAS if needed (i.e. gid is credit managed
@@ -219,8 +208,8 @@ namespace hpx { namespace parcelset
             if (0 == newid.get_credit())
             {
                 BOOST_ASSERT(1 == id.get_credit());
-                resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT/*, id, oldcredits*/);
-                resolver_.incref(newid.get_gid(), HPX_INITIAL_GLOBALCREDIT/*, id, oldcredits*/);
+                do_undo->incref(id, HPX_INITIAL_GLOBALCREDIT, id, oldcredits);
+                do_undo->incref(newid, HPX_INITIAL_GLOBALCREDIT, id, oldcredits);
             }
             const_cast<naming::id_type&>(id) = newid;
         }
@@ -228,30 +217,30 @@ namespace hpx { namespace parcelset
 
     // prepare all GIDs stored in an action
     void prepare_action(
-        naming::resolver_client& resolver_,
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
         actions::action_type action)
     {
-        action->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
+        action->enumerate_argument_gids(boost::bind(prepare_gid, do_undo, _1));
     }
 
     // prepare all GIDs stored in a continuation
     void prepare_continuation(
-        naming::resolver_client& resolver_,
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
         actions::continuation_type cont)
     {
         if (cont)
-            cont->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
+            cont->enumerate_argument_gids(boost::bind(prepare_gid, do_undo, _1));
     }
 
     // walk through all data in this parcel and register all required AGAS 
     // operations with the given resolver_helper
     void prepare_parcel(
-        naming::resolver_client& resolver_,
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo, 
         parcel& p, error_code& ec)
     {
-        prepare_gid(resolver_, p.get_source());                // we need to register the source gid
-        prepare_action(resolver_, p.get_action());             // all gids stored in the action
-        prepare_continuation(resolver_, p.get_continuation()); // all gids in the continuation
+        prepare_gid(do_undo, p.get_source());                // we need to register the source gid
+        prepare_action(do_undo, p.get_action());             // all gids stored in the action
+        prepare_continuation(do_undo, p.get_continuation()); // all gids in the continuation
         if (&ec != &throws)
             ec = make_success_code();
     }
@@ -261,66 +250,64 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
+        // asynchronously resolve destination address, if needed
+        boost::shared_ptr<naming::detail::bulk_resolver_helper> do_undo(
+            new naming::detail::bulk_resolver_helper(resolver_));
+
         if (!p.get_destination_addr())
         { 
             naming::address addr;
-
-            if (!resolver_.resolve_cached(p.get_destination(), addr))
-            {
+            if (!resolver_.resolve_cached(p.get_destination(), addr)) {
                 // resolve the remote address
-                resolver_.resolve(p.get_destination(), addr);
+                do_undo->resolve(p.get_destination(), p);
+            }
+            else {
                 p.set_destination_addr(addr);
             }
-
-            else
-                p.set_destination_addr(addr);
         }
 
         // prepare all additional AGAS related operations for this parcel
         error_code ec;
-        prepare_parcel(resolver_, p, ec);
-
-        if (ec)
-        {
+        prepare_parcel(do_undo, p, ec);
+        if (ec) {
             // parcel preparation failed
             HPX_THROW_EXCEPTION(no_success, 
                 "parcelhandler::put_parcel", ec.get_message());
         }
 
-        pp_.put_parcel(p, f);
+        // execute all necessary AGAS operations (if any)
+        do_undo->execute(ec);
+        if (ec) {
+            // one or more AGAS operations failed
+            HPX_THROW_EXCEPTION(no_success, 
+                "parcelhandler::put_parcel", ec.get_message());
+        }
+
+        // send the parcel to its destination, return parcel id of the 
+        // parcel being sent
+        pp_.put_parcel(p, boost::bind(&release_do_undo, _1, _2, f, do_undo));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::install_counters()
+    parcelhandler::parcelhandler(naming::resolver_client& resolver, 
+            parcelport& pp, threads::threadmanager_base* tm, 
+            parcelhandler_queue_base* policy)
+      : resolver_(resolver), pp_(pp), tm_(tm), parcels_(policy),
+        startup_time_(util::high_resolution_timer::now()), timer_()
     {
-        performance_counters::counter_type_data const counter_types[] = 
-        {
-            { "/parcels/count/sent", performance_counters::counter_raw,
-              "returns the number of sent parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
-            { "/parcels/count/received", performance_counters::counter_raw,
-              "returns the number of received parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 }
-        };
-        performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+        BOOST_ASSERT(parcels_);
 
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
+        // retrieve the prefix to be used for this site
+        resolver_.get_prefix(pp.here(), prefix_); // throws on error
 
-        performance_counters::counter_data const counters[] = 
-        {
-            // Total parcels sent (completed)
-            { boost::str(parcel_count % prefix % "sent"),
-              boost::bind(&parcelport::total_sends_completed, &pp_) },
-            // Total parcels received (completed)
-            { boost::str(parcel_count % prefix % "received"),
-              boost::bind(&parcelport::total_receives_completed, &pp_) }
-        };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
+        parcels_->set_parcelhandler(this);
+
+        // register our callback function with the parcelport
+        pp_.register_event_handler
+            (boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
     }
+
+///////////////////////////////////////////////////////////////////////////////
 }}
 
 #endif // HPX_AGAS_VERSION
-

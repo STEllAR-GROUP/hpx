@@ -54,10 +54,7 @@ macro(add_hpx_library name)
     # main_target is checked by the ini install code, to see if ini files for
     # this component need to be installed
     set(main_target lib${prefix}${name}.so)
-    set(install_targets
-      lib${prefix}${name}.so
-      lib${prefix}${name}.so.${HPX_SOVERSION}
-      lib${prefix}${name}.so.${HPX_VERSION})
+    set(install_targets lib${prefix}${name}.so)
   else()
     if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_lib

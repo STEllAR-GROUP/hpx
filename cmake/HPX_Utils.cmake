@@ -22,5 +22,7 @@ hpx_include(Message
             AddPseudoDependencies
             AddPseudoTarget
             AddLibrarySources
+            AddLibraryHeaders
+            AddSourceGroup
             ForceOutOfTreeBuild)
 
