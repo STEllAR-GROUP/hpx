@@ -89,7 +89,7 @@ int hpx_main(variables_map& vm)
 
         std::cout
             << ( boost::format("factorial(%1%) == %2%\n"
-                               "elapsed time == %3%\n")
+                               "elapsed time == %3% [s]\n")
                % n % r % elapsed);
     }
 
