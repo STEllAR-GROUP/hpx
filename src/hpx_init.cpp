@@ -883,8 +883,12 @@ namespace hpx
             std::string agas_host(env.agas_host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
             std::size_t num_threads = env.retrieve_number_of_threads();
-            std::size_t num_localities = env.retrieve_number_of_localities();
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
+
+            std::size_t num_localities = env.retrieve_number_of_localities();
+            if (vm.count("localities"))
+                num_localities = vm["localities"].as<std::size_t>();
+
 #if HPX_AGAS_VERSION > 0x10
             std::size_t node = env.retrieve_node_number();
 
@@ -894,10 +898,10 @@ namespace hpx
                 // command line overwrites the environment
                 if (vm.count("node")) {
                     node = vm["node"].as<std::size_t>();
-                    if (!vm.count("localities")) {
+                    if (1 == num_localities) {
                         throw std::logic_error("Command line option --node "
                             "requires to specify the number of localities as "
-                            "well (--localities/-l)");
+                            "well (for instance by using --localities/-l)");
                     }
                 }
                 if (0 == node) {
@@ -940,9 +944,6 @@ namespace hpx
                 if (!host.empty()) agas_host = host;
                 if (!port) agas_port = port;
             }
-
-            if (vm.count("localities"))
-                num_localities = vm["localities"].as<std::size_t>();
 
             if (vm.count("threads"))
                 num_threads = vm["threads"].as<std::size_t>();
