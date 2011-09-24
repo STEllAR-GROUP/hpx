@@ -8,10 +8,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #else
 
-#if BOOST_VERSION < 103700
-#include <hpx/util/binary_portable_oarchive.hpp>
-#else
-
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -248,7 +244,6 @@ public:
 #pragma warning( pop )
 #endif
 
-#endif // BOOST_VERSION < 103700
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
 
 #endif // HPX_USE_PORTABLE_ARCHIVES == 0
