@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/include/iostreams.hpp>
 
-
 #include <vector>
 #include <list>
 #include <set>
