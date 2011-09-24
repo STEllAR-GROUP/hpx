@@ -11,7 +11,6 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/bulk_resolver_client.hpp>
 
 #endif
 
