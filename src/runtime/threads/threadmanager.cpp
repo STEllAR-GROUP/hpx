@@ -211,9 +211,6 @@ namespace hpx { namespace threads
                    << "run_now(" << (run_now ? "true" : "false") << "), "
                    << "description(" << data.description << ")";
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
         return newid;
     }
 
@@ -294,9 +291,6 @@ namespace hpx { namespace threads
             // Create a task description for the new thread. 
             scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
         }
-
-        if (&ec != &throws)
-            ec = make_success_code();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -327,9 +321,10 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        if (HPX_UNLIKELY(!id))
+        if (HPX_UNLIKELY(!id)) {
            HPX_THROWS_IF(ec, null_thread_id,
               "threadmanager_impl::set_state", "NULL thread id encountered");  
+        }
 
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
 

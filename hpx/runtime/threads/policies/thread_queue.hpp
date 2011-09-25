@@ -332,6 +332,9 @@ namespace hpx { namespace threads { namespace policies
                 do_some_work();       // try to execute the new work item
                 thrd.release();       // release ownership to the map
 
+                if (&ec != &throws)
+                    ec = make_success_code();
+
                 // return the thread_id of the newly created thread
                 return id;
             }
@@ -340,6 +343,10 @@ namespace hpx { namespace threads { namespace policies
             // later thread creation
             ++new_tasks_count_;
             new_tasks_.enqueue(new task_description(data, initial_state));
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return invalid_thread_id;     // thread has not been created yet
         }
 
