@@ -12,7 +12,6 @@
 #include <hpx/util/pbs_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 
-#if HPX_AGAS_VERSION > 0x10
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/function.hpp>
@@ -21,7 +20,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/stringstream.hpp>
-#endif
 
 #if !defined(BOOST_WINDOWS)
     #include <signal.h>
@@ -45,7 +43,6 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if HPX_AGAS_VERSION > 0x10
 namespace hpx { namespace detail
 {
     // forward declarations only
@@ -149,7 +146,6 @@ namespace hpx { namespace detail
         return 0;
     }
 }}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -391,9 +387,9 @@ namespace hpx
                 hpx_options.add_options()
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
-#if HPX_AGAS_VERSION <= 0x10
-                    ("run-agas-server-only", "run only the AGAS server")
-#endif
+// #if HPX_AGAS_VERSION <= 0x10
+//                     ("run-agas-server-only", "run only the AGAS server")
+// #endif
                     ("run-hpx-main",
                      "run the hpx_main function, regardless of locality mode")
                     ("agas,a", value<std::string>(), 
@@ -416,11 +412,9 @@ namespace hpx
                     ("localities,l", value<std::size_t>(), 
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
-#if HPX_AGAS_VERSION > 0x10
                     ("node", value<std::size_t>(), 
                      "number of the node this locality is run on "
                      "(must be unique, alternatively: -1, -2, etc.)")
-#endif
                     ("threads,t", value<std::size_t>(), 
                      "the number of operating system threads to dedicate as "
                      "shepherd threads for this HPX locality (default: 1)")
@@ -442,13 +436,11 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add a configuration definition to the default runtime "
                      "configuration")
-#if HPX_AGAS_VERSION > 0x10
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
                     // enable debug output from command line handling
                     ("debug-clp", "debug command line processing")
                     ("exit", "exit after configuring the runtime")
-#endif
                 ;
                 
                 options_description counter_options(
@@ -537,30 +529,6 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // helper class for AGAS server initialization
-#if HPX_AGAS_VERSION <= 0x10
-        class agas_server_helper
-        {
-        public:
-            agas_server_helper(std::string host, boost::uint16_t port,
-                    bool blocking = false)
-              : agas_pool_(), agas_(agas_pool_, host, port)
-            {
-                agas_.run(blocking); 
-            }
-
-            ~agas_server_helper()
-            {
-                agas_.stop(); 
-            }
-
-        private:
-            hpx::util::io_service_pool agas_pool_;
-            hpx::naming::resolver_server agas_;
-        };
-#endif
-
-#if HPX_AGAS_VERSION > 0x10
         void print_shutdown_counters(std::vector<std::string> const& names)
         {
             std::cout << "performance counter values (at shutdown):\n";
@@ -590,7 +558,6 @@ namespace hpx
                     std::cout << name << ",invalid\n"; 
             }
         }
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
@@ -621,7 +588,6 @@ namespace hpx
                 rt.get_config().load_application_configuration(config.c_str());
             }
 
-#if HPX_AGAS_VERSION > 0x10
             if (vm.count("print-counter")) {
                 std::vector<std::string> counters = 
                     vm["print-counter"].as<std::vector<std::string> >();
@@ -681,10 +647,6 @@ namespace hpx
                     boost::bind(&list_counters<list_counter_info_action>, vm, f),
                     num_threads, num_localities);
             }
-#else
-            if (vm.count("exit"))
-                return 0;
-#endif
 
             if (0 != f) {
                 // Run this runtime instance using the given function f.
@@ -862,6 +824,18 @@ namespace hpx
             if (vm.count("ifsuffix")) 
                 mapnames.use_suffix(vm["ifsuffix"].as<std::string>());
 
+            // The AGAS host name and port number are pre-initialized from
+            //the command line
+            std::string agas_host;
+            boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
+            if (vm.count("agas")) {
+                std::string host;
+                boost::uint16_t port = HPX_INITIAL_IP_PORT;
+                detail::split_ip_address(vm["agas"].as<std::string>(), host, port);
+                if (!host.empty()) agas_host = host;
+                if (!port) agas_port = port;
+            }
+
             // Check command line arguments.
             util::pbs_environment env(debug_clp);
             if (vm.count("nodefile")) {
@@ -871,17 +845,18 @@ namespace hpx
                         "--nodes options at the same time.");
                 }
                 ini_config += "hpx.nodefile=" + 
-                    env.init_from_file(vm["nodefile"].as<std::string>());
+                    env.init_from_file(vm["nodefile"].as<std::string>(), agas_host);
             }
             else if (vm.count("nodes")) {
                 ini_config += "hpx.nodes=" + env.init_from_nodelist(
-                    vm["nodes"].as<std::vector<std::string> >());
+                    vm["nodes"].as<std::vector<std::string> >(), agas_host);
             }
+
+            // let the PBS environment decide about the AGAS host
+            agas_host = env.agas_host_name(HPX_INITIAL_IP_ADDRESS);
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
-            std::string agas_host(env.agas_host_name(HPX_INITIAL_IP_ADDRESS));
-            boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
             std::size_t num_threads = env.retrieve_number_of_threads();
             bool run_agas_server = vm.count("run-agas-server") ? true : false;
 
@@ -889,7 +864,6 @@ namespace hpx
             if (vm.count("localities"))
                 num_localities = vm["localities"].as<std::size_t>();
 
-#if HPX_AGAS_VERSION > 0x10
             std::size_t node = env.retrieve_node_number();
 
             // we initialize certain settings if --node is specified (or data 
@@ -897,6 +871,10 @@ namespace hpx
             if (node != std::size_t(-1) || vm.count("node")) {
                 // command line overwrites the environment
                 if (vm.count("node")) {
+                    if (vm.count("agas")) {
+                        throw std::logic_error("Command line option --node "
+                            "is not compatible with --agas/-a");
+                    }
                     node = vm["node"].as<std::size_t>();
                     if (1 == num_localities) {
                         throw std::logic_error("Command line option --node "
@@ -904,7 +882,7 @@ namespace hpx
                             "well (for instance by using --localities/-l)");
                     }
                 }
-                if (0 == node) {
+                if (env.agas_node() == node) {
                     // console node, by default runs AGAS
                     run_agas_server = true;
                     mode = hpx::runtime_mode_console;
@@ -922,7 +900,7 @@ namespace hpx
                 ini_config += "hpx.locality=" + 
                     boost::lexical_cast<std::string>(node);
             }
-#endif
+
             if (vm.count("ini")) {
                 std::vector<std::string> cfg =
                     vm["ini"].as<std::vector<std::string> >();
@@ -935,14 +913,6 @@ namespace hpx
                 detail::split_ip_address(vm["hpx"].as<std::string>(), host, port);
                 if (!host.empty()) hpx_host = host;
                 if (!port) hpx_port = port;
-            }
-
-            if (vm.count("agas")) {
-                std::string host;
-                boost::uint16_t port = HPX_INITIAL_IP_PORT;
-                detail::split_ip_address(vm["agas"].as<std::string>(), host, port);
-                if (!host.empty()) agas_host = host;
-                if (!port) agas_port = port;
             }
 
             if (vm.count("threads"))
@@ -988,26 +958,6 @@ namespace hpx
             hpx_host = mapnames.map(hpx_host, hpx_port);
             agas_host = mapnames.map(agas_host, agas_port);
 
-#if HPX_AGAS_VERSION <= 0x10
-            // Initialize and run the AGAS service, if appropriate.
-            boost::shared_ptr<detail::agas_server_helper> agas_server;
-
-            // We assume we have to run the AGAS server if
-            //  - it's explicitly specified
-            //  - the number of localities to run on is not specified (or is '1')
-            //    and no additional option (--agas) has been specified.
-            if (run_agas_server || (num_localities == 1 && !vm.count("agas"))) 
-            {
-                agas_server.reset(
-                    new detail::agas_server_helper(agas_host, agas_port));
-            }
-            else if (vm.count("run-agas-server-only")) 
-            {
-                agas_server.reset(
-                    new detail::agas_server_helper(agas_host, agas_port, true));
-                return 0;
-            }
-#else
             // write HPX and AGAS network parameters to the proper ini-file entries
             ini_config += "hpx.address=" + hpx_host;
             ini_config += "hpx.port=" + boost::lexical_cast<std::string>(hpx_port);
@@ -1023,7 +973,7 @@ namespace hpx
             {
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
             }
-#endif
+
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;
             for (int i = 0; i < argc; ++i)
@@ -1169,10 +1119,7 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-#if HPX_AGAS_VERSION > 0x10
         p->call_shutdown_functions();
-#endif
-
         p->shutdown(shutdown_timeout); 
     }
 }
