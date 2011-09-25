@@ -38,6 +38,11 @@
 
 namespace hpx
 {
+    class error_code;
+
+    // predefined error_code object used as "throw on error" tag
+    HPX_EXCEPTION_EXPORT extern error_code throws;
+
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
@@ -213,9 +218,13 @@ namespace hpx
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self& get_self();
 
-        /// The function \a get_self returns a pointer to the (OS thread 
+        /// The function \a get_self_ptr returns a pointer to the (OS thread 
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
+
+        /// The function \a get_self_ptr_checked returns a pointer to the (OS
+        /// thread specific) self reference to the current PX thread.
+        HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
 
         /// The function \a get_self_id returns the PX thread id of the current
         /// thread (or zero if the current thread is not a PX thread).
@@ -288,7 +297,6 @@ namespace hpx
     HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
         std::size_t dflt);
 
-#if HPX_AGAS_VERSION > 0x10
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
     typedef boost::function<void()> startup_function_type;
@@ -297,7 +305,6 @@ namespace hpx
     /// Add a function to be executed inside a HPX thread during hpx::finalize
     typedef boost::function<void()> shutdown_function_type;
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
-#endif
 
     template <
         typename SchedulingPolicy, 
@@ -495,11 +502,6 @@ namespace hpx
         template <typename Connection, typename Key = boost::uint32_t>
         class connection_cache;
     }
-
-    class error_code;
-
-    // predefined error_code object used as "throw on error" tag
-    HPX_EXCEPTION_EXPORT extern error_code throws;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality

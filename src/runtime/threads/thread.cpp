@@ -111,6 +111,23 @@ namespace hpx { namespace threads
         return thread_self::impl_type/*::super_type*/::get_self();
     }
 
+    thread_self* get_self_ptr_checked(error_code& ec)
+    {
+        thread_self* p = thread_self::impl_type::get_self();
+
+        if (HPX_UNLIKELY(!p))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked", 
+                "NULL thread id encountered (is this executed on a HPX-thread?)");
+            return 0;
+        }
+
+        if (&ec != &throws) 
+            ec = make_success_code();
+
+        return p; 
+    }
+
     thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();

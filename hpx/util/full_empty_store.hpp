@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,7 +80,7 @@ namespace hpx { namespace util { namespace detail
 
                 // we know that the id is actually the pointer to the thread
                 threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
-                LERR_(fatal) << "~full_empty_entry: pending thread in " 
+                LERR_(info) << "~full_empty_entry: pending thread in " 
                         << desc << ": " 
                         << get_thread_state_name(thrd->get_state()) 
                         << "(" << id << "): " << thrd->get_description();
@@ -89,7 +90,7 @@ namespace hpx { namespace util { namespace detail
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_abort, threads::thread_priority_normal, ec);
                 if (ec) {
-                    LERR_(fatal) << "~full_empty_entry: could not abort thread"
+                    LERR_(info) << "~full_empty_entry: could not abort thread"
                         << get_thread_state_name(thrd->get_state()) 
                         << "(" << id << "): " << thrd->get_description();
                 }
@@ -113,7 +114,7 @@ namespace hpx { namespace util { namespace detail
         ~full_empty_entry()
         {
             if (is_used()) {
-                LERR_(fatal) << "~full_empty_entry: one of the queues is not empty";
+                LERR_(info) << "~full_empty_entry: one of the queues is not empty";
                 log_non_empty_queue("write_queue", write_queue_);
                 log_non_empty_queue("read_and_empty_queue", read_and_empty_queue_);
                 log_non_empty_queue("read_queue", read_queue_);
@@ -145,17 +146,24 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
         template <typename T>
-        void enqueue_full_full(T& dest)
+        void enqueue_full_full(T& dest, error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_full");
+                threads::set_thread_lco_description(id, "enqueue_full_full", ec);
+
+                if (&ec != &throws && ec)
+                    return;  
 
                 queue_entry f(id);
                 read_queue_.push_back(f);
@@ -164,14 +172,20 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_full_full",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
@@ -181,20 +195,30 @@ namespace hpx { namespace util { namespace detail
             // copy the data to the destination
             if (get_address() != &dest) 
                 dest = *get_address();
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         // same as above, but for entries without associated data
-        void enqueue_full_full()
+        void enqueue_full_full(error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_full");
+                threads::set_thread_lco_description(id, "enqueue_full_full", ec);
+
+                if (&ec != &throws && ec)
+                    return;  
 
                 queue_entry f(id);
                 read_queue_.push_back(f);
@@ -203,35 +227,51 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_full_full",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
                     read_queue_.erase(last);     // remove entry from queue
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
         template <typename T>
-        void enqueue_full_empty(T& dest)
+        void enqueue_full_empty(T& dest, error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_empty");
+                threads::set_thread_lco_description(id, "enqueue_full_empty", ec);
+
+                if (&ec != &throws && ec)
+                    return;  
 
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
@@ -240,14 +280,20 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_full_empty",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
@@ -263,20 +309,30 @@ namespace hpx { namespace util { namespace detail
                     dest = *get_address();
                 set_empty_locked();   // state_ = empty;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         // same as above, but for entries without associated data
-        void enqueue_full_empty()
+        void enqueue_full_empty(error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_empty");
+                threads::set_thread_lco_description(id, "enqueue_full_empty", ec);
+
+                if (&ec != &throws && ec)
+                    return;  
 
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
@@ -285,14 +341,20 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_full_empty",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
@@ -301,22 +363,32 @@ namespace hpx { namespace util { namespace detail
             else {
                 set_empty_locked();   // state_ = empty
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T>
-        void enqueue_if_full(T const& src)
+        void enqueue_if_full(T const& src, error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_if_full");
+                threads::set_thread_lco_description(id, "enqueue_if_full", ec);
+
+                if (&ec != &throws && ec)
+                    return;  
 
                 queue_entry f(id);
                 write_queue_.push_back(f);
@@ -325,14 +397,20 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_if_full",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
@@ -345,21 +423,31 @@ namespace hpx { namespace util { namespace detail
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         // same as above, but for entries without associated data
-        void enqueue_if_full()
+        void enqueue_if_full(error_code& ec = throws)
         {
-            threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
+            threads::thread_self* self = threads::get_self_ptr_checked(ec);
+
+            if (&ec != &throws && ec)
+                return;
+
+            threads::thread_id_type id = self->get_thread_id();
 
             scoped_lock l(this);
 
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_if_full");
+                threads::set_thread_lco_description(id, "enqueue_if_full", ec);
 
+                if (&ec != &throws && ec)
+                    return;  
+ 
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -367,14 +455,20 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+                    threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
+
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, 
+                        HPX_THROWS_IF(ec, yield_aborted, 
                             "full_empty_entry::enqueue_if_full",
                             hpx::util::osstream_get_string(strm));
+                        return;
                     }
                 }
                 if (f.id_) 
@@ -383,6 +477,9 @@ namespace hpx { namespace util { namespace detail
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         ///////////////////////////////////////////////////////////////////////

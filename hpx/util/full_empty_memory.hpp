@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -43,6 +44,11 @@ namespace hpx { namespace util
     /// full_empty memory locations are very useful for synchronization and 
     /// data delivery (especially in producer/consumer scenarios).
     ///
+    /// If a full_empty memory location goes out of scope while reads/writes are
+    /// waiting on it, those operations will be resumed immediately, and they
+    /// either throw a \a hpx#yield_aborted exception or set their
+    /// \a hpx#error_code parameter to \a hpx#yield_aborted. 
+    /// 
     /// \tparam T   The template parameter \a T defines the type of the memory 
     ///             location to be guarded by an empty/full bit. It is possible 
     ///             to use any C++ data type with the empty/full mechanism.
@@ -102,13 +108,19 @@ namespace hpx { namespace util
         ///         calling thread will wait (block) for another thread to call 
         ///         either the function \a set or the function \a write.
         ///
+        /// \param ec [in,out] this represents the error status on exit,
+        ///           if this is pre-initialized to \a hpx#throws
+        ///           the function will throw on error instead. If the operation
+        ///           blocks and is aborted because the object went out of
+        ///           scope, the code \a hpx#yield_aborted is set or thrown. 
+        ///
         /// \note   When memory becomes full, all \a threads waiting for it
         ///         to become full with a read will receive the value at once 
         ///         and will be queued to run.
         template <typename Target>
-        void read(Target& dest)
+        void read(Target& dest, error_code& ec = throws)
         {
-            data_.enqueue_full_full(dest);
+            data_.enqueue_full_full(dest, ec);
         }
 
         /// \brief  Waits for memory to become full and then reads it, sets 
@@ -116,13 +128,19 @@ namespace hpx { namespace util
         ///         thread will wait (block) for another thread to call either
         ///         the function \a set or the function \a write.
         ///
+        /// \param ec [in,out] this represents the error status on exit,
+        ///           if this is pre-initialized to \a hpx#throws
+        ///           the function will throw on error instead. If the operation
+        ///           blocks and is aborted because the object went out of
+        ///           scope, the code \a hpx#yield_aborted is set or thrown. 
+        ///
         /// \note   When memory becomes empty, only one thread blocked like this 
         ///         will be queued to run (one thread waiting in a \a write 
         ///         function).
         template <typename Target>
-        void read_and_empty(Target& dest) 
+        void read_and_empty(Target& dest, error_code& ec = throws) 
         {
-            data_.enqueue_full_empty(dest);
+            data_.enqueue_full_empty(dest, ec);
         }
 
         /// \brief  Writes memory and atomically sets its state to full without 
@@ -141,12 +159,18 @@ namespace hpx { namespace util
         ///         location is filled the calling thread will wait (block) for 
         ///         another thread to call the function \a read_and_empty.
         ///
+        /// \param ec [in,out] this represents the error status on exit,
+        ///           if this is pre-initialized to \a hpx#throws
+        ///           the function will throw on error instead. If the operation
+        ///           blocks and is aborted because the object went out of
+        ///           scope, the code \a hpx#yield_aborted is set or thrown. 
+        ///
         /// \note   When memory becomes empty only one thread blocked like this 
         ///         will be queued to run.
         template <typename Target>
-        void write(Target const& data)
+        void write(Target const& data, error_code& ec = throws)
         {
-            data_.enqueue_if_full(data);
+            data_.enqueue_if_full(data, ec);
         }
 
     private:
