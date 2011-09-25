@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\util\binary_portable_archives.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\portable_binary_iarchive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -22,12 +19,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\hpx\util\binary_portable_iarchive.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\binary_portable_oarchive.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\portable_binary_archive.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -48,6 +48,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sine", "components\performa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sine_client", "components\performance_counters\sine\sine_client\sine_client.vcxproj", "{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}"
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "thread_testd", "..\..\bin64\Debug\bin\thread_testd.exe", "{7939846E-B3F1-4C60-A44E-D41C984E9822}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\CVS\hpx\hpx\bin64\Debug\bin\thread_testd.exe
+		RemoteMachine = FIFTYTWO
+		StartingDirectory = C:\CVS\hpx\hpx\bin64\Debug\lib\hpx
+		Arguments = -1 -l2
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -251,6 +264,12 @@ Global
 		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|Win32.ActiveCfg = Release|x64
 		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|x64.ActiveCfg = Release|x64
 		{075685CB-6DF6-4A83-A62B-6C7C48A6AAF2}.Release|x64.Build.0 = Release|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Debug|Win32.ActiveCfg = Debug|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Debug|x64.ActiveCfg = Debug|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Release|Mixed Platforms.ActiveCfg = Debug|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Release|Win32.ActiveCfg = Debug|x64
+		{7939846E-B3F1-4C60-A44E-D41C984E9822}.Release|x64.ActiveCfg = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -56,12 +56,6 @@
     <Filter Include="Header Files\Runtime\Naming">
       <UniqueIdentifier>{fb47b115-1a42-414a-bbdf-5a19ec700304}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Runtime\Naming\Detail">
-      <UniqueIdentifier>{03c4f995-537d-4da3-9ba9-0359376191a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\Naming\Server">
-      <UniqueIdentifier>{2cbde3f2-2fd0-4f6a-8ed8-94e6b9b9b702}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Runtime\Parcelset">
       <UniqueIdentifier>{4b54814a-a78e-4514-b7b1-ff8dcd26bb1d}</UniqueIdentifier>
     </Filter>
@@ -104,12 +98,6 @@
     </Filter>
     <Filter Include="Source Files\Runtime\Naming">
       <UniqueIdentifier>{397e8e4b-17e9-479b-9ce9-996c6a84db45}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\Naming\Detail">
-      <UniqueIdentifier>{d6a8b838-a2b5-49d4-8759-c1fd2162f1a4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\Naming\Server">
-      <UniqueIdentifier>{0f879e86-08c4-4233-9670-0e26ceeac812}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Runtime\Parcelset">
       <UniqueIdentifier>{26c64f12-fa35-4421-b73f-db2f78d379e5}</UniqueIdentifier>
@@ -260,32 +248,11 @@
     <ClCompile Include="..\..\..\src\runtime\naming\address.cpp">
       <Filter>Source Files\Runtime\Naming</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp">
-      <Filter>Source Files\Runtime\Naming</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp">
-      <Filter>Source Files\Runtime\Naming\Detail</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\naming\locality.cpp">
       <Filter>Source Files\Runtime\Naming</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\naming\name.cpp">
       <Filter>Source Files\Runtime\Naming</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\resolver_client.cpp">
-      <Filter>Source Files\Runtime\Naming</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\resolver_server.cpp">
-      <Filter>Source Files\Runtime\Naming</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\server\reply.cpp">
-      <Filter>Source Files\Runtime\Naming\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\server\request.cpp">
-      <Filter>Source Files\Runtime\Naming\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\server\request_handler.cpp">
-      <Filter>Source Files\Runtime\Naming\Server</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp">
       <Filter>Source Files\Runtime\Parcelset</Filter>
@@ -335,12 +302,6 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp">
       <Filter>Source Files\Runtime\Threads</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp">
-      <Filter>Source Files\Runtime\Parcelset</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp">
-      <Filter>Source Files\Runtime\Parcelset</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
       <Filter>Source Files\Runtime\AGAS\Router</Filter>
     </ClCompile>
@@ -358,12 +319,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp">
       <Filter>Source Files\LCOs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v1.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v2.cpp">
-      <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
       <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
@@ -397,6 +352,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\performance_counters\server\elapsed_time_counter.cpp">
       <Filter>Source Files\Performance Counters\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler.cpp">
+      <Filter>Source Files\Runtime\Parcelset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hpx\util\pbs_environment.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hpx\util\map_hostnames.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -437,9 +404,6 @@
       <Filter>Header Files\Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\include\lcos.hpp">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\include\naming.hpp">
       <Filter>Header Files\Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\include\parcelset.hpp">
@@ -643,38 +607,11 @@
     <ClInclude Include="..\..\..\hpx\runtime\naming\address.hpp">
       <Filter>Header Files\Runtime\Naming</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp">
-      <Filter>Header Files\Runtime\Naming</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp">
-      <Filter>Header Files\Runtime\Naming\Detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\naming\locality.hpp">
       <Filter>Header Files\Runtime\Naming</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\naming\name.hpp">
       <Filter>Header Files\Runtime\Naming</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp">
-      <Filter>Header Files\Runtime\Naming</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client_connection.hpp">
-      <Filter>Header Files\Runtime\Naming</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_server.hpp">
-      <Filter>Header Files\Runtime\Naming</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\connection.hpp">
-      <Filter>Header Files\Runtime\Naming\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\reply.hpp">
-      <Filter>Header Files\Runtime\Naming\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request.hpp">
-      <Filter>Header Files\Runtime\Naming\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler.hpp">
-      <Filter>Header Files\Runtime\Naming\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcel.hpp">
       <Filter>Header Files\Runtime\Parcelset</Filter>
@@ -819,9 +756,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp">
       <Filter>Header Files\Runtime\Threads\Detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp">
-      <Filter>Header Files\Runtime\Naming\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp">
       <Filter>Header Files\Util</Filter>
@@ -976,12 +910,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp">
       <Filter>Header Files\LCOs\Server</Filter>
     </ClInclude>
@@ -1090,20 +1018,11 @@
     <None Include="..\..\..\src\runtime\naming\CMakeLists.txt">
       <Filter>Source Files\Runtime\Naming</Filter>
     </None>
-    <None Include="..\..\..\src\runtime\naming\server\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Naming\Server</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\naming\detail\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Naming\Detail</Filter>
-    </None>
     <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt">
       <Filter>Source Files\Runtime\Parcelset</Filter>
     </None>
     <None Include="..\..\..\src\runtime\threads\CMakeLists.txt">
       <Filter>Source Files\Runtime\Threads</Filter>
-    </None>
-    <None Include="..\..\..\src\util\CMakeLists.txt">
-      <Filter>Source Files\Util</Filter>
     </None>
     <None Include="hpx.def">
       <Filter>Auxiliary Files</Filter>

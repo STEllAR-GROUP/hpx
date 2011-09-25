@@ -99,13 +99,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\util\binary_portable_archives.cpp" />
     <ClCompile Include="..\..\..\src\util\portable_binary_iarchive.cpp" />
     <ClCompile Include="..\..\..\src\util\portable_binary_oarchive.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\hpx\util\binary_portable_iarchive.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\binary_portable_oarchive.hpp" />
     <ClInclude Include="..\..\..\hpx\util\portable_binary_archive.hpp" />
     <ClInclude Include="..\..\..\hpx\util\portable_binary_iarchive.hpp" />
     <ClInclude Include="..\..\..\hpx\util\portable_binary_oarchive.hpp" />

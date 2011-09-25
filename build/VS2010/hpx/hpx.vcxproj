@@ -99,6 +99,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp" />
+    <ClCompile Include="..\..\..\hpx\util\map_hostnames.cpp" />
+    <ClCompile Include="..\..\..\hpx\util\pbs_environment.cpp" />
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
@@ -130,15 +132,11 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\naming\bulk_resolver_client.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\detail\resolver_do_undo.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v1.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler_v2.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler.cpp" />
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\state.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v1.cpp" />
-    <ClCompile Include="..\..\..\src\util\generate_unique_ids_v2.cpp" />
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
@@ -151,11 +149,6 @@
     <ClCompile Include="..\..\..\src\runtime\naming\address.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\locality.cpp" />
     <ClCompile Include="..\..\..\src\runtime\naming\name.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\resolver_client.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\resolver_server.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\server\reply.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\server\request.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\naming\server\request_handler.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport.cpp" />
     <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport_connection.cpp" />
@@ -250,9 +243,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\bulk_resolver_client.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\detail\resolver_do_undo.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_defs.h" />
@@ -261,8 +251,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v1.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids_v2.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\linux_x86.hpp" />
@@ -321,13 +309,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\naming\address.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\locality.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\naming\name.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client_connection.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_server.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\connection.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\reply.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\naming\server\request_handler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\applier\applier.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\applier\apply.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\applier\apply_helper.hpp" />
@@ -396,7 +377,6 @@
     <ClInclude Include="..\..\..\hpx\include\applier.hpp" />
     <ClInclude Include="..\..\..\hpx\include\components.hpp" />
     <ClInclude Include="..\..\..\hpx\include\lcos.hpp" />
-    <ClInclude Include="..\..\..\hpx\include\naming.hpp" />
     <ClInclude Include="..\..\..\hpx\include\parcelset.hpp" />
     <ClInclude Include="..\..\..\hpx\include\performance_counters.hpp" />
     <ClInclude Include="..\..\..\hpx\include\runtime.hpp" />
@@ -428,11 +408,8 @@
     <None Include="..\..\..\src\runtime\components\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\components\server\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\naming\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\naming\detail\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\naming\server\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt" />
     <None Include="..\..\..\src\runtime\threads\CMakeLists.txt" />
-    <None Include="..\..\..\src\util\CMakeLists.txt" />
     <None Include="hpx.def" />
   </ItemGroup>
   <ItemGroup>
