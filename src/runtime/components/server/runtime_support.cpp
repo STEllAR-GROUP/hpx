@@ -5,9 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#if HPX_AGAS_VERSION > 0x10
-    #include <hpx/runtime.hpp>
-#endif
+#include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -55,17 +53,15 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_memory_block_action,
     create_memory_block_action);
-#if HPX_AGAS_VERSION > 0x10
-    HPX_REGISTER_ACTION_EX(
-        hpx::components::server::runtime_support::load_components_action,
-        load_components_action);
-    HPX_REGISTER_ACTION_EX(
-        hpx::components::server::runtime_support::call_startup_functions_action,
-        call_startup_functions_action);
-    HPX_REGISTER_ACTION_EX(
-        hpx::components::server::runtime_support::call_shutdown_functions_action,
-        call_shutdown_functions_action);
-#endif
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::load_components_action,
+    load_components_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::call_startup_functions_action,
+    call_startup_functions_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::call_shutdown_functions_action,
+    call_shutdown_functions_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::free_component_action,
     free_component_action);
@@ -99,9 +95,6 @@ namespace hpx { namespace components { namespace server
             applier::applier& applier)
       : stopped_(false), terminated_(false), ini_(ini)
     {
-#if HPX_AGAS_VERSION <= 0x10
-        load_components(ini, prefix, agas_client);
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -345,7 +338,6 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_prefixes(prefixes);
         std::reverse(prefixes.begin(), prefixes.end());
 
-#if HPX_AGAS_VERSION > 0x10
         // execute registered shutdown functions on all localities
         {
             std::vector<lcos::future_value<void> > lazy_actions;
@@ -361,7 +353,6 @@ namespace hpx { namespace components { namespace server
             // shutdown functions
             lcos::wait(lazy_actions);
         }
-#endif
 
         // shut down all localities except the the local one
         {
@@ -422,11 +413,7 @@ namespace hpx { namespace components { namespace server
     // Retrieve configuration information
     util::section runtime_support::get_config()
     {
-#if HPX_AGAS_VERSION > 0x10
         return *(get_runtime().get_config().get_section("application"));
-#else
-        return *ini_.get_section("application");
-#endif
     }
 
     void runtime_support::tidy()
@@ -536,7 +523,6 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
-#if HPX_AGAS_VERSION > 0x10
             naming::resolver_client& agas_client = 
                 get_runtime().get_agas_client();
 
@@ -545,8 +531,7 @@ namespace hpx { namespace components { namespace server
             agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             // Drop the locality from the partition table.
-            agas_client.remove_prefix(appl.here(), ec);
-#endif
+            agas_client.unregister_locality(appl.here(), ec);
 
             if (respond_to) {
                 // respond synchronously
@@ -580,7 +565,6 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-#if HPX_AGAS_VERSION > 0x10
     void runtime_support::load_components()
     {
         // load components now that AGAS is up
@@ -605,7 +589,6 @@ namespace hpx { namespace components { namespace server
             f(); 
         } 
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
@@ -717,12 +700,12 @@ namespace hpx { namespace components { namespace server
                 shutdown_functions_.push_back(shutdown);
         }
         catch (std::logic_error const& e) {
-            LRT_(warning) << "loading of startup/shutdown functions failed: " 
+            LRT_(debug) << "loading of startup/shutdown functions failed: " 
                           << d.get_name() << ": " << e.what();
             return false;
         }
         catch (std::exception const& e) {
-            LRT_(warning) << "loading of startup/shutdown functions failed: " 
+            LRT_(debug) << "loading of startup/shutdown functions failed: " 
                           << d.get_name() << ": " << e.what();
             return false;
         }
