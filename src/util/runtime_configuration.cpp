@@ -48,11 +48,8 @@ namespace hpx { namespace util
             "router_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
-            "locality_cache_size = ${HPX_AGAS_LOCALITY_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE) "}",
             "connection_cache_size = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE) "}",
-            "smp_mode = ${HPX_AGAS_SMP_MODE:0}",
 
             "[hpx.components]",
             "load_external = ${HPX_LOAD_EXTERNAL_COMPONENTS:1}",
@@ -110,9 +107,6 @@ namespace hpx { namespace util
     {
         pre_initialize_ini(*this);
         post_initialize_ini(*this);
-#if HPX_AGAS_VERSION <= 0x10
-        load_components();
-#endif
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -134,9 +128,6 @@ namespace hpx { namespace util
             this->parse("static prefill defaults", prefill);
 
         post_initialize_ini(*this, hpx_ini_file_, cmdline_ini_defs_);
-#if HPX_AGAS_VERSION <= 0x10
-        load_components();
-#endif
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -169,7 +160,6 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
-#if HPX_AGAS_VERSION > 0x10
     agas::router_mode runtime_configuration::get_agas_router_mode() const
     {
         // load all components as described in the configuration information
@@ -235,7 +225,6 @@ namespace hpx { namespace util
         }
         return 16;
     }
-#endif
 
     // TODO: implement for AGAS v2
     naming::locality runtime_configuration::get_agas_locality(
@@ -276,19 +265,6 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_GVA_CACHE_SIZE;
     }
     
-    std::size_t runtime_configuration::get_agas_locality_cache_size() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("locality_cache_size",
-                        HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE));
-            }
-        }
-        return HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE;
-    }
-
     std::size_t runtime_configuration::get_agas_connection_cache_size() const
     {
         if (has_section("hpx.agas")) {
@@ -300,18 +276,6 @@ namespace hpx { namespace util
             }
         }
         return HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE;
-    }
-
-    bool runtime_configuration::get_agas_smp_mode() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return boost::lexical_cast<int>(
-                    sec->get_entry("smp_mode", "0")) ? true : false;
-            }
-        }
-        return false;
     }
 
     bool runtime_configuration::get_itt_notify_mode() const

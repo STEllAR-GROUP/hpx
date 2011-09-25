@@ -36,7 +36,6 @@ namespace hpx { namespace util
 
         void load_components();
 
-#if HPX_AGAS_VERSION > 0x10
         // Returns the AGAS mode of this locality, returns either hosted (for
         // localities connecting to a remote AGAS server) or bootstrap for the
         // locality hosting the AGAS server.
@@ -48,7 +47,6 @@ namespace hpx { namespace util
         std::size_t get_agas_allocate_response_pool_size() const;
 
         std::size_t get_agas_bind_response_pool_size() const;
-#endif
 
         // Get the AGAS locality to use 
         naming::locality get_agas_locality() const;
@@ -61,9 +59,6 @@ namespace hpx { namespace util
         // Get AGAS client-side GVA cache size
         std::size_t get_agas_gva_cache_size() const;
         
-        // Get AGAS client-side locality cache size
-        std::size_t get_agas_locality_cache_size() const;
-
         // Get AGAS connection cache size
         std::size_t get_agas_connection_cache_size() const;
 
@@ -71,9 +66,6 @@ namespace hpx { namespace util
         // default configuration loaded from hpx.ini
         bool load_application_configuration(char const* filename, 
             error_code& ec = throws);
-
-        // Can be set to true if we are only going to run HPX in one locality.
-        bool get_agas_smp_mode() const;
 
         // Can be set to true if we want to use the ITT notify tools API.
         bool get_itt_notify_mode() const;
