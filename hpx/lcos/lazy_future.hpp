@@ -85,18 +85,29 @@ namespace hpx { namespace lcos
         /// the result has been returned and the waiting thread has been 
         /// re-scheduled by the thread manager the function \a lazy_future#get 
         /// will return.
-        Result get() const
+        Result get(error_code& ec = throws) const
         {
             if (!closure_)
             {
-                HPX_THROW_EXCEPTION(uninitialized_value,
+                HPX_THROWS_IF(ec, uninitialized_value,
                     "lazy_future::closure_", "closure not properly initialized");
+                return Result();
             }
 
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_data(0);
+            return (*this->impl_)->get_data(0, ec);
+        }
+
+        void invalidate(int slot, boost::exception_ptr const& e)
+        {
+            (*this->impl_)->set_error(slot, e); // set the received error
+        }
+
+        void invalidate(boost::exception_ptr const& e)
+        {
+            (*this->impl_)->set_error(0, e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -280,18 +291,29 @@ namespace hpx { namespace lcos
         /// the result has been returned and the waiting thread has been 
         /// re-scheduled by the thread manager the function \a lazy_future#get 
         /// will return.
-        Result get() const
+        Result get(error_code& ec = throws) const
         {
             if (!closure_)
             {
-                HPX_THROW_EXCEPTION(uninitialized_value,
+                HPX_THROWS_IF(ec, uninitialized_value,
                     "lazy_future::closure_", "closure not properly initialized");
+                return Result();
             }
 
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_data(0);
+            return (*this->impl_)->get_data(0, ec);
+        }
+
+        void invalidate(int slot, boost::exception_ptr const& e)
+        {
+            (*this->impl_)->set_error(slot, e); // set the received error
+        }
+
+        void invalidate(boost::exception_ptr const& e)
+        {
+            (*this->impl_)->set_error(0, e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated

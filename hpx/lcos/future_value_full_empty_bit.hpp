@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Adelstein-Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +21,7 @@
 #include <boost/variant.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/identity.hpp>
-  
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail 
 {
@@ -70,33 +71,65 @@ namespace hpx { namespace lcos { namespace detail
         ///               smaller than the template parameter \a N.
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
+        /// \param ec     [in,out] this represents the error status on exit,
+        ///               if this is pre-initialized to \a hpx#throws
+        ///               the function will throw on error instead. If the
+        ///               operation blocks and is aborted because the object
+        ///               went out of scope, the code \a hpx#yield_aborted is
+        ///               set or thrown. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
-        ///               error description.
-        Result get_data(int slot) 
+        ///               error description if <code>&ec == &throws</code>.
+        Result get_data(int slot, error_code& ec = throws) 
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter, 
                     "future_value<Result, N>::get_data", "slot index out of range");
-                // never reached
+                return Result();
             }
 
             // yields control if needed
             data_type d;
-            data_[slot].read(d);
+            data_[slot].read(d, ec);
+
+            if (&ec != &throws && ec)
+                return Result();    
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
             // and future_value::set_error).
             if (1 == d.which())
             {
-                // an error has been reported in the meantime, throw 
+                // an error has been reported in the meantime, throw or set
+                // the error code 
                 error_type e = boost::get<error_type>(d);
-                boost::rethrow_exception(e);
-                // never reached
+
+                if (&ec == &throws)
+                {
+                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                    boost::rethrow_exception(e);
+                    // never reached
+                }
+
+                else
+                {
+                    try
+                    {
+                        boost::rethrow_exception(e);
+                    }
+
+                    catch (hpx::exception const& he)
+                    {
+                        ec = he.get_error_code(hpx::rethrow);
+                        return Result();
+                    }
+                }       
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             // no error has been reported, return the result
             return boost::get<result_type>(d);
@@ -212,33 +245,65 @@ namespace hpx { namespace lcos { namespace detail
         ///               smaller than the template parameter \a N.
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
+        /// \param ec     [in,out] this represents the error status on exit,
+        ///               if this is pre-initialized to \a hpx#throws
+        ///               the function will throw on error instead. If the
+        ///               operation blocks and is aborted because the object
+        ///               went out of scope, the code \a hpx#yield_aborted is
+        ///               set or thrown. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
-        ///               error description.
-        result_type get_data(int slot) 
+        ///               error description if <code>&ec == &throws</code>.
+        result_type get_data(int slot, error_code& ec = throws) 
         {
             if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter, 
                     "future_value<Result, N>::get_data", "slot index out of range");
                 return naming::invalid_id;
             }
 
             // yields control if needed
             data_type d;
-            data_[slot].read(d);
+            data_[slot].read(d, ec);
+
+            if (&ec != &throws && ec)
+                return naming::invalid_id;  
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
             // and future_value::set_error).
             if (1 == d.which())
             {
-                // an error has been reported in the meantime, throw 
+                // an error has been reported in the meantime, throw or set
+                // the error code 
                 error_type e = boost::get<error_type>(d);
-                boost::rethrow_exception(e);
-                return naming::invalid_id;
+
+                if (&ec == &throws)
+                {
+                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                    boost::rethrow_exception(e);
+                    // never reached
+                }
+
+                else
+                {
+                    try
+                    {
+                        boost::rethrow_exception(e);
+                    }
+
+                    catch (hpx::exception const& he)
+                    {
+                        ec = he.get_error_code(hpx::rethrow);
+                        return naming::invalid_id;
+                    }
+                }       
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             // no error has been reported, return the result
             return boost::get<naming::id_type>(d);
@@ -314,16 +379,21 @@ namespace hpx { namespace lcos { namespace detail
     template <typename T>
     struct log_on_exit
     {
-        log_on_exit(boost::shared_ptr<T> const& impl)
-          : impl_(impl)
+        log_on_exit(boost::shared_ptr<T> const& impl, error_code const& ec)
+          : impl_(impl), ec_(ec)
         {
-            LLCO_(info) << "future_value::get(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value::get(" << impl_->get_gid()
+                        << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
+                        << ")";
         }
         ~log_on_exit()
         {
-            LLCO_(info) << "future_value::got(" << impl_->get_gid() << ")";
+            LLCO_(info) << "future_value::got(" << impl_->get_gid() 
+                        << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
+                        << ")";
         }
         boost::shared_ptr<T> const& impl_;
+        error_code const& ec_;
     };
 }}}
 
@@ -433,15 +503,37 @@ namespace hpx { namespace lcos
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
+        /// \param ec     [in,out] this represents the error status on exit,
+        ///               if this is pre-initialized to \a hpx#throws
+        ///               the function will throw on error instead. If the
+        ///               operation blocks and is aborted because the object
+        ///               went out of scope, the code \a hpx#yield_aborted is
+        ///               set or thrown. 
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
-        ///               error description.
-        Result get(int slot = 0) const
+        ///               error description if <code>&ec == &throws</code>.
+        Result get(int slot, error_code& ec = throws) const
         {
-            detail::log_on_exit<wrapping_type> on_exit(impl_);
-            return (*impl_)->get_data(slot);
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->get_data(slot, ec);
+        }
+
+        Result get(error_code& ec = throws) const
+        {
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->get_data(0, ec);
+        }
+
+        void invalidate(int slot, boost::exception_ptr const& e)
+        {
+            (*impl_)->set_error(slot, e); // set the received error
+        }
+
+        void invalidate(boost::exception_ptr const& e)
+        {
+            (*impl_)->set_error(0, e); // set the received error
         }
 
     protected:
@@ -517,15 +609,34 @@ namespace hpx { namespace lcos
         ///
         /// \param self   [in] The \a thread which will be unconditionally
         ///               blocked (yielded) while waiting for the result. 
+        /// \param ec     [in,out] this represents the error status on exit,
+        ///               if this is pre-initialized to \a hpx#throws
+        ///               the function will throw on error instead.
         ///
         /// \note         If there has been an error reported (using the action
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
-        ///               error description.
-        util::unused_type get(int slot = 0) const
+        ///               error description if <code>&ec == &throws</code>.
+        util::unused_type get(int slot, error_code& ec = throws) const
         {
-            detail::log_on_exit<wrapping_type> on_exit(impl_);
-            return (*impl_)->get_data(slot);
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->get_data(slot, ec);
+        }
+
+        util::unused_type get(error_code& ec = throws) const
+        {
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->get_data(0, ec);
+        }
+
+        void invalidate(int slot, boost::exception_ptr const& e)
+        {
+            (*impl_)->set_error(slot, e); // set the received error
+        }
+
+        void invalidate(boost::exception_ptr const& e)
+        {
+            (*impl_)->set_error(0, e); // set the received error
         }
 
     protected:

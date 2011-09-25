@@ -73,19 +73,45 @@ namespace hpx { namespace lcos { namespace detail
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Value read(void) 
+        Value read(error_code& ec = throws) 
         {
             // Suspend calling thread, if necessary
             data_type d;
-            data_.read(d);
+            data_.read(d, ec);
+
+            if (&ec != &throws && !ec)
+                return Value();
 
             if (1 == d.which())
             {
-                // an error has been reported in the meantime, throw 
+                // an error has been reported in the meantime, throw or set
+                // the error code 
                 error_type e = boost::get<error_type>(d);
-                boost::rethrow_exception(e);
-                // never reached
+
+                if (&ec == &throws)
+                {
+                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                    boost::rethrow_exception(e);
+                    // never reached
+                }
+
+                else
+                {
+                    try
+                    {
+                        boost::rethrow_exception(e);
+                    }
+
+                    catch (hpx::exception const& he)
+                    {
+                        ec = he.get_error_code(hpx::rethrow);
+                        return Value();
+                    }
+                }       
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             // Continue execution
             return boost::get<value_type>(d);
@@ -165,19 +191,45 @@ namespace hpx { namespace lcos { namespace detail
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        value_type read(void) 
+        value_type read(error_code& ec = throws) 
         {
             // Suspend calling thread, if necessary
             data_type d;
-            data_.read(d);
+            data_.read(d, ec);
+
+            if (&ec != &throws && !ec)
+                return value_type();
 
             if (1 == d.which())
             {
-                // an error has been reported in the meantime, throw 
+                // an error has been reported in the meantime, throw or set
+                // the error code 
                 error_type e = boost::get<error_type>(d);
-                boost::rethrow_exception(e);
-                // never reached
+
+                if (&ec == &throws)
+                {
+                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                    boost::rethrow_exception(e);
+                    // never reached
+                }
+
+                else
+                {
+                    try
+                    {
+                        boost::rethrow_exception(e);
+                    }
+
+                    catch (hpx::exception const& he)
+                    {
+                        ec = he.get_error_code(hpx::rethrow);
+                        return value_type();
+                    }
+                }       
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             // Continue execution
             return boost::get<naming::id_type>(d);
@@ -284,10 +336,10 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        Value get(void) const
+        Value get(error_code& ec = throws) const
         {
-            detail::log_on_exit<wrapping_type> on_exit(impl_);
-            return (*impl_)->read();
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->read(ec);
         }
 
     protected:
@@ -339,10 +391,10 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_error), this function will throw an
         ///               exception encapsulating the reported error code and 
         ///               error description.
-        util::unused_type get(void) const
+        util::unused_type get(error_code& ec = throws) const
         {
-            detail::log_on_exit<wrapping_type> on_exit(impl_);
-            return (*impl_)->read();
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return (*impl_)->read(ec);
         }
 
     protected:
