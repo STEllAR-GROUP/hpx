@@ -387,9 +387,6 @@ namespace hpx
                 hpx_options.add_options()
                     ("run-agas-server,r",
                      "run AGAS server as part of this runtime instance")
-// #if HPX_AGAS_VERSION <= 0x10
-//                     ("run-agas-server-only", "run only the AGAS server")
-// #endif
                     ("run-hpx-main",
                      "run the hpx_main function, regardless of locality mode")
                     ("agas,a", value<std::string>(), 
@@ -553,9 +550,9 @@ namespace hpx
                 // Query the performance counter.
                 double value = performance_counter::get_typed_value<double>(gid, ec);
                 if (!ec)
-                    std::cout << name << "," << value << "\n"; 
+                    std::cout << "  " << name << "," << value << "\n"; 
                 else
-                    std::cout << name << ",invalid\n"; 
+                    std::cout << "  " << name << ",invalid\n"; 
             }
         }
 
