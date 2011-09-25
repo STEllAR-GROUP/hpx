@@ -11,12 +11,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
-#if HPX_AGAS_VERSION <= 0x10
-    #include <hpx/util/spinlock_pool.hpp>
-#else
-    #include <hpx/lcos/mutex.hpp>
-#endif
-
+#include <hpx/lcos/mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -42,13 +37,8 @@ namespace hpx { namespace lcos { namespace server
     private:
         typedef components::managed_component_base<barrier> base_type;
 
-#if HPX_AGAS_VERSION <= 0x10
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-#else
         typedef hpx::lcos::mutex mutex_type;
         mutex_type mtx_;
-#endif
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -97,11 +87,8 @@ namespace hpx { namespace lcos { namespace server
             if (!queue_.empty()) {
                 LERR_(fatal) << "~barrier: thread_queue is not empty, aborting threads";
 
-#if HPX_AGAS_VERSION <= 0x10
-                mutex_type::scoped_lock l(this);
-#else
                 mutex_type::scoped_lock l(mtx_);
-#endif
+
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
@@ -147,11 +134,8 @@ namespace hpx { namespace lcos { namespace server
         {
             threads::thread_self& self = threads::get_self();
 
-#if HPX_AGAS_VERSION <= 0x10
-            mutex_type::scoped_lock l(this);
-#else
             mutex_type::scoped_lock l(mtx_);
-#endif
+
             if (queue_.size() < number_of_threads_-1) {
                 threads::thread_id_type id = self.get_thread_id();
 
@@ -217,11 +201,7 @@ namespace hpx { namespace lcos { namespace server
         void set_error(boost::exception_ptr const& e)
         {
             try {
-#if HPX_AGAS_VERSION <= 0x10
-                mutex_type::scoped_lock l(this);
-#else
                 mutex_type::scoped_lock l(mtx_);
-#endif
 
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;

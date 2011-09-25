@@ -6,9 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -135,6 +132,4 @@ namespace hpx
     cout_wrapper cout = {};
     cerr_wrapper cerr = {};
 }
-
-#endif
 

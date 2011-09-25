@@ -17,18 +17,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#if HPX_AGAS_VERSION > 0x10
-    #include <hpx/lcos/mutex.hpp>
-#endif
+#include <hpx/lcos/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
-    #include <hpx/util/spinlock_pool.hpp>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail 
@@ -76,16 +71,7 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-#if HPX_AGAS_VERSION <= 0x10
-    #if !defined(DEBUG)
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-    #else
-        typedef boost::mutex mutex_type;
-    #endif
-#else
         typedef hpx::lcos::mutex mutex_type;
-#endif
 
         typedef typename mutex_type::scoped_lock scoped_lock;
 
@@ -141,11 +127,8 @@ namespace hpx { namespace components { namespace detail
 
         bool alloc(T** result, std::size_t count = 1)
         {
-#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
-            scoped_lock l(this);
-#else
             scoped_lock l(mtx_);
-#endif
+
             if (!ensure_pool(count))
                 return false;
 
@@ -172,11 +155,7 @@ namespace hpx { namespace components { namespace detail
         {
             BOOST_ASSERT(did_alloc(p));
 
-#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
-            scoped_lock l(this);
-#else
             scoped_lock l(mtx_);
-#endif
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
             storage_type* p1 = 0;
@@ -218,11 +197,7 @@ namespace hpx { namespace components { namespace detail
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             if (!base_gid_) {
-#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
-                scoped_lock l(this);
-#else
                 scoped_lock l(mtx_);
-#endif
 
                 // store a pointer to the AGAS client
                 hpx::applier::applier& appl = hpx::applier::get_applier();
@@ -247,12 +222,8 @@ namespace hpx { namespace components { namespace detail
 
         void set_gid(naming::gid_type const& g)
         {
-#if !defined(DEBUG) && HPX_AGAS_VERSION <= 0x10
-                scoped_lock l(this);
-#else
-                scoped_lock l(mtx_);
-#endif
-                base_gid_ = g;
+            scoped_lock l(mtx_);
+            base_gid_ = g;
         } 
 
         naming::address get_address()
@@ -346,9 +317,7 @@ namespace hpx { namespace components { namespace detail
         // managed_component heap
         naming::gid_type base_gid_;
 
-#if defined(DEBUG) || HPX_AGAS_VERSION > 0x10
         mutable mutex_type mtx_;
-#endif
 
     public:
         std::string const class_name_;

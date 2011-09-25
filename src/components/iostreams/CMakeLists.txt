@@ -4,13 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if("${HPX_AGAS_VERSION}" STREQUAL "2")
-  add_hpx_component(iostreams 
-    MODULE core
-    SOURCES component_module.cpp
-            manipulators.cpp
-            standard_streams.cpp
-            server/output_stream.cpp 
-    HEADERS ${headers})
-endif()
+add_hpx_component(iostreams 
+  MODULE core
+  SOURCES component_module.cpp
+          manipulators.cpp
+          standard_streams.cpp
+          server/output_stream.cpp)
 

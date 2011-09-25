@@ -225,11 +225,7 @@ namespace hpx { namespace applier
 
     naming::resolver_client& applier::get_agas_client()
     {
-#if HPX_AGAS_VERSION <= 0x10
-        return parcel_handler_.get_resolver();
-#else
         return hpx::naming::get_agas_client();
-#endif
     }
 
     parcelset::parcelhandler& applier::get_parcel_handler() 
@@ -244,20 +240,12 @@ namespace hpx { namespace applier
 
     naming::locality const& applier::here() const
     {
-#if HPX_AGAS_VERSION <= 0x10
-        return parcel_handler_.here();
-#else
         return hpx::get_locality();
-#endif
     }
 
     naming::gid_type const& applier::get_prefix() const
     {
-#if HPX_AGAS_VERSION <= 0x10
-        return parcel_handler_.get_prefix();
-#else
         return hpx::naming::get_agas_client().local_prefix();
-#endif
     }
 
     boost::uint32_t applier::get_prefix_id() const

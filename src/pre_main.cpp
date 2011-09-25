@@ -6,9 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/version.hpp>
-
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -151,6 +148,4 @@ void pre_main(runtime_mode mode)
 }
 
 }
-
-#endif
 

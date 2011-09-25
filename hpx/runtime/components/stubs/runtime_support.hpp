@@ -266,7 +266,6 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id.get_gid(), count, act).get();
         }
 
-#if HPX_AGAS_VERSION > 0x10
         static lcos::future_value<void>
         load_components_async(naming::id_type const& gid)
         {
@@ -302,7 +301,6 @@ namespace hpx { namespace components { namespace stubs
         {
             call_shutdown_functions_async(gid).get();
         }
-#endif
 
         static void free_component_sync(components::component_type type, 
             naming::gid_type const& gid) 
@@ -314,7 +312,7 @@ namespace hpx { namespace components { namespace stubs
             naming::address addr;
             applier::applier& appl = hpx::applier::get_applier();
             naming::resolver_client& agas = appl.get_agas_client();
-            if (agas.is_smp_mode() || appl.address_is_local(gid, addr)) {
+            if (agas.is_bootstrap() || appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::gid_type
@@ -323,8 +321,8 @@ namespace hpx { namespace components { namespace stubs
             }
             else {
                 // apply remotely
-                naming::gid_type prefix;
-                appl.get_agas_client().get_prefix(addr.locality_, prefix, false);
+                naming::gid_type prefix = naming::get_gid_from_prefix
+                    (naming::get_prefix_from_gid(gid));
                 lcos::eager_future<action_type, void>(prefix, type, gid).get();
             }
         }

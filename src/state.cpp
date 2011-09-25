@@ -38,7 +38,6 @@ namespace hpx
         }
     }
 
-#if HPX_AGAS_VERSION > 0x10
     namespace agas
     {
         // return whether resolver client is in state described by 'mask'
@@ -52,6 +51,5 @@ namespace hpx
             return (rt->get_agas_client().status() & mask) ? true : false;
         }
     } 
-#endif
 }
 

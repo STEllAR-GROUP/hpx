@@ -49,10 +49,6 @@ namespace hpx
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
 
-#if HPX_AGAS_VERSION <= 0x10
-        typedef void hpx_premain_function_type();
-#endif
-
         ///
         typedef void hpx_errorsink_function_type(
             boost::uint32_t, std::string const&);
@@ -64,16 +60,11 @@ namespace hpx
                     = std::vector<std::string>())
           : ini_(util::detail::get_logging_data(), hpx_ini_file,
                  cmdline_ini_defs),
-#if HPX_AGAS_VERSION <= 0x10
-            counters_(agas_client),
-#endif
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
-#if HPX_AGAS_VERSION > 0x10
             runtime::init_tss();
             counters_.reset(new performance_counters::registry(agas_client));
-#endif
         }
 
         ~runtime()
@@ -137,31 +128,21 @@ namespace hpx
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
         {
-#if HPX_AGAS_VERSION <= 0x10
-            return counters_;
-#else
             return *counters_;
-#endif
         }
 
         /// \brief Allow access to the registry counter registry instance used 
         ///        by the HPX runtime.
         performance_counters::registry const& get_counter_registry() const
         {
-#if HPX_AGAS_VERSION <= 0x10
-            return counters_;
-#else
             return *counters_;
-#endif
         }
 
         /// \brief Install all performance counters related to this runtime 
         ///        instance
         void install_counters();
 
-#if HPX_AGAS_VERSION > 0x10
         virtual util::io_service_pool& get_io_pool() = 0; 
-#endif
 
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
@@ -182,10 +163,9 @@ namespace hpx
 
         virtual util::unique_ids& get_id_pool() = 0;
 
-#if HPX_AGAS_VERSION > 0x10
         virtual void add_startup_function(boost::function<void()> const& f) = 0;
+
         virtual void add_shutdown_function(boost::function<void()> const& f) = 0;
-#endif
 
     protected:
         void init_tss();
@@ -199,11 +179,7 @@ namespace hpx
 
         util::runtime_configuration ini_;
 
-#if HPX_AGAS_VERSION <= 0x10
-        performance_counters::registry counters_;
-#else
         boost::shared_ptr<performance_counters::registry> counters_;
-#endif
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
@@ -508,12 +484,10 @@ namespace hpx
             return thread_manager_.get_executed_threads(num);
         }
 
-#if HPX_AGAS_VERSION > 0x10
         util::io_service_pool& get_io_pool()
         {
             return io_pool_;
         } 
-#endif
 
         std::size_t get_runtime_support_lva() const
         {
@@ -532,7 +506,6 @@ namespace hpx
             return id_pool;
         }
 
-#if HPX_AGAS_VERSION > 0x10
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
         /// \param  f   The function 'f' will be called from inside a HPX 
@@ -548,7 +521,6 @@ namespace hpx
         ///             useful to tear down the runtime environment of the 
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(boost::function<void()> const& f);
-#endif
 
     private:
         void init_tss();
@@ -564,17 +536,10 @@ namespace hpx
         parcelset::parcelport parcel_port_;
         naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;
-#if HPX_AGAS_VERSION <= 0x10
-        util::detail::init_logging init_logging_;
-        scheduling_policy_type scheduler_;
-        notification_policy_type notifier_;
-        threadmanager_type thread_manager_;
-#else
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         threadmanager_type thread_manager_;
         util::detail::init_logging init_logging_;
-#endif
         components::server::memory memory_;
         applier::applier applier_;
         actions::action_manager action_manager_;

@@ -118,7 +118,6 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-#if HPX_AGAS_VERSION > 0x10
         lcos::future_value<void> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
@@ -148,7 +147,6 @@ namespace hpx { namespace components
         {
             this->base_type::call_shutdown_functions(gid_);
         }
-#endif
 
         /// \brief Shutdown the given runtime system
         lcos::future_value<void> shutdown_async(double timeout = -1)

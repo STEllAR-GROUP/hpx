@@ -57,11 +57,9 @@ namespace hpx { namespace components { namespace server
 
             runtime_support_get_config = 8,         ///< get configuration information 
             runtime_support_create_memory_block = 9,  ///< create new memory block
-#if HPX_AGAS_VERSION > 0x10
             runtime_support_load_components = 10,
             runtime_support_call_startup_functions = 11,
             runtime_support_call_shutdown_functions = 12,
-#endif
         };
 
         static component_type get_component_type() 
@@ -132,12 +130,10 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
-#if HPX_AGAS_VERSION > 0x10
         void load_components();
 
         void call_startup_functions();
         void call_shutdown_functions();
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -168,7 +164,6 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_memory_block
         > create_memory_block_action;
 
-#if HPX_AGAS_VERSION > 0x10
         typedef hpx::actions::direct_action0<
             runtime_support, runtime_support_load_components, 
             &runtime_support::load_components
@@ -183,7 +178,6 @@ namespace hpx { namespace components { namespace server
             runtime_support, runtime_support_call_shutdown_functions, 
             &runtime_support::call_shutdown_functions
         > call_shutdown_functions_action;
-#endif
 
         typedef hpx::actions::direct_action2<
             runtime_support, runtime_support_free_component, 
@@ -243,7 +237,6 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
-#if HPX_AGAS_VERSION > 0x10
         void add_startup_function(boost::function<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
@@ -255,7 +248,6 @@ namespace hpx { namespace components { namespace server
             util::spinlock::scoped_lock l(globals_mtx_);
             shutdown_functions_.push_back(f);
         }
-#endif
 
     protected:
         // Load all components from the ini files found in the configuration

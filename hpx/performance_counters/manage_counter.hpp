@@ -81,7 +81,6 @@ namespace hpx { namespace performance_counters
         naming::id_type counter_;
     };
 
-#if HPX_AGAS_VERSION > 0x10
     /// Install a new performance counter in a way, which will uninstall it
     /// automatically during shutdown.
     HPX_EXPORT void install_counter(std::string const& name,
@@ -104,7 +103,6 @@ namespace hpx { namespace performance_counters
     /// them automatically during shutdown.
     HPX_EXPORT void install_counters(counter_data const* data, 
         std::size_t count, error_code& ec = throws); 
-#endif
 }}
 
 #endif // HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608

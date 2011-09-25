@@ -738,20 +738,6 @@ namespace hpx { namespace threads
         scheduler_.on_start_thread(num_thread);
 
         {
-#if HPX_AGAS_VERSION <= 0x10
-            performance_counters::manage_counter_type counter_type;
-            if (0 == num_thread) {
-                // register counter types
-                error_code ec;
-                counter_type.install("/queue/length", 
-                    performance_counters::counter_raw, ec);   // doesn't throw
-                if (ec) {
-                    LTM_(info) << "tfunc(" << num_thread << "): failed to install "
-                        "counter type '/queue/length': " << ec.get_message();
-                }
-            }
-#endif
-
             LTM_(info) << "tfunc(" << num_thread << "): start";
             try {
                 tfunc_impl(num_thread);
@@ -959,7 +945,6 @@ namespace hpx { namespace threads
     };
 #endif
 
-#if HPX_AGAS_VERSION > 0x10
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         install_counters()
@@ -1075,7 +1060,6 @@ namespace hpx { namespace threads
                 counters, sizeof(counters)/sizeof(counters[0]));
         }
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1088,18 +1072,6 @@ namespace hpx { namespace threads
         manage_active_thread_count count(thread_count_);
 
         set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
-
-#if HPX_AGAS_VERSION <= 0x10
-        // register performance counters
-        performance_counters::manage_counter queue_length_counter; 
-        if (0 == num_thread) {
-            // the thread with number zero is the master
-            std::string name("/queue(threadmanager)/length");
-            queue_length_counter.install(name, 
-                boost::bind(&scheduling_policy_type::get_queue_length, 
-                    &scheduler_, -1));
-        }
-#endif
 
         std::size_t idle_loop_count = 0;
 
@@ -1213,9 +1185,6 @@ namespace hpx { namespace threads
             else if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
             {
                 // if we need to terminate, unregister the counter first
-#if HPX_AGAS_VERSION <= 0x10
-                queue_length_counter.uninstall();
-#endif
                 count.exit();
                 break;
             }

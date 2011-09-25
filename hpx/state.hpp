@@ -37,7 +37,6 @@ namespace hpx
         }
     }
 
-#if HPX_AGAS_VERSION > 0x10
     namespace agas
     {
         // return whether resolver client is in state described by 'mask'
@@ -49,7 +48,6 @@ namespace hpx
             return router_is(boost::uint8_t(mask)); 
         }
     } 
-#endif
 }
 
 #endif // HPX_703646B3_0567_484E_AD34_A752B8163B30

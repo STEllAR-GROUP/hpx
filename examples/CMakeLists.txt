@@ -23,16 +23,13 @@ if(NOT MSVC)
       performance_counters
       queue
       quickstart
-      random_mem_access)
-
-  if("${HPX_AGAS_VERSION}" STREQUAL "2")
-    set(subdirs ${subdirs} heartbeat 
-                           throttle
-                           function
-                           math
-                           object_semaphore
-                           balancing)
-  endif()
+      random_mem_access
+      heartbeat 
+      throttle
+      function
+      math
+      object_semaphore
+      balancing)
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
     set(subdirs ${subdirs} geometry
@@ -43,13 +40,10 @@ if(NOT MSVC)
     set(subdirs ${subdirs} sheneos)
   endif()
 
-if(CMAKE_Fortran_COMPILER)
-  set(subdirs ${subdirs} marduk)
-endif()
+  if(CMAKE_Fortran_COMPILER)
+    set(subdirs ${subdirs} marduk)
+  endif()
 
-#  if(PHXPR_FOUND AND ${BOOST_MINOR_VERSION} GREATER 46)
-#    set(subdirs ${subdirs} hpxi)
-#  endif() 
 else()
   set(subdirs
       accumulator

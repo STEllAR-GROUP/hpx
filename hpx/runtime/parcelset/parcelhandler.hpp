@@ -16,10 +16,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 
-#if HPX_AGAS_VERSION <= 0x10
-  #include <hpx/runtime/naming/resolver_client.hpp>
-#endif
-
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -86,14 +82,7 @@ namespace hpx { namespace parcelset
         /// object the parcelhandler has been initialized with (see 
         /// parcelhandler constructors). This is the same resolver instance 
         /// this parcelhandler has been initialized with.
-#if HPX_AGAS_VERSION <= 0x10
-        naming::resolver_client& get_resolver()
-        {
-            return resolver_;
-        }
-#else
         naming::resolver_client& get_resolver();
-#endif
 
         /// Allow access to parcelport instance. 
         ///
@@ -296,11 +285,9 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
-#if HPX_AGAS_VERSION > 0x10
         /// install_counters is called during startup to allow registration of 
         /// performance counters 
         void install_counters();
-#endif
 
     private:
         /// The AGAS client

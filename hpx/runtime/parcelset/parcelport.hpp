@@ -39,13 +39,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { 
-#if HPX_AGAS_VERSION > 0x10
+
 namespace agas {
 
 struct HPX_EXPORT big_boot_barrier;
 
 } 
-#endif
 
 namespace parcelset
 {
@@ -59,9 +58,8 @@ namespace parcelset
         parcelport& This() { return *this; }
 
     public:
-#if HPX_AGAS_VERSION > 0x10
         friend struct agas::big_boot_barrier;
-#endif
+
         typedef boost::function<
               void(boost::system::error_code const&, std::size_t)
         > write_handler_type;

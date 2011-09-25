@@ -1,14 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach, Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/version.hpp>
-
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/runtime.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 
@@ -46,6 +43,4 @@ namespace hpx { namespace performance_counters
         }
     } 
 }}
-
-#endif
 
