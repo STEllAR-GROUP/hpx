@@ -726,7 +726,7 @@ namespace hpx { namespace components { namespace server
                           << d.get_name() << ": " << e.what();
             return false;
         }
-        return true;    // component got loaded
+        return true;    // startup/shutdown functions got registered
     }
 
     ///////////////////////////////////////////////////////////////////////////
