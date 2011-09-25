@@ -19,8 +19,5 @@
     <ClInclude Include="..\..\..\..\hpx\hpx_init.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\hpx\util\map_hostnames.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

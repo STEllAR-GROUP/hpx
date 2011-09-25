@@ -77,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\hpx\hpx_init.hpp" />
-    <ClInclude Include="..\..\..\..\hpx\util\map_hostnames.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
