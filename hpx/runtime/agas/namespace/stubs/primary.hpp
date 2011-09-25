@@ -40,8 +40,8 @@ struct primary_namespace
 
     static response_type
     bind_locality(naming::id_type const& gid, endpoint_type const& ep,
-                  count_type count)
-    { return bind_locality_async(gid, ep, count).get(); } 
+                  count_type count, error_code& ec = throws)
+    { return bind_locality_async(gid, ep, count).get(ec); } 
     // }}}
     
     // {{{ bind_gid dispatch
@@ -55,21 +55,8 @@ struct primary_namespace
 
     static response_type
     bind_gid(naming::id_type const& gid, naming::gid_type const& id,
-             gva_type const& gva)
-    { return bind_gid_async(gid, id, gva).get(); } 
-    // }}}
-
-    // {{{ resolve_locality dispatch
-    static lcos::future_value<response_type>
-    resolve_locality_async(naming::id_type const& gid, endpoint_type const& ep)
-    {
-        typedef typename server_type::resolve_locality_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, ep);
-    }
-    
-    static response_type
-    resolve_locality(naming::id_type const& gid, endpoint_type const& ep)
-    { return resolve_locality_async(gid, ep).get(); } 
+             gva_type const& gva, error_code& ec = throws)
+    { return bind_gid_async(gid, id, gva).get(ec); } 
     // }}}
 
     // {{{ resolve_gid dispatch 
@@ -81,8 +68,9 @@ struct primary_namespace
     }
     
     static response_type
-    resolve_gid(naming::id_type const& gid, naming::gid_type const& key)
-    { return resolve_gid_async(gid, key).get(); } 
+    resolve_gid(naming::id_type const& gid, naming::gid_type const& key,
+                error_code& ec = throws)
+    { return resolve_gid_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ unbind_locality dispatch 
@@ -94,8 +82,9 @@ struct primary_namespace
     }
     
     static response_type
-    unbind_locality(naming::id_type const& gid, endpoint_type const& ep)
-    { return unbind_locality_async(gid, ep).get(); } 
+    unbind_locality(naming::id_type const& gid, endpoint_type const& ep,
+                    error_code& ec = throws)
+    { return unbind_locality_async(gid, ep).get(ec); } 
     // }}}
 
     // {{{ unbind_gid dispatch 
@@ -109,8 +98,8 @@ struct primary_namespace
     
     static response_type
     unbind_gid(naming::id_type const& gid, naming::gid_type const& id,
-               count_type count)
-    { return unbind_gid_async(gid, id, count).get(); } 
+               count_type count, error_code& ec = throws)
+    { return unbind_gid_async(gid, id, count).get(ec); } 
     // }}}
     
     // {{{ increment dispatch 
@@ -124,8 +113,8 @@ struct primary_namespace
     
     static response_type
     increment(naming::id_type const& gid, naming::gid_type const& key,
-              count_type count)
-    { return increment_async(gid, key, count).get(); } 
+              count_type count, error_code& ec = throws)
+    { return increment_async(gid, key, count).get(ec); } 
     // }}}
     
     // {{{ decrement dispatch 
@@ -140,8 +129,8 @@ struct primary_namespace
     
     static response_type
     decrement(naming::id_type const& gid, naming::gid_type const& key,
-              count_type count)
-    { return decrement_async(gid, key, count).get(); } 
+              count_type count, error_code& ec = throws)
+    { return decrement_async(gid, key, count).get(ec); } 
     // }}}
     
     // {{{ localities dispatch 
@@ -153,8 +142,8 @@ struct primary_namespace
     }
     
     static response_type
-    localities(naming::id_type const& gid)
-    { return localities_async(gid).get(); } 
+    localities(naming::id_type const& gid, error_code& ec = throws)
+    { return localities_async(gid).get(ec); } 
     // }}}
 };            
 

@@ -50,29 +50,60 @@ struct component_namespace :
     bind_async(component_name_type const& key, prefix_type prefix)
     { return this->base_type::bind_prefix_async(this->gid_, key, prefix); }
 
-    response_type bind(component_name_type const& key, prefix_type prefix)
-    { return this->base_type::bind_prefix(this->gid_, key, prefix); }
+    response_type bind(component_name_type const& key, prefix_type prefix,
+                       error_code& ec = throws)
+    { return this->base_type::bind_prefix(this->gid_, key, prefix, ec); }
+
+    lcos::future_value<response_type>
+    bind_async(component_name_type const& key, naming::gid_type const& prefix)
+    {
+        return this->base_type::bind_prefix_async
+            (this->gid_, key, naming::get_prefix_from_gid(prefix));
+    }
+
+    response_type bind(component_name_type const& key,
+                       naming::gid_type const& prefix,
+                       error_code& ec = throws)
+    {
+        return this->base_type::bind_prefix
+            (this->gid_, key, naming::get_prefix_from_gid(prefix), ec);
+    }
     
     lcos::future_value<response_type> bind_async(component_name_type const& key)
     { return this->base_type::bind_name_async(this->gid_, key); }
     
-    response_type bind(component_name_type const& key)
-    { return this->base_type::bind_name(this->gid_, key); }
+    response_type bind(component_name_type const& key, error_code& ec = throws)
+    { return this->base_type::bind_name(this->gid_, key, ec); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_id and resolve_name interface 
     lcos::future_value<response_type> resolve_async(component_id_type key)
     { return this->base_type::resolve_id_async(this->gid_, key); }
     
-    response_type resolve(component_id_type key)
-    { return this->base_type::resolve_id(this->gid_, key); }
+    response_type resolve(component_id_type key, error_code& ec = throws)
+    { return this->base_type::resolve_id(this->gid_, key, ec); }
+
+    lcos::future_value<response_type>
+    resolve_async(components::component_type key)
+    {
+        return this->base_type::resolve_id_async
+            (this->gid_, component_id_type(key));
+    }
+    
+    response_type resolve(components::component_type key,
+                          error_code& ec = throws)
+    {
+        return this->base_type::resolve_id
+            (this->gid_, component_id_type(key), ec);
+    }
 
     lcos::future_value<response_type>
     resolve_async(component_name_type const& key)
     { return this->base_type::resolve_name_async(this->gid_, key); }
     
-    response_type resolve(component_name_type const& key)
-    { return this->base_type::resolve_name(this->gid_, key); }
+    response_type resolve(component_name_type const& key,
+                          error_code& ec = throws)
+    { return this->base_type::resolve_name(this->gid_, key, ec); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
@@ -80,8 +111,9 @@ struct component_namespace :
     unbind_async(component_name_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    response_type unbind(component_name_type const& key)
-    { return this->base_type::unbind(this->gid_, key); }
+    response_type unbind(component_name_type const& key,
+                         error_code& ec = throws)
+    { return this->base_type::unbind(this->gid_, key, ec); }
 };            
 
 }}

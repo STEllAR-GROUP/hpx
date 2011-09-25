@@ -48,33 +48,25 @@ struct symbol_namespace :
     bind_async(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind_async(this->gid_, key, gid); }
 
-    response_type bind(symbol_type const& key, naming::gid_type const& gid)
-    { return this->base_type::bind(this->gid_, key, gid); }
+    response_type bind(symbol_type const& key, naming::gid_type const& gid,
+                       error_code& ec = throws)
+    { return this->base_type::bind(this->gid_, key, gid, ec); }
     
-    ///////////////////////////////////////////////////////////////////////////
-    // rebind interface 
-    lcos::future_value<response_type>
-    rebind_async(symbol_type const& key, naming::gid_type const& gid)
-    { return this->base_type::rebind_async(this->gid_, key, gid); }
-
-    response_type rebind(symbol_type const& key, naming::gid_type const& gid)
-    { return this->base_type::rebind(this->gid_, key, gid); }
-
     ///////////////////////////////////////////////////////////////////////////
     // resolve interface 
     lcos::future_value<response_type> resolve_async(symbol_type const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
-    response_type resolve(symbol_type const& key)
-    { return this->base_type::resolve(this->gid_, key); }
+    response_type resolve(symbol_type const& key, error_code& ec = throws)
+    { return this->base_type::resolve(this->gid_, key, ec); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
     lcos::future_value<response_type> unbind_async(symbol_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    response_type unbind(symbol_type const& key)
-    { return this->base_type::unbind(this->gid_, key); }
+    response_type unbind(symbol_type const& key, error_code& ec = throws)
+    { return this->base_type::unbind(this->gid_, key, ec); }
 
     ///////////////////////////////////////////////////////////////////////////
     // iterate interface 
@@ -82,8 +74,9 @@ struct symbol_namespace :
     iterate_async(iterate_function_type const& f)
     { return this->base_type::iterate_async(this->gid_, f); }
     
-    response_type iterate(iterate_function_type const& f)
-    { return this->base_type::iterate(this->gid_, f); }
+    response_type iterate(iterate_function_type const& f,
+                          error_code& ec = throws)
+    { return this->base_type::iterate(this->gid_, f, ec); }
 };            
 
 }}

@@ -36,26 +36,11 @@ struct symbol_namespace
     }
 
     static response_type bind(naming::id_type const& gid, symbol_type const& key,
-                     naming::gid_type const& value)
-    { return bind_async(gid, key, value).get(); } 
+                              naming::gid_type const& value,
+                              error_code& ec = throws)
+    { return bind_async(gid, key, value).get(ec); } 
     // }}}
     
-    // {{{ rebind dispatch
-    static lcos::future_value<response_type>
-    rebind_async(naming::id_type const& gid, symbol_type const& key,
-                 naming::gid_type const& value)
-    {
-        typedef typename server_type::rebind_action action_type;
-        return lcos::eager_future<action_type, response_type>  
-            (gid, key, value);
-    }
-
-    static response_type
-    rebind(naming::id_type const& gid, symbol_type const& key,
-           naming::gid_type const& value)
-    { return rebind_async(gid, key, value).get(); } 
-    // }}}
-
     // {{{ resolve dispatch 
     static lcos::future_value<response_type>
     resolve_async(naming::id_type const& gid, symbol_type const& key)
@@ -65,8 +50,9 @@ struct symbol_namespace
     }
     
     static response_type
-    resolve(naming::id_type const& gid, symbol_type const& key)
-    { return resolve_async(gid, key).get(); } 
+    resolve(naming::id_type const& gid, symbol_type const& key,
+            error_code& ec = throws)
+    { return resolve_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ unbind dispatch 
@@ -78,8 +64,9 @@ struct symbol_namespace
     }
     
     static response_type
-    unbind(naming::id_type const& gid, symbol_type const& key)
-    { return unbind_async(gid, key).get(); } 
+    unbind(naming::id_type const& gid, symbol_type const& key,
+           error_code& ec = throws)
+    { return unbind_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ iterate dispatch 
@@ -91,8 +78,9 @@ struct symbol_namespace
     }
     
     static response_type
-    iterate(naming::id_type const& gid, iterate_function_type const& f)
-    { return iterate_async(gid, f).get(); } 
+    iterate(naming::id_type const& gid, iterate_function_type const& f,
+            error_code& ec = throws)
+    { return iterate_async(gid, f).get(ec); } 
     // }}}
 };            
 

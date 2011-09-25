@@ -40,8 +40,10 @@ struct component_namespace
 
     static response_type
     bind_prefix(naming::id_type const& gid, component_name_type const& key,
-                prefix_type prefix)
-    { return bind_prefix_async(gid, key, prefix).get(); } 
+                prefix_type prefix, error_code& ec = throws)
+    {
+        return bind_prefix_async(gid, key, prefix).get(ec);
+    } 
     // }}}
     
     // {{{ bind_name dispatch 
@@ -53,8 +55,9 @@ struct component_namespace
     }
     
     static response_type
-    bind_name(naming::id_type const& gid, component_name_type const& key)
-    { return bind_name_async(gid, key).get(); } 
+    bind_name(naming::id_type const& gid, component_name_type const& key,
+              error_code& ec = throws)
+    { return bind_name_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ resolve_id dispatch
@@ -66,8 +69,9 @@ struct component_namespace
     }
     
     static response_type
-    resolve_id(naming::id_type const& gid, component_id_type key)
-    { return resolve_id_async(gid, key).get(); } 
+    resolve_id(naming::id_type const& gid, component_id_type key,
+               error_code& ec = throws)
+    { return resolve_id_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ resolve_name dispatch 
@@ -80,21 +84,24 @@ struct component_namespace
     }
     
     static response_type
-    resolve_name(naming::id_type const& gid, component_name_type const& key)
-    { return resolve_name_async(gid, key).get(); } 
+    resolve_name(naming::id_type const& gid, component_name_type const& key,
+                 error_code& ec = throws)
+    { return resolve_name_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ unbind dispatch 
     static lcos::future_value<response_type>
-    unbind_async(naming::id_type const& gid, component_name_type const& key)
+    unbind_async(naming::id_type const& gid, component_name_type const& key,
+                 error_code& ec = throws)
     {
         typedef typename server_type::unbind_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
     static response_type
-    unbind(naming::id_type const& gid, component_name_type const& key)
-    { return unbind_async(gid, key).get(); } 
+    unbind(naming::id_type const& gid, component_name_type const& key,
+           error_code& ec = throws)
+    { return unbind_async(gid, key).get(ec); } 
     // }}}
 };            
 

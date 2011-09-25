@@ -7,8 +7,6 @@
 
 #include <hpx/version.hpp>
 
-#if HPX_AGAS_VERSION > 0x10
-
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
@@ -40,9 +38,6 @@ HPX_REGISTER_ACTION_EX(
     symbol_namespace_type::bind_action,
     stdmap_symbol_namespace_bind_action);
 HPX_REGISTER_ACTION_EX(
-    symbol_namespace_type::rebind_action,
-    stdmap_symbol_namespace_rebind_action);
-HPX_REGISTER_ACTION_EX(
     symbol_namespace_type::resolve_action,
     stdmap_symbol_namespace_resolve_action);
 HPX_REGISTER_ACTION_EX(
@@ -52,4 +47,3 @@ HPX_REGISTER_ACTION_EX(
     symbol_namespace_type::iterate_action,
     stdmap_symbol_namespace_iterate_action);
 
-#endif

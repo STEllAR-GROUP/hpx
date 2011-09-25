@@ -51,31 +51,29 @@ struct primary_namespace :
     bind_async(endpoint_type const& ep, count_type count = 0)
     { return this->base_type::bind_locality_async(this->gid_, ep, count); }
 
-    response_type bind(endpoint_type const& ep, count_type count = 0)
-    { return this->base_type::bind_locality(this->gid_, ep, count); }
+    response_type bind(endpoint_type const& ep, count_type count = 0,
+                       error_code& ec = throws)
+    { return this->base_type::bind_locality(this->gid_, ep, count, ec); }
+
+    response_type bind(endpoint_type const& ep, error_code& ec = throws)
+    { return this->base_type::bind_locality(this->gid_, ep, 0, ec); }
     
     lcos::future_value<response_type>
     bind_async(naming::gid_type const& gid, gva_type const& gva)
     { return this->base_type::bind_gid_async(this->gid_, gid, gva); }
 
-    response_type bind(naming::gid_type const& gid, gva_type const& gva)
+    response_type bind(naming::gid_type const& gid, gva_type const& gva,
+                       error_code& ec = throws)
     { return this->base_type::bind_gid(this->gid_, gid, gva); }
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_locality and resolve_gid interface
     lcos::future_value<response_type>
-    resolve_async(endpoint_type const& ep)
-    { return this->base_type::resolve_locality_async(this->gid_, ep); }
-    
-    response_type resolve(endpoint_type const& ep)
-    { return this->base_type::resolve_locality(this->gid_, ep); }
-
-    lcos::future_value<response_type>
     resolve_async(naming::gid_type const& gid)
     { return this->base_type::resolve_gid_async(this->gid_, gid); }
     
-    response_type resolve(naming::gid_type const& gid)
-    { return this->base_type::resolve_gid(this->gid_, gid); }
+    response_type resolve(naming::gid_type const& gid, error_code& ec = throws)
+    { return this->base_type::resolve_gid(this->gid_, gid, ec); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind_locality and unbind_gid interface 
@@ -83,15 +81,16 @@ struct primary_namespace :
     unbind_async(endpoint_type const& ep)
     { return this->base_type::unbind_locality_async(this->gid_, ep); }
     
-    response_type unbind(endpoint_type const& ep)
-    { return this->base_type::unbind_locality(this->gid_, ep); }
+    response_type unbind(endpoint_type const& ep, error_code& ec = throws)
+    { return this->base_type::unbind_locality(this->gid_, ep, ec); }
 
     lcos::future_value<response_type>
     unbind_async(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind_gid_async(this->gid_, gid, count); }
     
-    response_type unbind(naming::gid_type const& gid, count_type count)
-    { return this->base_type::unbind_gid(this->gid_, gid, count); }
+    response_type unbind(naming::gid_type const& gid, count_type count,
+                         error_code& ec = throws)
+    { return this->base_type::unbind_gid(this->gid_, gid, count, ec); }
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 
@@ -99,8 +98,9 @@ struct primary_namespace :
     increment_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::increment_async(this->gid_, gid, credits); }
     
-    response_type increment(naming::gid_type const& gid, count_type credits)
-    { return this->base_type::increment(this->gid_, gid, credits); }
+    response_type increment(naming::gid_type const& gid, count_type credits,
+                            error_code& ec = throws)
+    { return this->base_type::increment(this->gid_, gid, credits, ec); }
     
     ///////////////////////////////////////////////////////////////////////////
     // decrement interface 
@@ -109,16 +109,17 @@ struct primary_namespace :
     { return this->base_type::decrement_async(this->gid_, gid, credits); }
     
     response_type 
-    decrement(naming::gid_type const& gid, count_type credits)
-    { return this->base_type::decrement(this->gid_, gid, credits); }
+    decrement(naming::gid_type const& gid, count_type credits,
+              error_code& ec = throws)
+    { return this->base_type::decrement(this->gid_, gid, credits, ec); }
 
     ///////////////////////////////////////////////////////////////////////////
     // localities interface 
     lcos::future_value<response_type> localities_async()
     { return this->base_type::localities_async(this->gid_); }
     
-    response_type localities()
-    { return this->base_type::localities(this->gid_); }
+    response_type localities(error_code& ec = throws)
+    { return this->base_type::localities(this->gid_, ec); }
 }; 
 
 }}
