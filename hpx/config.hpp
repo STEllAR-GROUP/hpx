@@ -144,16 +144,29 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// on Windows the debug versions of the libraries have mangled entry points 
 #if !defined(BOOST_WINDOWS)
 #  define HPX_MANGLE_COMPONENT_NAME_PREFIX  libhpx_component_
-#  define HPX_MANGLE_COMPONENT_NAME(n)                                        \
-    BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n)                         \
-    /**/
-#  define HPX_MANGLE_COMPONENT_NAME_STR(n)                                    \
-    BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                  \
-    /**/
-#  define HPX_MANGLE_NAME(n)                BOOST_PP_CAT(lib, n)
+#  if defined(HPX_DEBUG)
+#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
+      BOOST_PP_CAT(BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n), d)      \
+      /**/
+#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
+      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n + "d"          \
+      /**/
+#    define HPX_MANGLE_NAME(n)                                                \
+      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
+      /**/
+#  else
+#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
+      BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n)                       \
+      /**/
+#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
+      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                \
+      /**/
+#    define HPX_MANGLE_NAME(n)                                                \
+      BOOST_PP_CAT(lib, n)                                                    \
+      /**/
+#  endif
 #elif defined(HPX_DEBUG)
 #  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(n, d)
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n + "d"
@@ -162,6 +175,11 @@
 #  define HPX_MANGLE_COMPONENT_NAME(n)      n
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n
 #  define HPX_MANGLE_NAME(n)                n
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_COMPONENT_NAME)
+# define HPX_COMPONENT_NAME hpx
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

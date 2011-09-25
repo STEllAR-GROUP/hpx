@@ -13,11 +13,6 @@
 #include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPONENT_NAME)
-# define HPX_COMPONENT_NAME hpx
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_COMPONENT_LIB_NAME)
 #define HPX_COMPONENT_LIB_NAME                                                \
         HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME)                         \
