@@ -7,9 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/version.hpp>
-
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/exception.hpp>
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
@@ -262,6 +259,8 @@ typedef actions::plain_action1<
 // TODO: merge with register_worker which is all but identical
 void register_console(registration_header const& header)
 {
+    using boost::asio::ip::address;
+
     get_big_boot_barrier().lock();
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
@@ -282,8 +281,8 @@ void register_console(registration_header const& header)
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
 
-    agas_client.get_prefix(header.locality, prefix, true, false); 
-
+    agas_client.register_locality(header.locality, prefix);
+   
     agas_client.get_id_range(header.locality, header.parcelport_allocation
                            , parcel_lower, parcel_upper);
     agas_client.get_id_range(header.locality, header.response_allocation
@@ -435,6 +434,8 @@ void notify_console(notification_header const& header)
 // remote call to AGAS
 void register_worker(registration_header const& header)
 {
+    using boost::asio::ip::address;
+
     get_big_boot_barrier().lock();
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
@@ -443,7 +444,7 @@ void register_worker(registration_header const& header)
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
 
-    agas_client.get_prefix(header.locality, prefix, true, false); 
+    agas_client.register_locality(header.locality, prefix);
 
     agas_client.get_id_range(header.locality, header.parcelport_allocation
                            , parcel_lower, parcel_upper);
@@ -841,4 +842,3 @@ big_boot_barrier& get_big_boot_barrier()
 
 }}
 
-#endif
