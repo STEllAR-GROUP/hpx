@@ -10,6 +10,7 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            MangleName
             Install)
 
 macro(add_hpx_library name)
@@ -51,10 +52,6 @@ macro(add_hpx_library name)
       target_link_libraries(${name}_lib ${${name}_DEPENDENCIES})
     endif()
     set(prefix "hpx_")
-    # main_target is checked by the ini install code, to see if ini files for
-    # this component need to be installed
-    set(main_target lib${prefix}${name}.so)
-    set(install_targets lib${prefix}${name}.so)
   else()
     if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_lib
@@ -62,8 +59,6 @@ macro(add_hpx_library name)
     else()
       target_link_libraries(${name}_lib ${${name}_DEPENDENCIES})
     endif()
-    set(main_target ${name}.dll)
-    set(install_targets ${name}.dll)
   endif()
 
   # set properties of generated shared library
@@ -77,18 +72,18 @@ macro(add_hpx_library name)
   
   set_property(TARGET ${name}_lib APPEND
                PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
+
+  hpx_mangle_name(install_target ${name}_lib)
   
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
     hpx_debug("add_library.${name}" "Module was not specified for component.")
   endif()
 
-  foreach(target ${install_targets})
-    hpx_library_install(${${name}_MODULE} ${target})
-  endforeach()
+  hpx_library_install(${${name}_MODULE} ${install_target})
 
   foreach(target ${${name}_INI})
-    hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
+    hpx_ini_install(${${name}_MODULE} ${install_target} ${target})
   endforeach()
 endmacro()
 

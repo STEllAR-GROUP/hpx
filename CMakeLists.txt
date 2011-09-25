@@ -38,7 +38,7 @@ set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 include(CMakeDetermineFortranCompiler)
 
 ################################################################################
-# cmake configuration
+# CMake configuration
 ################################################################################
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
@@ -135,18 +135,32 @@ include_directories(${hpx_SOURCE_DIR}/external/backtrace)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
-# Compiler configuration code
+# Compiler detection code
 ################################################################################
-hpx_include(GCCVersion)
-hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
+# C++
+hpx_include(GCCVersion)
+
+if(GCC_VERSION)
+  hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
+
+  if(040000 GREATER ${GCC_VERSION})
+    hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
+  endif()
+elseif(NOT MSVC10 OR NOT CMAKE_CL_64)
+  hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
+endif()
+
+# Fortran
 if(CMAKE_Fortran_COMPILER)
   hpx_include(GFortranVersion)
-  hpx_info("gfortran_config" "Compiler reports compatibility with gfortran version ${GFORTRAN_VERSION_STR}")
+  if(GFORTRAN_VERSION)
+    hpx_info("gfortran_config" "Compiler reports compatibility with gfortran version ${GFORTRAN_VERSION_STR}")
+  endif()
 endif()
 
 hpx_include(CompilerFlags)
-
+  
 ################################################################################
 # SVN revision detection 
 ################################################################################
@@ -155,10 +169,6 @@ include(HPX_SVNRevision)
 ################################################################################
 # installation configuration
 ################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
-endif()
-
 # for backwards compatibility
 if(CMAKE_PREFIX)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
@@ -201,17 +211,6 @@ if(HPX_CXX11)
 endif()
 
 ################################################################################
-# AGAS configuration
-################################################################################
-set(HPX_AGAS_VERSION "2" CACHE STRING "AGAS subsystem version")
-
-if("${HPX_AGAS_VERSION}" STREQUAL "2")
-  add_definitions(-DHPX_AGAS_VERSION=0x20)
-else()
-  add_definitions(-DHPX_AGAS_VERSION=0x10)
-endif()
-
-################################################################################
 # SDF output 
 ################################################################################
 find_package(HPX_RNPL)
@@ -235,134 +234,257 @@ if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
   add_definitions(-DHPX_STACKTRACES=1)
 endif()
+  
+################################################################################
+# Compiler configuration 
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+# Clear CMake defaults
+foreach(language CXX Fortran)
+  set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
+  set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
+  set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
+  set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
+endforeach()
+  
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  add_definitions(-DDEBUG)
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+  add_definitions(-DDEBUG)
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+  add_definitions(-DNDEBUG)
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+  add_definitions(-DNDEBUG)
+  add_definitions(-DBOOST_DISABLE_ASSERTS)
+else()
+  hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+endif()
+  
+# Debug library postfix 
+set(CMAKE_DEBUG_POSTFIX "d")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
 ################################################################################
-# Windows specific configuration 
+# MSVC configuration 
 ################################################################################
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    add_definitions(-DDEBUG)
-    add_definitions(-DHPX_EMULATE_SWAP_CONTEXT=1)
+    # No optimizations
+    hpx_append_flag(-Od LANGUAGES CXX Fortran)
+
+    # Generate debugging information
+    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
+
+    # Keep the frame pointer
+    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
+
+    # Don't inline functions
+    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
+
+    # Use multi-threaded debug runtime
+    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    # Optimize for speed
+    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
+
+    # Generate debugging information
+    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
+
+    # Keep the frame pointer
+    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
+
+    # Don't inline functions
+    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
+
+    # Use multi-threaded debug runtime
+    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    # Optimize for size
+    hpx_append_flag(-O1 LANGUAGES CXX Fortran)
+
+    # Use multi-threaded runtime
+    hpx_append_flag(-MD LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    add_definitions(-DNDEBUG)
-    add_definitions(-DBOOST_DISABLE_ASSERTS)
+    # Optimize for speed
+    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
+
+    # Use multi-threaded runtime
+    hpx_append_flag(-MD LANGUAGES CXX Fortran)
   endif()
 
-  if(MSVC10)
-    if(HPX_CXX11)
-      # C++11 support
-      if(HPX_CXX11)
-        set(HPX_CXX11_RVALUE_REFERENCES)
-        add_definitions(-DHPX_CXX11_HAVE_RVALUE_REFERENCES)
+  # Exceptions
+  hpx_append_flag(-EHsc)
 
-        set(HPX_CXX11_LAMBDAS)
-        add_definitions(-DHPX_CXX11_HAVE_LAMBDAS)
-      endif()
-    endif()
-  else()
-    hpx_error("msvc_config" "MSVC 2010 or higher is required.")
+  # Runtime type information
+  hpx_append_flag(-GR)
+
+  # Multiproccessor build
+  hpx_append_flag(-MP) 
+
+  # Increase the maximum size of object file sections 
+  hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
+
+  ##############################################################################
+  # Stacktraces 
+  ##############################################################################
+  if(HPX_STACKTRACES)
+    set(hpx_RUNTIME_LIBRARIES dbghelp)
   endif()
-    
-  set(CMAKE_DEBUG_POSTFIX "d")
 
-  # we auto-link Boost on Windows, so don't specify boost libraries explicitly
-  set(BOOST_FOUND_LIBRARIES "")
+  ##############################################################################
+  # C++11 
+  ##############################################################################
+  if(HPX_CXX11)
+    # C++11 support
+    set(HPX_CXX11_RVALUE_REFERENCES)
+    add_definitions(-DHPX_CXX11_HAVE_RVALUE_REFERENCES)
 
+    set(HPX_CXX11_LAMBDAS)
+    add_definitions(-DHPX_CXX11_HAVE_LAMBDAS)
+
+    set(HPX_CXX11_UNIQUE_PTR)
+    add_definitions(-DHPX_CXX11_HAVE_UNIQUE_PTR)
+    add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+  endif()
+
+  ##############################################################################
+  # Diagnostics 
+  ##############################################################################
+  if(HPX_WARNINGS)
+    hpx_append_flag(-W3)
+
+    # According to the ifort Windows manual, W3 isn't supported
+    hpx_append_flag(-W1 LANGUAGES Fortran)
+  endif()
+
+  # Display full paths in diagnostics
+  hpx_append_flag(-FC)
+
+  ##############################################################################
+  # Macro definitions for system headers 
+  ##############################################################################
   add_definitions(-D_WINDOWS)
-  add_definitions(-DBOOST_USE_WINDOWS_H)
+  add_definitions(-D_WIN32)
   add_definitions(-D_WIN32_WINNT=0x0600)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+
+  ##############################################################################
+  # Boost 
+  ##############################################################################
+  # We auto-link Boost on Windows, so don't specify boost libraries explicitly
+  set(BOOST_FOUND_LIBRARIES "")
+
+  add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  add_definitions(-DHPX_HAVE_CXX11_UNIQUE_PTR)
-  add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-
-  # suppress certain warnings (TODO: Document what warnings these disable)
-  add_definitions(-wd4251 -wd4231 -wd4275 -wd4660 -wd4094 -wd4267 -wd4180 -wd4244)
-
-  if(CMAKE_CL_64)
-    add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
-  endif()
-
-  # multiproccessor build
-  add_definitions(-MP) 
-
-  add_definitions(-bigobj)
-
-  if(HPX_STACKTRACES)
-    set(hpx_RUNTIME_LIBRARIES dbghelp)
-  endif()
+  add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
 
 ################################################################################
-# POSIX specific configuration 
+# GCC-compatible compiler configuration 
 ################################################################################
 else()
-  # clear CMake defaults
-  foreach(language CXX Fortran)
-    set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
-    set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
-    set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
-    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
-  endforeach()
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    # No optimizations
+    hpx_use_flag_if_available(-O0 LANGUAGES CXX Fortran)
 
+    # Generate debugging information
+    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+
+    # Keep the frame pointer
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+
+    # Don't inline functions
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    # Optimize for speed
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+
+    # Generate debugging information
+    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+
+    # Keep the frame pointer
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+
+    # Don't inline functions
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+
+    # No tail call optimizations
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+
+    # Don't allocate registers for wide types (e.g. 128bit ints) independently
+    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
+
+    # Disable register allocation webs, which make debugging impossible 
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+
+    # Disable register renaming  
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    # Optimize for size
+    hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    # Optimize for speed
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+  endif()
+
+  ##############################################################################
+  # Stacktraces 
+  ##############################################################################
   if(HPX_STACKTRACES)
+    # Export all visible symbols, not just those that are used
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX Fortran)
   endif()
 
+  ##############################################################################
+  # C++11 
+  ##############################################################################
   if(HPX_CXX11)
+    # Turn on C++11 support
     hpx_use_flag_if_available(-std=c++0x)
+
+    hpx_check_for_cxx11_rvalue_references(HPX_CXX11_RVALUE_REFERENCES
+      DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
+
+    hpx_check_for_cxx11_variadic_templates(HPX_CXX11_VARIADIC_TEMPLATES
+      DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+
+    hpx_check_for_cxx11_lambdas(HPX_CXX11_LAMBDAS
+      DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+
+    hpx_check_for_cxx11_unique_ptr(HPX_CXX11_UNIQUE_PTR
+      DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR
+                  BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
-  # non-standard C++ extensions that we forbid
-  hpx_use_flag_if_available(-Werror=vla)
-
-  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    add_definitions(-DDEBUG)
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    add_definitions(-DDEBUG)
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    add_definitions(-DNDEBUG)
-    hpx_use_flag_if_available(-Os)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    add_definitions(-DNDEBUG)
-    add_definitions(-DBOOST_DISABLE_ASSERTS)
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
-  else()
-    hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
-  endif()
-
+  ##############################################################################
+  # Diagnostics 
+  ##############################################################################
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(-Wall)
-    hpx_use_flag_if_available(-Wno-strict-aliasing)
+    hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX Fortran)
     hpx_use_flag_if_available(-Wsign-promo)
   endif()
 
-  ##############################################################################
-  # GNU specific configuration
-  ##############################################################################
+  # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
+  hpx_use_flag_if_available(-Werror=vla)
+
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
 
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # I'm aware that __sync_fetch_and_nand changed semantics
-    hpx_use_flag_if_available(-Wno-sync-nand)
+  # Silence warning about __sync_fetch_and_nand changing semantics
+  hpx_use_flag_if_available(-Wno-sync-nand)
 
-    if(0404 GREATER ${GCC_VERSION})
-      hpx_warn("gcc_config" "HPX will perform poorly with GCC ${GCC_VERSION_STR}. Please use GCC 4.4.x.")
-    else()
+  ##############################################################################
+  # GCC-only configuration 
+  ##############################################################################
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if(040400 LESS ${GCC_VERSION})
       option(HPX_ELF_HIDDEN_VISIBILITY
         "Use -fvisibility=hidden for Release and MinSizeRel builds (default: ON)" ON)
 
@@ -372,32 +494,20 @@ else()
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-          hpx_append_flag(-fvisibility=hidden)
+          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
         endif()
       endif()
     endif()
   ##############################################################################
-  # Intel specific configuration
+  # Intel-only configuration
   ##############################################################################
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    # warning #191: type qualifier is meaningless on cast type
-    add_definitions(-diag-disable 191) 
-    
-    # warning #279: controlling expression is constant 
-    add_definitions(-diag-disable 279) 
-    
-    # warning #68: integer conversion resulted in a change of sign 
-    add_definitions(-diag-disable 68) 
-    
-    # warning #858: type qualifier on return type is meaningless 
-    add_definitions(-diag-disable 858) 
-    
     # warning #1125: virtual function override intended 
     add_definitions(-diag-disable 1125) 
   endif()
 
   ##############################################################################
-  # POSIX configuration tests 
+  # x86-64 specific configuration
   ##############################################################################
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
@@ -448,29 +558,20 @@ else()
   hpx_cpuid("rdtscp" HPX_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
 
+  ##############################################################################
+  # Macro definitions for system headers 
+  ##############################################################################
+  add_definitions(-D_GNU_SOURCE)
+
+  ##############################################################################
+  # System libraries 
+  ##############################################################################
+  set(hpx_RUNTIME_LIBRARIES dl rt)
+
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
-  # C++11 support
-  if(HPX_CXX11)
-    hpx_check_for_cxx11_rvalue_references(HPX_CXX11_RVALUE_REFERENCES
-      DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
-
-    hpx_check_for_cxx11_variadic_templates(HPX_CXX11_VARIADIC_TEMPLATES
-      DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
-
-    hpx_check_for_cxx11_lambdas(HPX_CXX11_LAMBDAS
-      DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
-
-    hpx_check_for_cxx11_unique_ptr(HPX_CXX11_UNIQUE_PTR
-      DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR
-                  BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-  endif()
-
-  set(hpx_RUNTIME_LIBRARIES dl rt)
-
   hpx_use_flag_if_available(-pthread)
-  add_definitions(-D_GNU_SOURCE)
 
   set(HPX_MALLOC "TCMalloc" CACHE STRING
     "HPX malloc allocator (default: tcmalloc)" FORCE)

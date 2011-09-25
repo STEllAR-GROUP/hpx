@@ -13,6 +13,7 @@ hpx_include(Message
             Install
             GetIncludeDirectory
             Compile
+            MangleName
             AddComponent
             AddLibrary
             AddExecutable

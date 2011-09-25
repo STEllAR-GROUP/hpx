@@ -148,8 +148,7 @@ target_link_libraries(hpx_serialization
   ${BOOST_serialization_LIBRARY}
   ${BOOST_system_LIBRARY})
 
-get_target_property(path hpx_serialization LOCATION)
-get_filename_component(name "${path}" NAME)
+hpx_mangle_name(name hpx_serialization)
 
 set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -169,11 +168,14 @@ set_target_properties(hpx PROPERTIES
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx)
 
-target_link_libraries(hpx hpx_serialization
-  ${hpx_MALLOC_LIBRARY} ${hpx_RUNTIME_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+target_link_libraries(hpx
+  hpx_serialization
+  ${hpx_MALLOC_LIBRARY}
+  ${hpx_RUNTIME_LIBRARIES}
+  ${BOOST_FOUND_LIBRARIES})
  
-get_target_property(path hpx LOCATION)
-get_filename_component(name "${path}" NAME)
+hpx_mangle_name(name hpx)
+
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY=\"${name}\""
@@ -192,8 +194,7 @@ set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_COMPONENT_EXPORTS")
 
-get_target_property(path hpx LOCATION)
-get_filename_component(name "${path}" NAME)
+hpx_mangle_name(name hpx_init)
 
 hpx_archive_install(core ${name})
 

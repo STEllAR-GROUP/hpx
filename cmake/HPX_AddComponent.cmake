@@ -52,19 +52,12 @@ macro(add_hpx_component name)
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${libs} ${BOOST_FOUND_LIBRARIES})
     set(prefix "hpx_component_")
-    # main_target is checked by the ini install code, to see if ini files for
-    # this component need to be installed
-    set(main_target lib${prefix}${name}.so)
-    set(install_targets
-      lib${prefix}${name}.so)
     set_target_properties(${name}_component PROPERTIES
       COMPILE_FLAGS "-fno-use-cxa-atexit"
       LINK_FLAGS "-fno-use-cxa-atexit")
   else()
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${libs})
-    set(main_target ${name}.dll)
-    set(install_targets ${name}.dll)
   endif()
 
   # set properties of generated shared library
@@ -81,18 +74,18 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
+
+  hpx_mangle_name(install_target ${name}_component)
    
   if(NOT ${name}_MODULE)
     set(${name}_MODULE "Unspecified")
     hpx_debug("add_component.${name}" "Module was not specified for component.")
   endif()
 
-  foreach(target ${install_targets})
-    hpx_library_install(${${name}_MODULE} ${target})
-  endforeach()
+  hpx_library_install(${${name}_MODULE} ${install_target})
 
   foreach(target ${${name}_INI})
-    hpx_ini_install(${${name}_MODULE} ${main_target} ${target})
+    hpx_ini_install(${${name}_MODULE} ${install_target} ${target})
   endforeach()
 endmacro()
 
