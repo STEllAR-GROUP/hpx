@@ -30,7 +30,7 @@
 #define HPX_VERSION_DATE         20110818
 
 #if !defined(HPX_AGAS_VERSION)
-    #define HPX_AGAS_VERSION 0x20
+    #define HPX_AGAS_VERSION 0x21
 #endif
 
 #define HPX_VERSION_TAG          "-rc1"
