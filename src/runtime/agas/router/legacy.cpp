@@ -5,10 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/version.hpp>
-
-#if HPX_AGAS_VERSION > 0x10
-
 #include <hpx/exception.hpp>
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
@@ -22,8 +18,8 @@ legacy_router::legacy_router(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
-):
-    router_type(ini_.get_agas_router_mode())
+    )
+  : router_type(ini_.get_agas_router_mode())
   , runtime_type(runtime_type_)
   , state_(starting)
   , prefix_()
@@ -42,7 +38,8 @@ legacy_router::legacy_router(
 void legacy_router::launch_bootstrap(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
-) { // {{{
+    )
+{ // {{{
     using boost::asio::ip::address;
 
     bootstrap = boost::make_shared<bootstrap_data_type>();
@@ -91,265 +88,303 @@ void legacy_router::launch_bootstrap(
 void legacy_router::launch_hosted(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
-) { // {{{
+    )
+{ // {{{
     hosted = boost::make_shared<hosted_data_type>();
 
     hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
-    hosted->locality_cache_.reserve(ini_.get_agas_locality_cache_size());
 
     get_big_boot_barrier().wait();
 
     state_.store(running);
 } // }}}
 
-bool legacy_router::get_prefix(
+bool legacy_router::register_locality(
     naming::locality const& l
   , naming::gid_type& prefix
-  , bool self
-  , bool try_cache
   , error_code& ec
-) { // {{{ get_prefix implementation
-    using boost::asio::ip::address;
-    using boost::fusion::at_c;
-
-    if (try_cache && !is_bootstrap() &&
-        get_prefix_cached(l, prefix, self, ec))
-        return false;
-
-    address addr = address::from_string(l.get_address());
-
-    endpoint_type ep(addr, l.get_port()); 
-
-    if (self)
-    {
-        response_type r;
-
-        if (is_bootstrap())
-            r = bootstrap->primary_ns_server.bind_locality(ep, 0);
-        else
-            r = hosted->primary_ns_.bind(ep, 0);
-
-        naming::gid_type gid_ = naming::get_gid_from_prefix(r.get_prefix());
-
-        if (gid_ != naming::invalid_gid)
-        {
-            prefix = gid_; 
-
-            if (!is_bootstrap())
-            {
-                cache_mutex_type::scoped_lock
-                    lock(hosted->locality_cache_mtx_);
-                hosted->locality_cache_.insert(l, prefix);
-            }
-        }
-
-        return r.get_status() == success;
-    }
+    )
+{ // {{{
+    try {
+        using boost::asio::ip::address;
     
-    else 
-    {
+        const address addr = address::from_string(l.get_address());
+    
+        const endpoint_type ep(addr, l.get_port()); 
+    
         response_type r;
-
+    
         if (is_bootstrap())
-            r = bootstrap->primary_ns_server.resolve_locality(ep);
+            r = bootstrap->primary_ns_server.bind_locality(ep, 0, ec);
         else
-            r = hosted->primary_ns_.resolve(ep); 
+            r = hosted->primary_ns_.bind(ep, 0, ec);
 
-        naming::gid_type gid_ = naming::get_gid_from_prefix(r.get_prefix());
-
-        if (gid_ != naming::invalid_gid)
-        {
-            prefix = gid_;
-
-            if (!is_bootstrap())
-            {
-                cache_mutex_type::scoped_lock
-                    lock(hosted->locality_cache_mtx_);
-                hosted->locality_cache_.insert(l, prefix);
-            }
+        if ((&ec != &throws && ec) || (success != r.get_status()))
+            return false;
+   
+        prefix = naming::get_gid_from_prefix(r.get_prefix());
+ 
+        return true;
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::bind_locality", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
         }
 
         return false;
     }
 } // }}}
 
-bool legacy_router::get_prefix_cached(
+// TODO: We need to ensure that the locality isn't unbound while it still holds
+// referenced objects.
+bool legacy_router::unregister_locality(
     naming::locality const& l
-  , naming::gid_type& prefix
-  , bool self
   , error_code& ec
-) { // {{{
-    if (is_bootstrap())
-        return get_prefix(l, prefix, self, false, ec);
+    )
+{ // {{{
+    try {
+        using boost::asio::ip::address;
+    
+        const address addr = address::from_string(l.get_address());
+    
+        const endpoint_type ep(addr, l.get_port()); 
+    
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->primary_ns_server.unbind_locality(ep, ec);
+        else
+            r = hosted->primary_ns_.unbind(ep, ec);
 
-    locality_entry_type e;
-
-    cache_mutex_type::scoped_lock
-        lock(hosted->locality_cache_mtx_);
-
-    if (hosted->locality_cache_.get_entry(l, e))
-    {
-        prefix = e.get();
+        if ((&ec != &throws && ec) || (success != r.get_status()))
+            return false;
+    
         return true;
     }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::unbind_locality", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    return false; 
-} // }}}
-
-bool legacy_router::remove_prefix(
-    naming::locality const& l
-  , error_code& ec
-) { // {{{
-    using boost::asio::ip::address;
-    using boost::fusion::at_c;
-
-    const address addr = address::from_string(l.get_address());
-
-    const endpoint_type ep(addr, l.get_port()); 
-
-    response_type r;
-
-    if (is_bootstrap())
-        r = bootstrap->primary_ns_server.unbind_locality(ep);
-    else
-        r = hosted->primary_ns_.unbind(ep);
-
-    if (success == r.get_status())
-        return true;
-    else
         return false;
+    }
 } // }}}
 
 bool legacy_router::get_console_prefix(
     naming::gid_type& prefix
   , bool try_cache
   , error_code& ec
-) { // {{{
-    if (status() != running)
+    )
+{ // {{{
+    try {
+        if (status() != running)
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return false;
+        }
+
+        if (is_console())
+        {
+            prefix = local_prefix();
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+     
+        if (try_cache && !is_bootstrap())
+        {
+            if (hosted->console_cache_)
+            {
+                prefix = naming::get_gid_from_prefix(hosted->console_cache_);
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+        }
+    
+        if (is_bootstrap()) {
+            response_type r = 
+                bootstrap->symbol_ns_server.resolve("/locality(console)", ec);
+    
+            if ((&ec == &throws || !ec) &&
+                (r.get_gid() != naming::invalid_gid) &&
+                (r.get_status() == success))
+            {
+                prefix = r.get_gid();
+                return true;
+            }
+        }
+    
+        else {
+            response_type r = hosted->symbol_ns_.resolve
+                ("/locality(console)", ec);
+    
+            if ((&ec == &throws || !ec) &&
+                (r.get_gid() != naming::invalid_gid) &&
+                (r.get_status() == success))
+            {
+                prefix = r.get_gid();
+                hosted->console_cache_.store
+                    (naming::get_prefix_from_gid(prefix));
+                return true;
+            }
+        }
+    
         return false;
-
-    if (is_console())
-    {
-        prefix = local_prefix();
-        return true;
     }
- 
-    if (try_cache && !is_bootstrap())
-    {
-        if (hosted->console_cache_)
-        {
-            prefix = naming::get_gid_from_prefix(hosted->console_cache_);
-            return true;
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::get_console_prefix", e.what());
         }
-    }
-
-    if (is_bootstrap()) {
-        response_type r = 
-            bootstrap->symbol_ns_server.resolve("/locality(console)");
-
-        if ((r.get_gid() != naming::invalid_gid) &&
-            (r.get_status() == success))
-        {
-            prefix = r.get_gid();
-            return true;
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
         }
+
+        return false;
     }
-
-    else {
-        response_type r = hosted->symbol_ns_.resolve("/locality(console)");
-
-        if ((r.get_gid() != naming::invalid_gid) &&
-            (r.get_status() == success))
-        {
-            prefix = r.get_gid();
-            hosted->console_cache_.store
-                (naming::get_prefix_from_gid(prefix));
-            return true;
-        }
-    }
-
-    return false;
 } // }}}
 
 bool legacy_router::get_prefixes(
     std::vector<naming::gid_type>& prefixes
   , components::component_type type
   , error_code& ec 
-) { // {{{ get_prefixes implementation
-    if (type != components::component_invalid)
-    {
-        response_type r;
-
-        if (is_bootstrap())
-            r = bootstrap->component_ns_server.resolve_id
-                (component_id_type(type));
-        else
-            r = hosted->component_ns_.resolve(component_id_type(type));
-
-        const count_type s = r.get_localities_size();
-        prefix_type* p = r.get_localities();
-
-        // REVIEW: Check response status too? 
-        if (!s)
-            return false;
-
-        for (count_type i = 0; i < s; ++i) 
-            prefixes.push_back(naming::get_gid_from_prefix(p[i]));
-
-        return true; 
-    }
-
-    else
-    {
-        response_type r;
-
-        if (is_bootstrap())
-            r = bootstrap->primary_ns_server.localities();
-        else
-            r = hosted->primary_ns_.localities();
-       
-        const count_type s = r.get_localities_size();
-        prefix_type* p = r.get_localities();
-
-        // REVIEW: Check response status too? 
-        if (!s)
-            return false;
-
-        for (count_type i = 0; i < s; ++i) 
-            prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+    )
+{ // {{{ get_prefixes implementation
+    try {
+        if (type != components::component_invalid)
+        {
+            response_type r;
     
-        return true;
+            if (is_bootstrap())
+                r = bootstrap->component_ns_server.resolve_id(type, ec);
+            else
+                r = hosted->component_ns_.resolve(type, ec);
+
+            if (&ec != &throws && ec)
+                return false;
+    
+            const std::vector<boost::uint32_t> p = r.get_localities();
+    
+            // REVIEW: Check response status too? 
+            if (!p.size())
+                return false;
+    
+            for (count_type i = 0; i < p.size(); ++i) 
+                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+    
+            return true; 
+        }
+    
+        else
+        {
+            response_type r;
+    
+            if (is_bootstrap())
+                r = bootstrap->primary_ns_server.localities(ec);
+            else
+                r = hosted->primary_ns_.localities(ec);
+           
+            if (&ec != &throws && ec)
+                return false;
+
+            const std::vector<boost::uint32_t> p = r.get_localities();
+    
+            // REVIEW: Check response status too? 
+            if (!p.size())
+                return false;
+    
+            for (count_type i = 0; i < p.size(); ++i) 
+                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+        
+            return true;
+        }
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::get_prefixes", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return false;
     }
 } // }}} 
 
 components::component_type legacy_router::get_component_id(
     std::string const& name
   , error_code& ec 
-) { /// {{{
-    response_type r;
+    )
+{ /// {{{
+    try {
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->component_ns_server.bind_name(name, ec);
+        else
+            r = hosted->component_ns_.bind(name, ec);
 
-    if (is_bootstrap())
-        r = bootstrap->component_ns_server.bind_name(name);
-    else
-        r = hosted->component_ns_.bind(name);
+        if (&ec != &throws && ec)
+            return components::component_invalid;
+    
+        // REVIEW: Check response status?
+        return (components::component_type) r.get_component_type();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::get_component_id", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    // REVIEW: Check response status?
-    return (components::component_type) r.get_component_type();
+        return components::component_invalid;
+    }
 } // }}} 
 
 components::component_type legacy_router::register_factory(
     naming::gid_type const& prefix
   , std::string const& name
   , error_code& ec
-) { // {{{
-    if (is_bootstrap())
-        return (components::component_type)
-            bootstrap->component_ns_server.bind_prefix(name,
-                naming::get_prefix_from_gid(prefix)).get_component_type();
-    else
-        return (components::component_type)
-            hosted->component_ns_.bind(name,
-                naming::get_prefix_from_gid(prefix)).get_component_type();
+    )
+{ // {{{
+    try {
+        response_type r;
+
+        if (is_bootstrap())
+            r = bootstrap->component_ns_server.bind_prefix(name, prefix, ec);
+        else
+            r = hosted->component_ns_.bind(name, prefix, ec);
+        
+        if (&ec != &throws && ec)
+            return components::component_invalid;
+
+        // REVIEW: Check response status?
+        return (components::component_type) r.get_component_type();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "legacy_router::register_factory", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return components::component_invalid;
+    }
 } // }}}
 
 bool legacy_router::get_id_range(
@@ -358,53 +393,94 @@ bool legacy_router::get_id_range(
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
   , error_code& ec
-) { // {{{ get_id_range implementation
-    using boost::asio::ip::address;
-    using boost::fusion::at_c;
+    )
+{ // {{{ get_id_range implementation
+    typedef lcos::eager_future<
+        primary_namespace_server_type::bind_locality_action,
+        response_type
+    > allocate_response_future_type;
 
-    address addr = address::from_string(l.get_address());
+    allocate_response_future_type* f = 0;
 
-    endpoint_type ep(addr, l.get_port()); 
-     
-    response_type r;
+    try {
+        using boost::asio::ip::address;
+        using boost::fusion::at_c;
+    
+        address addr = address::from_string(l.get_address());
+    
+        endpoint_type ep(addr, l.get_port()); 
+         
+        response_type r;
+    
+        if (is_bootstrap())
+        {
+            r = bootstrap->primary_ns_server.bind_locality(ep, count, ec);
 
-    if (is_bootstrap())
-        r = bootstrap->primary_ns_server.bind_locality(ep, count);
+            if (&ec != &throws && ec) 
+                return false;
+        }
+ 
+        else
+        {
+            // WARNING: this deadlocks if AGAS is unresponsive and all response
+            // futures are checked out and pending.
+    
+            // get a future
+            hosted->allocate_response_sema_.wait(1);
+            hosted->allocate_response_pool_.dequeue(&f); 
+    
+            BOOST_ASSERT(f);
+    
+            // reset the future
+            f->reset();
+    
+            // execute the action (synchronously)
+            f->apply(
+                naming::id_type(primary_namespace_server_type::fixed_gid()
+                              , naming::id_type::unmanaged),
+                ep, count);
+            r = f->get(ec);
 
-    // WARNING: this deadlocks if AGAS is unresponsive and all response
-    // futures are checked out and pending.
-    else
-    {
-        lcos::eager_future<
-            primary_namespace_server_type::bind_locality_action,
-            response_type
-        >* f = 0;
+            // return the future to the pool
+            hosted->allocate_response_pool_.enqueue(f);
+            hosted->allocate_response_sema_.signal(1);
 
-        // get a future
-        hosted->allocate_response_sema_.wait(1);
-        hosted->allocate_response_pool_.dequeue(&f); 
-
-        BOOST_ASSERT(f);
-
-        // reset the future
-        f->reset();
-
-        // execute the action (synchronously)
-        f->apply(
-            naming::id_type(primary_namespace_server_type::fixed_gid()
-                          , naming::id_type::unmanaged),
-            ep, count);
-        r = f->get();
-
-        // return the future to the pool
-        hosted->allocate_response_pool_.enqueue(f);
-        hosted->allocate_response_sema_.signal(1);
+            if (&ec != &throws && ec)
+                return false;
+        }
+    
+        lower_bound = r.get_lower_bound(); 
+        upper_bound = r.get_upper_bound();
+    
+        return lower_bound && upper_bound;
     }
+    catch (hpx::exception const& e) {
+        // Replace the future in the pool. To be able to return the future to
+        // the pool, we'd have to ensure that all threads (pending, suspended,
+        // active, or in flight) that might read/write from it are aborted.
+        // There's no guarantee that the future isn't corrupted in some other
+        // way, and the aforementioned code would be lengthy, and would have to
+        // be meticulously exception-free. So, for now, we just allocate a new
+        // future for the pool, and let the old future stay in memory.
+        if (!is_bootstrap() && f) 
+        {
+            hosted->allocate_response_pool_.enqueue 
+                (new allocate_response_future_type);
+            hosted->allocate_response_sema_.signal(1);
 
-    lower_bound = r.get_lower_bound(); 
-    upper_bound = r.get_upper_bound();
+            f->invalidate(boost::current_exception());
+        }
 
-    return lower_bound && upper_bound;
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::get_id_range", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return false;
+    }
 } // }}}
 
 bool legacy_router::bind_range(
@@ -413,102 +489,96 @@ bool legacy_router::bind_range(
   , naming::address const& baseaddr
   , offset_type offset
   , error_code& ec
-) { // {{{ bind_range implementation
-    using boost::asio::ip::address;
-    using boost::fusion::at_c;
+    ) 
+{ // {{{ bind_range implementation
+    typedef lcos::eager_future<
+        primary_namespace_server_type::bind_gid_action,
+        response_type
+    > bind_response_future_type;
 
-    address addr = address::from_string(baseaddr.locality_.get_address());
-
-    endpoint_type ep(addr, baseaddr.locality_.get_port()); 
-   
-    // Create a global virtual address from the legacy calling convention
-    // parameters.
-    gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
+    bind_response_future_type* f = 0;
     
-    if (is_bootstrap())
-    {
-        response_type r
-            = bootstrap->primary_ns_server.bind_gid(lower_id, gva);
-
-        if (success == r.get_status()) 
-            return true;
-    }
-
-    else
-    {
-        // WARNING: this deadlocks if AGAS is unresponsive and all response
-        // futures are checked out and pending.
-        lcos::eager_future<
-            primary_namespace_server_type::bind_gid_action,
-            response_type
-        >* f = 0;
-
-        // get a future
-        hosted->bind_response_sema_.wait(1);
-        hosted->bind_response_pool_.dequeue(&f); 
-
-        BOOST_ASSERT(f);
-
-        // reset the future
-        f->reset();
-
-        // execute the action (synchronously)
-        f->apply(
-            naming::id_type(primary_namespace_server_type::fixed_gid()
-                          , naming::id_type::unmanaged),
-            lower_id, gva);
-        response_type r = f->get();
-
-        // return the future to the pool
-        hosted->bind_response_pool_.enqueue(f);
-        hosted->bind_response_sema_.signal(1);
-     
-        if (success == r.get_status()) 
-        { 
-            cache_mutex_type::scoped_lock
-                lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(lower_id, count);
-            hosted->gva_cache_.insert(key, gva);
-            return true;
+    try {
+        using boost::asio::ip::address;
+        using boost::fusion::at_c;
+    
+        address addr = address::from_string(baseaddr.locality_.get_address());
+    
+        endpoint_type ep(addr, baseaddr.locality_.get_port()); 
+       
+        // Create a global virtual address from the legacy calling convention
+        // parameters.
+        gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
+        
+        if (is_bootstrap())
+        {
+            response_type r
+                = bootstrap->primary_ns_server.bind_gid(lower_id, gva, ec);
+    
+            if ((&ec == &throws || !ec) && success == r.get_status()) 
+                return true;
         }
-    }
-
-    return false; 
-} // }}}
-
-legacy_router::count_type legacy_router::incref(
-    naming::gid_type const& id
-  , count_type credits
-  , error_code& ec 
-) { // {{{
-    if (is_bootstrap())
-        return bootstrap->primary_ns_server.increment(id, credits).
-            get_count();
-    else
-        return hosted->primary_ns_.increment(id, credits).get_count();
-} // }}}
-
-legacy_router::count_type legacy_router::decref(
-    naming::gid_type const& id
-  , components::component_type& t
-  , count_type credits
-  , error_code& ec
-) { // {{{ decref implementation
-    using boost::fusion::at_c;
     
-    response_type r;
+        else
+        {
+            // WARNING: this deadlocks if AGAS is unresponsive and all response
+            // futures are checked out and pending.
+            // get a future
+            hosted->bind_response_sema_.wait(1);
+            hosted->bind_response_pool_.dequeue(&f); 
     
-    if (is_bootstrap())
-        r = bootstrap->primary_ns_server.decrement(id, credits);
-    else
-        r = hosted->primary_ns_.decrement(id, credits);
+            BOOST_ASSERT(f);
+    
+            // reset the future
+            f->reset();
+    
+            // execute the action (synchronously)
+            f->apply(
+                naming::id_type(primary_namespace_server_type::fixed_gid()
+                              , naming::id_type::unmanaged),
+                lower_id, gva);
+            response_type r = f->get(ec);
+    
+            // return the future to the pool
+            hosted->bind_response_pool_.enqueue(f);
+            hosted->bind_response_sema_.signal(1);
 
-    if (0 == r.get_count()) {
-        t = (components::component_type) r.get_component_type();
-        BOOST_ASSERT(t != components::component_invalid);
+            if (&ec != &throws && ec)
+                return false;
+         
+            if (success == r.get_status()) 
+            { 
+                cache_mutex_type::scoped_lock
+                    lock(hosted->gva_cache_mtx_);
+                gva_cache_key key(lower_id, count);
+                hosted->gva_cache_.insert(key, gva);
+                return true;
+            }
+        }
+    
+        return false; 
     }
+    catch (hpx::exception const& e) {
+        // Replace the future in the pool. See get_id_range above for an
+        // explanation. 
+        if (!is_bootstrap() && f) 
+        {
+            hosted->bind_response_pool_.enqueue(new bind_response_future_type);
+            hosted->bind_response_sema_.signal(1);
 
-    return r.get_count();
+            f->invalidate(boost::current_exception());
+        }
+
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::bind_range", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return false;
+    }
 } // }}}
 
 bool legacy_router::unbind_range(
@@ -516,25 +586,42 @@ bool legacy_router::unbind_range(
   , count_type count
   , naming::address& addr
   , error_code& ec 
-) { // {{{ unbind_range implementation
-    response_type r;
+    )
+{ // {{{ unbind_range implementation
+    try {
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->primary_ns_server.unbind_gid(lower_id, count, ec);
+        else
+            r = hosted->primary_ns_.unbind(lower_id, count, ec);
 
-    if (is_bootstrap())
-        r = bootstrap->primary_ns_server.unbind_gid(lower_id, count);
-    else
-        r = hosted->primary_ns_.unbind(lower_id, count);
-
-    if (!is_bootstrap() && (success == r.get_status()))
-    {
-        cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-        gva_erase_policy ep(lower_id, count);
-        hosted->gva_cache_.erase(ep);
-        addr.locality_ = r.get_gva().endpoint;
-        addr.type_ = r.get_gva().type;
-        addr.address_ = r.get_gva().lva();
+        if (&ec != &throws && ec)
+            return false;
+ 
+        if (!is_bootstrap() && (success == r.get_status()))
+        {
+            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            gva_erase_policy ep(lower_id, count);
+            hosted->gva_cache_.erase(ep);
+            addr.locality_ = r.get_gva().endpoint;
+            addr.type_ = r.get_gva().type;
+            addr.address_ = r.get_gva().lva();
+        }
+    
+        return success == r.get_status(); 
     }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::unbind_range", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    return success == r.get_status(); 
+        return false;
+    }
 } // }}}
 
 bool legacy_router::resolve(
@@ -542,58 +629,76 @@ bool legacy_router::resolve(
   , naming::address& addr
   , bool try_cache
   , error_code& ec
-) { // {{{ resolve implementation
-    if (!is_bootstrap())
-    {
-        // {{{ special cases: authoritative AGAS component address
-        // resolution
-        if (id == primary_namespace_server_type::fixed_gid())
+    )
+{ // {{{ resolve implementation
+    try {
+        if (!is_bootstrap())
         {
-            addr =hosted->primary_ns_addr_;
-            return true;
-        }
-
-        else if (id == component_namespace_server_type::fixed_gid())
-        {
-            addr = hosted->component_ns_addr_;
-            return true;
-        }
-
-        else if (id == symbol_namespace_server_type::fixed_gid())
-        {
-            addr = hosted->symbol_ns_addr_;
-            return true;
-        }
-        // }}}
-
-        else if (try_cache && resolve_cached(id, addr, ec))
-            return true;
-    }
+            // {{{ special cases: authoritative AGAS component address
+            // resolution
+            if (id == primary_namespace_server_type::fixed_gid())
+            {
+                addr = hosted->primary_ns_addr_;
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
     
-    response_type r; 
+            else if (id == component_namespace_server_type::fixed_gid())
+            {
+                addr = hosted->component_ns_addr_;
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+    
+            else if (id == symbol_namespace_server_type::fixed_gid())
+            {
+                addr = hosted->symbol_ns_addr_;
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+            // }}}
+    
+            else if (try_cache && resolve_cached(id, addr, ec))
+                return true;
+        }
+        
+        response_type r; 
+    
+        if (is_bootstrap())
+            r = bootstrap->primary_ns_server.resolve_gid(id, ec);
+        else
+            r = hosted->primary_ns_.resolve(id, ec);
+    
+        if ((&ec != &throws && ec) || (success != r.get_status()))
+            return false;
 
-    if (is_bootstrap())
-        r = bootstrap->primary_ns_server.resolve_gid(id);
-    else
-        r = hosted->primary_ns_.resolve(id);
+        addr.locality_ = r.get_gva().endpoint;
+        addr.type_ = r.get_gva().type;
+        addr.address_ = r.get_gva().lva();
+    
+        if (!is_bootstrap())
+        {
+            // We only insert the entry into the cache if it's valid
+            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            gva_cache_key key(id);
+            hosted->gva_cache_.insert(key, r.get_gva());
+        }
 
-    addr.locality_ = r.get_gva().endpoint;
-    addr.type_ = r.get_gva().type;
-    addr.address_ = r.get_gva().lva();
+        return true;
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::resolve", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    if (success != r.get_status())
         return false;
-
-    else if (is_bootstrap())
-        return true;
-
-    else
-    {
-        // We only insert the entry into the cache if it's valid
-        cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-        gva_cache_key key(id);
-        hosted->gva_cache_.insert(key, r.get_gva());
-        return true;
     }
 } // }}}
 
@@ -601,8 +706,8 @@ bool legacy_router::resolve_cached(
     naming::gid_type const& id
   , naming::address& addr
   , error_code& ec
-) { // {{{ resolve_cached implementation
-    // TODO: assert?
+    )
+{ // {{{ resolve_cached implementation
     if (is_bootstrap())
         return resolve(id, addr, false, ec);
 
@@ -617,8 +722,9 @@ bool legacy_router::resolve_cached(
     {
         if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
         {
-            HPX_THROWS_IN_CURRENT_FUNC_IF(ec, bad_parameter, 
-                "MSBs of GID base and GID do not match");
+            HPX_THROWS_IF(ec, bad_parameter
+              , "legacy_router::resolve_cached" 
+              , "MSBs of GID base and GID do not match");
             return false;
         }
 
@@ -627,80 +733,209 @@ bool legacy_router::resolve_cached(
         addr.locality_ = gva.endpoint;
         addr.type_ = gva.type;
         addr.address_ = gva.lva(id, idbase.id);
+
+        if (&ec != &throws)
+            ec = make_success_code();
     
         return true;
     }
 
+    if (&ec != &throws)
+        ec = make_success_code();
+
     return false;
+} // }}}
+
+legacy_router::count_type legacy_router::incref(
+    naming::gid_type const& id
+  , count_type credits
+  , error_code& ec 
+    )
+{ // {{{ incref implementation
+    try {
+        response_type r;
+
+        if (is_bootstrap())
+            r = bootstrap->primary_ns_server.increment(id, credits, ec);
+        else
+            r = hosted->primary_ns_.increment(id, credits, ec);
+
+        if (&ec != &throws && ec)
+            return 0;
+
+        return r.get_count();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::incref", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return 0;
+    }
+} // }}}
+
+legacy_router::count_type legacy_router::decref(
+    naming::gid_type const& id
+  , components::component_type& t
+  , count_type credits
+  , error_code& ec
+    )
+{ // {{{ decref implementation
+    try {
+        response_type r;
+        
+        if (is_bootstrap())
+            r = bootstrap->primary_ns_server.decrement(id, credits, ec);
+        else
+            r = hosted->primary_ns_.decrement(id, credits, ec);
+   
+        if (&ec != &throws && ec)
+            return 0;
+ 
+        if (0 == r.get_count())
+        {
+            t = (components::component_type) r.get_component_type();
+
+            if (HPX_UNLIKELY(components::component_invalid != t))
+            {
+                HPX_THROWS_IF(ec, bad_component_type
+                  , "legacy_router::decref"
+                  , boost::str(boost::format(
+                    "received invalid component type when decrementing last "
+                    "GID to 0, gid(%1%)")
+                    % id));
+                return 0;
+            }
+        }
+    
+        return r.get_count();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::decref", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return false;
+    }
 } // }}}
 
 bool legacy_router::registerid(
     std::string const& name
   , naming::gid_type const& id
   , error_code& ec
-) { // {{{
-    response_type r;
+    )
+{ // {{{
+    try {
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->symbol_ns_server.bind(name, id, ec);
+        else
+            r = hosted->symbol_ns_.bind(name, id, ec);
+   
+        // Check if we evicted another entry or if an exception occured. 
+        return (&ec == &throws || !ec) && (r.get_gid() == id);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::registerid", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    if (is_bootstrap())
-        r = bootstrap->symbol_ns_server.rebind(name, id);
-    else
-        r = hosted->symbol_ns_.rebind(name, id);
-
-    return r.get_gid() == id;
+        return false;
+    }
 } // }}}
 
 bool legacy_router::unregisterid(
     std::string const& name
   , error_code& ec
-) { // {{{
-    response_type r;
+    )
+{ // {{{
+    try {
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->symbol_ns_server.unbind(name, ec);
+        else  
+            r = hosted->symbol_ns_.unbind(name, ec);
+    
+        return (&ec == &throws || !ec) && (success == r.get_status());
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::unregisterid", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    if (is_bootstrap())
-        r = bootstrap->symbol_ns_server.unbind(name);
-    else  
-        r = hosted->symbol_ns_.unbind(name);
-
-    return r.get_status() == success;
+        return false;
+    }
 } // }}}
 
 bool legacy_router::queryid(
     std::string const& ns_name
   , naming::gid_type& id
   , error_code& ec
-) { // {{{
-    response_type r;
-
-    if (is_bootstrap())
-        r = bootstrap->symbol_ns_server.resolve(ns_name);
-    else
-        r = hosted->symbol_ns_.resolve(ns_name);
-
-    if (r.get_status() == success)
-    {
-        id = r.get_gid();
-        return true;
+    )
+{ // {{{
+    try {
+        response_type r;
+    
+        if (is_bootstrap())
+            r = bootstrap->symbol_ns_server.resolve(ns_name, ec);
+        else
+            r = hosted->symbol_ns_.resolve(ns_name, ec);
+    
+        if ((&ec == &throws || !ec) && (success == r.get_status()))
+        {
+            id = r.get_gid();
+            return true;
+        }
+    
+        else
+            return false;
     }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::queryid", 
+                e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
 
-    else
         return false;
+    }
 } // }}}
 
 /// Invoke the supplied hpx::function for every registered global name
-void legacy_router::iterateids(
+bool legacy_router::iterateids(
     iterateids_function_type const& f
   , error_code& ec
-) 
+    ) 
 { // {{{
     try {
         response_type r;
 
         if (is_bootstrap())
-            r = bootstrap->symbol_ns_server.iterate(f);
+            r = bootstrap->symbol_ns_server.iterate(f, ec);
         else
-            r = hosted->symbol_ns_.iterate(f);
+            r = hosted->symbol_ns_.iterate(f, ec);
 
-        if (&ec != &throws)
-            ec = make_error_code(r.get_status());
+        return (&ec == &throws || !ec) && (success == r.get_status());
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -708,12 +943,12 @@ void legacy_router::iterateids(
                 e.what());
         }
         else {
-            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+            ec = e.get_error_code(hpx::rethrow); 
         }
+
+        return false;
     }
 } // }}}
 
 }}
-
-#endif // HPX_AGAS_VERSION > 0x10
 

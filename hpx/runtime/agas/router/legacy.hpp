@@ -41,8 +41,9 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-// TODO: use the response pools for GID range allocation and bind requests.
 // TODO: pass error codes once they're implemented in AGAS.
+// TODO: split into a base class and two implementations (one for bootstrap,
+// one for hosted).
 
 namespace hpx { namespace agas
 {
@@ -90,29 +91,44 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     struct gva_cache_key
     { // {{{ gva_cache_key implementation
         gva_cache_key()
-          : id(), count(0)
+          : id()
+          , count(0)
         {}
 
-        explicit gva_cache_key(naming::gid_type const& id_,
-                               count_type count_ = 1)
-          : id(id_), count(count_)
+        explicit gva_cache_key(
+            naming::gid_type const& id_
+          , count_type count_ = 1
+            )
+          : id(id_)
+          , count(count_)
         {}
 
         naming::gid_type id;
         count_type count;
 
-        friend bool
-        operator<(gva_cache_key const& lhs, gva_cache_key const& rhs)
-        { return (lhs.id + (lhs.count - 1)) < rhs.id; }
+        friend bool operator<(
+            gva_cache_key const& lhs
+          , gva_cache_key const& rhs
+            )
+        {
+            return (lhs.id + (lhs.count - 1)) < rhs.id;
+        }
 
-        friend bool
-        operator==(gva_cache_key const& lhs, gva_cache_key const& rhs)
-        { return (lhs.id == rhs.id) && (lhs.count == rhs.count); }
+        friend bool operator==(
+            gva_cache_key const& lhs
+          , gva_cache_key const& rhs
+            )
+        {
+            return (lhs.id == rhs.id) && (lhs.count == rhs.count);
+        }
     }; // }}}
     
     struct gva_erase_policy
     { // {{{ gva_erase_policy implementation
-        gva_erase_policy(naming::gid_type const& id, count_type count)
+        gva_erase_policy(
+            naming::gid_type const& id
+          , count_type count
+            )
           : entry(id, count)
         {}
 
@@ -120,8 +136,12 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
             gva_cache_key, boost::cache::entries::lfu_entry<gva_type>
         > entry_type;
 
-        bool operator()(entry_type const& p) const
-        { return p.first == entry; }
+        bool operator()(
+            entry_type const& p
+            ) const
+        {
+            return p.first == entry;
+        }
 
         gva_cache_key entry;
     }; // }}}
@@ -134,14 +154,6 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
         boost::cache::policies::always<gva_entry_type>,
         std::map<gva_cache_key, gva_entry_type>
     > gva_cache_type;
-    // }}}
-
-    // {{{ locality cache 
-    typedef boost::cache::entries::lfu_entry<naming::gid_type>
-        locality_entry_type;
-
-    typedef boost::cache::local_cache<naming::locality, locality_entry_type>
-        locality_cache_type;
     // }}}
 
     // {{{ future freelists
@@ -180,9 +192,6 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
         cache_mutex_type gva_cache_mtx_;
         gva_cache_type gva_cache_;
 
-        cache_mutex_type locality_cache_mtx_;
-        locality_cache_type locality_cache_;
-
         console_cache_type console_cache_;
 
         hpx::lcos::local_counting_semaphore allocate_response_sema_;
@@ -209,20 +218,23 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
-    );
+        );
 
     ~legacy_router()
-    { destroy_big_boot_barrier(); }
+    {
+        // TODO: Free the future pools?
+        destroy_big_boot_barrier();
+    }
 
     void launch_bootstrap(
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_
-    );
+        );
 
     void launch_hosted(
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_
-    );
+        );
 
     state status() const
     {
@@ -233,7 +245,9 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     }
     
     void status(state new_state) 
-    { state_.store(new_state); }
+    {
+        state_.store(new_state);
+    }
 
     naming::gid_type const& local_prefix() const
     {
@@ -242,65 +256,36 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     }
 
     void local_prefix(naming::gid_type const& g)
-    { prefix_ = g; }
+    {
+        prefix_ = g;
+    }
 
     bool is_bootstrap() const
-    { return router_type == router_mode_bootstrap; } 
+    {
+        return router_type == router_mode_bootstrap;
+    } 
 
     /// \brief Returns whether this resolver_client represents the console 
-    ///        locality
+    ///        locality.
     bool is_console() const
-    { return runtime_type == runtime_mode_console; }
+    {
+        return runtime_type == runtime_mode_console;
+    }
  
-    /// \brief Returns whether this resolver_client runs in SMP mode
-    ///
-    /// \note this function is deprecated
-    bool is_smp_mode() const
-    { return false; } 
+    /// \brief Add a locality to the runtime. 
+    bool register_locality(
+        naming::locality const& l
+      , naming::gid_type& prefix
+      , error_code& ec = throws
+        );
 
-    /// \brief Get unique prefix usable as locality id (locality prefix)
-    ///
-    /// Every locality needs to have an unique locality id, which may be 
-    /// used to issue unique global ids without having to consult the AGAS
-    /// server for every id to generate.
-    /// 
-    /// \param l          [in] The locality the locality id needs to be 
-    ///                   generated for. Repeating calls using the same 
-    ///                   locality results in identical prefix values.
-    /// \param prefix     [out] The generated prefix value uniquely 
-    ///                   identifying the given locality. This is valid 
-    ///                   only, if the return value of this function is 
-    ///                   true.
-    /// \param self       This parameter is \a true if the request is issued
-    ///                   to assign a prefix to this site, and it is \a false
-    ///                   if the command should return the prefix
-    ///                   for the given location.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \returns          This function returns \a true if a new prefix has 
-    ///                   been generated (it has been called for the first 
-    ///                   time for the given locality) and returns \a false 
-    ///                   if this locality already got a prefix assigned in 
-    ///                   an earlier call. Any error results in an exception 
-    ///                   thrown from this function.
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception.
-    bool get_prefix(naming::locality const& l, naming::gid_type& prefix,
-                    bool self = true, bool try_cache = true,
-                    error_code& ec = throws);
-    
-    bool get_prefix_cached(naming::locality const& l, naming::gid_type& prefix,
-                           bool self = true, error_code& ec = throws);
+    /// \brief Remove a locality from the runtime.
+    bool unregister_locality(
+        naming::locality const& l
+      , error_code& ec = throws
+        );
 
-    bool remove_prefix(naming::locality const& l, error_code& ec = throws);
-
-    /// \brief Get locality prefix of the console locality
+    /// \brief Get locality prefix of the console locality.
     ///
     /// \param prefix     [out] The prefix value uniquely identifying the
     ///                   console locality. This is valid only, if the 
@@ -321,11 +306,16 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_console_prefix(naming::gid_type& prefix, bool try_cache = true, 
-        error_code& ec = throws);
+    bool get_console_prefix(
+        naming::gid_type& prefix
+      , bool try_cache = true, 
+        error_code& ec = throws
+        );
 
-    bool get_console_prefix_cached(naming::gid_type& prefix, 
-        error_code& ec = throws)
+    bool get_console_prefix_cached(
+        naming::gid_type& prefix
+      , error_code& ec = throws
+        )
     {
         return get_console_prefix(prefix, true, ec);
     }
@@ -355,19 +345,25 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      components::component_type type, error_code& ec = throws);
+    bool get_prefixes(
+        std::vector<naming::gid_type>& prefixes
+      , components::component_type type
+      , error_code& ec = throws
+        );
 
-    // forwarder
-    bool get_prefixes(std::vector<naming::gid_type>& prefixes,
-                      error_code& ec = throws) 
-    { return get_prefixes(prefixes, components::component_invalid, ec); }
+    bool get_prefixes(
+        std::vector<naming::gid_type>& prefixes
+      , error_code& ec = throws
+        ) 
+    {
+        return get_prefixes(prefixes, components::component_invalid, ec);
+    }
 
     /// \brief Return a unique id usable as a component type.
     /// 
     /// This function returns the component type id associated with the 
     /// given component name. If this is the first request for this 
-    /// component name a new unique id will be created
+    /// component name a new unique id will be created.
     ///
     /// \param name       [in] The component name (string) to get the 
     ///                   component type for.
@@ -384,8 +380,10 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    components::component_type
-    get_component_id(std::string const& name, error_code& ec = throws);
+    components::component_type get_component_id(
+        std::string const& name
+      , error_code& ec = throws
+        );
 
     /// \brief Register a factory for a specific component type
     ///
@@ -413,11 +411,13 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    components::component_type
-    register_factory(naming::gid_type const& prefix, std::string const& name,
-                     error_code& ec = throws);
+    components::component_type register_factory(
+        naming::gid_type const& prefix
+      , std::string const& name
+      , error_code& ec = throws
+        );
 
-    /// \brief Get unique range of freely assignable global ids 
+    /// \brief Get unique range of freely assignable global ids.
     ///
     /// Every locality needs to be able to assign global ids to different
     /// components without having to consult the AGAS server for every id 
@@ -460,17 +460,20 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_id_range(naming::locality const& l, count_type count, 
-                      naming::gid_type& lower_bound,
-                      naming::gid_type& upper_bound, error_code& ec = throws);
+    bool get_id_range(
+        naming::locality const& l
+      , count_type count
+      , naming::gid_type& lower_bound
+      , naming::gid_type& upper_bound
+      , error_code& ec = throws
+        );
 
     /// \brief Bind a global address to a local address.
     ///
-    /// Every element in the ParalleX namespace has a unique global address
-    /// (global id). This global id is generated by the function 
-    /// px_core::get_next_component_id(). This global address has to be 
-    /// associated with a concrete local address to be able to address an
-    /// instance of a component using it's global address.
+    /// Every element in the HPX namespace has a unique global address
+    /// (global id). This global address has to be associated with a concrete
+    /// local address to be able to address an instance of a component using
+    /// it's global address.
     ///
     /// \param id         [in] The global address which has to be bound to 
     ///                   the local address.
@@ -496,9 +499,14 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             Binding a gid to a local address sets its global
     ///                   reference count to one.
-    bool bind(naming::gid_type const& id, naming::address const& addr,
-              error_code& ec = throws) 
-    { return bind_range(id, 1, addr, 0, ec); }
+    bool bind(
+        naming::gid_type const& id
+      , naming::address const& addr
+      , error_code& ec = throws
+        ) 
+    {
+        return bind_range(id, 1, addr, 0, ec);
+    }
 
     /// \brief Bind unique range of global ids to given base address
     ///
@@ -535,56 +543,13 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             Binding a gid to a local address sets its global
     ///                   reference count to one.
-    bool bind_range(naming::gid_type const& lower_id, count_type count, 
-                    naming::address const& baseaddr, offset_type offset,
-                    error_code& ec = throws);
-
-    /// \brief Increment the global reference count for the given id
-    ///
-    /// \param id         [in] The global address (id) for which the 
-    ///                   global reference count has to be incremented.
-    /// \param credits    [in] The number of reference counts to add for
-    ///                   the given id.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    /// 
-    /// \returns          The global reference count after the increment. 
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception. 
-    count_type
-    incref(naming::gid_type const& id, count_type credits = 1,
-           error_code& ec = throws);
-
-    /// \brief Decrement the global reference count for the given id
-    ///
-    /// \param id         [in] The global address (id) for which the 
-    ///                   global reference count has to be decremented.
-    /// \param t          [out] If this was the last outstanding global 
-    ///                   reference for the given gid (the return value of 
-    ///                   this function is zero), t will be set to the
-    ///                   component type of the corresponding element.
-    ///                   Otherwise t will not be modified.
-    /// \param credits    [in] The number of reference counts to add for
-    ///                   the given id.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    /// 
-    /// \returns          The global reference count after the decrement. 
-    ///
-    /// \note             As long as \a ec is not pre-initialized to 
-    ///                   \a hpx#throws this function doesn't 
-    ///                   throw but returns the result code using the 
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception. 
-    count_type
-    decref(naming::gid_type const& id, components::component_type& t,
-           count_type credits = 1, error_code& ec = throws);
+    bool bind_range(
+        naming::gid_type const& lower_id
+      , count_type count
+      , naming::address const& baseaddr
+      , offset_type offset
+      , error_code& ec = throws
+        );
 
     /// \brief Unbind a global address
     ///
@@ -616,8 +581,14 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             This function will raise an error if the global 
     ///                   reference count of the given gid is not zero!
-    bool unbind(naming::gid_type const& id, error_code& ec = throws) 
-    { return unbind_range(id, 1, ec); } 
+    ///                   TODO: confirm that this happens.
+    bool unbind(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        ) 
+    {
+        return unbind_range(id, 1, ec);
+    } 
         
     /// \brief Unbind a global address
     ///
@@ -653,9 +624,15 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             This function will raise an error if the global 
     ///                   reference count of the given gid is not zero!
-    bool unbind(naming::gid_type const& id, naming::address& addr,
-                error_code& ec = throws) 
-    { return unbind_range(id, 1, addr, ec); }
+    ///                   TODO: confirm that this happens.
+    bool unbind(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        ) 
+    {
+        return unbind_range(id, 1, addr, ec);
+    }
 
     /// \brief Unbind the given range of global ids
     ///
@@ -691,8 +668,12 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             This function will raise an error if the global 
     ///                   reference count of the given gid is not zero!
-    bool unbind_range(naming::gid_type const& lower_id, count_type count,
-                      error_code& ec = throws) 
+    ///                   TODO: confirm that this happens.
+    bool unbind_range(
+        naming::gid_type const& lower_id
+      , count_type count
+      , error_code& ec = throws
+        ) 
     {
         naming::address addr; 
         return unbind_range(lower_id, count, addr, ec);
@@ -735,16 +716,20 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     /// 
     /// \note             This function will raise an error if the global 
     ///                   reference count of the given gid is not zero!
-    bool unbind_range(naming::gid_type const& lower_id, count_type count, 
-                      naming::address& addr, error_code& ec = throws);
+    bool unbind_range(
+        naming::gid_type const& lower_id
+      , count_type count
+      , naming::address& addr
+      , error_code& ec = throws
+        );
 
-    /// \brief Resolve a given global address (id) to its associated local 
-    ///        address
+    /// \brief Resolve a given global address (\a id) to its associated local 
+    ///        address.
     ///
-    /// This function returns the local address which is currently 
-    /// associated with the given global address (id).
+    /// This function returns the local address which is currently associated 
+    /// with the given global address (\a id).
     ///
-    /// \param id         [in] The global address (id) for which the 
+    /// \param id         [in] The global address (\a id) for which the 
     ///                   associated local address should be returned.
     /// \param addr       [out] The local address which currently is 
     ///                   associated with the given global address (id), 
@@ -767,16 +752,80 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool resolve(naming::gid_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws);
+    bool resolve(
+        naming::gid_type const& id
+      , naming::address& addr
+      , bool try_cache = true
+      , error_code& ec = throws
+        );
 
-    // forwarder
-    bool resolve(naming::id_type const& id, naming::address& addr,
-                 bool try_cache = true, error_code& ec = throws) 
-    { return resolve(id.get_gid(), addr, try_cache, ec); }
+    bool resolve(
+        naming::id_type const& id
+      , naming::address& addr
+      , bool try_cache = true
+      , error_code& ec = throws
+        ) 
+    {
+        return resolve(id.get_gid(), addr, try_cache, ec);
+    }
 
-    bool resolve_cached(naming::gid_type const& id, naming::address& addr,
-                        error_code& ec = throws);
+    bool resolve_cached(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    /// \brief Increment the global reference count for the given id
+    ///
+    /// \param id         [in] The global address (id) for which the 
+    ///                   global reference count has to be incremented.
+    /// \param credits    [in] The number of reference counts to add for
+    ///                   the given id.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    /// 
+    /// \returns          The global reference count after the increment. 
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception. 
+    count_type incref(
+        naming::gid_type const& id
+      , count_type credits = 1
+      , error_code& ec = throws
+        );
+
+    /// \brief Decrement the global reference count for the given id
+    ///
+    /// \param id         [in] The global address (id) for which the 
+    ///                   global reference count has to be decremented.
+    /// \param t          [out] If this was the last outstanding global 
+    ///                   reference for the given gid (the return value of 
+    ///                   this function is zero), t will be set to the
+    ///                   component type of the corresponding element.
+    ///                   Otherwise t will not be modified.
+    /// \param credits    [in] The number of reference counts to add for
+    ///                   the given id.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    /// 
+    /// \returns          The global reference count after the decrement. 
+    ///
+    /// \note             As long as \a ec is not pre-initialized to 
+    ///                   \a hpx#throws this function doesn't 
+    ///                   throw but returns the result code using the 
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception. 
+    count_type decref(
+        naming::gid_type const& id
+      , components::component_type& t
+      , count_type credits = 1
+      , error_code& ec = throws
+        );
 
     /// \brief Register a global name with a global address (id)
     /// 
@@ -805,8 +854,11 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool registerid(std::string const& name, naming::gid_type const& id,
-                    error_code& ec = throws);
+    bool registerid(
+        std::string const& name
+      , naming::gid_type const& id
+      , error_code& ec = throws
+        );
 
     /// \brief Unregister a global name (release any existing association)
     ///
@@ -830,9 +882,12 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool unregisterid(std::string const& name, error_code& ec = throws);
+    bool unregisterid(
+        std::string const& name
+      , error_code& ec = throws
+        );
 
-    /// Query for the global address associated with a given global name.
+    /// \brief Query for the global address associated with a given global name.
     ///
     /// This function returns the global address associated with the given 
     /// global name.
@@ -857,10 +912,14 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool queryid(std::string const& ns_name, naming::gid_type& id,
-                 error_code& ec = throws);
+    bool queryid(
+        std::string const& ns_name
+      , naming::gid_type& id
+      , error_code& ec = throws
+        );
 
-    /// Invoke the supplied \a hpx#function for every registered global name
+    /// \brief Invoke the supplied \a hpx#function for every registered global
+    ///        name.
     ///
     /// This function iterates over all registered global ids and 
     /// unconditionally invokes the supplied hpx#function for ever found entry.
@@ -878,7 +937,10 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    void iterateids(iterateids_function_type const& f, error_code& ec = throws);
+    bool iterateids(
+        iterateids_function_type const& f
+      , error_code& ec = throws
+        );
 };
 
 }}
