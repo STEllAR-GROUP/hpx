@@ -55,11 +55,11 @@ namespace hpx
         startup_timed_out = 21,
         uninitialized_value = 22,
         bad_response_type = 23,
-        unknown_locality = 24,
-        unknown_gid = 25,
-        deadlock = 26,
-        assertion_failure = 27,
-        null_thread_id = 28,
+        deadlock = 24,
+        assertion_failure = 25,
+        null_thread_id = 26,
+        invalid_data = 27,
+        yield_aborted = 28,
         last_error
     };
 
@@ -89,11 +89,11 @@ namespace hpx
         "startup_timed_out",
         "uninitialized_value",
         "bad_response_type",
-        "unknown_locality",
-        "unknown_gid",
         "deadlock",
         "assertion_failure",
         "null_thread_id",
+        "invalid_data",
+        "yield_aborted",
         ""
     };
 
@@ -251,6 +251,14 @@ namespace hpx
             return static_cast<error>(
                 this->boost::system::system_error::code().value());
         }
+
+        error_code get_error_code(throwmode mode = plain) const throw() 
+        { 
+            return make_error_code(static_cast<error>(
+                this->boost::system::system_error::code().value())
+              , this->boost::system::system_error::what()
+              , mode);
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -318,7 +326,8 @@ namespace hpx
     {
         // rethrow an exception, internal helper
         template <typename Exception>
-        HPX_EXPORT void rethrow_exception(Exception const& e, 
+        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        void rethrow_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line, 
             std::string const& back_trace, boost::uint32_t node = 0,
             boost::int64_t shepherd = -1, std::size_t thread_id = 0,
@@ -326,15 +335,18 @@ namespace hpx
 
         // main function for throwing exceptions
         template <typename Exception>
-        HPX_EXPORT void throw_exception(Exception const& e, 
+        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        void throw_exception(Exception const& e, 
             std::string const& func, std::string const& file, int line);
 
         // BOOST_ASSERT handler
-        HPX_EXPORT void assertion_failed(char const* expr, char const* function,
+        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        void assertion_failed(char const* expr, char const* function,
             char const* file, long line);
 
         // BOOST_ASSERT_MSG handler
-        HPX_EXPORT void assertion_failed_msg(char const* msg, char const* expr,
+        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
+        void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
 
         // If backtrace support is enabled, this function returns the current 
