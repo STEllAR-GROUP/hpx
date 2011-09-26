@@ -830,7 +830,7 @@ namespace hpx
                 boost::uint16_t port = HPX_INITIAL_IP_PORT;
                 detail::split_ip_address(vm["agas"].as<std::string>(), host, port);
                 if (!host.empty()) agas_host = host;
-                if (!port) agas_port = port;
+                if (port) agas_port = port;
             }
 
             // Check command line arguments.
@@ -850,7 +850,8 @@ namespace hpx
             }
 
             // let the PBS environment decide about the AGAS host
-            agas_host = env.agas_host_name(HPX_INITIAL_IP_ADDRESS);
+            agas_host = env.agas_host_name(
+                agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
@@ -909,7 +910,7 @@ namespace hpx
                 boost::uint16_t port = HPX_INITIAL_IP_PORT;
                 detail::split_ip_address(vm["hpx"].as<std::string>(), host, port);
                 if (!host.empty()) hpx_host = host;
-                if (!port) hpx_port = port;
+                if (port) hpx_port = port;
             }
 
             if (vm.count("threads"))
