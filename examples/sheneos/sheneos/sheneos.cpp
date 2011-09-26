@@ -110,9 +110,6 @@ namespace sheneos
     // create one partition on each of the localities, initialize the partitions
     void sheneos::connect(std::string symbolic_name_base)
     {
-        if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
-            symbolic_name_base += "/";
-
         // FIXME: This is currently a fully synchronous operation. AGAS V2 
         //        needs to be extended to expose async functions before this 
         //        can be fixed.
@@ -120,6 +117,9 @@ namespace sheneos
         // connect to the config object 
         cfg_ = configuration(query_name(symbolic_name_base));
         config_data data = cfg_.get();
+
+        if (data.symbolic_name_[data.symbolic_name_.size()-1] != '/')
+            data.symbolic_name_ += "/";
 
         // reconnect to the partitions
         partitions_.reserve(data.num_instances_);
@@ -224,15 +224,15 @@ namespace sheneos
 
         // Register symbolic names of all involved components.
 
-        if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
-            symbolic_name_base += "/";
-
         // FIXME: This is currently a fully synchronous operation. AGAS V2 
         //        needs to be extended to expose async functions before this 
         //        can be fixed.
         // create the config object locally
         cfg_ = configuration(datafilename, symbolic_name_base, num_localities);
         register_name(cfg_.get_raw_gid(), symbolic_name_base);
+
+        if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
+            symbolic_name_base += "/";
 
         int i = 0;
         BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
