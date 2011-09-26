@@ -272,7 +272,7 @@ struct response
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid_gid_prefix, 1>(ec); 
+        return get_data<subtype_gid_gid_prefix, 0>(ec); 
     }
 
     naming::gid_type get_upper_bound(
