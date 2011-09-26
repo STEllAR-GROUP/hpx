@@ -36,7 +36,7 @@ if(NOT MSVC)
                            contact)
   endif() 
 
-  if(HDF5_FOUND)
+  if(HDF5_FOUND AND HPX_CXX11_LAMBDAS)
     set(subdirs ${subdirs} sheneos)
   endif()
 
