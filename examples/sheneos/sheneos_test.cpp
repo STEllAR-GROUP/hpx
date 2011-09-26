@@ -227,11 +227,11 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     po::options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
     cmdline.add_options()
-        ("file,f", po::value<std::string>(), 
+        ("file", po::value<std::string>(), 
             "name of HDF5 data file")
-        ("num_tests,n", po::value<std::size_t>(), 
+        ("num_tests", po::value<std::size_t>(), 
             "number of data points to interpolate (default: 10000)")
-        ("num_partitions,p", po::value<std::size_t>(), 
+        ("num_partitions", po::value<std::size_t>(), 
             "number of partitions to create (default: 27)")
     ;
 
