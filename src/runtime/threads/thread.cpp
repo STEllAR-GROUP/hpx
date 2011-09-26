@@ -103,7 +103,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self", 
                 "NULL thread id encountered (is this executed on a HPX-thread?)");
         }
-        return *get_self_ptr();
+        return *p;
     }
 
     thread_self* get_self_ptr()

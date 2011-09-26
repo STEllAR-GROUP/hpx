@@ -184,8 +184,9 @@ namespace hpx { namespace detail
 
             // If the runtime pointer is available, we can safely get the prefix
             // of this locality. If it's not available, then just terminate.
-            if (NULL != get_runtime_ptr())  {
-                get_runtime().report_error(boost::current_exception());
+            runtime* rt = get_runtime_ptr();
+            if (NULL != rt)  {
+                rt->report_error(boost::current_exception());
             }
             else {
                 std::cerr << "Runtime is not available, reporting error locally. "

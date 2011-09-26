@@ -93,9 +93,7 @@ namespace hpx { namespace lcos { namespace detail
             // yields control if needed
             data_type d;
             data_[slot].read(d, ec);
-
-            if (&ec != &throws && ec)
-                return Result();    
+            if (ec) return Result();    
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
@@ -105,27 +103,20 @@ namespace hpx { namespace lcos { namespace detail
                 // an error has been reported in the meantime, throw or set
                 // the error code 
                 error_type e = boost::get<error_type>(d);
-
-                if (&ec == &throws)
-                {
+                if (&ec == &throws) {
                     // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
                     boost::rethrow_exception(e);
                     // never reached
                 }
-
-                else
-                {
-                    try
-                    {
+                else {
+                    try {
                         boost::rethrow_exception(e);
                     }
-
-                    catch (hpx::exception const& he)
-                    {
+                    catch (hpx::exception const& he) {
                         ec = he.get_error_code(hpx::rethrow);
-                        return Result();
                     }
                 }       
+                return Result();
             }
 
             if (&ec != &throws)
@@ -267,9 +258,7 @@ namespace hpx { namespace lcos { namespace detail
             // yields control if needed
             data_type d;
             data_[slot].read(d, ec);
-
-            if (&ec != &throws && ec)
-                return naming::invalid_id;  
+            if (ec) return naming::invalid_id;  
 
             // the thread has been re-activated by one of the actions 
             // supported by this future_value (see \a future_value::set_event
@@ -279,27 +268,20 @@ namespace hpx { namespace lcos { namespace detail
                 // an error has been reported in the meantime, throw or set
                 // the error code 
                 error_type e = boost::get<error_type>(d);
-
-                if (&ec == &throws)
-                {
+                if (&ec == &throws) {
                     // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
                     boost::rethrow_exception(e);
                     // never reached
                 }
-
-                else
-                {
-                    try
-                    {
+                else {
+                    try {
                         boost::rethrow_exception(e);
                     }
-
-                    catch (hpx::exception const& he)
-                    {
+                    catch (hpx::exception const& he) {
                         ec = he.get_error_code(hpx::rethrow);
-                        return naming::invalid_id;
                     }
                 }       
+                return naming::invalid_id;
             }
 
             if (&ec != &throws)

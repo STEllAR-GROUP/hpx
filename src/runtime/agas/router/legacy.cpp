@@ -119,7 +119,7 @@ bool legacy_router::register_locality(
         else
             r = hosted->primary_ns_.bind(ep, 0, ec);
 
-        if ((&ec != &throws && ec) || (success != r.get_status()))
+        if (ec || (success != r.get_status()))
             return false;
    
         prefix = naming::get_gid_from_prefix(r.get_prefix());
@@ -160,7 +160,7 @@ bool legacy_router::unregister_locality(
         else
             r = hosted->primary_ns_.unbind(ep, ec);
 
-        if ((&ec != &throws && ec) || (success != r.get_status()))
+        if (ec || (success != r.get_status()))
             return false;
     
         return true;
@@ -270,7 +270,7 @@ bool legacy_router::get_prefixes(
             else
                 r = hosted->component_ns_.resolve(type, ec);
 
-            if (&ec != &throws && ec)
+            if (ec)
                 return false;
     
             const std::vector<boost::uint32_t> p = r.get_localities();
@@ -294,7 +294,7 @@ bool legacy_router::get_prefixes(
             else
                 r = hosted->primary_ns_.localities(ec);
            
-            if (&ec != &throws && ec)
+            if (ec)
                 return false;
 
             const std::vector<boost::uint32_t> p = r.get_localities();
@@ -335,7 +335,7 @@ components::component_type legacy_router::get_component_id(
         else
             r = hosted->component_ns_.bind(name, ec);
 
-        if (&ec != &throws && ec)
+        if (ec)
             return components::component_invalid;
     
         // REVIEW: Check response status?
@@ -368,7 +368,7 @@ components::component_type legacy_router::register_factory(
         else
             r = hosted->component_ns_.bind(name, prefix, ec);
         
-        if (&ec != &throws && ec)
+        if (ec)
             return components::component_invalid;
 
         // REVIEW: Check response status?
@@ -416,7 +416,7 @@ bool legacy_router::get_id_range(
         {
             r = bootstrap->primary_ns_server.bind_locality(ep, count, ec);
 
-            if (&ec != &throws && ec) 
+            if (ec) 
                 return false;
         }
  
@@ -445,7 +445,7 @@ bool legacy_router::get_id_range(
             hosted->allocate_response_pool_.enqueue(f);
             hosted->allocate_response_sema_.signal(1);
 
-            if (&ec != &throws && ec)
+            if (ec)
                 return false;
         }
     
@@ -543,7 +543,7 @@ bool legacy_router::bind_range(
             hosted->bind_response_pool_.enqueue(f);
             hosted->bind_response_sema_.signal(1);
 
-            if (&ec != &throws && ec)
+            if (ec)
                 return false;
          
             if (success == r.get_status()) 
@@ -596,7 +596,7 @@ bool legacy_router::unbind_range(
         else
             r = hosted->primary_ns_.unbind(lower_id, count, ec);
 
-        if (&ec != &throws && ec)
+        if (ec)
             return false;
  
         if (!is_bootstrap() && (success == r.get_status()))
@@ -672,7 +672,7 @@ bool legacy_router::resolve(
         else
             r = hosted->primary_ns_.resolve(id, ec);
     
-        if ((&ec != &throws && ec) || (success != r.get_status()))
+        if (ec || (success != r.get_status()))
             return false;
 
         addr.locality_ = r.get_gva().endpoint;
@@ -760,7 +760,7 @@ legacy_router::count_type legacy_router::incref(
         else
             r = hosted->primary_ns_.increment(id, credits, ec);
 
-        if (&ec != &throws && ec)
+        if (ec)
             return 0;
 
         return r.get_count();
@@ -793,7 +793,7 @@ legacy_router::count_type legacy_router::decref(
         else
             r = hosted->primary_ns_.decrement(id, credits, ec);
    
-        if (&ec != &throws && ec)
+        if (ec)
             return 0;
  
         if (0 == r.get_count())
