@@ -287,10 +287,9 @@ namespace hpx
         applier_.init_tss();
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line(); 
-
         LRT_(info) << "runtime_impl: beginning startup sequence";
-
         LRT_(info) << "runtime_impl: starting services";
+
         // start services (service threads)
         runtime_support_.run();
         LRT_(info) << "runtime_impl: started runtime_support component";
@@ -400,9 +399,8 @@ namespace hpx
         boost::condition cond;
         boost::mutex::scoped_lock l(mtx);
 
-        boost::thread t
-            (boost::bind(&runtime_impl::stopped, this, blocking, 
-                boost::ref(cond), boost::ref(mtx)));
+        boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking, 
+            boost::ref(cond), boost::ref(mtx)));
         cond.wait(l);
 
         t.join();
@@ -636,9 +634,9 @@ namespace hpx
 
     std::size_t get_runtime_instance_number()
     {
-//         runtime* rt = get_runtime_ptr();
-//         return (NULL == rt) ? 0 : rt->get_instance_number();
-        return get_runtime().get_instance_number();
+        runtime* rt = get_runtime_ptr();
+        return (NULL == rt) ? 0 : rt->get_instance_number();
+//        return get_runtime().get_instance_number();
     }
 
     std::string get_config_entry(std::string const& key, std::string const& dflt)
