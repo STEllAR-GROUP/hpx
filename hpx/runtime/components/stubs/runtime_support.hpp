@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace stubs
             naming::address addr;
             applier::applier& appl = hpx::applier::get_applier();
             naming::resolver_client& agas = appl.get_agas_client();
-            if (agas.is_bootstrap() || appl.address_is_local(gid, addr)) {
+            if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
                     action_type, components::component_type, naming::gid_type
@@ -321,8 +321,8 @@ namespace hpx { namespace components { namespace stubs
             }
             else {
                 // apply remotely
-                naming::gid_type prefix = naming::get_gid_from_prefix
-                    (naming::get_prefix_from_gid(gid));
+                naming::gid_type prefix = naming::get_gid_from_prefix(
+                    naming::get_prefix_from_gid(gid));
                 lcos::eager_future<action_type, void>(prefix, type, gid).get();
             }
         }
