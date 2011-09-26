@@ -311,7 +311,7 @@ namespace hpx { namespace components { namespace stubs
             // remote
             naming::address addr;
             applier::applier& appl = hpx::applier::get_applier();
-            naming::resolver_client& agas = appl.get_agas_client();
+            //naming::resolver_client& agas = appl.get_agas_client();
             if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
