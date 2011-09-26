@@ -99,8 +99,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp" />
-    <ClCompile Include="..\..\..\hpx\util\map_hostnames.cpp" />
-    <ClCompile Include="..\..\..\hpx\util\pbs_environment.cpp" />
     <ClCompile Include="..\..\..\src\exception.cpp" />
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
@@ -142,6 +140,8 @@
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
     <ClCompile Include="..\..\..\src\util\itt_notify.cpp" />
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
+    <ClCompile Include="..\..\..\src\util\map_hostnames.cpp" />
+    <ClCompile Include="..\..\..\src\util\pbs_environment.cpp" />
     <ClCompile Include="..\..\..\src\util\performance_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
     <ClCompile Include="..\..\..\src\runtime\actions\action_manager.cpp" />

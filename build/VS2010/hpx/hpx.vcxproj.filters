@@ -359,10 +359,10 @@
     <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hpx\util\pbs_environment.cpp">
+    <ClCompile Include="..\..\..\src\util\map_hostnames.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hpx\util\map_hostnames.cpp">
+    <ClCompile Include="..\..\..\src\util\pbs_environment.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
