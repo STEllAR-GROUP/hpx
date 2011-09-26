@@ -550,9 +550,9 @@ namespace hpx
                 // Query the performance counter.
                 double value = performance_counter::get_typed_value<double>(gid, ec);
                 if (!ec)
-                    std::cout << "  " << name << "," << value << "\n"; 
+                    std::cout << name << "," << value << "\n"; 
                 else
-                    std::cout << "  " << name << ",invalid\n"; 
+                    std::cout << name << ",invalid\n"; 
             }
         }
 
