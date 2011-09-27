@@ -181,6 +181,10 @@ int hpx_main(variables_map& vm)
     if (vm.count("num_partitions"))
         num_partitions = vm["num_partitions"].as<std::size_t>();
 
+    std::size_t num_workers = 1;
+    if (vm.count("num_workers"))
+        num_workers = vm["num_workers"].as<std::size_t>();
+
     {
         hpx::util::high_resolution_timer t;
 
@@ -206,8 +210,10 @@ int hpx_main(variables_map& vm)
         std::vector<hpx::lcos::future_value<void> > tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
         {
-            hpx::lcos::eager_future<test_action, void> f(id, num_test_points);
-            tests.push_back(f);
+            for (std::size_t i = 0; i < num_workers; ++i) {
+                hpx::lcos::eager_future<test_action, void> f(id, num_test_points);
+                tests.push_back(f);
+            }
         }
         hpx::lcos::wait(tests);   // wait for tests to run
 
@@ -233,6 +239,8 @@ int main(int argc, char* argv[])
             "number of data points to interpolate (default: 10000)")
         ("num_partitions", po::value<std::size_t>(), 
             "number of partitions to create (default: 27)")
+        ("num_workers", po::value<std::size_t>(), 
+            "number of worker (measurement) threads to create (default: 1)")
     ;
 
     // Initialize and run HPX
