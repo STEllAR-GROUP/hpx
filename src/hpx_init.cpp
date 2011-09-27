@@ -948,6 +948,15 @@ namespace hpx
             agas_host = mapnames.map(agas_host, agas_port);
 
             // sanity checks
+            if (num_localities == 1 && !vm.count("agas") && !vm.count("node")) {
+                // We assume we have to run the AGAS server if the number of 
+                // localities to run on is not specified (or is '1')
+                // and no additional option (--agas or --node) has been 
+                // specified. That simplifies running small standalone 
+                // applications on one locality.
+                run_agas_server = true;
+            }
+
             if (hpx_host == agas_host && hpx_port == agas_port) {
                 // we assume that we need to run the agas server if the user 
                 // asked for the same network addresses for HPX and AGAS
@@ -977,15 +986,8 @@ namespace hpx
             ini_config += "hpx.agas.address=" + agas_host;
             ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>(agas_port);
 
-            // We assume we have to run the AGAS server if
-            //  - it's explicitly specified
-            //  - the number of localities to run on is not specified (or is '1')
-            //    and no additional option (--agas or --node) has been specified.
-            if (run_agas_server || 
-                (num_localities == 1 && !vm.count("agas") && !vm.count("node")))  
-            {
+            if (run_agas_server)  
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
-            }
 
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;
