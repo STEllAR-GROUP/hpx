@@ -21,9 +21,12 @@ namespace sheneos { namespace server
     {
     }
 
-    void configuration::init(config_data const& data)
+    void configuration::init(std::string const& datafilename, 
+        std::string const& symbolic_name, std::size_t num_instances)
     {
-        data_ = data;
+        data_.datafile_name_ = datafilename;
+        data_.symbolic_name_ = symbolic_name;
+        data_.num_instances_ = num_instances;
     }
 
     config_data configuration::get() const

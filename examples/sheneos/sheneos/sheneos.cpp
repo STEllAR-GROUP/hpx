@@ -55,7 +55,12 @@ namespace sheneos
     sheneos::sheneos()
       : num_partitions_per_dim_(0), 
         was_created_(false)
-    {}
+    {
+        std::memset(minval_, 0, sizeof(minval_));
+        std::memset(maxval_, 0, sizeof(maxval_));
+        std::memset(delta_, 0, sizeof(delta_));
+        std::memset(num_values_, 0, sizeof(num_values_));
+    }
 
     sheneos::~sheneos()
     {
@@ -111,21 +116,29 @@ namespace sheneos
 
         // connect to the config object 
         cfg_ = configuration(query_name(symbolic_name_base));
-        data_ = cfg_.get();
+        config_data data = cfg_.get();
 
-        if (data_.symbolic_name_[data_.symbolic_name_.size()-1] != '/')
-            data_.symbolic_name_ += "/";
+        if (data.symbolic_name_[data.symbolic_name_.size()-1] != '/')
+            data.symbolic_name_ += "/";
 
         // reconnect to the partitions
-        partitions_.reserve(data_.num_instances_);
-        for (int i = 0; i < data_.num_instances_; ++i)
+        partitions_.reserve(data.num_instances_);
+        for (int i = 0; i < data.num_instances_; ++i)
         {
             using boost::lexical_cast;
             partitions_.push_back(query_name(
-                data_.symbolic_name_ + lexical_cast<std::string>(i)));
+                data.symbolic_name_ + lexical_cast<std::string>(i)));
         }
 
-        num_partitions_per_dim_ = std::exp(std::log(double(data_.num_instances_)) / 3);
+        // read required data from given file
+        num_values_[dimension::ye] = extract_data_range(data.datafile_name_, 
+            "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
+        num_values_[dimension::temp] = extract_data_range(data.datafile_name_, 
+            "logtemp", minval_[dimension::temp], maxval_[dimension::temp], delta_[dimension::temp]);
+        num_values_[dimension::rho] = extract_data_range(data.datafile_name_, 
+            "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
+
+        num_partitions_per_dim_ = std::exp(std::log(double(data.num_instances_)) / 3);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -133,15 +146,12 @@ namespace sheneos
         std::string symbolic_name_base, async_create_result_type future)
     {
         // read required data from file
-        data_.num_values_[dimension::ye] = extract_data_range(datafilename, 
-            "ye", data_.minval_[dimension::ye], 
-            data_.maxval_[dimension::ye], data_.delta_[dimension::ye]);
-        data_.num_values_[dimension::temp] = extract_data_range(datafilename, 
-            "logtemp", data_.minval_[dimension::temp], 
-            data_.maxval_[dimension::temp], data_.delta_[dimension::temp]);
-        data_.num_values_[dimension::rho] = extract_data_range(datafilename, 
-            "logrho", data_.minval_[dimension::rho], 
-            data_.maxval_[dimension::rho], data_.delta_[dimension::rho]);
+        num_values_[dimension::ye] = extract_data_range(datafilename, 
+            "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
+        num_values_[dimension::temp] = extract_data_range(datafilename, 
+            "logtemp", minval_[dimension::temp], maxval_[dimension::temp], delta_[dimension::temp]);
+        num_values_[dimension::rho] = extract_data_range(datafilename, 
+            "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
 
         // wait for the partitions to be created
         distributing_factory::result_type results = future.get();
@@ -159,23 +169,23 @@ namespace sheneos
         num_partitions_per_dim_ = std::exp(std::log(double(num_localities)) / 3);
 
         std::size_t partition_size_x = 
-            data_.num_values_[dimension::ye] / num_partitions_per_dim_;
+            num_values_[dimension::ye] / num_partitions_per_dim_;
         std::size_t last_partition_size_x = 
-            data_.num_values_[dimension::ye] - partition_size_x * (num_partitions_per_dim_-1);
+            num_values_[dimension::ye] - partition_size_x * (num_partitions_per_dim_-1);
 
         std::size_t partition_size_y = 
-            data_.num_values_[dimension::temp] / num_partitions_per_dim_;
+            num_values_[dimension::temp] / num_partitions_per_dim_;
         std::size_t last_partition_size_y = 
-            data_.num_values_[dimension::temp] - partition_size_y * (num_partitions_per_dim_-1);
+            num_values_[dimension::temp] - partition_size_y * (num_partitions_per_dim_-1);
 
         std::size_t partition_size_z = 
-            data_.num_values_[dimension::rho] / num_partitions_per_dim_;
+            num_values_[dimension::rho] / num_partitions_per_dim_;
         std::size_t last_partition_size_z = 
-            data_.num_values_[dimension::rho] - partition_size_z * (num_partitions_per_dim_-1);
+            num_values_[dimension::rho] - partition_size_z * (num_partitions_per_dim_-1);
 
-        dimension dim_x(data_.num_values_[dimension::ye]);
-        dimension dim_y(data_.num_values_[dimension::temp]);
-        dimension dim_z(data_.num_values_[dimension::rho]);
+        dimension dim_x(num_values_[dimension::ye]);
+        dimension dim_y(num_values_[dimension::temp]);
+        dimension dim_z(num_values_[dimension::rho]);
 
         std::vector<hpx::lcos::future_value<void> > lazy_sync;
         for (std::size_t x = 0; x != num_partitions_per_dim_; ++x)
@@ -218,11 +228,7 @@ namespace sheneos
         //        needs to be extended to expose async functions before this 
         //        can be fixed.
         // create the config object locally
-        data_.datafile_name_ = datafilename;
-        data_.symbolic_name_ = symbolic_name_base;
-        data_.num_instances_ = partitions_.size();
-
-        cfg_ = configuration(data_);
+        cfg_ = configuration(datafilename, symbolic_name_base, num_localities);
         register_name(cfg_.get_raw_gid(), symbolic_name_base);
 
         if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
@@ -243,8 +249,8 @@ namespace sheneos
     ///////////////////////////////////////////////////////////////////////////
     std::size_t sheneos::get_partition_index(int d, double value)
     {
-        std::size_t partition_size = data_.num_values_[d] / num_partitions_per_dim_;
-        std::size_t partition_index = (value - data_.minval_[d]) / (data_.delta_[d] * partition_size);
+        std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
+        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
         if (partition_index == num_partitions_per_dim_) 
             --partition_index;
         BOOST_ASSERT(partition_index < num_partitions_per_dim_);
@@ -276,14 +282,14 @@ namespace sheneos
 
         switch (what) {
         case dimension::ye:
-            min = data_.minval_[dimension::ye];
-            max = data_.maxval_[dimension::ye];
+            min = minval_[dimension::ye];
+            max = maxval_[dimension::ye];
             break;
 
         case dimension::temp:
         case dimension::rho:
-            min = std::pow(10., data_.minval_[what]);
-            max = std::pow(10., data_.maxval_[what]);
+            min = std::pow(10., minval_[what]);
+            max = std::pow(10., maxval_[what]);
             break;
         }
     }

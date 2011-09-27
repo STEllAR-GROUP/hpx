@@ -11,30 +11,16 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
-#include "../dimension.hpp"
-
 namespace sheneos 
 {
     ///////////////////////////////////////////////////////////////////////////
     struct config_data
     {
-        config_data() 
-          : num_instances_(0) 
-        {
-            std::memset(minval_, 0, sizeof(minval_));
-            std::memset(maxval_, 0, sizeof(maxval_));
-            std::memset(delta_, 0, sizeof(delta_));
-            std::memset(num_values_, 0, sizeof(num_values_));
-        }
+        config_data() : num_instances_(0) {}
 
         std::string datafile_name_;     // data file to load the data from
         std::string symbolic_name_;     // symbolic name this instance is registered
         std::size_t num_instances_;     // number of partition instances
-
-        double minval_[dimension::dim]; // minimal possible values in queries
-        double maxval_[dimension::dim]; // maximum possible values in queries
-        double delta_[dimension::dim];  // distance between existing datapoints
-        std::size_t num_values_[dimension::dim];    // number datapoints
     };
 }
 
@@ -64,16 +50,18 @@ namespace sheneos { namespace server
         };
 
         // exposed functionality
-        void init(config_data const& data);
+        void init(std::string const& datafile, std::string const& symbolic_name, 
+            std::size_t num_instances);
         config_data get() const;
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
+        typedef hpx::actions::action3<
             configuration, configuration_init, 
-            config_data const&, &configuration::init
+            std::string const&, std::string const&, std::size_t, 
+            &configuration::init
         > init_action;
 
         typedef hpx::actions::result_action0<
@@ -82,7 +70,7 @@ namespace sheneos { namespace server
         > get_action;
 
     private:
-        sheneos::config_data data_;
+        config_data data_;
     };
 }}
 

@@ -25,15 +25,17 @@ namespace sheneos
 
     public:
         // create a new partition instance and initialize it synchronously
-        configuration(config_data const& data) 
+        configuration(std::string const& datafilename, 
+                std::string const& symbolic_name, std::size_t num_instances) 
           : base_type(sheneos::stubs::configuration::create_sync(hpx::find_here()))
         {
-            init(data);
+            init(datafilename, symbolic_name, num_instances);
         }
-        configuration(hpx::naming::id_type gid, config_data const& data) 
+        configuration(hpx::naming::id_type gid, std::string const& datafilename, 
+                std::string const& symbolic_name, std::size_t num_instances) 
           : base_type(sheneos::stubs::configuration::create_sync(gid))
         {
-            init(data);
+            init(datafilename, symbolic_name, num_instances);
         }
         configuration(hpx::naming::id_type gid) 
           : base_type(gid) 
@@ -43,14 +45,18 @@ namespace sheneos
 
         ///////////////////////////////////////////////////////////////////////
         hpx::lcos::future_value<void>
-        init_async(config_data const& data)
+        init_async(std::string const& datafile, 
+            std::string const& symbolic_name, std::size_t num_instances)
         {
-            return stubs::configuration::init_async(this->gid_, data);
+            return stubs::configuration::init_async(this->gid_, datafile, 
+                symbolic_name, num_instances);
         }
 
-        void init(config_data const& data)
+        void init(std::string const& datafile, std::string const& symbolic_name, 
+            std::size_t num_instances)
         {
-            stubs::configuration::init(this->gid_, data);
+            stubs::configuration::init(this->gid_, datafile, symbolic_name, 
+                num_instances);
         }
 
         ///////////////////////////////////////////////////////////////////////
