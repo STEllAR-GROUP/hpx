@@ -234,7 +234,25 @@ if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
   add_definitions(-DHPX_STACKTRACES=1)
 endif()
-  
+
+################################################################################
+# pxthread stack size
+################################################################################
+if(NOT HPX_STACK_SIZE)
+  if(MSVC)
+    set(HPX_STACK_SIZE "0x4000" CACHE STRING "pxthread stack size" FORCE)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
+     "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
+  else()
+    set(HPX_STACK_SIZE "0x8000" CACHE STRING "pxthread stack size" FORCE)
+  endif()
+else()
+  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "pxthread stack size" FORCE)
+endif()
+ 
+add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
+
 ################################################################################
 # Compiler configuration 
 ################################################################################
