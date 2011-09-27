@@ -39,18 +39,27 @@ namespace hpx { namespace util
                 while (std::getline(ifs, line)) {
                     if (!line.empty()) {
                         if (debug_)
-                            std::cerr << "read: " << line << std::endl;
+                            std::cerr << "read: '" << line << "'" << std::endl;
 
-                        if ((agas_host.empty() && nodes_.empty()) || 
-                            line == agas_host) 
+                        if (!found_agas_host &&
+                            ((agas_host.empty() && nodes_.empty()) ||
+                             line == agas_host)) 
                         {
                             agas_node_ = line;
                             found_agas_host = true;
                             agas_node_num_ = agas_node;
                         }
+
+                        if (0 == nodes_.count(line))
+                        {
+                            if (debug_)
+                                std::cerr << "incrementing agas_node"
+                                          << std::endl;
+                            ++agas_node;
+                        }
+
                         ++nodes_[line];
                     }
-                    ++agas_node;
                 }
 
                 // if an AGAS host is specified, it needs to be in the list
@@ -61,7 +70,9 @@ namespace hpx { namespace util
                 }
 
                 if (debug_ && !agas_node_.empty()) 
-                    std::cerr << "using AGAS host: " << agas_node_ << std::endl;
+                    std::cerr << "using AGAS host: '" << agas_node_
+                              << "' (node number " << agas_node_num_ << ")"
+                              << std::endl;
             }
             else if (debug_) {
                 std::cerr << "failed opening: " << nodefile << std::endl;
@@ -87,18 +98,25 @@ namespace hpx { namespace util
         {
             if (!s.empty()) {
                 if (debug_)
-                    std::cerr << "extracted: " << s << std::endl;
+                    std::cerr << "extracted: '" << s << "'" << std::endl;
 
-                if ((agas_host.empty() && nodes_.empty()) || 
-                    s == agas_host) 
+                if (!found_agas_host &&
+                    ((agas_host.empty() && nodes_.empty()) || s == agas_host)) 
                 {
                     agas_node_ = s;
                     found_agas_host = true;
                     agas_node_num_ = agas_node;
                 }
 
+                if (0 == nodes_.count(s))
+                {
+                    if (debug_)
+                        std::cerr << "incrementing agas_node"
+                                  << std::endl;
+                    ++agas_node;
+                }
+
                 ++nodes_[s];
-                ++agas_node;
                 nodes_list += s + ' ';
             }
         }
@@ -111,7 +129,9 @@ namespace hpx { namespace util
         }
 
         if (debug_ && !agas_node_.empty())
-            std::cerr << "using AGAS host: " << agas_node_ << std::endl;
+            std::cerr << "using AGAS host: '" << agas_node_
+                      << "' (node number " << agas_node_num_ << ")"
+                      << std::endl;
 
         return nodes_list;
     }
@@ -121,13 +141,15 @@ namespace hpx { namespace util
     // been listed in the node file.
     std::size_t pbs_environment::retrieve_number_of_threads() const
     {
+        // WARNING: PBS_NUM_PPN appears to be plain unreliable
+        /*
         char* pbs_num_ppn = std::getenv("PBS_NUM_PPN");
         if (pbs_num_ppn) {
             try {
                 std::string value(pbs_num_ppn);
                 std::size_t result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_number_of_threads: " << result 
+                    std::cerr << "retrieve_number_of_threads (PBS_NUM_PPN): " << result 
                               << std::endl;
                 }
                 return result;
@@ -136,6 +158,7 @@ namespace hpx { namespace util
                 ; // just ignore the error
             }
         }
+        */
 
         // fall back to counting the number of occurrences of this node 
         // in the node-file
@@ -170,7 +193,7 @@ namespace hpx { namespace util
                 std::string value(pbs_nodenum);
                 std::size_t result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_node_number: " << result 
+                    std::cerr << "retrieve_node_number (PBS_NODENUM): " << result 
                               << std::endl;
                 }
                 return result;
