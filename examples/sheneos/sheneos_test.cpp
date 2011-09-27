@@ -215,7 +215,9 @@ int hpx_main(variables_map& vm)
                 tests.push_back(f);
             }
         }
-        hpx::lcos::wait(tests);   // wait for tests to run
+
+        // use a dummy lambda to work around a race condition in HPX's code
+        hpx::lcos::wait(tests, [](int) {});
 
         elapsed = t.elapsed();
         std::cout << "Running tests: " << elapsed << " [s]" << std::endl;
