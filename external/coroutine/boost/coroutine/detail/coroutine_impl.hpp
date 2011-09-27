@@ -214,6 +214,7 @@ namespace boost { namespace coroutines { namespace detail
 
       void deallocate(Coroutine* p)
       {
+          p->reset();          // reset bound function
           heap_.deallocate(p);
       }
 
@@ -351,6 +352,11 @@ private:
     }
 
     static inline void destroy(type* p);
+
+    void reset()
+    {
+        m_fun = FunctorType();    // just reset the bound function
+    }
 
     void rebind(FunctorType f, thread_id_type id)
     {
