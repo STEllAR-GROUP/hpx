@@ -49,11 +49,10 @@ namespace hpx { namespace lcos { namespace server
             > hook_type;
 
             barrier_queue_entry(threads::thread_id_type id)
-              : id_(id), aborted_waiting_(false)
+              : id_(id)
             {}
 
             threads::thread_id_type id_;
-            bool aborted_waiting_;
             hook_type slist_hook_;
         };
 
@@ -92,7 +91,6 @@ namespace hpx { namespace lcos { namespace server
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
-                    queue_.front().aborted_waiting_ = true;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -142,27 +140,24 @@ namespace hpx { namespace lcos { namespace server
                 barrier_queue_entry e(id);
                 queue_.push_back(e);
                 queue_type::const_iterator last = queue_.last();
+                threads::thread_state_ex_enum statex;
 
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
-                    if (statex == threads::wait_abort) {
-                        hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                             << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
-                            hpx::util::osstream_get_string(strm));
-                        return;
-                    }
-                }
-
-                if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
-                        "aborted wait on queue");
+                    statex = self.yield(threads::suspended);
                 }
 
                 if (e.id_)
                     queue_.erase(last);     // remove entry from queue
+
+                if (statex == threads::wait_abort) {
+                    hpx::util::osstream strm;
+                    strm << "thread(" << id << ", " << threads::get_thread_description(id)
+                          << ") aborted (yield returned wait_abort)";
+                    HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
+                        hpx::util::osstream_get_string(strm));
+                    return;
+                }                
             }
             else {
             // slist::swap has a bug in Boost 1.35.0
@@ -206,10 +201,10 @@ namespace hpx { namespace lcos { namespace server
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
-                    queue_.front().aborted_waiting_ = true;
                     queue_.pop_front();
 
-                    threads::set_thread_state(id, threads::pending);
+                    threads::set_thread_state(id, threads::pending, 
+                        threads::wait_abort);
                 }
 
                 boost::rethrow_exception(e);

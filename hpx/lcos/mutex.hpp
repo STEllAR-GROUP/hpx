@@ -209,6 +209,7 @@ namespace hpx { namespace lcos { namespace detail
 
             queue_type::const_iterator last = queue_.last();
             bool result = false;
+            threads::thread_state_ex_enum statex;
 
             {
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
@@ -218,20 +219,21 @@ namespace hpx { namespace lcos { namespace detail
                     threads::set_thread_state(id, wait_until);
 
                 // if this timed out, return true
-                threads::thread_state_ex_enum statex = self.yield(threads::suspended);
-                result = threads::wait_timeout == statex;
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-                    strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(no_success, "mutex::wait_for_single_object",
-                        hpx::util::osstream_get_string(strm));
-                    return result;
-                }
+                statex = self.yield(threads::suspended);
             }
 
             if (e.id_)
                 queue_.erase(last);     // remove entry from queue
+
+            result = threads::wait_timeout == statex;
+            if (statex == threads::wait_abort) {
+                hpx::util::osstream strm;
+                strm << "thread(" << id << ", " << threads::get_thread_description(id)
+                      << ") aborted (yield returned wait_abort)";
+                HPX_THROW_EXCEPTION(no_success, "mutex::wait_for_single_object",
+                    hpx::util::osstream_get_string(strm));
+                return result;
+            }
             return result;
         }
 

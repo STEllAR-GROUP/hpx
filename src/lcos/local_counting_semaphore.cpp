@@ -53,10 +53,9 @@ namespace hpx { namespace lcos
         }
     }
 
-    void local_counting_semaphore::wait(boost::int64_t count)
+    void local_counting_semaphore::wait_locked(boost::int64_t count, 
+        mutex_type::scoped_lock& l)
     {
-        mutex_type::scoped_lock l(mtx_);
-
         while (value_ < count)
         {
             // we need to get the self anew for each round as it might
@@ -69,28 +68,33 @@ namespace hpx { namespace lcos
             queue_entry e(id);
             queue_.push_back(e);
             queue_type::const_iterator last = queue_.last();
+            threads::thread_state_ex_enum statex;
 
             {
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                threads::thread_state_ex_enum statex = self.yield(threads::suspended);
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-                    strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                         << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(no_success, "lcos::local_counting_semaphore::wait",
-                        hpx::util::osstream_get_string(strm));
-                    return;
-                }
+                statex = self.yield(threads::suspended);
             }
 
             if (e.id_)
                 queue_.erase(last);     // remove entry from queue
+
+            if (statex == threads::wait_abort) {
+                hpx::util::osstream strm;
+                strm << "thread(" << id << ", " 
+                     << threads::get_thread_description(id)
+                     << ") aborted (yield returned wait_abort)";
+                HPX_THROW_EXCEPTION(no_success, 
+                    "lcos::local_counting_semaphore::wait",
+                    hpx::util::osstream_get_string(strm));
+                return;
+            }
         }
 
         value_ -= count;
     }
 
-    void local_counting_semaphore::signal_locked(boost::int64_t count) 
+    void local_counting_semaphore::signal_locked(boost::int64_t count,
+        mutex_type::scoped_lock& l) 
     {
         value_ += count;
         if (value_ >= 0)
@@ -111,16 +115,17 @@ namespace hpx { namespace lcos
             // swap the list
             queue_type queue;
             queue.swap(queue_);
-            mtx_.unlock();
+            l.unlock();
 
             // release the threads
             while (!queue.empty())
             {
                 threads::thread_id_type id = queue.front().id_;
-                if (HPX_UNLIKELY(!id))
-                    HPX_THROW_EXCEPTION(null_thread_id
-                                      , "local_counting_semaphore::signal_locked"
-                                      , "NULL thread id encountered"); 
+                if (HPX_UNLIKELY(!id)) {
+                    HPX_THROW_EXCEPTION(null_thread_id,
+                        "local_counting_semaphore::signal_locked",
+                        "NULL thread id encountered"); 
+                }
                 queue.front().id_ = 0;
                 queue.pop_front();
                 threads::set_thread_lco_description(id);

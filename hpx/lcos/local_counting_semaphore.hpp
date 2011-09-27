@@ -87,27 +87,55 @@ namespace hpx { namespace lcos
         ///                 be decremented. At the same time this is the minimum 
         ///                 value of the lock count at which the thread is not 
         ///                 yielded.
-        void wait(boost::int64_t count = 1);
+        void wait(boost::int64_t count = 1)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            wait_locked(count, l);
+        }
+
+        /// \brief Try to wait for the semaphore to be signaled
+        ///
+        /// \param count    [in] The value by which the internal lock count will 
+        ///                 be decremented. At the same time this is the minimum 
+        ///                 value of the lock count at which the thread is not 
+        ///                 yielded.
+        ///                 
+        /// \returns        The function returns true if the calling thread was 
+        ///                 able to acquire the requested amount of credits.
+        ///                 The function returns false if not sufficient credits
+        ///                 are available at this point in time.
+        bool try_wait(boost::int64_t count = 1)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!(value_ < count)) {
+                // enter wait_locked only if there are sufficient credits 
+                // available
+                wait_locked(count, l);
+                return true;
+            }
+            return false;
+        }
 
         /// \brief Signal the semaphore
         ///
         /// 
         void signal(boost::int64_t count = 1)
         {
-            mtx_.lock(); 
-            signal_locked(count);
+            mutex_type::scoped_lock l(mtx_);
+            signal_locked(count, l);
         }
 
         boost::int64_t signal_all()
         {
-            mtx_.lock();
+            mutex_type::scoped_lock l(mtx_);
             boost::int64_t count = queue_.size();
-            signal_locked(count);
+            signal_locked(count, l);
             return count;
         }
 
     private:
-        void signal_locked(boost::int64_t count);
+        void wait_locked(boost::int64_t count, mutex_type::scoped_lock& l);
+        void signal_locked(boost::int64_t count, mutex_type::scoped_lock& l);
 
         mutex_type mtx_;
         boost::int64_t value_;
