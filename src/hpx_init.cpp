@@ -964,6 +964,11 @@ namespace hpx
                 // if the network addresses are different and we should not run 
                 // the AGAS server we assume to be in worker mode
                 mode = hpx::runtime_mode_worker;
+
+                // do not execute any explicit hpx_main except if asked 
+                // otherwise
+                if (!vm.count("run-hpx-main"))
+                    f = 0;
             }
 
             // write HPX and AGAS network parameters to the proper ini-file entries
