@@ -125,14 +125,6 @@ namespace sheneos
                 data_.symbolic_name_ + lexical_cast<std::string>(i)));
         }
 
-        // read required data from given file
-//         num_values_[dimension::ye] = extract_data_range(data.datafile_name_, 
-//             "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
-//         num_values_[dimension::temp] = extract_data_range(data.datafile_name_, 
-//             "logtemp", minval_[dimension::temp], maxval_[dimension::temp], delta_[dimension::temp]);
-//         num_values_[dimension::rho] = extract_data_range(data.datafile_name_, 
-//             "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
-
         num_partitions_per_dim_ = std::exp(std::log(double(data_.num_instances_)) / 3);
     }
 
