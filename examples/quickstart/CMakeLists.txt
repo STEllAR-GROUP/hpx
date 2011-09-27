@@ -15,6 +15,7 @@ set(example_programs
     error_handling2
     error_handling3
     error_handling4
+    seg_fault
     timed_wake
     quicksort
    )
