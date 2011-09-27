@@ -26,6 +26,15 @@ namespace hpx { namespace lcos
         return 1;
     }
 
+    template <typename F>
+    inline std::size_t
+    wait (lcos::future_value<void> const& f1, F f)
+    {
+        f1.get();
+        f(0);
+        return 1;
+    }
+
     // This overload of wait() will make sure that the passed function will be 
     // invoked as soon as a value gets available, it will not wait for all 
     // results to be there.
@@ -45,6 +54,41 @@ namespace hpx { namespace lcos
                 if (!handled[i] && lazy_values[i].ready()) {
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
+
+                    handled[i] = true;
+                    ++handled_count;
+
+                    // give thread-manager a chance to look for more work while 
+                    // waiting
+                    threads::suspend();
+                    suspended = true;
+                }
+            }
+
+            // suspend after one full loop over all values
+            if (!suspended) 
+                threads::suspend();
+        }
+        return handled.count();
+    }
+
+    template <typename F>
+    inline std::size_t
+    wait (std::vector<lcos::future_value<void> > const& lazy_values, F f)
+    {
+        boost::dynamic_bitset<> handled(lazy_values.size());
+        std::size_t handled_count = 0;
+        while (handled_count < lazy_values.size()) {
+
+            bool suspended = false;
+            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
+
+                // loop over all lazy_values, executing the next as soon as its
+                // value gets available 
+                if (!handled[i] && lazy_values[i].ready()) {
+                    // get the value from the future, invoke the function
+                    lazy_values[i].get();
+                    f(i);
 
                     handled[i] = true;
                     ++handled_count;

@@ -574,7 +574,7 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a future_value.
-        bool ready()
+        bool ready() const
         {
             return (*impl_)->ready();
         }
