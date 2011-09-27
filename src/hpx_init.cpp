@@ -865,7 +865,7 @@ namespace hpx
                             "is not compatible with --agas/-a");
                     }
                     node = vm["node"].as<std::size_t>();
-                    if (1 == num_localities) {
+                    if (1 == num_localities && 0 != node) {
                         throw std::logic_error("Command line option --node "
                             "requires to specify the number of localities as "
                             "well (for instance by using --localities/-l)");
