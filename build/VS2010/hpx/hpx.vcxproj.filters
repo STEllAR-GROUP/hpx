@@ -994,6 +994,9 @@
     <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp">
       <Filter>Header Files\Performance Counters</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\spinlock.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">

@@ -268,6 +268,7 @@
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\spinlock.hpp" />
     <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
     <ClInclude Include="..\..\..\hpx\util\stringstream.hpp" />
     <ClInclude Include="..\..\..\hpx\util\unmangle_name.hpp" />
