@@ -20,22 +20,19 @@ namespace sheneos { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future_value<void>
-        init_async(hpx::naming::id_type const& gid, std::string const& datafile, 
-            std::string const& symbolic_name, std::size_t num_instances)
+        init_async(hpx::naming::id_type const& gid, config_data const& data)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized future_value, the caller needs
             // to call get() on the return value to obtain the result
             typedef sheneos::server::configuration::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(
-                gid, datafile, symbolic_name, num_instances);
+            return hpx::lcos::eager_future<action_type>(gid, data);
         }
 
         static void init(hpx::naming::id_type const& gid, 
-            std::string const& datafile, std::string const& symbolic_name, 
-            std::size_t num_instances)
+            config_data const& data)
         {
-            init_async(gid, datafile, symbolic_name, num_instances).get();
+            init_async(gid, data).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

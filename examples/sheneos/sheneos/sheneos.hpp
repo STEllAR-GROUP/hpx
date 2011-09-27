@@ -85,13 +85,9 @@ namespace sheneos
 
     private:
         std::vector<hpx::naming::id_type> partitions_;
-        double minval_[dimension::dim];
-        double maxval_[dimension::dim];
-        double delta_[dimension::dim];
-        std::size_t num_values_[dimension::dim];
         std::size_t num_partitions_per_dim_;
         bool was_created_;
-
+        config_data data_;
         configuration cfg_;
     };
 }
