@@ -113,7 +113,8 @@ namespace hpx { namespace lcos { namespace detail
                         boost::rethrow_exception(e);
                     }
                     catch (hpx::exception const& he) {
-                        ec = he.get_error_code(hpx::rethrow);
+                        ec = make_error_code(he.get_error(), he.what(), 
+                            hpx::rethrow);
                     }
                 }       
                 return Result();
@@ -278,7 +279,8 @@ namespace hpx { namespace lcos { namespace detail
                         boost::rethrow_exception(e);
                     }
                     catch (hpx::exception const& he) {
-                        ec = he.get_error_code(hpx::rethrow);
+                        ec = make_error_code(he.get_error(), he.what(), 
+                            hpx::rethrow);
                     }
                 }       
                 return naming::invalid_id;
