@@ -136,8 +136,6 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy> 
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            std::string const& address, boost::uint16_t port,
-            std::string const& agas_address, boost::uint16_t agas_port, 
             runtime_mode locality_mode, init_scheduler_type const& init,
             std::string const& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs) 
@@ -149,75 +147,7 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, naming::locality(address, port)),
-        agas_client_(parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
-                       , new parcelset::policies::global_parcelhandler_queue),
-        scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
-        thread_manager_(timer_pool_, scheduler_, notifier_),
-        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
-        applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
-    {
-        components::server::get_error_dispatcher().register_error_sink(
-            &runtime_impl::default_errorsink, default_error_sink_);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            naming::locality address, naming::locality agas_address, 
-            runtime_mode locality_mode, init_scheduler_type const& init,
-            std::string const& hpx_ini_file,
-            std::vector<std::string> const& cmdline_ini_defs) 
-      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
-        mode_(locality_mode), result_(0), 
-        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"), 
-        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
-        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, address),
-        agas_client_(parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
-                       , new parcelset::policies::global_parcelhandler_queue),
-        scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
-        thread_manager_(timer_pool_, scheduler_, notifier_),
-        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
-        applier_(parcel_handler_, thread_manager_, 
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
-    {
-        components::server::get_error_dispatcher().register_error_sink(
-            &runtime_impl::default_errorsink, default_error_sink_);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            naming::locality address, runtime_mode locality_mode, 
-            init_scheduler_type const& init,
-            std::string const& hpx_ini_file,
-            std::vector<std::string> const& cmdline_ini_defs) 
-      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
-        mode_(locality_mode), result_(0), 
-        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"), 
-        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"), 
-        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
-            boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, address),
+        parcel_port_(parcel_pool_, ini_.get_parcelport_address()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_
                        , new parcelset::policies::global_parcelhandler_queue),

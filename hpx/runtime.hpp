@@ -218,61 +218,13 @@ namespace hpx
 
         /// Construct a new HPX runtime instance 
         ///
-        /// \param address        [in] This is the address (IP address or 
-        ///                       host name) of the locality the new runtime 
-        ///                       instance should be associated with. It is 
-        ///                       used for receiving parcels.
-        /// \param port           [in] This is the port number the new runtime
-        ///                       instance will use to listen for incoming 
-        ///                       parcels.
-        /// \param agas_address   [in] This is the address (IP address or 
-        ///                       host name) of the locality the AGAS server is 
-        ///                       running on. If this value is not 
-        ///                       specified the actual address will be 
-        ///                       taken from the configuration file (hpx.ini).
-        /// \param agas_port      [in] This is the port number the AGAS server 
-        ///                       is listening on. If this value is not 
-        ///                       specified the actual port number will be 
-        ///                       taken from the configuration file (hpx.ini).
         /// \param locality_mode  [in] This is the mode the given runtime 
         ///                       instance should be executed in.
-        explicit runtime_impl(std::string const& address = HPX_INITIAL_IP_ADDRESS, 
-            boost::uint16_t port = HPX_INITIAL_IP_PORT,
-            std::string const& agas_address = "", 
-            boost::uint16_t agas_port = 0, runtime_mode locality_mode
-              = runtime_mode_console,
+        explicit runtime_impl(runtime_mode locality_mode = runtime_mode_console,
             init_scheduler_type const& init = init_scheduler_type(),
             std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs
-                = std::vector<std::string>());
-
-        /// Construct a new HPX runtime instance 
-        ///
-        /// \param address        [in] This is the locality the new runtime 
-        ///                       instance should be associated with. It is 
-        ///                       used for receiving parcels. 
-        /// \note The AGAS locality to use will be taken from the configuration 
-        ///       file (hpx.ini).
-        explicit runtime_impl(naming::locality address, 
-            runtime_mode locality_mode = runtime_mode_worker,
-            init_scheduler_type const& init = init_scheduler_type(),
-            std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs
-                = std::vector<std::string>());
-
-        /// Construct a new HPX runtime instance 
-        ///
-        /// \param address        [in] This is the locality the new runtime 
-        ///                       instance should be associated with. It is 
-        ///                       used for receiving parcels. 
-        /// \param agas_address   [in] This is the locality the AGAS server is 
-        ///                       running on. 
-        runtime_impl(naming::locality address, naming::locality agas_address, 
-            runtime_mode locality_mode = runtime_mode_worker,
-            init_scheduler_type const& init = init_scheduler_type(),
-            std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs
-                = std::vector<std::string>());
+            std::vector<std::string> const& cmdline_ini_defs = 
+                std::vector<std::string>());
 
         /// \brief The destructor makes sure all HPX runtime services are 
         ///        properly shut down before exiting.

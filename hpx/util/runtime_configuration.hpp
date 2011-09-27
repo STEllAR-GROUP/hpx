@@ -51,10 +51,13 @@ namespace hpx { namespace util
         // Get the AGAS locality to use 
         naming::locality get_agas_locality() const;
 
-        // Get the AGAS locality to use (default_address/default_port are 
-        // the default values describing the locality to use if no 
-        // configuration info can be found).
-        naming::locality get_agas_locality(naming::locality const& l) const;
+        // Get the HPX network address to use 
+        naming::locality get_parcelport_address() const;
+
+//         // Get the AGAS locality to use (default_address/default_port are 
+//         // the default values describing the locality to use if no 
+//         // configuration info can be found).
+//         naming::locality get_agas_locality(naming::locality const& l) const;
 
         // Get AGAS client-side GVA cache size
         std::size_t get_agas_gva_cache_size() const;

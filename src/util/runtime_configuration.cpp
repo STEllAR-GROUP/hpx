@@ -160,6 +160,30 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
+    // HPX network address configuration information has to be stored in the 
+    // global hpx configuration section:
+    // 
+    //    [hpx]
+    //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
+    //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
+    //
+    naming::locality runtime_configuration::get_parcelport_address() const
+    {
+        // load all components as described in the configuration information
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                std::string cfg_port(
+                    sec->get_entry("port", HPX_INITIAL_IP_PORT));
+
+                return naming::locality(
+                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
+                    boost::lexical_cast<boost::uint16_t>(cfg_port));
+            }
+        }
+        return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
+    }
+
     agas::router_mode runtime_configuration::get_agas_router_mode() const
     {
         // load all components as described in the configuration information
@@ -175,7 +199,7 @@ namespace hpx { namespace util
                 else if (m == "bootstrap")
                     return agas::router_mode_bootstrap;
                 else {
-                    // REVIEW: overused exception type is overused
+                    // REVIEW: exception type is overused
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "runtime_configuration::get_agas_router_mode", 
                         std::string("invalid AGAS router mode \"") + m + "\"");
@@ -226,31 +250,31 @@ namespace hpx { namespace util
         return 16;
     }
 
-    // TODO: implement for AGAS v2
-    naming::locality runtime_configuration::get_agas_locality(
-        naming::locality const& l) const
-    {
-        // load all components as described in the configuration information
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                // read fall back values from configuration file, if needed
-                std::string default_address (l.get_address());
-                boost::uint16_t default_port = l.get_port();
-
-                if (default_address.empty()) {
-                    default_address = 
-                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
-                }
-                if (0 == default_port) {
-                    default_port = boost::lexical_cast<boost::uint16_t>(
-                        sec->get_entry("port", HPX_INITIAL_IP_PORT));
-                }
-                return naming::locality(default_address, default_port);
-            }
-        }
-        return l;
-    }
+//     // TODO: implement for AGAS v2
+//     naming::locality runtime_configuration::get_agas_locality(
+//         naming::locality const& l) const
+//     {
+//         // load all components as described in the configuration information
+//         if (has_section("hpx.agas")) {
+//             util::section const* sec = get_section("hpx.agas");
+//             if (NULL != sec) {
+//                 // read fall back values from configuration file, if needed
+//                 std::string default_address (l.get_address());
+//                 boost::uint16_t default_port = l.get_port();
+// 
+//                 if (default_address.empty()) {
+//                     default_address = 
+//                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
+//                 }
+//                 if (0 == default_port) {
+//                     default_port = boost::lexical_cast<boost::uint16_t>(
+//                         sec->get_entry("port", HPX_INITIAL_IP_PORT));
+//                 }
+//                 return naming::locality(default_address, default_port);
+//             }
+//         }
+//         return l;
+//     }
 
     std::size_t runtime_configuration::get_agas_gva_cache_size() const
     {
@@ -297,8 +321,8 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>
-                    (sec->get_entry("os_threads", 1));
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("os_threads", 1));
             }
         }
         return 1;

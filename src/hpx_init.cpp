@@ -656,9 +656,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // global scheduler (one queue for all OS threads)
-        int run_global(std::string const& hpx_host, boost::uint16_t hpx_port, 
-            std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func f, boost::program_options::variables_map& vm, 
+        int run_global(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
@@ -674,8 +672,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<global_queue_policy> runtime_type;
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
-                global_queue_policy::init_parameter_type(), 
+            runtime_type rt(mode, global_queue_policy::init_parameter_type(), 
                 vm["hpx-config"].as<std::string>(), ini_config);
 
             return run(rt, f, vm, mode, startup, shutdown, num_threads, 
@@ -684,9 +681,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
-        int run_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
-            std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func f, boost::program_options::variables_map& vm, 
+        int run_local(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
@@ -703,8 +698,8 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
-                init, vm["hpx-config"].as<std::string>(), ini_config);
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(), 
+                ini_config);
 
             return run(rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
@@ -713,9 +708,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // local scheduler with priority queue (one queue for each OS threads
         // plus one separate queue for high priority PX-threads)
-        int run_priority_local(std::string const& hpx_host, boost::uint16_t hpx_port, 
-            std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func f, boost::program_options::variables_map& vm, 
+        int run_priority_local(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
@@ -733,8 +726,8 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
-                init, vm["hpx-config"].as<std::string>(), ini_config);
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(), 
+                ini_config);
 
             return run(rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
@@ -743,9 +736,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // abp scheduler: local deques for each OS thread, with work
         // stealing from the "bottom" of each.
-        int run_abp(std::string const& hpx_host, boost::uint16_t hpx_port, 
-            std::string const& agas_host, boost::uint16_t agas_port, 
-            hpx_main_func f, boost::program_options::variables_map& vm, 
+        int run_abp(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
             startup_func const& startup, shutdown_func const& shutdown, 
             std::size_t num_threads, std::size_t num_localities)
@@ -762,8 +753,8 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
-            runtime_type rt(hpx_host, hpx_port, agas_host, agas_port, mode,
-                init, vm["hpx-config"].as<std::string>(), ini_config);
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(), 
+                ini_config);
 
             return run(rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
@@ -956,6 +947,25 @@ namespace hpx
             hpx_host = mapnames.map(hpx_host, hpx_port);
             agas_host = mapnames.map(agas_host, agas_port);
 
+            // sanity checks
+            if (hpx_host == agas_host && hpx_port == agas_port) {
+                // we assume that we need to run the agas server if the user 
+                // asked for the same network addresses for HPX and AGAS
+                run_agas_server = true;
+            }
+            else if (run_agas_server) {
+                // otherwise, if the user instructed us to run the AGAS server,
+                // we set the AGAS network address to the same value as the HPX
+                // network address
+                agas_host = hpx_host;
+                agas_port = hpx_port;
+            }
+            else if (mode == hpx::runtime_mode_console) {
+                // if the network addresses are different and we should not run 
+                // the AGAS server we assume to be in worker mode
+                mode = hpx::runtime_mode_worker;
+            }
+
             // write HPX and AGAS network parameters to the proper ini-file entries
             ini_config += "hpx.address=" + hpx_host;
             ini_config += "hpx.port=" + boost::lexical_cast<std::string>(hpx_port);
@@ -1011,27 +1021,23 @@ namespace hpx
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
-                result = detail::run_global(hpx_host, hpx_port, 
-                    agas_host, agas_port, f, vm, mode, ini_config, 
+                result = detail::run_global(f, vm, mode, ini_config, 
                     startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("local").find(queueing)) {
-                result = detail::run_local(hpx_host, hpx_port, 
-                    agas_host, agas_port, f, vm, mode, ini_config, 
+                result = detail::run_local(f, vm, mode, ini_config, 
                     startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
-                result = detail::run_priority_local(hpx_host, hpx_port, 
-                    agas_host, agas_port, f, vm, mode, ini_config, 
+                result = detail::run_priority_local(f, vm, mode, ini_config, 
                     startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
-                result = detail::run_abp(hpx_host, hpx_port, 
-                    agas_host, agas_port, f, vm, mode, ini_config, 
+                result = detail::run_abp(f, vm, mode, ini_config, 
                     startup, shutdown, num_threads, num_localities);
             }
             else {
