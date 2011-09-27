@@ -10,6 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/agas/router/legacy.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 namespace hpx { namespace agas
 {
@@ -215,7 +216,7 @@ bool legacy_router::get_console_prefix(
             response_type r = 
                 bootstrap->symbol_ns_server.resolve("/locality(console)", ec);
     
-            if ((&ec == &throws || !ec) &&
+            if (!ec &&
                 (r.get_gid() != naming::invalid_gid) &&
                 (r.get_status() == success))
             {
@@ -228,7 +229,7 @@ bool legacy_router::get_console_prefix(
             response_type r = hosted->symbol_ns_.resolve
                 ("/locality(console)", ec);
     
-            if ((&ec == &throws || !ec) &&
+            if (!ec &&
                 (r.get_gid() != naming::invalid_gid) &&
                 (r.get_status() == success))
             {
@@ -387,6 +388,53 @@ components::component_type legacy_router::register_factory(
     }
 } // }}}
 
+///////////////////////////////////////////////////////////////////////////////
+struct lock_semaphore
+{
+    lock_semaphore(lcos::local_counting_semaphore& sem) 
+      : sem_(sem)
+    {
+        // this needs to be invoked from a px-thread
+        BOOST_ASSERT(NULL != threads::get_self_ptr());
+        sem_.wait(1);
+    }
+
+    ~lock_semaphore() 
+    {
+        sem_.signal(1);
+    }
+
+    lcos::local_counting_semaphore& sem_;
+};
+
+template <typename Pool, typename Future>
+struct checkout_future
+{
+    checkout_future(Pool& pool, Future*& future) 
+      : result_ok_(false), pool_(pool), future_(future)
+    {
+        pool_.dequeue(&future_);
+        BOOST_ASSERT(future_);    
+        
+        future_->reset();     // reset the future
+    }
+    ~checkout_future()
+    {
+        // return the future to the pool
+        if (result_ok_) 
+            pool_.enqueue(future_);
+    }
+
+    Future* operator->() { return future_; }
+    void set_ok() { result_ok_ = true; }
+
+private:
+    bool result_ok_;
+    Pool& pool_;
+    Future*& future_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 bool legacy_router::get_id_range(
     naming::locality const& l
   , count_type count
@@ -426,24 +474,20 @@ bool legacy_router::get_id_range(
             // futures are checked out and pending.
     
             // get a future
-            hosted->allocate_response_sema_.wait(1);
-            hosted->allocate_response_pool_.dequeue(&f); 
-    
-            BOOST_ASSERT(f);
-    
-            // reset the future
-            f->reset();
-    
+            lock_semaphore lock(hosted->allocate_response_sema_);
+            
+            typedef checkout_future<allocate_response_pool_type, 
+                allocate_response_future_type> checkout_future_type;
+            checkout_future_type cf(hosted->allocate_response_pool_, f);
+
             // execute the action (synchronously)
-            f->apply(
+            cf->apply(
                 naming::id_type(primary_namespace_server_type::fixed_gid()
                               , naming::id_type::unmanaged),
                 ep, count);
-            r = f->get(ec);
+            r = cf->get(ec);
 
-            // return the future to the pool
-            hosted->allocate_response_pool_.enqueue(f);
-            hosted->allocate_response_sema_.signal(1);
+            cf.set_ok();
 
             if (ec)
                 return false;
@@ -451,7 +495,8 @@ bool legacy_router::get_id_range(
     
         lower_bound = r.get_lower_bound(); 
         upper_bound = r.get_upper_bound();
-    
+        BOOST_ASSERT(lower_bound != upper_bound);
+
         return lower_bound && upper_bound;
     }
     catch (hpx::exception const& e) {
@@ -466,8 +511,6 @@ bool legacy_router::get_id_range(
         {
             hosted->allocate_response_pool_.enqueue 
                 (new allocate_response_future_type);
-            hosted->allocate_response_sema_.signal(1);
-
             f->invalidate(boost::current_exception());
         }
 
@@ -515,7 +558,7 @@ bool legacy_router::bind_range(
             response_type r
                 = bootstrap->primary_ns_server.bind_gid(lower_id, gva, ec);
     
-            if ((&ec == &throws || !ec) && success == r.get_status()) 
+            if (!ec && success == r.get_status()) 
                 return true;
         }
     
@@ -524,24 +567,22 @@ bool legacy_router::bind_range(
             // WARNING: this deadlocks if AGAS is unresponsive and all response
             // futures are checked out and pending.
             // get a future
-            hosted->bind_response_sema_.wait(1);
-            hosted->bind_response_pool_.dequeue(&f); 
-    
-            BOOST_ASSERT(f);
-    
-            // reset the future
-            f->reset();
+
+            // wait for the semaphore to get available 
+            lock_semaphore lock(hosted->bind_response_sema_);
+
+            typedef checkout_future<bind_response_pool_type, 
+                bind_response_future_type> checkout_future_type;
+            checkout_future_type cf(hosted->bind_response_pool_, f);
     
             // execute the action (synchronously)
-            f->apply(
+            cf->apply(
                 naming::id_type(primary_namespace_server_type::fixed_gid()
                               , naming::id_type::unmanaged),
                 lower_id, gva);
-            response_type r = f->get(ec);
-    
-            // return the future to the pool
-            hosted->bind_response_pool_.enqueue(f);
-            hosted->bind_response_sema_.signal(1);
+            response_type r = cf->get(ec);
+
+            cf.set_ok();
 
             if (ec)
                 return false;
@@ -564,8 +605,6 @@ bool legacy_router::bind_range(
         if (!is_bootstrap() && f) 
         {
             hosted->bind_response_pool_.enqueue(new bind_response_future_type);
-            hosted->bind_response_sema_.signal(1);
-
             f->invalidate(boost::current_exception());
         }
 
@@ -842,7 +881,7 @@ bool legacy_router::registerid(
             r = hosted->symbol_ns_.bind(name, id, ec);
    
         // Check if we evicted another entry or if an exception occured. 
-        return (&ec == &throws || !ec) && (r.get_gid() == id);
+        return !ec && (r.get_gid() == id);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -870,7 +909,7 @@ bool legacy_router::unregisterid(
         else  
             r = hosted->symbol_ns_.unbind(name, ec);
     
-        return (&ec == &throws || !ec) && (success == r.get_status());
+        return !ec && (success == r.get_status());
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -899,7 +938,7 @@ bool legacy_router::queryid(
         else
             r = hosted->symbol_ns_.resolve(ns_name, ec);
     
-        if ((&ec == &throws || !ec) && (success == r.get_status()))
+        if (!ec && (success == r.get_status()))
         {
             id = r.get_gid();
             return true;
@@ -935,7 +974,7 @@ bool legacy_router::iterateids(
         else
             r = hosted->symbol_ns_.iterate(f, ec);
 
-        return (&ec == &throws || !ec) && (success == r.get_status());
+        return !ec && (success == r.get_status());
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
