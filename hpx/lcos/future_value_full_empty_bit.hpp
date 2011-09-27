@@ -64,13 +64,11 @@ namespace hpx { namespace lcos { namespace detail
         /// Get the result of the requested action. This call blocks (yields 
         /// control) if the result is not ready. As soon as the result has been 
         /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a lazy_future#get will return.
+        /// manager the function will return.
         ///
         /// \param slot   [in] The number of the slot the value has to be 
         ///               returned for. This number must be positive, but 
         ///               smaller than the template parameter \a N.
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result. 
         /// \param ec     [in,out] this represents the error status on exit,
         ///               if this is pre-initialized to \a hpx#throws
         ///               the function will throw on error instead. If the
