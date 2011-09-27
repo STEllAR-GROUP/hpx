@@ -131,10 +131,10 @@ namespace hpx { namespace components { namespace server
         std::size_t part_size = info.size();
         if (part_size < prefixes.size()) 
         {
-            // we have less localities as required by one partition 
+            // we have less localities than required by one partition 
             HPX_THROW_EXCEPTION(bad_parameter, 
                 "distributing_factory::create_partitioned",
-                "partition size is smaller than number of localities");
+                "partition size is larger than number of localities");
         }
 
         // a new partition starts every parts_delta localities
