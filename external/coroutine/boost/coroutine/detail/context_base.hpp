@@ -351,6 +351,10 @@ namespace boost { namespace coroutines { namespace detail {
     {
         return m_allocation_counter;
     }
+    static boost::uint64_t incrememnt_count()
+    {
+        return ++m_allocation_counter;
+    }
 
   protected:
     // global coroutine state
