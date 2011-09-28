@@ -137,12 +137,14 @@
     <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
+    <ClCompile Include="..\..\..\src\util\interval_timer.cpp" />
     <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
     <ClCompile Include="..\..\..\src\util\itt_notify.cpp" />
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
     <ClCompile Include="..\..\..\src\util\map_hostnames.cpp" />
     <ClCompile Include="..\..\..\src\util\pbs_environment.cpp" />
     <ClCompile Include="..\..\..\src\util\performance_counters.cpp" />
+    <ClCompile Include="..\..\..\src\util\query_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
     <ClCompile Include="..\..\..\src\runtime\actions\action_manager.cpp" />
     <ClCompile Include="..\..\..\src\runtime\actions\continuation.cpp" />
@@ -259,10 +261,12 @@
     <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_32.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_64.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\msvc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\interval_timer.hpp" />
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp" />
     <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\query_counters.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />

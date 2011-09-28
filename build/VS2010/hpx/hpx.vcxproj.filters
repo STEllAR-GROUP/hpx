@@ -365,6 +365,12 @@
     <ClCompile Include="..\..\..\src\util\pbs_environment.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\interval_timer.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\query_counters.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -995,6 +1001,12 @@
       <Filter>Header Files\Performance Counters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\spinlock.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\interval_timer.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\query_counters.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
