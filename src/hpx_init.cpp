@@ -393,6 +393,7 @@ namespace hpx
                      "the IP address the AGAS server is running on, "
                      "expected format: `address:port' (default: "
                      "127.0.0.1:7910)")
+                    ("run-agas-server-only", "run only the AGAS server")
                     ("hpx,x", value<std::string>(), 
                      "the IP address the HPX parcelport is listening on, "
                      "expected format: `address:port' (default: "
@@ -980,8 +981,15 @@ namespace hpx
             ini_config += "hpx.agas.address=" + agas_host;
             ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>(agas_port);
 
-            if (run_agas_server)  
+            if (run_agas_server) {
                 ini_config += "hpx.agas.router_mode=bootstrap"; 
+                if (vm.count("run-agas-server-only")) 
+                    ini_config += "hpx.components.load_external=0"; 
+            }
+            else if (vm.count("run-agas-server-only")) {
+                throw std::logic_error("Command line option --run-agas-server-only "
+                    "can be specified only for the node running the AGAS server.");
+            }
 
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;
