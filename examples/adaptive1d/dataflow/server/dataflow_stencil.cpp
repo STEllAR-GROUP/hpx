@@ -322,12 +322,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = 2;
-
+        int num_rows = par->num_rows;
         std::vector<std::size_t> each_row;
         each_row.resize(num_rows);
         for (int i=0;i<num_rows;i++) {
-          each_row[i] = numvalues;
+          each_row[i] = par->rowsize[par->level_row[i]];
         }
 
         std::vector<result_type> stencils;
@@ -408,12 +407,14 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     void dataflow_stencil::prep_ports(array3d &dst_port,array3d &dst_src,
-                                  array3d &dst_step,array3d &dst_size,array3d &src_size,std::size_t num_rows,
+                                  array3d &dst_step,array3d &dst_size,
+                                  array3d &src_size,std::size_t num_rows,
                                   std::vector<std::size_t> &each_row,
                                   parameter const& par)
     {
       std::size_t j;
       std::size_t counter,dst;
+      bool prolongation;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -426,22 +427,145 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
       for (std::size_t step=0;step<num_rows;step = step + 1) {
         for (std::size_t i=0;i<each_row[step];i++) {
           counter = 0;
-     
-          dst = step + 1;
+
+          // find the level of this point
+          int level = par->level_row[step];
+          bool found = false;
+          for (int ii=par->allowedl;ii>=0;ii--) {
+            if ( i < par->rowsize[ii]) {
+              level = ii;
+              found = true;
+              break;
+            }
+          }
+          if ( !found ) {
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "marduk: Problem in prep_ports");
+          }
+          dst = step;
+
+          // Special case for allowedl==0
+          if ( par->allowedl == 0 ) {
+            dst += 1;
+            if ( dst >= num_rows ) dst = 0;
+
+            if ( i == 0 ) {
+              vsrc_step.push_back(step);vsrc_column.push_back(each_row[step]-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+              vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+            } else if ( i == each_row[step]-1 ) {
+              vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+              vsrc_step.push_back(step);vsrc_column.push_back(0);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+            } else {
+              vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+              vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+            }
+          } else {
+            if ( (step+3)%3 != 0 ) {
+               // anytime there is a difference of more than one level between src and dst rows,
+              // you need to account for the prolongation/restriction rows going on inbetween them.
+              // That is given by 2^{L-l-1}-1
+              int intermediate = (int) pow(2.,int(par->allowedl-level)) ;
+              if ( par->allowedl-level > 1 ) {
+                dst += intermediate + intermediate/2 - 1;
+              } else {
+                dst += intermediate;
+              }
+              prolongation = false;
+            } else {
+              dst += 1; // this is a prolongation/restriction step
+              prolongation = true;
+            }          
+          }
           if ( dst >= num_rows ) dst = 0;
 
-          if ( i == 0 ) {
-            vsrc_step.push_back(step);vsrc_column.push_back(each_row[step]-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-            vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
-          } else if ( i == each_row[step]-1 ) {
-            vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-            vsrc_step.push_back(step);vsrc_column.push_back(0);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
-          } else {
-            vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-            vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-            vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+          if ( par->allowedl > 0 ) {
+            // AMR dataflow goes here
+            if ( prolongation == false ) {
+              // level zero -- periodic BC
+              if ( level == 0 ) {
+                if ( i == 0 ) {
+                  vsrc_step.push_back(step);vsrc_column.push_back(each_row[step]-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+                } else if ( i == each_row[step]-1 ) {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+                  vsrc_step.push_back(step);vsrc_column.push_back(0);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+                } else {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
+                }
+              } else {
+                j = i;
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+
+                // Find out who else on this level neighbors this gi
+                int gi = par->levelp[level];
+                int gi2 = par->item2gi[i];
+                while ( gi >=0 && gi < par->gr_minx.size() ) {
+                  if ( intersection(par->gr_minx[gi]-par->gr_h[gi],
+                                    par->gr_maxx[gi]+par->gr_h[gi],
+                                    par->gr_minx[gi2],par->gr_maxx[gi2]) &&
+                                    gi2 != gi ) {
+                      
+                    j = par->gi2item[gi];
+                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                    counter++;
+                  }
+                  gi = par->gr_sibling[gi];
+                }
+              }
+            } else {
+              // prolongation true case
+              if ( level == 0 ) {
+                j = i;
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+              } else {
+                j = i;
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                counter++;
+
+                int gi2 = par->item2gi[i];
+                if ( par->gr_lbox[gi2] || par->gr_rbox[gi2] ) {
+                  //prolongation needed
+                  int gi = par->levelp[level-1];
+                  while ( gi >=0 && gi < par->gr_minx.size() ) {
+                    if ( intersection(par->gr_minx[gi], par->gr_maxx[gi],
+                                      par->gr_minx[gi2],par->gr_maxx[gi2]) &&
+                                      gi2 != gi ) {
+                        
+                      j = par->gi2item[gi];
+                      vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                      counter++;
+                    }
+                    gi = par->gr_sibling[gi];
+                  }
+                }  
+              } 
+
+              // restriction (taken care of at same time as prolongation)
+              if ( level < par->allowedl ) {
+                int gi2 = par->item2gi[i];
+                int gi = par->levelp[level+1];
+                while ( gi >=0 && gi < par->gr_minx.size() ) {
+                  if ( intersection(par->gr_minx[gi], par->gr_maxx[gi],
+                                    par->gr_minx[gi2],par->gr_maxx[gi2]) &&
+                                    gi2 != gi ) {
+                        
+                    j = par->gi2item[gi];
+                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
+                    counter++;
+                  }
+                  gi = par->gr_sibling[gi];
+                }
+              }
+
+            }
           }
 
         }
@@ -459,6 +583,31 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         dst_size(step,column,0) += 1;
         src_size(src_step,src_column,0) += 1;
       }
+    }
+
+    bool dataflow_stencil::intersection(double_type xmin,double_type xmax,
+                                        double_type xmin2,double_type xmax2)
+    {
+      double_type pa[3],ea[3];
+      static double_type const half = 0.5;
+      pa[0] = half*(xmax + xmin);
+
+      ea[0] = xmax - pa[0];
+
+      double_type pb[3],eb[3];
+      pb[0] = half*(xmax2 + xmin2);
+
+      eb[0] = xmax2 - pb[0];
+
+      double_type T[3];
+      T[0] = pb[0] - pa[0];
+
+      if ( floatcmp_le(fabs(T[0]),ea[0] + eb[0]) ) {
+        return true;
+      } else {
+        return false;
+      }
+
     }
 
 }}}}

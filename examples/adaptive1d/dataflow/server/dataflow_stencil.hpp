@@ -124,11 +124,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
                                     parameter const& par);
 
         static bool intersection(double_type xmin,double_type xmax,
-                                    double_type ymin,double_type ymax,
-                                    double_type zmin,double_type zmax,
-                                    double_type xmin2,double_type xmax2,
-                                    double_type ymin2,double_type ymax2,
-                                    double_type zmin2,double_type zmax2);
+                                    double_type xmin2,double_type xmax2);
 
 
         static bool floatcmp(double_type const& x1, double_type const& x2);

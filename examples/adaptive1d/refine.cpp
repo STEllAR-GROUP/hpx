@@ -13,6 +13,64 @@
 #include <examples/adaptive1d/stencil/logging.hpp>
 #include <examples/adaptive1d/refine.hpp>
 
+// level_bbox {{{
+// the purpose of this routine is to find the boundaries of contiguous refinement regions
+// this is used in the prolongation routines
+int level_bbox(int level,parameter &par)
+{
+  int rc;
+  int ghostwidth = par->ghostwidth;
+  double ethreshold = par->ethreshold;
+
+  int gi;
+  double minx,maxx;
+
+  // find the bounds of the level
+  rc = level_find_bounds(level,minx,maxx,par);
+
+  // find the grid index of the beginning of the level
+  gi = level_return_start(level,par);
+
+  double h = par->gr_h[gi];
+
+  std::vector<int> level_gi;
+
+  while ( grid_return_existence(gi,par) ) {
+    level_gi.push_back(gi);
+    gi = par->gr_sibling[gi];
+  }
+
+  // Check each element of level_gi to see if they touch
+  for (std::size_t i=0;i<level_gi.size();i++) {
+    double lminx = par->gr_minx[ level_gi[i] ];
+    double lmaxx = par->gr_maxx[ level_gi[i] ];
+    gi = level_return_start(level,par);
+    bool found_left = true;
+    bool found_right = true;
+    while ( grid_return_existence(gi,par) ) {
+      if ( gi != level_gi[i] ) {
+        double lminx2 = par->gr_minx[ gi ];
+        double lmaxx2 = par->gr_maxx[ gi ];
+        if ( ballpark(lminx,lmaxx2,2*h) ) {
+          std::cout << " TEST lmaxx2 " << lmaxx2 << " lminx " << lminx << std::endl;
+          found_left = false;
+        }
+        if ( ballpark(lminx2,lmaxx,2*h) ) {
+          std::cout << " TEST lminx2 " << lminx2 << " lmaxx " << lmaxx << std::endl;
+          found_right = false;
+        }
+        if ( !found_left && !found_right ) break;
+      }
+      gi = par->gr_sibling[gi];
+    }
+    if ( found_left )  par->gr_lbox[ level_gi[i] ] = true;
+    if ( found_right ) par->gr_rbox[ level_gi[i] ] = true;
+  } 
+
+  return 0;
+}
+
+// }}}
 
 // level_refine {{{
 int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type> > &result_data, double time)
@@ -90,6 +148,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       par->gr_minx.push_back(lminx);
       par->gr_maxx.push_back(lmaxx);
       par->gr_h.push_back(hl);
+      par->gr_lbox.push_back(false);
+      par->gr_rbox.push_back(false);
       par->gr_nx.push_back(nx);
     }
 
@@ -482,12 +542,16 @@ int increment_gi(int level,int nx,
     par->gr_minx.resize(gi+1);
     par->gr_maxx.resize(gi+1);
     par->gr_h.resize(gi+1);
+    par->gr_lbox.resize(gi+1);
+    par->gr_rbox.resize(gi+1);
     par->gr_nx.resize(gi+1);
     par->gr_sibling.resize(gi+1);
 
     par->gr_minx[gi]  = lminx;
     par->gr_maxx[gi]  = lmaxx;
     par->gr_h[gi]     = hl/refine_factor;
+    par->gr_lbox[gi]  = false;
+    par->gr_rbox[gi]  = false;
     par->gr_nx[gi]    = nx;
     
     return gi;
@@ -538,6 +602,18 @@ bool floatcmp_le(double const& x1, double const& x2) {
 int floatcmp(double const& x1, double const& x2) {
   // compare two floating point numbers
   static double const epsilon = 1.e-8;
+  if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
+    // the numbers are close enough for coordinate comparison
+    return true;
+  } else {
+    return false;
+  }
+}
+// }}}
+
+// ballpark {{{
+int ballpark(double const& x1, double const& x2,double const& epsilon) {
+  // compare two floating point numbers
   if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
     // the numbers are close enough for coordinate comparison
     return true;
