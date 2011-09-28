@@ -7,7 +7,7 @@
 #define HPX_PARTITION3D_AUG_06_2011_1020PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/partition3d.hpp"
@@ -42,7 +42,7 @@ namespace interpolate3d
         {}
 
         // initialize this partition
-        hpx::lcos::future_value<void>
+        hpx::lcos::promise<void>
         init_async(std::string const& datafilename, 
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
@@ -58,7 +58,7 @@ namespace interpolate3d
 
         // ask this partition to interpolate, note that value must be in the
         // range valid for this partition
-        hpx::lcos::future_value<double>
+        hpx::lcos::promise<double>
         interpolate_async(double value_x, double value_y, double value_z)
         {
             return stubs::partition3d::interpolate_async(this->gid_, 

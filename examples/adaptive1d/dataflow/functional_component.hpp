@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        lcos::future_value<int> eval_async(naming::id_type const& result, 
+        lcos::promise<int> eval_async(naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             double cycle_time, parameter const& par)
         {
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future_value<naming::id_type> alloc_data_async(int item,
+        lcos::promise<naming::id_type> alloc_data_async(int item,
             int maxitems, int row,
             std::vector<naming::id_type> const& interp_src_data,
             double time,

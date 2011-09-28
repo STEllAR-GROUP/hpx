@@ -87,10 +87,10 @@ typedef hpx::components::managed_component<
     bc_sssp_member_type
 > bc_sssp_component_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
 typedef std::vector<future_void_type> future_voids_type;
 
-typedef hpx::lcos::future_value<size_type> future_size_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
 typedef std::vector<future_size_type> future_sizes_type;
 
 ////////////////////////////////////////////////////////////////////////////////

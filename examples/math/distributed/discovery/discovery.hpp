@@ -26,7 +26,7 @@ struct discovery : components::client_base<discovery, stubs::discovery>
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<std::vector<naming::id_type> > build_network_async()
+    lcos::promise<std::vector<naming::id_type> > build_network_async()
     { return this->base_type::build_network_async(this->gid_); }
 
     std::vector<naming::id_type> build_network_sync()
@@ -36,7 +36,7 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::build_network(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<std::size_t> topology_lva_async()
+    lcos::promise<std::size_t> topology_lva_async()
     { return this->base_type::topology_lva_async(this->gid_); }
 
     std::size_t topology_lva_sync()
@@ -46,7 +46,7 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::topology_lva(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<boost::uint32_t> total_shepherds_async()
+    lcos::promise<boost::uint32_t> total_shepherds_async()
     { return this->base_type::total_shepherds_async(this->gid_); }
 
     boost::uint32_t total_shepherds_sync()
@@ -56,7 +56,7 @@ struct discovery : components::client_base<discovery, stubs::discovery>
     { return this->base_type::total_shepherds(this->gid_); }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<bool> empty_async()
+    lcos::promise<bool> empty_async()
     { return this->base_type::empty_async(this->gid_); }
 
     bool empty_sync()

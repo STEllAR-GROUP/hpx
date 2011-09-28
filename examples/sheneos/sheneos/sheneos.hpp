@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_AUG_08_2011_1223PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <vector>
@@ -50,7 +50,7 @@ namespace sheneos
         // Return the interpolated function values for the given argument. This
         // function dispatches to the proper partition for the actual 
         // interpolation.
-        hpx::lcos::future_value<std::vector<double> >
+        hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho, 
             boost::uint32_t eosvalues = server::partition3d::small_api_values)
         {

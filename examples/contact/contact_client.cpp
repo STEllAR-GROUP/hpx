@@ -90,14 +90,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         //  boost::geometry::assign(element[i],);
         //}
 
-        std::vector<hpx::lcos::future_value<void> > barrier;
+        std::vector<hpx::lcos::promise<void> > barrier;
         for (std::size_t i=0;i<num_vertices;i++) {
           barrier.push_back(accu[i].contactsearch_async());
         }
 
         hpx::lcos::wait(barrier);
 
-        std::vector<hpx::lcos::future_value<void> > barrier2;
+        std::vector<hpx::lcos::promise<void> > barrier2;
         for (std::size_t i=0;i<num_vertices;i++) {
           barrier2.push_back(accu[i].contactenforce_async()); 
         }

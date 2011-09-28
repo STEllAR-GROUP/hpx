@@ -35,9 +35,9 @@ typedef std::vector<edge_tuple_type> edge_tuples_type;
 
 typedef pxgl::graphs::server::extension_info_type extension_info_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
-typedef hpx::lcos::future_value<size_type> future_size_type;
-typedef hpx::lcos::future_value<extension_info_type> future_extension_info_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
+typedef hpx::lcos::promise<extension_info_type> future_extension_info_type;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stubs interface
@@ -57,7 +57,7 @@ namespace pxgl { namespace xua { namespace stubs {
 
     typedef pxgl::graphs::server::extension_info_type extension_info_type;
 
-    typedef hpx::lcos::future_value<size_type> future_size_type;
+    typedef hpx::lcos::promise<size_type> future_size_type;
 
     ////////////////////////////////////////////////////////////////////////////
     // Construction/initialization

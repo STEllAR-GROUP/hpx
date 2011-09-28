@@ -9,7 +9,7 @@
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/namespace/stubs/symbol.hpp>
 
@@ -44,7 +44,7 @@ struct symbol_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     bind_async(symbol_type const& key, naming::gid_type const& gid)
     { return this->base_type::bind_async(this->gid_, key, gid); }
 
@@ -54,7 +54,7 @@ struct symbol_namespace :
     
     ///////////////////////////////////////////////////////////////////////////
     // resolve interface 
-    lcos::future_value<response_type> resolve_async(symbol_type const& key)
+    lcos::promise<response_type> resolve_async(symbol_type const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
     response_type resolve(symbol_type const& key, error_code& ec = throws)
@@ -62,7 +62,7 @@ struct symbol_namespace :
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<response_type> unbind_async(symbol_type const& key)
+    lcos::promise<response_type> unbind_async(symbol_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
     response_type unbind(symbol_type const& key, error_code& ec = throws)
@@ -70,7 +70,7 @@ struct symbol_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // iterate interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     iterate_async(iterate_function_type const& f)
     { return this->base_type::iterate_async(this->gid_, f); }
     

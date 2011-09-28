@@ -23,9 +23,9 @@ namespace hpx { namespace components { namespace stubs
     {
         /// Query the current value of the server#simple_accumulator instance 
         /// with the given \a gid. This is a non-blocking call. The caller 
-        /// needs to call \a future_value#get on the return value of 
+        /// needs to call \a promise#get on the return value of 
         /// this function to obtain the result as returned by the simple_accumulator.
-        static lcos::future_value<int> query_async(naming::id_type gid) 
+        static lcos::promise<int> query_async(naming::id_type gid) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, int>(gid);
         }
 
-        static lcos::future_value<void> contactsearch_async(naming::id_type gid) 
+        static lcos::promise<void> contactsearch_async(naming::id_type gid) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type,void>(gid);
         }
 
-        static lcos::future_value<void> contactenforce_async(naming::id_type gid) 
+        static lcos::promise<void> contactenforce_async(naming::id_type gid) 
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace stubs
         static double query(naming::id_type gid) 
         {
             // The following get yields control while the action above 
-            // is executed and the result is returned to the future_value
+            // is executed and the result is returned to the promise
             return query_async(gid).get();
         }
 
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace stubs
         static void contactsearch(naming::id_type gid) 
         {
             // The following get yields control while the action above 
-            // is executed and the result is returned to the future_value
+            // is executed and the result is returned to the promise
             contactsearch_async(gid).get();
         }
 

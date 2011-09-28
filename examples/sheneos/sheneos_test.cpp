@@ -23,7 +23,7 @@ char const* shen_symbolic_name = "/sheneos_test/test";
 ///////////////////////////////////////////////////////////////////////////////
 // Monitor the test execution
 void monitor_test_sheneos(
-    std::vector<hpx::lcos::future_value<std::vector<double> > > const& tests)
+    std::vector<hpx::lcos::promise<std::vector<double> > > const& tests)
 {
     boost::dynamic_bitset<> handled(tests.size());
     std::size_t handled_count = 0;
@@ -47,12 +47,12 @@ void monitor_test_sheneos(
 
         // suspend after one full loop over all values, 10ms should be fine
         if (!suspended) 
-            hpx::threads::suspend(boost::posix_time::milliseconds(10));
+            hpx::threads::suspend(boost::posix_time::milliseconds(50));
     }
 }
 
 typedef hpx::actions::plain_action1<
-    std::vector<hpx::lcos::future_value<std::vector<double> > > const&, 
+    std::vector<hpx::lcos::promise<std::vector<double> > > const&, 
     monitor_test_sheneos> 
 monitor_test_action;
 
@@ -62,7 +62,7 @@ namespace boost { namespace serialization
 {
     template <typename Archive>
     void serialize(Archive&, 
-        std::vector<hpx::lcos::future_value<std::vector<double> > >&, 
+        std::vector<hpx::lcos::promise<std::vector<double> > >&, 
         unsigned int const)
     {
         // dummy function, will never be called as the monitor is invoked 
@@ -135,7 +135,7 @@ void test_sheneos(std::size_t num_test_points)
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // now, do the actual evaluation, all in parallel
-    std::vector<hpx::lcos::future_value<std::vector<double> > > tests;
+    std::vector<hpx::lcos::promise<std::vector<double> > > tests;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
         std::size_t ii = sequence_ye[i];
@@ -152,11 +152,13 @@ void test_sheneos(std::size_t num_test_points)
     }
 
     // schedule a monitoring thread
-    hpx::lcos::eager_future<monitor_test_action, void> monitor(hpx::find_here(), tests);
+    auto monitor = hpx::lcos::async<monitor_test_action>(hpx::find_here(), tests);
 
     // wait for all of the tests to finish
     int count = 0;
-    hpx::lcos::wait(tests, [&](int, std::vector<double> const&) { ++count; });
+    hpx::lcos::wait(tests, [&](int, std::vector<double> const&) { 
+        ++count; 
+    }, 50);
 
     // wait for the monitor to exit
     hpx::lcos::wait(monitor);
@@ -207,19 +209,18 @@ int hpx_main(variables_map& vm)
         // execute tests on all localities
         t.restart();
 
-        std::vector<hpx::lcos::future_value<void> > tests;
+        std::vector<hpx::lcos::promise<void> > tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
         {
-            for (std::size_t i = 0; i < num_workers; ++i) {
-                hpx::lcos::eager_future<test_action, void> f(id, num_test_points);
-                tests.push_back(f);
-            }
+            using hpx::lcos::async;
+            for (std::size_t i = 0; i < num_workers; ++i) 
+                tests.push_back(async<test_action>(id, num_test_points));
         }
 
         // use a dummy lambda to work around a race condition in HPX's code
         hpx::lcos::wait(tests, [](int i) {
             std::cout << "Finished task: " << i << std::endl;
-        });
+        }, 50);
 
         elapsed = t.elapsed();
         std::cout << "Running tests: " << elapsed << " [s]" << std::endl;

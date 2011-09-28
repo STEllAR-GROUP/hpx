@@ -61,7 +61,7 @@ namespace pxgl { namespace graphs { namespace server {
     typedef unsigned long size_type;
     typedef std::vector<size_type> sizes_type;
 
-    typedef hpx::lcos::future_value<signal_value_type> future_signal_value_type;
+    typedef hpx::lcos::promise<signal_value_type> future_signal_value_type;
     typedef std::vector<future_signal_value_type> future_signal_values_type;
      
     typedef pxgl::graphs::server::edge_tuple_type edge_tuple_type;

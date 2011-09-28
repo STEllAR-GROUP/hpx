@@ -28,13 +28,13 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        static lcos::future_value<int> eval_async(naming::id_type const& gid, 
+        static lcos::promise<int> eval_async(naming::id_type const& gid, 
             naming::id_type const& result, 
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             double cycle_time,parameter const& par)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
             return lcos::eager_future<action_type>(gid, result, gids, row, column,cycle_time,par);
@@ -50,13 +50,13 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<naming::id_type> alloc_data_async(
+        static lcos::promise<naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
             int row,std::vector<naming::id_type> const& interp_src_data,
             double time, parameter const& par)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
             return lcos::eager_future<action_type>(gid, item, maxitems, 
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<void>  
+        static lcos::promise<void>  
         init_async(naming::id_type const& gid, std::size_t numsteps, 
             naming::id_type const& val)
         {

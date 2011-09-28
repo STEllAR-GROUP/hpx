@@ -28,8 +28,8 @@ typedef pxgl::xua::arbitrary_distribution<id_type, pxgl::xua::range>
         arbitrary_distribution_type;
 typedef arbitrary_distribution_type distribution_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
-typedef hpx::lcos::future_value<size_type> future_size_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stubs interface

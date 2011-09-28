@@ -178,7 +178,7 @@ struct HPX_COMPONENT_EXPORT integrator
     ) {
         BOOST_ASSERT(f);
 
-        std::vector<lcos::future_value<naming::id_type, naming::gid_type> >
+        std::vector<lcos::promise<naming::id_type, naming::gid_type> >
             results0; 
 
         const boost::uint32_t root_prefix
@@ -212,7 +212,7 @@ struct HPX_COMPONENT_EXPORT integrator
 
         BOOST_ASSERT(integrator_network.size() == discovery_network.size());
     
-        std::list<lcos::future_value<void> > results1;
+        std::list<lcos::promise<void> > results1;
    
         for (std::size_t i = 0; i < integrator_network.size(); ++i)
         {
@@ -226,7 +226,7 @@ struct HPX_COMPONENT_EXPORT integrator
                                            , epsilon));
         }
     
-        BOOST_FOREACH(lcos::future_value<void> const& r, results1)
+        BOOST_FOREACH(lcos::promise<void> const& r, results1)
         { r.get(); }
     
         return integrator_network;
@@ -272,7 +272,7 @@ struct HPX_COMPONENT_EXPORT integrator
     ) {
         T area(0);
 
-        std::list<lcos::future_value<T> > results;
+        std::list<lcos::promise<T> > results;
 
         const boost::uint32_t here_index
             = here_ - naming::get_prefix_from_id(network_[0]);
@@ -299,7 +299,7 @@ struct HPX_COMPONENT_EXPORT integrator
             }
         }
 
-        BOOST_FOREACH(lcos::future_value<T> const& r, results)
+        BOOST_FOREACH(lcos::promise<T> const& r, results)
         { area += r.get(); }
 
         return area;
@@ -322,7 +322,7 @@ struct HPX_COMPONENT_EXPORT integrator
             return f_lower * length; 
 
         typedef boost::fusion::vector2<
-            lcos::future_value<T>
+            lcos::promise<T>
           , current_shepherd
         > result_type; 
 

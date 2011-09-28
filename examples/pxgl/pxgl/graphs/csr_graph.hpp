@@ -202,7 +202,7 @@ namespace pxgl { namespace graphs { namespace server {
     typedef hpx::naming::id_type id_type;
     typedef std::vector<id_type> ids_type;
 
-    typedef hpx::lcos::future_value<int> future_int_type;
+    typedef hpx::lcos::promise<int> future_int_type;
     typedef std::vector<future_int_type> future_ints_type;
 
     typedef unsigned long size_type;
@@ -211,10 +211,10 @@ namespace pxgl { namespace graphs { namespace server {
     typedef double weight_type;
     typedef std::vector<weight_type> weights_type;
 
-    typedef hpx::lcos::future_value<size_type> future_size_type;
+    typedef hpx::lcos::promise<size_type> future_size_type;
     typedef std::vector<future_size_type> future_sizes_type;
 
-    typedef hpx::lcos::future_value<signal_value_type> future_signal_value_type;
+    typedef hpx::lcos::promise<signal_value_type> future_signal_value_type;
     typedef std::vector<future_signal_value_type> future_signal_values_type;
       
     typedef Distribution distribution_type;
@@ -1146,7 +1146,7 @@ namespace pxgl { namespace graphs { namespace stubs {
       return hpx::lcos::eager_future<action_type>(id, me).get();
     }
 
-    static hpx::lcos::future_value<signal_value_type> 
+    static hpx::lcos::promise<signal_value_type> 
         eager_aligned_init(
             id_type const & id,
             id_type const & me)
@@ -1170,7 +1170,7 @@ namespace pxgl { namespace graphs { namespace stubs {
       return hpx::lcos::eager_future<action_type>(id).get();
     }
 
-    static hpx::lcos::future_value<signal_value_type>
+    static hpx::lcos::promise<signal_value_type>
         eager_signal_init(hpx::naming::id_type id)
     {
       typedef typename server_type::signal_init_action action_type;
@@ -1183,7 +1183,7 @@ namespace pxgl { namespace graphs { namespace stubs {
       hpx::applier::apply<action_type>(id, edges);
     }
 
-    static hpx::lcos::future_value<size_type> 
+    static hpx::lcos::promise<size_type> 
         eager_init_local(hpx::naming::id_type id, edge_tuples_type edges)
     {
       typedef typename server_type::init_local_action action_type;
@@ -1328,7 +1328,7 @@ namespace pxgl { namespace graphs {
       return this->base_type::aligned_init(this->gid_, me);
     }
 
-    hpx::lcos::future_value<signal_value_type> 
+    hpx::lcos::promise<signal_value_type> 
         eager_aligned_init(id_type const & me) const
     {
       BOOST_ASSERT(this->gid_);
@@ -1347,7 +1347,7 @@ namespace pxgl { namespace graphs {
       return this->base_type::signal_init(this->gid_);
     }
 
-    hpx::lcos::future_value<signal_value_type> eager_signal_init(void)
+    hpx::lcos::promise<signal_value_type> eager_signal_init(void)
     {
       BOOST_ASSERT(this->gid_);
       return this->base_type::eager_signal_init(this->gid_);
@@ -1359,7 +1359,7 @@ namespace pxgl { namespace graphs {
       this->base_type::init(this->gid_, edges);
     }
 
-    hpx::lcos::future_value<size_type> eager_init_local(edge_tuples_type edges)
+    hpx::lcos::promise<size_type> eager_init_local(edge_tuples_type edges)
     {
       BOOST_ASSERT(this->gid_);
       return this->base_type::eager_init_local(this->gid_, edges);

@@ -157,7 +157,7 @@ namespace pxgl { namespace xua {
   {
     typedef unsigned long size_type;
 
-    typedef hpx::lcos::future_value<typename Action::result_type> future_type;
+    typedef hpx::lcos::promise<typename Action::result_type> future_type;
     typedef std::vector<future_type> futures_type;
 
     size_type const extent = c0.get_distribution().size();
@@ -225,7 +225,7 @@ namespace pxgl { namespace xua {
   {
     typedef unsigned long size_type;
 
-    typedef hpx::lcos::future_value<typename Action::result_type> future_type;
+    typedef hpx::lcos::promise<typename Action::result_type> future_type;
     typedef std::vector<future_type> futures_type;
   
     Container container(container_id);
@@ -252,7 +252,7 @@ namespace pxgl { namespace xua {
   {
     typedef unsigned long size_type;
 
-    typedef hpx::lcos::future_value<typename Action::result_type> future_type;
+    typedef hpx::lcos::promise<typename Action::result_type> future_type;
     typedef std::vector<future_type> futures_type;
   
     Container container(container_id);
@@ -279,7 +279,7 @@ namespace pxgl { namespace xua {
   {
     typedef unsigned long size_type;
 
-    typedef hpx::lcos::future_value<Result> future_value_type;
+    typedef hpx::lcos::promise<Result> future_value_type;
     typedef std::vector<future_value_type> future_values_type;
    
     Container container(container_id);

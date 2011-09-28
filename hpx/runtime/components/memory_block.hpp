@@ -75,7 +75,7 @@ namespace hpx { namespace components
 
         /// Asynchronously get the \a memory_block_data maintained by this 
         /// memory_block
-        lcos::future_value<memory_block_data> get_async() 
+        lcos::promise<memory_block_data> get_async() 
         {
             return this->base_type::get_async(gid_);
         }
@@ -93,7 +93,7 @@ namespace hpx { namespace components
         /// memory_block. Use given data for serialization configuration (will 
         /// be passed to the save() function exposed by the datatype instance 
         /// wrapped in the return value of this get())
-        lcos::future_value<memory_block_data> get_async(
+        lcos::promise<memory_block_data> get_async(
           memory_block_data const& config) 
         {
             return this->base_type::get_async(gid_, config);
@@ -108,7 +108,7 @@ namespace hpx { namespace components
 
         /// Asynchronously clone the \a memory_block_data maintained by this 
         /// memory_block
-        lcos::future_value<naming::id_type, naming::gid_type> clone_async() 
+        lcos::promise<naming::id_type, naming::gid_type> clone_async() 
         {
             return this->base_type::clone_async(gid_);
         }
@@ -124,7 +124,7 @@ namespace hpx { namespace components
         /// Asynchronously clone the \a memory_block_data maintained by this 
         /// memory_block
         template <typename T>
-        lcos::future_value<void> checkin_async(
+        lcos::promise<void> checkin_async(
             components::access_memory_block<T> const& data) 
         {
             return this->base_type::checkin_async(gid_, data);
@@ -244,9 +244,9 @@ namespace hpx { namespace components
     get_memory_block_async(std::vector<access_memory_block<T>, AllocA>& results,
         std::vector<naming::id_type, AllocB> const& gids)
     {
-        typedef std::vector<lcos::future_value<memory_block_data>,
+        typedef std::vector<lcos::promise<memory_block_data>,
             typename AllocA::template rebind<
-                lcos::future_value<memory_block_data>
+                lcos::promise<memory_block_data>
             >::other
         > lazy_results_type;
         lazy_results_type lazy_results;
@@ -272,9 +272,9 @@ namespace hpx { namespace components
         std::vector<naming::id_type, AllocB> const& gids, 
         naming::id_type const& result)
     {
-        typedef std::vector<lcos::future_value<memory_block_data>,
+        typedef std::vector<lcos::promise<memory_block_data>,
             typename AllocA::template rebind<
-                lcos::future_value<memory_block_data>
+                lcos::promise<memory_block_data>
             >::other
         > lazy_results_type;
         lazy_results_type lazy_results;
@@ -288,7 +288,7 @@ namespace hpx { namespace components
             lazy_results.push_back(stubs::memory_block::get_async(*it));
 
         //  invoke the remote operation for the result gid as well
-        lcos::future_value<memory_block_data> lazy_result =
+        lcos::promise<memory_block_data> lazy_result =
             stubs::memory_block::get_async(result);
 
         // then wait for all results to get back to us

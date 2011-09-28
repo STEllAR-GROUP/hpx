@@ -7,7 +7,7 @@
 #define HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0703PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/configuration.hpp"
@@ -44,7 +44,7 @@ namespace interpolate3d
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::future_value<void>
+        hpx::lcos::promise<void>
         init_async(std::string const& datafile, 
             std::string const& symbolic_name, std::size_t num_instances)
         {
@@ -60,7 +60,7 @@ namespace interpolate3d
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::future_value<config_data> get_async() const
+        hpx::lcos::promise<config_data> get_async() const
         {
             return stubs::configuration::get_async(this->gid_);
         }

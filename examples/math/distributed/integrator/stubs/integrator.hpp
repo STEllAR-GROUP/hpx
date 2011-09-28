@@ -20,7 +20,7 @@ template <typename T>
 struct integrator : components::stub_base<server::integrator<T> >
 {
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<std::vector<naming::id_type> >
+    static lcos::promise<std::vector<naming::id_type> >
     build_network_async(
         naming::id_type const& gid
       , std::vector<naming::id_type> const& discovery_network
@@ -60,7 +60,7 @@ struct integrator : components::stub_base<server::integrator<T> >
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<T>
+    static lcos::promise<T>
     solve_async(
         naming::id_type const& gid
       , T const& lower_bound

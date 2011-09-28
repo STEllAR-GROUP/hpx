@@ -35,7 +35,7 @@
 typedef unsigned long size_type;
 typedef std::vector<size_type> sizes_type;
 
-typedef hpx::lcos::future_value<size_type> future_size_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
 typedef std::vector<future_size_type> future_sizes_type;
 
 typedef std::vector<double> doubles_type;

@@ -401,21 +401,21 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     /// The \a create_async function initiates the creation of a new 
     /// component instance using the runtime_support as given by targetgid. 
-    /// This function is non-blocking as it returns a \a lcos#future_value. The 
+    /// This function is non-blocking as it returns a \a lcos#promise. The 
     /// caller of this create_async is responsible to call 
-    /// \a lcos#future_value#get to obtain the result. 
+    /// \a lcos#promise#get to obtain the result. 
     ///
     /// \param targetgid
     /// \param type
     /// \param count
     ///
-    /// \returns    The function returns a \a lcos#future_value instance 
+    /// \returns    The function returns a \a lcos#promise instance 
     ///             returning the the global id of the newly created
     ///             component when used to call get.
     ///
     /// \note       For synchronous operation use the function 
     ///             \a applier#create_async.
-    HPX_API_EXPORT lcos::future_value<naming::id_type, naming::gid_type> 
+    HPX_API_EXPORT lcos::promise<naming::id_type, naming::gid_type> 
         create_async(naming::id_type const& targetgid, 
             components::component_type type, std::size_t count = 1);
 

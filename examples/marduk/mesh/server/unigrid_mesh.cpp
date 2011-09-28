@@ -101,7 +101,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         if (logging.first != logging.second)
             log = *logging.first;
 
-        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        typedef std::vector<lcos::promise<void> > lazyvals_type;
         lazyvals_type lazyvals;
 
         for (/**/; function != functions.second; ++function)
@@ -125,7 +125,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_type function = functions.first;
 
         // start an asynchronous operation for each of the stencil value instances
-        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        typedef std::vector<lcos::promise<void> > lazyvals_type;
         lazyvals_type lazyvals;
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace amr { namespace server
     {
         typedef components::distributing_factory::result_type result_type;
         typedef 
-            std::vector<lcos::future_value<std::vector<naming::id_type> > >
+            std::vector<lcos::promise<std::vector<naming::id_type> > >
         lazyvals_type;
 
         // start an asynchronous operation for each of the stencil value instances
@@ -199,7 +199,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         parameter const& par)
     {
         typedef components::distributing_factory::result_type result_type;
-        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        typedef std::vector<lcos::promise<void> > lazyvals_type;
 
         lazyvals_type lazyvals;
 
@@ -236,7 +236,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numvalues,
         parameter const& par)
     {
-        typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
+        typedef std::vector<lcos::promise<naming::id_type> > lazyvals_type;
 
         // create a data item value type for each of the functions
         lazyvals_type lazyvals;
@@ -259,7 +259,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type>& result_data)
     {
         // start the execution of all stencil stencils (data items)
-        typedef std::vector<lcos::future_value<naming::id_type> > lazyvals_type;
+        typedef std::vector<lcos::promise<naming::id_type> > lazyvals_type;
 
         lazyvals_type lazyvals;
         components::distributing_factory::iterator_type stencil = stencils.first;
@@ -281,7 +281,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         components::distributing_factory::iterator_range_type const& stencils)
     {
         // start the execution of all stencil stencils (data items)
-        typedef std::vector<lcos::future_value<void> > lazyvals_type;
+        typedef std::vector<lcos::promise<void> > lazyvals_type;
 
         lazyvals_type lazyvals;
         components::distributing_factory::iterator_type stencil = stencils.first;

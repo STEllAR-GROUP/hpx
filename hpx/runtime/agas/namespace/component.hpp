@@ -9,7 +9,7 @@
 #define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/namespace/stubs/component.hpp>
 
@@ -46,7 +46,7 @@ struct component_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     bind_async(component_name_type const& key, prefix_type prefix)
     { return this->base_type::bind_prefix_async(this->gid_, key, prefix); }
 
@@ -54,7 +54,7 @@ struct component_namespace :
                        error_code& ec = throws)
     { return this->base_type::bind_prefix(this->gid_, key, prefix, ec); }
 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     bind_async(component_name_type const& key, naming::gid_type const& prefix)
     {
         return this->base_type::bind_prefix_async
@@ -69,7 +69,7 @@ struct component_namespace :
             (this->gid_, key, naming::get_prefix_from_gid(prefix), ec);
     }
     
-    lcos::future_value<response_type> bind_async(component_name_type const& key)
+    lcos::promise<response_type> bind_async(component_name_type const& key)
     { return this->base_type::bind_name_async(this->gid_, key); }
     
     response_type bind(component_name_type const& key, error_code& ec = throws)
@@ -77,13 +77,13 @@ struct component_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_id and resolve_name interface 
-    lcos::future_value<response_type> resolve_async(component_id_type key)
+    lcos::promise<response_type> resolve_async(component_id_type key)
     { return this->base_type::resolve_id_async(this->gid_, key); }
     
     response_type resolve(component_id_type key, error_code& ec = throws)
     { return this->base_type::resolve_id(this->gid_, key, ec); }
 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     resolve_async(components::component_type key)
     {
         return this->base_type::resolve_id_async
@@ -97,7 +97,7 @@ struct component_namespace :
             (this->gid_, component_id_type(key), ec);
     }
 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     resolve_async(component_name_type const& key)
     { return this->base_type::resolve_name_async(this->gid_, key); }
     
@@ -107,7 +107,7 @@ struct component_namespace :
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     unbind_async(component_name_type const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     

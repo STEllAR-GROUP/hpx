@@ -75,7 +75,7 @@ using hpx::running;
 using hpx::components::get_component_type;
 
 using hpx::lcos::eager_future;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 using hpx::lcos::base_lco;
 
 using hpx::naming::resolver_client;
@@ -137,7 +137,7 @@ void agas_main(variables_map& vm)
 
     BOOST_ASSERT(gid); 
 
-    future_value<void> stop_flag;
+    promise<void> stop_flag;
 
     // Associate the stop flag with a symbolic name.
     get_applier().get_agas_client().registerid

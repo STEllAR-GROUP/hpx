@@ -53,7 +53,7 @@ namespace hpx { namespace components
             this->base_type::add(gid_);
         }
 
-        hpx::lcos::future_value<void> add_async () 
+        hpx::lcos::promise<void> add_async () 
         {
             BOOST_ASSERT(gid_);
             return(this->base_type::add_async(gid_));
@@ -66,7 +66,7 @@ namespace hpx { namespace components
             this->base_type::print(gid_);
         }
         /// Asynchronously query the current value of the random_mem_access
-        hpx::lcos::future_value<void> print_async () 
+        hpx::lcos::promise<void> print_async () 
         {
             BOOST_ASSERT(gid_);
             return(this->base_type::print_async(gid_));
@@ -80,7 +80,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the random_mem_access
-        lcos::future_value<int> query_async() 
+        lcos::promise<int> query_async() 
         {
             return this->base_type::query_async(gid_);
         }

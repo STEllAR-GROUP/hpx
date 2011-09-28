@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1223PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/partition3d.hpp"
@@ -42,7 +42,7 @@ namespace sheneos
         {}
 
         // initialize this partition
-        hpx::lcos::future_value<void>
+        hpx::lcos::promise<void>
         init_async(std::string const& datafilename, 
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
@@ -58,7 +58,7 @@ namespace sheneos
 
         // ask this partition to interpolate, note that value must be in the
         // range valid for this partition
-        hpx::lcos::future_value<std::vector<double> >
+        hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho, 
             boost::uint32_t eosvalues)
         {

@@ -94,10 +94,10 @@ typedef pxgl::graphs::server::extension_info_type extension_info_type;
 typedef pxgl::graphs::server::adjacency<size_type, double>  adjacency_type;
 typedef std::vector<adjacency_type> adjacencies_type;
 
-typedef hpx::lcos::future_value<size_type> future_size_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
 typedef std::vector<future_size_type> future_sizes_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
 typedef std::vector<future_void_type> future_voids_type;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -29,8 +29,8 @@ typedef arbitrary_distribution_type distribution_type;
 typedef pxgl::graphs::server::edge_tuple edge_tuple_type;
 typedef std::vector<edge_tuple_type> edge_tuples_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
-typedef hpx::lcos::future_value<size_type> future_size_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<size_type> future_size_type;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stubs interface
@@ -51,7 +51,7 @@ namespace pxgl { namespace graphs { namespace stubs {
     typedef server::extension_info_type extension_info_type;
     typedef server::signal_value_type signal_value_type;
 
-    typedef hpx::lcos::future_value<signal_value_type> future_signal_value_type;
+    typedef hpx::lcos::promise<signal_value_type> future_signal_value_type;
 
     ////////////////////////////////////////////////////////////////////////////
     // Construction/initialization

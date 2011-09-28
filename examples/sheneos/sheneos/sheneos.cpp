@@ -187,7 +187,7 @@ namespace sheneos
         dimension dim_y(num_values_[dimension::temp]);
         dimension dim_z(num_values_[dimension::rho]);
 
-        std::vector<hpx::lcos::future_value<void> > lazy_sync;
+        std::vector<hpx::lcos::promise<void> > lazy_sync;
         for (std::size_t x = 0; x != num_partitions_per_dim_; ++x)
         {
             dim_x.offset_ = partition_size_x * x;

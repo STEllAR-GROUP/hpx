@@ -429,6 +429,16 @@ namespace hpx
         HPX_EXPORT void activate_logging();
     }
 
+    /// \namespace traits
+    namespace traits
+    {
+        template <typename Result, typename Enable = void>
+        struct promise_remote_result;
+
+        template <typename Result, typename Enable = void>
+        struct promise_local_result;
+    }
+
     /// \namespace lcos
     namespace lcos
     {
@@ -436,35 +446,29 @@ namespace hpx
         template <typename Result, typename RemoteResult = Result> 
         class base_lco_with_value;
 
-        template <typename Result>
-        struct future_value_remote_result;
-
-        template <typename Result>
-        struct future_value_local_result;
-
         template <typename Result, 
             typename RemoteResult = 
-                typename future_value_remote_result<Result>::type, 
+                typename traits::promise_remote_result<Result>::type, 
             int N = 1> 
-        class future_value;
+        class promise;
 
         template <typename Value, typename RemoteValue = Value>
         class local_dataflow_variable;
 
         template <typename Action, 
-            typename Result = typename future_value_local_result<
+            typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class eager_future;
 
         template <typename Action, 
-            typename Result = typename future_value_local_result<
+            typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class lazy_future;
 
         template <typename Action, 
-            typename Result = typename future_value_local_result<
+            typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class contin;

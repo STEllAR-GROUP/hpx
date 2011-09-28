@@ -18,9 +18,9 @@ namespace hpx { namespace performance_counters { namespace stubs
     struct HPX_EXPORT performance_counter 
       : components::stubs::stub_base<server::base_performance_counter>
     {
-        static lcos::future_value<counter_info> get_info_async(
+        static lcos::promise<counter_info> get_info_async(
             naming::gid_type const& targetgid);
-        static lcos::future_value<counter_value> get_value_async(
+        static lcos::promise<counter_value> get_value_async(
             naming::gid_type const& targetgid);
 
         static counter_info get_info(naming::gid_type const& targetgid,

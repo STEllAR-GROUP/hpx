@@ -28,11 +28,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         /// data referred to by the parameter \a initial. After finishing 
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        static lcos::future_value<naming::id_type> call_async(
+        static lcos::promise<naming::id_type> call_async(
             naming::id_type const& targetgid, naming::id_type const& initial)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dynamic_stencil_value::call_action action_type;
             return lcos::eager_future<action_type>(targetgid,initial);
@@ -49,11 +49,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// Return the gid's of the output ports associated with this 
         /// \a dynamic_stencil_value instance.
-        static lcos::future_value<std::vector<naming::id_type> > 
+        static lcos::promise<std::vector<naming::id_type> > 
         get_output_ports_async(naming::id_type const& gid)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dynamic_stencil_value::get_output_ports_action 
             action_type;
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         /// Connect the destinations given by the provided gid's with the 
         /// corresponding input ports associated with this \a dynamic_stencil_value 
         /// instance.
-        static lcos::future_value<void> 
+        static lcos::promise<void> 
         connect_input_ports_async(naming::id_type const& gid, 
             std::vector<naming::id_type> const& gids)
         {
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        static lcos::future_value<void> 
+        static lcos::promise<void> 
         set_functional_component_async(naming::id_type const& gid, 
             naming::id_type const& functiongid, int row, int column,
             int instencilsize, int outstencilsize, double cycle_time,parameter const& par)
@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// Subset of set_functional_component functionality
-        static lcos::future_value<void> 
+        static lcos::promise<void> 
         start_async(naming::id_type const& gid)
         {
             typedef adaptive1d::server::dynamic_stencil_value::start_action 

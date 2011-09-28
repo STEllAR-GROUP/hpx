@@ -44,7 +44,7 @@ namespace hpx { namespace components
             return this->base_type::get_factory_properties(gid_, type);
         }
 
-        lcos::future_value<int> 
+        lcos::promise<int> 
         get_factory_properties_async(components::component_type type) 
         {
             return this->base_type::get_factory_properties_async(gid_, type);
@@ -58,7 +58,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously create a new component using the runtime_support 
-        lcos::future_value<naming::id_type, naming::gid_type> 
+        lcos::promise<naming::id_type, naming::gid_type> 
         create_component_async(components::component_type type, 
             std::size_t count = 1) 
         {
@@ -77,7 +77,7 @@ namespace hpx { namespace components
         /// Asynchronously create a new component using the runtime_support. 
         /// Pass one generic argument to the constructor. 
         template <typename Arg0>
-        lcos::future_value<naming::id_type, naming::gid_type> 
+        lcos::promise<naming::id_type, naming::gid_type> 
         create_component_async(components::component_type type, 
             Arg0 const& arg0) 
         {
@@ -94,7 +94,7 @@ namespace hpx { namespace components
 // 
 //         /// Asynchronously create a new memory block using the runtime_support 
 //         template <typename T>
-//         lcos::future_value<naming::id_type, naming::gid_type> 
+//         lcos::promise<naming::id_type, naming::gid_type> 
 //         create_memory_block_async(std::size_t count,
 //             hpx::actions::manage_object_action<T> const& act) 
 //         {
@@ -111,14 +111,14 @@ namespace hpx { namespace components
 
         /// Asynchronously create a new memory block using the runtime_support 
         template <typename T, typename Config>
-        lcos::future_value<naming::id_type, naming::gid_type> 
+        lcos::promise<naming::id_type, naming::gid_type> 
         create_memory_block_async(std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act) 
         {
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::future_value<void> load_components_async()
+        lcos::promise<void> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
@@ -128,7 +128,7 @@ namespace hpx { namespace components
             this->base_type::load_components(gid_);
         }
 
-        lcos::future_value<void> call_startup_functions_async()
+        lcos::promise<void> call_startup_functions_async()
         {
             return this->base_type::call_startup_functions_async(gid_);
         }
@@ -138,7 +138,7 @@ namespace hpx { namespace components
             this->base_type::call_startup_functions(gid_);
         }
 
-        lcos::future_value<void> call_shutdown_functions_async()
+        lcos::promise<void> call_shutdown_functions_async()
         {
             return this->base_type::call_shutdown_functions_async(gid_);
         }
@@ -149,7 +149,7 @@ namespace hpx { namespace components
         }
 
         /// \brief Shutdown the given runtime system
-        lcos::future_value<void> shutdown_async(double timeout = -1)
+        lcos::promise<void> shutdown_async(double timeout = -1)
         {
             return this->base_type::shutdown_async(gid_, timeout);
         }
@@ -166,7 +166,7 @@ namespace hpx { namespace components
         }
 
         /// \brief Terminate the given runtime system
-        lcos::future_value<void> terminate_async()
+        lcos::promise<void> terminate_async()
         {
             return this->base_type::terminate_async(gid_);
         }

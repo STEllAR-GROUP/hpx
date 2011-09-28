@@ -31,7 +31,7 @@ struct object_semaphore
     object_semaphore(naming::id_type gid) : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<void> signal_async(
+    lcos::promise<void> signal_async(
         ValueType const& val
       , boost::uint64_t count = 1
     ) {

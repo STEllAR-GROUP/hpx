@@ -9,21 +9,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace stubs
 {
-    lcos::future_value<counter_info> performance_counter::get_info_async(
+    lcos::promise<counter_info> performance_counter::get_info_async(
         naming::gid_type const& targetgid)
     {
         // Create an eager_future, execute the required action,
-        // we simply return the initialized future_value, the caller needs
+        // we simply return the initialized promise, the caller needs
         // to call get() on the return value to obtain the result
         typedef server::base_performance_counter::get_counter_info_action action_type;
         return lcos::eager_future<action_type, counter_info>(targetgid);
     }
 
-    lcos::future_value<counter_value> performance_counter::get_value_async(
+    lcos::promise<counter_value> performance_counter::get_value_async(
         naming::gid_type const& targetgid)
     {
         // Create an eager_future, execute the required action,
-        // we simply return the initialized future_value, the caller needs
+        // we simply return the initialized promise, the caller needs
         // to call get() on the return value to obtain the result
         typedef server::base_performance_counter::get_counter_value_action action_type;
         return lcos::eager_future<action_type, counter_value>(targetgid);

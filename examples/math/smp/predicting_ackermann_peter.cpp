@@ -35,7 +35,7 @@ using hpx::actions::plain_result_action3;
 
 using hpx::lcos::base_lco_with_value;
 using hpx::lcos::eager_future;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 
 using hpx::util::high_resolution_timer;
 using hpx::util::static_;
@@ -44,8 +44,8 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef future_value<boost::uint64_t> future_value_type;
-typedef caching_freelist<future_value<boost::uint64_t> > freelist_type;
+typedef promise<boost::uint64_t> future_value_type;
+typedef caching_freelist<promise<boost::uint64_t> > freelist_type;
 
 struct freelist_tag {};
 

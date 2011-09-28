@@ -24,7 +24,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     void continuation::trigger()
     {
-        LLCO_(info) << "future_value::set(" << gid_ << ")";
+        LLCO_(info) << "promise::set(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_event_action>(gid_);
     }
 

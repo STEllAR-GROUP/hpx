@@ -46,13 +46,13 @@ typedef lcos::eager_future<
 > bind_response_future_type;
 
 typedef components::heap_factory<
-    lcos::detail::future_value<
+    lcos::detail::promise<
         naming::resolver_client::response_type
       , naming::resolver_client::response_type
       , 1
     >
   , components::managed_component<
-        lcos::detail::future_value<
+        lcos::detail::promise<
             naming::resolver_client::response_type
           , naming::resolver_client::response_type
           , 1

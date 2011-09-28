@@ -27,16 +27,16 @@ namespace hpx { namespace components { namespace stubs
 
         /// Create a number of new components of the given \a type distributed
         /// evenly over all available localities. This is a non-blocking call. 
-        /// The caller needs to call \a future_value#get on the result 
+        /// The caller needs to call \a promise#get on the result 
         /// of this function to obtain the global ids of the newly created 
         /// objects.
-        static lcos::future_value<result_type, remote_result_type> 
+        static lcos::promise<result_type, remote_result_type> 
         create_components_async(
             naming::id_type const& targetgid, components::component_type type, 
             std::size_t count) 
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::distributing_factory::create_components_action 
                 action_type;

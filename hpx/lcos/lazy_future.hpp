@@ -15,7 +15,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/util/block_profiler.hpp>
 
 #include <boost/variant.hpp>
@@ -63,10 +63,10 @@ namespace hpx { namespace lcos
 
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::false_> 
-        : public future_value<Result, typename Action::result_type>
+      : public promise<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result, typename Action::result_type> base_type;
+        typedef promise<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a (non-functional) instance of a \a lazy_future. To use
@@ -269,10 +269,10 @@ namespace hpx { namespace lcos
 
     template <typename Action, typename Result>
     class lazy_future<Action, Result, boost::mpl::true_> 
-        : public future_value<Result, typename Action::result_type>
+      : public promise<Result, typename Action::result_type>
     {
     private:
-        typedef future_value<Result, typename Action::result_type> base_type;
+        typedef promise<Result, typename Action::result_type> base_type;
 
     public:
         /// Construct a (non-functional) instance of an \a lazy_future. To use
@@ -487,7 +487,6 @@ namespace hpx { namespace lcos
         util::block_profiler<lazy_future_direct_tag> apply_logger_;
         boost::function<void()> closure_;
     };
-
 }}
 
 #endif

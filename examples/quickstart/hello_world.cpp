@@ -40,7 +40,7 @@ using hpx::applier::get_prefix_id;
 using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action1;
 
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 using hpx::lcos::eager_future;
 using hpx::lcos::wait;
 
@@ -87,7 +87,7 @@ void hello_world_foreman()
 
     while (!attendance.empty())
     {
-        std::vector<future_value<std::size_t> > futures;
+        std::vector<promise<std::size_t> > futures;
         BOOST_FOREACH(std::size_t shepherd, attendance)
         {
             futures.push_back(hello_world_worker_future(prefix, shepherd)); 
@@ -113,7 +113,7 @@ int hpx_main(variables_map&)
     {
         std::vector<id_type> prefixes = find_all_localities();
 
-        std::vector<future_value<void> > futures;
+        std::vector<promise<void> > futures;
         BOOST_FOREACH(id_type const& node, prefixes)
         { 
             futures.push_back(hello_world_foreman_future(node)); 

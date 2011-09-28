@@ -29,7 +29,7 @@ struct component_namespace
     // }}}
 
     // {{{ bind_prefix dispatch
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     bind_prefix_async(naming::id_type const& gid, component_name_type const& key,
                       prefix_type prefix)
     {
@@ -47,7 +47,7 @@ struct component_namespace
     // }}}
     
     // {{{ bind_name dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     bind_name_async(naming::id_type const& gid, component_name_type const& key)
     {
         typedef typename server_type::bind_name_action action_type;
@@ -61,7 +61,7 @@ struct component_namespace
     // }}}
 
     // {{{ resolve_id dispatch
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     resolve_id_async(naming::id_type const& gid, component_id_type key)
     {
         typedef typename server_type::resolve_id_action action_type;
@@ -75,7 +75,7 @@ struct component_namespace
     // }}}
 
     // {{{ resolve_name dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     resolve_name_async(naming::id_type const& gid,
                        component_name_type const& key)
     {
@@ -90,7 +90,7 @@ struct component_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     unbind_async(naming::id_type const& gid, component_name_type const& key,
                  error_code& ec = throws)
     {

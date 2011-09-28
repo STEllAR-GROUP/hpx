@@ -19,12 +19,12 @@
 namespace hpx { namespace applier
 {
     // 
-    lcos::future_value<naming::id_type, naming::gid_type> 
+    lcos::promise<naming::id_type, naming::gid_type> 
     create_async(naming::id_type const& targetgid, 
         components::component_type type, std::size_t count)
     {
-        // Create a future_value, execute the required action, 
-        // we simply return the initialized future_value, the caller needs
+        // Create a promise, execute the required action, 
+        // we simply return the initialized promise, the caller needs
         // to call get() on the return value to obtain the result
         typedef 
             components::server::runtime_support::create_component_action

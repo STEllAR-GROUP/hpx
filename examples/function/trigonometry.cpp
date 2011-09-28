@@ -24,7 +24,7 @@ using hpx::actions::plain_action3;
 using hpx::actions::function;
 
 using hpx::lcos::eager_future;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 
 using hpx::naming::id_type;
 
@@ -81,7 +81,7 @@ typedef eager_future<print_action> print_future;
 int hpx_main(variables_map& vm)
 {
     {
-        std::list<future_value<void> > futures;
+        std::list<promise<void> > futures;
         std::vector<id_type> prefixes;
 
         // Get a list of the global addresses of all machines in our system
@@ -105,7 +105,7 @@ int hpx_main(variables_map& vm)
         }
 
         // Wait for all IO to finish
-        BOOST_FOREACH(future_value<void> const& f, futures)
+        BOOST_FOREACH(promise<void> const& f, futures)
         { f.get(); } 
     }
 

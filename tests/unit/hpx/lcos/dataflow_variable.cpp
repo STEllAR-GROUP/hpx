@@ -24,7 +24,7 @@ using hpx::naming::id_type;
 using hpx::lcos::base_lco_with_value;
 using hpx::lcos::eager_future;
 using hpx::lcos::dataflow_variable;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 
 using hpx::util::report_errors;
 
@@ -63,11 +63,11 @@ int hpx_main(variables_map& vm)
     {
         dataflow_int_type d1;
 
-        future_value<int> 
+        promise<int> 
             local_spawn(eager_future<dataflow_test_action>
                 (here, d1.get_gid()));
 
-        future_value<int> 
+        promise<int> 
             remote_spawn(eager_future<dataflow_test_action>
                 (there, d1.get_gid()));
 

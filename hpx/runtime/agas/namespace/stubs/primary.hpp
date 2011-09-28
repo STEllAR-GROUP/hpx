@@ -30,7 +30,7 @@ struct primary_namespace
     // }}}
 
     // {{{ bind_locality dispatch
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     bind_locality_async(naming::id_type const& gid, endpoint_type const& ep,
                         count_type count)
     {
@@ -45,7 +45,7 @@ struct primary_namespace
     // }}}
     
     // {{{ bind_gid dispatch
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                    gva_type const& gva)
     {
@@ -60,7 +60,7 @@ struct primary_namespace
     // }}}
 
     // {{{ resolve_gid dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     resolve_gid_async(naming::id_type const& gid, naming::gid_type const& key)
     {
         typedef typename server_type::resolve_gid_action action_type;
@@ -74,7 +74,7 @@ struct primary_namespace
     // }}}
 
     // {{{ unbind_locality dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     unbind_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
         typedef typename server_type::unbind_locality_action action_type;
@@ -88,7 +88,7 @@ struct primary_namespace
     // }}}
 
     // {{{ unbind_gid dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     unbind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                      count_type count)
     {
@@ -103,7 +103,7 @@ struct primary_namespace
     // }}}
     
     // {{{ increment dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     increment_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
@@ -118,7 +118,7 @@ struct primary_namespace
     // }}}
     
     // {{{ decrement dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     decrement_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
@@ -134,7 +134,7 @@ struct primary_namespace
     // }}}
     
     // {{{ localities dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     localities_async(naming::id_type const& gid)
     {
         typedef typename server_type::localities_action action_type;

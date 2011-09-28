@@ -64,7 +64,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         for (std::size_t i = 0; i < 5; ++i)
             os.signal_sync(i);
 
-        std::vector<hpx::lcos::future_value<void> > barrier;
+        std::vector<hpx::lcos::promise<void> > barrier;
     
         // create some threads waiting to pull elements from the queue
         for (std::size_t i = 0; i < 5; ++i)

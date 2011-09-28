@@ -42,7 +42,7 @@ using hpx::actions::plain_result_action1;
 using hpx::actions::function;
 
 using hpx::lcos::eager_future;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 
 using hpx::balancing::discovery;
 using hpx::balancing::topology_map;

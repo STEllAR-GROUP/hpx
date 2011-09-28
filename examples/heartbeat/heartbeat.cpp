@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/state.hpp>
 
 #include <boost/bind.hpp>
@@ -59,7 +59,7 @@ using hpx::naming::gid_type;
 using hpx::naming::get_prefix_from_gid;
 using hpx::naming::get_agas_client;
 
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 using hpx::lcos::eager_future;
 using hpx::lcos::base_lco;
 
@@ -111,7 +111,7 @@ int monitor(
         return 1;
     } 
 
-    future_value<void> stop_flag;
+    promise<void> stop_flag;
     const std::string stop_flag_name
         = str(format("/stop_flag(locality#%d]/heartbeat)") % prefix);
 

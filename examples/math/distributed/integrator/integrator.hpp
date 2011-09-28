@@ -28,7 +28,7 @@ struct integrator
       : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<std::vector<naming::id_type> > build_network_async(
+    lcos::promise<std::vector<naming::id_type> > build_network_async(
         std::vector<naming::id_type> const& discovery_network
       , hpx::actions::function<T(T const&)> const& f
       , T const& tolerance
@@ -62,7 +62,7 @@ struct integrator
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future_value<T> solve_async(
+    lcos::promise<T> solve_async(
         T const& lower_bound
       , T const& upper_bound
       , boost::uint32_t segments

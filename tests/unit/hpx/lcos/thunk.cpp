@@ -32,7 +32,7 @@ using hpx::util::report_errors;
 using hpx::lcos::detail::thunk;
 using hpx::lcos::thunk_client;
 using hpx::lcos::eager_future;
-using hpx::lcos::future_value;
+using hpx::lcos::promise;
 
 ///////////////////////////////////////////////////////////////////////////////
 int zero(void)
@@ -108,7 +108,7 @@ int hpx_main(variables_map &vm)
         std::cout << "  ... do a bunch of stuff ..." << std::endl;
 
         std::cout << ">>> z_f = eager_future(get, z)" << std::endl;
-        future_value<int> z_f =
+        promise<int> z_f =
             eager_future<zero_thunk_get_action>(z.get_gid());
 
         std::cout << ">>> print f" << std::endl;
@@ -124,7 +124,7 @@ int hpx_main(variables_map &vm)
         std::cout << "  ... do a bunch of stuff ..." << std::endl;
 
         std::cout << ">>> id_f = eager_future(get, id)" << std::endl;
-        future_value<int> id_f =
+        promise<int> id_f =
             eager_future<identity_thunk_get_action>(id.get_gid());
 
         std::cout << ">>> print id_f" << std::endl;
@@ -138,7 +138,7 @@ int hpx_main(variables_map &vm)
         sum_thunk_type s(here, 23, 42);
 
         std::cout << ">>> test_f = eager_future(test, s) there" << std::endl;
-        future_value<int> test_f =
+        promise<int> test_f =
             eager_future<thunk_test_action>(there, s.get_gid());
 
         std::cout << ">>> apply(trigger, s)" << std::endl;

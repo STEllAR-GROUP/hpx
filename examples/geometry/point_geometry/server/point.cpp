@@ -34,7 +34,7 @@ namespace hpx { namespace geometry { namespace server
         /// search for contact
         int point::search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
-            typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+            typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
             lazy_results_type lazy_results;
             BOOST_FOREACH(naming::id_type gid, search_objects)
@@ -261,7 +261,7 @@ namespace hpx { namespace geometry { namespace server
 
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,std::size_t n,std::size_t N)
         {
-          typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+          typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
  
@@ -367,7 +367,7 @@ namespace hpx { namespace geometry { namespace server
         /// Recompute Rsum
         void point::recompute(std::vector<hpx::naming::id_type> const& search_objects) 
         {
-          typedef std::vector<lcos::future_value<polygon_type> > lazy_results_type;
+          typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
 

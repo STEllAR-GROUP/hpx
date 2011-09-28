@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FUTURE_VALUE_FULL_EMPTY_FEB_03_2009_0841AMM)
-#define HPX_LCOS_FUTURE_VALUE_FULL_EMPTY_FEB_03_2009_0841AMM
+#if !defined(HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM)
+#define HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/get_result.hpp>
 #include <hpx/util/full_empty_memory.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
@@ -25,10 +26,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail 
 {
-    /// A future_value can be used by a single thread to invoke a (remote) 
+    /// A promise can be used by a single thread to invoke a (remote) 
     /// action and wait for the result. 
     template <typename Result, typename RemoteResult, int N>
-    class future_value : public lcos::base_lco_with_value<Result, RemoteResult>
+    class promise : public lcos::base_lco_with_value<Result, RemoteResult>
     {
     private:
         // make sure N is in a reasonable range
@@ -45,9 +46,9 @@ namespace hpx { namespace lcos { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_future };
 
-        future_value() {}
+        promise() {}
 
-        /// Reset the future_value to allow to restart an asynchronous 
+        /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
@@ -55,7 +56,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         /// Return whether or not the data is available for this
-        /// \a future_value.
+        /// \a promise.
         bool ready() const
         {
             return !(data_->is_empty());
@@ -84,7 +85,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROWS_IF(ec, bad_parameter, 
-                    "future_value<Result, N>::get_data", "slot index out of range");
+                    "promise<Result, N>::get_data", "slot index out of range");
                 return Result();
             }
 
@@ -94,8 +95,8 @@ namespace hpx { namespace lcos { namespace detail
             if (ec) return Result();    
 
             // the thread has been re-activated by one of the actions 
-            // supported by this future_value (see \a future_value::set_event
-            // and future_value::set_error).
+            // supported by this promise (see \a promise::set_event
+            // and promise::set_error).
             if (1 == d.which())
             {
                 // an error has been reported in the meantime, throw or set
@@ -132,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail
             // set the received result, reset error status
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "future_value::set_data<Result, N>", 
+                    "promise::set_data<Result, N>", 
                     "slot index out of range");
                 return;
             }
@@ -147,7 +148,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "future_value<Result, N>::set_error", 
+                    "promise<Result, N>::set_error", 
                     "slot index out of range");
                 return;
             }
@@ -192,11 +193,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A future_value can be used by a single thread to invoke a (remote) 
+    /// A promise can be used by a single thread to invoke a (remote) 
     /// action and wait for the result. This specialization wraps the result
     /// value (a gid_type) into a managed id_type.
     template <int N>
-    class future_value<naming::id_type, naming::gid_type, N>
+    class promise<naming::id_type, naming::gid_type, N>
       : public lcos::base_lco_with_value<naming::id_type, naming::gid_type>
     {
     private:
@@ -209,9 +210,9 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::variant<result_type, error_type> data_type;
 
     public:
-        future_value() {}
+        promise() {}
 
-        /// Reset the future_value to allow to restart an asynchronous 
+        /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
@@ -219,7 +220,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         /// Return whether or not the data is available for this
-        /// \a future_value.
+        /// \a promise.
         bool ready()
         {
             return !(data_->is_empty());
@@ -250,7 +251,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROWS_IF(ec, bad_parameter, 
-                    "future_value<Result, N>::get_data", "slot index out of range");
+                    "promise<Result, N>::get_data", "slot index out of range");
                 return naming::invalid_id;
             }
 
@@ -260,8 +261,8 @@ namespace hpx { namespace lcos { namespace detail
             if (ec) return naming::invalid_id;  
 
             // the thread has been re-activated by one of the actions 
-            // supported by this future_value (see \a future_value::set_event
-            // and future_value::set_error).
+            // supported by this promise (see \a promise::set_event
+            // and promise::set_error).
             if (1 == d.which())
             {
                 // an error has been reported in the meantime, throw or set
@@ -298,7 +299,7 @@ namespace hpx { namespace lcos { namespace detail
             // set the received result, reset error status
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "future_value::set_data<Result, N>", 
+                    "promise::set_data<Result, N>", 
                     "slot index out of range");
                 return;
             }
@@ -313,7 +314,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (slot < 0 || slot >= N) {
                 HPX_THROW_EXCEPTION(bad_parameter, 
-                    "future_value<Result, N>::set_error", 
+                    "promise<Result, N>::set_error", 
                     "slot index out of range");
                 return;
             }
@@ -364,13 +365,13 @@ namespace hpx { namespace lcos { namespace detail
         log_on_exit(boost::shared_ptr<T> const& impl, error_code const& ec)
           : impl_(impl), ec_(ec)
         {
-            LLCO_(info) << "future_value::get(" << impl_->get_gid()
+            LLCO_(info) << "promise::get(" << impl_->get_gid()
                         << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
                         << ")";
         }
         ~log_on_exit()
         {
-            LLCO_(info) << "future_value::got(" << impl_->get_gid() 
+            LLCO_(info) << "promise::got(" << impl_->get_gid() 
                         << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
                         << ")";
         }
@@ -380,26 +381,51 @@ namespace hpx { namespace lcos { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <typename Result, typename Enable>
+    struct promise_remote_result
+      : boost::mpl::identity<Result>
+    {};
+
+    template <>
+    struct promise_remote_result<void>
+      : boost::mpl::identity<util::unused_type>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename Enable>
+    struct promise_local_result 
+      : boost::mpl::identity<Result> 
+    {};
+
+    template <>
+    struct promise_local_result<util::unused_type> 
+      : boost::mpl::identity<void> 
+    {};
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos 
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class future_value future_value.hpp hpx/lcos/future_value.hpp
+    /// \class promise promise.hpp hpx/lcos/promise.hpp
     ///
-    /// A future_value can be used by a single \a thread to invoke a 
+    /// A promise can be used by a single \a thread to invoke a 
     /// (remote) action and wait for the result. The result is expected to be 
-    /// sent back to the future_value using the LCO's set_event action
+    /// sent back to the promise using the LCO's set_event action
     ///
-    /// A future_value is one of the simplest synchronization primitives 
+    /// A promise is one of the simplest synchronization primitives 
     /// provided by HPX. It allows to synchronize on a eager evaluated remote
-    /// operation returning a result of the type \a Result. The \a future_value
+    /// operation returning a result of the type \a Result. The \a promise
     /// allows to synchronize exactly one \a thread (the one passed during 
     /// construction time).
     ///
     /// \code
-    ///     // Create the future_value (the expected result is a id_type)
-    ///     lcos::future_value<naming::id_type> f;
+    ///     // Create the promise (the expected result is a id_type)
+    ///     lcos::promise<naming::id_type> f;
     ///
-    ///     // initiate the action supplying the future_value as a 
+    ///     // initiate the action supplying the promise as a 
     ///     // continuation
     ///     applier_.appy<some_action>(new continuation(f.get_gid()), ...);
     ///
@@ -410,32 +436,22 @@ namespace hpx { namespace lcos
     /// \endcode
     ///
     /// \tparam Result   The template parameter \a Result defines the type this 
-    ///                  future_value is expected to return from 
-    ///                  \a future_value#get.
+    ///                  promise is expected to return from 
+    ///                  \a promise#get.
     ///
-    /// \note            The action executed using the future_value as a 
+    /// \note            The action executed using the promise as a 
     ///                  continuation must return a value of a type convertible 
     ///                  to the type as specified by the template parameter 
     ///                  \a Result
-    template <typename Result>
-    struct future_value_remote_result
-      : boost::mpl::identity<Result>
-    {};
-
-    template <typename Result>
-    struct future_value_local_result 
-      : boost::mpl::identity<Result> 
-    {};
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult, int N>
-    class future_value 
+    class promise 
     {
     public:
-        typedef detail::future_value<Result, RemoteResult, N> wrapped_type;
+        typedef detail::promise<Result, RemoteResult, N> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
-        /// Construct a new \a future instance. The supplied 
+        /// Construct a new \a promise instance. The supplied 
         /// \a thread will be notified as soon as the result of the 
         /// operation associated with this future instance has been 
         /// returned.
@@ -447,13 +463,13 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        future_value()
+        promise()
           : impl_(new wrapping_type(new wrapped_type()))
         {
-            LLCO_(info) << "future_value::future_value(" << impl_->get_gid() << ")";
+            LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
-        /// Reset the future_value to allow to restart an asynchronous 
+        /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
@@ -467,7 +483,7 @@ namespace hpx { namespace lcos
         }
 
         /// Return whether or not the data is available for this
-        /// \a future_value.
+        /// \a promise.
         bool ready() const
         {
             return (*impl_)->ready();
@@ -475,7 +491,7 @@ namespace hpx { namespace lcos
 
         typedef Result result_type;
 
-        ~future_value()
+        ~promise()
         {}
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -523,21 +539,11 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    struct future_value_remote_result<void>
-      : boost::mpl::identity<util::unused_type>
-    {};
-
-    template <>
-    struct future_value_local_result<util::unused_type> 
-        : boost::mpl::identity<void> 
-    {};
-
     template <int N>
-    class future_value<void, util::unused_type, N>
+    class promise<void, util::unused_type, N>
     {
     public:
-        typedef detail::future_value<util::unused_type, util::unused_type, N> 
+        typedef detail::promise<util::unused_type, util::unused_type, N> 
             wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
 
@@ -553,13 +559,13 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this 
         ///               future instance (as it has to be sent along 
         ///               with the action as the continuation parameter).
-        future_value()
+        promise()
           : impl_(new wrapping_type(new wrapped_type()))
         {
-            LLCO_(info) << "future_value<void>::future_value(" << impl_->get_gid() << ")";
+            LLCO_(info) << "promise<void>::promise(" << impl_->get_gid() << ")";
         }
 
-        /// Reset the future_value to allow to restart an asynchronous 
+        /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
@@ -573,7 +579,7 @@ namespace hpx { namespace lcos
         }
 
         /// Return whether or not the data is available for this
-        /// \a future_value.
+        /// \a promise.
         bool ready() const
         {
             return (*impl_)->ready();
@@ -581,7 +587,7 @@ namespace hpx { namespace lcos
 
         typedef util::unused_type result_type;
 
-        ~future_value()
+        ~promise()
         {}
 
         /// Get the result of the requested action. This call blocks (yields 
@@ -631,7 +637,7 @@ namespace hpx { namespace components
 {
     template <typename Result, typename RemoteResult, int N>
     struct component_type_database<
-        lcos::detail::future_value<Result, RemoteResult, N> >
+        lcos::detail::promise<Result, RemoteResult, N> >
     { 
         static component_type get() 
         {

@@ -53,7 +53,7 @@ namespace hpx { namespace components
             this->base_type::contactsearch(gid_);
         }
 
-        hpx::lcos::future_value<void> contactsearch_async () 
+        hpx::lcos::promise<void> contactsearch_async () 
         {
             BOOST_ASSERT(gid_);
             return(this->base_type::contactsearch_async(gid_));
@@ -66,7 +66,7 @@ namespace hpx { namespace components
             this->base_type::contactenforce(gid_);
         }
         /// Asynchronously query the current value of the contact
-        hpx::lcos::future_value<void> contactenforce_async () 
+        hpx::lcos::promise<void> contactenforce_async () 
         {
             BOOST_ASSERT(gid_);
             return(this->base_type::contactenforce_async(gid_));
@@ -80,7 +80,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the contact
-        lcos::future_value<int> query_async() 
+        lcos::promise<int> query_async() 
         {
             return this->base_type::query_async(gid_);
         }

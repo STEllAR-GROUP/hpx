@@ -20,7 +20,7 @@ namespace hpx { namespace lcos { namespace stubs
             lcos::server::queue<ValueType, RemoteType> >
     {
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<ValueType, RemoteType> 
+        static lcos::promise<ValueType, RemoteType> 
         get_value_async(naming::id_type const& gid)
         {
             typedef typename 
@@ -29,7 +29,7 @@ namespace hpx { namespace lcos { namespace stubs
             return lcos::eager_future<action_type, ValueType>(gid);
         }
 
-        static lcos::future_value<void> 
+        static lcos::promise<void> 
         set_value_async(naming::id_type const& gid, RemoteType const& val)
         {
             typedef typename 
@@ -38,7 +38,7 @@ namespace hpx { namespace lcos { namespace stubs
             return lcos::eager_future<action_type, void>(gid, val);
         }
 
-        static lcos::future_value<void, util::unused_type> 
+        static lcos::promise<void, util::unused_type> 
         abort_pending_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {

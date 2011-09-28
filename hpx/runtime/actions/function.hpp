@@ -19,7 +19,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/unused.hpp>
 

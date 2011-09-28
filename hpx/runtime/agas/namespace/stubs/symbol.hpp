@@ -27,7 +27,7 @@ struct symbol_namespace
     // }}}
 
     // {{{ bind dispatch
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     bind_async(naming::id_type const& gid, symbol_type const& key,
                naming::gid_type const& value)
     {
@@ -42,7 +42,7 @@ struct symbol_namespace
     // }}}
     
     // {{{ resolve dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     resolve_async(naming::id_type const& gid, symbol_type const& key)
     {
         typedef typename server_type::resolve_action action_type;
@@ -56,7 +56,7 @@ struct symbol_namespace
     // }}}
 
     // {{{ unbind dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     unbind_async(naming::id_type const& gid, symbol_type const& key)
     {
         typedef typename server_type::unbind_action action_type;
@@ -70,7 +70,7 @@ struct symbol_namespace
     // }}}
 
     // {{{ iterate dispatch 
-    static lcos::future_value<response_type>
+    static lcos::promise<response_type>
     iterate_async(naming::id_type const& gid, iterate_function_type const& f)
     {
         typedef typename server_type::iterate_action action_type;

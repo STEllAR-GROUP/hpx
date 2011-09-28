@@ -19,7 +19,7 @@ namespace hpx { namespace balancing { namespace stubs
 struct discovery : components::stub_base<server::discovery>
 {
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<std::vector<naming::id_type> >
+    static lcos::promise<std::vector<naming::id_type> >
     build_network_async(
         naming::id_type const& gid
     ) {
@@ -36,7 +36,7 @@ struct discovery : components::stub_base<server::discovery>
     ) { return build_network_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<std::size_t> topology_lva_async(
+    static lcos::promise<std::size_t> topology_lva_async(
         naming::id_type const& gid
     ) {
         typedef server::discovery::topology_lva_action action_type;
@@ -52,7 +52,7 @@ struct discovery : components::stub_base<server::discovery>
     ) { return topology_lva_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<boost::uint32_t> total_shepherds_async(
+    static lcos::promise<boost::uint32_t> total_shepherds_async(
         naming::id_type const& gid
     ) {
         typedef server::discovery::total_shepherds_action action_type;
@@ -68,7 +68,7 @@ struct discovery : components::stub_base<server::discovery>
     ) { return total_shepherds_async(gid).get(); }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future_value<bool> empty_async(
+    static lcos::promise<bool> empty_async(
         naming::id_type const& gid
     ) {
         typedef server::discovery::empty_action action_type;

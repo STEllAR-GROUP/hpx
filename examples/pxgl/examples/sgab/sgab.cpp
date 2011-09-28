@@ -150,7 +150,7 @@ typedef pxgl::graphs::server::dynamic_graph subgraph_member_type;
 typedef pxgl::xua::vmap vmap_type;
 typedef pxgl::xua::server::vmap vmap_member_type;
 
-typedef hpx::lcos::future_value<id_type> future_id_type;
+typedef hpx::lcos::promise<id_type> future_id_type;
 typedef std::vector<future_id_type> future_ids_type;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ typedef double_container_type::server_type double_container_member_type;
 typedef double_container_type bc_scores_type;
 typedef double_container_member_type bc_scores_member_type;
 
-typedef hpx::lcos::future_value<hpx::util::unused_type> future_void_type;
+typedef hpx::lcos::promise<hpx::util::unused_type> future_void_type;
 typedef std::vector<future_void_type> future_voids_type;
 
 typedef examples::sgab::bc_sssp bc_sssp_type;

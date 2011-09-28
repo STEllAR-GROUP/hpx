@@ -114,7 +114,7 @@ std::vector<naming::id_type> discovery::build_network()
     // Ensure that the localities returned are ordered.    
     std::sort(localities.begin(), localities.end());
 
-    std::vector<lcos::future_value<boost::uint32_t> > results0;
+    std::vector<lcos::promise<boost::uint32_t> > results0;
 
     BOOST_FOREACH(naming::gid_type const& locality, localities)
     { results0.push_back(report_shepherd_count_future(locality)); }
@@ -131,7 +131,7 @@ std::vector<naming::id_type> discovery::build_network()
         total_shepherds_ += topology_[current_prefix]; 
     }
 
-    std::vector<lcos::future_value<naming::id_type, naming::gid_type> >
+    std::vector<lcos::promise<naming::id_type, naming::gid_type> >
         results1; 
 
     BOOST_FOREACH(naming::gid_type const& locality, localities)
@@ -165,12 +165,12 @@ std::vector<naming::id_type> discovery::build_network()
         }
     }
 
-    std::list<lcos::future_value<void> > results2;
+    std::list<lcos::promise<void> > results2;
 
     BOOST_FOREACH(naming::id_type const& node, network)
     { results2.push_back(deploy_future(node, topology_, total_shepherds_)); }
 
-    BOOST_FOREACH(lcos::future_value<void> const& f, results2)
+    BOOST_FOREACH(lcos::promise<void> const& f, results2)
     { f.get(); }
 
     return network;

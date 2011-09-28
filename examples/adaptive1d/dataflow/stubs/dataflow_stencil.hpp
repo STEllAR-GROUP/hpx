@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         // exposed functionality of this component
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<boost::shared_ptr<std::vector<naming::id_type> > > 
+        static lcos::promise<boost::shared_ptr<std::vector<naming::id_type> > > 
         init_execute_async(naming::id_type const& gid, 
             std::vector<naming::id_type> const& interp_src_data,
             double time,
@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             parameter const& par)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dataflow_stencil::init_execute_action action_type;
             return lcos::eager_future<action_type>(gid, interp_src_data,time,function_type,
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future_value<std::vector<naming::id_type> > 
+        static lcos::promise<std::vector<naming::id_type> > 
         execute_async(naming::id_type const& gid, 
             std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, std::size_t numvalues, 
@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             parameter const& par)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dataflow_stencil::execute_action action_type;
             return lcos::eager_future<action_type>(gid, initial_data, 

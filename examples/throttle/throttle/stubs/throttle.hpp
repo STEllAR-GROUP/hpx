@@ -7,7 +7,7 @@
 #define HPX_THROTTLE_STUBS_AUG_09_2011_0703PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/throttle.hpp"
@@ -18,11 +18,11 @@ namespace throttle { namespace stubs
     struct throttle : hpx::components::stubs::stub_base<server::throttle>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future_value<void>
+        static hpx::lcos::promise<void>
         suspend_async(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::throttle::suspend_action action_type;
             return hpx::lcos::eager_future<action_type>(gid, thread_num);
@@ -35,11 +35,11 @@ namespace throttle { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future_value<void>
+        static hpx::lcos::promise<void>
         resume_async(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             // Create an eager_future, execute the required action,
-            // we simply return the initialized future_value, the caller needs
+            // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::throttle::resume_action action_type;
             return hpx::lcos::eager_future<action_type>(gid, thread_num);

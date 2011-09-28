@@ -9,7 +9,7 @@
 #define HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future_value.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/namespace/stubs/primary.hpp>
 
@@ -47,7 +47,7 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind_locality and bind_gid interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     bind_async(endpoint_type const& ep, count_type count = 0)
     { return this->base_type::bind_locality_async(this->gid_, ep, count); }
 
@@ -58,7 +58,7 @@ struct primary_namespace :
     response_type bind(endpoint_type const& ep, error_code& ec = throws)
     { return this->base_type::bind_locality(this->gid_, ep, 0, ec); }
     
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     bind_async(naming::gid_type const& gid, gva_type const& gva)
     { return this->base_type::bind_gid_async(this->gid_, gid, gva); }
 
@@ -68,7 +68,7 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // resolve_locality and resolve_gid interface
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     resolve_async(naming::gid_type const& gid)
     { return this->base_type::resolve_gid_async(this->gid_, gid); }
     
@@ -77,14 +77,14 @@ struct primary_namespace :
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind_locality and unbind_gid interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     unbind_async(endpoint_type const& ep)
     { return this->base_type::unbind_locality_async(this->gid_, ep); }
     
     response_type unbind(endpoint_type const& ep, error_code& ec = throws)
     { return this->base_type::unbind_locality(this->gid_, ep, ec); }
 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     unbind_async(naming::gid_type const& gid, count_type count)
     { return this->base_type::unbind_gid_async(this->gid_, gid, count); }
     
@@ -94,7 +94,7 @@ struct primary_namespace :
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     increment_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::increment_async(this->gid_, gid, credits); }
     
@@ -104,7 +104,7 @@ struct primary_namespace :
     
     ///////////////////////////////////////////////////////////////////////////
     // decrement interface 
-    lcos::future_value<response_type>
+    lcos::promise<response_type>
     decrement_async(naming::gid_type const& gid, count_type credits)
     { return this->base_type::decrement_async(this->gid_, gid, credits); }
     
@@ -115,7 +115,7 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // localities interface 
-    lcos::future_value<response_type> localities_async()
+    lcos::promise<response_type> localities_async()
     { return this->base_type::localities_async(this->gid_); }
     
     response_type localities(error_code& ec = throws)

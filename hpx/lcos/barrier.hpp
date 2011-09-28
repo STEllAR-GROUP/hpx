@@ -31,7 +31,7 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        lcos::future_value<void> wait_async() 
+        lcos::promise<void> wait_async() 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::wait_async(gid_);
@@ -43,7 +43,7 @@ namespace hpx { namespace lcos
             this->base_type::wait(gid_);
         }
 
-        lcos::future_value<void> set_error_async(boost::exception_ptr const& e) 
+        lcos::promise<void> set_error_async(boost::exception_ptr const& e) 
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_error_async(gid_, e);
