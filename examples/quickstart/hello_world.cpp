@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach 
+//  Copyright (c) 2011 Hartmut Kaiser and Bryce Adelstein-Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -56,10 +56,10 @@ std::size_t hello_world_worker(std::size_t desired)
 
     if (current == desired)
     {
-        cout << ( format("hello world from shepherd %1% on locality %2%")
+        cout << ( format("hello world from shepherd %1% on locality %2%\n")
                   % desired 
                   % get_prefix_id())
-            << endl;
+            << flush;
         return desired;
     }
 
