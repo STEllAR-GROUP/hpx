@@ -53,7 +53,11 @@ namespace hpx { namespace components
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
             fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
+#if !defined(HPX_EXPORT)
+            // all components in the core library need to be accessible all 
+            // the time
             fillini += "enabled = $[hpx.components.load_external]";
+#endif
             return true;
         }
     };
