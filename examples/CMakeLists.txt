@@ -15,8 +15,6 @@ if(NOT MSVC)
   set(subdirs
       accumulator
       adaptive1d
-      # Disabled by wash as this is randomly breaking things.
-      # barnes_hut
       dataflow
       hplpx
       nqueen
@@ -36,8 +34,12 @@ if(NOT MSVC)
                            contact)
   endif() 
 
-  if(HDF5_FOUND AND HPX_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} sheneos)
+  if(HDF5_FOUND) 
+    set(subdirs ${subdirs} interpolate1d
+                           interpolate3d)
+    if(HPX_CXX11_LAMBDAS)
+      set(subdirs ${subdirs} sheneos)
+    endif()
   endif()
 
   if(CMAKE_Fortran_COMPILER)
