@@ -959,6 +959,9 @@ namespace hpx { namespace threads
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
               "returns the overall number of executed (retired) px-threads for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
+            { "/threads/count/objects", performance_counters::counter_raw,
+              "returns the overall number of created px-thread objects for "
+              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of px-threads instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
@@ -991,6 +994,7 @@ namespace hpx { namespace threads
         boost::format total_queue_length("/queue(locality#%d/total)/length");
         boost::format total_avg_maint("/time(locality#%d/total)/idle-rate");
         boost::format total_thread_cumulative("/threads(locality#%d/total)/count/cumulative/all");
+        boost::format total_thread_created("/threads(locality#%d/total)/count/objects");
         boost::format total_thread_instant("/threads(locality#%d/total)/count/instantaneous/%s");
         boost::format queue_length("/queue(locality#%d/os-thread%d)/length");
         boost::format avg_maint("/time(locality#%d/os-thread#%d)/idle-rate");
@@ -1008,6 +1012,9 @@ namespace hpx { namespace threads
             // Locality-wide thread count (cumulative)
             { boost::str(total_thread_cumulative % prefix),
               boost::bind(&ti::get_executed_threads, this, -1) },
+            // Locality-wide thread object count
+            { boost::str(total_thread_created % prefix),
+              &coroutine_type::impl_type::get_count },
             // Locality-wide thread count (instantaneous)
             { boost::str(total_thread_instant % prefix % "all"),
               boost::bind(&spt::get_thread_count, &scheduler_, unknown, -1) },

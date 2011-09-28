@@ -18,7 +18,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #if !defined(BOOST_WINDOWS)
@@ -444,8 +444,12 @@ namespace hpx
                     "HPX options related to performance counters");
                 counter_options.add_options()
                     ("print-counter", value<std::vector<std::string> >()->composing(),
-                     "print the specified performance counter before shutting "
-                     "down the system")
+                     "print the specified performance counter either repeatedly or "
+                     "before shutting down the system (see option --print-counter-interval)")
+                     ("print-counter-interval", value<std::size_t>(),
+                     "print the performance counter(s) specified with --print-counter "
+                     "repeatedly after the time interval (specified in milliseconds) "
+                     "(default: 0, which means print once at shutdown)")
                     ("list-counters", "list the names of all registered performance "
                      "counters")
                     ("list-counter-infos", "list the description of all registered "
@@ -526,37 +530,6 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void print_shutdown_counters(std::vector<std::string> const& names)
-        {
-            std::cout << "performance counter values (at shutdown):\n";
-
-            BOOST_FOREACH(std::string const& name, names)
-            {
-                error_code ec;
-                naming::gid_type gid;
-                naming::get_agas_client().queryid(name, gid, ec);
-
-                if (HPX_UNLIKELY(ec || !gid))
-                {
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "print_shutdown_counters",
-                        boost::str(boost::format(
-                            "unknown performance counter: '%s'") % name))
-                }
-
-                using hpx::performance_counters::stubs::performance_counter;
-                using hpx::performance_counters::status_valid_data;
-
-                // Query the performance counter.
-                double value = performance_counter::get_typed_value<double>(gid, ec);
-                if (!ec)
-                    std::cout << name << "," << value << "\n"; 
-                else
-                    std::cout << name << ",invalid\n"; 
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
         struct dump_config
         {
@@ -586,10 +559,31 @@ namespace hpx
             }
 
             if (vm.count("print-counter")) {
+                std::size_t interval = 0;
+                if (vm.count("print-counter-interval")) 
+                    interval = vm["print-counter-interval"].as<std::size_t>();
+
                 std::vector<std::string> counters = 
                     vm["print-counter"].as<std::vector<std::string> >();
+
+                // schedule the query function at startup, which will schedule 
+                // itself to run after the given interval
+                boost::shared_ptr<util::query_counters> qc = 
+                    boost::make_shared<util::query_counters>(
+                        boost::ref(counters), interval, boost::ref(std::cout));
+
+                if (0 != interval) {
+                    rt.add_startup_function(
+                        boost::bind(&util::query_counters::start, qc));
+                }
+
+                // schedule to run at shutdown in any case
                 rt.add_shutdown_function(
-                    boost::bind(print_shutdown_counters, counters));
+                    boost::bind(&util::query_counters::evaluate, qc));
+            }
+            else if (vm.count("print-counter-interval")) {
+                throw std::logic_error("bad parameter --print-counter-interval, "
+                    "valid in conjunction with --print-counter only");
             }
 
             if (!startup.empty())

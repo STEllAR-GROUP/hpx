@@ -252,11 +252,6 @@ namespace hpx
         /// The function \a get_thread_manager returns a reference to the
         /// current thread manager.
         HPX_API_EXPORT threadmanager_base& get_thread_manager();
-
-        /// The function \a suspend will return control to the thread manager
-        /// (suspends the current thread). It sets the new state of this thread
-        /// to the thread state passed as the parameter.
-        HPX_API_EXPORT void suspend(thread_state_enum state = pending);
     }
 
     class HPX_API_EXPORT runtime;

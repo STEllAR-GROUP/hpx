@@ -401,8 +401,10 @@ private:
 
       wrapper_type* wrapper = wrapper_type::allocate(
           (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
-      if (NULL == wrapper)
+      if (NULL == wrapper) {
+          ++m_allocation_counter;
           return new wrapper_type(f, id, stack_size);
+      }
 
       wrapper->rebind(f, id);
       return wrapper;

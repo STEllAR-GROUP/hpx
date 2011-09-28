@@ -347,6 +347,11 @@ namespace boost { namespace coroutines { namespace detail {
       } catch(...) {}
     }
 
+    static boost::uint64_t get_count()
+    {
+        return m_allocation_counter;
+    }
+
   protected:
     // global coroutine state
     enum context_state {
@@ -428,8 +433,10 @@ namespace boost { namespace coroutines { namespace detail {
     ctx_type m_caller;
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
     mutable std::size_t m_counter;
+    static std::size_t m_allocation_counter;
 #else
-    mutable  boost::detail::atomic_count m_counter;
+    mutable boost::detail::atomic_count m_counter;
+    static boost::detail::atomic_count m_allocation_counter;
 #endif
     deleter_type * m_deleter;
     context_state m_state;
@@ -442,6 +449,10 @@ namespace boost { namespace coroutines { namespace detail {
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;
   };
+
+  // initialize static allocation counter
+  template <typename ContextImpl>
+  boost::detail::atomic_count context_base<ContextImpl>::m_allocation_counter(0);
 
 } } }
 #endif

@@ -45,9 +45,9 @@ void monitor_test_sheneos(
             }
         }
 
-        // suspend after one full loop over all values
-        if (!suspended)
-            hpx::threads::suspend();
+        // suspend after one full loop over all values, 10ms should be fine
+        if (!suspended) 
+            hpx::threads::suspend(boost::posix_time::milliseconds(10));
     }
 }
 
@@ -217,7 +217,9 @@ int hpx_main(variables_map& vm)
         }
 
         // use a dummy lambda to work around a race condition in HPX's code
-        hpx::lcos::wait(tests, [](int) {});
+        hpx::lcos::wait(tests, [](int i) {
+            std::cout << "Finished task: " << i << std::endl;
+        });
 
         elapsed = t.elapsed();
         std::cout << "Running tests: " << elapsed << " [s]" << std::endl;

@@ -222,5 +222,49 @@ namespace hpx { namespace threads
                 hpx::util::osstream_get_string(strm));
         }
     }
+
+    void suspend(boost::posix_time::ptime const& at_time)
+    {
+        // schedule a thread waking us up at_time
+        threads::thread_self& self = threads::get_self();
+        threads::set_thread_state(self.get_thread_id(), 
+            at_time, threads::pending, threads::wait_signaled, 
+            threads::thread_priority_critical);
+
+        // let the thread manager do other things while waiting
+        threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+
+        if (statex == threads::wait_abort) {
+            threads::thread_id_type id = self.get_thread_id();
+            hpx::util::osstream strm;
+            strm << "thread(" << id << ", " 
+                  << threads::get_thread_description(id)
+                  << ") aborted (yield returned wait_abort)";
+            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+                hpx::util::osstream_get_string(strm));
+        }
+    }
+
+    void suspend(boost::posix_time::time_duration const& after_duration)
+    {
+        // schedule a thread waking us up after_duration
+        threads::thread_self& self = threads::get_self();
+        threads::set_thread_state(self.get_thread_id(), 
+            after_duration, threads::pending, threads::wait_signaled, 
+            threads::thread_priority_critical);
+
+        // let the thread manager do other things while waiting
+        threads::thread_state_ex_enum statex = self.yield(threads::suspended);
+
+        if (statex == threads::wait_abort) {
+            threads::thread_id_type id = self.get_thread_id();
+            hpx::util::osstream strm;
+            strm << "thread(" << id << ", " 
+                  << threads::get_thread_description(id)
+                  << ") aborted (yield returned wait_abort)";
+            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+                hpx::util::osstream_get_string(strm));
+        }
+    }
 }}
 

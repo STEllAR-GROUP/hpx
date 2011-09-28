@@ -7,6 +7,7 @@
 #define PERFORMANCE_COUNTERS_SINE_SEP_20_2011_0112PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/interval_timer.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 namespace performance_counters { namespace sine { namespace server
@@ -41,8 +42,7 @@ namespace performance_counters { namespace sine { namespace server
         using base_type::set_component_type;
 
     protected:
-        hpx::threads::thread_state_enum evaluate(hpx::threads::thread_state_ex_enum);
-        void schedule_thread(std::size_t secs);
+        void evaluate();
 
     private:
         typedef hpx::util::spinlock mutex_type;
@@ -50,7 +50,7 @@ namespace performance_counters { namespace sine { namespace server
         mutable mutex_type mtx_;
         double current_value_;
 
-        hpx::threads::thread_id_type id_;     // id of currently scheduled thread
+        hpx::util::interval_timer timer_;
         boost::chrono::high_resolution_clock::time_point started_at_;
     };
 }}}

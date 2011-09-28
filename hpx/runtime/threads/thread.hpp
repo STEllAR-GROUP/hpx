@@ -74,7 +74,6 @@ namespace hpx { namespace threads { namespace detail
     struct coroutine_allocator
     {
         coroutine_allocator() 
-          : acount(0), dcount(0)
         {}
 
         CoroutineImpl* get()
@@ -86,21 +85,15 @@ namespace hpx { namespace threads { namespace detail
 
             CoroutineImpl* next = heap_.top();
             heap_.pop();
-            ++acount;
-
             return next;
         }
 
         void deallocate(CoroutineImpl* c)
         {
             thread_mutex_type::scoped_lock l(this);
-
             heap_.push(c);
-            ++dcount;
         }
 
-        // Declare allocation/deallocation counters and timers.
-        boost::int64_t acount, dcount;
         std::stack<CoroutineImpl*> heap_;
     };
 

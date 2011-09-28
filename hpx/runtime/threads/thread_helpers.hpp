@@ -185,6 +185,24 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
     HPX_API_EXPORT int get_numa_node_number();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to the thread state passed as the parameter.
+    HPX_API_EXPORT void suspend(thread_state_enum state = pending);
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to \a suspended and schedules a wakeup for this threads at the given 
+    /// time.
+    HPX_API_EXPORT void suspend(boost::posix_time::ptime const&);
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to \a suspended and schedules a wakeup for this threads after the given
+    /// duration.
+    HPX_API_EXPORT void suspend(boost::posix_time::time_duration const&);
 }}
 
 #endif

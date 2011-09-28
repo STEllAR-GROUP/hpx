@@ -65,9 +65,9 @@ namespace hpx { namespace lcos
                 }
             }
 
-            // suspend after one full loop over all values
+            // suspend after one full loop over all values, 10ms should be fine
             if (!suspended) 
-                threads::suspend();
+                threads::suspend(boost::posix_time::milliseconds(10));
         }
         return handled.count();
     }
@@ -100,9 +100,9 @@ namespace hpx { namespace lcos
                 }
             }
 
-            // suspend after one full loop over all values
+            // suspend after one full loop over all values, 10ms should be fine
             if (!suspended) 
-                threads::suspend();
+                threads::suspend(boost::posix_time::milliseconds(10));
         }
         return handled.count();
     }
