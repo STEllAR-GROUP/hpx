@@ -233,5 +233,10 @@ namespace hpx { namespace util
             std::cerr << "agas host_name: " << host << std::endl;
         return host;
     }
+
+    bool pbs_environment::run_with_pbs() const
+    {
+        return std::getenv("PBS_NODENUM") != 0 ? true : false;
+    }
 }}
 

@@ -986,7 +986,7 @@ namespace hpx
                 if (vm.count("run-agas-server-only")) 
                     ini_config += "hpx.components.load_external=0"; 
             }
-            else if (vm.count("run-agas-server-only")) {
+            else if (vm.count("run-agas-server-only") && !env.run_with_pbs()) {
                 throw std::logic_error("Command line option --run-agas-server-only "
                     "can be specified only for the node running the AGAS server.");
             }

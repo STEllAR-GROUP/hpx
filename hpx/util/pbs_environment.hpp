@@ -26,7 +26,7 @@ namespace hpx { namespace util
         // the constructor tries to read from a PBS node-file, filling our
         // map of nodes and thread counts
         pbs_environment(bool debug = false) 
-          : agas_node_num_(0), debug_(debug) 
+          : agas_node_num_(0), debug_(debug)
         {}
 
         // this function tries to read from a PBS node-file, filling our
@@ -69,6 +69,10 @@ namespace hpx { namespace util
         // The AGAS node number represents the number of the node which has 
         // been selected as the AGAS host.
         std::size_t agas_node() const { return agas_node_num_; }
+
+        // The function run_with_pbs returns true if the job was started using 
+        // PBS, false otherwise
+        bool run_with_pbs() const;
 
         std::string agas_node_;
         std::size_t agas_node_num_;
