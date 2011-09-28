@@ -41,6 +41,105 @@ HPX_EXPORT int itt_mark_create(char const*);
 HPX_EXPORT void itt_mark_off(int mark);
 HPX_EXPORT void itt_mark(int mark, char const*);
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util { namespace itt
+{
+    struct stack_context
+    {
+        stack_context() 
+          : itt_context_(0)
+        {
+            HPX_ITT_STACK_CREATE(itt_context_);
+        }
+        ~stack_context()
+        {
+            HPX_ITT_STACK_DESTROY(itt_context_);
+        }
+
+        struct ___itt_caller* itt_context_;
+    };
+
+    struct caller_context
+    {
+        caller_context(stack_context& ctx) 
+          : ctx_(ctx) 
+        {
+            HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
+        }
+        ~caller_context()
+        {
+            HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
+        }
+
+        stack_context& ctx_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct frame_context
+    {
+        frame_context(char const* name) 
+          : itt_frame_(0)
+        {
+            HPX_ITT_FRAME_CREATE(itt_frame_, name);
+            HPX_ITT_FRAME_BEGIN(itt_frame_);
+        }
+        ~frame_context()
+        {
+            HPX_ITT_FRAME_END(itt_frame_);
+            HPX_ITT_FRAME_DESTROY(itt_frame_);
+        }
+
+        struct __itt_frame_t* itt_frame_;
+    };
+
+    struct undo_frame_context
+    {
+        undo_frame_context(frame_context& frame) 
+          : frame_(frame) 
+        {
+            HPX_ITT_FRAME_END(frame_.itt_frame_);
+        }
+        ~undo_frame_context() 
+        {
+            HPX_ITT_FRAME_BEGIN(frame_.itt_frame_);
+        }
+
+        frame_context& frame_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct mark_context
+    {
+        mark_context(char const* name) 
+          : itt_mark_(0), name_(name)
+        {
+            HPX_ITT_MARK_CREATE(itt_mark_, name);
+        }
+        ~mark_context()
+        {
+            HPX_ITT_MARK_OFF(itt_mark_);
+        }
+
+        int itt_mark_;
+        char const* name_;
+    };
+
+    struct undo_mark_context
+    {
+        undo_mark_context(mark_context& mark) 
+          : mark_(mark) 
+        {
+            HPX_ITT_MARK_OFF(mark_.itt_mark_);
+        }
+        ~undo_mark_context() 
+        {
+            HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
+        }
+
+        mark_context& mark_;
+    };
+}}}
+
 #else
 
 inline void itt_sync_create(void* addr, const char* objtype, const char* objname) {}
@@ -65,6 +164,48 @@ inline void itt_frame_destroy(__itt_frame_t* ctx) {}
 inline int itt_mark_create(char const*) { return 0; }
 inline void itt_mark_off(int mark) {}
 inline void itt_mark(int mark, char const*) {}
+
+//////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util { namespace itt
+{
+    struct stack_context
+    {
+        stack_context() {}
+        ~stack_context() {}
+    };
+
+    struct caller_context
+    {
+        caller_context(stack_context&) {}
+        ~caller_context() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct frame_context
+    {
+        frame_context(char const* name) {}
+        ~frame_context() {}
+    };
+
+    struct undo_frame_context
+    {
+        undo_frame_context(frame_context&) {}
+        ~undo_frame_context() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct mark_context
+    {
+        mark_context(char const* name) {}
+        ~mark_context() {}
+    };
+
+    struct undo_mark_context
+    {
+        undo_mark_context(mark_context&) {}
+        ~undo_mark_context() {}
+    };
+}}}
 
 #endif // HPX_USE_ITT
 

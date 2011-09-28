@@ -148,7 +148,7 @@ namespace hpx { namespace threads
         // verify state
         if (thread_count_ == 0 && state_.load() != running) 
         {
-            // threadmanager is not currently running
+            // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
                 "threadmanager_impl::register_thread",
                 "invalid state: thread manager is not running");
@@ -224,7 +224,7 @@ namespace hpx { namespace threads
         // verify state
         if (thread_count_ == 0 && state_.load() != running) 
         {
-            // threadmanager is not currently running
+            // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
                 "threadmanager_impl::register_work",
                 "invalid state: thread manager is not running");
@@ -301,10 +301,11 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::set_active_state",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_active_state",
+                "NULL thread id encountered");  
+        }
 
         // just retry, set_state will create new thread if target is still active
         error_code ec;      // do not throw
@@ -322,8 +323,9 @@ namespace hpx { namespace threads
             error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
-           HPX_THROWS_IF(ec, null_thread_id,
-              "threadmanager_impl::set_state", "NULL thread id encountered");  
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::set_state", "NULL thread id encountered");
+            return thread_state(unknown);
         }
 
         util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
@@ -435,10 +437,11 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_description(thread_id_type id, char const* desc)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::set_description",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_description",
+                "NULL thread id encountered");  
+        }
 
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
@@ -450,6 +453,12 @@ namespace hpx { namespace threads
     std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_lco_description(thread_id_type id) const
     {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_lco_description",
+                "NULL thread id encountered");
+        }
+
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         return thrd->get() ? thrd->get_lco_description() : "<unknown>";
@@ -459,10 +468,11 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_lco_description(thread_id_type id, char const* desc)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::set_lco_description",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_lco_description",
+                "NULL thread id encountered");  
+        }
 
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
@@ -479,15 +489,12 @@ namespace hpx { namespace threads
             thread_priority priority, thread_id_type timer_id, 
             boost::shared_ptr<boost::atomic<bool> > triggered) 
     {
-        if (HPX_UNLIKELY(!id))
-        {
+        if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (id)");  
         }
-
-        else if (HPX_UNLIKELY(!timer_id))
-        {
+        if (HPX_UNLIKELY(!timer_id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (timer_id)");
@@ -515,10 +522,11 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex, 
             thread_priority priority)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::at_timer",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::at_timer",
+                "NULL thread id encountered");  
+        }
 
         // create a new thread in suspended state, which will execute the 
         // requested set_state when timer fires and will re-awaken this thread, 
@@ -544,7 +552,7 @@ namespace hpx { namespace threads
             boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
-        // if it returns 'signalled' the timer has been canceled, otherwise 
+        // if it returns 'signaled the timer has been canceled, otherwise 
         // the timer fired and the wake_timer_thread above has been executed
         bool oldvalue = false;
         thread_state_ex_enum statex = self.yield(suspended);
@@ -567,10 +575,12 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::set_state",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::set_state",
+                "NULL thread id encountered");  
+            return 0;
+        }
 
         // this creates a new thread which creates the timer and handles the
         // requested actions
@@ -593,10 +603,12 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id))
-           HPX_THROW_EXCEPTION(null_thread_id,
-              "threadmanager_impl::set_state",
-              "NULL thread id encountered");  
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::set_state",
+                "NULL thread id encountered");  
+            return 0;
+        }
 
         // this creates a new thread which creates the timer and handles the
         // requested actions
@@ -617,6 +629,12 @@ namespace hpx { namespace threads
     threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_gid(thread_id_type id) 
     {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_thread_gid",
+                "NULL thread id encountered");  
+        }
+
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
         return thrd->get() ? thrd->get_gid() : naming::invalid_id;
@@ -727,7 +745,7 @@ namespace hpx { namespace threads
         tfunc(std::size_t num_thread)
     {
         // wait for all threads to start up before before starting px work
-        startup_->wait();   
+        startup_->wait();
 
         // manage the number of this thread in its TSS
         init_tss_helper<SchedulingPolicy, NotificationPolicy> 
@@ -792,159 +810,23 @@ namespace hpx { namespace threads
         thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
-                   << "thread(" << thrd->get_thread_id() << "), "
-                   << "description(" << thrd->get_description() << "), "
-                   << "new state(" << get_thread_state_name(state) << "), "
-                   << info;
+            << "thread(" << thrd->get_thread_id() << "), "
+            << "description(" << thrd->get_description() << "), "
+            << "new state(" << get_thread_state_name(state) << "), "
+            << info;
     }
     inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd, 
         thread_state_enum state, char const* info)
     {
         // log this in any case
         LTM_(fatal) << "tfunc(" << num_thread << "): "
-                   << "thread(" << thrd->get_thread_id() << "), "
-                   << "description(" << thrd->get_description() << "), "
-                   << "new state(" << get_thread_state_name(state) << "), "
-                   << info;
+            << "thread(" << thrd->get_thread_id() << "), "
+            << "description(" << thrd->get_description() << "), "
+            << "new state(" << get_thread_state_name(state) << "), "
+            << info;
     }
 
-#if HPX_USE_ITT != 0
     ///////////////////////////////////////////////////////////////////////////
-    struct itt_caller_context
-    {
-        itt_caller_context() 
-          : itt_context_(0)
-        {
-            HPX_ITT_STACK_CREATE(itt_context_);
-        }
-        ~itt_caller_context()
-        {
-            HPX_ITT_STACK_DESTROY(itt_context_);
-        }
-
-        struct ___itt_caller* itt_context_;
-    };
-
-    struct caller_context
-    {
-        caller_context(itt_caller_context& ctx) 
-          : ctx_(ctx) 
-        {
-            HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
-        }
-        ~caller_context()
-        {
-            HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
-        }
-
-        itt_caller_context& ctx_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct itt_frame_context
-    {
-        itt_frame_context(char const* name) 
-          : itt_frame_(0)
-        {
-            HPX_ITT_FRAME_CREATE(itt_frame_, name);
-            HPX_ITT_FRAME_BEGIN(itt_frame_);
-        }
-        ~itt_frame_context()
-        {
-            HPX_ITT_FRAME_END(itt_frame_);
-            HPX_ITT_FRAME_DESTROY(itt_frame_);
-        }
-
-        struct __itt_frame_t* itt_frame_;
-    };
-
-    struct undo_frame_context
-    {
-        undo_frame_context(itt_frame_context& frame) 
-          : frame_(frame) 
-        {
-            HPX_ITT_FRAME_END(frame_.itt_frame_);
-        }
-        ~undo_frame_context() 
-        {
-            HPX_ITT_FRAME_BEGIN(frame_.itt_frame_);
-        }
-
-        itt_frame_context& frame_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct itt_mark_context
-    {
-        itt_mark_context(char const* name) 
-          : itt_mark_(0), name_(name)
-        {
-            HPX_ITT_MARK_CREATE(itt_mark_, name);
-        }
-        ~itt_mark_context()
-        {
-            HPX_ITT_MARK_OFF(itt_mark_);
-        }
-
-        int itt_mark_;
-        char const* name_;
-    };
-
-    struct undo_mark_context
-    {
-        undo_mark_context(itt_mark_context& mark) 
-          : mark_(mark) 
-        {
-            HPX_ITT_MARK_OFF(mark_.itt_mark_);
-        }
-        ~undo_mark_context() 
-        {
-            HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
-        }
-
-        itt_mark_context& mark_;
-    };
-#else
-    ///////////////////////////////////////////////////////////////////////////
-    struct itt_caller_context
-    {
-        itt_caller_context() {}
-        ~itt_caller_context() {}
-    };
-
-    struct caller_context
-    {
-        caller_context(itt_caller_context&) {}
-        ~caller_context() {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct itt_frame_context
-    {
-        itt_frame_context(char const* name) {}
-        ~itt_frame_context() {}
-    };
-
-    struct undo_frame_context
-    {
-        undo_frame_context(itt_frame_context&) {}
-        ~undo_frame_context() {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct itt_mark_context
-    {
-        itt_mark_context(char const* name) {}
-        ~itt_mark_context() {}
-    };
-
-    struct undo_mark_context
-    {
-        undo_mark_context(itt_mark_context&) {}
-        ~undo_mark_context() {}
-    };
-#endif
-
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         install_counters()
@@ -1073,8 +955,8 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
-        itt_caller_context ctx;        // helper for itt support
-        itt_mark_context mark("threadmanager");
+        util::itt::stack_context ctx;        // helper for itt support
+        util::itt::mark_context mark("threadmanager");
 
         manage_active_thread_count count(thread_count_);
 
@@ -1118,8 +1000,8 @@ namespace hpx { namespace threads
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-                                undo_mark_context cmark(mark);  // itt support
-                                caller_context cctx(ctx);
+                                util::itt::undo_mark_context cmark(mark);  // itt support
+                                util::itt::caller_context cctx(ctx);
 
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
@@ -1382,7 +1264,7 @@ namespace hpx { namespace threads
             }
         }
 
-        // some OS threads are not managed by the threadmanager
+        // some OS threads are not managed by the thread-manager
         if (numa_sensitive)
             *numa_sensitive = false;
         return std::size_t(-1);
