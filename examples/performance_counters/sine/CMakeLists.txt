@@ -17,3 +17,14 @@ add_hpx_executable(sine_client
   SOURCES sine_client.cpp 
   DEPENDENCIES sine_component)
 
+# add a custom target for this example 
+add_hpx_pseudo_target(examples.performance_counters.sine_client)
+
+# make pseudo-targets depend on master pseudo-target
+add_hpx_pseudo_dependencies(examples.performance_counters
+                            examples.performance_counters.sine_client)
+  
+# add dependencies to pseudo-target 
+add_hpx_pseudo_dependencies(examples.performance_counters.sine_client
+                            sine_client_exe)
+

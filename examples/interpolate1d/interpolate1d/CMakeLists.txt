@@ -32,7 +32,8 @@ set(headers
 
 ###############################################################################
 set(dependencies
-    distributing_factory_component)
+    distributing_factory_component
+    ${HDF5_CPP_LIBRARY})
 
 ###############################################################################
 source_group("Source Files\\Client" FILES ${client_sources})

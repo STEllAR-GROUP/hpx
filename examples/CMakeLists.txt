@@ -5,12 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# NOTE: please do not comment out targets here and commit. If you do not want
-# to build all the examples, you can explicitly specify which examples you
-# would like to build on the command line, e.g. `make examples.had_amr3d'.
-# It is important that all of these examples remain linked into the CMake
-# dependency tree for testing purposes.
-
 if(NOT MSVC)
   set(subdirs
       accumulator
@@ -18,7 +12,8 @@ if(NOT MSVC)
       dataflow
       hplpx
       nqueen
-      performance_counters
+      # wash: disabled temporarily as it breaks stuff
+      #performance_counters
       queue
       quickstart
       random_mem_access
@@ -34,9 +29,11 @@ if(NOT MSVC)
                            contact)
   endif() 
 
-  if(HDF5_FOUND) 
-    set(subdirs ${subdirs} interpolate1d
-                           interpolate3d)
+  if(HDF5_CPP_FOUND) 
+    if(HDF5_FOUND) 
+      set(subdirs ${subdirs} interpolate1d
+                             interpolate3d)
+    endif()
     if(HPX_CXX11_LAMBDAS)
       set(subdirs ${subdirs} sheneos)
     endif()
