@@ -398,6 +398,7 @@ if(MSVC)
   ##############################################################################
   # We auto-link Boost on Windows, so don't specify boost libraries explicitly
   set(BOOST_FOUND_LIBRARIES "")
+  set(BOOST_serialization_LIBRARY "")
 
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
