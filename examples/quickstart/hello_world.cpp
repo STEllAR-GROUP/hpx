@@ -47,7 +47,7 @@ using hpx::lcos::wait;
 using hpx::threads::threadmanager_base;
 
 using hpx::cout;
-using hpx::endl;
+using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t hello_world_worker(std::size_t desired)
