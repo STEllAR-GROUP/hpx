@@ -559,32 +559,34 @@ namespace hpx
                 rt.get_config().load_application_configuration(config.c_str());
             }
 
-            if (vm.count("print-counter")) {
-                std::size_t interval = 0;
-                if (vm.count("print-counter-interval")) 
-                    interval = vm["print-counter-interval"].as<std::size_t>();
+            if (runtime_mode_console == mode) {
+                if (vm.count("print-counter")) {
+                    std::size_t interval = 0;
+                    if (vm.count("print-counter-interval")) 
+                        interval = vm["print-counter-interval"].as<std::size_t>();
 
-                std::vector<std::string> counters = 
-                    vm["print-counter"].as<std::vector<std::string> >();
+                    std::vector<std::string> counters = 
+                        vm["print-counter"].as<std::vector<std::string> >();
 
-                // schedule the query function at startup, which will schedule 
-                // itself to run after the given interval
-                boost::shared_ptr<util::query_counters> qc = 
-                    boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, boost::ref(std::cout));
+                    // schedule the query function at startup, which will schedule 
+                    // itself to run after the given interval
+                    boost::shared_ptr<util::query_counters> qc = 
+                        boost::make_shared<util::query_counters>(
+                            boost::ref(counters), interval, boost::ref(std::cout));
 
-                if (0 != interval) {
-                    rt.add_startup_function(
-                        boost::bind(&util::query_counters::start, qc));
+                    if (0 != interval) {
+                        rt.add_startup_function(
+                            boost::bind(&util::query_counters::start, qc));
+                    }
+
+                    // schedule to run at shutdown in any case
+                    rt.add_shutdown_function(
+                        boost::bind(&util::query_counters::evaluate, qc));
                 }
-
-                // schedule to run at shutdown in any case
-                rt.add_shutdown_function(
-                    boost::bind(&util::query_counters::evaluate, qc));
-            }
-            else if (vm.count("print-counter-interval")) {
-                throw std::logic_error("bad parameter --print-counter-interval, "
-                    "valid in conjunction with --print-counter only");
+                else if (vm.count("print-counter-interval")) {
+                    throw std::logic_error("bad parameter --print-counter-interval, "
+                        "valid in conjunction with --print-counter only");
+                }
             }
 
             if (!startup.empty())
