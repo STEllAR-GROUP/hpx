@@ -49,5 +49,7 @@ bool intersection(double xmin,double xmax,double xmin2,double xmax2);
 bool floatcmp_le(double const& x1, double const& x2);
 int floatcmp(double const& x1, double const& x2);
 int level_makeflag_simple(std::vector<int> &flag,std::vector<double> &error,int nxl,double ethreshold);
+int level_bbox(int level,parameter &par);
+int ballpark(double const& x1, double const& x2,double const& epsilon);
 
 #endif
