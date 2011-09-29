@@ -9,7 +9,6 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time.hpp>
-#include <boost/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int monitor(boost::uint64_t pause, boost::uint64_t values)
@@ -24,7 +23,6 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     id_type id1 = get_counter(boost::str(sine_instance % prefix % 0));
     id_type id2 = get_counter(boost::str(sine_instance % prefix % 1));
 
-    using boost::chrono::duration;
     boost::int64_t start_time = 0;
 
     while (values-- > 0) 
