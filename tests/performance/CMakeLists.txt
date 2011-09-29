@@ -4,12 +4,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    performance
+    overhead
    )
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.${subdir})
+  add_hpx_pseudo_target(tests.performance.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests tests.${subdir})
+  add_hpx_pseudo_dependencies(tests.performance tests.performance.${subdir})
 endforeach()
 
