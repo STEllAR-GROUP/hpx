@@ -663,6 +663,15 @@ if(HPX_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+option(HPX_TESTS "Build HPX tests (default: ON)" ON)
+
+if(HPX_TESTS)
+  add_hpx_pseudo_target(tests)
+
+  include_directories(tests)
+  add_subdirectory(tests)
+endif()
+
 option(HPX_RUNTIME "Build HPX runtime (default: ON)" ON)
 
 if(HPX_RUNTIME)
