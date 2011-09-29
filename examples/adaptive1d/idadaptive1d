@@ -1,14 +1,14 @@
 [adaptive1d]
 nx0  = 801
-nt0  = 2800
+nt0  = 200
 refine_every = 100
 
-grain_size = 20
+grain_size = 100
 num_neighbors = 1
 out_every = 5.0
 loglevel     = 2
 output_directory = .
-allowedl = 2
+allowedl = 1
 
 cfl = 0.01
 disip = .005
@@ -20,3 +20,5 @@ v = 0.1
 amp = 0.0001
 x0  = 10.
 id_sigma = 0.9
+
+
