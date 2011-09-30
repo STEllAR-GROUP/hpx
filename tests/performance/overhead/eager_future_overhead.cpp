@@ -8,18 +8,15 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/asio/deadline_timer.hpp>
 
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/lcos/async_future_wait.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/eager_future.hpp>
-
-using boost::posix_time::seconds;
-
-using boost::asio::deadline_timer;
+#include <hpx/include/iostreams.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -29,25 +26,38 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::find_here;
-using hpx::get_runtime;
 
 using hpx::naming::id_type;
 
 using hpx::actions::plain_result_action0;
 
+using hpx::lcos::promise;
 using hpx::lcos::eager_future;
+using hpx::lcos::wait;
 
 using hpx::util::high_resolution_timer;
 
+using hpx::cout;
+using hpx::flush;
+
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t null_function()
+// we use globals here to prevent the delay from being optimized away
+double global_scratch = 0;
+boost::uint64_t num_iterations = 0;
+
+///////////////////////////////////////////////////////////////////////////////
+double null_function()
 {
-    return 1;
+    double d = 0.;
+    for (boost::uint64_t i = 0; i < num_iterations; ++i)
+        d += 1 / (2. * i + 1);
+    return d;
 }
 
 typedef plain_result_action0<
     // result type
-    boost::uint64_t
+    double
+    // arguments
     // function
   , null_function
 > null_action;
@@ -55,55 +65,48 @@ typedef plain_result_action0<
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
 typedef eager_future<null_action> null_future;
-
-///////////////////////////////////////////////////////////////////////////////
-void timeout_handler(
-    bool& flag
-  , boost::system::error_code const&
-    )
-{
-    flag = true;     
-}
     
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(
+    variables_map& vm
+    )
 {
     {
-        const boost::uint64_t duration = vm["duration"].as<boost::uint64_t>();
 
-        if (duration == 0)
-            throw std::logic_error("error: duration of 0 seconds specified\n");
-
+        num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
+    
+        const boost::uint64_t count = vm["count"].as<boost::uint64_t>();
+    
         const id_type here = find_here();
 
-        bool flag = false;
-        boost::uint64_t futures = 0;
+        if (HPX_UNLIKELY(0 == count))
+            throw std::logic_error("error: count of 0 futures specified\n");
+ 
+        std::vector<promise<double> > futures;
 
-        deadline_timer t( get_runtime().get_io_pool().get_io_service()
-                        , seconds(duration));
-
-        t.async_wait(boost::bind( &timeout_handler
-                                , boost::ref(flag)
-                                , boost::asio::placeholders::error));
-
-        high_resolution_timer real_clock;
-
-        while (HPX_LIKELY(!flag))
-        {
-            null_future nf(here);
-            futures += nf.get(); 
-        }
-
-        double actual_seconds = real_clock.elapsed();
-
+        futures.reserve(count);        
+ 
+        // start the clock 
+        high_resolution_timer walltime;
+   
+        for (boost::uint64_t i = 0; i < count; ++i)
+            futures.push_back(null_future(here));
+  
+        wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+ 
+        // stop the clock 
+        double duration = walltime.elapsed();
+    
         if (vm.count("csv"))
-            std::cout << ( boost::format("%1%,%2%\n")
-                         % futures
-                         % actual_seconds);
+            cout << ( boost::format("%1%,%2%\n")
+                    % count 
+                    % duration)
+                 << flush;
         else
-            std::cout << ( boost::format("invoked %1% futures in %2% seconds\n")
-                         % futures
-                         % actual_seconds);
+            cout << ( boost::format("invoked %1% futures in %2% seconds\n")
+                    % count
+                    % duration)
+                 << flush;
     }
 
     finalize();
@@ -111,19 +114,25 @@ int hpx_main(variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main(
+    int argc
+  , char* argv[]
+    )
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ( "duration"
-        , value<boost::uint64_t>()->default_value(5) 
-        , "duration of the test period in seconds")
+        ( "count"
+        , value<boost::uint64_t>()->implicit_value(500000) 
+        , "number of futures to invoke")
+        
+        ( "delay-iterations"
+        , value<boost::uint64_t>()->default_value(0) 
+        , "number of iterations in the delay loop")
 
         ( "csv"
-        , "output results in csv format (number of futures invoked, test "
-          "duration in seconds)")
+        , "output results as csv (format: count,duration)")
         ;
 
     // Initialize and run HPX.

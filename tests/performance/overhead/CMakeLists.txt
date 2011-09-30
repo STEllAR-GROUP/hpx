@@ -4,8 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
-    eager_future_overhead
    )
+
+if(HPX_CXX11_LAMBDAS)
+  set(benchmarks ${benchmarks}
+      eager_future_overhead
+     )
+endif()
 
 foreach(benchmark ${benchmarks})
   set(sources
@@ -16,7 +21,8 @@ foreach(benchmark ${benchmarks})
   # add example executable
   add_hpx_executable(${benchmark}
                      MODULE overhead
-                     SOURCES ${sources})
+                     SOURCES ${sources}
+                     DEPENDENCIES iostreams_component)
 
   # add a custom target for this example 
   add_hpx_pseudo_target(tests.performance.overhead.${benchmark})
