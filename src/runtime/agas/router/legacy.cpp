@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/agas/router/legacy.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/logging.hpp>
 
 namespace hpx { namespace agas
 {
@@ -41,14 +42,9 @@ void legacy_router::launch_bootstrap(
   , util::runtime_configuration const& ini_
     )
 { // {{{
-    using boost::asio::ip::address;
-
     bootstrap = boost::make_shared<bootstrap_data_type>();
     
-    naming::locality l = ini_.get_agas_locality();
-
-    address addr = address::from_string(l.get_address());
-    endpoint_type ep(addr, l.get_port());
+    naming::locality ep = ini_.get_agas_locality();
 
     gva_type primary_gva(ep,
         primary_namespace_server_type::get_component_type(), 1U,
@@ -74,7 +70,7 @@ void legacy_router::launch_bootstrap(
         (symbol_namespace_server_type::fixed_gid(), symbol_gva);
 
     naming::gid_type lower, upper;
-    get_id_range(l, HPX_INITIAL_GID_RANGE, lower, upper);
+    get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
     get_runtime().get_id_pool().set_range(lower, upper);
 
     if (runtime_type == runtime_mode_console)
@@ -101,18 +97,12 @@ void legacy_router::launch_hosted(
 } // }}}
 
 bool legacy_router::register_locality(
-    naming::locality const& l
+    naming::locality const& ep
   , naming::gid_type& prefix
   , error_code& ec
     )
 { // {{{
     try {
-        using boost::asio::ip::address;
-    
-        const address addr = address::from_string(l.get_address());
-    
-        const endpoint_type ep(addr, l.get_port()); 
-    
         response_type r;
     
         if (is_bootstrap())
@@ -143,17 +133,11 @@ bool legacy_router::register_locality(
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
 bool legacy_router::unregister_locality(
-    naming::locality const& l
+    naming::locality const& ep
   , error_code& ec
     )
 { // {{{
     try {
-        using boost::asio::ip::address;
-    
-        const address addr = address::from_string(l.get_address());
-    
-        const endpoint_type ep(addr, l.get_port()); 
-    
         response_type r;
     
         if (is_bootstrap())
@@ -436,7 +420,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 bool legacy_router::get_id_range(
-    naming::locality const& l
+    naming::locality const& ep
   , count_type count
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
@@ -451,13 +435,6 @@ bool legacy_router::get_id_range(
     allocate_response_future_type* f = 0;
 
     try {
-        using boost::asio::ip::address;
-        using boost::fusion::at_c;
-    
-        address addr = address::from_string(l.get_address());
-    
-        endpoint_type ep(addr, l.get_port()); 
-         
         response_type r;
     
         if (is_bootstrap())
@@ -542,12 +519,7 @@ bool legacy_router::bind_range(
     bind_response_future_type* f = 0;
     
     try {
-        using boost::asio::ip::address;
-        using boost::fusion::at_c;
-    
-        address addr = address::from_string(baseaddr.locality_.get_address());
-    
-        endpoint_type ep(addr, baseaddr.locality_.get_port()); 
+        naming::locality const& ep = baseaddr.locality_;
        
         // Create a global virtual address from the legacy calling convention
         // parameters.
@@ -640,9 +612,11 @@ bool legacy_router::unbind_range(
  
         if (!is_bootstrap() && (success == r.get_status()))
         {
-            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            gva_erase_policy ep(lower_id, count);
-            hosted->gva_cache_.erase(ep);
+            // I'm afraid that this will break the first form of paged caching,
+            // so it's commented out for now.
+            //cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            //gva_erase_policy ep(lower_id, count);
+            //hosted->gva_cache_.erase(ep);
             addr.locality_ = r.get_gva().endpoint;
             addr.type_ = r.get_gva().type;
             addr.address_ = r.get_gva().lva();
@@ -700,6 +674,7 @@ bool legacy_router::resolve(
             }
             // }}}
     
+            // Try the TLB.
             else if (try_cache && resolve_cached(id, addr, ec))
                 return true;
         }
@@ -707,22 +682,30 @@ bool legacy_router::resolve(
         response_type r; 
     
         if (is_bootstrap())
-            r = bootstrap->primary_ns_server.resolve_gid(id, ec);
+            r = bootstrap->primary_ns_server.page_fault(id, ec);
         else
-            r = hosted->primary_ns_.resolve(id, ec);
-    
+        {
+            LHPX_(info, "  [AC] ") <<
+                (boost::format("soft page fault, faulting address %1%") % id);
+            r = hosted->primary_ns_.page_fault(id, ec);
+        } 
+
         if (ec || (success != r.get_status()))
             return false;
 
-        addr.locality_ = r.get_gva().endpoint;
-        addr.type_ = r.get_gva().type;
-        addr.address_ = r.get_gva().lva();
+        // Resolve the page to the real resolved address (which is just a page
+        // with as fully resolved LVA and an offset of zero).
+        gva_type g = r.get_gva().resolve(id, r.get_base_gid());
+
+        addr.locality_ = g.endpoint;
+        addr.type_ = g.type;
+        addr.address_ = g.lva();
     
         if (!is_bootstrap())
         {
-            // We only insert the entry into the cache if it's valid
+            // Put the page into the TLB
             cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(id);
+            gva_cache_key key(r.get_base_gid(), r.get_gva().count);
             hosted->gva_cache_.insert(key, r.get_gva());
         }
 
@@ -750,6 +733,32 @@ bool legacy_router::resolve_cached(
     if (is_bootstrap())
         return resolve(id, addr, false, ec);
 
+    // {{{ special cases: authoritative AGAS component address resolution
+    if (id == primary_namespace_server_type::fixed_gid())
+    {
+        addr = hosted->primary_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+    
+    else if (id == component_namespace_server_type::fixed_gid())
+    {
+        addr = hosted->component_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+    
+    else if (id == symbol_namespace_server_type::fixed_gid())
+    {
+        addr = hosted->symbol_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+    // }}}
+
     // first look up the requested item in the cache
     gva_cache_key k(id);
     cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
@@ -761,9 +770,9 @@ bool legacy_router::resolve_cached(
     {
         if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
         {
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROWS_IF(ec, invalid_page_fault
               , "legacy_router::resolve_cached" 
-              , "MSBs of GID base and GID do not match");
+              , "bad page in TLB, MSBs of GID base and GID do not match");
             return false;
         }
 

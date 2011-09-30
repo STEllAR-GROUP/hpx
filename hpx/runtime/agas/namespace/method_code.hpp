@@ -18,7 +18,7 @@ enum method_code
     invalid_request             = 0,
     primary_ns_bind_locality    = BOOST_BINARY_U(1000000), 
     primary_ns_bind_gid         = BOOST_BINARY_U(1000001), 
-    primary_ns_resolve_gid      = BOOST_BINARY_U(1000010), 
+    primary_ns_page_fault       = BOOST_BINARY_U(1000010), 
     primary_ns_unbind_locality  = BOOST_BINARY_U(1000011), 
     primary_ns_unbind_gid       = BOOST_BINARY_U(1000100), 
     primary_ns_increment        = BOOST_BINARY_U(1000101), 

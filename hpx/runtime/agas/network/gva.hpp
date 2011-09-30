@@ -18,6 +18,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 namespace hpx { namespace agas
@@ -26,9 +27,7 @@ namespace hpx { namespace agas
 template <typename Protocol>
 struct gva 
 {
-    typedef typename traits::network::endpoint_type<Protocol>::type
-        endpoint_type;
-
+    typedef naming::locality endpoint_type;
     typedef int component_type;
     typedef boost::uint64_t lva_type;
     typedef boost::uint64_t count_type;
@@ -114,25 +113,41 @@ struct gva
     bool operator!=(gva const& rhs) const
     { return !(*this == rhs); }
     
-    lva_type lva(naming::gid_type const& gid = naming::invalid_gid,
-                 naming::gid_type const& gidbase = naming::invalid_gid) const
-    {
-        lva_type l = lva_;
-        l += (gid.get_lsb() - gidbase.get_lsb()) * offset;
-        return l;
-    }
-    
     void lva(lva_type a)
     { lva_ = a; }
 
     void lva(void* a)
     { lva_ = reinterpret_cast<lva_type>(a); }
     
+    lva_type lva(naming::gid_type const& gid = naming::invalid_gid,
+                 naming::gid_type const& gidbase = naming::invalid_gid) const
+    {
+        // Make sure that the credit has been stripped.
+        naming::gid_type raw_gid = gid
+                       , raw_gidbase = gidbase;
+        naming::strip_credit_from_gid(raw_gid); 
+        naming::strip_credit_from_gid(raw_gidbase); 
+
+        lva_type l = lva_;
+        l += (raw_gid.get_lsb() - raw_gidbase.get_lsb()) * offset;
+        return l;
+    }
+    
     gva resolve(naming::gid_type const& gid,
                 naming::gid_type const& gidbase) const
     {
+        // Make sure that the credit has been stripped.
+        naming::gid_type raw_gid = gid
+                       , raw_gidbase = gidbase;
+        naming::strip_credit_from_gid(raw_gid); 
+        naming::strip_credit_from_gid(raw_gidbase); 
+
         gva g(*this);
-        g.lva_ = g.lva(gid, gidbase);
+        g.lva_ = g.lva(raw_gid, raw_gidbase);
+
+        // This is a hack to make sure that if resolve() or lva() is called on
+        // the returned GVA, an exact copy will be returned (see the last two
+        // lines of lva() above.
         g.offset = 0;
         return g;
     }

@@ -59,18 +59,18 @@ struct primary_namespace
     { return bind_gid_async(gid, id, gva).get(ec); } 
     // }}}
 
-    // {{{ resolve_gid dispatch 
+    // {{{ page_fault dispatch 
     static lcos::promise<response_type>
-    resolve_gid_async(naming::id_type const& gid, naming::gid_type const& key)
+    page_fault_async(naming::id_type const& gid, naming::gid_type const& key)
     {
-        typedef typename server_type::resolve_gid_action action_type;
+        typedef typename server_type::page_fault_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
     static response_type
-    resolve_gid(naming::id_type const& gid, naming::gid_type const& key,
+    page_fault(naming::id_type const& gid, naming::gid_type const& key,
                 error_code& ec = throws)
-    { return resolve_gid_async(gid, key).get(ec); } 
+    { return page_fault_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ unbind_locality dispatch 

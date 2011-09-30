@@ -67,13 +67,14 @@ struct primary_namespace :
     { return this->base_type::bind_gid(this->gid_, gid, gva); }
 
     ///////////////////////////////////////////////////////////////////////////
-    // resolve_locality and resolve_gid interface
+    // page_fault interface 
     lcos::promise<response_type>
-    resolve_async(naming::gid_type const& gid)
-    { return this->base_type::resolve_gid_async(this->gid_, gid); }
+    page_fault_async(naming::gid_type const& gid)
+    { return this->base_type::page_fault_gid_async(this->gid_, gid); }
     
-    response_type resolve(naming::gid_type const& gid, error_code& ec = throws)
-    { return this->base_type::resolve_gid(this->gid_, gid, ec); }
+    response_type
+    page_fault(naming::gid_type const& gid, error_code& ec = throws)
+    { return this->base_type::page_fault(this->gid_, gid, ec); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind_locality and unbind_gid interface 

@@ -23,6 +23,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
@@ -42,8 +43,7 @@ struct primary_namespace :
     typedef typename traits::database::mutex_type<Database>::type
         database_mutex_type;
 
-    typedef typename traits::network::endpoint_type<Protocol>::type
-        endpoint_type;
+    typedef naming::locality endpoint_type;
 
     typedef gva<Protocol> gva_type;
     typedef typename gva_type::count_type count_type;
@@ -428,18 +428,18 @@ struct primary_namespace :
         return response_type(primary_ns_bind_gid);
     } // }}}
 
-    response_type resolve_gid(
+    response_type page_fault(
         naming::gid_type const& gid
         )
     {
-        return resolve_gid(gid, throws);
+        return page_fault(gid, throws);
     }
 
-    response_type resolve_gid(
+    response_type page_fault(
         naming::gid_type const& gid
       , error_code& ec
         )
-    { // {{{ resolve_gid implementation 
+    { // {{{ page_fault implementation 
         // TODO: Implement and use a non-mutating version of
         // strip_credit_from_gid()
         naming::gid_type id = gid;
@@ -461,13 +461,15 @@ struct primary_namespace :
             if (it->first == id)
             {
                 LAGAS_(info) << (boost::format(
-                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
+                    "primary_namespace::page_fault, soft page fault, faulting "
+                    "address %1%, gva(%2%)")
                     % gid % it->second);
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return response_type(primary_ns_resolve_gid
+                return response_type(primary_ns_page_fault
+                                   , it->first
                                    , it->second);
             }
 
@@ -482,22 +484,24 @@ struct primary_namespace :
                 {
                     if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                     {
-                        HPX_THROWS_IF(ec, internal_server_error
-                          , "primary_namespace::resolve_gid" 
+                        HPX_THROWS_IF(ec, invalid_page_fault
+                          , "primary_namespace::page_fault" 
                           , "MSBs of lower and upper range bound do not match");
                         return response_type();
                     }
  
                     // Calculation of the lva address occurs in gva<>::resolve()
                     LAGAS_(info) << (boost::format(
-                        "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
-                        % gid % it->second.resolve(id, it->first));
+                        "primary_namespace::page_fault, soft page fault, "
+                        "faulting address %1%, gva(%2%)")
+                        % gid % it->second);
 
                     if (&ec != &throws)
                         ec = make_success_code();
 
-                    return response_type(primary_ns_resolve_gid
-                                       , it->second.resolve(id, it->first));
+                    return response_type(primary_ns_page_fault
+                                       , it->first
+                                       , it->second);
                 }
             }
         }
@@ -511,35 +515,39 @@ struct primary_namespace :
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
-                    HPX_THROWS_IF(ec, internal_server_error
-                      , "primary_namespace::resolve_gid" 
+                    HPX_THROWS_IF(ec, invalid_page_fault
+                      , "primary_namespace::page_fault" 
                       , "MSBs of lower and upper range bound do not match");
                     return response_type();
                 }
  
                 // Calculation of the local address occurs in gva<>::resolve()
                 LAGAS_(info) << (boost::format(
-                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
-                    % gid % it->second.resolve(id, it->first));
+                    "primary_namespace::page_fault, soft page fault, faulting "
+                    "address %1%, gva(%2%)")
+                    % gid % it->second);
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return response_type(primary_ns_resolve_gid
-                                   , it->second.resolve(id, it->first));
+                return response_type(primary_ns_page_fault
+                                   , it->first
+                                   , it->second);
             }
         }
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
+            "primary_namespace::page_fault, invalid page fault, faulting "
+            "address %1%")
             % gid);
     
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response_type(primary_ns_resolve_gid
-                           , gva_type() 
-                           , no_success);
+        return response_type(primary_ns_page_fault
+                           , naming::invalid_gid 
+                           , gva_type()
+                           , invalid_page_fault);
     } // }}}
 
     response_type unbind_locality(
@@ -1080,7 +1088,7 @@ struct primary_namespace :
     { // {{{ action enum
         namespace_bind_locality    = BOOST_BINARY_U(1000000),
         namespace_bind_gid         = BOOST_BINARY_U(1000001),
-        namespace_resolve_gid      = BOOST_BINARY_U(1000010),
+        namespace_page_fault      = BOOST_BINARY_U(1000010),
         namespace_unbind_locality  = BOOST_BINARY_U(1000011),
         namespace_unbind_gid       = BOOST_BINARY_U(1000100),
         namespace_increment        = BOOST_BINARY_U(1000101),
@@ -1109,11 +1117,11 @@ struct primary_namespace :
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,
         /* return type */ response_type,
-        /* enum value */  namespace_resolve_gid,
+        /* enum value */  namespace_page_fault,
         /* arguments */   naming::gid_type const&,
-        &primary_namespace<Database, Protocol>::resolve_gid
+        &primary_namespace<Database, Protocol>::page_fault
       , threads::thread_priority_critical
-    > resolve_gid_action;
+    > page_fault_action;
 
     typedef hpx::actions::result_action1<
         primary_namespace<Database, Protocol>,

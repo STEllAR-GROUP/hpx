@@ -24,7 +24,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 8
+#define HPX_AGAS_RESPONSE_SUBTYPES 9
 
 namespace hpx { namespace agas
 {
@@ -66,6 +66,19 @@ struct response
       : mc(type_)
       , status(status_)
       , data(boost::fusion::make_vector(gva_, prefix_))
+    {
+        // TODO: verification of method_code
+    }
+
+    response(
+        method_code type_
+      , naming::gid_type const& gidbase_
+      , gva<Protocol> const& gva_
+      , error status_ = success
+        )
+      : mc(type_)
+      , status(status_)
+      , data(boost::fusion::make_vector(gidbase_, gva_))
     {
         // TODO: verification of method_code
     }
@@ -206,7 +219,19 @@ struct response
         error_code& ec = throws
         ) const
     { 
-        return get_data<subtype_gva, 0>(ec); 
+        gva<Protocol> g;
+
+        // Don't let the first attempt throw.
+        error_code first_try;
+        g = get_data<subtype_gid_gva, 1>(first_try);
+
+        // If the first try failed, check again.
+        if (first_try)
+            g = get_data<subtype_gva, 0>(ec);
+        else if (&ec != &throws)
+            ec = make_success_code();
+
+        return g; 
     } 
 
     boost::uint64_t get_count(
@@ -260,6 +285,13 @@ struct response
     { 
         return get_data<subtype_gid_gid_prefix, 2>(ec); 
     } 
+    
+    naming::gid_type get_base_gid(
+        error_code& ec = throws
+        ) const
+    { 
+        return get_data<subtype_gid_gva, 0>(ec); 
+    } 
 
     naming::gid_type get_gid(
         error_code& ec = throws
@@ -298,13 +330,14 @@ struct response
     enum subtype
     {
         subtype_gid_gid_prefix  = 0x0
-      , subtype_gva             = 0x1
-      , subtype_count_ctype     = 0x2
-      , subtype_count           = 0x3
-      , subtype_ctype           = 0x4
-      , subtype_prefixes        = 0x5
-      , subtype_gid             = 0x6
-      , subtype_void            = 0x7
+      , subtype_gid_gva         = 0x1
+      , subtype_gva             = 0x2
+      , subtype_count_ctype     = 0x3
+      , subtype_count           = 0x4
+      , subtype_ctype           = 0x5
+      , subtype_prefixes        = 0x6
+      , subtype_gid             = 0x7
+      , subtype_void            = 0x8
     }; 
 
     // The order of the variant types is significant, and should not be changed
@@ -317,41 +350,46 @@ struct response
           , boost::uint32_t  // prefix 
         >
         // 0x1
-        // primary_ns_resolve_gid
+        // primary_ns_page_fault
+      , boost::fusion::vector2<
+            naming::gid_type // idbase
+          , gva<Protocol>    // gva
+        >
+        // 0x2
         // primary_ns_unbind_gid
       , boost::fusion::vector1<
             gva<Protocol>   // gva
         >
-        // 0x2
+        // 0x3
         // primary_ns_decrement
       , boost::fusion::vector2<
             boost::uint64_t // count
           , boost::int32_t  // ctype
         > 
-        // 0x3
+        // 0x4
         // primary_ns_increment
       , boost::fusion::vector1<
             boost::uint64_t // count
         >
-        // 0x4
+        // 0x5
         // component_ns_bind_prefix
         // component_ns_bind_name
         // component_ns_resolve_name
       , boost::fusion::vector1<
             boost::int32_t // ctype
         > 
-        // 0x5
+        // 0x6
         // primary_ns_localities
         // component_ns_resolve_id
       , boost::fusion::vector1<
             std::vector<boost::uint32_t> // prefixes
         >
-        // 0x6 
+        // 0x7 
         // symbol_ns_resolve
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
-        // 0x7
+        // 0x8
         // primary_ns_unbind_locality
         // primary_ns_bind_gid
         // component_ns_unbind

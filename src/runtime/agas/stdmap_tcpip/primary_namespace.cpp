@@ -43,8 +43,8 @@ HPX_REGISTER_ACTION_EX(
     primary_namespace_type::bind_gid_action,
     stdmap_tcpip_primary_namespace_bind_gid_action);
 HPX_REGISTER_ACTION_EX(
-    primary_namespace_type::resolve_gid_action,
-    stdmap_tcpip_primary_namespace_resolve_gid_action);
+    primary_namespace_type::page_fault_action,
+    stdmap_tcpip_primary_namespace_page_fault_action);
 HPX_REGISTER_ACTION_EX(
     primary_namespace_type::unbind_locality_action,
     stdmap_tcpip_primary_namespace_unbind_locality_action);

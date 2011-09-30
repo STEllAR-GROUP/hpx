@@ -111,7 +111,13 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            return (lhs.id + (lhs.count - 1)) < rhs.id;
+            // Make sure that the credit has been stripped.
+            naming::gid_type raw_lgid = lhs.id
+                           , raw_rgid = rhs.id;
+            naming::strip_credit_from_gid(raw_lgid); 
+            naming::strip_credit_from_gid(raw_rgid); 
+
+            return (raw_lgid + (lhs.count - 1)) < raw_rgid;
         }
 
         friend bool operator==(
@@ -119,7 +125,24 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            return (lhs.id == rhs.id) && (lhs.count == rhs.count);
+            naming::gid_type raw_lgid = lhs.id
+                           , raw_rgid = rhs.id;
+            naming::strip_credit_from_gid(raw_lgid); 
+            naming::strip_credit_from_gid(raw_rgid); 
+
+            // Is lhs in rhs?
+            if (1 == lhs.count && 1 != rhs.count)
+                return (raw_lgid >= raw_rgid)
+                    && (raw_lgid <= (raw_rgid + (lhs.count - 1)));
+             
+            // Is rhs in lhs?
+            else if (1 != lhs.count && 1 == rhs.count)
+                return (raw_rgid >= raw_lgid)
+                    && (raw_rgid <= (raw_lgid + (lhs.count - 1)));
+
+            // Direct hit 
+            else
+                return (raw_lgid == raw_rgid) && (lhs.count == rhs.count);
         }
     }; // }}}
     
@@ -190,7 +213,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
         symbol_namespace_type symbol_ns_;
 
         cache_mutex_type gva_cache_mtx_;
-        gva_cache_type gva_cache_;
+        gva_cache_type gva_cache_; // AKA, the TLB
 
         console_cache_type console_cache_;
 
