@@ -38,7 +38,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a block_profiler class can be used to collect timings for a block
+    /// The \a value_logger class can be used to collect timings for a block
     /// of code. It measures the execution time for each of the executions and
     /// collects the number of invocations, the average, and the variance of 
     /// the measured execution times.
