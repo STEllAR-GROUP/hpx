@@ -381,7 +381,10 @@ namespace hpx
             component_agas_symbol_namespace = 14,
 
             component_last,
-            component_first_dynamic = component_last
+            component_first_dynamic = component_last,
+
+            // force this enum type to be at least 32 bits.
+            component_upper_bound = 0x7fffffffL
         };
 
         ///////////////////////////////////////////////////////////////////////
