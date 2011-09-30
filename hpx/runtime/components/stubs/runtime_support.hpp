@@ -291,15 +291,15 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static lcos::promise<void>
-        call_shutdown_functions_async(naming::id_type const& gid)
+        call_shutdown_functions_async(naming::id_type const& gid, bool pre_shutdown)
         {
             typedef server::runtime_support::call_shutdown_functions_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid());
+            return lcos::eager_future<action_type, void>(gid.get_gid(), pre_shutdown);
         }
 
-        static void call_shutdown_functions(naming::id_type const& gid)
+        static void call_shutdown_functions(naming::id_type const& gid, bool pre_shutdown)
         {
-            call_shutdown_functions_async(gid).get();
+            call_shutdown_functions_async(gid, pre_shutdown).get();
         }
 
         static void free_component_sync(components::component_type type, 

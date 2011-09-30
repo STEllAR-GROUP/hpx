@@ -228,7 +228,9 @@ namespace sheneos
         //        needs to be extended to expose async functions before this 
         //        can be fixed.
         // create the config object locally
-        cfg_ = configuration(datafilename, symbolic_name_base, num_localities);
+        hpx::naming::id_type config_id = 
+            hpx::find_locality(configuration::get_component_type());
+        cfg_ = configuration(config_id, datafilename, symbolic_name_base, num_localities);
         register_name(cfg_.get_raw_gid(), symbolic_name_base);
 
         if (symbolic_name_base[symbolic_name_base.size()-1] != '/')

@@ -60,8 +60,8 @@ namespace hpx { namespace components
         /// \note The contents of both sections has to be cloned in order to 
         ///       save the configuration setting for later use.
         derived_component_factory_one(util::section const* global, 
-            util::section const* local)
-          : refcnt_(0)
+                util::section const* local, bool isenabled)
+          : refcnt_(0), isenabled_(isenabled)
         {
             // store the configuration settings
             if (NULL != global)
@@ -100,8 +100,15 @@ namespace hpx { namespace components
                         unique_component_name<derived_component_factory_one, base_name>::call());
                 }
 
-                component_type this_type = (component_type) agas_client.register_factory(
-                    prefix, unique_component_name<derived_component_factory_one>::call());
+                component_type this_type;
+                if (isenabled_) {
+                    this_type = (component_type) agas_client.register_factory(
+                        prefix, unique_component_name<derived_component_factory_one>::call());
+                }
+                else {
+                    this_type = (component_type) agas_client.get_component_id(
+                        unique_component_name<derived_component_factory_one>::call());
+                }
 
                 components::set_component_type<type_holder>(
                     derived_component_type(this_type, base_type));
@@ -142,10 +149,18 @@ namespace hpx { namespace components
         ///         sequential in a row.
         naming::gid_type create (std::size_t count)
         {
-            naming::gid_type id = server::create<Component>(count);
-            if (id) 
-                ++refcnt_;
-            return id;
+            if (isenabled_) {
+                naming::gid_type id = server::create<Component>(count);
+                if (id) 
+                    ++refcnt_;
+                return id;
+            }
+
+            HPX_THROW_EXCEPTION(bad_request, 
+                "derived_component_factory::create", 
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
+            return naming::invalid_gid;
         }
 
         /// \brief Create one new component instance using the given constructor 
@@ -159,10 +174,18 @@ namespace hpx { namespace components
         ///         sequential in a row.
         naming::gid_type create_one (components::constructor_argument const& arg0)
         {
-            naming::gid_type id = server::create_one<Component>(arg0);
-            if (id) 
-                ++refcnt_;
-            return id;
+            if (isenabled_) {
+                naming::gid_type id = server::create_one<Component>(arg0);
+                if (id) 
+                    ++refcnt_;
+                return id;
+            }
+
+            HPX_THROW_EXCEPTION(bad_request, 
+                "derived_component_factory_one::create_one", 
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
+            return naming::invalid_gid;
         }
 
         /// \brief Destroy one or more component instances
@@ -189,6 +212,7 @@ namespace hpx { namespace components
     protected:
         util::section global_settings_;
         util::section local_settings_;
+        bool isenabled_;
 
         // count outstanding instances to avoid premature unloading
         boost::detail::atomic_count refcnt_;
@@ -202,8 +226,8 @@ namespace hpx { namespace components
 /// from a particular module. If more than one factories need to be exposed
 /// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
 /// macros should be used instead.
-#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(ComponentType,             \
-    componentname, basecomponentname)                                         \
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(ComponentType,          \
+    componentname, basecomponentname, enable_always)                          \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::derived_component_factory_one<ComponentType>,    \
             componentname);                                                   \
@@ -212,7 +236,14 @@ namespace hpx { namespace components
             componentname, basecomponentname)                                 \
         template struct                                                       \
             hpx::components::derived_component_factory_one<ComponentType>;    \
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(ComponentType,             \
+            componentname, enable_always)                                     \
+    /**/
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(ComponentType,             \
+    componentname, basecomponentname)                                         \
+        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(                        \
+            ComponentType, componentname, basecomponentname, false)           \
     /**/
 
 #endif

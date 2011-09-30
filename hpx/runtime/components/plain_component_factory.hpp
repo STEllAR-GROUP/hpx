@@ -51,7 +51,10 @@ namespace hpx { namespace components
         ///
         /// \note The contents of both sections has to be cloned in order to 
         ///       save the configuration setting for later use.
-        plain_component_factory(util::section const*, util::section const*) {}
+        plain_component_factory(util::section const*, util::section const*, 
+                bool isenabled) 
+          : isenabled_(isenabled)
+        {}
 
         ///
         ~plain_component_factory() {}
@@ -74,9 +77,16 @@ namespace hpx { namespace components
             if (component_invalid == components::get_component_type<type_holder>()) 
             {
                 // first call to get_component_type, ask AGAS for a unique id
-                components::set_component_type<type_holder>(
-                    (component_type) agas_client.register_factory(prefix,
-                        unique_component_name<plain_component_factory>::call()));
+                if (isenabled_) {
+                    components::set_component_type<type_holder>(
+                        (component_type) agas_client.register_factory(prefix,
+                            unique_component_name<plain_component_factory>::call()));
+                }
+                else {
+                    components::set_component_type<type_holder>(
+                        (component_type) agas_client.get_component_id(
+                            unique_component_name<plain_component_factory>::call()));
+                }
             }
             return components::get_component_type<type_holder>();
         }
@@ -114,6 +124,10 @@ namespace hpx { namespace components
         ///         sequential in a row.
         naming::gid_type create (std::size_t count)
         {
+            HPX_THROW_EXCEPTION(bad_request, 
+                "derived_component_factory_one::create", 
+                "create is not supported by this factory instance (" +
+                get_component_name() + ")");
             return naming::invalid_gid;
         }
 
@@ -135,13 +149,17 @@ namespace hpx { namespace components
         {
             return false;   // will never unload
         }
+
+    protected:
+        bool isenabled_;
     };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_PLAIN_ACTION is used create and to 
 /// register a minimal factory for plain actions with Boost.Plugin. 
-#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
+#define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
+        enable_always)                                                        \
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
@@ -150,15 +168,19 @@ namespace hpx { namespace components
         hpx::components::plain_component_factory<plain_action>,               \
         plain_action_name);                                                   \
     template struct hpx::components::plain_component_factory<plain_action>;   \
-    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(                                  \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                               \
         hpx::components::server::plain_function<plain_action>,                \
-        plain_action_name);                                                   \
+        plain_action_name, enable_always);                                    \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
         hpx::components::server::plain_function<plain_action>)                \
     /**/
 
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
-    HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action)                  \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action, false)          \
+    /**/
+
+#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name, false)     \
     /**/
 
 #endif

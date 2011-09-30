@@ -54,19 +54,19 @@ namespace hpx { namespace detail
 typedef hpx::actions::plain_action1<
     std::string const&, hpx::detail::print_counter
 > print_counter_action;
-HPX_REGISTER_PLAIN_ACTION(print_counter_action);
+HPX_REGISTER_PLAIN_ACTION_EX2(print_counter_action, print_counter_action, true);
 
 typedef hpx::actions::plain_action2<
     std::string const&, hpx::naming::gid_type const&, 
     hpx::detail::list_counter
 > list_counter_action;
-HPX_REGISTER_PLAIN_ACTION(list_counter_action);
+HPX_REGISTER_PLAIN_ACTION_EX2(list_counter_action, list_counter_action, true);
 
 typedef hpx::actions::plain_action2<
     std::string const&, hpx::naming::gid_type const&, 
     hpx::detail::list_counter_info
 > list_counter_info_action;
-HPX_REGISTER_PLAIN_ACTION(list_counter_info_action);
+HPX_REGISTER_PLAIN_ACTION_EX2(list_counter_info_action, list_counter_info_action, true);
 
 namespace hpx { namespace detail
 {
@@ -195,7 +195,8 @@ namespace hpx
                 "  Date: %s\n" 
                 "  Platform: %s\n"
                 "  Compiler: %s\n"
-                "  Standard Library: %s\n");
+                "  Standard Library: %s\n"
+                "  Build type: %s\n");
 
             std::cout << (logo
                           % boost::str( hpx_version
@@ -212,7 +213,12 @@ namespace hpx
                           % __DATE__
                           % BOOST_PLATFORM
                           % BOOST_COMPILER
-                          % BOOST_STDLIB);
+                          % BOOST_STDLIB
+#if defined(_DEBUG)
+                          % "debug");
+#else
+                          % "release");
+#endif
             return help;
         }
 
@@ -242,6 +248,19 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // Read all options from a given config file, parse and add them to the
         // given variables_map
+        inline std::string
+        trim_whitespace (std::string const &s)
+        {
+            typedef std::string::size_type size_type;
+
+            size_type first = s.find_first_not_of(" \t");
+            if (std::string::npos == first)
+                return std::string();
+
+            size_type last = s.find_last_not_of(" \t");
+            return s.substr(first, last - first + 1);
+        }
+  
         bool read_config_file_options(std::string const &filename, 
             boost::program_options::options_description const &desc, 
             boost::program_options::variables_map &vm, bool may_fail = false)
@@ -267,9 +286,15 @@ namespace hpx
                 // skip comment lines
                 if ('#' != line[pos]) {
                     // strip leading and trailing whitespace
-                    std::string::size_type endpos = line.find_last_not_of(" \t");
-                    BOOST_ASSERT(endpos != std::string::npos);
-                    options.push_back(line.substr(pos, endpos-pos+1));
+                    line = trim_whitespace(line);
+
+                    std::string::size_type p1 = line.find_first_of(" \t");
+                    if (p1 != std::string::npos) {
+                        // rebuild the line connecting the parts with a '='
+                        line = trim_whitespace(line.substr(0, p1)) + '=' + 
+                            trim_whitespace(line.substr(p1));
+                    }
+                    options.push_back(line);
                 }
             }
 
@@ -447,7 +472,7 @@ namespace hpx
                     ("print-counter", value<std::vector<std::string> >()->composing(),
                      "print the specified performance counter either repeatedly or "
                      "before shutting down the system (see option --print-counter-interval)")
-                     ("print-counter-interval", value<std::size_t>(),
+                    ("print-counter-interval", value<std::size_t>(),
                      "print the performance counter(s) specified with --print-counter "
                      "repeatedly after the time interval (specified in milliseconds) "
                      "(default: 0, which means print once at shutdown)")
@@ -580,7 +605,7 @@ namespace hpx
                     }
 
                     // schedule to run at shutdown in any case
-                    rt.add_shutdown_function(
+                    rt.add_pre_shutdown_function(
                         boost::bind(&util::query_counters::evaluate, qc));
                 }
                 else if (vm.count("print-counter-interval")) {
@@ -1134,7 +1159,8 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-        p->call_shutdown_functions();
+        p->call_shutdown_functions(true);
+        p->call_shutdown_functions(false);
         p->shutdown(shutdown_timeout); 
     }
 }

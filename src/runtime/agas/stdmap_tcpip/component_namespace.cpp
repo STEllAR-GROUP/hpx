@@ -27,9 +27,9 @@ typedef hpx::agas::server::component_namespace<
   , hpx::agas::tag::network::tcpip
 > component_namespace_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::fixed_component<component_namespace_type>,
-    stdmap_tcpip_component_namespace);
+    stdmap_tcpip_component_namespace, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     component_namespace_type, component_agas_component_namespace);

@@ -27,7 +27,7 @@ namespace hpx { namespace components
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <>                                                           \
-        struct unique_component_name<ComponentType>                           \
+        struct unique_component_name<ComponentType >                          \
         {                                                                     \
             typedef char const* type;                                         \
                                                                               \
@@ -43,7 +43,7 @@ namespace hpx { namespace components
     namespace hpx { namespace components                                      \
     {                                                                         \
         template <>                                                           \
-        struct unique_component_name<ComponentType>                           \
+        struct unique_component_name<ComponentType >                          \
         {                                                                     \
             typedef char const* type;                                         \
                                                                               \
@@ -54,7 +54,7 @@ namespace hpx { namespace components
         };                                                                    \
                                                                               \
         template <>                                                           \
-        struct unique_component_name<ComponentType, base_name>                \
+        struct unique_component_name<ComponentType, base_name >               \
         {                                                                     \
             typedef char const* type;                                         \
                                                                               \

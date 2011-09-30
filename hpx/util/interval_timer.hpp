@@ -23,7 +23,7 @@ namespace hpx { namespace util
     public:
         interval_timer();
         interval_timer(boost::function<void()> const& f, std::size_t microsecs,
-                std::string const& description);
+                std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
 
         void start();
@@ -44,6 +44,7 @@ namespace hpx { namespace util
         std::size_t microsecs_;       ///< time interval 
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer
+        bool pre_shutdown_;           ///< execute termination during pre-shutdown
     };
 }}
 

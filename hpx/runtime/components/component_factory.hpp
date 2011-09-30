@@ -51,8 +51,9 @@ namespace hpx { namespace components
         ///
         /// \note The contents of both sections has to be cloned in order to 
         ///       save the configuration setting for later use.
-        component_factory(util::section const* global, util::section const* local)
-          : refcnt_(0)
+        component_factory(util::section const* global, 
+                util::section const* local, bool isenabled)
+          : refcnt_(0), isenabled_(isenabled)
         {
             // store the configuration settings
             if (NULL != global)
@@ -82,9 +83,16 @@ namespace hpx { namespace components
             if (component_invalid == components::get_component_type<type_holder>()) 
             {
                 // first call to get_component_type, ask AGAS for a unique id
-                components::set_component_type<type_holder>(
-                    (component_type) agas_client.register_factory(prefix,
-                        unique_component_name<component_factory>::call()));
+                if (isenabled_) {
+                    components::set_component_type<type_holder>(
+                        (component_type) agas_client.register_factory(prefix,
+                            unique_component_name<component_factory>::call()));
+                }
+                else {
+                    components::set_component_type<type_holder>(
+                        (component_type) agas_client.get_component_id(
+                            unique_component_name<component_factory>::call()));
+                }
             }
             return components::get_component_type<type_holder>();
         }
@@ -122,10 +130,18 @@ namespace hpx { namespace components
         ///         sequential in a row.
         naming::gid_type create (std::size_t count)
         {
-            naming::gid_type id = server::create<Component>(count);
-            if (id) 
-                ++refcnt_;
-            return id;
+            if (isenabled_) {
+                naming::gid_type id = server::create<Component>(count);
+                if (id) 
+                    ++refcnt_;
+                return id;
+            }
+
+            HPX_THROW_EXCEPTION(bad_request, 
+                "component_factory::create", 
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
+            return naming::invalid_gid;
         }
 
         /// \brief Destroy one or more component instances
@@ -152,6 +168,7 @@ namespace hpx { namespace components
     protected:
         util::section global_settings_;
         util::section local_settings_;
+        bool isenabled_;
 
         // count outstanding instances to avoid premature unloading
         boost::detail::atomic_count refcnt_;
@@ -161,7 +178,8 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to 
 /// register a minimal component factory with Boost.Plugin. 
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ComponentType, componentname)  \
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
+            ComponentType, componentname, enable_always)                      \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::component_factory<ComponentType>,                \
             componentname);                                                   \
@@ -169,7 +187,13 @@ namespace hpx { namespace components
             hpx::components::component_factory<ComponentType>,                \
             componentname)                                                    \
         template struct hpx::components::component_factory<ComponentType>;    \
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
+            ComponentType, componentname, enable_always)                      \
+    /**/
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ComponentType, componentname)  \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
+            ComponentType, componentname, false)                              \
     /**/
 
 #endif

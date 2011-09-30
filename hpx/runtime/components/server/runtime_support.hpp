@@ -32,9 +32,21 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef boost::mutex mutex_type;
-        typedef std::pair<
-            boost::shared_ptr<component_factory_base>, boost::plugin::dll
-        > component_factory_type;
+        struct component_factory
+        {
+            component_factory() : isenabled(false) {}
+
+            component_factory(
+                  boost::shared_ptr<component_factory_base> const& f,
+                  boost::plugin::dll const& d, bool enabled)
+              : first(f), second(d), isenabled(enabled)
+            {};
+
+            boost::shared_ptr<component_factory_base> first;
+            boost::plugin::dll second;
+            bool isenabled;
+        };
+        typedef component_factory component_factory_type;
         typedef std::map<component_type, component_factory_type> component_map_type;
 
     public:
@@ -133,7 +145,7 @@ namespace hpx { namespace components { namespace server
         void load_components();
 
         void call_startup_functions();
-        void call_shutdown_functions();
+        void call_shutdown_functions(bool pre_shutdown);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -174,8 +186,8 @@ namespace hpx { namespace components { namespace server
             &runtime_support::call_startup_functions
         > call_startup_functions_action;
 
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_call_shutdown_functions, 
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_call_shutdown_functions, bool,
             &runtime_support::call_shutdown_functions
         > call_shutdown_functions_action;
 
@@ -243,6 +255,12 @@ namespace hpx { namespace components { namespace server
             startup_functions_.push_back(f);
         }
 
+        void add_pre_shutdown_function(boost::function<void()> const& f)
+        {
+            util::spinlock::scoped_lock l(globals_mtx_);
+            pre_shutdown_functions_.push_back(f);
+        }
+
         void add_shutdown_function(boost::function<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
@@ -256,7 +274,7 @@ namespace hpx { namespace components { namespace server
         bool load_component(util::section& ini, std::string const& instance, 
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client, 
-            bool isdefault);
+            bool isdefault, bool isenabled);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);
 
@@ -272,6 +290,7 @@ namespace hpx { namespace components { namespace server
 
         util::spinlock globals_mtx_;
         std::list<boost::function<void()> > startup_functions_;
+        std::list<boost::function<void()> > pre_shutdown_functions_;
         std::list<boost::function<void()> > shutdown_functions_;
     };
 

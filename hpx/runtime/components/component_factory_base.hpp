@@ -81,7 +81,12 @@ namespace hpx { namespace components
         ///         sequential in a row.
         virtual naming::gid_type create_one (
             components::constructor_argument const&) 
-        { return naming::invalid_gid; }
+        { 
+            HPX_THROW_EXCEPTION(bad_request, 
+                "component_factory_base::create_one", 
+                "create_one is not supported by this factory instance");
+            return naming::invalid_gid; 
+        }
 
         /// \brief Destroy one or more component instances
         ///
@@ -124,7 +129,7 @@ namespace boost { namespace plugin
     struct virtual_constructors<hpx::components::component_factory_base>
     {
         typedef mpl::list<
-            mpl::list<hpx::util::section const*, hpx::util::section const*> 
+            mpl::list<hpx::util::section const*, hpx::util::section const*, bool> 
         > type;
     };
 }}

@@ -20,13 +20,19 @@ namespace hpx { namespace util
     {}
 
     interval_timer::interval_timer(boost::function<void()> const& f, 
-            std::size_t microsecs, std::string const& description)
-      : f_(f), microsecs_(microsecs), id_(0), description_(description)
+            std::size_t microsecs, std::string const& description,
+            bool pre_shutdown)
+      : f_(f), microsecs_(microsecs), id_(0), description_(description),
+        pre_shutdown_(pre_shutdown)
     {}
 
     void interval_timer::start()
     {
-        register_shutdown_function(boost::bind(&interval_timer::stop, this));
+        if (pre_shutdown_)
+            register_pre_shutdown_function(boost::bind(&interval_timer::stop, this));
+        else
+            register_shutdown_function(boost::bind(&interval_timer::stop, this));
+
         evaluate(threads::wait_signaled);
     }
 

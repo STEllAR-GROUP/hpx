@@ -165,6 +165,8 @@ namespace hpx
 
         virtual void add_startup_function(boost::function<void()> const& f) = 0;
 
+        virtual void add_pre_shutdown_function(boost::function<void()> const& f) = 0;
+
         virtual void add_shutdown_function(boost::function<void()> const& f) = 0;
 
     protected:
@@ -465,6 +467,20 @@ namespace hpx
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
         void add_startup_function(boost::function<void()> const& f);
+
+        /// Add a function to be executed inside a HPX thread during 
+        /// hpx::finalize, but guaranteed before any of teh shutdown functions 
+        /// is executed.
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX 
+        ///             thread while hpx::finalize is executed. This is very 
+        ///             useful to tear down the runtime environment of the 
+        ///             application (uninstall performance counters, etc.)
+        ///             
+        /// \note       The difference to a shutdown function is that all
+        ///             pre-shutdown functions will be (system-wide) executed 
+        ///             before any shutdown function.
+        void add_pre_shutdown_function(boost::function<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///

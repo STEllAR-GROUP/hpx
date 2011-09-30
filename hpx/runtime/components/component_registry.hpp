@@ -30,7 +30,7 @@ namespace hpx { namespace components
     ///
     /// \tparam Component   The component type this registry should be 
     ///                     responsible for.
-    template <typename Component>
+    template <typename Component, bool enable_always>
     struct component_registry : public component_registry_base
     {
         ///
@@ -53,11 +53,8 @@ namespace hpx { namespace components
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
             fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
-#if !defined(HPX_EXPORT)
-            // all components in the core library need to be accessible all 
-            // the time
-            fillini += "enabled = $[hpx.components.load_external]";
-#endif
+            fillini += enable_always ? 
+                "enabled = 1" : "enabled = $[hpx.components.load_external]";
             return true;
         }
     };
@@ -66,14 +63,25 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY is used create and to 
 /// register a minimal component registry with Boost.Plugin. 
-#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
+#define HPX_HELPER_UNPACK2(a, b) a, b
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
+            ComponentType, componentname, always_enabled)                     \
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
-            hpx::components::component_registry<ComponentType>,               \
+            hpx::components::component_registry<                              \
+                HPX_HELPER_UNPACK2(ComponentType, always_enabled)>,           \
             componentname);                                                   \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::component_registry<ComponentType>,               \
-            componentname)                                                    \
-        template struct hpx::components::component_registry<ComponentType>;   \
+            hpx::components::component_registry<                              \
+                HPX_HELPER_UNPACK2(ComponentType, always_enabled)>,           \
+                componentname)                                                \
+        template struct hpx::components::component_registry<                  \
+            ComponentType, always_enabled>;                                   \
+    /**/
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
+            ComponentType, componentname, false)                              \
     /**/
 
 #endif

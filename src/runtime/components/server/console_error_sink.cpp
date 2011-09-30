@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION_EX(
+HPX_REGISTER_PLAIN_ACTION_EX2(
     hpx::components::server::console_error_sink_action, 
-    console_error_sink_action);
+    console_error_sink_action, true);
 

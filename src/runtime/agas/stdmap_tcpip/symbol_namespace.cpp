@@ -27,9 +27,9 @@ typedef hpx::agas::server::symbol_namespace<
   , hpx::agas::tag::network::tcpip
 > symbol_namespace_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::fixed_component<symbol_namespace_type>,
-    stdmap_symbol_namespace);
+    stdmap_symbol_namespace, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     symbol_namespace_type, component_agas_symbol_namespace);

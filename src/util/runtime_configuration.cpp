@@ -57,14 +57,17 @@ namespace hpx { namespace util
             "[hpx.components.barrier]",
             "name = hpx",
             "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "enabled = 1",
 
             "[hpx.components.raw_counter]",
             "name = hpx",
             "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "enabled = 1",
 
             "[hpx.components.elapsed_time_counter]",
             "name = hpx",
             "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY
+            "enabled = 1"
         ;
         // don't overload user overrides
         ini.parse("static defaults", lines);

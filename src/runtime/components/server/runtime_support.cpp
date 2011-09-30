@@ -331,6 +331,23 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
+    void invoke_shutdown_functions(
+        std::vector<naming::gid_type> const& prefixes, bool pre_shutdown)
+    {
+        std::vector<lcos::promise<void> > lazy_actions;
+        BOOST_FOREACH(naming::gid_type const& gid, prefixes)
+        {
+            using components::stubs::runtime_support;
+            naming::id_type id(gid, naming::id_type::unmanaged);
+            lazy_actions.push_back(
+                runtime_support::call_shutdown_functions_async(id, pre_shutdown));
+        }
+
+        // wait for all localities to finish executing their registered 
+        // shutdown functions
+        lcos::wait(lazy_actions);
+    }
+
     void runtime_support::shutdown_all(double timeout)
     {
         std::vector<naming::gid_type> prefixes;
@@ -339,20 +356,8 @@ namespace hpx { namespace components { namespace server
         std::reverse(prefixes.begin(), prefixes.end());
 
         // execute registered shutdown functions on all localities
-        {
-            std::vector<lcos::promise<void> > lazy_actions;
-
-            BOOST_FOREACH(naming::gid_type gid, prefixes)
-            {
-                using components::stubs::runtime_support;
-                naming::id_type id(gid, naming::id_type::unmanaged);
-                lazy_actions.push_back(runtime_support::call_shutdown_functions_async(id));
-            }
-
-            // wait for all localities to finish executing their registered 
-            // shutdown functions
-            lcos::wait(lazy_actions);
-        }
+        invoke_shutdown_functions(prefixes, true);
+        invoke_shutdown_functions(prefixes, false);
 
         // shut down all localities except the the local one
         {
@@ -582,12 +587,20 @@ namespace hpx { namespace components { namespace server
         } 
     }
 
-    void runtime_support::call_shutdown_functions()
+    void runtime_support::call_shutdown_functions(bool pre_shutdown)
     {
-        BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
-        { 
-            f(); 
-        } 
+        if (pre_shutdown) {
+            BOOST_FOREACH(boost::function<void()> const& f, pre_shutdown_functions_) 
+            { 
+                f(); 
+            } 
+        }
+        else {
+            BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_) 
+            { 
+                f(); 
+            } 
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -638,12 +651,13 @@ namespace hpx { namespace components { namespace server
             else
                 component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
 
+            bool isenabled = true;
             if (i->second.has_entry("enabled")) {
                 std::string tmp = i->second.get_entry("enabled");
                 boost::algorithm::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0") {
-                    LRT_(info) << "dynamic loading disabled: " << instance;
-                    continue;     // this component has been disabled
+                    LRT_(info) << "component factory disabled: " << instance;
+                    isenabled = false;     // this component has been disabled
                 }
             }
 
@@ -663,12 +677,17 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
-                if (!load_component(ini, instance, component, lib, prefix, agas_client, isdefault)) {
+                if (!load_component(ini, instance, component, lib, prefix, 
+                        agas_client, isdefault, isenabled)) 
+                {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= hpx::util::create_path(libname);
-                    if (!load_component (ini, instance, component, lib, prefix, agas_client, isdefault))
+                    if (!load_component(ini, instance, component, lib, prefix, 
+                            agas_client, isdefault, isenabled))
+                    {
                         continue;   // next please :-P
+                    }
                 }
             } 
             catch (hpx::exception const& e) {
@@ -716,7 +735,7 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_component(util::section& ini, 
         std::string const& instance, std::string const& component, 
         boost::filesystem::path lib, naming::gid_type const& prefix, 
-        naming::resolver_client& agas_client, bool isdefault)
+        naming::resolver_client& agas_client, bool isdefault, bool isenabled)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -746,16 +765,17 @@ namespace hpx { namespace components { namespace server
 
             // create the component factory object
             boost::shared_ptr<component_factory_base> factory (
-                pf.create(instance, glob_ini, component_ini)); 
+                pf.create(instance, glob_ini, component_ini, isenabled)); 
 
-            component_type t = factory->get_component_type(prefix, agas_client);
+            component_type t = factory->get_component_type(
+                prefix, agas_client);
             if (0 == t) {
                 LRT_(info) << "component refused to load: "  << instance;
                 return false;   // module refused to load
             }
 
             // store component factory and module for later use
-            component_factory_type data(factory, d);
+            component_factory_type data(factory, d, isenabled);
             std::pair<component_map_type::iterator, bool> p = 
                 components_.insert(component_map_type::value_type(t, data));
 

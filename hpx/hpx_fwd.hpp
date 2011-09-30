@@ -298,7 +298,11 @@ namespace hpx
     HPX_API_EXPORT void register_startup_function(startup_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
+    /// but guaranteed before any shutdown function (system-wide)
     typedef boost::function<void()> shutdown_function_type;
+    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
+
+    /// Add a function to be executed inside a HPX thread during hpx::finalize
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
 
     template <
@@ -511,7 +515,8 @@ namespace hpx
     ///        list of all localities.
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
-        components::component_type type);
+        components::component_type);
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type);
 
     HPX_API_EXPORT naming::gid_type get_next_id();
 

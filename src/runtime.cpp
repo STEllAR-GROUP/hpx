@@ -471,15 +471,22 @@ namespace hpx
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::add_startup_function(
-        boost::function<void()> const& f)
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        add_startup_function(boost::function<void()> const& f)
     {
         runtime_support_.add_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::add_shutdown_function(
-        boost::function<void()> const& f)
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        add_pre_shutdown_function(boost::function<void()> const& f)
+    {
+        runtime_support_.add_pre_shutdown_function(f);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        add_shutdown_function(boost::function<void()> const& f)
     {
         runtime_support_.add_shutdown_function(f);
     }
@@ -602,6 +609,22 @@ namespace hpx
         return prefixes;
     }
 
+    // find a locality supporting the given component
+    naming::id_type find_locality(components::component_type type)
+    {
+        std::vector<naming::id_type> prefixes;
+        hpx::applier::get_applier().get_prefixes(prefixes, type);
+
+        if (prefixes.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_component_type, "find_locality",
+                "no locality supporting sheneos configuration component found");
+            return naming::invalid_id;
+        }
+
+        // chose first locality to host the object
+        return prefixes.front();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id()
     {
@@ -617,6 +640,11 @@ namespace hpx
     void register_startup_function(boost::function<void()> const& f)
     {
         get_runtime().add_startup_function(f);
+    }
+
+    void register_pre_shutdown_function(boost::function<void()> const& f)
+    {
+        get_runtime().add_pre_shutdown_function(f);
     }
 
     void register_shutdown_function(boost::function<void()> const& f)

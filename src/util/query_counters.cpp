@@ -12,7 +12,7 @@ namespace hpx { namespace util
             std::size_t interval, std::ostream& out)
       : out_(out), names_(names), 
         timer_(boost::bind(&query_counters::evaluate, this),
-            interval*1000, "query_counters")
+            interval*1000, "query_counters", true)
     {}
 
     void query_counters::start() 

@@ -17,8 +17,9 @@ typedef hpx::components::managed_component<
     hpx::performance_counters::server::elapsed_time_counter
 > elapsed_time_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    elapsed_time_counter_type, elapsed_time_counter, "base_performance_counter");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
+    elapsed_time_counter_type, elapsed_time_counter, 
+    "base_performance_counter", true);
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::elapsed_time_counter);
 

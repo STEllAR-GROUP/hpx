@@ -138,14 +138,14 @@ namespace hpx { namespace components
             this->base_type::call_startup_functions(gid_);
         }
 
-        lcos::promise<void> call_shutdown_functions_async()
+        lcos::promise<void> call_shutdown_functions_async(bool pre_shutdown)
         {
-            return this->base_type::call_shutdown_functions_async(gid_);
+            return this->base_type::call_shutdown_functions_async(gid_, pre_shutdown);
         }
 
-        void call_shutdown_functions()
+        void call_shutdown_functions(bool pre_shutdown)
         {
-            this->base_type::call_shutdown_functions(gid_);
+            this->base_type::call_shutdown_functions(gid_, pre_shutdown);
         }
 
         /// \brief Shutdown the given runtime system
