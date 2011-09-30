@@ -61,7 +61,7 @@ namespace hpx { namespace components
         ///       save the configuration setting for later use.
         derived_component_factory_one(util::section const* global, 
                 util::section const* local, bool isenabled)
-          : refcnt_(0), isenabled_(isenabled)
+          : isenabled_(isenabled), refcnt_(0)
         {
             // store the configuration settings
             if (NULL != global)

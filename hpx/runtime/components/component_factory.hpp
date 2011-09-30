@@ -53,7 +53,7 @@ namespace hpx { namespace components
         ///       save the configuration setting for later use.
         component_factory(util::section const* global, 
                 util::section const* local, bool isenabled)
-          : refcnt_(0), isenabled_(isenabled)
+          : isenabled_(isenabled), refcnt_(0)
         {
             // store the configuration settings
             if (NULL != global)
