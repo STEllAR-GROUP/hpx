@@ -188,8 +188,8 @@ namespace hpx
                 "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
                 "\n"
                 "Versions:\n"
-                "  HPX %s (AGAS %x), SVN %s\n"
-                "  Boost %s\n"
+                "  HPX: %s (AGAS: %x, build-type: %s), SVN: %s\n"
+                "  Boost: %s\n"
                 "\n"
                 "Build:\n"
                 "  Date: %s\n" 
@@ -205,6 +205,7 @@ namespace hpx
                                       % HPX_VERSION_SUBMINOR
                                       % HPX_VERSION_TAG)
                           % HPX_AGAS_VERSION 
+                          % HPX_BUILD_TYPE
                           % HPX_SVN_REVISION
                           % boost::str( boost_version
                                       % (BOOST_VERSION / 100000)
@@ -213,12 +214,7 @@ namespace hpx
                           % __DATE__
                           % BOOST_PLATFORM
                           % BOOST_COMPILER
-                          % BOOST_STDLIB
-#if defined(_DEBUG)
-                          % "debug");
-#else
-                          % "release");
-#endif
+                          % BOOST_STDLIB);
             return help;
         }
 

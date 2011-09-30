@@ -277,9 +277,11 @@ namespace hpx { namespace detail
             strm << "[thread_name]: " << *thread_name << "\n";
 
         // add system information
-        strm << "[version]: " << boost::str(boost::format("%d.%d.%d%s (%s)\n") % 
-                HPX_VERSION_MAJOR % HPX_VERSION_MINOR % 
-                HPX_VERSION_SUBMINOR % HPX_VERSION_TAG % HPX_SVN_REVISION); 
+        strm << "[version]: " << boost::str(
+                boost::format("%d.%d.%d%s (AGAS: %x, build-type: %s), SVN: %s\n") % 
+                    HPX_VERSION_MAJOR % HPX_VERSION_MINOR % 
+                    HPX_VERSION_SUBMINOR % HPX_VERSION_TAG % 
+                    HPX_AGAS_VERSION % HPX_BUILD_TYPE % HPX_SVN_REVISION); 
         strm << "[boost]: " << boost::str(boost::format("%d.%d.%d\n") % 
                 (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) % 
                 (BOOST_VERSION % 100));

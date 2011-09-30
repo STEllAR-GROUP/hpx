@@ -22,6 +22,14 @@
 #  define HPX_DEBUG 1
 #endif
 
+#if !defined(HPX_BUILD_TYPE)
+#  if defined(HPX_DEBUG)
+#    define HPX_BUILD_TYPE "debug"
+#  else
+#    define HPX_BUILD_TYPE "release"
+#  endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the parcel subsystem
 #define HPX_INITIAL_IP_PORT         7910
@@ -184,17 +192,17 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_LIBRARY)
-  #if defined(HPX_COMPONENT_EXPORTS)
-    #define HPX_LIBRARY                                                       \
+#  if defined(HPX_COMPONENT_EXPORTS)
+#    define HPX_LIBRARY                                                       \
         BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME))     \
         HPX_SHARED_LIB_EXTENSION                                              \
     /**/
-  #else
-    #define HPX_LIBRARY                                                       \
+#  else
+#    define HPX_LIBRARY                                                       \
         BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))               \
         HPX_SHARED_LIB_EXTENSION                                              \
     /**/
-  #endif
+#  endif
 #endif
 
 #if !defined(HPX_COMPONENT_STRING)
@@ -234,44 +242,44 @@
 #endif
 
 #if !defined(HPX_WRAPPER_HEAP_STEP)
-  #define HPX_WRAPPER_HEAP_STEP 0xFFFFU
+#  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
 
 #if !defined(HPX_INITIAL_GID_RANGE)
-  #define HPX_INITIAL_GID_RANGE 0xFFFFU
+#  define HPX_INITIAL_GID_RANGE 0xFFFFU
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEFAULT_STACK_SIZE)
-  #if defined(BOOST_WINDOWS)
-    #define HPX_DEFAULT_STACK_SIZE 0x4000
-  #else
-    #if defined(HPX_DEBUG)
-      #define HPX_DEFAULT_STACK_SIZE 0x10000 
-    #else
-      #define HPX_DEFAULT_STACK_SIZE 0x8000 
-    #endif 
-  #endif
+#  if defined(BOOST_WINDOWS)
+#    define HPX_DEFAULT_STACK_SIZE 0x4000
+#  else
+#    if defined(HPX_DEBUG)
+#      define HPX_DEFAULT_STACK_SIZE 0x10000 
+#    else
+#      define HPX_DEFAULT_STACK_SIZE 0x8000 
+#    endif 
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Disable stack trace support by default
 #if !defined(HPX_STACKTRACES)
-  #define HPX_STACKTRACES 0
+#  define HPX_STACKTRACES 0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Enable usage of std::unique_ptr instead of std::auto_ptr
 #if !defined(HPX_HAVE_CXX11_UNIQUE_PTR)
-  #define HPX_UNIQUE_PTR ::std::auto_ptr
+#  define HPX_UNIQUE_PTR ::std::auto_ptr
 #else
-  #define HPX_UNIQUE_PTR ::std::unique_ptr
+#  define HPX_UNIQUE_PTR ::std::unique_ptr
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
-#define BOOST_CHRONO_NO_LIB
+#  define BOOST_CHRONO_NO_LIB
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,17 +292,15 @@
 #define HPX_AGAS_SYMBOL_NS_LSB      0x0000000000000003ULL
 
 #if !defined(HPX_NO_DEPRECATED)
-#define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
-
-# if defined(BOOST_MSVC)
-#  define HPX_DEPRECATED(x) __declspec(deprecated(x))
-# elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
-#  define HPX_DEPRECATED(x) __attribute__((__deprecated__))
-# endif
-
-# if !defined(HPX_DEPRECATED)
-#  define HPX_DEPRECATED(x)  /**/
-# endif
+#  define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
+#  if defined(BOOST_MSVC)
+#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
+#  elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
+#    define HPX_DEPRECATED(x) __attribute__((__deprecated__))
+#  endif
+#  if !defined(HPX_DEPRECATED)
+#    define HPX_DEPRECATED(x)  /**/
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
