@@ -131,13 +131,16 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
         for (int column = 0; stencil != stencils.second; ++stencil, ++function, ++column)
         {
+            std::cout << " TEST D " << std::endl;
             namespace stubs = components::adaptive1d::stubs;
+            std::cout << " TEST E " << std::endl;
             BOOST_ASSERT(function != functions.second);
 
-#if 0       // DEBUG
+//#if 0       // DEBUG
+            std::cout << " pretest row " << static_step << " column " << column << std::endl;
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-#endif
-#if 0
+//#endif
+//#if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
             }
@@ -150,13 +153,15 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             if ( dst_size(static_step,column,0) > 3 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,3) << " in column " << dst_src(static_step,column,3) << std::endl;
             }
-#endif
-
+//#endif
+            std::cout << " TEST A " << dst_size(static_step, column, 0) << std::endl; 
+            std::cout << " TEST B " << src_size(static_step, column, 0) << std::endl; 
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
                     *stencil, *function, static_step, column, 
                     dst_size(static_step, column, 0), 
                     src_size(static_step, column, 0), cycle_time,par));
+            std::cout << " TEST C " << std::endl; 
         }
         //BOOST_ASSERT(function == functions.second);
 
@@ -485,86 +490,28 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             if ( prolongation == false ) {
               // level zero -- periodic BC
               if ( level == 0 ) {
-                if ( i == 0 ) {
-                  vsrc_step.push_back(step);vsrc_column.push_back(each_row[step]-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-                  vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
-                } else if ( i == each_row[step]-1 ) {
-                  vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-                  vsrc_step.push_back(step);vsrc_column.push_back(0);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
-                } else {
-                  vsrc_step.push_back(step);vsrc_column.push_back(i-1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-                  vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
-                }
-              } else {
                 j = i;
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(0);
+              } else {
+                // sanity checks
+                if ( !par->gr_lbox[ par->item2gi[i] ] && par->gr_left_neighbor[ par->item2gi[i] ] == -1 ) BOOST_ASSERT(false);
+                if ( !par->gr_rbox[ par->item2gi[i] ] && par->gr_right_neighbor[ par->item2gi[i] ] == -1 ) BOOST_ASSERT(false);
 
-                // Find out who else on this level neighbors this gi
-                int gi = par->levelp[level];
-                int gi2 = par->item2gi[i];
-                while ( gi >=0 && gi < par->gr_minx.size() ) {
-                  if ( intersection(par->gr_minx[gi]-par->gr_h[gi],
-                                    par->gr_maxx[gi]+par->gr_h[gi],
-                                    par->gr_minx[gi2],par->gr_maxx[gi2]) &&
-                                    gi2 != gi ) {
-                      
-                    j = par->gi2item[gi];
-                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                    counter++;
-                  }
-                  gi = par->gr_sibling[gi];
+                if ( par->gr_lbox[ par->item2gi[i] ] && par->gr_rbox[ par->item2gi[i] ] ) {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+                } else if ( par->gr_lbox[ par->item2gi[i] ] && par->gr_right_neighbor[ par->item2gi[i] ] != -1 ) {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]);vport.push_back(1);
+                } else if ( par->gr_left_neighbor[ par->item2gi[i] ] != -1 && par->gr_right_neighbor[ par->item2gi[i] ] != -1 ) {
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_left_neighbor[ par->item2gi[i] ]);vport.push_back(0);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
+                  vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]);vport.push_back(2);
                 }
               }
             } else {
               // prolongation true case
-              if ( level == 0 ) {
-                j = i;
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-              } else {
-                j = i;
-                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                counter++;
-
-                int gi2 = par->item2gi[i];
-                if ( par->gr_lbox[gi2] || par->gr_rbox[gi2] ) {
-                  //prolongation needed
-                  int gi = par->levelp[level-1];
-                  while ( gi >=0 && gi < par->gr_minx.size() ) {
-                    if ( intersection(par->gr_minx[gi], par->gr_maxx[gi],
-                                      par->gr_minx[gi2],par->gr_maxx[gi2]) &&
-                                      gi2 != gi ) {
-                        
-                      j = par->gi2item[gi];
-                      vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                      counter++;
-                    }
-                    gi = par->gr_sibling[gi];
-                  }
-                }  
-              } 
-
-              // restriction (taken care of at same time as prolongation)
-              if ( level < par->allowedl ) {
-                int gi2 = par->item2gi[i];
-                int gi = par->levelp[level+1];
-                while ( gi >=0 && gi < par->gr_minx.size() ) {
-                  if ( intersection(par->gr_minx[gi], par->gr_maxx[gi],
-                                    par->gr_minx[gi2],par->gr_maxx[gi2]) &&
-                                    gi2 != gi ) {
-                        
-                    j = par->gi2item[gi];
-                    vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(counter);
-                    counter++;
-                  }
-                  gi = par->gr_sibling[gi];
-                }
-              }
-
+              j = i;
+              vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(0);
             }
           }
 
@@ -577,7 +524,9 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         src_column = vsrc_column[j]; src_step = vsrc_step[j];
         column = vcolumn[j]; step = vstep[j];
         port = vport[j];
+        std::cout << " step " << step << " column " << column << " dst_size(ste,column,0) " << dst_size(step,column,0) << std::endl;
         dst_port( step,column,dst_size(step,column,0) ) = port;
+        std::cout << " port " << port << std::endl;
         dst_src(  step,column,dst_size(step,column,0) ) = src_column;
         dst_step( step,column,dst_size(step,column,0) ) = src_step;
         dst_size(step,column,0) += 1;

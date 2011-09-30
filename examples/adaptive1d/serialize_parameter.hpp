@@ -41,6 +41,8 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.gr_h;
     ar & par.gr_lbox;
     ar & par.gr_rbox;
+    ar & par.gr_left_neighbor;
+    ar & par.gr_right_neighbor;
     ar & par.levelp;
     ar & par.item2gi;
     ar & par.gi2item;

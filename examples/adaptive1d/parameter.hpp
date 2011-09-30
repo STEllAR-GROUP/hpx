@@ -46,6 +46,8 @@ struct HPX_COMPONENT_EXPORT parameter
     std::vector<double_type> gr_h;
     std::vector<bool> gr_lbox;
     std::vector<bool> gr_rbox;
+    std::vector<int> gr_left_neighbor;
+    std::vector<int> gr_right_neighbor;
     std::vector<std::size_t> levelp;
     std::vector<std::size_t> item2gi;
     std::vector<std::size_t> gi2item;
