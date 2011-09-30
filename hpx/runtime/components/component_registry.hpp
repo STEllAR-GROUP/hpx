@@ -63,18 +63,17 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY is used create and to 
 /// register a minimal component registry with Boost.Plugin. 
-#define HPX_HELPER_UNPACK2(a, b) a, b
-
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
             ComponentType, componentname, always_enabled)                     \
+        typedef hpx::components::component_registry<                          \
+                ComponentType, always_enabled>                                \
+            componentname ## _component_registry_type_ ## always_enabled;     \
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
-            hpx::components::component_registry<                              \
-                HPX_HELPER_UNPACK2(ComponentType, always_enabled)>,           \
+            componentname ## _component_registry_type_ ## always_enabled,     \
             componentname);                                                   \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::component_registry<                              \
-                HPX_HELPER_UNPACK2(ComponentType, always_enabled)>,           \
-                componentname)                                                \
+            componentname ## _component_registry_type_ ## always_enabled,     \
+            componentname)                                                    \
         template struct hpx::components::component_registry<                  \
             ComponentType, always_enabled>;                                   \
     /**/
