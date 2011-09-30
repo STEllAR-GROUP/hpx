@@ -6,16 +6,10 @@
 #include <stdexcept>
 
 #include <boost/format.hpp>
-#include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 
-#include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
 
 using boost::program_options::variables_map;
@@ -24,16 +18,6 @@ using boost::program_options::value;
 
 using hpx::init;
 using hpx::finalize;
-
-using hpx::find_here;
-
-using hpx::naming::id_type;
-
-using hpx::actions::plain_result_action0;
-
-using hpx::lcos::promise;
-using hpx::lcos::eager_future;
-using hpx::lcos::wait;
 
 using hpx::util::high_resolution_timer;
 
@@ -46,25 +30,13 @@ double global_scratch = 0;
 boost::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function()
+double delay()
 {
     double d = 0.;
     for (boost::uint64_t i = 0; i < num_iterations; ++i)
         d += 1 / (2. * i + 1);
     return d;
 }
-
-typedef plain_result_action0<
-    // result type
-    double
-    // arguments
-    // function
-  , null_function
-> null_action;
-
-HPX_REGISTER_PLAIN_ACTION(null_action);
-
-typedef eager_future<null_action> null_future;
     
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -72,41 +44,36 @@ int hpx_main(
     )
 {
     {
-
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
     
         const boost::uint64_t count = vm["count"].as<boost::uint64_t>();
-    
-        const id_type here = find_here();
 
+        const bool csv = vm.count("csv");
+    
         if (HPX_UNLIKELY(0 == count))
-            throw std::logic_error("error: count of 0 futures specified\n");
- 
-        std::vector<promise<double> > futures;
+            throw std::logic_error("error: count of 0 loops specified\n");
 
-        futures.reserve(count);        
- 
-        // start the clock 
-        high_resolution_timer walltime;
-   
         for (boost::uint64_t i = 0; i < count; ++i)
-            futures.push_back(null_future(here));
-  
-        wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
- 
-        // stop the clock 
-        const double duration = walltime.elapsed();
-    
-        if (vm.count("csv"))
-            cout << ( boost::format("%1%,%2%\n")
-                    % count 
-                    % duration)
-                 << flush;
-        else
-            cout << ( boost::format("invoked %1% futures in %2% seconds\n")
-                    % count
-                    % duration)
-                 << flush;
+        {
+            // start the clock 
+            high_resolution_timer walltime;
+     
+            global_scratch = delay();  
+      
+            // stop the clock 
+            const double duration = walltime.elapsed();
+        
+            if (csv)
+                cout << ( boost::format("%1%,%2%\n")
+                        % num_iterations 
+                        % duration)
+                     << flush;
+            else
+                cout << ( boost::format("ran %1% iterations in %2% seconds\n")
+                        % num_iterations
+                        % duration)
+                     << flush;
+        }
     }
 
     finalize();
@@ -124,15 +91,15 @@ int main(
 
     cmdline.add_options()
         ( "count"
-        , value<boost::uint64_t>()->default_value(500000) 
-        , "number of futures to invoke")
+        , value<boost::uint64_t>()->default_value(64) 
+        , "number of delay loops to run")
         
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(0) 
+        , value<boost::uint64_t>()->default_value(65536) 
         , "number of iterations in the delay loop")
 
         ( "csv"
-        , "output results as csv (format: count,duration)")
+        , "output results as csv (format: iterations,duration)")
         ;
 
     // Initialize and run HPX.

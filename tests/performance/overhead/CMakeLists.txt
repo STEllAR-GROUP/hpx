@@ -4,12 +4,17 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
+    delay_baseline_overhead
    )
+
+set(delay_baseline_overhead_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
       eager_future_overhead
      )
+
+  set(eager_future_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 foreach(benchmark ${benchmarks})
@@ -22,7 +27,7 @@ foreach(benchmark ${benchmarks})
   add_hpx_executable(${benchmark}
                      MODULE overhead
                      SOURCES ${sources}
-                     DEPENDENCIES iostreams_component)
+                     ${${benchmark}_FLAGS})
 
   # add a custom target for this example 
   add_hpx_pseudo_target(tests.performance.overhead.${benchmark})
