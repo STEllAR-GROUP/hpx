@@ -186,11 +186,14 @@
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\async.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\promise.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
@@ -365,9 +368,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\eager_future_constructors.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\eager_future_constructors_direct.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\future_callback.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\future_value.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\future_value_full_empty_bit.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\future_value_promise.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\future_wait.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results.hpp" />

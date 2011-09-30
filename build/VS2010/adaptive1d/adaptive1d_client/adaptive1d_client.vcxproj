@@ -78,6 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\adaptive1d\adaptive1d.cpp" />
+    <ClCompile Include="..\..\..\..\examples\adaptive1d\refine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
@@ -136,6 +137,12 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\examples\adaptive1d\array1d.hpp" />
+    <ClInclude Include="..\..\..\..\examples\adaptive1d\array3d.hpp" />
+    <ClInclude Include="..\..\..\..\examples\adaptive1d\refine.hpp" />
+    <ClInclude Include="..\..\..\..\examples\adaptive1d\serialize_parameter.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

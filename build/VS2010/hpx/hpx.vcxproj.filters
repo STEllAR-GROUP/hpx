@@ -445,15 +445,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\future_callback.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\future_value.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\future_value_full_empty_bit.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\future_value_promise.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\future_wait.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
@@ -1008,6 +999,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\query_counters.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\async.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\promise.hpp">
+      <Filter>Header Files\LCOs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
