@@ -239,7 +239,7 @@ int hpx_main(variables_map& vm)
     rc = compute_numrows(par);
     rc = compute_rowsize(par);
     std::cout << " num_rows " << par->num_rows << std::endl;
-    std::cout << " rowsize " << par->rowsize[0] << std::endl;
+    std::cout << " rowsize " << par->rowsize[0] << " number stencils " << number_stencils << std::endl;
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
@@ -259,7 +259,7 @@ int hpx_main(variables_map& vm)
           double time = j*par->refine_every*par->cfl*par->h;
 
           result_data = um.init_execute(*result_data,time,function_type, 
-                                        number_stencils, numsteps,
+                                        par->rowsize[0], numsteps,
                                 par->loglevel ? logging_type : component_invalid, par);
       
           // Regrid

@@ -102,6 +102,7 @@ namespace hpx { namespace components { namespace adaptive1d
             return -1;
         }
 
+
         // this should occur only after result has been delivered already
         BOOST_FOREACH(naming::id_type gid, gids)
         {
@@ -109,58 +110,153 @@ namespace hpx { namespace components { namespace adaptive1d
                 return -1;
         }
 
-        // Generate new config info
-        stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the right face coming from the left
-        stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the left face coming from the right
-
-        // get all input memory_block_data instances
-        typedef std::vector<lcos::promise<memory_block_data> > 
+        if ( gids.size() == 1  ) {
+          // get all input memory_block_data instances
+          typedef std::vector<lcos::promise<memory_block_data> >
             lazy_results_type;
+            
+          // first invoke all remote operations
+          lazy_results_type lazy_results;
+          
+          namespace s = hpx::components::stubs;
+          lazy_results.push_back(s::memory_block::get_async(gids[0]));
+          
+          //  invoke the operation for the result gid as well
+          lazy_results.push_back(s::memory_block::get_async(result));
+          
+          // then wait for all results to get back to us
+          std::vector<access_memory_block<stencil_data> > val;
+          BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
+            val.push_back(f.get());
+            
+          // lock all user defined data elements, will be unlocked at function exit
+          scoped_values_lock<lcos::mutex> l(val); 
+          
+          val[1]->max_index_ = val[0]->max_index_;
+          val[1]->index_ = val[0]->index_;
+          val[1]->value_.resize(val[0]->value_.size());
+          for (std::size_t i=0;i<val[0]->value_.size();i++) {
+            val[1]->value_[i].x = val[0]->value_[i].x;
+          }
 
-        // first invoke all remote operations
-        lazy_results_type lazy_results;
+          double t = val[0]->timestep_*par->h*par->cfl + cycle_time;
+          rkupdate1(val,t,*par.p);
 
-        namespace s = hpx::components::stubs;
-        lazy_results.push_back(
-            s::memory_block::get_async(gids[0], cfg0.get_memory_block()));
-        lazy_results.push_back(s::memory_block::get_async(gids[1]));
-        lazy_results.push_back(
-            s::memory_block::get_async(gids[2], cfg1.get_memory_block()));
+          val[1]->timestep_ = val[0]->timestep_ + 1.0;
+          if (val[1]->timestep_ >= par->nt0-1) {
+            return 0;
+          }
+          return 1;
+        } else if ( gids.size() == 2 ) {
+          // get all input memory_block_data instances
+          typedef std::vector<lcos::promise<memory_block_data> >
+            lazy_results_type;
+            
+          // first invoke all remote operations
+          lazy_results_type lazy_results;
+          namespace s = hpx::components::stubs;
 
-        //  invoke the operation for the result gid as well
-        lazy_results.push_back(s::memory_block::get_async(result));
+          if ( par->gr_lbox[ par->item2gi[column] ] ) {
+            stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the left face coming from the right
+            lazy_results.push_back(s::memory_block::get_async(gids[0]));
+            lazy_results.push_back(s::memory_block::get_async(gids[1], cfg1.get_memory_block()));
+          } else if ( par->gr_rbox[ par->item2gi[column] ] ) {
+            stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the right face coming from the left
+            lazy_results.push_back(s::memory_block::get_async(gids[0], cfg0.get_memory_block()));
+            lazy_results.push_back(s::memory_block::get_async(gids[1]));
+          } else {
+            BOOST_ASSERT(false);
+          }
+          //  invoke the operation for the result gid as well
+          lazy_results.push_back(s::memory_block::get_async(result));
+          
+          // then wait for all results to get back to us
+          std::vector<access_memory_block<stencil_data> > val;
+          BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
+            val.push_back(f.get());
+            
+          // lock all user defined data elements, will be unlocked at function exit
+          scoped_values_lock<lcos::mutex> l(val); 
+          
+          val[2]->max_index_ = val[0]->max_index_;
+          val[2]->index_ = val[0]->index_;
+          val[2]->value_.resize(val[0]->value_.size());
+          for (std::size_t i=0;i<val[0]->value_.size();i++) {
+            val[2]->value_[i].x = val[0]->value_[i].x;
+          }
 
-        // then wait for all results to get back to us
-        std::vector<access_memory_block<stencil_data> > val;
-        BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
-          val.push_back(f.get());
+          double t = val[0]->timestep_*par->h*par->cfl + cycle_time;
+          if ( par->gr_lbox[ par->item2gi[column] ] ) {
+            rkupdate2b(val,t,*par.p);
+          } else if ( par->gr_rbox[ par->item2gi[column] ] ) {
+            rkupdate2a(val,t,*par.p);
+          } else {
+            BOOST_ASSERT(false);
+          }
 
-        // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(val); 
+          val[2]->timestep_ = val[0]->timestep_ + 1.0;
+          if (val[2]->timestep_ >= par->nt0-1) {
+            return 0;
+          }
+          return 1;
+        } else if ( gids.size() == 3 ) {
+          // Generate new config info
+          stencil_config_data cfg0(0,3*par->num_neighbors);  // serializes the right face coming from the left
+          stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the left face coming from the right
 
-        val[3]->max_index_ = val[1]->max_index_;
-        val[3]->index_ = val[1]->index_;
-        val[3]->value_.resize(val[1]->value_.size());
-        for (std::size_t i=0;i<val[1]->value_.size();i++) {
-          val[3]->value_[i].x = val[1]->value_[i].x;
+          // get all input memory_block_data instances
+          typedef std::vector<lcos::promise<memory_block_data> > 
+              lazy_results_type;
+  
+          // first invoke all remote operations
+          lazy_results_type lazy_results;
+  
+          namespace s = hpx::components::stubs;
+          lazy_results.push_back(
+              s::memory_block::get_async(gids[0], cfg0.get_memory_block()));
+          lazy_results.push_back(s::memory_block::get_async(gids[1]));
+          lazy_results.push_back(
+              s::memory_block::get_async(gids[2], cfg1.get_memory_block()));
+  
+          //  invoke the operation for the result gid as well
+          lazy_results.push_back(s::memory_block::get_async(result));
+  
+          // then wait for all results to get back to us
+          std::vector<access_memory_block<stencil_data> > val;
+          BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
+            val.push_back(f.get());
+  
+          // lock all user defined data elements, will be unlocked at function exit
+          scoped_values_lock<lcos::mutex> l(val); 
+  
+          val[3]->max_index_ = val[1]->max_index_;
+          val[3]->index_ = val[1]->index_;
+          val[3]->value_.resize(val[1]->value_.size());
+          for (std::size_t i=0;i<val[1]->value_.size();i++) {
+            val[3]->value_[i].x = val[1]->value_[i].x;
+          }
+  
+          double t = val[1]->timestep_*par->h*par->cfl + cycle_time;
+          rkupdate3(val,t,*par.p);
+
+          val[3]->timestep_ = val[1]->timestep_ + 1.0;
+
+          //std::cout << " row " << row << " column " << column 
+          //    << " timestep " << val[3]->timestep_ 
+          //    << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
+          //    << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
+          //    << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
+          //    << std::endl;
+
+          if (val[3]->timestep_ >= par->refine_every-1) {
+            return 0;
+          }
+          return 1;
+        } else {
+          BOOST_ASSERT(false);
         }
-
-        double t = val[1]->timestep_*par->h*par->cfl + cycle_time;
-        rkupdate(val,t,*par.p);
-
-        val[3]->timestep_ = val[1]->timestep_ + 1.0;
-
-        //std::cout << " row " << row << " column " << column 
-        //    << " timestep " << val[3]->timestep_ 
-        //    << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
-        //    << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
-        //    << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
-        //    << std::endl;
-
-        if (val[3]->timestep_ >= par->refine_every-1) {
-          return 0;
-        }
-        return 1;
+        BOOST_ASSERT(false);
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

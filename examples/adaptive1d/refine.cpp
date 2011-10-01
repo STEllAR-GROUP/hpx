@@ -45,26 +45,26 @@ int level_bbox(int level,parameter &par)
     double lminx = par->gr_minx[ level_gi[i] ];
     double lmaxx = par->gr_maxx[ level_gi[i] ];
     gi = level_return_start(level,par);
-    bool found_left = true;
-    bool found_right = true;
+    bool left_boundary = true;
+    bool right_boundary = true;
     while ( grid_return_existence(gi,par) ) {
       if ( gi != level_gi[i] ) {
         double lminx2 = par->gr_minx[ gi ];
         double lmaxx2 = par->gr_maxx[ gi ];
         if ( ballpark(lminx,lmaxx2,2*h) ) {
-          std::cout << " TEST lmaxx2 " << lmaxx2 << " lminx " << lminx << std::endl;
-          found_left = false;
+          left_boundary = false;
+          par->gr_left_neighbor[ level_gi[i] ] = gi;
         }
         if ( ballpark(lminx2,lmaxx,2*h) ) {
-          std::cout << " TEST lminx2 " << lminx2 << " lmaxx " << lmaxx << std::endl;
-          found_right = false;
+          right_boundary = false;
+          par->gr_right_neighbor[ level_gi[i] ] = gi;
         }
-        if ( !found_left && !found_right ) break;
       }
+      if ( !right_boundary && !left_boundary ) break;
       gi = par->gr_sibling[gi];
     }
-    if ( found_left )  par->gr_lbox[ level_gi[i] ] = true;
-    if ( found_right ) par->gr_rbox[ level_gi[i] ] = true;
+    if ( left_boundary ) par->gr_lbox[ level_gi[i] ] = true;
+    if ( right_boundary ) par->gr_rbox[ level_gi[i] ] = true;
   } 
 
   return 0;
@@ -150,6 +150,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       par->gr_h.push_back(hl);
       par->gr_lbox.push_back(false);
       par->gr_rbox.push_back(false);
+      par->gr_left_neighbor.push_back(-1);
+      par->gr_right_neighbor.push_back(-1);
       par->gr_nx.push_back(nx);
     }
 
@@ -544,6 +546,8 @@ int increment_gi(int level,int nx,
     par->gr_h.resize(gi+1);
     par->gr_lbox.resize(gi+1);
     par->gr_rbox.resize(gi+1);
+    par->gr_left_neighbor.resize(gi+1);
+    par->gr_right_neighbor.resize(gi+1);
     par->gr_nx.resize(gi+1);
     par->gr_sibling.resize(gi+1);
 
@@ -552,6 +556,8 @@ int increment_gi(int level,int nx,
     par->gr_h[gi]     = hl/refine_factor;
     par->gr_lbox[gi]  = false;
     par->gr_rbox[gi]  = false;
+    par->gr_left_neighbor[gi] = -1;
+    par->gr_right_neighbor[gi] = -1;
     par->gr_nx[gi]    = nx;
     
     return gi;
