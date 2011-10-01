@@ -29,7 +29,6 @@ namespace hpx { namespace components { namespace adaptive1d
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     detail::parameter const& par)
 {
-    std::cout << " TEST INIT " << std::endl;
     // provide initial data for the given data value 
     val->max_index_ = maxitems;
     val->index_ = item;

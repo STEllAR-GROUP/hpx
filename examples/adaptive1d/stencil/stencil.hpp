@@ -57,6 +57,13 @@ namespace hpx { namespace components { namespace adaptive1d
                                    double time,
                                    parameter const& par);
 
+        double interp_linear(double y1, double y2,
+                             double x, double x1, double x2);
+
+        void interpolate(double x, double minx,double h,
+                              access_memory_block<stencil_data> &val,
+                              nodedata &result, parameter const& par);
+
         /// The init function initializes this stencil point
         void init(std::size_t, naming::id_type const&);
 

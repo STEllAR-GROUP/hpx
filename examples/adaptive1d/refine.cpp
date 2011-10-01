@@ -65,7 +65,28 @@ int level_bbox(int level,parameter &par)
     }
     if ( left_boundary ) par->gr_lbox[ level_gi[i] ] = true;
     if ( right_boundary ) par->gr_rbox[ level_gi[i] ] = true;
+
+    // get prolongation neighbors
+    if ( left_boundary || right_boundary ) {
+      gi = level_return_start(level-1,par);
+      while ( grid_return_existence(gi,par) ) {
+        // look for intersection with ghostwidth region
+        double lminx2 = par->gr_minx[ gi ];
+        double lmaxx2 = par->gr_maxx[ gi ];
+        if ( intersection(lminx,lminx+ghostwidth*h,
+                         lminx2,lmaxx2) ) {
+          par->gr_left_neighbor[ level_gi[i] ] = gi;
+        }
+        if ( intersection(lmaxx-ghostwidth*h,lmaxx,
+                         lminx2,lmaxx2) ) {
+          par->gr_right_neighbor[ level_gi[i] ] = gi;
+        }
+        gi = par->gr_sibling[gi];
+      }
+    }
+
   } 
+
 
   return 0;
 }

@@ -226,20 +226,20 @@ int hpx_main(variables_map& vm)
 
     // TEST
     // Check grid structure
-    for (std::size_t i=0;i<=par->allowedl;i++) {
-      int gi = level_return_start(i,par);
-      while ( grid_return_existence(gi,par) ) {
-        std::cout << " TEST level : " << i << " nx : " << par->gr_nx[gi] << " minx : " << par->gr_minx[gi] << " maxx : " << par->gr_maxx[gi] << " test dx : " << (par->gr_maxx[gi]-par->gr_minx[gi])/(par->gr_nx[gi]-1) << " actual h " << par->gr_h[gi] << " end: " << par->gr_minx[gi] + (par->gr_nx[gi]-1)*par->gr_h[gi] << std::endl;
-        std::cout << " TEST bbox : " << par->gr_lbox[gi] << " " << par->gr_rbox[gi] << std::endl;
-        gi = par->gr_sibling[gi];
-      }
-    }
+    //for (std::size_t i=0;i<=par->allowedl;i++) {
+    //  int gi = level_return_start(i,par);
+    //  while ( grid_return_existence(gi,par) ) {
+    //    std::cout << " TEST level : " << i << " nx : " << par->gr_nx[gi] << " minx : " << par->gr_minx[gi] << " maxx : " << par->gr_maxx[gi] << " test dx : " << (par->gr_maxx[gi]-par->gr_minx[gi])/(par->gr_nx[gi]-1) << " actual h " << par->gr_h[gi] << " end: " << par->gr_minx[gi] + (par->gr_nx[gi]-1)*par->gr_h[gi] << std::endl;
+    //    std::cout << " TEST bbox : " << par->gr_lbox[gi] << " " << par->gr_rbox[gi] << std::endl;
+    //    gi = par->gr_sibling[gi];
+    //  }
+    //}
     // END TEST 
 
     rc = compute_numrows(par);
     rc = compute_rowsize(par);
-    std::cout << " num_rows " << par->num_rows << std::endl;
-    std::cout << " rowsize " << par->rowsize[0] << " number stencils " << number_stencils << std::endl;
+    //std::cout << " num_rows " << par->num_rows << std::endl;
+    //std::cout << " rowsize " << par->rowsize[0] << " number stencils " << number_stencils << std::endl;
  
     // get component types needed below
     component_type function_type = get_component_type<stencil>();

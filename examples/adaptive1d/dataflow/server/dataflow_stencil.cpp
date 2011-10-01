@@ -134,9 +134,9 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             namespace stubs = components::adaptive1d::stubs;
             BOOST_ASSERT(function != functions.second);
 
-//#if 0       // DEBUG
+#if 0       // DEBUG
             std::cout << " row " << static_step << " column " << column << " in " << dst_size(static_step,column,0) << " out " << src_size(static_step,column,0) << std::endl;
-//#endif
+#endif
 #if 0
             if ( dst_size(static_step,column,0) > 0 ) {
               std::cout << "                      in row:  " << dst_step(static_step,column,0) << " in column " << dst_src(static_step,column,0) << std::endl;
@@ -438,7 +438,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             }
           }
           if ( !found ) {
-            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "marduk: Problem in prep_ports");
+            HPX_THROW_IN_CURRENT_FUNC(bad_parameter, "adaptive1d: Problem in prep_ports");
           }
           dst = step;
 
@@ -499,19 +499,15 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
                   vsrc_step.push_back(step);vsrc_column.push_back(i+1);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(2);
                 }
               } else {
-                // sanity checks
-                if ( !par->gr_lbox[ par->item2gi[i] ] && par->gr_left_neighbor[ par->item2gi[i] ] == -1 ) BOOST_ASSERT(false);
-                if ( !par->gr_rbox[ par->item2gi[i] ] && par->gr_right_neighbor[ par->item2gi[i] ] == -1 ) BOOST_ASSERT(false);
-
                 if ( par->gr_lbox[ par->item2gi[i] ] && par->gr_rbox[ par->item2gi[i] ] ) {
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
-                } else if ( par->gr_lbox[ par->item2gi[i] ] && par->gr_right_neighbor[ par->item2gi[i] ] != -1 ) {
+                } else if ( par->gr_lbox[ par->item2gi[i] ] && !par->gr_rbox[ par->item2gi[i] ] ) {
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(0);
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]);vport.push_back(1);
-                } else if ( par->gr_rbox[ par->item2gi[i] ] && par->gr_left_neighbor[ par->item2gi[i] ] != -1 ) {
+                } else if ( !par->gr_lbox[ par->item2gi[i] ] && par->gr_rbox[ par->item2gi[i] ] ) {
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_left_neighbor[ par->item2gi[i] ]);vport.push_back(0);
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
-                } else if ( par->gr_left_neighbor[ par->item2gi[i] ] != -1 && par->gr_right_neighbor[ par->item2gi[i] ] != -1 ) {
+                } else if ( !par->gr_lbox[ par->item2gi[i] ] && !par->gr_rbox[ par->item2gi[i] ] ) {
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_left_neighbor[ par->item2gi[i] ]);vport.push_back(0);
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(i);vport.push_back(1);
                   vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]);vport.push_back(2);
@@ -521,6 +517,17 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
               // prolongation true case
               j = i;
               vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back(j);vport.push_back(0);
+#if 0
+              if ( par->gr_lbox[ par->item2gi[i] ] && par->gr_rbox[ par->item2gi[i] ] ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_left_neighbor[ par->item2gi[i] ]  );vport.push_back(1);
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]  );vport.push_back(2);
+              } else if ( par->gr_lbox[ par->item2gi[i] ] && !par->gr_rbox[ par->item2gi[i] ] ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_left_neighbor[ par->item2gi[i] ]  );vport.push_back(1);
+              } else if ( !par->gr_lbox[ par->item2gi[i] ] && par->gr_rbox[ par->item2gi[i] ] ) {
+                vsrc_step.push_back(step);vsrc_column.push_back(i);vstep.push_back(dst);vcolumn.push_back( par->gr_right_neighbor[ par->item2gi[i] ]  );vport.push_back(1);
+              }
+#endif
+
             }
           }
 
