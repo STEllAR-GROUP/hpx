@@ -674,7 +674,7 @@ bool legacy_router::resolve(
             }
             // }}}
     
-            // Try the TLB.
+            // Try the cache.
             else if (try_cache && resolve_cached(id, addr, ec))
                 return true;
         }
@@ -703,7 +703,7 @@ bool legacy_router::resolve(
     
         if (!is_bootstrap())
         {
-            // Put the page into the TLB
+            // Put the page into the cache.
             cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             gva_cache_key key(r.get_base_gid(), r.get_gva().count);
             hosted->gva_cache_.insert(key, r.get_gva());
@@ -772,7 +772,7 @@ bool legacy_router::resolve_cached(
         {
             HPX_THROWS_IF(ec, invalid_page_fault
               , "legacy_router::resolve_cached" 
-              , "bad page in TLB, MSBs of GID base and GID do not match");
+              , "bad page in cache, MSBs of GID base and GID do not match");
             return false;
         }
 
@@ -784,12 +784,19 @@ bool legacy_router::resolve_cached(
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        LHPX_(debug, "  [AC] ") <<
+            ( boost::format("cache hit for address %1% (base %2%)")
+            % id % idbase.id);
     
         return true;
     }
 
     if (&ec != &throws)
         ec = make_success_code();
+
+    LHPX_(debug, "  [AC] ") <<
+        (boost::format("cache miss for address %1%") % id);
 
     return false;
 } // }}}
