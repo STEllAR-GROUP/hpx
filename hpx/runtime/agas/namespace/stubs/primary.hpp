@@ -15,18 +15,17 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database, typename Protocol>
 struct primary_namespace 
 {
     // {{{ nested types
-    typedef server::primary_namespace<Database, Protocol> server_type; 
+    typedef server::primary_namespace server_type; 
 
-    typedef typename server_type::response_type response_type;
-    typedef typename server_type::endpoint_type endpoint_type;
-    typedef typename server_type::gva_type gva_type;
-    typedef typename server_type::count_type count_type;
-    typedef typename server_type::offset_type offset_type;
-    typedef typename server_type::prefix_type prefix_type;
+    typedef server_type::response_type response_type;
+    typedef server_type::endpoint_type endpoint_type;
+    typedef server_type::gva_type gva_type;
+    typedef server_type::count_type count_type;
+    typedef server_type::offset_type offset_type;
+    typedef server_type::prefix_type prefix_type;
     // }}}
 
     // {{{ bind_locality dispatch
@@ -34,7 +33,7 @@ struct primary_namespace
     bind_locality_async(naming::id_type const& gid, endpoint_type const& ep,
                         count_type count)
     {
-        typedef typename server_type::bind_locality_action action_type;
+        typedef server_type::bind_locality_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, ep, count);
     }
 
@@ -49,7 +48,7 @@ struct primary_namespace
     bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                    gva_type const& gva)
     {
-        typedef typename server_type::bind_gid_action action_type;
+        typedef server_type::bind_gid_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, id, gva);
     }
 
@@ -63,7 +62,7 @@ struct primary_namespace
     static lcos::promise<response_type>
     page_fault_async(naming::id_type const& gid, naming::gid_type const& key)
     {
-        typedef typename server_type::page_fault_action action_type;
+        typedef server_type::page_fault_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -77,7 +76,7 @@ struct primary_namespace
     static lcos::promise<response_type>
     unbind_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
-        typedef typename server_type::unbind_locality_action action_type;
+        typedef server_type::unbind_locality_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, ep);
     }
     
@@ -92,7 +91,7 @@ struct primary_namespace
     unbind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                      count_type count)
     {
-        typedef typename server_type::unbind_gid_action action_type;
+        typedef server_type::unbind_gid_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, id, count);
     }
     
@@ -107,7 +106,7 @@ struct primary_namespace
     increment_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
-        typedef typename server_type::increment_action action_type;
+        typedef server_type::increment_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key, count);
     }
     
@@ -122,7 +121,7 @@ struct primary_namespace
     decrement_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
-        typedef typename server_type::decrement_action action_type;
+        typedef server_type::decrement_action action_type;
         return lcos::eager_future<action_type, response_type>
             (gid, key, count);
     }
@@ -137,7 +136,7 @@ struct primary_namespace
     static lcos::promise<response_type>
     localities_async(naming::id_type const& gid)
     {
-        typedef typename server_type::localities_action action_type;
+        typedef server_type::localities_action action_type;
         return lcos::eager_future<action_type, response_type>(gid);
     }
     

@@ -8,6 +8,7 @@
 #if !defined(HPX_A16135FC_AA32_444F_BB46_549AD456A661)
 #define HPX_A16135FC_AA32_444F_BB46_549AD456A661
 
+#include <map>
 #include <set>
 
 #include <boost/format.hpp>
@@ -18,8 +19,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/database/table.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
@@ -27,16 +27,14 @@
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database, typename Protocol>
 struct component_namespace :
   components::fixed_component_base<
     HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB, // constant GID
-    component_namespace<Database, Protocol>
+    component_namespace
   >
 {
     // {{{ nested types
-    typedef typename traits::database::mutex_type<Database>::type
-        database_mutex_type;
+    typedef util::spinlock database_mutex_type;
 
     typedef std::string component_name_type;
     typedef int component_id_type;
@@ -44,12 +42,12 @@ struct component_namespace :
 
     typedef std::set<prefix_type> prefixes_type;
 
-    typedef response<Protocol> response_type;
+    typedef response response_type;
 
-    typedef table<Database, component_name_type, component_id_type>
+    typedef std::map<component_name_type, component_id_type>
         component_id_table_type; 
 
-    typedef table<Database, component_id_type, prefixes_type>
+    typedef std::map<component_id_type, prefixes_type>
         factory_table_type;
     // }}}
 
@@ -60,16 +58,12 @@ struct component_namespace :
     component_id_type type_counter; 
  
   public:
-    component_namespace(
-        std::string const& name = "root_component_namespace"
-        )
+    component_namespace()
       : mutex_()
-      , component_ids_(std::string("hpx.agas.") + name + ".id")
-      , factories_(std::string("hpx.agas.") + name + ".factory")
+      , component_ids_()
+      , factories_()
       , type_counter(components::component_first_dynamic)
-    {
-        traits::initialize_mutex(mutex_);
-    }
+    {}
 
     response_type bind_prefix(
         component_name_type const& key
@@ -102,25 +96,16 @@ struct component_namespace :
       , error_code& ec
         )
     { // {{{ bind_prefix implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Always load the table once, as the operation might be expensive for
-        // some backends and the compiler may not be able to optimize this away
-        // if the database backend has implicit/builtin atomic semantics.
-        typename component_id_table_type::map_type& c_id_table =
-            component_ids_.get();
-        
-        typename factory_table_type::map_type& factory_table =
-            factories_.get();
-
-        typename component_id_table_type::map_type::iterator
-            cit = c_id_table.find(key), cend = c_id_table.end();
+        component_id_table_type::iterator cit = component_ids_.find(key)
+                                        , cend = component_ids_.end();
 
         // This is the first request, so we use the type counter, and then
         // increment it.
         if (cit == cend)
         {
-            if (HPX_UNLIKELY(!util::insert_checked(c_id_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(component_ids_.insert(
                     std::make_pair(key, type_counter)), cit)))
             {
                 HPX_THROWS_IF(ec, lock_error
@@ -135,8 +120,8 @@ struct component_namespace :
             ++type_counter;
         }
  
-        typename factory_table_type::map_type::iterator
-            fit = factory_table.find(cit->second), fend = factory_table.end();
+        factory_table_type::iterator fit = factories_.find(cit->second)
+                                   , fend = factories_.end();
 
         if (fit == fend)
         {
@@ -144,7 +129,7 @@ struct component_namespace :
             // an empty set, then put the prefix into said set. This should
             // prevent a copy, though most compilers should be able to optimize
             // this without our help.
-            if (HPX_UNLIKELY(!util::insert_checked(factory_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(factories_.insert(
                     std::make_pair(cit->second, prefixes_type())), fit)))
             {
                 HPX_THROWS_IF(ec, lock_error
@@ -180,20 +165,16 @@ struct component_namespace :
       , error_code& ec
         )
     { // {{{ bind_name implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the table.
-        typename component_id_table_type::map_type& c_id_table =
-            component_ids_.get();
-        
-        typename component_id_table_type::map_type::iterator
-            it = c_id_table.find(key), end = c_id_table.end();
+        component_id_table_type::iterator it = component_ids_.find(key)
+                                        , end = component_ids_.end();
 
         // If the name is not in the table, register it (this is only done so
         // we can implement a backwards compatible get_component_id).
         if (it == end)
         {
-            if (HPX_UNLIKELY(!util::insert_checked(c_id_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(component_ids_.insert(
                     std::make_pair(key, type_counter)), it)))
             {
                 HPX_THROWS_IF(ec, lock_error
@@ -245,14 +226,10 @@ struct component_namespace :
       , error_code& ec
         )
     { // {{{ resolve_id implementation 
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the table.
-        typename factory_table_type::map_type const& factory_table =
-            factories_.get();
-        
-        typename factory_table_type::map_type::const_iterator
-            it = factory_table.find(key), end = factory_table.end();
+        factory_table_type::const_iterator it = factories_.find(key)
+                                         , end = factories_.end();
 
         // REVIEW: Should we differentiate between these two cases? Should we
         // throw an exception if it->second.empty()? It should be impossible.
@@ -273,8 +250,8 @@ struct component_namespace :
         {
             std::vector<boost::uint32_t> p;
 
-            typename prefixes_type::const_iterator pit = it->second.begin()
-                                                 , pend = it->second.end();
+            prefixes_type::const_iterator pit = it->second.begin()
+                                        , pend = it->second.end();
 
             for (; pit != pend; ++pit)
                 p.push_back(*pit); 
@@ -302,14 +279,10 @@ struct component_namespace :
       , error_code& ec
         )
     { // {{{ resolve_name implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the table.
-        typename component_id_table_type::map_type& c_id_table =
-            component_ids_.get();
-        
-        typename component_id_table_type::map_type::iterator
-            it = c_id_table.find(key), end = c_id_table.end();
+        component_id_table_type::iterator it = component_ids_.find(key)
+                                        , end = component_ids_.end();
 
         if (it == end)
         {
@@ -349,16 +322,10 @@ struct component_namespace :
       , error_code& ec
         )
     { // {{{ unbind implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
-
-        typename component_id_table_type::map_type& c_id_table =
-            component_ids_.get();
+        database_mutex_type::scoped_lock l(mutex_);
         
-        typename factory_table_type::map_type& factory_table =
-            factories_.get();
-
-        typename component_id_table_type::map_type::iterator
-            it = c_id_table.find(key), end = c_id_table.end();
+        component_id_table_type::iterator it = component_ids_.find(key)
+                                        , end = component_ids_.end();
 
         // REVIEW: Should this be an error?
         if (it == end)
@@ -375,8 +342,8 @@ struct component_namespace :
 
         // REVIEW: If there are no localities with this type, should we throw
         // an exception here?
-        factory_table.erase(it->second);
-        c_id_table.erase(it);
+        factories_.erase(it->second);
+        component_ids_.erase(it);
 
         LAGAS_(info) << (boost::format(
             "component_namespace::unbind, key(%1%)")
@@ -398,47 +365,47 @@ struct component_namespace :
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        component_namespace<Database, Protocol>,
+        component_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_bind_prefix,
         /* arguments */   component_name_type const&, prefix_type,
-        &component_namespace<Database, Protocol>::bind_prefix
+        &component_namespace::bind_prefix
       , threads::thread_priority_critical
     > bind_prefix_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace<Database, Protocol>,
+        component_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_bind_name,
         /* arguments */   component_name_type const&,
-        &component_namespace<Database, Protocol>::bind_name
+        &component_namespace::bind_name
       , threads::thread_priority_critical
     > bind_name_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace<Database, Protocol>,
+        component_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_resolve_id,
         /* arguments */   component_id_type,
-        &component_namespace<Database, Protocol>::resolve_id
+        &component_namespace::resolve_id
       , threads::thread_priority_critical
     > resolve_id_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace<Database, Protocol>,
+        component_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_resolve_name,
         /* arguments */   component_name_type const&,
-        &component_namespace<Database, Protocol>::resolve_name
+        &component_namespace::resolve_name
       , threads::thread_priority_critical
     > resolve_name_action;
     
     typedef hpx::actions::result_action1<
-        component_namespace<Database, Protocol>,
+        component_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_unbind,
         /* arguments */   component_name_type const&,
-        &component_namespace<Database, Protocol>::unbind
+        &component_namespace::unbind
       , threads::thread_priority_critical
     > unbind_action;
 };

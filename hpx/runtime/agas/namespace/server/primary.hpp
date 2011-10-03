@@ -21,48 +21,95 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/insert_checked.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
-#include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database, typename Protocol>
+/// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
+/// resolved addresses.
+///
+/// \note The layout of the address space is implementation defined, and
+/// subject to change. Never write application code that relies on the internal
+/// layout of GIDs. AGAS only guarantees that all assigned GIDs will be unique.
+/// 
+/// The following is the canonical description of the partitioning of AGAS's
+/// primary namespace.
+///
+///     |-----MSB------||------LSB-----|
+///     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+///     |prefix||RC||----identifier----|
+///     
+///     MSB        - Most significant bits (bit 64 to bit 127)
+///     LSB        - Least significant bits (bit 0 to bit 63)
+///     prefix     - Highest 32 bits (bit 96 to bit 127) of the MSB. Each
+///                  locality is assigned a prefix. This creates a 96-bit
+///                  address space for each locality.
+///     RC         - Bit 80 to bit 95 of the MSB. This is the number of
+///                  reference counting credits on the GID.
+///     identifier - Bit 64 to bit 80 of the MSB, and the entire LSB. The
+///                  content of these bits depends on the component type of
+///                  the underlying object. For all user-defined components,
+///                  these bits contain a unique 80-bit number which is
+///                  assigned sequentially for each locality. For
+///                  \a hpx#components#component_runtime_support and
+///                  \a hpx#components#component_memory, the high 16 bits are
+///                  zeroed and the low 64 bits hold the LVA of the component.
+///
+/// The following address ranges are reserved. Some are either explicitly or 
+/// implicitly protected by AGAS. The letter x represents a single-byte
+/// wildcard.
+///
+///     00000000xxxxxxxxxxxxxxxxxxxxxxxx
+///         Historically unused address space reserved for future use.
+///     xxxxxxxxxxxx0000xxxxxxxxxxxxxxxx
+///         Address space for LVA-encoded GIDs.
+///     00000001xxxxxxxxxxxxxxxxxxxxxxxx
+///         Prefix of the bootstrap AGAS locality.
+///     00000001000000010000000000000001
+///         Address of the primary_namespace component on the bootstrap AGAS
+///         locality.
+///     00000001000000010000000000000002 
+///         Address of the component_namespace component on the bootstrap AGAS
+///         locality.
+///     00000001000000010000000000000003
+///         Address of the symbol_namespace component on the bootstrap AGAS
+///         locality.
+///
 struct primary_namespace : 
   components::fixed_component_base<
     HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
-    primary_namespace<Database, Protocol>
+    primary_namespace
   >
 {
     // {{{ nested types
-    typedef typename traits::database::mutex_type<Database>::type
-        database_mutex_type;
+    typedef util::spinlock database_mutex_type;
 
     typedef naming::locality endpoint_type;
 
-    typedef gva<Protocol> gva_type;
-    typedef typename gva_type::count_type count_type;
-    typedef typename gva_type::offset_type offset_type;
+    typedef gva gva_type;
+    typedef gva_type::count_type count_type;
+    typedef gva_type::offset_type offset_type;
     typedef boost::int32_t component_type;
     typedef boost::uint32_t prefix_type;
 
     typedef boost::fusion::vector2<prefix_type, naming::gid_type>
         partition_type;
 
-    typedef response<Protocol> response_type;
+    typedef response response_type;
 
-    typedef table<Database, naming::gid_type, gva_type>
+    typedef std::map<naming::gid_type, gva_type>
         gva_table_type; 
 
-    typedef table<Database, endpoint_type, partition_type>
+    typedef std::map<endpoint_type, partition_type>
         partition_table_type;
     
-    typedef table<Database, naming::gid_type, count_type>
+    typedef std::map<naming::gid_type, count_type>
         refcnt_table_type;
     // }}}
  
@@ -74,17 +121,13 @@ struct primary_namespace :
     boost::uint32_t prefix_counter_; 
 
   public:
-    primary_namespace(
-        std::string const& name = "root_primary_namespace"
-        )
-      : mutex_(),
-        gvas_(std::string("hpx.agas.") + name + ".gva"),
-        partitions_(std::string("hpx.agas.") + name + ".partition"),
-        refcnts_(std::string("hpx.agas.") + name +".refcnt"),
-        prefix_counter_(0)
-    {
-        traits::initialize_mutex(mutex_);
-    }
+    primary_namespace()
+      : mutex_()
+      , gvas_()
+      , partitions_()
+      , refcnts_()
+      , prefix_counter_(0)
+    {}
 
     response_type bind_locality(
         endpoint_type const& ep
@@ -102,15 +145,10 @@ struct primary_namespace :
     { // {{{ bind_locality implementation
         using boost::fusion::at_c;
 
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the partition table 
-        typename partition_table_type::map_type&
-            partition_table = partitions_.get();
-
-        typename partition_table_type::map_type::iterator
-            it = partition_table.find(ep),
-            end = partition_table.end(); 
+        partition_table_type::iterator it = partitions_.find(ep)
+                                     , end = partitions_.end(); 
 
         count_type const real_count = (count) ? (count - 1) : (0);
 
@@ -118,7 +156,7 @@ struct primary_namespace :
         if (it != end)
         {
             // Just return the prefix
-            if (count == 0)
+            if (0 == count)
             {
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::bind_locality, ep(%1%), count(%2%), "
@@ -186,7 +224,7 @@ struct primary_namespace :
         else
         {
             // Check for address space exhaustion.
-            if (HPX_UNLIKELY(partition_table.size() > 0xFFFFFFFE))
+            if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
             {
                 HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::bind_locality" 
@@ -203,23 +241,23 @@ struct primary_namespace :
 
             naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
-            // Load the GVA table, so that we can check if this prefix has
-            // already been assigned.
-            typename gva_table_type::map_type& gva_table = gvas_.get();
-
-            while (gva_table.count(id))
+            // Check if this prefix has already been assigned.
+            while (gvas_.count(id))
             {
                 prefix = ++prefix_counter_;
                 id = naming::get_gid_from_prefix(prefix); 
             }
 
             // Start assigning ids with the second block of 64bit numbers only.
+            // The first block is reserved for components with LVA-encoded GIDs
+            // (currently, runtime_support and memory). 
             naming::gid_type lower_id(id.get_msb() + 1, 0);
 
-            // Create an entry in the partition table for this endpoint
-            typename partition_table_type::map_type::iterator pit;
+            // We need to create an entry in the partition table for this
+            // locality.
+            partition_table_type::iterator pit;
 
-            if (HPX_UNLIKELY(!util::insert_checked(partition_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
                     std::make_pair(ep,
                         partition_type(prefix, lower_id))), pit)))
             {
@@ -242,7 +280,7 @@ struct primary_namespace :
             // Now that we've inserted the locality into the partition table
             // successfully, we need to put the locality's GID into the GVA
             // table so that parcels can be sent to the memory of a locality.
-            if (HPX_UNLIKELY(!util::insert_checked(gva_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
                     std::make_pair(id, gva)))))
             {
                 HPX_THROWS_IF(ec, lock_error
@@ -298,20 +336,16 @@ struct primary_namespace :
         naming::gid_type id = gid;
         naming::strip_credit_from_gid(id); 
 
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the GVA table 
-        typename gva_table_type::map_type& gva_table = gvas_.get();
-
-        typename gva_table_type::map_type::iterator
-            it = gva_table.lower_bound(id),
-            begin = gva_table.begin(),
-            end = gva_table.end();
+        gva_table_type::iterator it = gvas_.lower_bound(id)
+                               , begin = gvas_.begin()
+                               , end = gvas_.end();
 
         if (it != end)
         {
             // If we got an exact match, this is a request to update an existing
-            // locality binding (e.g. move semantics).
+            // binding (e.g. move semantics).
             if (it->first == id)
             {
                 // Check for count mismatch (we can't change block sizes of
@@ -353,7 +387,8 @@ struct primary_namespace :
                 return response_type(primary_ns_bind_gid, repeated_request);
             }
 
-            // We're about to decrement it, so make sure it's safe to do so.
+            // We're about to decrement the iterator it - first, we
+            // check that it's safe to do this.
             else if (it != begin)
             {
                 --it;
@@ -370,9 +405,10 @@ struct primary_namespace :
             }
         }            
 
-        else if (HPX_LIKELY(!gva_table.empty()))
+        else if (HPX_LIKELY(!gvas_.empty()))
         {
             --it;
+
             // Check that a previous range doesn't cover the new id.
             if ((it->first + it->second.count) > id)
             {
@@ -406,7 +442,7 @@ struct primary_namespace :
         }
         
         // Insert a GID -> GVA entry into the GVA table. 
-        if (HPX_UNLIKELY(!util::insert_checked(gva_table.insert(
+        if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
                 std::make_pair(id, gva)))))
         {
             HPX_THROWS_IF(ec, lock_error 
@@ -445,15 +481,11 @@ struct primary_namespace :
         naming::gid_type id = gid;
         naming::strip_credit_from_gid(id); 
             
-        typename database_mutex_type::scoped_lock l(mutex_);
-        
-        // Load the GVA table 
-        typename gva_table_type::map_type const& gva_table = gvas_.get();
+        database_mutex_type::scoped_lock l(mutex_);
 
-        typename gva_table_type::map_type::const_iterator
-            it = gva_table.lower_bound(id),
-            begin = gva_table.begin(),
-            end = gva_table.end();
+        gva_table_type::const_iterator it = gvas_.lower_bound(id)
+                                     , begin = gvas_.begin()
+                                     , end = gvas_.end();
 
         if (it != end)
         {
@@ -473,8 +505,8 @@ struct primary_namespace :
                                    , it->second);
             }
 
-            // We need to decrement the iterator, check that it's safe to do
-            // so.
+            // We need to decrement the iterator, first we check that it's safe
+            // to do this.
             else if (it != begin)
             {
                 --it;
@@ -506,7 +538,7 @@ struct primary_namespace :
             }
         }
 
-        else if (HPX_LIKELY(!gva_table.empty()))
+        else if (HPX_LIKELY(!gvas_.empty()))
         {
             --it;
 
@@ -521,7 +553,6 @@ struct primary_namespace :
                     return response_type();
                 }
  
-                // Calculation of the local address occurs in gva<>::resolve()
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::page_fault, soft page fault, faulting "
                     "address %1%, gva(%2%)")
@@ -564,27 +595,18 @@ struct primary_namespace :
     { // {{{ unbind_locality implementation
         using boost::fusion::at_c;
 
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Load the partition table 
-        typename partition_table_type::map_type&
-            partition_table = partitions_.get();
-
-        typename partition_table_type::map_type::iterator
-            pit = partition_table.find(ep),
-            pend = partition_table.end(); 
+        partition_table_type::iterator pit = partitions_.find(ep)
+                                     , pend = partitions_.end(); 
 
         if (pit != pend)
         {
-            // Load the GVA table 
-            typename gva_table_type::map_type& gva_table = gvas_.get();
+            gva_table_type::iterator git = gvas_.find
+                (naming::get_gid_from_prefix(at_c<0>(pit->second)));
+            gva_table_type::iterator gend = gvas_.end();
 
-            typename gva_table_type::map_type::iterator
-                git = gva_table.find(naming::get_gid_from_prefix
-                    (at_c<0>(pit->second))),
-                gend = gva_table.end();
-
-            if (git == gend)
+            if (HPX_UNLIKELY(git == gend))
             {
                 HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::unbind_locality" 
@@ -596,8 +618,8 @@ struct primary_namespace :
             }
 
             // Wipe the locality from the tables.
-            partition_table.erase(pit);
-            gva_table.erase(git);
+            partitions_.erase(pit);
+            gvas_.erase(git);
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::unbind_locality, ep(%1%)")
@@ -640,18 +662,14 @@ struct primary_namespace :
         naming::gid_type id = gid;
         naming::strip_credit_from_gid(id); 
         
-        typename database_mutex_type::scoped_lock l(mutex_);
-        
-        // Load the GVA table 
-        typename gva_table_type::map_type& gva_table = gvas_.get();
+        database_mutex_type::scoped_lock l(mutex_);
 
-        typename gva_table_type::map_type::iterator
-            it = gva_table.find(id),
-            end = gva_table.end();
+        gva_table_type::iterator it = gvas_.find(id)
+                               , end = gvas_.end();
 
         if (it != end)
         {
-            if (it->second.count != count)
+            if (HPX_UNLIKELY(it->second.count != count))
             {
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::unbind_gid" 
@@ -664,7 +682,7 @@ struct primary_namespace :
                 "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%)")
                 % gid % count % it->second);
 
-            gva_table.erase(it);
+            gvas_.erase(it);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -707,19 +725,16 @@ struct primary_namespace :
         naming::gid_type id = gid;
         naming::strip_credit_from_gid(id); 
         
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        typename refcnt_table_type::map_type& refcnt_table = refcnts_.get();
-
-        typename refcnt_table_type::map_type::iterator
-            it = refcnt_table.find(id),
-            end = refcnt_table.end();
+        refcnt_table_type::iterator it = refcnts_.find(id)
+                                  , end = refcnts_.end();
 
         // If this is the first increment request for this GID, we need to
         // register the GID in the reference counting table
         if (it == end)
         {
-            if (HPX_UNLIKELY(!util::insert_checked(refcnt_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
                     std::make_pair(id,
                         count_type(HPX_INITIAL_GLOBALCREDIT))), it)))
             {
@@ -771,16 +786,13 @@ struct primary_namespace :
               , "cannot decrement more than "
                 BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
                 " credits");
+            return response_type();
         } 
         
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
         
-        // Load the reference count table    
-        typename refcnt_table_type::map_type& refcnt_table = refcnts_.get();
-
-        typename refcnt_table_type::map_type::iterator
-            it = refcnt_table.find(id),
-            end = refcnt_table.end();
+        refcnt_table_type::iterator it = refcnts_.find(id)
+                                  , end = refcnts_.end();
 
         if (it != end)
         {
@@ -790,21 +802,18 @@ struct primary_namespace :
                   , "primary_namespace::decrement" 
                   , "bogus credit encountered while decrement global reference "
                     "count");
+                return response_type();
             }
 
             count_type cnt = (it->second -= credits);
             
             if (0 == cnt)
             {
-                refcnt_table.erase(it);
+                refcnts_.erase(it);
 
-                // Load the GVA table 
-                typename gva_table_type::map_type& gva_table = gvas_.get();
-
-                typename gva_table_type::map_type::iterator
-                    git = gva_table.lower_bound(id),
-                    gbegin = gva_table.begin(),
-                    gend = gva_table.end();
+                gva_table_type::iterator git = gvas_.lower_bound(id)
+                                       , gbegin = gvas_.begin()
+                                       , gend = gvas_.end();
 
                 if (git != gend)
                 {
@@ -856,7 +865,7 @@ struct primary_namespace :
                     }
                 }
                 
-                else if (HPX_LIKELY(!gva_table.empty()))
+                else if (HPX_LIKELY(!gvas_.empty()))
                 {
                     --git;
 
@@ -913,13 +922,9 @@ struct primary_namespace :
         // HPX_INITIAL_GLOBALCREDIT, then it needs to be destroyed. 
         else if (HPX_INITIAL_GLOBALCREDIT == credits)
         {
-            // Load the GVA table 
-            typename gva_table_type::map_type& gva_table = gvas_.get();
-
-            typename gva_table_type::map_type::iterator
-                git = gva_table.lower_bound(id),
-                gbegin = gva_table.begin(),
-                gend = gva_table.end();
+            gva_table_type::iterator git = gvas_.lower_bound(id)
+                                   , gbegin = gvas_.begin()
+                                   , gend = gvas_.end();
 
             if (git != gend)
             {
@@ -970,7 +975,7 @@ struct primary_namespace :
                 }
             }
             
-            else if (HPX_LIKELY(!gva_table.empty()))
+            else if (HPX_LIKELY(!gvas_.empty()))
             {
                 --git;
 
@@ -1010,7 +1015,7 @@ struct primary_namespace :
         // binding has already created a first reference + credits.
         else 
         {
-            if (HPX_UNLIKELY(!util::insert_checked(refcnt_table.insert(
+            if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
                     std::make_pair(id,
                         count_type(HPX_INITIAL_GLOBALCREDIT))), it)))
             {
@@ -1059,17 +1064,12 @@ struct primary_namespace :
     { // {{{ localities implementation
         using boost::fusion::at_c;
 
-        typename database_mutex_type::scoped_lock l(mutex_);
-
-        // Load the partition table 
-        typename partition_table_type::map_type const&
-            partition_table = partitions_.get();
+        database_mutex_type::scoped_lock l(mutex_);
 
         std::vector<boost::uint32_t> p;
 
-        typename partition_table_type::map_type::const_iterator
-            it = partition_table.begin(),
-            end = partition_table.end(); 
+        partition_table_type::const_iterator it = partitions_.begin()
+                                           , end = partitions_.end(); 
 
         for (; it != end; ++it)
             p.push_back(at_c<0>(it->second)); 
@@ -1097,73 +1097,73 @@ struct primary_namespace :
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_bind_locality,
         /* arguments */   endpoint_type const&, count_type,
-        &primary_namespace<Database, Protocol>::bind_locality
+        &primary_namespace::bind_locality
       , threads::thread_priority_critical
     > bind_locality_action; 
     
     typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_bind_gid,
         /* arguments */   naming::gid_type const&, gva_type const&,
-        &primary_namespace<Database, Protocol>::bind_gid
+        &primary_namespace::bind_gid
       , threads::thread_priority_critical
     > bind_gid_action;
     
     typedef hpx::actions::result_action1<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_page_fault,
         /* arguments */   naming::gid_type const&,
-        &primary_namespace<Database, Protocol>::page_fault
+        &primary_namespace::page_fault
       , threads::thread_priority_critical
     > page_fault_action;
 
     typedef hpx::actions::result_action1<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_unbind_locality,
         /* arguments */   endpoint_type const&,
-        &primary_namespace<Database, Protocol>::unbind_locality
+        &primary_namespace::unbind_locality
       , threads::thread_priority_critical
     > unbind_locality_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_unbind_gid,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::unbind_gid
+        &primary_namespace::unbind_gid
       , threads::thread_priority_critical
     > unbind_gid_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,  
         /* enum value */  namespace_increment,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::increment
+        &primary_namespace::increment
       , threads::thread_priority_critical
     > increment_action;
     
     typedef hpx::actions::result_action2<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_decrement,
         /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace<Database, Protocol>::decrement
+        &primary_namespace::decrement
       , threads::thread_priority_critical
     > decrement_action;
     
     typedef hpx::actions::result_action0<
-        primary_namespace<Database, Protocol>,
+        primary_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_localities,
-        &primary_namespace<Database, Protocol>::localities
+        &primary_namespace::localities
       , threads::thread_priority_critical
     > localities_action;
 };

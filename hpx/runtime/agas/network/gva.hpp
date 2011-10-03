@@ -13,10 +13,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/agas/traits.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -24,7 +25,6 @@
 namespace hpx { namespace agas
 {
 
-template <typename Protocol>
 struct gva 
 {
     typedef naming::locality endpoint_type;
@@ -73,7 +73,7 @@ struct gva
  
     gva& operator=(lva_type a)
     {
-        endpoint = endpoint();
+        endpoint = endpoint_type();
         type = components::component_invalid;
         count = 0;
         lva_ = a;
@@ -83,7 +83,7 @@ struct gva
     
     gva& operator=(void* a)
     {
-        endpoint = endpoint();
+        endpoint = endpoint_type();
         type = components::component_invalid;
         count = 0;
         lva_ = reinterpret_cast<lva_type>(a);
@@ -172,7 +172,7 @@ struct gva
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
     {
-        if (version > traits::serialization_version<Protocol>::value) {
+        if (version > HPX_AGAS_VERSION) {
             throw exception(version_too_new, 
                 "trying to load GVA with unknown version");
         }
@@ -182,13 +182,12 @@ struct gva
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
-template <typename Char, typename Traits, typename Protocol>
+template <typename Char, typename Traits>
 inline std::basic_ostream<Char, Traits>&
-operator<< (std::basic_ostream<Char, Traits>& os, gva<Protocol> const& addr)
+operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 {
     boost::io::ios_flags_saver ifs(os); 
-    os << "(" << traits::network::name<Protocol>() << " "
-       << addr.endpoint << " " 
+    os << "(" << addr.endpoint << " " 
        << components::get_component_type_name(addr.type) << " "
        << addr.count << " "
        << std::showbase << std::hex << addr.lva() << " "
@@ -197,6 +196,9 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva<Protocol> const& addr)
 } 
 
 }}
+
+BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION)
+BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
 
 #endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 

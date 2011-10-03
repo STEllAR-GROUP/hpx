@@ -16,27 +16,25 @@
 namespace hpx { namespace agas 
 {
 
-// TODO: add error code parameters
-template <typename Database, typename Protocol>
 struct component_namespace :
     components::client_base<
-        component_namespace<Database, Protocol>,
-        stubs::component_namespace<Database, Protocol>
+        component_namespace,
+        stubs::component_namespace
     >
 {
     // {{{ nested types 
     typedef components::client_base<
-        component_namespace<Database, Protocol>,
-        stubs::component_namespace<Database, Protocol>
+        component_namespace,
+        stubs::component_namespace
     > base_type; 
 
-    typedef server::component_namespace<Database, Protocol> server_type;
+    typedef server::component_namespace server_type;
     
-    typedef typename server_type::response_type response_type;
-    typedef typename server_type::component_name_type component_name_type;
-    typedef typename server_type::component_id_type component_id_type;
-    typedef typename server_type::prefix_type prefix_type;
-    typedef typename server_type::prefixes_type prefixes_type;
+    typedef server_type::response_type response_type;
+    typedef server_type::component_name_type component_name_type;
+    typedef server_type::component_id_type component_id_type;
+    typedef server_type::prefix_type prefix_type;
+    typedef server_type::prefixes_type prefixes_type;
     // }}}
 
     explicit component_namespace(naming::id_type const& id =

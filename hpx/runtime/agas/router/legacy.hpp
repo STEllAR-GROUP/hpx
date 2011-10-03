@@ -32,8 +32,6 @@
 #include <hpx/runtime/agas/namespace/component.hpp>
 #include <hpx/runtime/agas/namespace/primary.hpp>
 #include <hpx/runtime/agas/namespace/symbol.hpp>
-#include <hpx/runtime/agas/network/backend/tcpip.hpp>
-#include <hpx/runtime/agas/database/backend/stdmap.hpp>
 #include <hpx/runtime/agas/network/gva.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -41,7 +39,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-// TODO: pass error codes once they're implemented in AGAS.
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
 
@@ -51,35 +48,26 @@ namespace hpx { namespace agas
 struct HPX_EXPORT legacy_router : boost::noncopyable
 {
     // {{{ types 
-    typedef primary_namespace<tag::database::stdmap, tag::network::tcpip>
-        primary_namespace_type;
-
-    typedef component_namespace<tag::database::stdmap, tag::network::tcpip>
-        component_namespace_type;
-
-    typedef symbol_namespace<tag::database::stdmap, tag::network::tcpip>
-        symbol_namespace_type;
-
-    typedef primary_namespace_type::server_type
+    typedef primary_namespace::server_type
         primary_namespace_server_type; 
 
-    typedef component_namespace_type::server_type
+    typedef component_namespace::server_type
         component_namespace_server_type; 
 
-    typedef symbol_namespace_type::server_type
+    typedef symbol_namespace::server_type
         symbol_namespace_server_type; 
 
-    typedef component_namespace_type::component_id_type component_id_type;
+    typedef component_namespace::component_id_type component_id_type;
 
-    typedef response<tag::network::tcpip> response_type; 
+    typedef response response_type; 
 
-    typedef primary_namespace_type::gva_type gva_type;
-    typedef primary_namespace_type::count_type count_type;
-    typedef primary_namespace_type::offset_type offset_type;
-    typedef primary_namespace_type::endpoint_type endpoint_type;
-    typedef component_namespace_type::prefix_type prefix_type;
+    typedef primary_namespace::gva_type gva_type;
+    typedef primary_namespace::count_type count_type;
+    typedef primary_namespace::offset_type offset_type;
+    typedef primary_namespace::endpoint_type endpoint_type;
+    typedef component_namespace::prefix_type prefix_type;
 
-    typedef symbol_namespace_type::iterate_function_type
+    typedef symbol_namespace::iterate_function_type
         iterateids_function_type;
 
     typedef hpx::lcos::mutex cache_mutex_type;
@@ -208,9 +196,9 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
           : console_cache_(0)
         {}
 
-        primary_namespace_type primary_ns_;
-        component_namespace_type component_ns_;
-        symbol_namespace_type symbol_ns_;
+        primary_namespace primary_ns_;
+        component_namespace component_ns_;
+        symbol_namespace symbol_ns_;
 
         cache_mutex_type gva_cache_mtx_;
         gva_cache_type gva_cache_; // AKA, the TLB

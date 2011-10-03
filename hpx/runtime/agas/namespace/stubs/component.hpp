@@ -15,17 +15,16 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database, typename Protocol>
 struct component_namespace 
 {
     // {{{ nested types
-    typedef server::component_namespace<Database, Protocol> server_type; 
+    typedef server::component_namespace server_type; 
 
-    typedef typename server_type::response_type response_type;
-    typedef typename server_type::component_name_type component_name_type;
-    typedef typename server_type::component_id_type component_id_type;
-    typedef typename server_type::prefix_type prefix_type;
-    typedef typename server_type::prefixes_type prefixes_type;
+    typedef server_type::response_type response_type;
+    typedef server_type::component_name_type component_name_type;
+    typedef server_type::component_id_type component_id_type;
+    typedef server_type::prefix_type prefix_type;
+    typedef server_type::prefixes_type prefixes_type;
     // }}}
 
     // {{{ bind_prefix dispatch
@@ -33,7 +32,7 @@ struct component_namespace
     bind_prefix_async(naming::id_type const& gid, component_name_type const& key,
                       prefix_type prefix)
     {
-        typedef typename server_type::bind_prefix_action action_type;
+        typedef server_type::bind_prefix_action action_type;
         return lcos::eager_future<action_type, response_type>
             (gid, key, prefix);
     }
@@ -50,7 +49,7 @@ struct component_namespace
     static lcos::promise<response_type>
     bind_name_async(naming::id_type const& gid, component_name_type const& key)
     {
-        typedef typename server_type::bind_name_action action_type;
+        typedef server_type::bind_name_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -64,7 +63,7 @@ struct component_namespace
     static lcos::promise<response_type>
     resolve_id_async(naming::id_type const& gid, component_id_type key)
     {
-        typedef typename server_type::resolve_id_action action_type;
+        typedef server_type::resolve_id_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -79,7 +78,7 @@ struct component_namespace
     resolve_name_async(naming::id_type const& gid,
                        component_name_type const& key)
     {
-        typedef typename server_type::resolve_name_action action_type;
+        typedef server_type::resolve_name_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -94,7 +93,7 @@ struct component_namespace
     unbind_async(naming::id_type const& gid, component_name_type const& key,
                  error_code& ec = throws)
     {
-        typedef typename server_type::unbind_action action_type;
+        typedef server_type::unbind_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     

@@ -31,9 +31,6 @@ namespace hpx { namespace agas
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-template <
-    typename Protocol
->
 struct response
 {
   public:
@@ -59,21 +56,8 @@ struct response
 
     response(
         method_code type_
-      , gva<Protocol> const& gva_
-      , boost::uint32_t prefix_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(gva_, prefix_))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
       , naming::gid_type const& gidbase_
-      , gva<Protocol> const& gva_
+      , gva const& gva_
       , error status_ = success
         )
       : mc(type_)
@@ -85,7 +69,7 @@ struct response
 
     response(
         method_code type_
-      , gva<Protocol> const& gva_
+      , gva const& gva_
       , error status_ = success
         )
       : mc(type_)
@@ -215,11 +199,11 @@ struct response
         return *this;
     }
 
-    gva<Protocol> get_gva(
+    gva get_gva(
         error_code& ec = throws
         ) const
     { 
-        gva<Protocol> g;
+        gva g;
 
         // Don't let the first attempt throw.
         error_code first_try;
@@ -353,12 +337,12 @@ struct response
         // primary_ns_page_fault
       , boost::fusion::vector2<
             naming::gid_type // idbase
-          , gva<Protocol>    // gva
+          , gva              // gva
         >
         // 0x2
         // primary_ns_unbind_gid
       , boost::fusion::vector1<
-            gva<Protocol>   // gva
+            gva             // gva
         >
         // 0x3
         // primary_ns_decrement

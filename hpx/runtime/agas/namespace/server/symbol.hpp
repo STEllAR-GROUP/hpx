@@ -8,31 +8,30 @@
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
+#include <map>
+
 #include <boost/format.hpp>
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/insert_checked.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/actions/function.hpp>
-#include <hpx/runtime/agas/traits.hpp>
-#include <hpx/runtime/agas/database/table.hpp>
 #include <hpx/runtime/agas/namespace/response.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
 
-template <typename Database, typename Protocol>
 struct symbol_namespace :
   components::fixed_component_base<
     HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-    symbol_namespace<Database, Protocol>
+    symbol_namespace
   >
 {
     // {{{ nested types
-    typedef typename traits::database::mutex_type<Database>::type
-        database_mutex_type;
+    typedef util::spinlock database_mutex_type;
 
     typedef std::string symbol_type;
 
@@ -40,9 +39,9 @@ struct symbol_namespace :
         void(symbol_type const&, naming::gid_type const&)
     > iterate_function_type;
 
-    typedef response<Protocol> response_type;
+    typedef response response_type;
 
-    typedef table<Database, symbol_type, naming::gid_type>
+    typedef std::map<symbol_type, naming::gid_type>
         gid_table_type; 
     // }}} 
  
@@ -51,14 +50,10 @@ struct symbol_namespace :
     gid_table_type gids_;
   
   public:
-    symbol_namespace(
-        std::string const& name = "root_symbol_namespace"
-        )
+    symbol_namespace()
       : mutex_()
-      , gids_(std::string("hpx.agas.") + name + ".gid")
-    {
-        traits::initialize_mutex(mutex_);
-    }
+      , gids_()
+    {}
     
     response_type bind(
         symbol_type const& key
@@ -74,14 +69,10 @@ struct symbol_namespace :
       , error_code& ec
         )
     { // {{{ bind implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        // Always load the table once, as this operation might be slow for some
-        // database backends.
-        typename gid_table_type::map_type& gid_table = gids_.get();
-
-        typename gid_table_type::map_type::iterator
-            it = gid_table.find(key), end = gid_table.end();
+        gid_table_type::iterator it = gids_.find(key)
+                               , end = gids_.end();
 
         if (it != end)
         {
@@ -98,7 +89,7 @@ struct symbol_namespace :
             return response_type(symbol_ns_bind, old);
         }
 
-        if (HPX_UNLIKELY(!util::insert_checked(gid_table.insert(
+        if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
                 std::make_pair(key, gid)))))
         {
             HPX_THROWS_IF(ec, lock_error
@@ -130,12 +121,10 @@ struct symbol_namespace :
       , error_code& ec
         )
     { // {{{ resolve implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
 
-        typename gid_table_type::map_type& gid_table = gids_.get();
-
-        typename gid_table_type::map_type::iterator
-            it = gid_table.find(key), end = gid_table.end();
+        gid_table_type::iterator it = gids_.find(key)
+                               , end = gids_.end();
 
         if (it == end)
         {
@@ -173,12 +162,10 @@ struct symbol_namespace :
       , error_code& ec
         )
     { // {{{ unbind implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
         
-        typename gid_table_type::map_type& gid_table = gids_.get();
-
-        typename gid_table_type::map_type::iterator
-            it = gid_table.find(key), end = gid_table.end();
+        gid_table_type::iterator it = gids_.find(key)
+                               , end = gids_.end();
 
         if (it == end)
         {
@@ -192,7 +179,7 @@ struct symbol_namespace :
             return response_type(symbol_ns_unbind, no_success);
         }
 
-        gid_table.erase(it);
+        gids_.erase(it);
 
         LAGAS_(info) << (boost::format(
             "symbol_namespace::unbind, key(%1%)")
@@ -216,12 +203,10 @@ struct symbol_namespace :
       , error_code& ec
         )
     { // {{{ iterate implementation
-        typename database_mutex_type::scoped_lock l(mutex_);
+        database_mutex_type::scoped_lock l(mutex_);
         
-        typename gid_table_type::map_type& gid_table = gids_.get();
-
-        for (typename gid_table_type::map_type::iterator it = gid_table.begin(),
-                                                         end = gid_table.end();
+        for (gid_table_type::iterator it = gids_.begin()
+                                    , end = gids_.end();
              it != end; ++it)
         {
             f(it->first, it->second);
@@ -244,38 +229,38 @@ struct symbol_namespace :
     }; // }}}
     
     typedef hpx::actions::result_action2<
-        symbol_namespace<Database, Protocol>,
+        symbol_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_bind,
         /* arguments */   symbol_type const&, naming::gid_type const&,
-        &symbol_namespace<Database, Protocol>::bind
+        &symbol_namespace::bind
       , threads::thread_priority_critical
     > bind_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace<Database, Protocol>,
+        symbol_namespace,
         /* return type */ response_type,
         /* enum value */  namespace_resolve,
         /* arguments */   symbol_type const&,
-        &symbol_namespace<Database, Protocol>::resolve
+        &symbol_namespace::resolve
       , threads::thread_priority_critical
     > resolve_action;
     
     typedef hpx::actions::result_action1<
-        symbol_namespace<Database, Protocol>,
+        symbol_namespace,
         /* retrun type */ response_type,
         /* enum value */  namespace_unbind,
         /* arguments */   symbol_type const&,
-        &symbol_namespace<Database, Protocol>::unbind
+        &symbol_namespace::unbind
       , threads::thread_priority_critical
     > unbind_action;
 
     typedef hpx::actions::result_action1<
-        symbol_namespace<Database, Protocol>,
+        symbol_namespace,
         /* retrun type */ response_type,
         /* enum value */  namespace_iterate,
         /* arguments */   iterate_function_type const&,
-        &symbol_namespace<Database, Protocol>::iterate
+        &symbol_namespace::iterate
       , threads::thread_priority_critical
     > iterate_action;
 };

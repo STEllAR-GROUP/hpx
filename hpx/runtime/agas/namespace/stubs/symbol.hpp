@@ -15,15 +15,14 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-template <typename Database, typename Protocol>
 struct symbol_namespace 
 {
     // {{{ nested types
-    typedef server::symbol_namespace<Database, Protocol> server_type; 
+    typedef server::symbol_namespace server_type; 
 
-    typedef typename server_type::response_type response_type;
-    typedef typename server_type::iterate_function_type iterate_function_type;
-    typedef typename server_type::symbol_type symbol_type;
+    typedef server_type::response_type response_type;
+    typedef server_type::iterate_function_type iterate_function_type;
+    typedef server_type::symbol_type symbol_type;
     // }}}
 
     // {{{ bind dispatch
@@ -31,7 +30,7 @@ struct symbol_namespace
     bind_async(naming::id_type const& gid, symbol_type const& key,
                naming::gid_type const& value)
     {
-        typedef typename server_type::bind_action action_type;
+        typedef server_type::bind_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key, value);
     }
 
@@ -45,7 +44,7 @@ struct symbol_namespace
     static lcos::promise<response_type>
     resolve_async(naming::id_type const& gid, symbol_type const& key)
     {
-        typedef typename server_type::resolve_action action_type;
+        typedef server_type::resolve_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -59,7 +58,7 @@ struct symbol_namespace
     static lcos::promise<response_type>
     unbind_async(naming::id_type const& gid, symbol_type const& key)
     {
-        typedef typename server_type::unbind_action action_type;
+        typedef server_type::unbind_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, key);
     }
     
@@ -73,7 +72,7 @@ struct symbol_namespace
     static lcos::promise<response_type>
     iterate_async(naming::id_type const& gid, iterate_function_type const& f)
     {
-        typedef typename server_type::iterate_action action_type;
+        typedef server_type::iterate_action action_type;
         return lcos::eager_future<action_type, response_type>(gid, f);
     }
     
