@@ -6,12 +6,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/eager_future.hpp>
-#include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <vector>
@@ -41,7 +38,7 @@ using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action1;
 
 using hpx::lcos::promise;
-using hpx::lcos::eager_future;
+using hpx::lcos::async;
 using hpx::lcos::wait;
 
 using hpx::threads::threadmanager_base;
@@ -50,19 +47,32 @@ using hpx::cout;
 using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
+// The purpose of this example is to execute a PX-thread printing "Hello world"
+// once on each OS-thread on each of the connected localities. 
+// 
+// The function hello_world_foreman_action is executed once on each locality.
+// It schedules a PX-thread (encapsulating hello_world_worker) once for each 
+// OS-thread on that locality. The code make sure that the PX-thread gets 
+// really executed by the requested OS-thread. While the PX-thread is scheduled
+// to run on a particular OS-thread, we may have to retry as the PX-thread may 
+// end up being 'stolen' by another OS-thread.
+
+///////////////////////////////////////////////////////////////////////////////
 std::size_t hello_world_worker(std::size_t desired)
 {
     std::size_t current = threadmanager_base::get_thread_num();
 
     if (current == desired)
     {
-        cout << ( format("hello world from shepherd %1% on locality %2%\n")
+        // Yes! The PX-thread is run by the designated OS-thread.
+        cout << ( format("hello world from OS-thread %1% on locality %2%\n")
                   % desired 
                   % get_prefix_id())
             << flush;
         return desired;
     }
 
+    // this PX-thread is run by the wrong OS-thread, make the foreman retry
     return std::size_t(-1);
 }
 
@@ -73,24 +83,25 @@ typedef plain_result_action1<std::size_t, std::size_t, hello_world_worker>
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
 
-typedef eager_future<hello_world_worker_action> hello_world_worker_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 void hello_world_foreman()
 {
-    std::size_t const shepherds = get_num_os_threads();
+    std::size_t const os_threads = get_num_os_threads();
     id_type const prefix = find_here();
 
     std::set<std::size_t> attendance;
-    for (std::size_t shepherd = 0; shepherd < shepherds; ++shepherd)
-        attendance.insert(shepherd);
+    for (std::size_t os_thread = 0; os_thread < os_threads; ++os_thread)
+        attendance.insert(os_thread);
 
+    // Retry until all PX-threads got executed by their designated OS-thread.
     while (!attendance.empty())
     {
         std::vector<promise<std::size_t> > futures;
-        BOOST_FOREACH(std::size_t shepherd, attendance)
+        BOOST_FOREACH(std::size_t os_thread, attendance)
         {
-            futures.push_back(hello_world_worker_future(prefix, shepherd)); 
+            // Schedule a PX-thread encapsulating the print action on a 
+            // particular OS-thread.
+            futures.push_back(async<hello_world_worker_action>(prefix, os_thread)); 
         }
 
         // wait for all of the futures to return their values, we re-spawn the
@@ -105,8 +116,6 @@ typedef plain_action0<hello_world_foreman> hello_world_foreman_action;
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_foreman_action);
 
-typedef eager_future<hello_world_foreman_action> hello_world_foreman_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
@@ -116,7 +125,7 @@ int hpx_main(variables_map&)
         std::vector<promise<void> > futures;
         BOOST_FOREACH(id_type const& node, prefixes)
         { 
-            futures.push_back(hello_world_foreman_future(node)); 
+            futures.push_back(async<hello_world_foreman_action>(node)); 
         }
 
         wait(futures);    // Wait for all IO to finish
