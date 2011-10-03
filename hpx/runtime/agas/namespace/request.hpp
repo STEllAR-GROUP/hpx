@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
-#define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+#if !defined(HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685)
+#define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
 #include <boost/move/move.hpp>
 #include <boost/assert.hpp>
@@ -23,177 +23,163 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
-// The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 9
+// The number of types that request's variant can represent.
+#define HPX_AGAS_REQUEST_SUBTYPES 9
 
 namespace hpx { namespace agas
 {
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-struct response
+struct request
 {
   public:
-    response()
+    request()
         : mc(invalid_request) 
-        , status(invalid_status)
         , data(boost::fusion::make_vector())
     {}
 
-    response(
+    // REVIEW: Should the GVA here be a resolved address?
+    request(
         method_code type_
-      , naming::gid_type lower_
-      , naming::gid_type upper_
-      , boost::uint32_t prefix_
-      , error status_ = success
+      , naming::gid_type const& gid_
+      , gva const& gva_ 
         )
       : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(lower_, upper_, prefix_))
+      , data(boost::fusion::make_vector(gid_, gva_))
     {
         // TODO: verification of method_code
     }
 
-    response(
+    request(
         method_code type_
-      , naming::gid_type const& gidbase_
-      , gva const& gva_
-      , error status_ = success
+      , naming::gid_type const& gid_
+      , boost::uint64_t count_  
         )
       : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(gidbase_, gva_))
+      , data(boost::fusion::make_vector(gid_, count_))
     {
         // TODO: verification of method_code
     }
 
-    response(
+    request(
         method_code type_
-      , gva const& gva_
-      , error status_ = success
+      , naming::gid_type const& gid_
         )
       : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(gva_))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , boost::uint64_t count_
-      , boost::int32_t ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, ctype_))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , boost::uint64_t count_
-      , components::component_type ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, boost::int32_t(ctype_)))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , boost::uint64_t count_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_))
-    {
-        // TODO: verification of method_code
-    }
-    
-    response(
-        method_code type_
-      , components::component_type ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , boost::int32_t ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(ctype_))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , std::vector<boost::uint32_t> const& prefixes_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(prefixes_))
-    {
-        // TODO: verification of method_code
-    }
-
-    response(
-        method_code type_
-      , naming::gid_type gid_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
       , data(boost::fusion::make_vector(gid_))
     {
         // TODO: verification of method_code
     }
 
-    response(
+    request(
         method_code type_
-      , error status_ = success
+      , naming::locality const& locality_
+      , boost::uint64_t count_  
         )
       : mc(type_)
-      , status(status_)
+      , data(boost::fusion::make_vector(locality_, count_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , naming::locality const& locality_
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(locality_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , components::component_type ctype_ 
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , boost::int32_t ctype_ 
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(ctype_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , std::string const& name_
+      , boost::uint32_t prefix_ 
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(name_, prefix_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , std::string const& name_
+      , naming::gid_type const& gid_ 
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(name_, gid_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , std::string const& name_
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(name_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+      , symbol_namespace::iterate_function_type const& f_ 
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(f_))
+    {
+        // TODO: verification of method_code
+    }
+
+    request(
+        method_code type_
+        )
+      : mc(type_)
       , data(boost::fusion::make_vector())
     {
         // TODO: verification of method_code
     }
 
     // copy constructor
-    response(
-        response const& other
+    request(
+        request const& other
         )
       : mc(other.mc)
-      , status(other.status)
       , data(other.data)
     {}   
 
     // copy assignment
-    response& operator=(
-        response const& other
+    request& operator=(
+        request const& other
         )
     {
         if (this != &other)
         {
             mc = other.mc;
-            status = other.status;
             data = other.data;
         } 
         return *this;
@@ -203,19 +189,7 @@ struct response
         error_code& ec = throws
         ) const
     { 
-        gva g;
-
-        // Don't let the first attempt throw.
-        error_code first_try;
-        g = get_data<subtype_gid_gva, 1>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            g = get_data<subtype_gva, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return g; 
+        return get_data<subtype_gid_gva, 1>(ec); 
     } 
 
     boost::uint64_t get_count(
@@ -226,165 +200,220 @@ struct response
 
         // Don't let the first attempt throw.
         error_code first_try;
-        count = get_data<subtype_count, 0>(first_try);
+        count = get_data<subtype_gid_count, 1>(first_try);
 
         // If the first try failed, check again.
         if (first_try)
-            count = get_data<subtype_count_ctype, 0>(ec);
+            count = get_data<subtype_locality_count, 1>(ec);
         else if (&ec != &throws)
             ec = make_success_code();
 
         return count; 
     } // }}} 
 
-    std::vector<boost::uint32_t> get_localities(
-        error_code& ec = throws
-        ) const
-    { 
-        return get_data<subtype_prefixes, 0>(ec); 
-    } 
-
     boost::int32_t get_component_type(
         error_code& ec = throws
         ) const
-    { // {{{
-        boost::int32_t ctype = 0;
-
-        // Don't let the first attempt throw.
-        error_code first_try;
-        ctype = get_data<subtype_ctype, 0>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            ctype = get_data<subtype_count_ctype, 1>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return ctype; 
-    } // }}} 
+    { 
+        return get_data<subtype_ctype, 0>(ec); 
+    } 
 
     boost::uint32_t get_prefix(
         error_code& ec = throws
         ) const
     { 
-        return get_data<subtype_gid_gid_prefix, 2>(ec); 
+        return get_data<subtype_name_prefix, 1>(ec); 
     } 
-    
-    naming::gid_type get_base_gid(
+
+    symbol_namespace::iterate_function_type get_iterate_function(
         error_code& ec = throws
         ) const
     { 
-        return get_data<subtype_gid_gva, 0>(ec); 
+        return get_data<subtype_iterate_function, 0>(ec); 
     } 
 
+    naming::locality get_locality(
+        error_code& ec = throws
+        ) const
+    { // {{{
+        naming::locality l;
+
+        // Don't let the first attempt throw.
+        error_code first_try;
+        l = get_data<subtype_locality_count, 0>(first_try);
+
+        // If the first try failed, check again.
+        if (first_try)
+            l = get_data<subtype_locality, 0>(ec);
+        else if (&ec != &throws)
+            ec = make_success_code();
+
+        return l; 
+    } // }}} 
+    
     naming::gid_type get_gid(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_gid, 0>(ec); 
-    } 
+    { // {{{ 
+        naming::gid_type gid = naming::invalid_gid;
 
-    naming::gid_type get_lower_bound(
+        // Don't let any attempt except the last throw.
+        error_code try_;
+        gid = get_data<subtype_gid, 0>(try_);
+
+        // If the first try failed, check again.
+        if (try_)
+            gid = get_data<subtype_gid_gva, 0>(try_);
+
+        else if (&ec != &throws)
+        {
+            ec = make_success_code();
+            return gid;
+        }
+
+        // If the second try failed, check again.
+        if (try_)
+            gid = get_data<subtype_gid_count, 0>(try_);
+
+        else if (&ec != &throws)
+        {
+            ec = make_success_code();
+            return gid;
+        }
+ 
+        // If the third try failed, check again.
+        if (try_)
+            gid = get_data<subtype_name_gid, 1>(ec);
+
+        else if (&ec != &throws)
+            ec = make_success_code();
+
+        return gid;
+    } // }}} 
+
+    std::string get_name(
         error_code& ec = throws
         ) const
-    {
-        return get_data<subtype_gid_gid_prefix, 0>(ec); 
-    }
+    { // {{{ 
+        std::string name = "";
 
-    naming::gid_type get_upper_bound(
-        error_code& ec = throws
-        ) const
-    {
-        return get_data<subtype_gid_gid_prefix, 1>(ec); 
-    }
+        // Don't let any attempt except the last throw.
+        error_code try_;
+        name = get_data<subtype_name, 0>(try_);
+
+        // If the first try failed, check again.
+        if (try_)
+            name = get_data<subtype_name_prefix, 0>(try_);
+
+        else if (&ec != &throws)
+        {
+            ec = make_success_code();
+            return name;
+        }
+
+        // If the second try failed, check again.
+        if (try_)
+            name = get_data<subtype_name_gid, 0>(ec);
+
+        else if (&ec != &throws)
+            ec = make_success_code();
+
+        return name;
+    } // }}} 
 
     method_code get_method() const
     {
         return mc;
     }
-
-    error get_status() const
-    {
-        return status;
-    } 
  
   private:
     friend class boost::serialization::access;
 
     enum subtype
     {
-        subtype_gid_gid_prefix  = 0x0
-      , subtype_gid_gva         = 0x1
-      , subtype_gva             = 0x2
-      , subtype_count_ctype     = 0x3
-      , subtype_count           = 0x4
-      , subtype_ctype           = 0x5
-      , subtype_prefixes        = 0x6
-      , subtype_gid             = 0x7
-      , subtype_void            = 0x8
+        subtype_gid_gva             = 0x0
+      , subtype_gid_count           = 0x1
+      , subtype_gid                 = 0x2
+      , subtype_locality_count      = 0x3
+      , subtype_locality            = 0x4
+      , subtype_ctype               = 0x5
+      , subtype_name_prefix         = 0x6
+      , subtype_name_gid            = 0x7
+      , subtype_name                = 0x8
+      , subtype_iterate_function    = 0x9
+      , subtype_void                = 0xa
     }; 
 
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
         // 0x0
-        // primary_ns_bind_locality
-        boost::fusion::vector3<
-            naming::gid_type // lower bound
-          , naming::gid_type // upper bound 
-          , boost::uint32_t  // prefix 
+        // primary_ns_bind_gid
+      , boost::fusion::vector2<
+            naming::gid_type                        // gid
+          , gva                                     // resolved address
         >
         // 0x1
-        // primary_ns_page_fault
-      , boost::fusion::vector2<
-            naming::gid_type // idbase
-          , gva              // gva
-        >
-        // 0x2
         // primary_ns_unbind_gid
-      , boost::fusion::vector1<
-            gva             // gva
-        >
-        // 0x3
+        // primary_ns_increment
         // primary_ns_decrement
       , boost::fusion::vector2<
-            boost::uint64_t // count
-          , boost::int32_t  // ctype
-        > 
-        // 0x4
-        // primary_ns_increment
+            naming::gid_type                        // gid
+          , boost::uint64_t                         // count
+        >
+        // 0x2
+        // primary_ns_page_fault
       , boost::fusion::vector1<
-            boost::uint64_t // count
+            naming::gid_type                        // gid
+        >
+        // 0x3
+        // primary_ns_bind_locality
+      , boost::fusion::vector2<
+            naming::locality                        // locality
+          , boost::uint64_t                         // count
+        >
+        // 0x4
+        // primary_ns_unbind_locality
+      , boost::fusion::vector1<
+            naming::locality                        // locality
         >
         // 0x5
-        // component_ns_bind_prefix
-        // component_ns_bind_name
-        // component_ns_resolve_name
-      , boost::fusion::vector1<
-            boost::int32_t // ctype
-        > 
-        // 0x6
-        // primary_ns_localities
         // component_ns_resolve_id
       , boost::fusion::vector1<
-            std::vector<boost::uint32_t> // prefixes
+          , boost::int32_t                          // ctype 
         >
-        // 0x7 
-        // symbol_ns_resolve
-      , boost::fusion::vector1<
-            naming::gid_type // gid
+        // 0x6
+        // component_ns_bind_prefix
+      , boost::fusion::vector2<
+            std::string                             // name 
+          , boost::uint32_t                         // prefix 
+        >
+        // 0x7
+        // symbol_ns_bind
+      , boost::fusion::vector2<
+            std::string                             // name 
+          , naming::gid_type                        // gid 
         >
         // 0x8
-        // primary_ns_unbind_locality
-        // primary_ns_bind_gid
+        // component_ns_resolve_name
+        // component_ns_bind_name
         // component_ns_unbind
-        // symbol_ns_bind
+        // symbol_ns_resolve
         // symbol_ns_unbind
+      , boost::fusion::vector1<
+            std::string                             // name 
+        >
+        // 0x9
         // symbol_ns_iterate
+      , boost::fusion::vector1<
+            symbol_namespace::iterate_function_type // f
+        >
+        // 0xa
+        // primary_ns_localities
       , boost::fusion::vector0<
         >
     > data_type;
 
-    // {{{ variant helper TODO: consolidate with helpers in request
+    // {{{ variant helper TODO: consolidate with helpers in response
     template <
         subtype Type
       , int N
@@ -415,7 +444,7 @@ struct response
                 if (!v)
                 {
                     HPX_THROWS_IF(ec, invalid_data
-                      , "response::get_data"
+                      , "request::get_data"
                       , "internal data corruption"); 
                     return return_type(); 
                 }
@@ -428,7 +457,7 @@ struct response
 
             default: {
                 HPX_THROWS_IF(ec, bad_parameter, 
-                    "response::get_data",
+                    "request::get_data",
                     "invalid operation for request type");
                 return return_type();
             }
@@ -476,7 +505,6 @@ struct response
 
         ar & which; 
         ar & mc;
-        ar & status;
         boost::apply_visitor(save_visitor<Archive>(ar), data);  
     } // }}}
 
@@ -505,16 +533,15 @@ struct response
 
         ar & which;
         ar & mc;
-        ar & status;
 
         // Build the jump table.
         switch (which)
         {
-            BOOST_PP_REPEAT(HPX_AGAS_RESPONSE_SUBTYPES, HPX_LOAD_SEQUENCE, _)
+            BOOST_PP_REPEAT(HPX_AGAS_REQUEST_SUBTYPES, HPX_LOAD_SEQUENCE, _)
 
             default: {
                 HPX_THROW_EXCEPTION(invalid_data, 
-                    "response::load",
+                    "request::load",
                     "unknown or invalid data loaded");
                 return;
             }
@@ -526,11 +553,10 @@ struct response
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     method_code mc;
-    error status;
     data_type data;
 };
 
 }}
 
-#endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
+#endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
