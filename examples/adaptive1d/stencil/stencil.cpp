@@ -201,7 +201,7 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         bool prolongation;
-        if ( allowedl == 0 ) {
+        if ( par->allowedl == 0 ) {
           prolongation = false;
         } else if ( (row+3)%3 != 0 ) {
           prolongation = false;
