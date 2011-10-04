@@ -101,7 +101,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // SIMPLE PROBLEM
         // create some boxes to smash together
         const std::size_t num_bodies = 2;
-        const std::size_t numpoints = 5;
+        const std::size_t numpoints = 20;
         double bbox[num_bodies][4];
         double velx[num_bodies];
         double vely[num_bodies];
