@@ -81,7 +81,8 @@ int hpx_main(boost::program_options::variables_map &vm)
     {
        high_resolution_timer t;
 
-        std::size_t array_size = 8;
+        // create some boxes to smash together
+        const std::size_t num_bodies = 4;
 
         namespace bg = boost::geometry;
 
@@ -94,14 +95,13 @@ int hpx_main(boost::program_options::variables_map &vm)
                 hpx::geometry::point::server_component_type>();
 
         hpx::components::distributing_factory::result_type blocks =
-            factory.create_components(block_type, array_size);
+            factory.create_components(block_type, num_bodies);
 
         std::vector<hpx::geometry::point> accu;
 
         // SIMPLE PROBLEM
         // create some boxes to smash together
-        const std::size_t num_bodies = 2;
-        const std::size_t numpoints = 20;
+        const std::size_t numpoints = 2;
         double bbox[num_bodies][4];
         double velx[num_bodies];
         double vely[num_bodies];
@@ -126,6 +126,15 @@ int hpx_main(boost::program_options::variables_map &vm)
         velx[1] = -1.0;
         vely[1] =  0.0;
 
+        for (i=2;i<num_bodies;i++) {
+          bbox[i][0] =  bbox[i-1][0]+2;
+          bbox[i][1] =  bbox[i-1][1];
+          bbox[i][2] =  bbox[i-1][2];
+          bbox[i][3] =  bbox[i-1][3];
+          velx[i] = -1.0;
+          vely[i] =  0.0;
+        }
+
         init(locality_results(blocks), accu);
 
 
@@ -145,6 +154,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         for (i=0;i<num_bodies;i++) {
           master_objects.push_back(accu[i].get_gid());
         }
+
 
         hpx::lcos::wait(initial_phase);
         while (time < stop_time) {
@@ -171,6 +181,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(search_phase,search_vector);
             }
+#if 0
 
             // Contact enforcement ----------------------------------
             BOOST_ASSERT(search_vector.size() == num_bodies);
@@ -207,7 +218,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(recompute_phase);
             }
-
+#endif
+          break;
         } // time loop
 
       std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

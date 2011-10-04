@@ -52,7 +52,6 @@ namespace hpx { namespace geometry { namespace server
 
         bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
         {
-
           //std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
  
           // This contains the R1/R2 sums needed to compute alpha2
