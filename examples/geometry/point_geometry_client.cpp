@@ -11,6 +11,8 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+using hpx::util::high_resolution_timer;
+
 namespace hpx { namespace geometry
 {
     typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d; 
@@ -77,6 +79,7 @@ bool intersection(double xmin,double xmax,
 int hpx_main(boost::program_options::variables_map &vm)
 {
     {
+       high_resolution_timer t;
 
         std::size_t array_size = 8;
 
@@ -207,6 +210,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         } // time loop
 
+      std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // ensure things are go out of scope 
 
     hpx::finalize();
