@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,32 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
-namespace hpx { namespace agas { namespace server
+namespace hpx { namespace agas
 {
+
+naming::gid_type bootstrap_symbol_namespace_gid()
+{
+    return naming::gid_type
+        (HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB);
+}
+
+naming::id_type bootstrap_symbol_namespace_id()
+{
+    return naming::id_type
+        (bootstrap_symbol_namespace_gid(), naming::id_type::unmanaged);
+}
+
+namespace server
+{
+
+response symbol_namespace::service(
+    request const& req
+  , error_code& ec
+    )
+{
+    // IMPLEMENT
+    return response();
+}
 
 response symbol_namespace::bind(
     std::string const& key
@@ -126,7 +150,7 @@ response symbol_namespace::unbind(
 } // }}} 
 
 response symbol_namespace::iterate(
-    iterate_function_type const& f
+    iterate_symbols_function_type const& f
   , error_code& ec
     )
 { // {{{ iterate implementation

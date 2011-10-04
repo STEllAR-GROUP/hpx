@@ -30,12 +30,11 @@ struct primary_namespace :
     typedef server_type::prefix_type prefix_type;
     // }}}
 
-    // TODO: Make this a constant global.
-    explicit primary_namespace(
-        naming::id_type const& id =
-            naming::id_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB,
-                naming::id_type::unmanaged)
-        )
+    primary_namespace()
+      : base_type(bootstrap_primary_namespace_id())
+    {}
+
+    explicit primary_namespace(naming::id_type const& id)
       : base_type(id)
     {}
 

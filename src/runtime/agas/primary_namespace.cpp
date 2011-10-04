@@ -27,6 +27,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace);
 
 HPX_REGISTER_ACTION_EX(
+    primary_namespace::service_action,
+    primary_namespace_service_action);
+HPX_REGISTER_ACTION_EX(
     primary_namespace::bind_locality_action,
     primary_namespace_bind_locality_action);
 HPX_REGISTER_ACTION_EX(

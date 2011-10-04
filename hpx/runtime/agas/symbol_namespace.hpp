@@ -24,13 +24,17 @@ struct symbol_namespace :
 
     typedef server::symbol_namespace server_type;
 
-    typedef server_type::iterate_function_type iterate_function_type;
+    typedef server_type::iterate_symbols_function_type
+        iterate_symbols_function_type;
     // }}}
 
-    explicit symbol_namespace(naming::id_type const& id =
-      naming::id_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB,
-                      naming::id_type::unmanaged))
-      : base_type(id) {}
+    symbol_namespace()
+      : base_type(bootstrap_symbol_namespace_id())
+    {}
+
+    explicit symbol_namespace(naming::id_type const& id)
+      : base_type(id)
+    {}
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
@@ -61,11 +65,11 @@ struct symbol_namespace :
     ///////////////////////////////////////////////////////////////////////////
     // iterate interface 
     lcos::promise<response>
-    iterate_async(iterate_function_type const& f)
+    iterate_async(iterate_symbols_function_type const& f)
     { return this->base_type::iterate_async(this->gid_, f); }
     
-    response iterate(iterate_function_type const& f,
-                          error_code& ec = throws)
+    response iterate(iterate_symbols_function_type const& f,
+                     error_code& ec = throws)
     { return this->base_type::iterate(this->gid_, f, ec); }
 };            
 

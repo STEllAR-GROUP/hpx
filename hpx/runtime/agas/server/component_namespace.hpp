@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,14 +17,21 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/spinlock.hpp>
 
-namespace hpx { namespace agas { namespace server
+namespace hpx { namespace agas
+{
+
+HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid(); 
+HPX_EXPORT naming::id_type bootstrap_component_namespace_id(); 
+
+namespace server
 {
 
 struct component_namespace :
@@ -59,6 +66,18 @@ struct component_namespace :
       , factories_()
       , type_counter(components::component_first_dynamic)
     {}
+
+    response service(
+        request const& req
+        )
+    {
+        return service(req, throws);
+    }
+
+    response service(
+        request const& req
+      , error_code& ec
+        );
 
     response bind_prefix(
         std::string const& key
@@ -160,8 +179,18 @@ struct component_namespace :
         namespace_bind_name    = BOOST_BINARY_U(0100001),
         namespace_resolve_id   = BOOST_BINARY_U(0100010),
         namespace_resolve_name = BOOST_BINARY_U(0100011),
-        namespace_unbind       = BOOST_BINARY_U(0100100)
+        namespace_unbind       = BOOST_BINARY_U(0100100),
+        namespace_service      = BOOST_BINARY_U(0100101)
     }; // }}}
+
+    typedef hpx::actions::result_action1<
+        component_namespace,
+        /* return type */ response,
+        /* enum value */  namespace_service,
+        /* arguments */   request const&,
+        &component_namespace::service
+      , threads::thread_priority_critical
+    > service_action;
     
     typedef hpx::actions::result_action2<
         component_namespace,

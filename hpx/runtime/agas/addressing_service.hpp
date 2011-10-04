@@ -65,7 +65,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef primary_namespace::endpoint_type endpoint_type;
     typedef component_namespace::prefix_type prefix_type;
 
-    typedef symbol_namespace::iterate_function_type
+    typedef symbol_namespace::iterate_symbols_function_type
         iterateids_function_type;
 
     typedef hpx::lcos::mutex cache_mutex_type;

@@ -27,6 +27,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     symbol_namespace, component_agas_symbol_namespace);
 
 HPX_REGISTER_ACTION_EX(
+    symbol_namespace::service_action,
+    symbol_namespace_service_action);
+HPX_REGISTER_ACTION_EX(
     symbol_namespace::bind_action,
     symbol_namespace_bind_action);
 HPX_REGISTER_ACTION_EX(

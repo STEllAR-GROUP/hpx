@@ -8,8 +8,31 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 
-namespace hpx { namespace agas { namespace server
+namespace hpx { namespace agas
 {
+
+naming::gid_type bootstrap_primary_namespace_gid()
+{
+    return naming::gid_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
+}
+
+naming::id_type bootstrap_primary_namespace_id()
+{
+    return naming::id_type( bootstrap_primary_namespace_gid()
+                          , naming::id_type::unmanaged);
+}
+
+namespace server
+{
+
+response primary_namespace::service(
+    request const& req
+  , error_code& ec
+    )
+{
+    // IMPLEMENT
+    return response();
+}
 
 response primary_namespace::bind_locality(
     endpoint_type const& ep

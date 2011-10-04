@@ -20,7 +20,8 @@ struct symbol_namespace
     // {{{ nested types
     typedef server::symbol_namespace server_type; 
 
-    typedef server_type::iterate_function_type iterate_function_type;
+    typedef server_type::iterate_symbols_function_type
+        iterate_symbols_function_type;
     // }}}
 
     // {{{ bind dispatch
@@ -68,14 +69,15 @@ struct symbol_namespace
 
     // {{{ iterate dispatch 
     static lcos::promise<response>
-    iterate_async(naming::id_type const& gid, iterate_function_type const& f)
+    iterate_async(naming::id_type const& gid,
+                  iterate_symbols_function_type const& f)
     {
         typedef server_type::iterate_action action_type;
         return lcos::eager_future<action_type, response>(gid, f);
     }
     
     static response
-    iterate(naming::id_type const& gid, iterate_function_type const& f,
+    iterate(naming::id_type const& gid, iterate_symbols_function_type const& f,
             error_code& ec = throws)
     { return iterate_async(gid, f).get(ec); } 
     // }}}

@@ -15,18 +15,25 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/utility/binary.hpp>
 
-#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
-#include <hpx/runtime/agas/response.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/spinlock.hpp>
 
-namespace hpx { namespace agas { namespace server
+namespace hpx { namespace agas
+{
+
+HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid(); 
+HPX_EXPORT naming::id_type bootstrap_primary_namespace_id(); 
+
+namespace server
 {
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
@@ -80,10 +87,10 @@ namespace hpx { namespace agas { namespace server
 ///         locality.
 ///
 struct primary_namespace : 
-  components::fixed_component_base<
-    HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
-    primary_namespace
-  >
+    components::fixed_component_base<
+        HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
+        primary_namespace
+    >
 {
     // {{{ nested types
     typedef util::spinlock database_mutex_type;
@@ -124,6 +131,18 @@ struct primary_namespace :
       , refcnts_()
       , prefix_counter_(0)
     {}
+
+    response service(
+        request const& req
+        )
+    {
+        return service(req, throws);
+    }
+
+    response service(
+        request const& req
+      , error_code& ec
+        );
 
     response bind_locality(
         endpoint_type const& ep
@@ -232,14 +251,24 @@ struct primary_namespace :
     { // {{{ action enum
         namespace_bind_locality    = BOOST_BINARY_U(1000000),
         namespace_bind_gid         = BOOST_BINARY_U(1000001),
-        namespace_page_fault      = BOOST_BINARY_U(1000010),
+        namespace_page_fault       = BOOST_BINARY_U(1000010),
         namespace_unbind_locality  = BOOST_BINARY_U(1000011),
         namespace_unbind_gid       = BOOST_BINARY_U(1000100),
         namespace_increment        = BOOST_BINARY_U(1000101),
         namespace_decrement        = BOOST_BINARY_U(1000110),
         namespace_localities       = BOOST_BINARY_U(1000111),
+        namespace_service          = BOOST_BINARY_U(1001000)
     }; // }}}
     
+    typedef hpx::actions::result_action1<
+        primary_namespace,
+        /* return type */ response,
+        /* enum value */  namespace_service,
+        /* arguments */   request const&,
+        &primary_namespace::service
+      , threads::thread_priority_critical
+    > service_action;
+
     typedef hpx::actions::result_action2<
         primary_namespace,
         /* return type */ response,

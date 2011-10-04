@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +8,32 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 
-namespace hpx { namespace agas { namespace server
+namespace hpx { namespace agas
 {
+
+naming::gid_type bootstrap_component_namespace_gid()
+{
+    return naming::gid_type
+        (HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB);
+}
+
+naming::id_type bootstrap_component_namespace_id()
+{
+    return naming::id_type
+        (bootstrap_component_namespace_gid(), naming::id_type::unmanaged);
+}
+
+namespace server
+{
+
+response component_namespace::service(
+    request const& req
+  , error_code& ec
+    )
+{
+    // IMPLEMENT
+    return response();
+}
 
 response component_namespace::bind_prefix(
     std::string const& key
