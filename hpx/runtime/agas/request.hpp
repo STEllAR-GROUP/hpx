@@ -8,18 +8,18 @@
 #if !defined(HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685)
 #define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
-#include <boost/move/move.hpp>
-#include <boost/assert.hpp>
 #include <boost/variant.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/runtime/agas/namespace/method_code.hpp>
-#include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/runtime/agas/namespace/namespace_action_code.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
@@ -41,127 +41,127 @@ struct request
 
     // REVIEW: Should the GVA here be a resolved address?
     request(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type const& gid_
       , gva const& gva_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, gva_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type const& gid_
       , boost::uint64_t count_  
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, count_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type const& gid_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , naming::locality const& locality_
       , boost::uint64_t count_  
         )
       : mc(type_)
       , data(boost::fusion::make_vector(locality_, count_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , naming::locality const& locality_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(locality_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , components::component_type ctype_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , boost::int32_t ctype_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(ctype_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , std::string const& name_
       , boost::uint32_t prefix_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, prefix_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , std::string const& name_
       , naming::gid_type const& gid_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, gid_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , std::string const& name_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
       , symbol_namespace::iterate_function_type const& f_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(f_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     request(
-        method_code type_
+        namespace_action_code type_
         )
       : mc(type_)
       , data(boost::fusion::make_vector())
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     // copy constructor
@@ -321,7 +321,7 @@ struct request
         return name;
     } // }}} 
 
-    method_code get_method() const
+    namespace_action_code get_method() const
     {
         return mc;
     }
@@ -552,11 +552,14 @@ struct request
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    method_code mc;
+    namespace_action_code mc;
     data_type data;
 };
 
 }}
+
+BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION)
+BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
 
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 

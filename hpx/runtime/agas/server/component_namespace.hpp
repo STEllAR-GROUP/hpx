@@ -20,7 +20,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/runtime/agas/namespace/response.hpp>
+#include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 

@@ -5,23 +5,22 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/exception.hpp>
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/agas/router/legacy.hpp>
-#include <hpx/util/safe_bool.hpp>
 #include <hpx/util/logging.hpp>
 
 namespace hpx { namespace agas
 {
 
-legacy_router::legacy_router(
+addressing_service::addressing_service(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
-  : router_type(ini_.get_agas_router_mode())
+  : service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , state_(starting)
   , prefix_()
@@ -31,13 +30,13 @@ legacy_router::legacy_router(
 
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
-    if (router_type == router_mode_bootstrap)
+    if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);
     else
         launch_hosted(pp, ini_);
 } // }}}
 
-void legacy_router::launch_bootstrap(
+void addressing_service::launch_bootstrap(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
     )
@@ -82,7 +81,7 @@ void legacy_router::launch_bootstrap(
     state_.store(running);
 } // }}}
 
-void legacy_router::launch_hosted(
+void addressing_service::launch_hosted(
     parcelset::parcelport& pp 
   , util::runtime_configuration const& ini_
     )
@@ -96,7 +95,7 @@ void legacy_router::launch_hosted(
     state_.store(running);
 } // }}}
 
-bool legacy_router::register_locality(
+bool addressing_service::register_locality(
     naming::locality const& ep
   , naming::gid_type& prefix
   , error_code& ec
@@ -120,7 +119,7 @@ bool legacy_router::register_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::bind_locality", e.what());
+                "addressing_service::bind_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -132,7 +131,7 @@ bool legacy_router::register_locality(
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
-bool legacy_router::unregister_locality(
+bool addressing_service::unregister_locality(
     naming::locality const& ep
   , error_code& ec
     )
@@ -153,7 +152,7 @@ bool legacy_router::unregister_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::unbind_locality", e.what());
+                "addressing_service::unbind_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -163,7 +162,7 @@ bool legacy_router::unregister_locality(
     }
 } // }}}
 
-bool legacy_router::get_console_prefix(
+bool addressing_service::get_console_prefix(
     naming::gid_type& prefix
   , bool try_cache
   , error_code& ec
@@ -229,7 +228,7 @@ bool legacy_router::get_console_prefix(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::get_console_prefix", e.what());
+                "addressing_service::get_console_prefix", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -239,7 +238,7 @@ bool legacy_router::get_console_prefix(
     }
 } // }}}
 
-bool legacy_router::get_prefixes(
+bool addressing_service::get_prefixes(
     std::vector<naming::gid_type>& prefixes
   , components::component_type type
   , error_code& ec 
@@ -297,7 +296,7 @@ bool legacy_router::get_prefixes(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::get_prefixes", e.what());
+                "addressing_service::get_prefixes", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -307,7 +306,7 @@ bool legacy_router::get_prefixes(
     }
 } // }}} 
 
-components::component_type legacy_router::get_component_id(
+components::component_type addressing_service::get_component_id(
     std::string const& name
   , error_code& ec 
     )
@@ -329,7 +328,7 @@ components::component_type legacy_router::get_component_id(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::get_component_id", e.what());
+                "addressing_service::get_component_id", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -339,7 +338,7 @@ components::component_type legacy_router::get_component_id(
     }
 } // }}} 
 
-components::component_type legacy_router::register_factory(
+components::component_type addressing_service::register_factory(
     naming::gid_type const& prefix
   , std::string const& name
   , error_code& ec
@@ -362,7 +361,7 @@ components::component_type legacy_router::register_factory(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "legacy_router::register_factory", e.what());
+                "addressing_service::register_factory", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -419,7 +418,7 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-bool legacy_router::get_id_range(
+bool addressing_service::get_id_range(
     naming::locality const& ep
   , count_type count
   , naming::gid_type& lower_bound
@@ -492,7 +491,7 @@ bool legacy_router::get_id_range(
         }
 
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::get_id_range", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::get_id_range", 
                 e.what());
         }
         else {
@@ -503,7 +502,7 @@ bool legacy_router::get_id_range(
     }
 } // }}}
 
-bool legacy_router::bind_range(
+bool addressing_service::bind_range(
     naming::gid_type const& lower_id
   , count_type count
   , naming::address const& baseaddr
@@ -581,7 +580,7 @@ bool legacy_router::bind_range(
         }
 
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::bind_range", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::bind_range", 
                 e.what());
         }
         else {
@@ -592,7 +591,7 @@ bool legacy_router::bind_range(
     }
 } // }}}
 
-bool legacy_router::unbind_range(
+bool addressing_service::unbind_range(
     naming::gid_type const& lower_id
   , count_type count
   , naming::address& addr
@@ -626,7 +625,7 @@ bool legacy_router::unbind_range(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::unbind_range", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::unbind_range", 
                 e.what());
         }
         else {
@@ -637,7 +636,7 @@ bool legacy_router::unbind_range(
     }
 } // }}}
 
-bool legacy_router::resolve(
+bool addressing_service::resolve(
     naming::gid_type const& id
   , naming::address& addr
   , bool try_cache
@@ -713,7 +712,7 @@ bool legacy_router::resolve(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::resolve", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::resolve", 
                 e.what());
         }
         else {
@@ -724,7 +723,7 @@ bool legacy_router::resolve(
     }
 } // }}}
 
-bool legacy_router::resolve_cached(
+bool addressing_service::resolve_cached(
     naming::gid_type const& id
   , naming::address& addr
   , error_code& ec
@@ -771,7 +770,7 @@ bool legacy_router::resolve_cached(
         if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
         {
             HPX_THROWS_IF(ec, invalid_page_fault
-              , "legacy_router::resolve_cached" 
+              , "addressing_service::resolve_cached" 
               , "bad page in cache, MSBs of GID base and GID do not match");
             return false;
         }
@@ -801,7 +800,7 @@ bool legacy_router::resolve_cached(
     return false;
 } // }}}
 
-legacy_router::count_type legacy_router::incref(
+addressing_service::count_type addressing_service::incref(
     naming::gid_type const& id
   , count_type credits
   , error_code& ec 
@@ -822,7 +821,7 @@ legacy_router::count_type legacy_router::incref(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::incref", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::incref", 
                 e.what());
         }
         else {
@@ -833,7 +832,7 @@ legacy_router::count_type legacy_router::incref(
     }
 } // }}}
 
-legacy_router::count_type legacy_router::decref(
+addressing_service::count_type addressing_service::decref(
     naming::gid_type const& id
   , components::component_type& t
   , count_type credits
@@ -858,7 +857,7 @@ legacy_router::count_type legacy_router::decref(
             if (HPX_UNLIKELY(components::component_invalid != t))
             {
                 HPX_THROWS_IF(ec, bad_component_type
-                  , "legacy_router::decref"
+                  , "addressing_service::decref"
                   , boost::str(boost::format(
                     "received invalid component type when decrementing last "
                     "GID to 0, gid(%1%)")
@@ -871,7 +870,7 @@ legacy_router::count_type legacy_router::decref(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::decref", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::decref", 
                 e.what());
         }
         else {
@@ -882,7 +881,7 @@ legacy_router::count_type legacy_router::decref(
     }
 } // }}}
 
-bool legacy_router::registerid(
+bool addressing_service::registerid(
     std::string const& name
   , naming::gid_type const& id
   , error_code& ec
@@ -901,7 +900,7 @@ bool legacy_router::registerid(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::registerid", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::registerid", 
                 e.what());
         }
         else {
@@ -912,7 +911,7 @@ bool legacy_router::registerid(
     }
 } // }}}
 
-bool legacy_router::unregisterid(
+bool addressing_service::unregisterid(
     std::string const& name
   , error_code& ec
     )
@@ -929,7 +928,7 @@ bool legacy_router::unregisterid(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::unregisterid", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::unregisterid", 
                 e.what());
         }
         else {
@@ -940,7 +939,7 @@ bool legacy_router::unregisterid(
     }
 } // }}}
 
-bool legacy_router::queryid(
+bool addressing_service::queryid(
     std::string const& ns_name
   , naming::gid_type& id
   , error_code& ec
@@ -965,7 +964,7 @@ bool legacy_router::queryid(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::queryid", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::queryid", 
                 e.what());
         }
         else {
@@ -977,7 +976,7 @@ bool legacy_router::queryid(
 } // }}}
 
 /// Invoke the supplied hpx::function for every registered global name
-bool legacy_router::iterateids(
+bool addressing_service::iterateids(
     iterateids_function_type const& f
   , error_code& ec
     ) 
@@ -994,7 +993,7 @@ bool legacy_router::iterateids(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "legacy_router::iterateids", 
+            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::iterateids", 
                 e.what());
         }
         else {

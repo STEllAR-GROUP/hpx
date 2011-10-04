@@ -22,7 +22,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/assert.hpp>
@@ -259,9 +259,9 @@ typedef actions::plain_action1<
 // TODO: merge with register_worker which is all but identical
 void register_console(registration_header const& header)
 {
-    using boost::asio::ip::address;
-
-    get_big_boot_barrier().lock();
+    // This lock acquires the bbb mutex on creation. When it goes out of scope,
+    // it's dtor calls big_boot_barrier::notify().
+    big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
@@ -355,8 +355,6 @@ void register_console(registration_header const& header)
                    , p)); 
 
     get_big_boot_barrier().add_thunk(thunk);
-
-    get_big_boot_barrier().notify();
 }
 
 // TODO: merge with notify_worker which is all but identical
@@ -365,7 +363,9 @@ void register_console(registration_header const& header)
 // AGAS callback to client
 void notify_console(notification_header const& header)
 {
-    get_big_boot_barrier().lock();
+    // This lock acquires the bbb mutex on creation. When it goes out of scope,
+    // it's dtor calls big_boot_barrier::notify().
+    big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
@@ -427,16 +427,14 @@ void notify_console(notification_header const& header)
 
     for (std::size_t i = 0; i < bind_size; ++i)
         bind_pool.enqueue(new bind_response_future_type);     
-
-    get_big_boot_barrier().notify();
 }
 
 // remote call to AGAS
 void register_worker(registration_header const& header)
 {
-    using boost::asio::ip::address;
-
-    get_big_boot_barrier().lock();
+    // This lock acquires the bbb mutex on creation. When it goes out of scope,
+    // it's dtor calls big_boot_barrier::notify().
+    big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
@@ -529,8 +527,6 @@ void register_worker(registration_header const& header)
 
         get_big_boot_barrier().add_thunk(thunk);
     }
-
-    get_big_boot_barrier().notify();
 }
 
 // TODO: callback must finish installing new heap
@@ -538,27 +534,16 @@ void register_worker(registration_header const& header)
 // AGAS callback to client
 void notify_worker(notification_header const& header)
 {
-    get_big_boot_barrier().lock();
+    // This lock acquires the bbb mutex on creation. When it goes out of scope,
+    // it's dtor calls big_boot_barrier::notify().
+    big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
-
-/*
-    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
-    {
-        hpx::util::osstream strm;
-        strm << "locality "
-             << get_runtime().here() 
-             << " has launched early"; 
-        HPX_THROW_EXCEPTION(internal_server_error, 
-            "agas::notify_worker", 
-            hpx::util::osstream_get_string(strm));
-    }
-*/
 
     // set our prefix
     agas_client.local_prefix(header.prefix);
 
-    // store the full addresses of the agas servers in our local router
+    // store the full addresses of the agas servers in our local service
     agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
     agas_client.hosted->component_ns_addr_ = header.component_ns_address;
     agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
@@ -602,8 +587,6 @@ void notify_worker(notification_header const& header)
 
     for (std::size_t i = 0; i < bind_size; ++i)
         bind_pool.enqueue(new bind_response_future_type);     
-
-    get_big_boot_barrier().notify();
 }
 // }}}
 
@@ -624,7 +607,7 @@ namespace hpx { namespace agas
 
 void big_boot_barrier::spin()
 {
-    boost::unique_lock<boost::mutex> lock(mtx);
+    boost::mutex::scoped_lock lock(mtx);
     while (connected)
         cond.wait(lock);
 }
@@ -637,12 +620,12 @@ big_boot_barrier::big_boot_barrier(
     pp(pp_)
   , connection_cache_(pp_.get_connection_cache())
   , io_service_pool_(pp_.get_io_service_pool())
-  , router_type(ini_.get_agas_router_mode())
+  , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , bootstrap_agas(ini_.get_agas_locality())
   , cond()
   , mtx()
-  , connected( (router_mode_bootstrap == router_type)
+  , connected( (service_mode_bootstrap == service_type)
              ? ( ini_.get_num_localities()
                ? (ini_.get_num_localities() - 1)
                : 0)
@@ -728,7 +711,7 @@ void big_boot_barrier::apply(
 
 void big_boot_barrier::wait()
 { // {{{
-    if (router_mode_bootstrap == router_type)
+    if (service_mode_bootstrap == service_type)
         spin();
 
     else
@@ -790,7 +773,7 @@ void big_boot_barrier::notify()
 // until this point so that the AGAS locality can come up.
 void big_boot_barrier::trigger()
 {
-    if (router_mode_bootstrap == router_type)
+    if (service_mode_bootstrap == service_type)
     {
         boost::function<void()>* p;
 

@@ -8,18 +8,18 @@
 #if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
-#include <boost/move/move.hpp>
-#include <boost/assert.hpp>
 #include <boost/variant.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/runtime/agas/namespace/method_code.hpp>
-#include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
@@ -41,7 +41,7 @@ struct response
     {}
 
     response(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
       , boost::uint32_t prefix_
@@ -51,11 +51,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(lower_, upper_, prefix_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
       , error status_ = success
@@ -64,11 +64,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(gidbase_, gva_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , gva const& gva_
       , error status_ = success
         )
@@ -76,11 +76,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(gva_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , boost::uint64_t count_
       , boost::int32_t ctype_
       , error status_ = success
@@ -89,11 +89,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(count_, ctype_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , boost::uint64_t count_
       , components::component_type ctype_
       , error status_ = success
@@ -102,11 +102,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(count_, boost::int32_t(ctype_)))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , boost::uint64_t count_
       , error status_ = success
         )
@@ -114,11 +114,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(count_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
     
     response(
-        method_code type_
+        namespace_action_code type_
       , components::component_type ctype_
       , error status_ = success
         )
@@ -126,11 +126,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , boost::int32_t ctype_
       , error status_ = success
         )
@@ -138,11 +138,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(ctype_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , std::vector<boost::uint32_t> const& prefixes_
       , error status_ = success
         )
@@ -150,11 +150,11 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(prefixes_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , naming::gid_type gid_
       , error status_ = success
         )
@@ -162,18 +162,18 @@ struct response
       , status(status_)
       , data(boost::fusion::make_vector(gid_))
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     response(
-        method_code type_
+        namespace_action_code type_
       , error status_ = success
         )
       : mc(type_)
       , status(status_)
       , data(boost::fusion::make_vector())
     {
-        // TODO: verification of method_code
+        // TODO: verification of namespace_action_code
     }
 
     // copy constructor
@@ -298,7 +298,7 @@ struct response
         return get_data<subtype_gid_gid_prefix, 1>(ec); 
     }
 
-    method_code get_method() const
+    namespace_action_code get_method() const
     {
         return mc;
     }
@@ -525,12 +525,15 @@ struct response
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    method_code mc;
+    namespace_action_code mc;
     error status;
     data_type data;
 };
 
 }}
+
+BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
+BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

@@ -8,10 +8,8 @@
 #if !defined(HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7)
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/agas/namespace/stubs/symbol.hpp>
+#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 
 namespace hpx { namespace agas 
 {

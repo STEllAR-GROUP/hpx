@@ -28,11 +28,11 @@
 #include <hpx/lcos/mutex.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/namespace/component.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
-#include <hpx/runtime/agas/namespace/symbol.hpp>
-#include <hpx/runtime/agas/network/gva.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -45,7 +45,7 @@
 namespace hpx { namespace agas
 {
 
-struct HPX_EXPORT legacy_router : boost::noncopyable
+struct HPX_EXPORT addressing_service : boost::noncopyable
 {
     // {{{ types 
     typedef primary_namespace::server_type
@@ -216,7 +216,7 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
         naming::address symbol_ns_addr_;
     }; // }}}
 
-    const router_mode router_type;
+    const service_mode service_type;
     const runtime_mode runtime_type;
 
     boost::shared_ptr<bootstrap_data_type> bootstrap;
@@ -225,13 +225,13 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
     atomic_state state_;
     naming::gid_type prefix_;
 
-    legacy_router(
+    addressing_service(
         parcelset::parcelport& pp 
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
         );
 
-    ~legacy_router()
+    ~addressing_service()
     {
         // TODO: Free the future pools?
         destroy_big_boot_barrier();
@@ -273,10 +273,10 @@ struct HPX_EXPORT legacy_router : boost::noncopyable
 
     bool is_bootstrap() const
     {
-        return router_type == router_mode_bootstrap;
+        return service_type == service_mode_bootstrap;
     } 
 
-    /// \brief Returns whether this resolver_client represents the console 
+    /// \brief Returns whether this addressing_service represents the console 
     ///        locality.
     bool is_console() const
     {

@@ -8,10 +8,8 @@
 #if !defined(HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6)
 #define HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/agas/namespace/stubs/primary.hpp>
+#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 
 namespace hpx { namespace agas 
 {

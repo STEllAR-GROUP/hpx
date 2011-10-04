@@ -7,25 +7,7 @@
 #if !defined(HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM)
 #define HPX_NAMING_CLIENT_RESOLVER_MAR_24_2008_0952AM
 
-#include <hpx/version.hpp>
-#include <hpx/runtime/agas/router/legacy.hpp>
-
-namespace hpx { namespace naming
-{
-
-class HPX_EXPORT resolver_client : public hpx::agas::legacy_router
-{
-public:
-    typedef hpx::agas::legacy_router base_type;
-
-    resolver_client(
-        parcelset::parcelport& pp 
-      , util::runtime_configuration const& ini_ 
-      , runtime_mode mode
-        )
-      : base_type(pp, ini_, mode) {} 
-};
-
-}}  // namespace hpx::naming
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 
 #endif

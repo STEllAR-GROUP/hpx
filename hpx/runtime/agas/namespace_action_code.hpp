@@ -13,7 +13,7 @@
 namespace hpx { namespace agas
 {
 
-enum method_code
+enum namespace_action_code
 { 
     invalid_request             = 0,
     primary_ns_bind_locality    = BOOST_BINARY_U(1000000), 

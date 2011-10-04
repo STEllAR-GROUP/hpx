@@ -24,7 +24,7 @@
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <hpx/runtime/agas/router/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
 #include <io.h>

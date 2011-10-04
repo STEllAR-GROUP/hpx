@@ -25,8 +25,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
-#include <hpx/runtime/agas/network/gva.hpp>
-#include <hpx/runtime/agas/namespace/response.hpp>
+#include <hpx/runtime/agas/response.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
@@ -249,8 +248,7 @@ struct primary_namespace :
             }
 
             // Start assigning ids with the second block of 64bit numbers only.
-            // The first block is reserved for components with LVA-encoded GIDs
-            // (currently, runtime_support and memory). 
+            // The first block is reserved for components with LVA-encoded GIDs.
             naming::gid_type lower_id(id.get_msb() + 1, 0);
 
             // We need to create an entry in the partition table for this

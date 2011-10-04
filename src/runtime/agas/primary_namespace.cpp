@@ -7,15 +7,13 @@
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
-//#include <boost/serialization/optional.hpp>
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/lcos/base_lco.hpp>
-#include <hpx/runtime/agas/namespace/primary.hpp>
 
 using hpx::components::component_agas_primary_namespace;
 

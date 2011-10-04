@@ -77,24 +77,23 @@ namespace hpx
         class HPX_API_EXPORT action_manager;
     }
 
+    namespace agas
+    {
+        struct HPX_API_EXPORT addressing_service;
+    }
+
     /// \namespace naming
     ///
     /// The namespace \a naming contains all definitions needed for the AGAS
-    /// (Distributed Global Address Space) service.
+    /// (Active Global Address Space) service.
     namespace naming
     {
+        typedef agas::addressing_service resolver_client;
+
         struct HPX_API_EXPORT gid_type;
         struct HPX_API_EXPORT id_type;
         struct HPX_API_EXPORT address;
         class HPX_API_EXPORT locality;
-        class HPX_API_EXPORT resolver_client;
-        class HPX_API_EXPORT resolver_server;
-
-        namespace server
-        {
-            class reply;
-            class request;
-        }
 
         HPX_API_EXPORT resolver_client& get_agas_client();
     }
@@ -276,11 +275,11 @@ namespace hpx
 
     namespace agas
     {
-        enum router_mode
+        enum service_mode
         {
-            router_mode_invalid = -1,
-            router_mode_bootstrap = 0,
-            router_mode_hosted = 1,
+            service_mode_invalid = -1,
+            service_mode_bootstrap = 0,
+            service_mode_hosted = 1,
         };
     }
 

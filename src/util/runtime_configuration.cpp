@@ -45,7 +45,7 @@ namespace hpx { namespace util
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:" 
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "router_mode = hosted",
+            "service_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
             "connection_cache_size = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
@@ -187,7 +187,7 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
-    agas::router_mode runtime_configuration::get_agas_router_mode() const
+    agas::service_mode runtime_configuration::get_agas_service_mode() const
     {
         // load all components as described in the configuration information
         if (has_section("hpx.agas"))
@@ -195,27 +195,27 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec)
             {
-                std::string const m = sec->get_entry("router_mode", "hosted");
+                std::string const m = sec->get_entry("service_mode", "hosted");
 
                 if (m == "hosted")
-                    return agas::router_mode_hosted;
+                    return agas::service_mode_hosted;
                 else if (m == "bootstrap")
-                    return agas::router_mode_bootstrap;
+                    return agas::service_mode_bootstrap;
                 else {
                     // REVIEW: exception type is overused
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "runtime_configuration::get_agas_router_mode", 
+                        "runtime_configuration::get_agas_service_mode", 
                         std::string("invalid AGAS router mode \"") + m + "\"");
                 }
             }
         }
-        return agas::router_mode_hosted;
+        return agas::service_mode_hosted;
     }
 
     std::size_t runtime_configuration::get_num_localities() const
     {
         // this function should only be called on the AGAS server
-        BOOST_ASSERT(agas::router_mode_bootstrap == get_agas_router_mode());
+        BOOST_ASSERT(agas::service_mode_bootstrap == get_agas_service_mode());
 
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");

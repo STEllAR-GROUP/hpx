@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/runtime/agas/namespace/server/component.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {

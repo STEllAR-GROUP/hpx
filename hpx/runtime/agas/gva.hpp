@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
@@ -28,7 +27,7 @@ namespace hpx { namespace agas
 struct gva 
 {
     typedef naming::locality endpoint_type;
-    typedef int component_type;
+    typedef boost::int32_t component_type;
     typedef boost::uint64_t lva_type;
     typedef boost::uint64_t count_type;
     typedef boost::uint64_t offset_type;
@@ -172,10 +171,10 @@ struct gva
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_AGAS_VERSION) {
-            throw exception(version_too_new, 
-                "trying to load GVA with unknown version");
-        }
+        if (version > HPX_AGAS_VERSION)
+            HPX_THROW_EXCEPTION(version_too_new
+              , "gva::load"
+              , "trying to load GVA with unknown version");
         ar >> endpoint >> type >> count >> lva_ >> offset; 
     }
 

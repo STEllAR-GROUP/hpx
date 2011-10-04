@@ -1005,7 +1005,7 @@ namespace hpx
             ini_config += "hpx.agas.port=" + boost::lexical_cast<std::string>(agas_port);
 
             if (run_agas_server) {
-                ini_config += "hpx.agas.router_mode=bootstrap"; 
+                ini_config += "hpx.agas.service_mode=bootstrap"; 
                 if (vm.count("run-agas-server-only")) 
                     ini_config += "hpx.components.load_external=0"; 
             }

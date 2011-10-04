@@ -23,8 +23,8 @@ namespace hpx { namespace util
     // more convenient way
     class HPX_API_EXPORT runtime_configuration : public section
     {
-    std::string hpx_ini_file;
-    std::vector<std::string> cmdline_ini_defs;
+        std::string hpx_ini_file;
+        std::vector<std::string> cmdline_ini_defs;
  
     public:
         // initialize and load configuration information
@@ -39,7 +39,7 @@ namespace hpx { namespace util
         // Returns the AGAS mode of this locality, returns either hosted (for
         // localities connecting to a remote AGAS server) or bootstrap for the
         // locality hosting the AGAS server.
-        agas::router_mode get_agas_router_mode() const;
+        agas::service_mode get_agas_service_mode() const;
 
         // AGAS server only: get number of localities served
         std::size_t get_num_localities() const;

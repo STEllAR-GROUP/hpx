@@ -30,7 +30,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     util::connection_cache<parcelset::parcelport_connection>& connection_cache_;
     util::io_service_pool& io_service_pool_;
 
-    const router_mode router_type;
+    const service_mode service_type;
     const runtime_mode runtime_type;
     const naming::address bootstrap_agas;
 
@@ -42,34 +42,50 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     void spin();
 
+    void notify();
+
   public:
+    struct scoped_lock
+    {
+      private:
+        big_boot_barrier& bbb;
+
+      public:
+        scoped_lock(
+            big_boot_barrier& bbb_
+            )
+          : bbb(bbb_)
+        {
+            bbb.mtx.lock();
+        }
+
+        ~scoped_lock()
+        {
+            bbb.notify();
+        }
+    };
+
     big_boot_barrier(
         parcelset::parcelport& pp_ 
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
-    );
+        );
 
     void apply(
         boost::uint32_t prefix
       , naming::address const& addr
       , actions::base_action* act 
-    );
+        );
 
     void wait();
-
-    void notify();
-
-    void lock()
-    {
-        mtx.lock();
-    } 
 
     // no-op on non-bootstrap localities 
     void trigger(); 
 
     void add_thunk(
         boost::function<void()>* f
-    ) {
+        )
+    {
         thunks.enqueue(f);
     }
 };
@@ -78,7 +94,7 @@ HPX_EXPORT void create_big_boot_barrier(
     parcelset::parcelport& pp_ 
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
-);
+    );
 
 HPX_EXPORT void destroy_big_boot_barrier();
 

@@ -8,10 +8,8 @@
 #if !defined(HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6)
 #define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/agas/namespace/stubs/component.hpp>
+#include <hpx/runtime/agas/stubs/component_namespace.hpp>
 
 namespace hpx { namespace agas 
 {
