@@ -102,7 +102,7 @@ bool addressing_service::register_locality(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.bind_locality(ep, 0, ec);
@@ -137,7 +137,7 @@ bool addressing_service::unregister_locality(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.unbind_locality(ep, ec);
@@ -196,7 +196,7 @@ bool addressing_service::get_console_prefix(
         }
     
         if (is_bootstrap()) {
-            response_type r = 
+            response r = 
                 bootstrap->symbol_ns_server.resolve("/locality(console)", ec);
     
             if (!ec &&
@@ -209,7 +209,7 @@ bool addressing_service::get_console_prefix(
         }
     
         else {
-            response_type r = hosted->symbol_ns_.resolve
+            response r = hosted->symbol_ns_.resolve
                 ("/locality(console)", ec);
     
             if (!ec &&
@@ -247,7 +247,7 @@ bool addressing_service::get_prefixes(
     try {
         if (type != components::component_invalid)
         {
-            response_type r;
+            response r;
     
             if (is_bootstrap())
                 r = bootstrap->component_ns_server.resolve_id(type, ec);
@@ -271,7 +271,7 @@ bool addressing_service::get_prefixes(
     
         else
         {
-            response_type r;
+            response r;
     
             if (is_bootstrap())
                 r = bootstrap->primary_ns_server.localities(ec);
@@ -312,7 +312,7 @@ components::component_type addressing_service::get_component_id(
     )
 { /// {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->component_ns_server.bind_name(name, ec);
@@ -345,7 +345,7 @@ components::component_type addressing_service::register_factory(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
 
         if (is_bootstrap())
             r = bootstrap->component_ns_server.bind_prefix(name, prefix, ec);
@@ -428,13 +428,13 @@ bool addressing_service::get_id_range(
 { // {{{ get_id_range implementation
     typedef lcos::eager_future<
         primary_namespace_server_type::bind_locality_action,
-        response_type
+        response
     > allocate_response_future_type;
 
     allocate_response_future_type* f = 0;
 
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
         {
@@ -512,7 +512,7 @@ bool addressing_service::bind_range(
 { // {{{ bind_range implementation
     typedef lcos::eager_future<
         primary_namespace_server_type::bind_gid_action,
-        response_type
+        response
     > bind_response_future_type;
 
     bind_response_future_type* f = 0;
@@ -526,7 +526,7 @@ bool addressing_service::bind_range(
         
         if (is_bootstrap())
         {
-            response_type r
+            response r
                 = bootstrap->primary_ns_server.bind_gid(lower_id, gva, ec);
     
             if (!ec && success == r.get_status()) 
@@ -551,7 +551,7 @@ bool addressing_service::bind_range(
                 naming::id_type(primary_namespace_server_type::fixed_gid()
                               , naming::id_type::unmanaged),
                 lower_id, gva);
-            response_type r = cf->get(ec);
+            response r = cf->get(ec);
 
             cf.set_ok();
 
@@ -599,7 +599,7 @@ bool addressing_service::unbind_range(
     )
 { // {{{ unbind_range implementation
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.unbind_gid(lower_id, count, ec);
@@ -678,7 +678,7 @@ bool addressing_service::resolve(
                 return true;
         }
         
-        response_type r; 
+        response r; 
     
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.page_fault(id, ec);
@@ -807,7 +807,7 @@ addressing_service::count_type addressing_service::incref(
     )
 { // {{{ incref implementation
     try {
-        response_type r;
+        response r;
 
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.increment(id, credits, ec);
@@ -840,7 +840,7 @@ addressing_service::count_type addressing_service::decref(
     )
 { // {{{ decref implementation
     try {
-        response_type r;
+        response r;
         
         if (is_bootstrap())
             r = bootstrap->primary_ns_server.decrement(id, credits, ec);
@@ -888,7 +888,7 @@ bool addressing_service::registerid(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->symbol_ns_server.bind(name, id, ec);
@@ -917,7 +917,7 @@ bool addressing_service::unregisterid(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->symbol_ns_server.unbind(name, ec);
@@ -946,7 +946,7 @@ bool addressing_service::queryid(
     )
 { // {{{
     try {
-        response_type r;
+        response r;
     
         if (is_bootstrap())
             r = bootstrap->symbol_ns_server.resolve(ns_name, ec);
@@ -982,7 +982,7 @@ bool addressing_service::iterateids(
     ) 
 { // {{{
     try {
-        response_type r;
+        response r;
 
         if (is_bootstrap())
             r = bootstrap->symbol_ns_server.iterate(f, ec);

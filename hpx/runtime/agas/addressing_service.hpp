@@ -59,8 +59,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef component_namespace::component_id_type component_id_type;
 
-    typedef response response_type; 
-
     typedef primary_namespace::gva_type gva_type;
     typedef primary_namespace::count_type count_type;
     typedef primary_namespace::offset_type offset_type;
@@ -171,14 +169,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef boost::lockfree::fifo<
         lcos::eager_future<
             primary_namespace_server_type::bind_locality_action,
-            response_type
+            response
         >*
     > allocate_response_pool_type;
 
     typedef boost::lockfree::fifo<
         lcos::eager_future<
             primary_namespace_server_type::bind_gid_action,
-            response_type
+            response
         >*
     > bind_response_pool_type;
     // }}}

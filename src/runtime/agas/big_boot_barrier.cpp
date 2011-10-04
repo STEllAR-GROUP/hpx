@@ -36,25 +36,25 @@ namespace hpx { namespace agas
 {
 
 typedef lcos::eager_future<
-    naming::resolver_client::primary_namespace_server_type::bind_locality_action,
-    naming::resolver_client::response_type
+    server::primary_namespace::bind_locality_action,
+    response
 > allocate_response_future_type;
 
 typedef lcos::eager_future<
-    naming::resolver_client::primary_namespace_server_type::bind_gid_action,
-    naming::resolver_client::response_type
+    server::primary_namespace::bind_gid_action,
+    response
 > bind_response_future_type;
 
 typedef components::heap_factory<
     lcos::detail::promise<
-        naming::resolver_client::response_type
-      , naming::resolver_client::response_type
+        response
+      , response
       , 1
     >
   , components::managed_component<
         lcos::detail::promise<
-            naming::resolver_client::response_type
-          , naming::resolver_client::response_type
+            response
+          , response
           , 1
         >
     >
@@ -321,21 +321,14 @@ void register_console(registration_header const& header)
     }
     */
 
-    typedef naming::resolver_client::primary_namespace_server_type
-        primary_namespace_server_type;
-    typedef naming::resolver_client::component_namespace_server_type
-        component_namespace_server_type;
-    typedef naming::resolver_client::symbol_namespace_server_type
-        symbol_namespace_server_type;
-
     naming::address primary_addr(get_runtime().here(),
-        primary_namespace_server_type::get_component_type(),
+        server::primary_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
     naming::address component_addr(get_runtime().here(),
-        component_namespace_server_type::get_component_type(), 
+        server::component_namespace::get_component_type(), 
             static_cast<void*>(&agas_client.bootstrap->component_ns_server));
     naming::address symbol_addr(get_runtime().here(),
-        symbol_namespace_server_type::get_component_type(),
+        server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
 
     actions::base_action* p =
@@ -480,21 +473,14 @@ void register_worker(registration_header const& header)
     }
     */ 
 
-    typedef naming::resolver_client::primary_namespace_server_type
-        primary_namespace_server_type;
-    typedef naming::resolver_client::component_namespace_server_type
-        component_namespace_server_type;
-    typedef naming::resolver_client::symbol_namespace_server_type
-        symbol_namespace_server_type;
-
     naming::address primary_addr(get_runtime().here(),
-        primary_namespace_server_type::get_component_type(),
+        server::primary_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
     naming::address component_addr(get_runtime().here(),
-        component_namespace_server_type::get_component_type(), 
+        server::component_namespace::get_component_type(), 
             static_cast<void*>(&agas_client.bootstrap->component_ns_server));
     naming::address symbol_addr(get_runtime().here(),
-        symbol_namespace_server_type::get_component_type(),
+        server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
 
     actions::base_action* p =

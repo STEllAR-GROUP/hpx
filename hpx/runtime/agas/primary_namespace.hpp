@@ -23,7 +23,6 @@ struct primary_namespace :
 
     typedef server::primary_namespace server_type;
 
-    typedef server_type::response_type response_type;
     typedef server_type::endpoint_type endpoint_type;
     typedef server_type::gva_type gva_type;
     typedef server_type::count_type count_type;
@@ -42,7 +41,7 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind_locality and bind_gid interface 
-    lcos::promise<response_type> bind_async(
+    lcos::promise<response> bind_async(
         endpoint_type const& ep
       , count_type count = 0
         )
@@ -50,7 +49,7 @@ struct primary_namespace :
         return this->base_type::bind_locality_async(this->gid_, ep, count);
     }
 
-    response_type bind(
+    response bind(
         endpoint_type const& ep
       , count_type count = 0
       , error_code& ec = throws
@@ -59,7 +58,7 @@ struct primary_namespace :
         return this->base_type::bind_locality(this->gid_, ep, count, ec);
     }
 
-    response_type bind(
+    response bind(
         endpoint_type const& ep
       , error_code& ec = throws
         )
@@ -67,7 +66,7 @@ struct primary_namespace :
         return this->base_type::bind_locality(this->gid_, ep, 0, ec);
     }
     
-    lcos::promise<response_type> bind_async(
+    lcos::promise<response> bind_async(
         naming::gid_type const& gid
       , gva_type const& gva
         )
@@ -75,7 +74,7 @@ struct primary_namespace :
         return this->base_type::bind_gid_async(this->gid_, gid, gva);
     }
 
-    response_type bind(
+    response bind(
         naming::gid_type const& gid
       , gva_type const& gva
       , error_code& ec = throws
@@ -86,14 +85,14 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // page_fault interface 
-    lcos::promise<response_type> page_fault_async(
+    lcos::promise<response> page_fault_async(
         naming::gid_type const& gid
         )
     {
         return this->base_type::page_fault_async(this->gid_, gid);
     }
     
-    response_type page_fault(
+    response page_fault(
         naming::gid_type const& gid, error_code& ec = throws
         )
     {
@@ -102,14 +101,14 @@ struct primary_namespace :
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind_locality and unbind_gid interface 
-    lcos::promise<response_type> unbind_async(
+    lcos::promise<response> unbind_async(
         endpoint_type const& ep
         )
     {
         return this->base_type::unbind_locality_async(this->gid_, ep);
     }
     
-    response_type unbind(
+    response unbind(
         endpoint_type const& ep
       , error_code& ec = throws
         )
@@ -117,7 +116,7 @@ struct primary_namespace :
         return this->base_type::unbind_locality(this->gid_, ep, ec);
     }
 
-    lcos::promise<response_type> unbind_async(
+    lcos::promise<response> unbind_async(
         naming::gid_type const& gid
       , count_type count
         )
@@ -125,7 +124,7 @@ struct primary_namespace :
         return this->base_type::unbind_gid_async(this->gid_, gid, count);
     }
     
-    response_type unbind(
+    response unbind(
         naming::gid_type const& gid
       , count_type count
       , error_code& ec = throws
@@ -136,7 +135,7 @@ struct primary_namespace :
     
     ///////////////////////////////////////////////////////////////////////////
     // increment interface 
-    lcos::promise<response_type> increment_async(
+    lcos::promise<response> increment_async(
         naming::gid_type const& gid
       , count_type credits
         )
@@ -144,7 +143,7 @@ struct primary_namespace :
         return this->base_type::increment_async(this->gid_, gid, credits);
     }
     
-    response_type increment(
+    response increment(
         naming::gid_type const& gid
       , count_type credits
       , error_code& ec = throws
@@ -155,7 +154,7 @@ struct primary_namespace :
     
     ///////////////////////////////////////////////////////////////////////////
     // decrement interface 
-    lcos::promise<response_type> decrement_async(
+    lcos::promise<response> decrement_async(
         naming::gid_type const& gid
       , count_type credits
         )
@@ -163,7 +162,7 @@ struct primary_namespace :
         return this->base_type::decrement_async(this->gid_, gid, credits);
     }
     
-    response_type decrement(
+    response decrement(
         naming::gid_type const& gid
       , count_type credits
       , error_code& ec = throws
@@ -174,12 +173,12 @@ struct primary_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // localities interface 
-    lcos::promise<response_type> localities_async()
+    lcos::promise<response> localities_async()
     {
         return this->base_type::localities_async(this->gid_);
     }
     
-    response_type localities(
+    response localities(
         error_code& ec = throws
         )
     {

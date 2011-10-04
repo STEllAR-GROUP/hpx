@@ -15,22 +15,16 @@ namespace hpx { namespace agas
 {
 
 struct symbol_namespace :
-    components::client_base<
-        symbol_namespace,
-        stubs::symbol_namespace
-    >
+    components::client_base<symbol_namespace, stubs::symbol_namespace>
 {
     // {{{ nested types 
     typedef components::client_base<
-        symbol_namespace,
-        stubs::symbol_namespace
+        symbol_namespace, stubs::symbol_namespace
     > base_type; 
 
     typedef server::symbol_namespace server_type;
 
-    typedef server_type::response_type response_type;
     typedef server_type::iterate_function_type iterate_function_type;
-    typedef server_type::symbol_type symbol_type;
     // }}}
 
     explicit symbol_namespace(naming::id_type const& id =
@@ -40,37 +34,37 @@ struct symbol_namespace :
 
     ///////////////////////////////////////////////////////////////////////////
     // bind interface 
-    lcos::promise<response_type>
-    bind_async(symbol_type const& key, naming::gid_type const& gid)
+    lcos::promise<response>
+    bind_async(std::string const& key, naming::gid_type const& gid)
     { return this->base_type::bind_async(this->gid_, key, gid); }
 
-    response_type bind(symbol_type const& key, naming::gid_type const& gid,
+    response bind(std::string const& key, naming::gid_type const& gid,
                        error_code& ec = throws)
     { return this->base_type::bind(this->gid_, key, gid, ec); }
     
     ///////////////////////////////////////////////////////////////////////////
     // resolve interface 
-    lcos::promise<response_type> resolve_async(symbol_type const& key)
+    lcos::promise<response> resolve_async(std::string const& key)
     { return this->base_type::resolve_async(this->gid_, key); }
     
-    response_type resolve(symbol_type const& key, error_code& ec = throws)
+    response resolve(std::string const& key, error_code& ec = throws)
     { return this->base_type::resolve(this->gid_, key, ec); }
  
     ///////////////////////////////////////////////////////////////////////////
     // unbind interface 
-    lcos::promise<response_type> unbind_async(symbol_type const& key)
+    lcos::promise<response> unbind_async(std::string const& key)
     { return this->base_type::unbind_async(this->gid_, key); }
     
-    response_type unbind(symbol_type const& key, error_code& ec = throws)
+    response unbind(std::string const& key, error_code& ec = throws)
     { return this->base_type::unbind(this->gid_, key, ec); }
 
     ///////////////////////////////////////////////////////////////////////////
     // iterate interface 
-    lcos::promise<response_type>
+    lcos::promise<response>
     iterate_async(iterate_function_type const& f)
     { return this->base_type::iterate_async(this->gid_, f); }
     
-    response_type iterate(iterate_function_type const& f,
+    response iterate(iterate_function_type const& f,
                           error_code& ec = throws)
     { return this->base_type::iterate(this->gid_, f, ec); }
 };            

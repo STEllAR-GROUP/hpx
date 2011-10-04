@@ -9,6 +9,8 @@
 #define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
 #include <boost/variant.hpp>
+#include <boost/mpl/at.hpp>
+#include <boost/fusion/include/value_at.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/serialization/split_member.hpp>

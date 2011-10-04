@@ -20,7 +20,6 @@ struct primary_namespace
     // {{{ nested types
     typedef server::primary_namespace server_type; 
 
-    typedef server_type::response_type response_type;
     typedef server_type::endpoint_type endpoint_type;
     typedef server_type::gva_type gva_type;
     typedef server_type::count_type count_type;
@@ -29,118 +28,118 @@ struct primary_namespace
     // }}}
 
     // {{{ bind_locality dispatch
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     bind_locality_async(naming::id_type const& gid, endpoint_type const& ep,
                         count_type count)
     {
         typedef server_type::bind_locality_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, ep, count);
+        return lcos::eager_future<action_type, response>(gid, ep, count);
     }
 
-    static response_type
+    static response
     bind_locality(naming::id_type const& gid, endpoint_type const& ep,
                   count_type count, error_code& ec = throws)
     { return bind_locality_async(gid, ep, count).get(ec); } 
     // }}}
     
     // {{{ bind_gid dispatch
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     bind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                    gva_type const& gva)
     {
         typedef server_type::bind_gid_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, id, gva);
+        return lcos::eager_future<action_type, response>(gid, id, gva);
     }
 
-    static response_type
+    static response
     bind_gid(naming::id_type const& gid, naming::gid_type const& id,
              gva_type const& gva, error_code& ec = throws)
     { return bind_gid_async(gid, id, gva).get(ec); } 
     // }}}
 
     // {{{ page_fault dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     page_fault_async(naming::id_type const& gid, naming::gid_type const& key)
     {
         typedef server_type::page_fault_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, key);
+        return lcos::eager_future<action_type, response>(gid, key);
     }
     
-    static response_type
+    static response
     page_fault(naming::id_type const& gid, naming::gid_type const& key,
                 error_code& ec = throws)
     { return page_fault_async(gid, key).get(ec); } 
     // }}}
 
     // {{{ unbind_locality dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     unbind_locality_async(naming::id_type const& gid, endpoint_type const& ep)
     {
         typedef server_type::unbind_locality_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, ep);
+        return lcos::eager_future<action_type, response>(gid, ep);
     }
     
-    static response_type
+    static response
     unbind_locality(naming::id_type const& gid, endpoint_type const& ep,
                     error_code& ec = throws)
     { return unbind_locality_async(gid, ep).get(ec); } 
     // }}}
 
     // {{{ unbind_gid dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     unbind_gid_async(naming::id_type const& gid, naming::gid_type const& id,
                      count_type count)
     {
         typedef server_type::unbind_gid_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, id, count);
+        return lcos::eager_future<action_type, response>(gid, id, count);
     }
     
-    static response_type
+    static response
     unbind_gid(naming::id_type const& gid, naming::gid_type const& id,
                count_type count, error_code& ec = throws)
     { return unbind_gid_async(gid, id, count).get(ec); } 
     // }}}
     
     // {{{ increment dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     increment_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
         typedef server_type::increment_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid, key, count);
+        return lcos::eager_future<action_type, response>(gid, key, count);
     }
     
-    static response_type
+    static response
     increment(naming::id_type const& gid, naming::gid_type const& key,
               count_type count, error_code& ec = throws)
     { return increment_async(gid, key, count).get(ec); } 
     // }}}
     
     // {{{ decrement dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     decrement_async(naming::id_type const& gid, naming::gid_type const& key,
                     count_type count)
     {
         typedef server_type::decrement_action action_type;
-        return lcos::eager_future<action_type, response_type>
+        return lcos::eager_future<action_type, response>
             (gid, key, count);
     }
     
-    static response_type
+    static response
     decrement(naming::id_type const& gid, naming::gid_type const& key,
               count_type count, error_code& ec = throws)
     { return decrement_async(gid, key, count).get(ec); } 
     // }}}
     
     // {{{ localities dispatch 
-    static lcos::promise<response_type>
+    static lcos::promise<response>
     localities_async(naming::id_type const& gid)
     {
         typedef server_type::localities_action action_type;
-        return lcos::eager_future<action_type, response_type>(gid);
+        return lcos::eager_future<action_type, response>(gid);
     }
     
-    static response_type
+    static response
     localities(naming::id_type const& gid, error_code& ec = throws)
     { return localities_async(gid).get(ec); } 
     // }}}
