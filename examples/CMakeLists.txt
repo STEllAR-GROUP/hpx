@@ -27,7 +27,7 @@ if(NOT MSVC)
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
     set(subdirs ${subdirs} geometry
-                           contact)
+                           )
   endif() 
 
   if(HDF5_CPP_FOUND) 
