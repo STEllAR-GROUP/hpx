@@ -9,20 +9,21 @@ if(NOT MSVC)
   set(subdirs
       accumulator
       adaptive1d
+      balancing
       dataflow
+      function
+      heartbeat 
       hplpx
+      math
+      neutron_star
       nqueen
       # wash: disabled temporarily as it breaks stuff
       #performance_counters
       queue
       quickstart
       random_mem_access
-      heartbeat 
       throttle
-      function
-      math
-      object_semaphore
-      balancing)
+     )
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
     set(subdirs ${subdirs} geometry
@@ -47,7 +48,8 @@ else()
   set(subdirs
       accumulator
       quickstart
-      queue)
+      queue
+     )
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
     set(subdirs ${subdirs} geometry)
