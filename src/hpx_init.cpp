@@ -457,6 +457,9 @@ namespace hpx
                      "configuration")
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
+                    ("debug-log", value<std::string>()->implicit_value("cout"),
+                     "enable all messages on the HPX log channel and send all "
+                     "HPX logs to the target destination")
                     // enable debug output from command line handling
                     ("debug-clp", "debug command line processing")
                     ("exit", "exit after configuring the runtime")
@@ -1012,6 +1015,15 @@ namespace hpx
             else if (vm.count("run-agas-server-only") && !env.run_with_pbs()) {
                 throw std::logic_error("Command line option --run-agas-server-only "
                     "can be specified only for the node running the AGAS server.");
+            }
+
+            if (vm.count("debug-log")) {
+                ini_config += "hpx.logging.console.destination="
+                    + vm["debug-log"].as<std::string>();
+                ini_config += "hpx.logging.destination="
+                    + vm["debug-log"].as<std::string>();
+                ini_config += "hpx.logging.console.level=5";
+                ini_config += "hpx.logging.level=5";
             }
 
             // Collect the command line for diagnostic purposes.
