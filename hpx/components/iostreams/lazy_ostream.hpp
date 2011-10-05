@@ -21,6 +21,7 @@
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
 #include <hpx/util/iterator_sink.hpp>
+#include <hpx/util/serializable_shared_ptr.hpp>
 
 namespace hpx { namespace iostreams
 {
@@ -46,7 +47,7 @@ struct lazy_ostream
 
     struct data_type
     {
-        boost::shared_ptr<std::deque<char> > out_buffer;
+        util::serializable_shared_ptr<std::deque<char> > out_buffer;
         stream_type stream;
 
         data_type()

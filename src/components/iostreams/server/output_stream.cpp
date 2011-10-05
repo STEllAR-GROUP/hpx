@@ -20,7 +20,7 @@ namespace hpx { namespace iostreams { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 void output_stream::call_write_async(
-    boost::shared_ptr<std::deque<char> > const& in
+    util::serializable_shared_ptr<std::deque<char> > const& in
 ) { // {{{
     mutex_type::scoped_lock l(mtx);
 
@@ -29,7 +29,7 @@ void output_stream::call_write_async(
 } // }}}
 
 void output_stream::write_async(
-    boost::shared_ptr<std::deque<char> > const& in
+    util::serializable_shared_ptr<std::deque<char> > const& in
 ) { // {{{
     // Perform the IO in another OS thread. 
     get_runtime().get_io_pool().get_io_service().post(boost::bind
@@ -38,7 +38,7 @@ void output_stream::write_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 void output_stream::call_write_sync(
-    boost::shared_ptr<std::deque<char> > const& in
+    util::serializable_shared_ptr<std::deque<char> > const& in
   , threads::thread_id_type caller
 ) {
     {
@@ -53,7 +53,7 @@ void output_stream::call_write_sync(
 }
 
 void output_stream::write_sync(
-    boost::shared_ptr<std::deque<char> > const& in
+    util::serializable_shared_ptr<std::deque<char> > const& in
 ) { // {{{
     threads::thread_self& self = threads::get_self();
     threads::thread_id_type id = self.get_thread_id();

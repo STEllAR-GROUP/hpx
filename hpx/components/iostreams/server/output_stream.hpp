@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/serializable_shared_ptr.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -36,11 +37,11 @@ struct HPX_COMPONENT_EXPORT output_stream
     // Executed in an io_pool thread to prevent io from blocking an HPX
     // shepherd thread.
     void call_write_async(
-        boost::shared_ptr<std::deque<char> > const& in
+        util::serializable_shared_ptr<std::deque<char> > const& in
     );
 
     void call_write_sync(
-        boost::shared_ptr<std::deque<char> > const& in
+        util::serializable_shared_ptr<std::deque<char> > const& in
       , threads::thread_id_type caller
     );
 
@@ -57,9 +58,13 @@ struct HPX_COMPONENT_EXPORT output_stream
     output_stream(boost::reference_wrapper<std::ostream> os)
         : write_f(make_std_ostream_write_function(os.get())) {}
 
-    void write_async(boost::shared_ptr<std::deque<char> > const& in);
+    void write_async(
+        util::serializable_shared_ptr<std::deque<char> > const& in
+        );
 
-    void write_sync(boost::shared_ptr<std::deque<char> > const& in);
+    void write_sync(
+        util::serializable_shared_ptr<std::deque<char> > const& in
+        );
 
     enum actions
     {
@@ -69,13 +74,13 @@ struct HPX_COMPONENT_EXPORT output_stream
 
     typedef hpx::actions::action1<
         output_stream, output_stream_write_async,
-        boost::shared_ptr<std::deque<char> > const&, 
+        util::serializable_shared_ptr<std::deque<char> > const&, 
         &output_stream::write_async
     > write_async_action;
 
     typedef hpx::actions::action1<
         output_stream, output_stream_write_sync,
-        boost::shared_ptr<std::deque<char> > const&, 
+        util::serializable_shared_ptr<std::deque<char> > const&, 
         &output_stream::write_sync
     > write_sync_action;
 };

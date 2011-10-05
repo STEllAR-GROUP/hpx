@@ -20,7 +20,7 @@ struct output_stream : components::stub_base<server::output_stream>
 {
     static void write_sync(
         naming::id_type const& gid
-      , boost::shared_ptr<std::deque<char> > const& in
+      , util::serializable_shared_ptr<std::deque<char> > const& in
     ) {
         typedef server::output_stream::write_sync_action action_type;
         lcos::eager_future<action_type>(gid, in).get();
@@ -28,7 +28,7 @@ struct output_stream : components::stub_base<server::output_stream>
 
     static void write_async(
         naming::id_type const& gid
-      , boost::shared_ptr<std::deque<char> > const& in
+      , util::serializable_shared_ptr<std::deque<char> > const& in
     ) {
         typedef server::output_stream::write_async_action action_type;
         lcos::eager_future<action_type>(gid, in).get();
