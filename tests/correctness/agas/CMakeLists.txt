@@ -7,11 +7,14 @@ add_subdirectory(components)
 
 set(tests
     local_scoped_deletion
+    remote_scoped_deletion
    )
 
 set(local_scoped_deletion_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component
-                 iostreams_component)
+    DEPENDENCIES managed_refcnt_checker_component)
+
+set(remote_scoped_deletion_FLAGS
+    DEPENDENCIES managed_refcnt_checker_component)
 
 foreach(test ${tests})
   set(sources
