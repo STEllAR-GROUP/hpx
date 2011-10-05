@@ -502,7 +502,17 @@ void section::dump(int ind, std::ostream& strm) const
     for (entry_map::const_iterator i = entries_.begin(); i != eend; ++i)
     {
         indent (ind, strm);
-        strm << "'" << i->first << "' : '" << i->second << "'\n";
+
+        const std::string expansion = expand_entry(i->second);
+
+        // Check if the expanded entry is different from the actual entry.
+        if (expansion != i->second)
+            // If the expansion is different from the real entry, then print
+            // it out.
+            strm << "'" << i->first << "' : '" << i->second << "' -> '"
+                 << expansion << "'\n";
+        else
+            strm << "'" << i->first << "' : '" << i->second << "'\n";
     }
 
     section_map::const_iterator send = sections_.end();
