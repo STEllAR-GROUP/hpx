@@ -9,13 +9,18 @@
 #include <boost/variant.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/variant.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
     // currently, we support a limited set of possible constructor argument 
     // types
-    typedef boost::variant<std::size_t> constructor_argument;
+    typedef boost::variant<
+        std::size_t
+      , naming::gid_type
+      , naming::id_type
+    > constructor_argument;
 }}
 
 #endif
