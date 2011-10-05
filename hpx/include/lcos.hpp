@@ -14,6 +14,7 @@
 
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/lazy_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <hpx/lcos/local_counting_semaphore.hpp>
 
