@@ -10,7 +10,6 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/lcos/local_dataflow_variable.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 
 namespace hpx { namespace lcos { namespace stubs 
@@ -49,13 +48,13 @@ struct object_semaphore : components::stubs::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::local_dataflow_variable<ValueType>
+    static lcos::promise<ValueType>
     get_async(naming::id_type const& gid)
     {
         typedef typename server_type::get_action action_type; 
-        lcos::local_dataflow_variable<ValueType> lco;
+        lcos::promise<ValueType> lco;
         applier::apply<action_type>(gid, lco.get_gid());
-        return lco;
+        return lco; 
     }
 
     static ValueType get_sync(naming::id_type const& gid)

@@ -39,8 +39,7 @@ struct object_semaphore
 
     typedef components::managed_component_base<object_semaphore> base_type;
 
-    struct tag {};
-    typedef hpx::util::spinlock_pool<tag> mutex_type;
+    typedef hpx::util::spinlock mutex_type;
 
     // define data structures needed for intrusive slist container used for
     // the queues
@@ -143,7 +142,7 @@ struct object_semaphore
         HPX_UNIQUE_PTR<queue_value_entry> node
             (new queue_value_entry(val, count));
 
-        typename mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
         value_queue_.push_back(*node);
 
         node.release();
@@ -156,7 +155,7 @@ struct object_semaphore
         // push the LCO's GID onto the queue
         HPX_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
         
-        typename mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
 
         thread_queue_.push_back(*node);
 
@@ -167,7 +166,7 @@ struct object_semaphore
 
     void abort_pending(error ec)
     { // {{{
-        typename mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
 
         LLCO_(info)
             << "object_semaphore::abort_pending: thread_queue is not empty, "
@@ -183,26 +182,15 @@ struct object_semaphore
             LLCO_(info)
                 << "object_semaphore::abort_pending: pending thread " << id; 
 
-            // try to abort the thread, do not throw
             try
             {
-                try
-                {
-                    HPX_THROW_EXCEPTION(ec, "object_semaphore::abort_pending",
-                        "aborting pending thread");
-                }
-
-                catch (hpx::exception& e)
-                { 
-                    applier::trigger_error(id, boost::current_exception());
-                }
+                HPX_THROW_EXCEPTION(ec, "object_semaphore::abort_pending",
+                    "aborting pending thread");
             }
 
-            catch (...)
-            {
-                LLCO_(warning)
-                    << "object_semaphore::abort_pending: could not abort "
-                       "thread " << id;
+            catch (hpx::exception& e)
+            { 
+                applier::trigger_error(id, boost::current_exception());
             }
         }
 
@@ -215,7 +203,7 @@ struct object_semaphore
             lcos::template base_lco_with_value<ValueType>::get_value_action 
         action_type;
 
-        typename mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
 
         typename thread_queue_type::const_iterator it = thread_queue_.begin()
                                                  , end = thread_queue_.end(); 
@@ -226,16 +214,7 @@ struct object_semaphore
 
             LLCO_(info) << "object_semapohre::wait: waiting for " << id;
 
-            try
-            {
-                applier::apply<action_type>(id);
-            }
-
-            catch (...)
-            {
-                LLCO_(warning) << "object_semapohre::wait: " << id
-                               << " threw an exception";
-            }
+            applier::apply<action_type>(id);
         }
     } // }}}
 
@@ -270,6 +249,7 @@ struct object_semaphore
   private:
     value_queue_type value_queue_;
     thread_queue_type thread_queue_;
+    mutex_type mtx_;
 };
 
 }}}

@@ -25,9 +25,6 @@ typedef hpx::components::managed_component<
     hpx::lcos::server::object_semaphore<int>
 > int_object_semaphore_type;
 
-typedef hpx::lcos::detail::local_dataflow_variable<int, int> int_dataflow_type;
-HPX_DEFINE_GET_COMPONENT_TYPE(int_dataflow_type);
-
 HPX_DEFINE_GET_COMPONENT_TYPE(int_object_semaphore_type::wrapped_type);
 
 HPX_REGISTER_ACTION_EX(
