@@ -82,7 +82,7 @@ int hpx_main(boost::program_options::variables_map &vm)
        high_resolution_timer t;
 
         // create some boxes to smash together
-        const std::size_t num_bodies = 4;
+        const std::size_t num_bodies = 148;
 
         namespace bg = boost::geometry;
 
@@ -101,7 +101,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // SIMPLE PROBLEM
         // create some boxes to smash together
-        const std::size_t numpoints = 2;
+        const std::size_t numpoints = 800000;
         double bbox[num_bodies][4];
         double velx[num_bodies];
         double vely[num_bodies];
@@ -156,6 +156,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
 
+#if 0
         hpx::lcos::wait(initial_phase);
         while (time < stop_time) {
             {
@@ -181,7 +182,6 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(search_phase,search_vector);
             }
-#if 0
 
             // Contact enforcement ----------------------------------
             BOOST_ASSERT(search_vector.size() == num_bodies);
@@ -218,9 +218,9 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(recompute_phase);
             }
-#endif
           break;
         } // time loop
+#endif
 
       std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // ensure things are go out of scope 

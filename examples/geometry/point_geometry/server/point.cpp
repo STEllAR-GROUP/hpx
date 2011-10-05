@@ -34,6 +34,8 @@ namespace hpx { namespace geometry { namespace server
         /// search for contact
         int point::search(std::vector<hpx::naming::id_type> const& search_objects) 
         {
+          return 0;
+#if 0
             typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
             lazy_results_type lazy_results;
@@ -45,20 +47,25 @@ namespace hpx { namespace geometry { namespace server
             // will return the number of invoked futures
             bool redo = false;
             lcos::wait(lazy_results, boost::bind(&point::search_callback, this, _1, _2,boost::ref(redo)));
-
+#endif
             if ( slave_.size() > 0 ) return 1;
             else return 0;
         }
 
         bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
         {
+
+          double tmp = 0;
+          for (std::size_t k=0;k<1000;k++) {
+            tmp += rand();
+          }
           //std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
  
           // This contains the R1/R2 sums needed to compute alpha2
           R_.resize(poly_.outer().size());
           // initialize
           for (std::size_t j=0;j<poly_.outer().size();j++) {
-            R_[j] = 0.0;
+            R_[j] = tmp;
           }
 
           if ( i != objectid_ ) {
