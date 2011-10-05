@@ -17,6 +17,7 @@ if(NOT MSVC)
       math
       neutron_star
       nqueen
+      object_semaphore
       # wash: disabled temporarily as it breaks stuff
       #performance_counters
       queue
