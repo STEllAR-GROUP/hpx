@@ -495,14 +495,12 @@ namespace hpx { namespace naming
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return get_credit_from_gid(*gid_);
         }
-        void strip_credit() const
+        void strip_credit() 
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
-            const_cast<detail::id_type_impl&>(*gid_).set_msb
-                (strip_credit_from_gid((*gid_).get_msb()));
-            //strip_credit_from_gid(*gid_);
+            strip_credit_from_gid(*gid_);
         }
-        boost::uint16_t add_credit(boost::uint16_t credit) const
+        boost::uint16_t add_credit(boost::uint16_t credit) 
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return add_credit_to_gid(*gid_, credit);
