@@ -22,6 +22,8 @@ addressing_service::addressing_service(
     )
   : service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
+  , here_(get_runtime().here())
+  , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
   , prefix_()
 { // {{{
