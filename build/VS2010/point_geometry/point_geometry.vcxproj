@@ -48,12 +48,12 @@
       <GenerateMapFile>false</GenerateMapFile>
     </Link>
     <ClCompile>
-      <PreprocessorDefinitions>HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

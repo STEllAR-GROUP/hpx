@@ -98,7 +98,9 @@
     <ClCompile Include="..\..\..\..\examples\adaptive1d\dataflow\server\dataflow_stencil.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\examples\adaptive1d\dataflow\server\dynamic_stencil_value.cpp" />
+    <ClCompile Include="..\..\..\..\examples\adaptive1d\dataflow\server\dynamic_stencil_value.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\examples\adaptive1d\dataflow\server\functional_component.cpp" />
     <ClCompile Include="..\..\..\..\examples\adaptive1d\dataflow\server\stencil_value_out_adaptor.cpp" />
   </ItemGroup>

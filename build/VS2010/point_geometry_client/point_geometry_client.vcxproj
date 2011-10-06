@@ -43,8 +43,16 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ClCompile>
-      <PreprocessorDefinitions>HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HPX_ACTION_ARGUMENT_LIMIT=8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\geometry\point_geometry_client.cpp" />
@@ -71,6 +79,11 @@
     </ProjectReference>
     <ProjectReference Include="..\hpx\init\init.vcxproj">
       <Project>{bde2250c-073a-436b-8fdd-00f9e83c87e3}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="..\hpx_serialization\hpx_serialization.vcxproj">
       <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>

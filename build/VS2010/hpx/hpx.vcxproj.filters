@@ -126,36 +126,6 @@
     <Filter Include="Header Files\Runtime\AGAS">
       <UniqueIdentifier>{229da103-f219-4fee-bdc6-8c247ac79483}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Database">
-      <UniqueIdentifier>{a33113d6-635c-44f9-84d3-d2fca0fba6b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace">
-      <UniqueIdentifier>{eb3a0579-668f-4c0d-8e79-b5a5b6fe9ffd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Network">
-      <UniqueIdentifier>{2a44ba57-9834-43ee-a87b-8f90fe69cfd0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Database\Backend">
-      <UniqueIdentifier>{d6052bdc-2a2d-4289-b1e9-13f02c22ef30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace\Server">
-      <UniqueIdentifier>{f9b32c7e-2a5b-4eb8-9118-cc556dbc61c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Namespace\Stubs">
-      <UniqueIdentifier>{fbdc0ec4-7330-49e9-bfff-cf202a20ab17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Network\Backend">
-      <UniqueIdentifier>{b41a173e-5972-460c-b048-15220561b694}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Runtime\AGAS\Router">
-      <UniqueIdentifier>{84ceed2a-1ec5-49bd-8147-408220d6286e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\AGAS\Router">
-      <UniqueIdentifier>{be39e8bb-c075-4144-8aae-40c166ef0c87}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\AGAS\stdmap_tcpip">
-      <UniqueIdentifier>{6768df38-3f64-4ccf-a453-15d2ca54008d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\LCOs\Server">
       <UniqueIdentifier>{5a50fc87-5817-41d7-9026-94f9c3cec668}</UniqueIdentifier>
     </Filter>
@@ -179,6 +149,15 @@
     </Filter>
     <Filter Include="Header Files\Util\Hardware\Timestamp">
       <UniqueIdentifier>{1ec0081d-63d0-427b-a313-90364ad2307c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Server">
+      <UniqueIdentifier>{f2c6c8f3-3d57-445a-9211-dbe182481edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\AGAS\Stubs">
+      <UniqueIdentifier>{eb831b4c-4fa7-4193-957c-9a78f8b7bd01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\AGAS\Server">
+      <UniqueIdentifier>{8f481286-a23b-4d82-8b2a-8030a8fadbce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -302,9 +281,6 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp">
       <Filter>Source Files\Runtime\Threads</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
-      <Filter>Source Files\Runtime\AGAS\Router</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
       <Filter>Source Files\Runtime\Components</Filter>
     </ClCompile>
@@ -314,26 +290,8 @@
     <ClCompile Include="..\..\..\src\pre_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp">
-      <Filter>Source Files\Runtime\AGAS\Router</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp">
       <Filter>Source Files\LCOs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\symbol_namespace.cpp">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp">
       <Filter>Source Files\LCOs\Barrier</Filter>
@@ -370,6 +328,39 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\query_counters.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\server\average_count_counter.cpp">
+      <Filter>Source Files\Performance Counters\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\component_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\primary_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\response.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\addressing_service.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\big_boot_barrier.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp">
+      <Filter>Source Files\Runtime\Applier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\component_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\primary_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\symbol_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -823,86 +814,8 @@
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\stdmap.hpp">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\gva.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\ib.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\tcpip.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\udpip.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp">
       <Filter>Header Files\Runtime\Applier</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\router\legacy.hpp">
-      <Filter>Header Files\Runtime\AGAS\Router</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace\Stubs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\router\big_boot_barrier.hpp">
-      <Filter>Header Files\Runtime\AGAS\Router</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp">
-      <Filter>Header Files\Runtime\AGAS\Namespace</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp">
       <Filter>Header Files\LCOs</Filter>
@@ -1009,6 +922,54 @@
     <ClInclude Include="..\..\..\hpx\lcos\promise.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\average_count_counter.hpp">
+      <Filter>Header Files\Performance Counters\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace_action_code.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\primary_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\request.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\response.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\symbol_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\addressing_service.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\big_boot_barrier.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\component_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\gva.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\primary_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\symbol_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\component_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\primary_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\symbol_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\component_namespace.hpp">
+      <Filter>Header Files\Runtime\AGAS\Stubs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -1018,59 +979,11 @@
       <Filter>Auxiliary Files</Filter>
     </None>
     <None Include="..\..\..\src\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\actions\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Actions</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\applier\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Applier</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\components\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Components</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\components\server\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Components\Server</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\naming\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Naming</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Parcelset</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\threads\CMakeLists.txt">
-      <Filter>Source Files\Runtime\Threads</Filter>
-    </None>
     <None Include="hpx.def">
       <Filter>Auxiliary Files</Filter>
     </None>
-    <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept">
-      <Filter>Header Files\Runtime\AGAS\Database\Backend</Filter>
-    </None>
-    <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept">
-      <Filter>Header Files\Runtime\AGAS\Network\Backend</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\agas\stdmap_tcpip\CMakeLists.txt">
-      <Filter>Source Files\Runtime\AGAS\stdmap_tcpip</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\agas\router\CMakeLists.txt">
-      <Filter>Source Files\Runtime\AGAS\Router</Filter>
-    </None>
-    <None Include="..\..\..\src\lcos\CMakeLists.txt">
-      <Filter>Source Files\LCOs</Filter>
-    </None>
     <None Include="..\..\..\src\performance_counters\CMakeLists.txt">
       <Filter>Source Files\Performance Counters</Filter>
-    </None>
-    <None Include="..\..\..\src\performance_counters\server\CMakeLists.txt">
-      <Filter>Source Files\Performance Counters\Server</Filter>
-    </None>
-    <None Include="..\..\..\src\performance_counters\stubs\CMakeLists.txt">
-      <Filter>Source Files\Performance Counters\Stubs</Filter>
-    </None>
-    <None Include="..\..\..\src\runtime\CMakeLists.txt">
-      <Filter>Source Files\Runtime</Filter>
-    </None>
-    <None Include="..\..\..\src\lcos\barrier\CMakeLists.txt">
-      <Filter>Source Files\LCOs\Barrier</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

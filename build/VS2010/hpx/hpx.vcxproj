@@ -105,22 +105,38 @@
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\server\average_count_counter.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\server\elapsed_time_counter.cpp" />
     <ClCompile Include="..\..\..\src\pre_main.cpp" />
     <ClCompile Include="..\..\..\src\runtime.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\agas\router\big_boot_barrier.cpp">
+    <ClCompile Include="..\..\..\src\runtime\agas\addressing_service.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\router\legacy.cpp">
+    <ClCompile Include="..\..\..\src\runtime\agas\big_boot_barrier.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_module.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\component_namespace.cpp" />
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\primary_namespace.cpp">
+    <ClCompile Include="..\..\..\src\runtime\agas\component_namespace.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\runtime\agas\stdmap_tcpip\symbol_namespace.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\primary_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\response.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\server\component_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\component_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\component_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\primary_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\symbol_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
     <ClCompile Include="..\..\..\src\runtime\components\console_error_sink.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_error_sink1.obj</ObjectFileName>
@@ -205,6 +221,7 @@
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\average_count_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\server\elapsed_time_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
@@ -212,32 +229,21 @@
     <ClInclude Include="..\..\..\hpx\runtime\actions\function_implementations.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\default.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\backend\stdmap.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\table.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\database\traits_fwd.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\component.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\primary.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\response.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\component.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\primary.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\server\symbol.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\component.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\primary.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\stubs\symbol.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace\symbol.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\default.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\ib.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\tcpip.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\backend\udpip.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\gva.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\network\traits_fwd.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\router\big_boot_barrier.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\router\legacy.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits.hpp" />
-    <ClInclude Include="..\..\..\hpx\runtime\agas\traits_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\addressing_service.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\big_boot_barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\gva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace_action_code.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\request.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\response.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\symbol_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\symbol_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\symbol_namespace.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
@@ -397,24 +403,8 @@
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt" />
     <None Include="..\..\..\docs\hpx.doxy" />
-    <None Include="..\..\..\hpx\runtime\agas\database\backend\database_backend.concept" />
-    <None Include="..\..\..\hpx\runtime\agas\network\backend\network_backend.concept" />
     <None Include="..\..\..\src\CMakeLists.txt" />
-    <None Include="..\..\..\src\lcos\barrier\CMakeLists.txt" />
-    <None Include="..\..\..\src\lcos\CMakeLists.txt" />
     <None Include="..\..\..\src\performance_counters\CMakeLists.txt" />
-    <None Include="..\..\..\src\performance_counters\server\CMakeLists.txt" />
-    <None Include="..\..\..\src\performance_counters\stubs\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\actions\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\agas\router\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\agas\stdmap_tcpip\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\applier\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\components\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\components\server\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\naming\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\parcelset\CMakeLists.txt" />
-    <None Include="..\..\..\src\runtime\threads\CMakeLists.txt" />
     <None Include="hpx.def" />
   </ItemGroup>
   <ItemGroup>
