@@ -92,6 +92,9 @@ namespace hpx { namespace geometry { namespace server
             // Add points *CLOCKWISE* -- otherwise intersection routine will not work
             //polygon_type poly;
             // create the rectangle of the mesh object
+            velx_.reserve(numpoints*4);
+            vely_.reserve(numpoints*4);
+            poly_.outer().reserve(numpoints*4);
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
               point_type p(xmin,y);
@@ -199,55 +202,55 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_action8<
+        typedef hpx::actions::action8<
             point, point_init, double, double,double,double,double,double,std::size_t,std::size_t, &point::init
         > init_action;
 
-        typedef hpx::actions::direct_result_action0<
+        typedef hpx::actions::result_action0<
             point const, double, point_get_X, &point::get_X
         > get_X_action;
 
-        typedef hpx::actions::direct_result_action0<
+        typedef hpx::actions::result_action0<
             point const, polygon_type, point_get_poly, &point::get_poly
         > get_poly_action;
 
-        typedef hpx::actions::direct_action2<
+        typedef hpx::actions::action2<
             point, point_move, double, double, &point::move
         > move_action;
 
-        typedef hpx::actions::direct_action1<
+        typedef hpx::actions::action1<
             point, point_adjust, double, &point::adjust
         > adjust_action;
 
-        typedef hpx::actions::direct_action4<
+        typedef hpx::actions::action4<
             point, point_enforce,std::vector<hpx::naming::id_type> const&,double,std::size_t,std::size_t,
             &point::enforce
         > enforce_action;
 
-        typedef hpx::actions::direct_result_action0<
+        typedef hpx::actions::result_action0<
             point const, double, point_get_Y, &point::get_Y
         > get_Y_action;
 
-        typedef hpx::actions::direct_action1<
+        typedef hpx::actions::action1<
             point, point_set_X, double, &point::set_X
         > set_X_action;
 
-        typedef hpx::actions::direct_action1<
+        typedef hpx::actions::action1<
             point, point_set_Y, double, &point::set_Y
         > set_Y_action;
 
-        typedef hpx::actions::direct_result_action1<
+        typedef hpx::actions::result_action1<
             point, int, point_search, std::vector<hpx::naming::id_type> const&, 
             &point::search
         > search_action;
 
-        typedef hpx::actions::direct_action1<
+        typedef hpx::actions::action1<
             point, point_recompute, std::vector<hpx::naming::id_type> const&, 
             &point::recompute
         > recompute_action;
 
     private:
-        hpx::lcos::mutex mtx_;    // lock for this data block
+        //hpx::lcos::mutex mtx_;    // lock for this data block
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;
