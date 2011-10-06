@@ -498,7 +498,9 @@ namespace hpx { namespace naming
         void strip_credit() const
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
-            strip_credit_from_gid(*gid_);
+            const_cast<detail::id_type_impl&>(*gid_).set_msb
+                (strip_credit_from_gid((*gid_).get_msb()));
+            //strip_credit_from_gid(*gid_);
         }
         boost::uint16_t add_credit(boost::uint16_t credit) const
         {
