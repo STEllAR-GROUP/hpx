@@ -767,7 +767,12 @@ bool addressing_service::resolve_cached(
     // Check if the entry is currently in the cache
     if (hosted->gva_cache_.get_entry(k, idbase, e))
     {
-        if (HPX_UNLIKELY(id.get_msb() != idbase.id.get_msb()))
+        const boost::uint64_t id_msb
+            = naming::strip_credit_from_gid(id.get_msb());
+        const boost::uint64_t idbase_msb
+            = naming::strip_credit_from_gid(idbase.id.get_msb());
+
+        if (HPX_UNLIKELY(id_msb != idbase_msb))
         {
             HPX_THROWS_IF(ec, invalid_page_fault
               , "addressing_service::resolve_cached" 
