@@ -12,20 +12,20 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <tests/correctness/agas/components/stubs/managed_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/stubs/simple_refcnt_checker.hpp>
 
 namespace hpx { namespace test 
 {
 
-struct managed_refcnt_checker
+struct simple_refcnt_checker
   : components::client_base<
-        managed_refcnt_checker
-      , stubs::managed_refcnt_checker
+        simple_refcnt_checker
+      , stubs::simple_refcnt_checker
     >
 {
     typedef components::client_base<
-        managed_refcnt_checker
-      , stubs::managed_refcnt_checker
+        simple_refcnt_checker
+      , stubs::simple_refcnt_checker
     > base_type;
 
   private:
@@ -36,7 +36,7 @@ struct managed_refcnt_checker
 
   public:
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(
+    explicit simple_refcnt_checker(
         naming::gid_type const& locality
         ) 
     {
@@ -44,7 +44,7 @@ struct managed_refcnt_checker
     }
 
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(
+    explicit simple_refcnt_checker(
         naming::id_type const& locality
         ) 
     {

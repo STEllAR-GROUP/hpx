@@ -13,6 +13,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/eager_future.hpp>

@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/include/iostreams.hpp>
 
 using boost::program_options::variables_map;

@@ -11,20 +11,20 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <tests/correctness/agas/components/server/managed_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/server/simple_refcnt_checker.hpp>
 
 namespace hpx { namespace test { namespace stubs
 {
 
-struct managed_refcnt_checker
-  : components::stub_base<server::managed_refcnt_checker>
+struct simple_refcnt_checker
+  : components::stub_base<server::simple_refcnt_checker>
 {
     static lcos::promise<void> take_reference_async(
         naming::id_type const& this_
       , naming::id_type const& gid
         )
     {
-        typedef server::managed_refcnt_checker::take_reference_action
+        typedef server::simple_refcnt_checker::take_reference_action
             action_type;
         return lcos::eager_future<action_type>(this_, gid);
     }

@@ -4,12 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -23,7 +24,12 @@ using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
 
-using hpx::test::managed_refcnt_checker;
+using hpx::test::simple_refcnt_checker;
+
+using hpx::util::report_errors;
+
+using hpx::cout;
+using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -40,8 +46,11 @@ int hpx_main(
         ///     references to both components go out of scope. Both components
         ///     should be deleted. 
 
-        managed_refcnt_checker monitor0(find_here());
-        managed_refcnt_checker monitor1(find_here());
+        simple_refcnt_checker monitor0(find_here());
+        simple_refcnt_checker monitor1(find_here());
+
+        cout << "id0: " << monitor0.get_gid() << "\n"
+             << "id1: " << monitor1.get_gid() << "\n" << flush; 
 
         {
             // Have the second object store a reference to the first object.
@@ -62,7 +71,7 @@ int hpx_main(
     }
 
     finalize();
-    return 0;
+    return report_errors();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

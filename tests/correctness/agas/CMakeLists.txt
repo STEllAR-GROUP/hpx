@@ -15,22 +15,22 @@ set(tests
    )
 
 set(scoped_ref_to_local_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 set(scoped_ref_to_remote_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 set(local_embedded_ref_to_local_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 set(local_embedded_ref_to_remote_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 set(remote_embedded_ref_to_local_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 set(remote_embedded_ref_to_remote_object_FLAGS
-    DEPENDENCIES managed_refcnt_checker_component)
+    DEPENDENCIES simple_refcnt_checker_component)
 
 foreach(test ${tests})
   set(sources

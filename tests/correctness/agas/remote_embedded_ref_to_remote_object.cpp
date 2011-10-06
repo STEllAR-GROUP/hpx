@@ -4,13 +4,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -28,7 +29,12 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::test::managed_refcnt_checker;
+using hpx::test::simple_refcnt_checker;
+
+using hpx::util::report_errors;
+
+using hpx::cout;
+using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -47,19 +53,25 @@ int hpx_main(
 
         std::vector<id_type> remote_localities;
 
-        typedef hpx::test::server::managed_refcnt_checker server_type;
+        typedef hpx::test::server::simple_refcnt_checker server_type;
 
         component_type ctype = get_component_type<server_type>();
 
         if (!get_applier().get_remote_prefixes(remote_localities, ctype))
             throw std::logic_error("this test cannot be run on one locality");
 
-        managed_refcnt_checker monitor0(remote_localities[0]);
-        managed_refcnt_checker monitor1(remote_localities[0]);
+        simple_refcnt_checker monitor0(remote_localities[0]);
+        simple_refcnt_checker monitor1(remote_localities[0]);
+
+        cout << "id0: " << monitor0.get_gid() << "\n"
+             << "id1: " << monitor1.get_gid() << "\n" << flush; 
 
         {
             // Have the second object store a reference to the first object.
             monitor1.take_reference(monitor0.get_gid());
+
+            cout << "id0: " << monitor0.get_gid() << "\n"
+                 << "id1: " << monitor1.get_gid() << "\n" << flush; 
 
             // Detach the references.
             id_type id0 = monitor0.detach()
@@ -76,7 +88,7 @@ int hpx_main(
     }
 
     finalize();
-    return 0;
+    return report_errors();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
