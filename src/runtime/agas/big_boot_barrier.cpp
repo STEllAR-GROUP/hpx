@@ -265,6 +265,13 @@ void register_console(registration_header const& header)
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
+    if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_console"
+            , "registration parcel received by non-bootstrap locality"); 
+    }
+
 /*
     if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
     {
@@ -430,6 +437,13 @@ void register_worker(registration_header const& header)
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
+
+    if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_worker"
+            , "registration parcel received by non-bootstrap locality"); 
+    }
 
     naming::gid_type prefix
                    , parcel_lower, parcel_upper
