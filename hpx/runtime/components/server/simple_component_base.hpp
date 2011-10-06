@@ -97,11 +97,6 @@ namespace hpx { namespace components
             return gid_;
         }
 
-        // Forwarder for interface compatibility 
-        // REVIEW: I'm 99.9% sure this should be unmanaged.
-        naming::id_type get_gid() const
-        { return naming::id_type(get_base_gid(), naming::id_type::unmanaged); }
-
         /// \brief  The function \a get_factory_properties is used to 
         ///         determine, whether instances of the derived component can 
         ///         be created in blocks (i.e. more than one instance at once). 
@@ -136,6 +131,22 @@ namespace hpx { namespace components
             BOOST_ASSERT(1 == count);
             return new Component();
         }
+
+        /// \brief  The function \a create is used for allocation and 
+        //          initialization of a single instance.
+#define HPX_SIMPLE_COMPONENT_CREATE_ONE(Z, N, _)                              \
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
+        static Component*                                                     \
+        create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
+        {                                                                     \
+            return new Component(BOOST_PP_ENUM_PARAMS(N, t));                 \
+        }                                                                     \
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
+            HPX_SIMPLE_COMPONENT_CREATE_ONE, _)
+
+#undef HPX_SIMPLE_COMPONENT_CREATE_ONE
 
         /// \brief  The function \a destroy is used for destruction and 
         ///         de-allocation of instances of the derived components.
