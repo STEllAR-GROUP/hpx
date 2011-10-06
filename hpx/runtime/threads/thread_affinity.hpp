@@ -44,6 +44,12 @@ namespace hpx { namespace threads
         return std::size_t(-1);
     }
 
+    inline std::size_t hardware_concurrency()
+    {
+        static std::size_t num_of_cores = boost::thread::hardware_concurrency();
+        return num_of_cores;
+    }
+
 #if defined(BOOST_WINDOWS)
 
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
@@ -55,7 +61,7 @@ namespace hpx { namespace threads
         if (GetNumaProcessorNode(thread_num, &node_number))
             return int(node_number);
 
-        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        unsigned int num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
 
@@ -70,7 +76,7 @@ namespace hpx { namespace threads
     inline std::size_t 
     get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
-        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        unsigned int num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
         std::size_t affinity = num_thread % num_of_cores;
@@ -98,7 +104,7 @@ namespace hpx { namespace threads
     inline std::size_t 
     get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
-        unsigned int num_of_cores = boost::thread::hardware_concurrency();
+        unsigned int num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
         std::size_t affinity = num_thread % num_of_cores;
@@ -220,7 +226,7 @@ namespace hpx { namespace threads
     }
     inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
-        std::size_t num_of_cores = boost::thread::hardware_concurrency();
+        std::size_t num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
             num_of_cores = 1;     // assume one core
 
