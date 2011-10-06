@@ -46,7 +46,7 @@ find_barrier(naming::resolver_client& agas_client, char const* symname)
     }
     if (HPX_UNLIKELY(!barrier_id))
     {
-        HPX_THROW_EXCEPTION(network_error, "pre_main (find_barrier)", 
+        HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier", 
             std::string("couldn't find stage boot barrier ") + symname);
     }
     return lcos::barrier(naming::id_type(barrier_id, naming::id_type::unmanaged));
@@ -111,6 +111,15 @@ void pre_main(runtime_mode mode)
         // {{{ Second and third stage barrier creation.
         if (agas_client.is_bootstrap())
         {
+            naming::gid_type console_;
+            
+            if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_, false)))
+            {
+                HPX_THROW_EXCEPTION(network_error
+                    , "pre_main"
+                    , "no console locality registered"); 
+            }
+
             std::size_t const num_localities = cfg.get_num_localities();
             second_stage = create_barrier(agas_client, num_localities, second_barrier);
             third_stage = create_barrier(agas_client, num_localities, third_barrier);
