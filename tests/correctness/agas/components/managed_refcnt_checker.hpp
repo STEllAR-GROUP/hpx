@@ -36,26 +36,48 @@ struct managed_refcnt_checker
 
   public:
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(naming::gid_type const& locality) 
+    explicit managed_refcnt_checker(
+        naming::gid_type const& locality
+        ) 
     {
         this->base_type::create_one(locality, flag_.get_gid()); 
     }
 
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(naming::id_type const& locality) 
+    explicit managed_refcnt_checker(
+        naming::id_type const& locality
+        ) 
     {
         this->base_type::create_one(locality, flag_.get_gid()); 
     }
 
-    using base_type::detach;
+    lcos::promise<void> take_reference_async(
+        naming::id_type const& gid
+        )
+    {
+        BOOST_ASSERT(gid_);
+        return this->base_type::take_reference_async(gid_, gid);
+    } 
+
+    void take_reference(
+        naming::id_type const& gid
+        )
+    {
+        BOOST_ASSERT(gid_);
+        return this->base_type::take_reference(gid_, gid);
+    }
 
     bool ready()
     {
         return flag_.ready();
     }
 
-    template <typename Duration>
-    bool ready(Duration const& d)
+    template <
+        typename Duration
+    >
+    bool ready(
+        Duration const& d
+        )
     {
         // Schedule a wakeup.
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);

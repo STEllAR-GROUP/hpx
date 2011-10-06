@@ -6,14 +6,30 @@
 add_subdirectory(components)
 
 set(tests
-    local_scoped_deletion
-    remote_scoped_deletion
+    scoped_ref_to_local_object
+    scoped_ref_to_remote_object
+    local_embedded_ref_to_local_object
+    local_embedded_ref_to_remote_object
+    remote_embedded_ref_to_local_object
+    remote_embedded_ref_to_remote_object
    )
 
-set(local_scoped_deletion_FLAGS
+set(scoped_ref_to_local_object_FLAGS
     DEPENDENCIES managed_refcnt_checker_component)
 
-set(remote_scoped_deletion_FLAGS
+set(scoped_ref_to_remote_object_FLAGS
+    DEPENDENCIES managed_refcnt_checker_component)
+
+set(local_embedded_ref_to_local_object_FLAGS
+    DEPENDENCIES managed_refcnt_checker_component)
+
+set(local_embedded_ref_to_remote_object_FLAGS
+    DEPENDENCIES managed_refcnt_checker_component)
+
+set(remote_embedded_ref_to_local_object_FLAGS
+    DEPENDENCIES managed_refcnt_checker_component)
+
+set(remote_embedded_ref_to_remote_object_FLAGS
     DEPENDENCIES managed_refcnt_checker_component)
 
 foreach(test ${tests})
