@@ -9,11 +9,12 @@
 #include <cmath>
 
 #include <boost/math/constants/constants.hpp>
-#include <hpx/include/iostreams.hpp>
+
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/actions/function.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
+
+#include <hpx/include/iostreams.hpp>
+#include <hpx/include/actions.hpp>
+
 #include <hpx/lcos/eager_future.hpp>
 
 using boost::program_options::variables_map;
