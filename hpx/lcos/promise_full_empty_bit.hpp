@@ -176,6 +176,7 @@ namespace hpx { namespace lcos { namespace detail
             return get_data(0);
         }
 
+        // REVIEW: why does this strip the credit?
         template <typename ManagedType>
         naming::id_type const& get_gid(ManagedType* p) const
         {
