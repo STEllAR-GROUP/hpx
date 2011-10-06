@@ -644,40 +644,69 @@ bool addressing_service::resolve(
     )
 { // {{{ resolve implementation
     try {
-        if (!is_bootstrap())
+        // {{{ special cases
+
+        // LVA-encoded GIDs 
+        if (naming::strip_credit_from_gid(id.get_msb())
+            == local_prefix().get_msb())  
         {
-            // {{{ special cases: authoritative AGAS component address
-            // resolution
-            if (id == primary_namespace_server_type::fixed_gid())
+            addr.locality_ = here_;  
+    
+            // An LSB of 0 references the runtime support component
+            if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
             {
-                addr = hosted->primary_ns_addr_;
-                if (&ec != &throws)
-                    ec = make_success_code();
-                return true;
+                addr.type_ = components::component_runtime_support;
+                addr.address_ = rts_lva_;
             }
     
-            else if (id == component_namespace_server_type::fixed_gid())
+            else
             {
-                addr = hosted->component_ns_addr_;
-                if (&ec != &throws)
-                    ec = make_success_code();
-                return true;
+                addr.type_ = components::component_memory;
+                addr.address_ = id.get_lsb();
             }
     
-            else if (id == symbol_namespace_server_type::fixed_gid())
-            {
-                addr = hosted->symbol_ns_addr_;
-                if (&ec != &throws)
-                    ec = make_success_code();
-                return true;
-            }
-            // }}}
+            if (&ec != &throws)
+                ec = make_success_code();
     
-            // Try the cache.
-            else if (try_cache && resolve_cached(id, addr, ec))
-                return true;
+            return true;
         }
-        
+
+        // authoritative AGAS component address resolution
+        else if (id == primary_namespace_server_type::fixed_gid())
+        {
+            addr = hosted->primary_ns_addr_;
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+    
+        else if (id == component_namespace_server_type::fixed_gid())
+        {
+            addr = hosted->component_ns_addr_;
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+    
+        else if (id == symbol_namespace_server_type::fixed_gid())
+        {
+            addr = hosted->symbol_ns_addr_;
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+        // }}}
+
+        // Try the cache if applicable.
+        if (!is_bootstrap() && try_cache)
+        {
+            if (resolve_cached(id, addr, ec))
+                return true;
+
+            if (ec)
+                return false;
+        }
+ 
         response r; 
     
         if (is_bootstrap())
@@ -732,8 +761,34 @@ bool addressing_service::resolve_cached(
     if (is_bootstrap())
         return resolve(id, addr, false, ec);
 
-    // {{{ special cases: authoritative AGAS component address resolution
-    if (id == primary_namespace_server_type::fixed_gid())
+    // {{{ special cases
+
+    // LVA-encoded GIDs 
+    if (naming::strip_credit_from_gid(id.get_msb()) == local_prefix().get_msb())  
+    {
+        addr.locality_ = here_;  
+
+        // An LSB of 0 references the runtime support component
+        if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
+        {
+            addr.type_ = components::component_runtime_support;
+            addr.address_ = rts_lva_;
+        }
+
+        else
+        {
+            addr.type_ = components::component_memory;
+            addr.address_ = id.get_lsb();
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
+    // authoritative AGAS component address resolution
+    else if (id == primary_namespace_server_type::fixed_gid())
     {
         addr = hosted->primary_ns_addr_;
         if (&ec != &throws)

@@ -143,20 +143,7 @@ namespace hpx { namespace naming
         bool id_type_impl::resolve()
         {
             // call only if not already resolved
-
             applier::applier& appl = applier::get_applier();
-            if (is_local_address(*this, appl.get_prefix()))
-            {
-                // a zero address references the local runtime support component
-                gid_type::mutex_type::scoped_lock l(this);
-                if (0 != this->get_lsb())
-                    address_ = this->get_lsb();
-                else 
-                    address_ = appl.get_runtime_support_gid().get_lsb();
-
-                address_.locality_ = appl.here();
-                return true;
-            }
 
             error_code ec;
             address addr;

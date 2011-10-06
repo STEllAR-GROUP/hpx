@@ -388,6 +388,10 @@ void notify_console(notification_header const& header)
     agas_client.hosted->component_ns_addr_ = header.component_ns_address;
     agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
 
+    // cache runtime variables
+    agas_client.here_ = get_runtime().here();
+    agas_client.rts_lva_ = get_runtime().get_runtime_support_lva();
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     get_runtime().get_id_pool().set_range(header.parcelport_lower_gid
@@ -547,6 +551,10 @@ void notify_worker(notification_header const& header)
     agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
     agas_client.hosted->component_ns_addr_ = header.component_ns_address;
     agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
+
+    // cache runtime variables
+    agas_client.here_ = get_runtime().here();
+    agas_client.rts_lva_ = get_runtime().get_runtime_support_lva();
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.

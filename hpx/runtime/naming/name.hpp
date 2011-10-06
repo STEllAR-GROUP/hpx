@@ -302,14 +302,6 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline bool is_local_address(gid_type const& gid, gid_type const& prefix) HPX_PURE;
-
-    inline bool is_local_address(gid_type const& gid, gid_type const& prefix)
-    {
-        return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     gid_type const invalid_gid = gid_type();
 
     ///////////////////////////////////////////////////////////////////////////

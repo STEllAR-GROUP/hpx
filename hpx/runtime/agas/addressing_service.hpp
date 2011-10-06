@@ -199,7 +199,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         symbol_namespace symbol_ns_;
 
         cache_mutex_type gva_cache_mtx_;
-        gva_cache_type gva_cache_; // AKA, the TLB
+        gva_cache_type gva_cache_; 
 
         console_cache_type console_cache_;
 
@@ -216,6 +216,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     const service_mode service_type;
     const runtime_mode runtime_type;
+
+    naming::locality here_;
+    boost::uint64_t rts_lva_;
 
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
