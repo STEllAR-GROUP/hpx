@@ -151,7 +151,8 @@ std::vector<naming::id_type> discovery::build_network()
     {
         if (naming::get_prefix_from_gid(localities[i]) == root_prefix)
         {
-            network.push_back(this->get_gid());
+            network.push_back( naming::id_type(this->get_base_gid()
+                             , naming::id_type::unmanaged));
         }
         else if (naming::get_prefix_from_gid(localities[i]) > root_prefix)
         {

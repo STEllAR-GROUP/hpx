@@ -203,7 +203,8 @@ struct HPX_COMPONENT_EXPORT integrator
                 naming::get_prefix_from_id(discovery_network[i]);
 
             if (current_prefix == root_prefix)
-                integrator_network.push_back(this->get_gid());
+                integrator_network.push_back(naming::id_type
+                    (this->get_base_gid(), naming::id_type::unmanaged));
             else if (current_prefix > root_prefix)
                 integrator_network.push_back(results0[i - 1].get());
             else
