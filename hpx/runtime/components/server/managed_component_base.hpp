@@ -321,7 +321,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and 
         //          initialization of a single instance.
-#define MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                                 \
+#define HPX_MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                             \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
         static derived_type*                                                  \
         create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
@@ -333,9 +333,9 @@ namespace hpx { namespace components
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
-            MANAGED_COMPONENT_CREATE_ONE, _)
+            HPX_MANAGED_COMPONENT_CREATE_ONE, _)
 
-#undef MANAGED_COMPONENT_CREATE_ONE
+#undef HPX_MANAGED_COMPONENT_CREATE_ONE
 
         /// \brief  The function \a destroy is used for deletion and 
         //          de-allocation of arrays of wrappers
