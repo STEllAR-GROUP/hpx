@@ -21,7 +21,6 @@
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
 #include <hpx/util/iterator_sink.hpp>
-#include <hpx/util/serializable_shared_ptr.hpp>
 
 namespace hpx { namespace iostreams
 {
@@ -47,12 +46,12 @@ struct lazy_ostream
 
     struct data_type
     {
-        util::serializable_shared_ptr<std::deque<char> > out_buffer;
+        buffer out_buffer;
         stream_type stream;
 
         data_type()
-            : out_buffer(new std::deque<char>)
-            , stream(iterator_type(*out_buffer)) {}
+          : out_buffer(new std::deque<char>)
+          , stream(iterator_type(*(out_buffer.data_))) {}
     };
 
     data_type* data;
@@ -74,7 +73,7 @@ struct lazy_ostream
         data->stream << subject;
 
         // If the buffer isn't empty, send it to the destination.
-        if (!data->out_buffer->empty())
+        if (!data->out_buffer.data_->empty())
         {
             // Create the next buffer/stream.
             data_type* next = new data_type;
@@ -104,7 +103,7 @@ struct lazy_ostream
         data->stream << subject;
 
         // If the buffer isn't empty, send it to the destination.
-        if (!data->out_buffer->empty())
+        if (!data->out_buffer.data_->empty())
         {
             // Create the next buffer/stream.
             data_type* next = new data_type;
@@ -128,8 +127,8 @@ struct lazy_ostream
 
   public:
     lazy_ostream(naming::id_type const& gid = naming::invalid_id)
-        : base_type(gid)
-        , data(new data_type)
+      : base_type(gid)
+      , data(new data_type)
     {} 
 
     lazy_ostream(BOOST_RV_REF(lazy_ostream) other)

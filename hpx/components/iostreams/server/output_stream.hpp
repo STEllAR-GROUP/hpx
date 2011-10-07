@@ -8,17 +8,79 @@
 #if !defined(HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0)
 #define HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/serializable_shared_ptr.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
 // TODO: Error handling?
 
-namespace hpx { namespace iostreams { namespace server
+namespace hpx { namespace iostreams
+{
+
+struct buffer
+{
+    buffer()
+      : data_()
+    {}
+
+    buffer(
+        std::deque<char>* ptr
+        )
+      : data_(ptr)
+    {}
+
+    boost::shared_ptr<std::deque<char> > data_;
+
+  private:
+    friend class boost::serialization::access;
+
+    template <
+        typename Archive
+    >
+    void save(
+        Archive& ar
+      , const unsigned int
+        ) const
+    {
+        bool isvalid = data_ ? true : false;
+        ar << isvalid;
+
+        if (isvalid)
+        {
+            std::deque<char> const& instance = *data_;
+            ar << instance;
+        }
+    }
+
+    template <
+        typename Archive
+    >
+    void load(
+        Archive& ar
+      , const unsigned int
+        )
+    {
+        bool isvalid;
+        ar >> isvalid;
+
+        if (isvalid)
+        {
+            std::deque<char> instance;
+            ar >> instance;
+            data_.reset(new std::deque<char>(instance));
+        }
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+};
+
+namespace server
 {
 
 struct HPX_COMPONENT_EXPORT output_stream
@@ -37,13 +99,13 @@ struct HPX_COMPONENT_EXPORT output_stream
     // Executed in an io_pool thread to prevent io from blocking an HPX
     // shepherd thread.
     void call_write_async(
-        util::serializable_shared_ptr<std::deque<char> > const& in
-    );
+        buffer const& in
+        );
 
     void call_write_sync(
-        util::serializable_shared_ptr<std::deque<char> > const& in
+        buffer const& in 
       , threads::thread_id_type caller
-    );
+        );
 
   public:
     explicit output_stream(write_function_type write_f_ = write_function_type())
@@ -59,11 +121,11 @@ struct HPX_COMPONENT_EXPORT output_stream
         : write_f(make_std_ostream_write_function(os.get())) {}
 
     void write_async(
-        util::serializable_shared_ptr<std::deque<char> > const& in
+        buffer const& in
         );
 
     void write_sync(
-        util::serializable_shared_ptr<std::deque<char> > const& in
+        buffer const& in
         );
 
     enum actions
@@ -74,13 +136,13 @@ struct HPX_COMPONENT_EXPORT output_stream
 
     typedef hpx::actions::action1<
         output_stream, output_stream_write_async,
-        util::serializable_shared_ptr<std::deque<char> > const&, 
+        buffer const&,
         &output_stream::write_async
     > write_async_action;
 
     typedef hpx::actions::action1<
         output_stream, output_stream_write_sync,
-        util::serializable_shared_ptr<std::deque<char> > const&, 
+        buffer const&,
         &output_stream::write_sync
     > write_sync_action;
 };
