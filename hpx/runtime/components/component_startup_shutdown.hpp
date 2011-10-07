@@ -68,12 +68,14 @@ namespace hpx { namespace components
     {                                                                         \
         bool startup(boost::function<void()>& startup_func)                   \
         {                                                                     \
-            if (startup_ != 0) { startup_func = startup_; return true; }      \
+            boost::function<void()> tmp = startup_;                           \
+            if (!tmp.empty()) { startup_func = startup_; return true; }       \
             return false;                                                     \
         }                                                                     \
         bool shutdown(boost::function<void()>& shutdown_func)                 \
         {                                                                     \
-            if (shutdown_ != 0) { shutdown_func = shutdown_; return true; }   \
+            boost::function<void()> tmp = shutdown_;                          \
+            if (!tmp.empty()) { shutdown_func = shutdown_; return true; }     \
             return false;                                                     \
         }                                                                     \
     }}}                                                                       \
