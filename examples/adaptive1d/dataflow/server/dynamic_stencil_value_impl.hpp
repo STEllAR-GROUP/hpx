@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     inline dynamic_stencil_value::dynamic_stencil_value()
       : is_called_(false), driver_thread_(0), sem_result_(0), 
         functional_gid_(naming::invalid_id), row_(-1), column_(-1), 
-        instencilsize_(-1), outstencilsize_(-1), mtx_("marduk_dynamic_stencil_value")
+        instencilsize_(-1), outstencilsize_(-1), mtx_("adaptive1d_dynamic_stencil_value")
     {
         std::fill(&value_gids_[0], &value_gids_[2], naming::invalid_id);
 
