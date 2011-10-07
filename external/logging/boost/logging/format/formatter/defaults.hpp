@@ -21,6 +21,7 @@
 # pragma once
 #endif
 
+#include <boost/cstdint.hpp>
 #include <boost/logging/detail/fwd.hpp>
 #include <boost/logging/detail/manipulator.hpp>
 #include <boost/logging/format/formatter/convert_format.hpp>
@@ -31,6 +32,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <sstream>
+#include <ios>
+#include <iomanip>
 
 namespace boost { namespace logging { namespace formatter {
 
@@ -55,14 +58,14 @@ This will output something similar to:
 @param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
 For instance, you might use @ref boost::logging::optimize::cache_string_one_str "a cached_string class" (see @ref boost::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct idx_t : is_generic, formatter::non_const_context<int>, boost::logging::op_equal::always_equal  {
-    typedef formatter::non_const_context<int> non_const_context_base;
+template<class convert = do_convert_format::prepend> struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>, boost::logging::op_equal::always_equal  {
+    typedef formatter::non_const_context<boost::uint64_t> non_const_context_base;
     typedef convert convert_type;
 
-    idx_t() : non_const_context_base((int)0) {}
+    idx_t() : non_const_context_base((boost::uint64_t)0) {}
     template<class msg_type> void operator()(msg_type & str) const {
         std::basic_ostringstream<char_type> idx;
-        idx << ++context() ;
+        idx << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0') << ++context();
 
         convert::write( idx.str(), str );
     }
