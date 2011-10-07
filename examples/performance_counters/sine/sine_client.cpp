@@ -13,18 +13,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 int monitor(boost::uint64_t pause, boost::uint64_t values)
 {
-    // Resolve the GID of the performance counter using it's symbolic name.
-    boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();        
-    boost::format sine_instance("/sine(locality#%d/instance#%d)/immediate");
+    // Resolve the GID of the performances counter using it's symbolic name.
+    boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+    boost::format sine_immediate("/sine(locality#%d/instance#%d)/immediate");
+    boost::format sine_average("/sine(locality#%d/instance#0)/average");
 
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
 
-    id_type id1 = get_counter(boost::str(sine_instance % prefix % 0));
-    id_type id2 = get_counter(boost::str(sine_instance % prefix % 1));
+    id_type id1 = get_counter(boost::str(sine_immediate % prefix % 0));
+    id_type id2 = get_counter(boost::str(sine_immediate % prefix % 1));
+    id_type id3 = get_counter(boost::str(sine_average % prefix));
 
+    // retrieve the counter values
     boost::int64_t start_time = 0;
-
     while (values-- > 0) 
     {
         // Query the performance counter.
@@ -34,15 +36,17 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         counter_value value1 = performance_counter::get_value(id1); 
         counter_value value2 = performance_counter::get_value(id2); 
+        counter_value value3 = performance_counter::get_value(id3); 
         if (status_valid_data == value1.status_)
         {
             if (!start_time)
                 start_time = value1.time_;
 
-            std::cout << (boost::format("%.3f: %.4f, %.4f\n") % 
-                ((value1.time_ - start_time) * 10e-10) % 
+            std::cout << (boost::format("%.3f: %.4f, %.4f, %.4f\n") % 
+                ((value1.time_ - start_time) * 1e-9) % 
                 value1.get_value<double>() % 
-                (value2.value_ / 100000.));
+                (value2.get_value<double>() / 100000.) %
+                value3.get_value<double>());
         }
 
         // Schedule a wakeup.
@@ -65,6 +69,36 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     return 0;
 }
 
+// create an averaging performance counter based on the immediate sine 
+// counter
+void create_averaging_sine()
+{
+    // First, register the counter type
+    hpx::performance_counters::install_counter_type(
+        "/sine/average", hpx::performance_counters::counter_average_count,
+        "returns the averaged value of a sine wave calculated over "
+        "an arbitrary time line");
+
+    // Second create and register the counter instance
+    boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+    boost::format sine_instance("/sine(locality#%d/instance#0)/average");
+
+    // full info of the counter to create, help text and version will be
+    // complemented from counter type info as specified above
+    hpx::performance_counters::counter_info info(
+        hpx::performance_counters::counter_average_count, 
+        boost::str(sine_instance % prefix));
+
+    // create the 'sine' performance counter component locally
+    boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
+    hpx::naming::id_type id;
+    hpx::performance_counters::create_average_count_counter(info, 
+        boost::str(base_instance % prefix), 1000, id);
+
+    // install the counter instance
+    hpx::performance_counters::install_counter(id, info);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -72,7 +106,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t const pause = vm["pause"].as<boost::uint64_t>();
     boost::uint64_t const values = vm["values"].as<boost::uint64_t>();
 
-    // do main work, i.e. query the performance counter
+    // create and install averaging performance counter
+    create_averaging_sine();
+
+    // do main work, i.e. query the performance counters
     std::cout << "starting sine monitoring..." << std::endl;
     int result = monitor(pause, values);
 

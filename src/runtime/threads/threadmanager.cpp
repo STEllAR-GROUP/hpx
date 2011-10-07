@@ -21,7 +21,7 @@
 #include <hpx/util/hardware/timestamp.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/cstdint.hpp>
@@ -535,7 +535,7 @@ namespace hpx { namespace threads
         thread_id_type self_id = self.get_thread_id();
 
         boost::shared_ptr<boost::atomic<bool> > triggered(
-            new boost::atomic<bool>(false));
+            boost::make_shared<boost::atomic<bool> >(false));
 
         thread_init_data data(
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id, 
@@ -883,7 +883,7 @@ namespace hpx { namespace threads
         boost::format thread_cumulative("/threads(locality#%d/os-thread#%d)/count/cumulative/all");
         boost::format thread_instant("/threads(locality#%d/os-thread#%d)/count/instantaneous/%s");
 
-        performance_counters::counter_data const counters[] = 
+        performance_counters::raw_counter_data const counters[] = 
         {
             // Locality-wide queue length
             { boost::str(total_queue_length % prefix), 
@@ -918,7 +918,7 @@ namespace hpx { namespace threads
 
         for (std::size_t i = 0; i < shepherd_count; ++i)
         {
-            performance_counters::counter_data const counters[] = 
+            performance_counters::raw_counter_data const counters[] = 
             {
                 // Queue length
                 { boost::str(queue_length % prefix % i),

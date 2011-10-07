@@ -22,7 +22,8 @@ namespace hpx { namespace performance_counters
         error_code& ec)
     {
         counter_info info(type, name, helptext, version ? version : 0x01000000);
-        boost::shared_ptr<manage_counter_type> p(new manage_counter_type(info));
+        boost::shared_ptr<manage_counter_type> p =
+            boost::make_shared<manage_counter_type>(info);
 
         // Install the counter type.
         p->install(ec);  

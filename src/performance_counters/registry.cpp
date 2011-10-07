@@ -9,6 +9,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
+#include <hpx/performance_counters/server/average_count_counter.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/format.hpp>
@@ -87,13 +88,13 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    counter_status registry::create_counter(counter_info const& info, 
+    counter_status registry::create_raw_counter(counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, error_code& ec)
     {
-        return create_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
+        return create_raw_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
     }
 
-    counter_status registry::create_counter(counter_info const& info, 
+    counter_status registry::create_raw_counter(counter_info const& info, 
         boost::function<boost::int64_t()> f, naming::id_type& id, error_code& ec)
     {
         // create canonical type name
@@ -103,7 +104,7 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter", 
                 boost::str(boost::format("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
@@ -111,7 +112,7 @@ namespace hpx { namespace performance_counters
         // make sure the counter type requested is supported
         if (counter_raw != (*it).second.type_ || counter_raw != info.type_) 
         {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter", 
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter", 
                 "invalid counter type requested (only counter_raw is supported)");
             return status_counter_type_unknown;
         }
@@ -120,7 +121,7 @@ namespace hpx { namespace performance_counters
         counter_info complemented_info = info;
         complement_counter_info(complemented_info, (*it).second, ec);
         if (ec) return status_invalid_data;
-        
+
         // create the counter as requested
         naming::gid_type newid = naming::invalid_gid;
         try {
@@ -193,6 +194,71 @@ namespace hpx { namespace performance_counters
                     "invalid counter type requested");
                 return status_counter_type_unknown;
             }
+
+            // register the canonical name with AGAS
+            std::string name(complemented_info.fullname_);
+            ensure_counter_prefix(name);      // prepend prefix, if necessary
+            agas_client_.registerid(name, newid);
+        }
+        catch (hpx::exception const& e) {
+            if (&ec == &throws)
+                throw;
+            ec = make_error_code(e.get_error(), e.what());
+            LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
+                % complemented_info.fullname_ % e.what());
+            return status_invalid_data;
+        }
+
+        LPCS_(info) << (boost::format("counter %s created at %s") 
+            % complemented_info.fullname_ % newid);
+
+        id = naming::id_type(newid, naming::id_type::managed);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
+    }
+
+    /// \brief Create a new performance counter instance of type 
+    ///        counter_average_count based on given base counter name and
+    ///        given base time interval (milliseconds)
+    counter_status registry::create_average_count_counter(
+        counter_info const& info, std::string const& base_counter_name, 
+        std::size_t base_time_interval, naming::id_type& id, error_code& ec)
+    {
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
+        if (status_valid_data != status) return status;
+
+        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_average_count_counter", 
+                boost::str(boost::format("unknown counter type %s") % type_name));
+            return status_counter_type_unknown;
+        }
+
+        // make sure the counter type requested is supported
+        if (counter_average_count != (*it).second.type_ || 
+            counter_average_count != info.type_) 
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_average_count_counter", 
+                "invalid counter type requested (only counter_raw is supported)");
+            return status_counter_type_unknown;
+        }
+
+        // make sure parent instance name is set properly
+        counter_info complemented_info = info;
+        complement_counter_info(complemented_info, (*it).second, ec);
+        if (ec) return status_invalid_data;
+
+        // create the counter as requested
+        naming::gid_type newid = naming::invalid_gid;
+        try {
+            typedef components::managed_component<server::average_count_counter> 
+                counter_type;
+            newid = components::server::create_one<counter_type>(
+                complemented_info, base_counter_name, base_time_interval);
 
             // register the canonical name with AGAS
             std::string name(complemented_info.fullname_);

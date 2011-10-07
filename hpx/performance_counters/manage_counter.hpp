@@ -35,7 +35,24 @@ namespace hpx { namespace performance_counters
             }
  
             info_.fullname_ = name;
-            return create_counter(info_, f, counter_, ec);
+            return create_raw_counter(info_, f, counter_, ec);
+        }
+
+        // create and install a counter which calculates the average rate of 
+        // another counter during the given time interval (milliseconds)
+        counter_status install(std::string const& name,
+            std::string const& base_counter_name, std::size_t base_time_interval, 
+            error_code& ec = throws)
+        {
+            if (0 != counter_) {
+                HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install", 
+                    "counter has been already installed");
+                return status_invalid_data;
+            }
+ 
+            info_.fullname_ = name;
+            return create_average_count_counter(info_, base_counter_name, 
+                base_time_interval, counter_, ec);
         }
 
         // create and install a self-contained counter
@@ -87,22 +104,41 @@ namespace hpx { namespace performance_counters
     HPX_EXPORT void install_counter(std::string const& name,
         boost::function<boost::int64_t()> const& f, error_code& ec = throws); 
 
+    /// Install a new performance counter in a way, which will uninstall it
+    /// automatically during shutdown.
+    HPX_EXPORT void install_counter(std::string const& name,
+        std::string const& base_counter_name, std::size_t base_time_interval, 
+        error_code& ec = throws); 
+
     HPX_EXPORT void install_counter(std::string const& name,
         error_code& ec = throws); 
 
     HPX_EXPORT void install_counter(naming::id_type const& id, 
         counter_info const& info, error_code& ec = throws);
 
-    /// A small data structure holding all data needed to install a counter 
-    struct counter_data
+    ///////////////////////////////////////////////////////////////////////////
+    /// Small data structures holding all data needed to install a counter 
+    struct raw_counter_data
     {
         std::string name_;
         boost::function<boost::int64_t()> func_;
     };
 
+    struct average_count_counter_data
+    {
+        std::string name_;
+        std::string base_counter_name_;
+        std::size_t base_time_interval_;
+    };
+
     /// Install several new performance counters in a way, which will uninstall 
     /// them automatically during shutdown.
-    HPX_EXPORT void install_counters(counter_data const* data, 
+    HPX_EXPORT void install_counters(raw_counter_data const* data, 
+        std::size_t count, error_code& ec = throws); 
+
+    /// Install several new performance counters in a way, which will uninstall 
+    /// them automatically during shutdown.
+    HPX_EXPORT void install_counters(average_count_counter_data const* data, 
         std::size_t count, error_code& ec = throws); 
 }}
 

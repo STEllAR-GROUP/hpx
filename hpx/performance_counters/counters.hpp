@@ -17,11 +17,20 @@
 namespace hpx { namespace performance_counters 
 {
     ///////////////////////////////////////////////////////////////////////////
+    char const counter_prefix[] = "/counters";
+
+    ///////////////////////////////////////////////////////////////////////////
     inline std::string& ensure_counter_prefix(std::string& name)
     {
-        if (name.find("/counters") != 0)
-            name = "/counters" + name;
+        if (name.find(counter_prefix) != 0)
+            name = counter_prefix + name;
         return name;
+    }
+
+    inline std::string ensure_counter_prefix(std::string const& counter)
+    {
+        std::string name(counter);
+        return ensure_counter_prefix(name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -352,14 +361,14 @@ namespace hpx { namespace performance_counters
         counter_info const& info, error_code& ec = throws);
 
     /// \brief Create a new performance counter instance based on given
-    ///        counter value
-    HPX_API_EXPORT counter_status create_counter(
+    ///        counter value 
+    HPX_API_EXPORT counter_status create_raw_counter(
         counter_info const& info, boost::int64_t* countervalue, 
         naming::id_type& id, error_code& ec = throws);
 
     /// \brief Create a new performance counter instance based on given
     ///        function returning the counter value
-    HPX_API_EXPORT counter_status create_counter(
+    HPX_API_EXPORT counter_status create_raw_counter(
         counter_info const& info, boost::function<boost::int64_t()> f, 
         naming::id_type& id, error_code& ec = throws);
 
@@ -368,6 +377,14 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT counter_status create_counter(
         counter_info const& info, naming::id_type& id, 
         error_code& ec = throws);
+
+    /// \brief Create a new performance counter instance of type 
+    ///        counter_average_count based on given base counter name and
+    ///        given base time interval (milliseconds)
+    HPX_API_EXPORT counter_status create_average_count_counter(
+        performance_counters::counter_info const& info, 
+        std::string const& base_counter_name, std::size_t base_time_interval,
+        naming::id_type& id, error_code& ec = throws);
 
     /// \brief Add an existing performance counter instance to the registry
     HPX_API_EXPORT counter_status add_counter(naming::id_type const& id, 

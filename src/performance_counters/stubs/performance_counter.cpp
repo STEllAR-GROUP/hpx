@@ -32,24 +32,24 @@ namespace hpx { namespace performance_counters { namespace stubs
     counter_info performance_counter::get_info(naming::gid_type const& targetgid,
         error_code& ec)
     {
-        return get_info_async(targetgid).get(/*ec*/);   // FIXME
+        return get_info_async(targetgid).get(ec);
     }
 
     counter_value performance_counter::get_value(naming::gid_type const& targetgid,
         error_code& ec)
     {
-        return get_value_async(targetgid).get(/*ec*/);  // FIXME!
+        return get_value_async(targetgid).get(ec);
     }
 
     counter_info performance_counter::get_info(naming::id_type const& targetgid,
         error_code& ec)
     {
-        return get_info_async(targetgid.get_gid()).get(/*ec*/);   // FIXME
+        return get_info_async(targetgid.get_gid()).get(ec);
     }
 
     counter_value performance_counter::get_value(naming::id_type const& targetgid,
         error_code& ec)
     {
-        return get_value_async(targetgid.get_gid()).get(/*ec*/);  // FIXME!
+        return get_value_async(targetgid.get_gid()).get(ec);
     }
 }}}

@@ -29,6 +29,8 @@ namespace hpx { namespace util
         void start();
         void stop();
 
+        std::size_t get_interval() const { return microsecs_; }
+
     protected:
         // schedule a high priority task after a given time interval
         void schedule_thread();

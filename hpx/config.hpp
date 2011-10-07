@@ -66,7 +66,7 @@
 /// This defines the maximum number of arguments a component constructor can 
 /// take
 #if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
-#  define HPX_COMPONENT_CREATE_ARG_MAX 3
+#  define HPX_COMPONENT_CREATE_ARG_MAX 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

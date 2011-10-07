@@ -79,8 +79,8 @@ namespace hpx { namespace detail
     // redirect the printing of the given counter name to the console
     void list_counter(std::string const& name, naming::gid_type const& gid)
     {
-        char const prefix[] = "/counters";
-        if (sizeof(prefix)-1 <= name.size() && 0 == name.find(prefix))
+        if (sizeof(hpx::performance_counters::counter_prefix)-1 <= name.size() && 
+            0 == name.find(hpx::performance_counters::counter_prefix))
         {
             typedef lcos::eager_future<print_counter_action> future_type;
 
@@ -93,8 +93,8 @@ namespace hpx { namespace detail
     // redirect the printing of the full counter info to the console
     void list_counter_info(std::string const& name, naming::gid_type const& gid)
     {
-        char const prefix[] = "/counters";
-        if (sizeof(prefix)-1 <= name.size() && 0 == name.find(prefix))
+        if (sizeof(hpx::performance_counters::counter_prefix)-1 <= name.size() && 
+            0 == name.find(hpx::performance_counters::counter_prefix))
         {
             using hpx::performance_counters::stubs::performance_counter;
 

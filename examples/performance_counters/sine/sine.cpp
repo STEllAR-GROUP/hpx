@@ -48,8 +48,8 @@ namespace performance_counters { namespace sine
         counter_type_data const counter_types[] = 
         {
             { "/sine/immediate", counter_raw,
-              "returns the current value of an sine wave calculated over "
-              "an arbitrary timeline", 
+              "returns the current value of a sine wave calculated over "
+              "an arbitrary time line", 
               HPX_PERFORMANCE_COUNTER_V1 }
         };
 
@@ -62,7 +62,7 @@ namespace performance_counters { namespace sine
         // The first counter uses our own full counter implementation, we create 
         // the sine_type counter locally and install it to the local counter
         // registry.
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();        
+        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
         boost::format sine_instance("/sine(locality#%d/instance#%d)/immediate");
 
         // full info of the counter to create, help text and version will be

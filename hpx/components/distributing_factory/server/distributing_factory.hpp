@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/get_result.hpp>
 
-#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
@@ -221,7 +221,7 @@ namespace hpx { namespace components { namespace server
 
         /// construct end iterator
         locality_result_iterator()
-          : data_(new data())
+          : data_(boost::make_shared<data>())
         {}
 
     private:

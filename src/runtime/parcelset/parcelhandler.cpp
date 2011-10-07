@@ -305,7 +305,7 @@ namespace hpx { namespace parcelset
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
 
-        performance_counters::counter_data const counters[] = 
+        performance_counters::raw_counter_data const counters[] = 
         {
             // Total parcels sent (completed)
             { boost::str(parcel_count % prefix % "sent"),

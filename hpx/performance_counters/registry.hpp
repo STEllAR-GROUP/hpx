@@ -35,21 +35,29 @@ namespace hpx { namespace performance_counters
         counter_status remove_counter_type(counter_info const& info, 
             error_code& ec = throws);
 
-        /// \brief Create a new performance counter instance based on given
-        ///        counter value
-        counter_status create_counter(counter_info const& info, 
+        /// \brief Create a new performance counter instance of type 
+        ///        raw_counter based on given counter value
+        counter_status create_raw_counter(counter_info const& info, 
             boost::int64_t* countervalue, naming::id_type& id, 
             error_code& ec = throws);
 
-        /// \brief Create a new performance counter instance based on given
-        ///        function returning the counter value
-        counter_status create_counter(counter_info const& info, 
+        /// \brief Create a new performance counter instance of type 
+        ///        raw_counter based on given function returning the counter 
+        ///        value
+        counter_status create_raw_counter(counter_info const& info, 
             boost::function<boost::int64_t()> f, naming::id_type& id, 
             error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
         ///        counter info
         counter_status create_counter(counter_info const& info, 
+            naming::id_type& id, error_code& ec = throws);
+
+        /// \brief Create a new performance counter instance of type 
+        ///        counter_average_count based on given base counter name and
+        ///        given base time interval (milliseconds)
+        counter_status create_average_count_counter(counter_info const& info, 
+            std::string const& base_counter_name, std::size_t base_time_interval,
             naming::id_type& id, error_code& ec = throws);
 
         /// \brief Add an existing performance counter instance to the registry

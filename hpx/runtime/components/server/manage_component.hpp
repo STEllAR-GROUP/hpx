@@ -108,7 +108,6 @@ namespace hpx { namespace components { namespace server
         if (&ec != &throws)
             ec = make_success_code();
     }
-
 }}}
 
 #endif

@@ -26,20 +26,20 @@ namespace hpx { namespace performance_counters
             performance_counters::status_generic_error;
     }
 
-    performance_counters::counter_status create_counter(
+    performance_counters::counter_status create_raw_counter(
         performance_counters::counter_info const& info, 
         boost::int64_t* countervalue, naming::id_type& id, error_code& ec)
     {
-        return get_runtime().get_counter_registry().create_counter(
+        return get_runtime().get_counter_registry().create_raw_counter(
             info, countervalue, id, ec);
     }
 
-    performance_counters::counter_status create_counter(
+    performance_counters::counter_status create_raw_counter(
         performance_counters::counter_info const& info, 
         boost::function<boost::int64_t()> f, naming::id_type& id, 
         error_code& ec)
     {
-        return get_runtime().get_counter_registry().create_counter(
+        return get_runtime().get_counter_registry().create_raw_counter(
             info, f, id, ec);
     }
 
@@ -48,6 +48,16 @@ namespace hpx { namespace performance_counters
         naming::id_type& id, error_code& ec)
     {
         return get_runtime().get_counter_registry().create_counter(info, id, ec);
+    }
+
+    performance_counters::counter_status create_average_count_counter(
+        performance_counters::counter_info const& info, 
+        std::string const& base_counter_name, std::size_t base_time_interval,
+        naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().
+            create_average_count_counter(info, base_counter_name, 
+                base_time_interval, id, ec);
     }
 
     performance_counters::counter_status add_counter(
