@@ -7,6 +7,8 @@ set(example_programs
     os_thread_num
     px_thread_phase)
 
+set(os_thread_num_FLAGS DEPENDENCIES iostreams_component)
+
 foreach(example_program ${example_programs})
   set(sources ${example_program}.cpp)
 
@@ -15,7 +17,8 @@ foreach(example_program ${example_programs})
   # add example executable
   add_hpx_executable(${example_program}
                      MODULE balancing
-                     SOURCES ${sources})
+                     SOURCES ${sources}
+                     ${${example_program}_FLAGS})
 
   # add a custom target for this example 
   add_hpx_pseudo_target(examples.balancing.${example_program})
