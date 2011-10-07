@@ -73,10 +73,9 @@ int hpx_main(
     )
 {
     {
-
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
     
-        const boost::uint64_t count = vm["count"].as<boost::uint64_t>();
+        const boost::uint64_t count = vm["futures"].as<boost::uint64_t>();
     
         const id_type here = find_here();
 
@@ -124,7 +123,7 @@ int main(
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ( "count"
+        ( "futures"
         , value<boost::uint64_t>()->default_value(500000) 
         , "number of futures to invoke")
         

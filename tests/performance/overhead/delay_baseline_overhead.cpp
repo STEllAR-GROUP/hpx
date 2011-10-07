@@ -47,7 +47,7 @@ int hpx_main(
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
     
-        const boost::uint64_t count = vm["count"].as<boost::uint64_t>();
+        const boost::uint64_t count = vm["delay-loops"].as<boost::uint64_t>();
 
         const bool csv = vm.count("csv");
     
@@ -91,7 +91,7 @@ int main(
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ( "count"
+        ( "delay-loops"
         , value<boost::uint64_t>()->default_value(64) 
         , "number of delay loops to run")
         
