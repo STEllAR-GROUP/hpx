@@ -11,7 +11,6 @@ if(NOT MSVC)
       adaptive1d
       balancing
       dataflow
-      function
       heartbeat 
       hplpx
       neutron_star
