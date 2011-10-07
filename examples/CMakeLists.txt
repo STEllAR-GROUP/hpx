@@ -41,9 +41,10 @@ if(NOT MSVC)
     endif()
   endif()
 
-  if(CMAKE_Fortran_COMPILER)
-    set(subdirs ${subdirs} marduk)
-  endif()
+  # wash: disabled as it breaks other components 
+  #if(CMAKE_Fortran_COMPILER)
+  #  set(subdirs ${subdirs} marduk)
+  #endif()
 
 else()
   set(subdirs
