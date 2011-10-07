@@ -156,8 +156,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
 
-#if 0
         hpx::lcos::wait(initial_phase);
+#if 0
         while (time < stop_time) {
             {
               // Move bodies--------------------------------------------
