@@ -18,8 +18,7 @@ if(NOT MSVC)
       neutron_star
       nqueen
       object_semaphore
-      # wash: disabled temporarily as it breaks stuff
-      #performance_counters
+      performance_counters
       queue
       quickstart
       random_mem_access
