@@ -719,13 +719,13 @@ namespace hpx { namespace components { namespace server
                 shutdown_functions_.push_back(shutdown);
         }
         catch (std::logic_error const& e) {
-            LRT_(debug) << "loading of startup/shutdown functions failed: " 
-                          << d.get_name() << ": " << e.what();
+            LRT_(debug) << "no startup/shutdown functions for " 
+                        << d.get_name();
             return false;
         }
         catch (std::exception const& e) {
-            LRT_(debug) << "loading of startup/shutdown functions failed: " 
-                          << d.get_name() << ": " << e.what();
+            LRT_(debug) << "no startup/shutdown functions for " 
+                        << d.get_name();
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -793,7 +793,7 @@ namespace hpx { namespace components { namespace server
             }
 
             if (!p.second) {
-                LRT_(error) << "duplicate component id: " << instance
+                LRT_(fatal) << "duplicate component id: " << instance
                     << ": " << components::get_component_type_name(t);
                 return false;   // duplicate component id?
             }
