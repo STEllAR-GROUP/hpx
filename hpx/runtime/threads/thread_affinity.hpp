@@ -7,9 +7,12 @@
 #define HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -52,94 +55,203 @@ namespace hpx { namespace threads
 
 #if defined(BOOST_WINDOWS)
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct numa_node_data
+    {
+        struct tag {};
+
+        numa_node_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            {
+                data_.push_back(init_numa_node(i, false));
+                numa_sensitve_data_.push_back(init_numa_node(i, true));
+            }
+        }
+
+        int get_numa_node(std::size_t thread_num, bool numa_sensitive)
+        {
+            BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
+            return numa_sensitive ? 
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+        int init_numa_node(std::size_t thread_num, bool numa_sensitive)
+        {
+            if (std::size_t(-1) == thread_num) 
+                 return -1;
+
+            UCHAR node_number = 0;
+            if (GetNumaProcessorNode(thread_num, &node_number))
+                return int(node_number);
+
+            unsigned int num_of_cores = hardware_concurrency();
+            if (0 == num_of_cores)
+                num_of_cores = 1;     // assume one core
+
+            unsigned int num_of_numa_cores = num_of_cores;
+            ULONG numa_nodes = 0;
+            if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes) 
+                num_of_numa_cores = num_of_cores / (numa_nodes + 1);
+
+            return thread_num / num_of_numa_cores;
+        }
+
+        std::vector<int> data_;
+        std::vector<int> numa_sensitve_data_;
+    };
+
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
     {
-        if (std::size_t(-1) == thread_num) 
-             return -1;
-
-        UCHAR node_number = 0;
-        if (GetNumaProcessorNode(thread_num, &node_number))
-            return int(node_number);
-
-        unsigned int num_of_cores = hardware_concurrency();
-        if (0 == num_of_cores)
-            num_of_cores = 1;     // assume one core
-
-        unsigned int num_of_numa_cores = num_of_cores;
-        ULONG numa_nodes = 0;
-        if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes) 
-            num_of_numa_cores = num_of_cores / (numa_nodes + 1);
-
-        return thread_num / num_of_numa_cores;
+        util::static_<numa_node_data, numa_node_data::tag> data;
+        return data.get().get_numa_node(thread_num, numa_sensitive);
     }
 
-    inline std::size_t 
-    get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
+    ///////////////////////////////////////////////////////////////////////////
+    struct numa_affinity_mask_data
     {
-        unsigned int num_of_cores = hardware_concurrency();
-        if (0 == num_of_cores)
-            num_of_cores = 1;     // assume one core
-        std::size_t affinity = num_thread % num_of_cores;
+        struct tag {};
 
-        ULONG numa_nodes = 1;
-        if (GetNumaHighestNodeNumber(&numa_nodes))
-            ++numa_nodes;
+        numa_affinity_mask_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            {
+                data_.push_back(init_numa_node_affinity_mask(i, false));
+                numa_sensitve_data_.push_back(init_numa_node_affinity_mask(i, true));
+            }
+        }
 
-        DWORD_PTR node_affinity_mask = 0;
-        if (numa_sensitive) {
-            ULONG numa_node = affinity % numa_nodes;
+        std::size_t get_numa_node_affinity_mask(std::size_t thread_num, 
+            bool numa_sensitive)
+        {
+            BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
+            return numa_sensitive ? 
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+        std::size_t init_numa_node_affinity_mask(std::size_t num_thread, 
+            bool numa_sensitive)
+        {
+            unsigned int num_of_cores = hardware_concurrency();
+            if (0 == num_of_cores)
+                num_of_cores = 1;     // assume one core
+            std::size_t affinity = num_thread % num_of_cores;
+
+            ULONG numa_nodes = 1;
+            if (GetNumaHighestNodeNumber(&numa_nodes))
+                ++numa_nodes;
+
+            DWORD_PTR node_affinity_mask = 0;
+            if (numa_sensitive) {
+                ULONG numa_node = affinity % numa_nodes;
+                if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
+                    return false;
+
+                return node_affinity_mask;
+            }
+
+            ULONG numa_node = get_numa_node(num_thread, numa_sensitive);
             if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
                 return false;
 
             return node_affinity_mask;
         }
 
-        ULONG numa_node = get_numa_node(num_thread, numa_sensitive);
-        if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
-            return false;
+        std::vector<int> data_;
+        std::vector<int> numa_sensitve_data_;
+    };
 
-        return node_affinity_mask;
+    inline std::size_t 
+    get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
+    {
+        util::static_<numa_affinity_mask_data, numa_affinity_mask_data::tag> data;
+        return data.get().get_numa_node_affinity_mask(num_thread, numa_sensitive);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct thread_affinity_mask_data
+    {
+        struct tag {};
+
+        thread_affinity_mask_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            {
+                data_.push_back(init_thread_affinity_mask(i, false));
+                numa_sensitve_data_.push_back(init_thread_affinity_mask(i, true));
+            }
+        }
+
+        std::size_t get_thread_affinity_mask(std::size_t thread_num, 
+            bool numa_sensitive)
+        {
+            BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
+            return numa_sensitive ? 
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+        std::size_t init_thread_affinity_mask(std::size_t num_thread, 
+            bool numa_sensitive)
+        {
+            unsigned int num_of_cores = hardware_concurrency();
+            if (0 == num_of_cores)
+                num_of_cores = 1;     // assume one core
+            std::size_t affinity = num_thread % num_of_cores;
+
+            ULONG numa_nodes = 1;
+            if (GetNumaHighestNodeNumber(&numa_nodes))
+                ++numa_nodes;
+
+            std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
+            DWORD_PTR node_affinity_mask = 0;
+            DWORD_PTR mask = 0x01LL;
+            if (numa_sensitive) {
+                ULONG numa_node = affinity % numa_nodes;
+                if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
+                    return false;
+
+                mask = least_significant_bit(node_affinity_mask) << 
+                    (affinity / numa_nodes);
+            }
+            else {
+                ULONG numa_node = get_numa_node(num_thread, numa_sensitive);
+                if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
+                    return false;
+
+                mask = least_significant_bit(node_affinity_mask) << 
+                    (affinity % num_of_cores_per_numa_node);
+            }
+
+            while (!(mask & node_affinity_mask)) {
+                mask <<= 1LL;
+                if (0 == mask)
+                    mask = 0x01LL;
+            }
+
+            return mask;
+        }
+
+        std::vector<int> data_;
+        std::vector<int> numa_sensitve_data_;
+    };
 
     inline std::size_t 
     get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
-        unsigned int num_of_cores = hardware_concurrency();
-        if (0 == num_of_cores)
-            num_of_cores = 1;     // assume one core
-        std::size_t affinity = num_thread % num_of_cores;
-
-        ULONG numa_nodes = 1;
-        if (GetNumaHighestNodeNumber(&numa_nodes))
-            ++numa_nodes;
-
-        std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
-        DWORD_PTR node_affinity_mask = 0;
-        DWORD_PTR mask = 0x01LL;
-        if (numa_sensitive) {
-            ULONG numa_node = affinity % numa_nodes;
-            if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
-                return false;
-
-            mask = least_significant_bit(node_affinity_mask) << (affinity / numa_nodes);
-        }
-        else {
-            ULONG numa_node = get_numa_node(num_thread, numa_sensitive);
-            if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
-                return false;
-
-            mask = least_significant_bit(node_affinity_mask) << (affinity % num_of_cores_per_numa_node);
-        }
-
-        while (!(mask & node_affinity_mask)) {
-            mask <<= 1LL;
-            if (0 == mask)
-                mask = 0x01LL;
-        }
-
-        return mask;
+        util::static_<thread_affinity_mask_data, thread_affinity_mask_data::tag> data;
+        return data.get().get_thread_affinity_mask(num_thread, numa_sensitive);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     inline bool 
     set_affinity(boost::thread& thrd, std::size_t num_thread, bool numa_sensitive)
     {
