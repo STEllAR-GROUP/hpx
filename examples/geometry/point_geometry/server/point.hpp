@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -92,9 +93,13 @@ namespace hpx { namespace geometry { namespace server
             // Add points *CLOCKWISE* -- otherwise intersection routine will not work
             //polygon_type poly;
             // create the rectangle of the mesh object
+
+            // Pre-allocate storage for the vectors, so that we avoid re-allocations
+            // during the initialization loops.
             velx_.reserve(numpoints*4);
             vely_.reserve(numpoints*4);
             poly_.outer().reserve(numpoints*4);
+
             for (std::size_t i=0;i<numpoints;i++) {
               double y = ymin + dy*i;
               point_type p(xmin,y);

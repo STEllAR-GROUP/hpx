@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -102,6 +103,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         // SIMPLE PROBLEM
         // create some boxes to smash together
         const std::size_t numpoints = 800000;
+
+        // NOTE: this puts appx 8k on the stack
         double bbox[num_bodies][4];
         double velx[num_bodies];
         double vely[num_bodies];
@@ -135,6 +138,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           vely[i] =  0.0;
         }
 
+        // Initialize the data
         init(locality_results(blocks), accu);
 
 
@@ -155,6 +159,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           master_objects.push_back(accu[i].get_gid());
         }
 
+        // We have to wait for the futures to finish before exiting.
 
         hpx::lcos::wait(initial_phase);
 #if 0
