@@ -14,7 +14,6 @@ if(NOT MSVC)
       function
       heartbeat 
       hplpx
-      math
       neutron_star
       nqueen
       object_semaphore
@@ -26,25 +25,24 @@ if(NOT MSVC)
      )
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} geometry
-                           )
+    set(subdirs ${subdirs}
+        geometry
+       )
   endif() 
 
   if(HDF5_CPP_FOUND) 
     if(HDF5_FOUND) 
-      set(subdirs ${subdirs} interpolate1d
-                             interpolate3d)
+      set(subdirs ${subdirs}
+          interpolate1d
+          interpolate3d
+         )
     endif()
     if(HPX_CXX11_LAMBDAS)
-      set(subdirs ${subdirs} sheneos)
+      set(subdirs ${subdirs}
+          sheneos
+         )
     endif()
   endif()
-
-  # wash: disabled as it breaks other components 
-  #if(CMAKE_Fortran_COMPILER)
-  #  set(subdirs ${subdirs} marduk)
-  #endif()
-
 else()
   set(subdirs
       accumulator
@@ -53,7 +51,9 @@ else()
      )
 
   if(${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs} geometry)
+    set(subdirs ${subdirs}
+        geometry
+       )
   endif() 
 endif()
 
