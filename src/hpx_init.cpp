@@ -990,9 +990,9 @@ namespace hpx
                 agas_host = hpx_host;
                 agas_port = hpx_port;
             }
-            else if (mode == hpx::runtime_mode_console) {
-                // if the network addresses are different and we should not run 
-                // the AGAS server we assume to be in worker mode
+            else if (env.run_with_pbs()) {
+                // in PBS mode, if the network addresses are different and we 
+                // should not run the AGAS server we assume to be in worker mode
                 mode = hpx::runtime_mode_worker;
 
                 // do not execute any explicit hpx_main except if asked 
@@ -1018,10 +1018,10 @@ namespace hpx
             }
 
             if (vm.count("debug-log")) {
-                ini_config += "hpx.logging.console.destination="
-                    + vm["debug-log"].as<std::string>();
-                ini_config += "hpx.logging.destination="
-                    + vm["debug-log"].as<std::string>();
+                ini_config += "hpx.logging.console.destination=" + 
+                    vm["debug-log"].as<std::string>();
+                ini_config += "hpx.logging.destination=" + 
+                    vm["debug-log"].as<std::string>();
                 ini_config += "hpx.logging.console.level=5";
                 ini_config += "hpx.logging.level=5";
             }
