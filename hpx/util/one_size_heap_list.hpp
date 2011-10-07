@@ -82,7 +82,7 @@ class one_size_heap_list
                % alloc_count_
                % free_count_);
 
-        if (alloc_count_ != free_count_) 
+        if (alloc_count_ > free_count_) 
         {
             LOSH_(warning) 
                 << (boost::format(
