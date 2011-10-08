@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -412,8 +413,10 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
                                   parameter const& par)
     {
       std::size_t j;
-      std::size_t counter,dst;
-      bool prolongation;
+      std::size_t /*counter,*/dst;
+
+      // NOTE: this was used uninitialized in the following code
+      bool prolongation = false;
       
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
@@ -425,7 +428,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
       //using namespace boost::assign;
       for (std::size_t step=0;step<num_rows;step = step + 1) {
         for (std::size_t i=0;i<each_row[step];i++) {
-          counter = 0;
+          //counter = 0;
 
           // find the level of this point
           int level = par->level_row[step];
