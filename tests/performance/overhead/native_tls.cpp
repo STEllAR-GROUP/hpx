@@ -16,8 +16,10 @@
 
 #if defined(_GLIBCXX_HAVE_TLS)
     #define HPX_NATIVE_TLS __thread
-#else
+#elif defined(BOOST_WINDOWS)
     #define HPX_NATIVE_TLS __declspec(thread)
+#else
+    #error Unsupported platform.
 #endif
 
 using boost::program_options::variables_map;
