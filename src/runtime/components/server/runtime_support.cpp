@@ -719,13 +719,13 @@ namespace hpx { namespace components { namespace server
                 shutdown_functions_.push_back(shutdown);
         }
         catch (std::logic_error const& e) {
-            LRT_(debug) << "no startup/shutdown functions for " 
-                        << d.get_name();
+            LRT_(debug) << "loading of startup/shutdown functions failed: " 
+                        << d.get_name() << ": " << e.what();
             return false;
         }
         catch (std::exception const& e) {
-            LRT_(debug) << "no startup/shutdown functions for " 
-                        << d.get_name();
+            LRT_(debug) << "loading of startup/shutdown functions failed: " 
+                        << d.get_name() << ": " << e.what();
             return false;
         }
         return true;    // startup/shutdown functions got registered
