@@ -10,8 +10,6 @@
 #include <hpx/lcos/local_barrier.hpp>
 #include <hpx/lcos/barrier.hpp>
 
-#include <hpx/lcos/local_dataflow_variable.hpp>
-
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/lazy_future.hpp>
 #include <hpx/lcos/async.hpp>

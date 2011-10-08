@@ -368,12 +368,6 @@ namespace hpx
                 ((7 << 16) | component_base_lco),
             component_thread =              ///< a ParalleX thread
                 ((8 << 16) | component_base_lco_with_value),
-            component_dataflow_variable =   ///< a LCO implementing dataflow var.
-                ((9 << 16) | component_base_lco_with_value),
-            component_thunk =               ///< a LCO implementing a thunk
-                ((10 << 16) | component_base_lco_with_value),
-
-            component_dataflow_block = 11,  ///< a dataflow block
 
             component_agas_primary_namespace = 12,
             component_agas_component_namespace = 13,
@@ -458,9 +452,6 @@ namespace hpx
             int N = 1> 
         class promise;
 
-        template <typename Value, typename RemoteValue = Value>
-        class local_dataflow_variable;
-
         template <typename Action, 
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
@@ -472,15 +463,6 @@ namespace hpx
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution> 
         class lazy_future;
-
-        template <typename Action, 
-            typename Result = typename traits::promise_local_result<
-                typename Action::result_type>::type,
-            typename DirectExecute = typename Action::direct_execution> 
-        class contin;
-
-        template <typename Thunk>
-        class thunk_client;
 
         template <typename ValueType>
         struct object_semaphore;

@@ -55,7 +55,7 @@ struct object_semaphore
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::local_dataflow_variable<ValueType> get_async()
+    lcos::promise<ValueType> get_async()
     {
         BOOST_ASSERT(this->gid_);
         return this->base_type::get_async(this->gid_);
