@@ -165,7 +165,7 @@ int hpx_main(variables_map& vm)
     {
         // create a (remote) memory block
         memory_block mb;
-        mb.create(prefix, sizeof(int) * elements, raw_memory);
+        mb.create<int, uint8_t>(prefix, elements);
         access_memory_block<int> data(mb.get());
 
         // randomly fill the vector
