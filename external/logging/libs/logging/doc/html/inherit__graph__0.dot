@@ -1,7 +1,0 @@
-digraph G
-{
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
-  rankdir=LR;
-  Node1 [label="boost::logging::after_being_destroyed_defer_to_function\< T \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structboost_1_1logging_1_1after__being__destroyed__defer__to__function.html"];
-}
