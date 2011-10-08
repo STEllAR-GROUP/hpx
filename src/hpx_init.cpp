@@ -188,15 +188,15 @@ namespace hpx
                 "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
                 "\n"
                 "Versions:\n"
-                "  HPX: %s (AGAS: %x, build-type: %s), SVN: %s\n"
+                "  HPX: %s (AGAS: %x), SVN: %s\n"
                 "  Boost: %s\n"
                 "\n"
                 "Build:\n"
+                "  Type: %s\n"
                 "  Date: %s\n" 
                 "  Platform: %s\n"
                 "  Compiler: %s\n"
-                "  Standard Library: %s\n"
-                "  Build type: %s\n");
+                "  Standard Library: %s\n");
 
             std::cout << (logo
                           % boost::str( hpx_version
@@ -205,16 +205,17 @@ namespace hpx
                                       % HPX_VERSION_SUBMINOR
                                       % HPX_VERSION_TAG)
                           % HPX_AGAS_VERSION 
-                          % HPX_BUILD_TYPE
                           % HPX_SVN_REVISION
                           % boost::str( boost_version
                                       % (BOOST_VERSION / 100000)
                                       % (BOOST_VERSION / 100 % 1000)
                                       % (BOOST_VERSION % 100))
+                          % HPX_BUILD_TYPE
                           % __DATE__
                           % BOOST_PLATFORM
                           % BOOST_COMPILER
-                          % BOOST_STDLIB);
+                          % BOOST_STDLIB
+                         );
             return help;
         }
 
