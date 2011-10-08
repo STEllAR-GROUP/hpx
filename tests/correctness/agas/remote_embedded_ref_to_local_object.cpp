@@ -12,6 +12,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -31,6 +32,7 @@ using hpx::components::get_component_type;
 using hpx::applier::get_applier;
 
 using hpx::test::simple_refcnt_checker;
+using hpx::test::managed_refcnt_checker;
 
 using hpx::util::report_errors;
 
@@ -38,7 +40,10 @@ using hpx::cout;
 using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
+template <
+    typename Client
+>
+void hpx_test_main(
     variables_map& vm
     )
 {
@@ -54,15 +59,15 @@ int hpx_main(
 
         std::vector<id_type> remote_localities;
 
-        typedef hpx::test::server::simple_refcnt_checker server_type;
+        typedef typename Client::server_type server_type;
 
         component_type ctype = get_component_type<server_type>();
 
         if (!get_applier().get_remote_prefixes(remote_localities, ctype))
             throw std::logic_error("this test cannot be run on one locality");
 
-        simple_refcnt_checker monitor_remote(remote_localities[0]);
-        simple_refcnt_checker monitor_local(find_here());
+        Client monitor_remote(remote_localities[0]);
+        Client monitor_local(find_here());
 
         cout << "id_remote: " << monitor_remote.get_gid() << "\n"
              << "id_local:  " << monitor_local.get_gid() << "\n" << flush; 
@@ -83,6 +88,26 @@ int hpx_main(
         // Both components should be out of scope now.
         HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay))); 
         HPX_TEST_EQ(true, monitor_local.ready(milliseconds(delay))); 
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main(
+    variables_map& vm
+    )
+{
+    {
+        cout << std::string(80, '#') << "\n"
+             << "simple component test\n" 
+             << std::string(80, '#') << "\n" << flush;
+
+        hpx_test_main<simple_refcnt_checker>(vm);
+
+        cout << std::string(80, '#') << "\n"
+             << "managed component test\n" 
+             << std::string(80, '#') << "\n" << flush;
+
+        hpx_test_main<managed_refcnt_checker>(vm);
     }
 
     finalize();

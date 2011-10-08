@@ -11,6 +11,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
+#include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -25,6 +26,7 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 
 using hpx::test::simple_refcnt_checker;
+using hpx::test::managed_refcnt_checker;
 
 using hpx::util::report_errors;
 
@@ -32,7 +34,10 @@ using hpx::cout;
 using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
+template <
+    typename Client
+>
+void hpx_test_main(
     variables_map& vm
     )
 {
@@ -46,8 +51,8 @@ int hpx_main(
         ///     references to both components go out of scope. Both components
         ///     should be deleted. 
 
-        simple_refcnt_checker monitor0(find_here());
-        simple_refcnt_checker monitor1(find_here());
+        Client monitor0(find_here());
+        Client monitor1(find_here());
 
         cout << "id0: " << monitor0.get_gid() << "\n"
              << "id1: " << monitor1.get_gid() << "\n" << flush; 
@@ -68,6 +73,26 @@ int hpx_main(
         // Both components should be out of scope now.
         HPX_TEST_EQ(true, monitor0.ready(milliseconds(delay))); 
         HPX_TEST_EQ(true, monitor1.ready(milliseconds(delay))); 
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main(
+    variables_map& vm
+    )
+{
+    {
+        cout << std::string(80, '#') << "\n"
+             << "simple component test\n" 
+             << std::string(80, '#') << "\n" << flush;
+
+        hpx_test_main<simple_refcnt_checker>(vm);
+
+        cout << std::string(80, '#') << "\n"
+             << "managed component test\n" 
+             << std::string(80, '#') << "\n" << flush;
+
+        hpx_test_main<managed_refcnt_checker>(vm);
     }
 
     finalize();
