@@ -90,18 +90,12 @@ namespace hpx { namespace components
                         hpx::util::osstream_get_string(strm));
                 }
             }
-            return naming::gid_type(
-                naming::strip_credit_from_gid(gid_.get_msb()), gid_.get_lsb());
+            return gid_; 
         }
 
         naming::id_type get_gid() const
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
-        }
-
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(gid_);
         }
 
         /// \brief  The function \a get_factory_properties is used to 

@@ -207,7 +207,6 @@ namespace hpx { namespace components { namespace server
     {
         server::memory_block* c = server::memory_block::create(count, act);
         naming::gid_type gid = c->get_base_gid();
-        set_credit_for_gid(gid, c->get_initial_credits());
         if (gid) {
             LRT_(info) << "successfully created memory block of size " << count 
                        << ": " << gid;

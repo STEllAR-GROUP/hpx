@@ -29,7 +29,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Version of id_type
-#define HPX_IDTYPE_VERSION  0x10
+#define HPX_IDTYPE_VERSION  0x20
 #define HPX_GIDTYPE_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,9 +373,9 @@ namespace hpx { namespace naming
             managed = 1
         };
 
-    private:
         typedef void (*deleter_type)(detail::id_type_impl*);
 
+    private:
         static deleter_type get_deleter(management_type t)
         {
             return (t == managed) ? &detail::gid_managed_deleter : 

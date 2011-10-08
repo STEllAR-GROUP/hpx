@@ -44,7 +44,6 @@ namespace hpx { namespace components { namespace server
 
         Component* c = static_cast<Component*>(Component::create(count));
         naming::gid_type gid = c->get_base_gid();
-        set_credit_for_gid(gid, c->get_initial_credits());
         if (gid) {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -132,7 +131,6 @@ namespace hpx { namespace components { namespace server
         Component* c = static_cast<Component*>(
             Component::create_one(BOOST_PP_ENUM_PARAMS(N, t)));
         naming::gid_type gid = c->get_base_gid();
-        set_credit_for_gid(gid, c->get_initial_credits());
         if (gid) 
             return gid;
 

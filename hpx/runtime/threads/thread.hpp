@@ -320,15 +320,8 @@ namespace hpx { namespace threads { namespace detail
         naming::gid_type get_base_gid() const
         {
             BOOST_ASSERT(back_ptr_);
-            naming::gid_type gid = back_ptr_->get_base_gid(); 
-            return naming::gid_type(
-                naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+            return back_ptr_->get_base_gid(); 
         } 
-
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(get_base_gid());
-        }
 
     private:
         friend class threads::thread;

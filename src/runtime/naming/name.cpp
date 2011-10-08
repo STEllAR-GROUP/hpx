@@ -157,13 +157,29 @@ namespace hpx { namespace naming
         }
     }   // detail
 
+    static id_type::management_type get_management_type(
+        boost::shared_ptr<detail::id_type_impl> const& p)
+    {
+        BOOST_ASSERT(p);
+
+        id_type::deleter_type* d = boost::get_deleter<id_type::deleter_type>(p);
+        BOOST_ASSERT(d);
+
+        if (*d == &detail::gid_managed_deleter)
+            return id_type::managed;
+        else
+            return id_type::unmanaged;
+    }
+
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
     {
         bool isvalid = gid_ ? true : false;
         ar << isvalid;
         if (isvalid) {
+            management_type m = get_management_type(gid_);
             gid_type const& g = *gid_;
+            ar << m; 
             ar << g;
         }
     }
@@ -180,9 +196,11 @@ namespace hpx { namespace naming
         bool isvalid;
         ar >> isvalid;
         if (isvalid) {
+            management_type m;
             gid_type g;
+            ar >> m;
             ar >> g;
-            gid_.reset(new detail::id_type_impl(g), get_deleter(managed));
+            gid_.reset(new detail::id_type_impl(g), get_deleter(m));
         }
     }
 

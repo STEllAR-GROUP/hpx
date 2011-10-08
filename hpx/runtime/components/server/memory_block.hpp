@@ -124,11 +124,6 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         naming::gid_type get_base_gid() const;
 
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(get_base_gid());
-        }
-
     protected:
         friend void intrusive_ptr_add_ref(memory_block_header* p);
         friend void intrusive_ptr_release(memory_block_header* p);
@@ -678,11 +673,6 @@ namespace hpx { namespace components { namespace server
             return get_checked()->get_gid();
         }
 
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(get_base_gid());
-        }
-
         naming::gid_type get_base_gid() const
         {
             return get_heap().get_gid(const_cast<memory_block*>(this));
@@ -708,9 +698,7 @@ inline naming::id_type memory_block_header::get_gid() const
 inline naming::gid_type memory_block_header::get_base_gid() const
 {
     BOOST_ASSERT(wrapper_);
-    naming::gid_type gid = wrapper_->get_base_gid(); 
-    return naming::gid_type(
-        naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+    return wrapper_->get_base_gid(); 
 } 
 
 }}}}

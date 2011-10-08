@@ -62,11 +62,6 @@ namespace hpx { namespace components
 
         naming::gid_type get_base_gid() const;
 
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(get_base_gid());
-        }
-
     private:
         template <typename, typename>
         friend class managed_component;
@@ -404,11 +399,6 @@ namespace hpx { namespace components
             return get_checked()->get_gid();
         }
 
-        boost::uint16_t get_initial_credits() const
-        {
-            return naming::get_credit_from_gid(get_base_gid());
-        }
-
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()
@@ -454,9 +444,7 @@ namespace hpx { namespace components
     managed_component_base<Component, Wrapper>::get_base_gid() const
     {
         BOOST_ASSERT(back_ptr_);
-        naming::gid_type gid = back_ptr_->get_base_gid(); 
-        return naming::gid_type(
-            naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+        return back_ptr_->get_base_gid(); 
     } 
 }}
 
