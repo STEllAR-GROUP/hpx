@@ -42,7 +42,7 @@ namespace hpx { namespace components
         /// \brief Destruct a simple_component
         ~simple_component_base()
         { 
-            applier::unbind_gid(gid_.get_gid()); 
+            applier::unbind_gid(gid_); 
         }
 
         /// \brief finalize() will be called just before the instance gets 
@@ -69,8 +69,7 @@ namespace hpx { namespace components
         ///
         /// \returns      The global id (GID) assigned to this instance of a 
         ///               component
-        naming::gid_type 
-        get_base_gid() const
+        naming::gid_type get_base_gid() const
         {
             if (!gid_) 
             {
@@ -78,28 +77,31 @@ namespace hpx { namespace components
                 naming::address addr(appl.here(), 
                     components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
-                gid_ = naming::id_type(get_next_id(), naming::id_type::unmanaged);
-                if (!applier::bind_gid(gid_.get_gid(), addr))
+                gid_ = get_next_id();
+                if (!applier::bind_gid(gid_, addr))
                 {
                     hpx::util::osstream strm;
                     strm << gid_;
 
-                    gid_ = naming::invalid_id;   // invalidate GID
+                    gid_ = naming::invalid_gid;   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "simple_component_base<Component>::get_base_gid", 
                         hpx::util::osstream_get_string(strm));
                 }
             }
-            return gid_.get_gid();
+            return naming::gid_type(
+                naming::strip_credit_from_gid(gid_.get_msb()), gid_.get_lsb());
         }
 
-        naming::id_type const& get_gid() const
+        naming::id_type get_gid() const
         {
-            // Make sure our GID is bound.
-            get_base_gid();
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
 
-            return gid_;
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(gid_);
         }
 
         /// \brief  The function \a get_factory_properties is used to 
@@ -115,7 +117,7 @@ namespace hpx { namespace components
         }
 
     private:
-        mutable naming::id_type gid_;
+        mutable naming::gid_type gid_;
     };
 
 

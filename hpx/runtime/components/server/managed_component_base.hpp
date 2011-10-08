@@ -34,6 +34,10 @@ namespace hpx { namespace components
       : public detail::managed_component_tag, boost::noncopyable
     {
     public:
+        managed_component_base()
+          : back_ptr_(0)
+        {}
+
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this 
         // component
@@ -54,23 +58,26 @@ namespace hpx { namespace components
             components::set_component_type<Component>(type);
         }
 
-        template <typename ManagedType>
-        naming::id_type const& get_gid(ManagedType* p) const
-        {
-            if (!id_) 
-                id_ = naming::id_type(p->get_base_gid(), naming::id_type::unmanaged);
-            return id_;
-        }
-
-        naming::id_type const& get_gid() const;
+        naming::id_type get_gid() const;
 
         naming::gid_type get_base_gid() const;
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
+        }
 
     private:
         template <typename, typename>
         friend class managed_component;
 
-        mutable naming::id_type id_;
+        void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
+        {
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
+            back_ptr_ = bp;
+        }
+
         managed_component<Component, Wrapper>* back_ptr_;        
     };
 
@@ -166,14 +173,16 @@ namespace hpx { namespace components
         ///             managed_component takes ownership of this pointer.
         explicit managed_component(Component* c) 
           : component_(c) 
-        {}
+        {
+            component_->set_back_ptr(this);
+        }
 
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
         managed_component() 
           : component_(new wrapped_type()) 
         {
-            component_->back_ptr_ = this; 
+            component_->set_back_ptr(this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
@@ -181,7 +190,7 @@ namespace hpx { namespace components
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
           : component_(new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t)))          \
         {                                                                     \
-            component_->back_ptr_ = this;                                     \
+            component_->set_back_ptr(this);                                   \
         }
     /**/
 
@@ -390,9 +399,14 @@ namespace hpx { namespace components
     public:
         ///
         /// \brief Return the global id of this \a future instance
-        naming::id_type const& get_gid() const
+        naming::id_type get_gid() const
         {
-            return get_checked()->get_gid(this);
+            return get_checked()->get_gid();
+        }
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -429,18 +443,20 @@ namespace hpx { namespace components
     };
 
     template <typename Component, typename Wrapper>
-    naming::id_type const&
+    inline naming::id_type
     managed_component_base<Component, Wrapper>::get_gid() const
     {
-        BOOST_ASSERT(back_ptr_);
-        return get_gid(back_ptr_);
+        return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
     } 
 
     template <typename Component, typename Wrapper>
-    naming::gid_type 
+    inline naming::gid_type 
     managed_component_base<Component, Wrapper>::get_base_gid() const
     {
-        return get_gid().get_gid();
+        BOOST_ASSERT(back_ptr_);
+        naming::gid_type gid = back_ptr_->get_base_gid(); 
+        return naming::gid_type(
+            naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
     } 
 }}
 

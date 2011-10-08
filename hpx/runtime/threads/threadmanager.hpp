@@ -193,7 +193,7 @@ namespace hpx { namespace threads
         ///                   thread referenced by the \a id parameter. If the 
         ///                   thread is not known to the threadmanager the 
         ///                   return value will be \a naming::invalid_id.
-        virtual naming::id_type const& get_thread_gid(thread_id_type id) = 0;
+        virtual naming::id_type get_thread_gid(thread_id_type id) = 0;
 
         /// The get_description function is part of the thread related API and 
         /// allows to query the description of one of the threads known to the 
@@ -513,7 +513,7 @@ namespace hpx { namespace threads
         ///                   thread referenced by the \a id parameter. If the 
         ///                   thread is not known to the threadmanager the 
         ///                   return value will be \a naming::invalid_id.
-        naming::id_type const& get_thread_gid(thread_id_type id);
+        naming::id_type get_thread_gid(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given 
         /// new value after it expired (at the given time)

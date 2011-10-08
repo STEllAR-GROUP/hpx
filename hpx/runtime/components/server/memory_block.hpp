@@ -120,12 +120,13 @@ namespace hpx { namespace components { namespace server { namespace detail
             components::set_component_type<memory_block_header>(t); 
         }
 
-        template <typename ManagedType>
-        naming::id_type const& get_gid(ManagedType* p) const
+        naming::id_type get_gid() const;
+
+        naming::gid_type get_base_gid() const;
+
+        boost::uint16_t get_initial_credits() const
         {
-            if (!id_) 
-                id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
-            return id_;
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
     protected:
@@ -135,7 +136,6 @@ namespace hpx { namespace components { namespace server { namespace detail
         boost::detail::atomic_count count_;
         std::size_t size_;
         server::memory_block* wrapper_;
-        mutable naming::id_type id_;
         actions::manage_object_action_base const& managing_object_;
     };
 
@@ -672,10 +672,15 @@ namespace hpx { namespace components { namespace server
         }
 
     public:
-        ///
-        naming::id_type const& get_gid() const
+        /// \brief Return the global id of this \a future instance
+        naming::id_type get_gid() const
         {
-            return get_checked()->get_gid(this);
+            return get_checked()->get_gid();
+        }
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
         naming::gid_type get_base_gid() const
@@ -691,6 +696,23 @@ namespace hpx { namespace components { namespace server
         ///        a single pointer
         boost::intrusive_ptr<detail::memory_block_header> component_;
     };
-}}}
+
+namespace detail
+{
+
+inline naming::id_type memory_block_header::get_gid() const
+{
+    return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+} 
+
+inline naming::gid_type memory_block_header::get_base_gid() const
+{
+    BOOST_ASSERT(wrapper_);
+    naming::gid_type gid = wrapper_->get_base_gid(); 
+    return naming::gid_type(
+        naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+} 
+
+}}}}
 
 #endif

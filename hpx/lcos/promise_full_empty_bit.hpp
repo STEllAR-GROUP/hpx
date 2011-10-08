@@ -46,7 +46,9 @@ namespace hpx { namespace lcos { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_future };
 
-        promise() {}
+        promise()
+          : back_ptr_(0)
+        {}
 
         /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -176,21 +178,37 @@ namespace hpx { namespace lcos { namespace detail
             return get_data(0);
         }
 
-        // REVIEW: why does this strip the credit?
-        template <typename ManagedType>
-        naming::id_type const& get_gid(ManagedType* p) const
+        naming::id_type get_gid() const
         {
-            if (!id_) {
-                naming::gid_type gid = p->get_base_gid(); 
-                naming::strip_credit_from_gid(gid);
-                id_ = naming::id_type(gid, naming::id_type::unmanaged);
-            }
-            return id_;
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        } 
+
+        naming::gid_type get_base_gid() const
+        {
+            BOOST_ASSERT(back_ptr_);
+            naming::gid_type gid = back_ptr_->get_base_gid(); 
+            return naming::gid_type(
+                naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+        } 
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
     private:
+        template <typename, typename>
+        friend class components::managed_component;
+
+        void set_back_ptr(components::managed_component<promise>* bp)
+        {
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
+            back_ptr_ = bp;
+        }
+
         util::full_empty<data_type> data_[N];
-        mutable naming::id_type id_;
+        components::managed_component<promise>* back_ptr_; 
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -211,7 +229,9 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::variant<result_type, error_type> data_type;
 
     public:
-        promise() {}
+        promise()
+          : back_ptr_(0)
+        {}
 
         /// Reset the promise to allow to restart an asynchronous 
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -343,20 +363,37 @@ namespace hpx { namespace lcos { namespace detail
             return get_data(0);
         }
 
-        template <typename ManagedType>
-        naming::id_type const& get_gid(ManagedType* p) const
+        inline naming::id_type get_gid() const
         {
-            if (!id_) {
-                naming::gid_type gid = p->get_base_gid(); 
-                naming::strip_credit_from_gid(gid);
-                id_ = naming::id_type(gid, naming::id_type::unmanaged);
-            }
-            return id_;
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        } 
+
+        inline naming::gid_type get_base_gid() const
+        {
+            BOOST_ASSERT(back_ptr_);
+            naming::gid_type gid = back_ptr_->get_base_gid(); 
+            return naming::gid_type(
+                naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+        } 
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
     private:
+        template <typename, typename>
+        friend class components::managed_component;
+
+        void set_back_ptr(components::managed_component<promise>* bp)
+        {
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
+            back_ptr_ = bp;
+        }
+
         util::full_empty<data_type> data_[N];
-        mutable naming::id_type id_;
+        components::managed_component<promise>* back_ptr_; 
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -478,9 +515,9 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type const& get_gid() const
+        naming::id_type get_gid() const
         {
-            return (*impl_)->get_gid(impl_.get());
+            return (*impl_)->get_gid();
         }
 
         /// Return whether or not the data is available for this
@@ -574,9 +611,9 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type const& get_gid() const
+        naming::id_type get_gid() const
         {
-            return (*impl_)->get_gid(impl_.get());
+            return (*impl_)->get_gid();
         }
 
         /// Return whether or not the data is available for this

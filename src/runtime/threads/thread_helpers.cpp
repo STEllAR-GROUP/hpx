@@ -183,7 +183,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type const& get_thread_gid(thread_id_type id, error_code& ec)
+    naming::id_type get_thread_gid(thread_id_type id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)

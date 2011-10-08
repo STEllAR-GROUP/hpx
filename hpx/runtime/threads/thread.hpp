@@ -116,6 +116,7 @@ namespace hpx { namespace threads { namespace detail
             parent_thread_phase_(init_data.parent_phase),
             component_id_(init_data.lva),
             marked_state_(unknown),
+            back_ptr_(0),
             pool_(&pool)
         {
             // store the thread id of the parent thread, mainly for debugging 
@@ -140,7 +141,7 @@ namespace hpx { namespace threads { namespace detail
           : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())), 
             description_(""), lco_description_(""),
             parent_locality_prefix_(0), parent_thread_id_(0), 
-            parent_thread_phase_(0), component_id_(0), pool_(0)
+            parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -311,15 +312,22 @@ namespace hpx { namespace threads { namespace detail
         /// 
         void set_event();
 
-        template <typename ManagedType>
-        naming::id_type const& get_gid(ManagedType* p) const
+        naming::id_type get_gid() const
         {
-            if (!id_) {
-                naming::gid_type gid = p->get_base_gid(); 
-                naming::strip_credit_from_gid(gid);
-                id_ = naming::id_type(gid, naming::id_type::unmanaged);
-            }
-            return id_;
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        } 
+
+        naming::gid_type get_base_gid() const
+        {
+            BOOST_ASSERT(back_ptr_);
+            naming::gid_type gid = back_ptr_->get_base_gid(); 
+            return naming::gid_type(
+                naming::strip_credit_from_gid(gid.get_msb()), gid.get_lsb());
+        } 
+
+        boost::uint16_t get_initial_credits() const
+        {
+            return naming::get_credit_from_gid(get_base_gid());
         }
 
     private:
@@ -343,7 +351,14 @@ namespace hpx { namespace threads { namespace detail
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
 
-        mutable naming::id_type id_;    // that's our gid
+        void set_back_ptr(
+            components::managed_component<thread, threads::thread>* bp)
+        {
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
+            back_ptr_ = bp;
+        }
+
         components::managed_component<thread, threads::thread>* back_ptr_; 
         thread_pool* pool_;
     };
@@ -694,6 +709,8 @@ namespace hpx { namespace components
         static void free(void* p, std::size_t count = 1)
         {
         }
+
+        // REVIEW: Doesn't this mean that threads will always have invalid GIDs?
         static naming::gid_type get_gid(void* p)
         {
             return naming::invalid_gid;

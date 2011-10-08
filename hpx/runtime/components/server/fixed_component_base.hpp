@@ -68,7 +68,7 @@ struct fixed_component_base : detail::fixed_component_tag
     /// \brief Return the component's fixed GID. 
     ///
     /// \returns The fixed global id (GID) for this component
-    naming::gid_type const& get_base_gid() const
+    naming::gid_type get_base_gid() const
     {
         if (!gid_)
         {
@@ -96,7 +96,18 @@ struct fixed_component_base : detail::fixed_component_tag
                 }
             }
         }
-        return gid_;
+        return naming::gid_type(
+            naming::strip_credit_from_gid(gid_.get_msb()), gid_.get_lsb());
+    }
+
+    naming::id_type get_gid() const
+    {
+        return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+    }
+
+    boost::uint16_t get_initial_credits() const
+    {
+        return naming::get_credit_from_gid(gid_);
     }
 
     static naming::gid_type const& fixed_gid()

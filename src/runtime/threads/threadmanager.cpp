@@ -625,7 +625,7 @@ namespace hpx { namespace threads
 
     /// Retrieve the global id of the given thread
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    naming::id_type const& 
+    naming::id_type 
     threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_gid(thread_id_type id) 
     {
