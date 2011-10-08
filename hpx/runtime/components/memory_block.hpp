@@ -79,10 +79,13 @@ namespace hpx { namespace components
         /// given by the parameter \a targetgid.
         /// Allocates count * sizeof(T) bytes of memory and automatically creates
         /// an instance of hpx::actions::manage_object_action<T>
-        template <typename T, typename T0 = T, typename Config = void>
+// removed for now as it requires default template arguments for functions
+// FIXME: do build time detection whether this is supported
+//        template <typename T, typename T0 = T, typename Config = void>
+        template <typename T, typename T0, typename Config>
         memory_block& create(naming::id_type const& targetgid, std::size_t count)
         {
-            hpx::actions::manage_object_action<T0, void> const act;
+            hpx::actions::manage_object_action<T0, Config> const act;
             return create(targetgid, sizeof(T) * count, act);
         }
 
