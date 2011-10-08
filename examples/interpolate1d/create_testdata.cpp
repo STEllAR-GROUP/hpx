@@ -14,7 +14,7 @@ using namespace H5;
 int main()
 {
     double const pi = 4*std::atan(1.);
-    int const num_points = 36000;
+    std::size_t const num_points = 36000;
 
     std::vector<double> data;
     std::vector<double> values;

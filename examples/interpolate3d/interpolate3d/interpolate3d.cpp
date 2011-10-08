@@ -72,8 +72,7 @@ namespace interpolate3d
             config_data data = cfg_.get();
             unregister_name(data.symbolic_name_);   // unregister config data
 
-            int i = 0;
-            BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
+            for (std::size_t i = 0; i < partitions_.size();)
             {
                 unregister_name(data.symbolic_name_ + 
                     boost::lexical_cast<std::string>(i++));
@@ -123,7 +122,7 @@ namespace interpolate3d
 
         // reconnect to the partitions
         partitions_.reserve(data.num_instances_);
-        for (int i = 0; i < data.num_instances_; ++i)
+        for (std::size_t i = 0; i < data.num_instances_; ++i)
         {
             using boost::lexical_cast;
             partitions_.push_back(query_name(

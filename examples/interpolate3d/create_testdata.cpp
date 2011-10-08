@@ -13,9 +13,9 @@ using namespace H5;
 
 int main()
 {
-    int const num_points_x = 100;
-    int const num_points_y = 100;
-    int const num_points_z = 100;
+    std::size_t const num_points_x = 100;
+    std::size_t const num_points_y = 100;
+    std::size_t const num_points_z = 100;
 
     std::vector<double> data_x;
     std::vector<double> data_y;
