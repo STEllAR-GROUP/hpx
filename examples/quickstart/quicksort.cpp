@@ -145,9 +145,6 @@ int hpx_main(variables_map& vm)
     if (vm.count("elements"))
         elements = vm["elements"].as<std::size_t>();
 
-    manage_object_action<boost::uint8_t> const raw_memory =
-      manage_object_action<boost::uint8_t>();
-
     // get list of all known localities
     std::vector<id_type> prefixes;
     id_type prefix;
