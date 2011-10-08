@@ -506,6 +506,13 @@ else()
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_use_flag_if_available(-Werror=vla)
 
+  # No return statement in a non-void function can lead to garbage return values
+  # in GCC.
+  hpx_use_flag_if_available(-Werror=return-type)
+
+  # Uninitialized variables are bad
+  hpx_use_flag_if_available(-Werror=uninitialized)
+
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
 
