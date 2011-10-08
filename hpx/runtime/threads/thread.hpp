@@ -325,6 +325,9 @@ namespace hpx { namespace threads { namespace detail
     private:
         friend class threads::thread;
         friend void threads::delete_clone(threads::thread const*);
+    
+        template <typename, typename>
+        friend class components::managed_component;
 
         coroutine_type coroutine_;
         mutable boost::atomic<thread_state> current_state_;
@@ -341,6 +344,7 @@ namespace hpx { namespace threads { namespace detail
         mutable thread_state marked_state_;
 
         mutable naming::id_type id_;    // that's our gid
+        components::managed_component<thread, threads::thread>* back_ptr_; 
         thread_pool* pool_;
     };
 }}}

@@ -25,6 +25,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components 
 {
+    template <typename Component, typename Derived>
+    class managed_component;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Wrapper>
     class managed_component_base 
@@ -55,12 +58,20 @@ namespace hpx { namespace components
         naming::id_type const& get_gid(ManagedType* p) const
         {
             if (!id_) 
-                id_ = naming::id_type(p->get_base_gid(), naming::id_type::managed);
+                id_ = naming::id_type(p->get_base_gid(), naming::id_type::unmanaged);
             return id_;
         }
 
+        naming::id_type const& get_gid() const;
+
+        naming::gid_type get_base_gid() const;
+
     private:
+        template <typename, typename>
+        friend class managed_component;
+
         mutable naming::id_type id_;
+        managed_component<Component, Wrapper>* back_ptr_;        
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -132,7 +143,6 @@ namespace hpx { namespace components
     ///
     /// \tparam Component
     /// \tparam Derived
-    /// \tparam HasUseCount
     ///
     template <typename Component, typename Derived>
     class managed_component : boost::noncopyable
@@ -162,13 +172,17 @@ namespace hpx { namespace components
         ///        instance
         managed_component() 
           : component_(new wrapped_type()) 
-        {}
+        {
+            component_->back_ptr_ = this; 
+        }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
           : component_(new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t)))          \
-        {}
+        {                                                                     \
+            component_->back_ptr_ = this;                                     \
+        }
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
@@ -414,6 +428,20 @@ namespace hpx { namespace components
         Component* component_;
     };
 
+    template <typename Component, typename Wrapper>
+    naming::id_type const&
+    managed_component_base<Component, Wrapper>::get_gid() const
+    {
+        BOOST_ASSERT(back_ptr_);
+        return get_gid(back_ptr_);
+    } 
+
+    template <typename Component, typename Wrapper>
+    naming::gid_type 
+    managed_component_base<Component, Wrapper>::get_base_gid() const
+    {
+        return get_gid().get_gid();
+    } 
 }}
 
 #endif

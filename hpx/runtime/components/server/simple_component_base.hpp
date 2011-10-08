@@ -42,7 +42,7 @@ namespace hpx { namespace components
         /// \brief Destruct a simple_component
         ~simple_component_base()
         { 
-            applier::unbind_gid(gid_); 
+            applier::unbind_gid(gid_.get_gid()); 
         }
 
         /// \brief finalize() will be called just before the instance gets 
@@ -67,12 +67,9 @@ namespace hpx { namespace components
         ///        GID to this instance of a component and register this gid 
         ///        with the AGAS service
         ///
-        /// \param appl   The applier instance to be used for accessing the 
-        ///               AGAS service.
-        ///
-        /// \returns      The global id (GID)  assigned to this instance of a 
+        /// \returns      The global id (GID) assigned to this instance of a 
         ///               component
-        naming::gid_type const&
+        naming::gid_type 
         get_base_gid() const
         {
             if (!gid_) 
@@ -81,19 +78,27 @@ namespace hpx { namespace components
                 naming::address addr(appl.here(), 
                     components::get_component_type<wrapped_type>(), 
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
-                gid_ = get_next_id();
-                if (!applier::bind_gid(gid_, addr))
+                gid_ = naming::id_type(get_next_id(), naming::id_type::unmanaged);
+                if (!applier::bind_gid(gid_.get_gid(), addr))
                 {
                     hpx::util::osstream strm;
                     strm << gid_;
 
-                    gid_ = naming::gid_type();   // invalidate GID
+                    gid_ = naming::invalid_id;   // invalidate GID
 
                     HPX_THROW_EXCEPTION(duplicate_component_address,
                         "simple_component_base<Component>::get_base_gid", 
                         hpx::util::osstream_get_string(strm));
                 }
             }
+            return gid_.get_gid();
+        }
+
+        naming::id_type const& get_gid() const
+        {
+            // Make sure our GID is bound.
+            get_base_gid();
+
             return gid_;
         }
 
@@ -110,7 +115,7 @@ namespace hpx { namespace components
         }
 
     private:
-        mutable naming::gid_type gid_;
+        mutable naming::id_type gid_;
     };
 
 
