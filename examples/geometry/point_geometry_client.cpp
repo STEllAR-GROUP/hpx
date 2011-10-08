@@ -145,9 +145,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Initial Data -----------------------------------------
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
-        double dt = 0.025; // guess for start dt
-        double stop_time = 0.035;
-        double time = 0.0;
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
           initial_phase.push_back(accu[i].init_async(bbox[i][0],bbox[i][1],bbox[i][2],bbox[i][3],velx[i],vely[i],numpoints,i));
@@ -163,6 +160,10 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         hpx::lcos::wait(initial_phase);
 #if 0
+        const double dt = 0.025; // guess for start dt
+        const double stop_time = 0.035;
+        const double time = 0.0;
+
         while (time < stop_time) {
             {
               // Move bodies--------------------------------------------
