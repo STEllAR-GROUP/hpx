@@ -231,7 +231,17 @@ option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
-  add_definitions(-DHPX_STACKTRACES=1)
+  add_definitions(-DHPX_HAVE_STACKTRACES)
+endif()
+
+################################################################################
+# Backtrace configuration 
+################################################################################
+option(HPX_NATIVE_TLS "Use native TLS support if available (default: ON)" ON)
+
+if(HPX_NATIVE_TLS)
+  hpx_info("stacktraces" "Stack traces are enabled.")
+  add_definitions(-DHPX_HAVE_NATIVE_TLS)
 endif()
 
 ################################################################################
