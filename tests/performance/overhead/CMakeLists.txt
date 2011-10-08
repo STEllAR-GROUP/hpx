@@ -1,11 +1,16 @@
-# Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
+    boost_tls
+    native_tls
     delay_baseline_overhead
    )
+
+set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                                        ${BOOST_thread_LIBRARY})
 
 set(delay_baseline_overhead_FLAGS DEPENDENCIES iostreams_component)
 
