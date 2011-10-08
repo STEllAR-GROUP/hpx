@@ -77,7 +77,7 @@ namespace boost { namespace serialization
 void test_sheneos(std::size_t num_test_points)
 {
     // cubic root
-    int num_points = std::exp(std::log(double(num_test_points)) / 3);
+    const std::size_t num_points = std::exp(std::log(double(num_test_points)) / 3);
 
     // create a client instance connected to the already existing interpolation 
     // object
