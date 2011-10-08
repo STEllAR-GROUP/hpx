@@ -214,8 +214,7 @@ namespace hpx
                           % __DATE__
                           % BOOST_PLATFORM
                           % BOOST_COMPILER
-                          % BOOST_STDLIB
-                         );
+                          % BOOST_STDLIB);
             return help;
         }
 
