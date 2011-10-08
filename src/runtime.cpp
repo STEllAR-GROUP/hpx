@@ -40,7 +40,7 @@ namespace hpx
     void handle_termination(char const* reason)
     {
         std::cerr << "Received " << (reason ? reason : "unknown signal")
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES) 
                   << ", " << hpx::detail::backtrace() 
 #else
                   << "."
@@ -85,7 +85,7 @@ namespace hpx
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES)
     #include <boost/backtrace.hpp>
 #endif
 
@@ -95,7 +95,7 @@ namespace hpx
     {
         char* c = strsignal(signum); 
         std::cerr << "Received " << (c ? c : "unknown signal")
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES)
                   << ", " << hpx::detail::backtrace() 
 #else
                   << "."
@@ -492,7 +492,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::thread_specific_ptr<runtime *> runtime::runtime_;
+    hpx::util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
 
     void runtime::init_tss()
     {

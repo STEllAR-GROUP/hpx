@@ -1237,7 +1237,8 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::thread_specific_ptr<std::size_t> threadmanager_base::thread_num_;
+    hpx::util::thread_specific_ptr<std::size_t, threadmanager_base::tls_tag>
+        threadmanager_base::thread_num_;
 
     void threadmanager_base::init_tss(std::size_t thread_num, bool numa_sensitive)
     {

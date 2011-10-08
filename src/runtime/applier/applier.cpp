@@ -210,7 +210,7 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::thread_specific_ptr<applier*> applier::applier_;
+    hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
         
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
                 boost::uint64_t rts, boost::uint64_t mem)

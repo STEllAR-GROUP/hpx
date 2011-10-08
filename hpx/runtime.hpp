@@ -28,7 +28,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -107,7 +107,8 @@ namespace hpx
 
         // the TSS holds a pointer to the runtime associated with a given 
         // OS thread
-        static boost::thread_specific_ptr<runtime*> runtime_;
+        struct tls_tag {};
+        static hpx::util::thread_specific_ptr<runtime*, tls_tag> runtime_;
 
         /// \brief access configuration information
         util::runtime_configuration& get_config()

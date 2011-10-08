@@ -35,7 +35,6 @@
 
 #include <cstddef>
 #include <boost/optional.hpp>
-#include <boost/thread/tss.hpp>
 #include <boost/coroutine/detail/argument_unpacker.hpp>
 #include <boost/coroutine/detail/coroutine_accessor.hpp>
 #include <boost/coroutine/detail/context_base.hpp>
@@ -43,6 +42,12 @@
 #include <boost/coroutine/detail/static.hpp>
 
 #include <boost/config.hpp>
+
+#if defined(HPX_HAVE_NATIVE_TLS)
+# include <hpx/util/thread_specific_ptr.hpp>
+#else
+# include <boost/thread/tss.hpp>
+#endif
 
 #if defined(BOOST_WINDOWS)
 # define BOOST_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
@@ -163,9 +168,15 @@ namespace boost { namespace coroutines { namespace detail
         return this->phase();
     }
 
+    struct tls_tag {};
+
   private:
     typedef detail::coroutine_self<coroutine_type> self_type;
+#if defined(HPX_HAVE_NATIVE_TLS)
+    static hpx::util::thread_specific_ptr<self_type*, tls_tag> self_;
+#else
     static boost::thread_specific_ptr<self_type*> self_;
+#endif
 
   public:
     BOOST_COROUTINE_EXPORT static void set_self(self_type* self);
@@ -188,11 +199,20 @@ namespace boost { namespace coroutines { namespace detail
   };
 
   // the TSS holds a pointer to the self instance as stored on the stack
+#if defined(HPX_HAVE_NATIVE_TLS)
+  template<typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
+  hpx::util::thread_specific_ptr<
+      typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
+    , typename coroutine_impl<CoroutineType, ContextImpl, Heap>::tls_tag
+  > coroutine_impl<CoroutineType, ContextImpl, Heap>::self_;
+#else
   template<typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
   boost::thread_specific_ptr<
       typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
   > coroutine_impl<CoroutineType, ContextImpl, Heap>::self_;
+#endif
 
   /////////////////////////////////////////////////////////////////////////////
   template <typename Coroutine, template <typename> class Heap>

@@ -31,6 +31,7 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -297,7 +298,8 @@ namespace hpx { namespace threads
 
     private:
         // the TSS holds the number associated with a given OS thread
-        static boost::thread_specific_ptr<std::size_t> thread_num_;
+        struct tls_tag {};
+        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> thread_num_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

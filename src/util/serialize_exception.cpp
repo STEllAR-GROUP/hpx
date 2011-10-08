@@ -100,7 +100,7 @@ namespace boost { namespace serialization
                 throw_thread_name_ = *thread_name;
             }
  
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES)
             std::string const* back_trace =
                 boost::get_error_info<hpx::throw_stacktrace>(e);
             if (back_trace)

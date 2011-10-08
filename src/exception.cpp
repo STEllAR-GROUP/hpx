@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/stringstream.hpp>
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES)
   #include <boost/backtrace.hpp>
 #endif
 #include <boost/format.hpp>
@@ -24,7 +24,7 @@ namespace hpx { namespace detail
 {
     std::string backtrace()
     {
-#if HPX_STACKTRACES != 0
+#if defined(HPX_HAVE_STACKTRACES)
         return boost::trace();
 #else
         return "";

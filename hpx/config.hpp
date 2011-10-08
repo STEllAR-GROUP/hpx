@@ -263,12 +263,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Disable stack trace support by default
-#if !defined(HPX_STACKTRACES)
-#  define HPX_STACKTRACES 0
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Enable usage of std::unique_ptr instead of std::auto_ptr
 #if !defined(HPX_HAVE_CXX11_UNIQUE_PTR)
 #  define HPX_UNIQUE_PTR ::std::auto_ptr

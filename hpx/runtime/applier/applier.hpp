@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -165,7 +166,8 @@ namespace hpx { namespace applier
     public:
         // the TSS holds a pointer to the applier associated with a given 
         // OS thread
-        static boost::thread_specific_ptr<applier*> applier_;
+        struct tls_tag {};
+        static hpx::util::thread_specific_ptr<applier*, tls_tag> applier_;
         void init_tss();
         void deinit_tss();
 
