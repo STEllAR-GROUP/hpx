@@ -56,7 +56,12 @@ namespace interpolate1d
 
             // number of dimensions
             int numdims = dataspace.getSimpleExtentNdims();
-            BOOST_ASSERT(numdims == 1);
+
+            if (numdims != 1)
+            {
+                HPX_THROW_EXCEPTION(hpx::no_success, "extract_data_range",
+                    "number of dimensions was not 1");
+            }
 
             // Get the dimension size of each dimension in the dataspace.
             hsize_t dims[1];
@@ -94,7 +99,12 @@ namespace interpolate1d
 
             // number of dimensions
             int numdims = dataspace.getSimpleExtentNdims();
-            BOOST_ASSERT(numdims == 1);
+
+            if (numdims != 1)
+            {
+                HPX_THROW_EXCEPTION(hpx::no_success, "extract_data",
+                    "number of dimensions was not 1");
+            }
 
             // Get the dimension size of each dimension in the dataspace.
             hsize_t dims[1];

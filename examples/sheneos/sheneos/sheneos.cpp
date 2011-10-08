@@ -123,7 +123,7 @@ namespace sheneos
 
         // reconnect to the partitions
         partitions_.reserve(data.num_instances_);
-        for (int i = 0; i < data.num_instances_; ++i)
+        for (std::size_t i = 0; i < data.num_instances_; ++i)
         {
             using boost::lexical_cast;
             partitions_.push_back(query_name(
