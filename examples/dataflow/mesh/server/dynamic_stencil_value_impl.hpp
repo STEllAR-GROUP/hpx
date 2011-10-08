@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach 
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -89,7 +90,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         is_called_ = true;
 
         // this needs to have been initialized
-        if (-1 == instencilsize_ || -1 == outstencilsize_) {
+        if (std::size_t(-1) == instencilsize_ || std::size_t(-1) == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "dynamic_stencil_value::call", 
                 "this instance has not been initialized yet");
@@ -221,7 +222,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> gids;
 
         // this needs to have been initialized
-        if (-1 == instencilsize_ || -1 == outstencilsize_) {
+        if (std::size_t(-1) == instencilsize_ || std::size_t(-1) == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "dynamic_stencil_value::get_output_ports", 
                 "this instance has not been initialized yet");
@@ -241,7 +242,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type> const& gids)
     {
         // this needs to have been initialized
-        if (-1 == instencilsize_ || -1 == outstencilsize_) {
+        if (std::size_t(-1) == instencilsize_ || std::size_t(-1) == outstencilsize_) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "dynamic_stencil_value::connect_input_ports", 
                 "this instance has not been initialized yet");
