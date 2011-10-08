@@ -33,11 +33,6 @@ set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 ################################################################################
-# Fortran detection (part 1)
-################################################################################
-include(CMakeDetermineFortranCompiler)
-
-################################################################################
 # CMake configuration
 ################################################################################
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
@@ -54,21 +49,16 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 ################################################################################
-# Fortran detection (part 2)
+# Fortran compiler detection 
 ################################################################################
-if(CMAKE_Fortran_COMPILER)
-  hpx_info("fortran" "Found a Fortran compiler")
-  enable_language(Fortran)
-else()
-  hpx_warn("fortran" "Couldn't find a Fortran compiler")
-endif()
+include(HPX_FortranCompiler)
 
 ################################################################################
 # Boost configuration
 ################################################################################
 # Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
 
-option(HPX_INTERNAL_CHRONO "Use HPX's internal version of Boost.Chrono (default: ON)" ON)
+hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono (default: ON)" ON)
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
@@ -203,7 +193,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 # C++11 configuration
 ################################################################################
-option(HPX_CXX11 "Use C++11 support (default: ON)" ON)
+hpx_option(HPX_CXX11 BOOL "Use C++11 support (default: ON)" ON)
 
 if(HPX_CXX11)
   add_definitions(-DHPX_HAVE_CXX11)
@@ -222,12 +212,12 @@ find_package(HPX_HDF5)
 ################################################################################
 # Warning configuration
 ################################################################################
-option(HPX_WARNINGS "Enable compiler warnings (default: ON)" ON)
+hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON)
 
 ################################################################################
 # Backtrace configuration 
 ################################################################################
-option(HPX_STACKTRACES "Attach backtraces to HPX exceptions (default: ON)" ON)
+hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
@@ -237,10 +227,10 @@ endif()
 ################################################################################
 # Backtrace configuration 
 ################################################################################
-option(HPX_NATIVE_TLS "Use native TLS support if available (default: ON)" ON)
+hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)
 
 if(HPX_NATIVE_TLS)
-  hpx_info("stacktraces" "Stack traces are enabled.")
+  hpx_info("tls" "Native TLS is enabled.")
   add_definitions(-DHPX_HAVE_NATIVE_TLS)
 endif()
 

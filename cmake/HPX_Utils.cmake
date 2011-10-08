@@ -8,6 +8,7 @@ set(HPX_UTILS_LOADED TRUE)
 include(HPX_Include)
 
 hpx_include(Message
+            Option
             ListContains
             ParseArguments
             Install
