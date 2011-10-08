@@ -6,11 +6,18 @@
 set(benchmarks
     boost_tls
     native_tls
+    hpx_tls
     delay_baseline_overhead
    )
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                         ${BOOST_thread_LIBRARY})
+
+set(native_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                                         ${BOOST_thread_LIBRARY})
+
+set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                                      ${BOOST_thread_LIBRARY})
 
 set(delay_baseline_overhead_FLAGS DEPENDENCIES iostreams_component)
 
