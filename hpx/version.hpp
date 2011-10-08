@@ -33,7 +33,7 @@
     #define HPX_AGAS_VERSION 0x21
 #endif
 
-#define HPX_VERSION_TAG          "-rc1"
+#define HPX_VERSION_TAG          "-trunk"
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
