@@ -202,6 +202,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
+    // FIXME: error code?
     naming::gid_type runtime_support::create_memory_block(
         std::size_t count, hpx::actions::manage_object_action_base const& act)
     {
@@ -214,10 +215,14 @@ namespace hpx { namespace components { namespace server
         }
 
         delete c;
+
+        hpx::util::osstream strm;
+        strm << "global id " << gid << " is already bound to a different "
+                "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "runtime_support::create_memory_block", 
-            "global id is already bound to a different "
-            "component instance");
+            hpx::util::osstream_get_string(strm));
+
         return naming::invalid_gid;
     }
 

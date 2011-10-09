@@ -94,6 +94,7 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     /// Clone this memory_block
+    // FIXME: error code?
     naming::gid_type create_memory_block (detail::memory_block_header const* rhs,
         actions::manage_object_action_base const& act)
     {
@@ -102,10 +103,14 @@ namespace hpx { namespace components { namespace server { namespace detail
         if (gid) return gid;
 
         ::free(c);
+
+        hpx::util::osstream strm;
+        strm << "global id " << gid << " is already bound to a different "
+                "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "server::detail::create_memory_block", 
-            "global id is already bound to a different "
-            "component instance");
+            hpx::util::osstream_get_string(strm));
+
         return naming::invalid_gid;
     }
 

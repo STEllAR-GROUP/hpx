@@ -51,10 +51,14 @@ namespace hpx { namespace components { namespace server
         }
 
         delete c;
+
+        hpx::util::osstream strm;
+        strm << "global id " << gid << " is already bound to a different "
+                "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>", 
-            "global id is already bound to a different "
-            "component instance");
+            hpx::util::osstream_get_string(strm));
+
         return naming::invalid_gid;
     }
 
@@ -125,6 +129,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// Create single instances of a component using additional constructor 
     /// parameters
+    // FIXME: error code?
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T)>
     naming::gid_type create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))
     {
@@ -135,10 +140,14 @@ namespace hpx { namespace components { namespace server
             return gid;
 
         delete c;
+
+        hpx::util::osstream strm;
+        strm << "global id " << gid << " is already bound to a different "
+                "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "create<Component>", 
-            "global id is already bound to a different "
-            "component instance");
+            "create_one<Component>", 
+            hpx::util::osstream_get_string(strm));
+
         return naming::invalid_gid;
     }
 
