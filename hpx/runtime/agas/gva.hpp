@@ -26,11 +26,8 @@ namespace hpx { namespace agas
 
 struct gva 
 {
-    typedef naming::locality endpoint_type;
     typedef boost::int32_t component_type;
     typedef boost::uint64_t lva_type;
-    typedef boost::uint64_t count_type;
-    typedef boost::uint64_t offset_type;
 
     gva()
       : endpoint(),
@@ -39,17 +36,17 @@ struct gva
         lva_(0),
         offset(0) {}
 
-    gva(endpoint_type const& ep,
-        component_type t = components::component_invalid, count_type c = 1,
-        lva_type a = 0, offset_type o = 0)
+    gva(naming::locality const& ep,
+        component_type t = components::component_invalid, boost::uint64_t c = 1,
+        lva_type a = 0, boost::uint64_t o = 0)
       : endpoint(ep),
         type(t),
         count(c),
         lva_(a),
         offset(o) {}
 
-    gva(endpoint_type const& ep, component_type t, count_type c, void* a,
-        offset_type o = 0)
+    gva(naming::locality const& ep, component_type t, boost::uint64_t c, void* a,
+        boost::uint64_t o = 0)
       : endpoint(ep),
         type(t),
         count(c),
@@ -72,7 +69,7 @@ struct gva
  
     gva& operator=(lva_type a)
     {
-        endpoint = endpoint_type();
+        endpoint = naming::locality();
         type = components::component_invalid;
         count = 0;
         lva_ = a;
@@ -82,7 +79,7 @@ struct gva
     
     gva& operator=(void* a)
     {
-        endpoint = endpoint_type();
+        endpoint = naming::locality();
         type = components::component_invalid;
         count = 0;
         lva_ = reinterpret_cast<lva_type>(a);
@@ -151,15 +148,15 @@ struct gva
         return g;
     }
     
-    endpoint_type endpoint;
+    naming::locality endpoint;
     component_type type;
-    count_type count;
+    boost::uint64_t count;
 
   private:
     lva_type lva_;
 
   public:
-    offset_type offset; 
+    boost::uint64_t offset; 
 
   private:
     friend class boost::serialization::access;

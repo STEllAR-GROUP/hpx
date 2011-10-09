@@ -21,7 +21,6 @@ struct component_namespace
     typedef server::component_namespace server_type; 
 
     typedef server_type::component_id_type component_id_type;
-    typedef server_type::prefix_type prefix_type;
     typedef server_type::prefixes_type prefixes_type;
     // }}}
 

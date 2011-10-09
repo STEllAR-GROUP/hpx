@@ -95,9 +95,9 @@ response component_namespace::bind_prefix(
 { // {{{ bind_prefix implementation
     // parameters
     std::string key = req.get_name();
-    prefix_type prefix = req.get_prefix();
+    boost::uint32_t prefix = req.get_prefix();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator cit = component_ids_.find(key)
                                     , cend = component_ids_.end();
@@ -162,7 +162,7 @@ response component_namespace::bind_name(
     // parameters
     std::string key = req.get_name();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator it = component_ids_.find(key)
                                     , end = component_ids_.end();
@@ -204,7 +204,7 @@ response component_namespace::resolve_id(
     // parameters
     component_id_type key = req.get_component_type();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     factory_table_type::const_iterator it = factories_.find(key)
                                      , end = factories_.end();
@@ -253,7 +253,7 @@ response component_namespace::resolve_name(
     // parameters
     std::string key = req.get_name();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator it = component_ids_.find(key)
                                     , end = component_ids_.end();
@@ -292,7 +292,7 @@ response component_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
     
     component_id_table_type::iterator it = component_ids_.find(key)
                                     , end = component_ids_.end();

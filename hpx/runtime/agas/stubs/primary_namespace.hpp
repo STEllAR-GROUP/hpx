@@ -17,15 +17,7 @@ namespace hpx { namespace agas { namespace stubs
 
 struct primary_namespace 
 {
-    // {{{ nested types
     typedef server::primary_namespace server_type; 
-
-    typedef server_type::endpoint_type endpoint_type;
-    typedef server_type::gva_type gva_type;
-    typedef server_type::count_type count_type;
-    typedef server_type::offset_type offset_type;
-    typedef server_type::prefix_type prefix_type;
-    // }}}
 
     static lcos::promise<response> service_async(
         naming::id_type const& gid

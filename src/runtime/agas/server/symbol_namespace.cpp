@@ -96,7 +96,7 @@ response symbol_namespace::bind(
     std::string key = req.get_name();
     naming::gid_type gid = req.get_gid();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key)
                            , end = gids_.end();
@@ -144,7 +144,7 @@ response symbol_namespace::resolve(
     // parameters
     std::string key = req.get_name();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key)
                            , end = gids_.end();
@@ -202,7 +202,7 @@ response symbol_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
     
     gid_table_type::iterator it = gids_.find(key)
                            , end = gids_.end();
@@ -240,7 +240,7 @@ response symbol_namespace::iterate(
 { // {{{ iterate implementation
     iterate_symbols_function_type f = req.get_iterate_symbols_function();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
     
     for (gid_table_type::iterator it = gids_.begin()
                                 , end = gids_.end();

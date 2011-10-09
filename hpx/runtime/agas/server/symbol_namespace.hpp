@@ -38,7 +38,7 @@ struct symbol_namespace :
     >
 {
     // {{{ nested types
-    typedef util::spinlock database_mutex_type;
+    typedef util::spinlock mutex_type;
 
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
@@ -48,7 +48,7 @@ struct symbol_namespace :
     // }}} 
  
   private:
-    database_mutex_type mutex_;
+    mutex_type mutex_;
     gid_table_type gids_;
   
   public:

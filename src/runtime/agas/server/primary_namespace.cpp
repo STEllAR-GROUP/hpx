@@ -99,10 +99,10 @@ response primary_namespace::bind_locality(
 
     // parameters
     naming::locality ep = req.get_locality();
-    count_type const count = req.get_count();
-    count_type const real_count = (count) ? (count - 1) : (0);
+    boost::uint64_t const count = req.get_count();
+    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator it = partitions_.find(ep)
                                  , end = partitions_.end(); 
@@ -229,21 +229,20 @@ response primary_namespace::bind_locality(
             return response();
         }
 
-        const gva_type gva
-            (ep, components::component_runtime_support, count);
+        const gva g(ep, components::component_runtime_support, count);
 
         // Now that we've inserted the locality into the partition table
         // successfully, we need to put the locality's GID into the GVA
         // table so that parcels can be sent to the memory of a locality.
         if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-                std::make_pair(id, gva)))))
+                std::make_pair(id, g)))))
         {
             HPX_THROWS_IF(ec, lock_error
               , "primary_namespace::bind_locality"  
               , boost::str(boost::format(
                     "GVA table insertion failed due to a locking error "
                     "or memory corruption, gid(%1%), gva(%2%)")
-                    % id % gva));
+                    % id % g));
             return response();
         }
 
@@ -284,7 +283,7 @@ response primary_namespace::bind_gid(
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     gva_table_type::iterator it = gvas_.lower_bound(id)
                            , begin = gvas_.begin()
@@ -421,7 +420,7 @@ response primary_namespace::page_fault(
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
         
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
                                  , begin = gvas_.begin()
@@ -517,7 +516,7 @@ response primary_namespace::page_fault(
 
     return response(primary_ns_page_fault
                   , naming::invalid_gid 
-                  , gva_type()
+                  , gva()
                   , invalid_page_fault);
 } // }}}
 
@@ -531,7 +530,7 @@ response primary_namespace::unbind_locality(
     // parameters
     naming::locality ep = req.get_locality();
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(ep)
                                  , pend = partitions_.end(); 
@@ -585,11 +584,11 @@ response primary_namespace::unbind_gid(
     )
 { // {{{ unbind_gid implementation
     // parameters
-    count_type count = req.get_count(); 
+    boost::uint64_t count = req.get_count(); 
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
     
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
                            , end = gvas_.end();
@@ -628,7 +627,7 @@ response primary_namespace::unbind_gid(
             ec = make_success_code();
 
         return response(primary_ns_unbind_gid
-                      , gva_type()
+                      , gva()
                       , no_success);
     }
 } // }}}
@@ -639,11 +638,11 @@ response primary_namespace::increment(
     )
 { // {{{ increment implementation
     // parameters
-    count_type credits = req.get_count(); 
+    boost::uint64_t credits = req.get_count(); 
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
     
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     refcnt_table_type::iterator it = refcnts_.find(id)
                               , end = refcnts_.end();
@@ -654,7 +653,7 @@ response primary_namespace::increment(
     {
         if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
                 std::make_pair(id,
-                    count_type(HPX_INITIAL_GLOBALCREDIT))), it)))
+                    boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
         {
             HPX_THROWS_IF(ec, lock_error
               , "primary_namespace::increment" 
@@ -684,7 +683,7 @@ response primary_namespace::decrement(
     )
 { // {{{ decrement implementation
     // parameters
-    count_type credits = req.get_count(); 
+    boost::uint64_t credits = req.get_count(); 
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
 
@@ -698,7 +697,7 @@ response primary_namespace::decrement(
         return response();
     } 
     
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
     
     refcnt_table_type::iterator it = refcnts_.find(id)
                               , end = refcnts_.end();
@@ -714,7 +713,7 @@ response primary_namespace::decrement(
             return response();
         }
 
-        count_type cnt = (it->second -= credits);
+        boost::uint64_t cnt = (it->second -= credits);
         
         if (0 == cnt)
         {
@@ -926,7 +925,7 @@ response primary_namespace::decrement(
     {
         if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
                 std::make_pair(id,
-                    count_type(HPX_INITIAL_GLOBALCREDIT))), it)))
+                    boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
         {
             HPX_THROWS_IF(ec, lock_error
               , "primary_namespace::decrement" 
@@ -946,7 +945,7 @@ response primary_namespace::decrement(
             return response();
         }
         
-        count_type cnt = (it->second -= credits);
+        boost::uint64_t cnt = (it->second -= credits);
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::decrement, gid(%1%), credits(%2%), "
@@ -969,7 +968,7 @@ response primary_namespace::localities(
 { // {{{ localities implementation
     using boost::fusion::at_c;
 
-    database_mutex_type::scoped_lock l(mutex_);
+    mutex_type::scoped_lock l(mutex_);
 
     std::vector<boost::uint32_t> p;
 

@@ -41,12 +41,11 @@ struct component_namespace :
     >
 {
     // {{{ nested types
-    typedef util::spinlock database_mutex_type;
+    typedef util::spinlock mutex_type;
 
     typedef int component_id_type;
-    typedef boost::uint32_t prefix_type;
 
-    typedef std::set<prefix_type> prefixes_type;
+    typedef std::set<boost::uint32_t> prefixes_type;
 
     typedef std::map<std::string, component_id_type> component_id_table_type; 
 
@@ -54,7 +53,7 @@ struct component_namespace :
     // }}}
 
   private:
-    database_mutex_type mutex_;
+    mutex_type mutex_;
     component_id_table_type component_ids_;
     factory_table_type factories_;
     component_id_type type_counter; 

@@ -59,12 +59,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef component_namespace::component_id_type component_id_type;
 
-    typedef primary_namespace::gva_type gva_type;
-    typedef primary_namespace::count_type count_type;
-    typedef primary_namespace::offset_type offset_type;
-    typedef primary_namespace::endpoint_type endpoint_type;
-    typedef component_namespace::prefix_type prefix_type;
-
     typedef symbol_namespace::iterate_symbols_function_type
         iterateids_function_type;
 
@@ -76,6 +70,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // {{{ gva cache
     struct gva_cache_key
     { // {{{ gva_cache_key implementation
+      private:
+        naming::gid_type id;
+        boost::uint64_t count;
+
+      public:
         gva_cache_key()
           : id()
           , count(0)
@@ -83,27 +82,30 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
         explicit gva_cache_key(
             naming::gid_type const& id_
-          , count_type count_ = 1
+          , boost::uint64_t count_ = 1
             )
           : id(id_)
           , count(count_)
-        {}
+        {
+            naming::strip_credit_from_gid(id);
+        }
 
-        naming::gid_type id;
-        count_type count;
+        naming::gid_type const& get_gid() const
+        {
+            return id;
+        }
+
+        boost::uint64_t get_count() const
+        {
+            return count;
+        }
 
         friend bool operator<(
             gva_cache_key const& lhs
           , gva_cache_key const& rhs
             )
         {
-            // Make sure that the credit has been stripped.
-            naming::gid_type raw_lgid = lhs.id
-                           , raw_rgid = rhs.id;
-            naming::strip_credit_from_gid(raw_lgid); 
-            naming::strip_credit_from_gid(raw_rgid); 
-
-            return (raw_lgid + (lhs.count - 1)) < raw_rgid;
+            return (lhs.id + (lhs.count - 1)) < rhs.id;
         }
 
         friend bool operator==(
@@ -111,24 +113,19 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            naming::gid_type raw_lgid = lhs.id
-                           , raw_rgid = rhs.id;
-            naming::strip_credit_from_gid(raw_lgid); 
-            naming::strip_credit_from_gid(raw_rgid); 
-
             // Is lhs in rhs?
             if (1 == lhs.count && 1 != rhs.count)
-                return (raw_lgid >= raw_rgid)
-                    && (raw_lgid <= (raw_rgid + (lhs.count - 1)));
+                return (lhs.id >= rhs.id)
+                    && (lhs.id <= (rhs.id + (lhs.count - 1)));
              
             // Is rhs in lhs?
             else if (1 != lhs.count && 1 == rhs.count)
-                return (raw_rgid >= raw_lgid)
-                    && (raw_rgid <= (raw_lgid + (lhs.count - 1)));
+                return (rhs.id >= lhs.id)
+                    && (rhs.id <= (lhs.id + (lhs.count - 1)));
 
             // Direct hit 
             else
-                return (raw_lgid == raw_rgid) && (lhs.count == rhs.count);
+                return (lhs.id == rhs.id) && (lhs.count == rhs.count);
         }
     }; // }}}
     
@@ -136,13 +133,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     { // {{{ gva_erase_policy implementation
         gva_erase_policy(
             naming::gid_type const& id
-          , count_type count
+          , boost::uint64_t count
             )
           : entry(id, count)
         {}
 
         typedef std::pair<
-            gva_cache_key, boost::cache::entries::lfu_entry<gva_type>
+            gva_cache_key, boost::cache::entries::lfu_entry<gva>
         > entry_type;
 
         bool operator()(
@@ -155,7 +152,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         gva_cache_key entry;
     }; // }}}
 
-    typedef boost::cache::entries::lfu_entry<gva_type> gva_entry_type;
+    typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
     typedef boost::cache::local_cache<
         gva_cache_key, gva_entry_type, 
@@ -488,7 +485,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   of hpx#exception.
     bool get_id_range(
         naming::locality const& l
-      , count_type count
+      , boost::uint64_t count
       , naming::gid_type& lower_bound
       , naming::gid_type& upper_bound
       , error_code& ec = throws
@@ -571,9 +568,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   reference count to one.
     bool bind_range(
         naming::gid_type const& lower_id
-      , count_type count
+      , boost::uint64_t count
       , naming::address const& baseaddr
-      , offset_type offset
+      , boost::uint64_t offset
       , error_code& ec = throws
         );
 
@@ -697,7 +694,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   TODO: confirm that this happens.
     bool unbind_range(
         naming::gid_type const& lower_id
-      , count_type count
+      , boost::uint64_t count
       , error_code& ec = throws
         ) 
     {
@@ -744,7 +741,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   reference count of the given gid is not zero!
     bool unbind_range(
         naming::gid_type const& lower_id
-      , count_type count
+      , boost::uint64_t count
       , naming::address& addr
       , error_code& ec = throws
         );
@@ -818,9 +815,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception. 
-    count_type incref(
+    boost::uint64_t incref(
         naming::gid_type const& id
-      , count_type credits = 1
+      , boost::uint64_t credits = 1
       , error_code& ec = throws
         );
 
@@ -846,10 +843,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception. 
-    count_type decref(
+    boost::uint64_t decref(
         naming::gid_type const& id
       , components::component_type& t
-      , count_type credits = 1
+      , boost::uint64_t credits = 1
       , error_code& ec = throws
         );
 

@@ -17,18 +17,10 @@ namespace hpx { namespace agas
 struct primary_namespace :
     components::client_base<primary_namespace, stubs::primary_namespace>
 {
-    // {{{ nested types 
     typedef components::client_base<primary_namespace, stubs::primary_namespace>
         base_type; 
 
     typedef server::primary_namespace server_type;
-
-    typedef server_type::endpoint_type endpoint_type;
-    typedef server_type::gva_type gva_type;
-    typedef server_type::count_type count_type;
-    typedef server_type::offset_type offset_type;
-    typedef server_type::prefix_type prefix_type;
-    // }}}
 
     primary_namespace()
       : base_type(bootstrap_primary_namespace_id())

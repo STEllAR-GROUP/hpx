@@ -53,13 +53,13 @@ void addressing_service::launch_bootstrap(
     const naming::gid_type component_gid = bootstrap_component_namespace_gid();
     const naming::gid_type symbol_gid = bootstrap_symbol_namespace_gid();
 
-    gva_type primary_gva(ep,
+    gva primary_gva(ep,
         primary_namespace_server_type::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->primary_ns_server));
-    gva_type component_gva(ep,
+    gva component_gva(ep,
         component_namespace_server_type::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->component_ns_server));
-    gva_type symbol_gva(ep,
+    gva symbol_gva(ep,
         symbol_namespace_server_type::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
@@ -311,7 +311,7 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
     
-            for (count_type i = 0; i < p.size(); ++i) 
+            for (boost::uint64_t i = 0; i < p.size(); ++i) 
                 prefixes.push_back(naming::get_gid_from_prefix(p[i]));
     
             return true; 
@@ -335,7 +335,7 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
     
-            for (count_type i = 0; i < p.size(); ++i) 
+            for (boost::uint64_t i = 0; i < p.size(); ++i) 
                 prefixes.push_back(naming::get_gid_from_prefix(p[i]));
         
             return true;
@@ -468,7 +468,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::get_id_range(
     naming::locality const& ep
-  , count_type count
+  , boost::uint64_t count
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
   , error_code& ec
@@ -551,9 +551,9 @@ bool addressing_service::get_id_range(
 
 bool addressing_service::bind_range(
     naming::gid_type const& lower_id
-  , count_type count
+  , boost::uint64_t count
   , naming::address const& baseaddr
-  , offset_type offset
+  , boost::uint64_t offset
   , error_code& ec
     ) 
 { // {{{ bind_range implementation
@@ -569,9 +569,9 @@ bool addressing_service::bind_range(
        
         // Create a global virtual address from the legacy calling convention
         // parameters.
-        gva_type gva(ep, baseaddr.type_, count, baseaddr.address_, offset);
+        const gva g(ep, baseaddr.type_, count, baseaddr.address_, offset);
         
-        request req(primary_ns_bind_gid, lower_id, gva);
+        request req(primary_ns_bind_gid, lower_id, g);
         response rep;
 
         if (is_bootstrap())
@@ -609,7 +609,7 @@ bool addressing_service::bind_range(
         { 
             cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             gva_cache_key key(lower_id, count);
-            hosted->gva_cache_.insert(key, gva);
+            hosted->gva_cache_.insert(key, g);
         }
 
         return repeated_request != s;
@@ -638,7 +638,7 @@ bool addressing_service::bind_range(
 
 bool addressing_service::unbind_range(
     naming::gid_type const& lower_id
-  , count_type count
+  , boost::uint64_t count
   , naming::address& addr
   , error_code& ec 
     )
@@ -771,7 +771,7 @@ bool addressing_service::resolve(
 
         // Resolve the page to the real resolved address (which is just a page
         // with as fully resolved LVA and an offset of zero).
-        gva_type g = rep.get_gva().resolve(id, rep.get_base_gid());
+        const gva g = rep.get_gva().resolve(id, rep.get_base_gid());
 
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
@@ -872,10 +872,8 @@ bool addressing_service::resolve_cached(
     {
         const boost::uint64_t id_msb
             = naming::strip_credit_from_gid(id.get_msb());
-        const boost::uint64_t idbase_msb
-            = naming::strip_credit_from_gid(idbase.id.get_msb());
 
-        if (HPX_UNLIKELY(id_msb != idbase_msb))
+        if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
             HPX_THROWS_IF(ec, invalid_page_fault
               , "addressing_service::resolve_cached" 
@@ -883,18 +881,18 @@ bool addressing_service::resolve_cached(
             return false;
         }
 
-        gva_type const& gva = e.get();
+        gva const& g = e.get();
 
-        addr.locality_ = gva.endpoint;
-        addr.type_ = gva.type;
-        addr.address_ = gva.lva(id, idbase.id);
+        addr.locality_ = g.endpoint;
+        addr.type_ = g.type;
+        addr.address_ = g.lva(id, idbase.get_gid());
 
         if (&ec != &throws)
             ec = make_success_code();
 
         LHPX_(debug, "  [AC] ") <<
             ( boost::format("cache hit for address %1% (base %2%)")
-            % id % idbase.id);
+            % id % idbase.get_gid());
     
         return true;
     }
@@ -908,9 +906,9 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
-addressing_service::count_type addressing_service::incref(
+boost::uint64_t addressing_service::incref(
     naming::gid_type const& id
-  , count_type credits
+  , boost::uint64_t credits
   , error_code& ec 
     )
 { // {{{ incref implementation
@@ -941,10 +939,10 @@ addressing_service::count_type addressing_service::incref(
     }
 } // }}}
 
-addressing_service::count_type addressing_service::decref(
+boost::uint64_t addressing_service::decref(
     naming::gid_type const& id
   , components::component_type& t
-  , count_type credits
+  , boost::uint64_t credits
   , error_code& ec
     )
 { // {{{ decref implementation

@@ -93,31 +93,25 @@ struct primary_namespace :
     >
 {
     // {{{ nested types
-    typedef util::spinlock database_mutex_type;
+    typedef util::spinlock mutex_type;
 
-    typedef naming::locality endpoint_type;
-
-    typedef gva gva_type;
-    typedef gva_type::count_type count_type;
-    typedef gva_type::offset_type offset_type;
     typedef boost::int32_t component_type;
-    typedef boost::uint32_t prefix_type;
 
-    typedef boost::fusion::vector2<prefix_type, naming::gid_type>
+    typedef boost::fusion::vector2<boost::uint32_t, naming::gid_type>
         partition_type;
 
-    typedef std::map<naming::gid_type, gva_type>
+    typedef std::map<naming::gid_type, gva>
         gva_table_type; 
 
-    typedef std::map<endpoint_type, partition_type>
+    typedef std::map<naming::locality, partition_type>
         partition_table_type;
     
-    typedef std::map<naming::gid_type, count_type>
+    typedef std::map<naming::gid_type, boost::uint64_t>
         refcnt_table_type;
     // }}}
  
   private:
-    database_mutex_type mutex_;
+    mutex_type mutex_;
     gva_table_type gvas_;
     partition_table_type partitions_;
     refcnt_table_type refcnts_;
