@@ -412,6 +412,13 @@ namespace boost
     }                                                                         \
     /**/
 
+#define HPX_THROW_STD_EXCEPTION(except, func)                                 \
+    {                                                                         \
+        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
+        hpx::detail::throw_exception(except, func, p.string(), __LINE__);     \
+    }                                                                         \
+    /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
     HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \
