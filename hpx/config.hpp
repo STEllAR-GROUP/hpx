@@ -47,19 +47,19 @@
 /// This defines the maximum number of possible runtime instances in one 
 /// executable
 #if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
-#  define HPX_RUNTIME_INSTANCE_LIMIT 2
+#  define HPX_RUNTIME_INSTANCE_LIMIT 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a component action can take
+/// This defines the maximum number of arguments an action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  define HPX_ACTION_ARGUMENT_LIMIT 7
+#  define HPX_ACTION_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a component action can take
+/// This defines the maximum number of arguments \a hpx#lcos#wait can take
 #if !defined(HPX_WAIT_ARGUMENT_LIMIT)
-#  define HPX_WAIT_ARGUMENT_LIMIT 10
+#  define HPX_WAIT_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,29 +76,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of outgoing (agas-) connections kept alive 
-/// This generally shouldn't be much larger than the number of OS threads used
-/// in the runtime system.
-#if !defined(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE 8
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local 
 /// cache. This is just the initial size which may be adjusted depending on the 
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
 #if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
 #  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 256
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of AGAS locality translations kept in the local 
-/// cache. This is just the initial size which may be adjusted depending on the 
-/// load of the system, etc. It must be a minimum of 1 for AGAS v3
-/// bootstrapping.
-#if !defined(HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_LOCALITY_CACHE_SIZE 128
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

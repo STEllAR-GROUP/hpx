@@ -181,6 +181,7 @@ set_property(TARGET hpx APPEND
   "HPX_LIBRARY=\"${name}\""
   "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
+  "HPX_ACTION_ARGUMENT_LIMIT=2"
   "BOOST_ENABLE_ASSERT_HANDLER"
   "BOOST_COROUTINE_EXPORTS") # Do we still need this?
 
@@ -193,6 +194,7 @@ add_library(hpx_init STATIC ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_APPLICATION_EXPORTS"
+  "HPX_ACTION_ARGUMENT_LIMIT=2"
   "BOOST_ENABLE_ASSERT_HANDLER")
 
 hpx_mangle_name(name hpx_init)

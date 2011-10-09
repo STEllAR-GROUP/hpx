@@ -11,6 +11,8 @@ set(subdirs
     stencil
     application)
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
+
 if(RNPL_FOUND)
   # FIXME: HPX_* identifiers please
   add_definitions(-DRNPL_FOUND)

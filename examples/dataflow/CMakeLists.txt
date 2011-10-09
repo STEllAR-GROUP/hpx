@@ -11,6 +11,8 @@ set(subdirs
     amr_c
     amr_c_test)
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
+
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 endforeach()

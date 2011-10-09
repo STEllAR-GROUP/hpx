@@ -48,8 +48,6 @@ namespace hpx { namespace util
             "service_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
-            "connection_cache_size = ${HPX_AGAS_CONNECTION_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE) "}",
 
             "[hpx.components]",
             "load_external = ${HPX_LOAD_EXTERNAL_COMPONENTS:1}",
@@ -253,32 +251,6 @@ namespace hpx { namespace util
         return 16;
     }
 
-//     // TODO: implement for AGAS v2
-//     naming::locality runtime_configuration::get_agas_locality(
-//         naming::locality const& l) const
-//     {
-//         // load all components as described in the configuration information
-//         if (has_section("hpx.agas")) {
-//             util::section const* sec = get_section("hpx.agas");
-//             if (NULL != sec) {
-//                 // read fall back values from configuration file, if needed
-//                 std::string default_address (l.get_address());
-//                 boost::uint16_t default_port = l.get_port();
-// 
-//                 if (default_address.empty()) {
-//                     default_address = 
-//                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
-//                 }
-//                 if (0 == default_port) {
-//                     default_port = boost::lexical_cast<boost::uint16_t>(
-//                         sec->get_entry("port", HPX_INITIAL_IP_PORT));
-//                 }
-//                 return naming::locality(default_address, default_port);
-//             }
-//         }
-//         return l;
-//     }
-
     std::size_t runtime_configuration::get_agas_gva_cache_size() const
     {
         if (has_section("hpx.agas")) {
@@ -290,19 +262,6 @@ namespace hpx { namespace util
             }
         }
         return HPX_INITIAL_AGAS_GVA_CACHE_SIZE;
-    }
-    
-    std::size_t runtime_configuration::get_agas_connection_cache_size() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("connection_cache_size", 
-                        HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE));
-            }
-        }
-        return HPX_INITIAL_AGAS_CONNECTION_CACHE_SIZE;
     }
 
     bool runtime_configuration::get_itt_notify_mode() const
