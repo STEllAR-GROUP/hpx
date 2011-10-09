@@ -171,6 +171,10 @@ namespace hpx { namespace util
                 hpx_sec->add_section("components", comp_sec);
             }
 
+// FIXME: make sure this isn't needed anymore for sure
+//             util::section* components_sec = ini.get_section("hpx.components");
+//             BOOST_ASSERT(NULL != components_sec);
+
             // generate component sections for all found shared libraries
             // this will create too many sections, but the non-components will 
             // be filtered out during loading
@@ -213,13 +217,24 @@ namespace hpx { namespace util
                     continue;   // handle next module
                 }
                 catch (std::logic_error const& e) {
-                    LRT_(info) << "skipping " << curr.string(); 
+                    LRT_(info) << "skipping " << curr.string() 
+                               << ": " << e.what();
                     continue;   // handle next module
                 }
                 catch (std::exception const& e) {
-                    LRT_(info) << "skipping " << curr.string(); 
+                    LRT_(info) << "skipping " << curr.string() 
+                               << ": " << e.what();
                     continue;   // handle next module
                 }
+
+// FIXME: make sure this isn't needed anymore for sure
+            // if something went wrong while reading the registry, just use
+            // some default settings
+//                 util::section sec;
+//                 sec.add_entry("name", name);
+//                 sec.add_entry("path", libs);
+//                 sec.add_entry("isdefault", "true");
+//                 components_sec->add_section(name, sec);
             }
         }
         catch (fs::filesystem_error const& /*e*/) {
