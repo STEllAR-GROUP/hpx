@@ -273,8 +273,10 @@ namespace hpx { namespace components
             if (size > sizeof(managed_component))
                 return ::operator new(size);
             derived_type* p = heap_type::alloc();
-            if (NULL == p) 
-                boost::throw_exception(std::bad_alloc());
+            if (NULL == p) {
+                HPX_THROW_STD_EXCEPTION(std::bad_alloc(), 
+                    "managed_component::operator new(std::size_t size)");
+            }
             return p;
         }
         static void operator delete(void* p, std::size_t size)
@@ -307,8 +309,10 @@ namespace hpx { namespace components
         {
             // allocate the memory
             derived_type* p = heap_type::alloc(count);
-            if (NULL == p) 
-                boost::throw_exception(std::bad_alloc());
+            if (NULL == p) {
+                HPX_THROW_STD_EXCEPTION(std::bad_alloc(), 
+                    "managed_component::create");
+            }
 
             if (1 == count)
                 return new (p) derived_type();
@@ -345,7 +349,10 @@ namespace hpx { namespace components
         create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
         {                                                                     \
             derived_type* p = heap_type::alloc();                             \
-            if (NULL == p) boost::throw_exception(std::bad_alloc());          \
+            if (NULL == p) {                                                  \
+                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),                     \
+                    "managed_component::create_one");                         \
+            }                                                                 \
             return new (p) derived_type(BOOST_PP_ENUM_PARAMS(N, t));          \
         }                                                                     \
     /**/
