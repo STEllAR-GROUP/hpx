@@ -158,10 +158,6 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef boost::function<void()> startup_func;
-    typedef boost::function<void()> shutdown_func;
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         enum command_line_result
@@ -174,47 +170,8 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         command_line_result print_version()
         {
-            boost::format hpx_version("%d.%d.%d%s");
-            boost::format boost_version("%d.%d.%d");
-            boost::format logo(
-                "HPX - High Performance ParalleX\n"
-                "\n"
-                "An experimental runtime system for conventional machines implementing\n"
-                "(parts of) the ParalleX execution model.\n" 
-                "\n"
-                "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n"
-                "\n"
-                "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
-                "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n"
-                "\n"
-                "Versions:\n"
-                "  HPX: %s (AGAS: %x), SVN: %s\n"
-                "  Boost: %s\n"
-                "\n"
-                "Build:\n"
-                "  Type: %s\n"
-                "  Date: %s\n" 
-                "  Platform: %s\n"
-                "  Compiler: %s\n"
-                "  Standard Library: %s\n");
-
-            std::cout << (logo
-                          % boost::str( hpx_version
-                                      % HPX_VERSION_MAJOR
-                                      % HPX_VERSION_MINOR
-                                      % HPX_VERSION_SUBMINOR
-                                      % HPX_VERSION_TAG)
-                          % HPX_AGAS_VERSION 
-                          % HPX_SVN_REVISION
-                          % boost::str( boost_version
-                                      % (BOOST_VERSION / 100000)
-                                      % (BOOST_VERSION / 100 % 1000)
-                                      % (BOOST_VERSION % 100))
-                          % HPX_BUILD_TYPE
-                          % __DATE__
-                          % BOOST_PLATFORM
-                          % BOOST_COMPILER
-                          % BOOST_STDLIB);
+            std::cout << std::endl << hpx::copyright() << std::endl;
+            std::cout << hpx::complete_version() << std::endl;
             return help;
         }
 
@@ -256,7 +213,7 @@ namespace hpx
             size_type last = s.find_last_not_of(" \t");
             return s.substr(first, last - first + 1);
         }
-  
+
         bool read_config_file_options(std::string const &filename, 
             boost::program_options::options_description const &desc, 
             boost::program_options::variables_map &vm, bool may_fail = false)
@@ -265,7 +222,8 @@ namespace hpx
             if (!ifs.is_open()) {
                 if (!may_fail) {
                     std::cerr << filename 
-                        << ": command line warning: command line options file not found"
+                        << ": command line warning: command line options file "
+                           "not found" 
                         << std::endl;
                 }
                 return false;
@@ -574,8 +532,9 @@ namespace hpx
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
-            startup_func const& startup, shutdown_func const& shutdown, 
-            std::size_t num_threads, std::size_t num_localities)
+            startup_function_type const& startup, 
+            shutdown_function_type const& shutdown, std::size_t num_threads, 
+            std::size_t num_localities)
         {
             if (vm.count("app-config"))
             {
@@ -679,8 +638,9 @@ namespace hpx
         // global scheduler (one queue for all OS threads)
         int run_global(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup, shutdown_func const& shutdown, 
-            std::size_t num_threads, std::size_t num_localities)
+            startup_function_type const& startup, 
+            shutdown_function_type const& shutdown, std::size_t num_threads, 
+            std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
                 throw std::logic_error("bad parameter --high-priority-threads, "
@@ -704,8 +664,9 @@ namespace hpx
         // local scheduler (one queue for each OS threads)
         int run_local(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup, shutdown_func const& shutdown, 
-            std::size_t num_threads, std::size_t num_localities)
+            startup_function_type const& startup, 
+            shutdown_function_type const& shutdown, std::size_t num_threads, 
+            std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
                 throw std::logic_error("bad parameter --high-priority-threads, "
@@ -731,8 +692,9 @@ namespace hpx
         // plus one separate queue for high priority PX-threads)
         int run_priority_local(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup, shutdown_func const& shutdown, 
-            std::size_t num_threads, std::size_t num_localities)
+            startup_function_type const& startup, 
+            shutdown_function_type const& shutdown, std::size_t num_threads, 
+            std::size_t num_localities)
         {
             std::size_t num_high_priority_queues = num_threads;
             if (vm.count("high-priority-threads"))
@@ -759,8 +721,9 @@ namespace hpx
         // stealing from the "bottom" of each.
         int run_abp(hpx_main_func f, boost::program_options::variables_map& vm, 
             runtime_mode mode, std::vector<std::string> const& ini_config, 
-            startup_func const& startup, shutdown_func const& shutdown, 
-            std::size_t num_threads, std::size_t num_localities)
+            startup_function_type const& startup, 
+            shutdown_function_type const& shutdown, std::size_t num_threads, 
+            std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
                 throw std::logic_error("bad parameter --high-priority-threads, "
@@ -807,7 +770,8 @@ namespace hpx
     int init(hpx_main_func f,
         boost::program_options::options_description& desc_cmdline, 
         int argc, char* argv[], std::vector<std::string> ini_config,
-        startup_func startup, shutdown_func shutdown, hpx::runtime_mode mode)
+        startup_function_type startup, shutdown_function_type shutdown, 
+        hpx::runtime_mode mode)
     {
         int result = 0;
         detail::set_signal_handlers();

@@ -58,6 +58,18 @@ namespace hpx
 
     // Returns the tag.
     HPX_EXPORT std::string tag();
+
+    // Returns the HPX version string.
+    HPX_EXPORT std::string build_string();
+
+    // Returns the Boost version string.
+    HPX_EXPORT std::string boost_version();
+
+    // Returns the copyright string.
+    HPX_EXPORT std::string copyright();
+
+    // Returns the full version string.
+    HPX_EXPORT std::string complete_version();
 }
 
 #endif
