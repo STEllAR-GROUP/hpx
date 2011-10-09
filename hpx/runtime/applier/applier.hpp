@@ -18,7 +18,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
-#include <boost/thread/tss.hpp>
 #include <boost/foreach.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

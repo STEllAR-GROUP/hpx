@@ -30,7 +30,6 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <boost/foreach.hpp>
-#include <boost/thread/tss.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
