@@ -362,6 +362,9 @@
     <ClCompile Include="..\..\..\src\runtime\agas\server\symbol_namespace.cpp">
       <Filter>Source Files\Runtime\AGAS\Server</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
