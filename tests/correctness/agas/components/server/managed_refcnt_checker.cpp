@@ -35,7 +35,9 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
         BOOST_FOREACH(naming::id_type const& ref, references_)
         {
-            strm << "  " << ref << "\n";
+            strm << "  " << ref << " "
+                 << naming::get_management_type_name(ref.get_management_type())
+                 << "\n";
         } 
     }
 

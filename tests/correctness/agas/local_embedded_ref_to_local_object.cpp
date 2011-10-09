@@ -24,6 +24,7 @@ using hpx::find_here;
 using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
+using hpx::naming::get_management_type_name;
 
 using hpx::test::simple_refcnt_checker;
 using hpx::test::managed_refcnt_checker;
@@ -54,8 +55,13 @@ void hpx_test_main(
         Client monitor0(find_here());
         Client monitor1(find_here());
 
-        cout << "id0: " << monitor0.get_gid() << "\n"
-             << "id1: " << monitor1.get_gid() << "\n" << flush; 
+        cout << "id0: " << monitor0.get_gid() << " "
+             << get_management_type_name
+                    (monitor0.get_gid().get_management_type()) << "\n"
+             << "id1: " << monitor1.get_gid() << " "
+             << get_management_type_name
+                    (monitor1.get_gid().get_management_type()) << "\n"
+             << flush;
 
         {
             // Have the second object store a reference to the first object.

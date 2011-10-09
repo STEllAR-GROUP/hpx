@@ -6,6 +6,7 @@
 set(subdirs
     performance
     correctness
+    abi
    )
 
 foreach(subdir ${subdirs})

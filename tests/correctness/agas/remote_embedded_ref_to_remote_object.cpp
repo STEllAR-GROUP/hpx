@@ -24,6 +24,7 @@ using hpx::finalize;
 using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
+using hpx::naming::get_management_type_name;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -68,15 +69,17 @@ void hpx_test_main(
         Client monitor0(remote_localities[0]);
         Client monitor1(remote_localities[0]);
 
-        cout << "id0: " << monitor0.get_gid() << "\n"
-             << "id1: " << monitor1.get_gid() << "\n" << flush; 
+        cout << "id0: " << monitor0.get_gid() << " "
+             << get_management_type_name
+                    (monitor0.get_gid().get_management_type()) << "\n"
+             << "id1: " << monitor1.get_gid() << " " 
+             << get_management_type_name
+                    (monitor1.get_gid().get_management_type()) << "\n"
+             << flush;
 
         {
             // Have the second object store a reference to the first object.
             monitor1.take_reference(monitor0.get_gid());
-
-            cout << "id0: " << monitor0.get_gid() << "\n"
-                 << "id1: " << monitor1.get_gid() << "\n" << flush; 
 
             // Detach the references.
             id_type id0 = monitor0.detach()

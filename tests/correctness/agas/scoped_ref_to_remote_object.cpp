@@ -24,6 +24,7 @@ using hpx::finalize;
 using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
+using hpx::naming::get_management_type_name;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -65,7 +66,10 @@ void hpx_test_main(
 
         Client monitor(remote_localities[0]);
 
-        cout << "id: " << monitor.get_gid() << "\n" << flush;
+        cout << "id: " << monitor.get_gid() << " "
+             << get_management_type_name
+                    (monitor.get_gid().get_management_type()) << "\n"
+             << flush;
 
         {
             // Detach the reference.

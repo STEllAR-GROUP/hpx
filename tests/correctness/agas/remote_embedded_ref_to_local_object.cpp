@@ -25,6 +25,7 @@ using hpx::find_here;
 using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
+using hpx::naming::get_management_type_name;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -69,8 +70,13 @@ void hpx_test_main(
         Client monitor_remote(remote_localities[0]);
         Client monitor_local(find_here());
 
-        cout << "id_remote: " << monitor_remote.get_gid() << "\n"
-             << "id_local:  " << monitor_local.get_gid() << "\n" << flush; 
+        cout << "id_remote: " << monitor_remote.get_gid() << " "
+             << get_management_type_name
+                    (monitor_remote.get_gid().get_management_type()) << "\n"
+             << "id_local:  " << monitor_local.get_gid() << " "
+             << get_management_type_name
+                    (monitor_local.get_gid().get_management_type()) << "\n"
+             << flush; 
 
         {
             // Have the remote object store a reference to the local object.
