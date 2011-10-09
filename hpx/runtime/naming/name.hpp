@@ -278,8 +278,8 @@ namespace hpx { namespace naming
 
     inline gid_type strip_credit_from_gid(gid_type const& id)
     {
-        const boost::uint64_t msb = strip_credit_from_gid(id.get_msb());
-        const boost::uint64_t lsb = id.get_lsb();
+        boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
+        boost::uint64_t const lsb = id.get_lsb();
         return gid_type(msb, lsb);
     }
 

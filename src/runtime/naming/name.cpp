@@ -167,8 +167,7 @@ namespace hpx { namespace naming
 
         if (*d == &detail::gid_managed_deleter)
             return id_type::managed;
-        else
-            return id_type::unmanaged;
+        return id_type::unmanaged;
     }
 
     template <class Archive>
