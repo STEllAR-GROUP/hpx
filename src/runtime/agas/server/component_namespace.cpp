@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 namespace hpx { namespace agas
 {
@@ -30,17 +31,72 @@ response component_namespace::service(
     request const& req
   , error_code& ec
     )
-{
-    // IMPLEMENT
-    return response();
-}
+{ // {{{
+    switch (req.get_action_code())
+    {
+        case component_ns_bind_prefix:
+            return bind_prefix(req, ec);
+        case component_ns_bind_name:
+            return bind_name(req, ec);
+        case component_ns_resolve_id:
+            return resolve_id(req, ec);
+        case component_ns_resolve_name:
+            return resolve_name(req, ec);
+        case component_ns_unbind:
+            return unbind(req, ec);
+
+        case primary_ns_bind_locality:
+        case primary_ns_bind_gid:
+        case primary_ns_page_fault:
+        case primary_ns_unbind_locality:
+        case primary_ns_unbind_gid:
+        case primary_ns_increment:
+        case primary_ns_decrement:
+        case primary_ns_localities:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "primary_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        case symbol_ns_bind:
+        case symbol_ns_resolve:
+        case symbol_ns_unbind:
+        case symbol_ns_iterate:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "symbol_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        default:
+        case component_ns_service:
+        case primary_ns_service:
+        case symbol_ns_service:
+        case invalid_request: 
+        {
+            HPX_THROWS_IF(ec, bad_action_code
+              , "component_namespace::service"
+              , boost::str(boost::format(
+                    "invalid action code encountered in request, "
+                    "action_code(%x)")
+                    % boost::uint16_t(req.get_action_code())));
+            return response();
+        }
+    };
+} // }}}
 
 response component_namespace::bind_prefix(
-    std::string const& key
-  , prefix_type prefix
+    request const& req
   , error_code& ec
     )
 { // {{{ bind_prefix implementation
+    // parameters
+    std::string key = req.get_name();
+    prefix_type prefix = req.get_prefix();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator cit = component_ids_.find(key)
@@ -99,10 +155,13 @@ response component_namespace::bind_prefix(
 } // }}}
 
 response component_namespace::bind_name(
-    std::string const& key
+    request const& req
   , error_code& ec
     )
 { // {{{ bind_name implementation
+    // parameters
+    std::string key = req.get_name();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator it = component_ids_.find(key)
@@ -138,10 +197,13 @@ response component_namespace::bind_name(
 } // }}} 
 
 response component_namespace::resolve_id(
-    component_id_type key
+    request const& req
   , error_code& ec
     )
 { // {{{ resolve_id implementation 
+    // parameters
+    component_id_type key = req.get_component_type();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     factory_table_type::const_iterator it = factories_.find(key)
@@ -184,10 +246,13 @@ response component_namespace::resolve_id(
 } // }}}
 
 response component_namespace::resolve_name(
-    std::string const& key
+    request const& req
   , error_code& ec
     )
 { // {{{ resolve_name implementation
+    // parameters
+    std::string key = req.get_name();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     component_id_table_type::iterator it = component_ids_.find(key)
@@ -220,10 +285,13 @@ response component_namespace::resolve_name(
 } // }}} 
 
 response component_namespace::unbind(
-    std::string const& key
+    request const& req
   , error_code& ec
     )
 { // {{{ unbind implementation
+    // parameters
+    std::string key = req.get_name();
+
     database_mutex_type::scoped_lock l(mutex_);
     
     component_id_table_type::iterator it = component_ids_.find(key)

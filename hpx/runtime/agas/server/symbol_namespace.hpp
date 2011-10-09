@@ -68,110 +68,47 @@ struct symbol_namespace :
         request const& req
       , error_code& ec
         );
-    
-    response bind(
-        std::string const& key
-      , naming::gid_type const& gid
-        )
-    {
-        return bind(key, gid, throws);
-    }
 
     response bind(
-        std::string const& key
-      , naming::gid_type const& gid
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response resolve(
-        std::string const& key
-        )
-    {
-        return resolve(key, throws);
-    }
-
-    response resolve(
-        std::string const& key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
     
     response unbind(
-        std::string const& key
-        )
-    {
-        return unbind(key, throws);
-    }
-
-    response unbind(
-        std::string const& key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response iterate(
-        iterate_symbols_function_type const& f
-        )
-    {
-        return iterate(f, throws);
-    }
-
-    response iterate(
-        iterate_symbols_function_type const& f
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     enum actions
     { // {{{ action enum
-        namespace_bind    = BOOST_BINARY_U(0010000),
-        namespace_resolve = BOOST_BINARY_U(0010001),
-        namespace_unbind  = BOOST_BINARY_U(0010010),
-        namespace_iterate = BOOST_BINARY_U(0010011),
-        namespace_service = BOOST_BINARY_U(0010100)
+        // Actual actions
+        namespace_service = BOOST_BINARY_U(0010000)
+
+        // Pseudo-actions
+      , namespace_bind    = BOOST_BINARY_U(0010001)
+      , namespace_resolve = BOOST_BINARY_U(0010010)
+      , namespace_unbind  = BOOST_BINARY_U(0010011)
+      , namespace_iterate = BOOST_BINARY_U(0010100)
     }; // }}}
 
     typedef hpx::actions::result_action1<
-        symbol_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_service,
-        /* arguments */   request const&,
-        &symbol_namespace::service
+        symbol_namespace
+      , /* return type */ response
+      , /* enum value */  namespace_service
+      , /* arguments */   request const&
+      , &symbol_namespace::service
       , threads::thread_priority_critical
     > service_action;
-    
-    typedef hpx::actions::result_action2<
-        symbol_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_bind,
-        /* arguments */   std::string const&, naming::gid_type const&,
-        &symbol_namespace::bind
-      , threads::thread_priority_critical
-    > bind_action;
-    
-    typedef hpx::actions::result_action1<
-        symbol_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_resolve,
-        /* arguments */   std::string const&,
-        &symbol_namespace::resolve
-      , threads::thread_priority_critical
-    > resolve_action;
-    
-    typedef hpx::actions::result_action1<
-        symbol_namespace,
-        /* retrun type */ response,
-        /* enum value */  namespace_unbind,
-        /* arguments */   std::string const&,
-        &symbol_namespace::unbind
-      , threads::thread_priority_critical
-    > unbind_action;
-
-    typedef hpx::actions::result_action1<
-        symbol_namespace,
-        /* retrun type */ response,
-        /* enum value */  namespace_iterate,
-        /* arguments */   iterate_symbols_function_type const&,
-        &symbol_namespace::iterate
-      , threads::thread_priority_critical
-    > iterate_action;
 };
 
 }}}

@@ -168,14 +168,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // {{{ future freelists
     typedef boost::lockfree::fifo<
         lcos::eager_future<
-            primary_namespace_server_type::bind_locality_action,
+            primary_namespace_server_type::service_action,
             response
         >*
     > allocate_response_pool_type;
 
     typedef boost::lockfree::fifo<
         lcos::eager_future<
-            primary_namespace_server_type::bind_gid_action,
+            primary_namespace_server_type::service_action,
             response
         >*
     > bind_response_pool_type;
@@ -283,6 +283,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     {
         return runtime_type == runtime_mode_console;
     }
+
+    response service(
+        request const& req
+      , error_code& ec = throws
+        );
  
     /// \brief Add a locality to the runtime. 
     bool register_locality(
@@ -425,6 +430,15 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   of hpx#exception.
     components::component_type register_factory(
         naming::gid_type const& prefix
+      , std::string const& name
+      , error_code& ec = throws
+        )
+    {
+        return register_factory(naming::get_prefix_from_gid(prefix), name, ec);
+    }
+
+    components::component_type register_factory(
+        boost::uint32_t prefix 
       , std::string const& name
       , error_code& ec = throws
         );
@@ -935,7 +949,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool queryid(
-        std::string const& ns_name
+        std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
         );

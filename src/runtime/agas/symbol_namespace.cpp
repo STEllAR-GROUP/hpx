@@ -29,16 +29,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_ACTION_EX(
     symbol_namespace::service_action,
     symbol_namespace_service_action);
-HPX_REGISTER_ACTION_EX(
-    symbol_namespace::bind_action,
-    symbol_namespace_bind_action);
-HPX_REGISTER_ACTION_EX(
-    symbol_namespace::resolve_action,
-    symbol_namespace_resolve_action);
-HPX_REGISTER_ACTION_EX(
-    symbol_namespace::unbind_action,
-    symbol_namespace_unbind_action);
-HPX_REGISTER_ACTION_EX(
-    symbol_namespace::iterate_action,
-    symbol_namespace_iterate_action);
 

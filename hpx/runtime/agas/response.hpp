@@ -301,7 +301,7 @@ struct response
         return get_data<subtype_gid_gid_prefix, 1>(ec); 
     }
 
-    namespace_action_code get_method() const
+    namespace_action_code get_action_code() const
     {
         return mc;
     }

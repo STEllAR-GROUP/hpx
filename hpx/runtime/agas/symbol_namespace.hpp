@@ -36,41 +36,20 @@ struct symbol_namespace :
       : base_type(id)
     {}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // bind interface 
-    lcos::promise<response>
-    bind_async(std::string const& key, naming::gid_type const& gid)
-    { return this->base_type::bind_async(this->gid_, key, gid); }
+    lcos::promise<response> service_async(
+        request const& req 
+        )
+    {
+        return this->base_type::service_async(this->gid_, req);
+    }
 
-    response bind(std::string const& key, naming::gid_type const& gid,
-                       error_code& ec = throws)
-    { return this->base_type::bind(this->gid_, key, gid, ec); }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // resolve interface 
-    lcos::promise<response> resolve_async(std::string const& key)
-    { return this->base_type::resolve_async(this->gid_, key); }
-    
-    response resolve(std::string const& key, error_code& ec = throws)
-    { return this->base_type::resolve(this->gid_, key, ec); }
- 
-    ///////////////////////////////////////////////////////////////////////////
-    // unbind interface 
-    lcos::promise<response> unbind_async(std::string const& key)
-    { return this->base_type::unbind_async(this->gid_, key); }
-    
-    response unbind(std::string const& key, error_code& ec = throws)
-    { return this->base_type::unbind(this->gid_, key, ec); }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // iterate interface 
-    lcos::promise<response>
-    iterate_async(iterate_symbols_function_type const& f)
-    { return this->base_type::iterate_async(this->gid_, f); }
-    
-    response iterate(iterate_symbols_function_type const& f,
-                     error_code& ec = throws)
-    { return this->base_type::iterate(this->gid_, f, ec); }
+    response service(
+        request const& req 
+      , error_code& ec = throws
+        )
+    {
+        return this->base_type::service(this->gid_, req, ec);
+    }
 };            
 
 }}

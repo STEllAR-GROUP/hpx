@@ -29,19 +29,16 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
-// TODO: update comments wrt to parcel port id range, which has migrated into
-// the runtime.
-
 namespace hpx { namespace agas
 {
 
 typedef lcos::eager_future<
-    server::primary_namespace::bind_locality_action,
+    server::primary_namespace::service_action,
     response
 > allocate_response_future_type;
 
 typedef lcos::eager_future<
-    server::primary_namespace::bind_gid_action,
+    server::primary_namespace::service_action,
     response
 > bind_response_future_type;
 
@@ -60,10 +57,12 @@ typedef components::heap_factory<
     >
 > response_heap_type; 
 
+// TODO: Make assertions exceptions 
 void early_parcel_sink(
     parcelset::parcelport&
   , boost::shared_ptr<std::vector<char> > const& parcel_data
-) { // {{{
+    )
+{ // {{{
     parcelset::parcel p;
 
     typedef util::container_device<std::vector<char> > io_device_type;
@@ -82,8 +81,7 @@ void early_parcel_sink(
     actions::action_type act = p.get_action();
 
     // early parcels should only be plain actions
-    BOOST_ASSERT
-        (actions::base_action::plain_action == act->get_action_type());
+    BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
 
     // early parcels can't have continuations 
     BOOST_ASSERT(!p.get_continuation());
@@ -94,24 +92,23 @@ void early_parcel_sink(
         act->get_thread_function(0)
             (threads::thread_state_ex(threads::wait_signaled));
     }
-    catch(...) {
-        LTM_(error) << "Unhandled exception while executing early_parcel_sink";
-        hpx::report_error(boost::current_exception());
+    catch (...) {
+        try {
+            boost::rethrow_exception(boost::current_exception());
+        }
+        catch (boost::exception const& be) {
+            std::cerr << hpx::diagnostic_information(be) << std::endl;
+            std::abort();
+        }
     }
 } // }}}
 
 void early_write_handler(
     boost::system::error_code const& e 
   , std::size_t size
-) {
-/*
-    hpx::util::osstream strm;
-    strm << e.message() << " (read " 
-         << size << " bytes)";
-    HPX_THROW_EXCEPTION(network_error, 
-        "agas::early_write_handler", 
-        hpx::util::osstream_get_string(strm));
-*/
+    )
+{
+    // no-op
 }
 
 struct registration_header
@@ -220,7 +217,7 @@ struct notification_header
     }
 };
 
-// {{{ early action forwards TODO: make header class for register_* functions
+// {{{ early action forwards 
 void register_console(registration_header const& header);
 
 void notify_console(notification_header const& header);
@@ -232,22 +229,26 @@ void notify_worker(notification_header const& header);
 
 // {{{ early action types
 typedef actions::plain_action1<
-    registration_header const&, register_console
+    registration_header const&
+  , register_console
   , threads::thread_priority_critical
 > register_console_action;
 
 typedef actions::plain_action1<
-    notification_header const&, notify_console
+    notification_header const&
+  , notify_console
   , threads::thread_priority_critical
 > notify_console_action;
 
 typedef actions::plain_action1<
-    registration_header const&, register_worker
+    registration_header const&
+  , register_worker
   , threads::thread_priority_critical
 > register_worker_action;
 
 typedef actions::plain_action1<
-    notification_header const&, notify_worker
+    notification_header const&
+  , notify_worker
   , threads::thread_priority_critical
 > notify_worker_action;
 // }}}
@@ -271,18 +272,6 @@ void register_console(registration_header const& header)
             , "agas::register_console"
             , "registration parcel received by non-bootstrap locality"); 
     }
-
-/*
-    if (HPX_UNLIKELY(agas_client.state() != router_state_launching))
-    {
-        hpx::util::osstream strm;
-        strm << "AGAS server has already launched, can't register "
-             << baseaddr.locality_; 
-        HPX_THROW_EXCEPTION(internal_server_error, 
-            "agas::register_console", 
-            hpx::util::osstream_get_string(strm));
-    }
-*/
 
     naming::gid_type prefix
                    , parcel_lower, parcel_upper
@@ -319,15 +308,6 @@ void register_console(registration_header const& header)
 
     agas_client.registerid("/locality(console)", prefix);
 
-    /*
-    if (HPX_UNLIKELY((prefix + 1) != lower))
-    {
-        HPX_THROW_EXCEPTION(internal_server_error,
-            "agas::register_console",
-            "bad initial GID range allocation");
-    }
-    */
-
     naming::address primary_addr(get_runtime().here(),
         server::primary_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
@@ -344,8 +324,6 @@ void register_console(registration_header const& header)
                 prefix, header.response_heap_address, header.response_heap_ptr,
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
-
-    // FIXME: handle the exceptional case of a late console.
 
     boost::function<void()>* thunk = new boost::function<void()>
         (boost::bind(&big_boot_barrier::apply
@@ -477,15 +455,6 @@ void register_worker(registration_header const& header)
     agas_client.bind_range(heap_lower, header.response_allocation
                          , header.response_heap_address
                          , header.response_heap_offset); 
-
-    /* 
-    if (HPX_UNLIKELY((prefix + 1) != lower))
-    {
-        HPX_THROW_EXCEPTION(internal_server_error,
-            "agas::register_worker",
-            "bad initial GID range allocation");
-    }
-    */ 
 
     naming::address primary_addr(get_runtime().here(),
         server::primary_namespace::get_component_type(),

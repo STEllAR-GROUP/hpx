@@ -145,200 +145,69 @@ struct primary_namespace :
         );
 
     response bind_locality(
-        endpoint_type const& ep
-      , count_type count
-        )
-    { 
-        return bind_locality(ep, count, throws);
-    } 
-
-    response bind_locality(
-        endpoint_type const& ep
-      , count_type count
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response bind_gid(
-        naming::gid_type const& gid
-      , gva_type const& gva
-        )
-    {
-        return bind_gid(gid, gva, throws);
-    }
-
-    response bind_gid(
-        naming::gid_type const& gid
-      , gva_type const& gva
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response page_fault(
-        naming::gid_type const& gid
-        )
-    {
-        return page_fault(gid, throws);
-    }
-
-    response page_fault(
-        naming::gid_type const& gid
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response unbind_locality(
-        endpoint_type const& ep
-        )
-    {
-        return unbind_locality(ep, throws);
-    }
-
-    response unbind_locality(
-        endpoint_type const& ep
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response unbind_gid(
-        naming::gid_type const& gid
-      , count_type count
-        )
-    {
-        return unbind_gid(gid, count, throws);
-    }
-
-    response unbind_gid(
-        naming::gid_type const& gid
-      , count_type count
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response increment(
-        naming::gid_type const& gid
-      , count_type credits
-        )
-    {
-        return increment(gid, credits, throws);
-    }
-
-    response increment(
-        naming::gid_type const& gid
-      , count_type credits
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
     
     response decrement(
-        naming::gid_type const& gid
-      , count_type credits
-        )
-    {
-        return decrement(gid, credits, throws); 
-    }
-       
-    response decrement(
-        naming::gid_type const& gid
-      , count_type credits
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
- 
-    response localities()
-    {
-        return localities(throws);
-    }
 
     response localities(
-        error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     enum actions 
     { // {{{ action enum
-        namespace_bind_locality    = BOOST_BINARY_U(1000000),
-        namespace_bind_gid         = BOOST_BINARY_U(1000001),
-        namespace_page_fault       = BOOST_BINARY_U(1000010),
-        namespace_unbind_locality  = BOOST_BINARY_U(1000011),
-        namespace_unbind_gid       = BOOST_BINARY_U(1000100),
-        namespace_increment        = BOOST_BINARY_U(1000101),
-        namespace_decrement        = BOOST_BINARY_U(1000110),
-        namespace_localities       = BOOST_BINARY_U(1000111),
-        namespace_service          = BOOST_BINARY_U(1001000)
+        // Actual actions
+        namespace_service          = BOOST_BINARY_U(1000000)
+
+        // Pseudo-actions
+      , namespace_bind_locality    = BOOST_BINARY_U(1000001)
+      , namespace_bind_gid         = BOOST_BINARY_U(1000010)
+      , namespace_page_fault       = BOOST_BINARY_U(1000011)
+      , namespace_unbind_locality  = BOOST_BINARY_U(1000100)
+      , namespace_unbind_gid       = BOOST_BINARY_U(1000101)
+      , namespace_increment        = BOOST_BINARY_U(1000110)
+      , namespace_decrement        = BOOST_BINARY_U(1000111)
+      , namespace_localities       = BOOST_BINARY_U(1001000)
     }; // }}}
     
     typedef hpx::actions::result_action1<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_service,
-        /* arguments */   request const&,
-        &primary_namespace::service
+        primary_namespace
+      , /* return type */ response
+      , /* enum value */  namespace_service
+      , /* arguments */   request const&
+      , &primary_namespace::service
       , threads::thread_priority_critical
     > service_action;
-
-    typedef hpx::actions::result_action2<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_bind_locality,
-        /* arguments */   endpoint_type const&, count_type,
-        &primary_namespace::bind_locality
-      , threads::thread_priority_critical
-    > bind_locality_action; 
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_bind_gid,
-        /* arguments */   naming::gid_type const&, gva_type const&,
-        &primary_namespace::bind_gid
-      , threads::thread_priority_critical
-    > bind_gid_action;
-    
-    typedef hpx::actions::result_action1<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_page_fault,
-        /* arguments */   naming::gid_type const&,
-        &primary_namespace::page_fault
-      , threads::thread_priority_critical
-    > page_fault_action;
-
-    typedef hpx::actions::result_action1<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_unbind_locality,
-        /* arguments */   endpoint_type const&,
-        &primary_namespace::unbind_locality
-      , threads::thread_priority_critical
-    > unbind_locality_action;
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_unbind_gid,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace::unbind_gid
-      , threads::thread_priority_critical
-    > unbind_gid_action;
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace,
-        /* return type */ response,  
-        /* enum value */  namespace_increment,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace::increment
-      , threads::thread_priority_critical
-    > increment_action;
-    
-    typedef hpx::actions::result_action2<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_decrement,
-        /* arguments */   naming::gid_type const&, count_type,
-        &primary_namespace::decrement
-      , threads::thread_priority_critical
-    > decrement_action;
-    
-    typedef hpx::actions::result_action0<
-        primary_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_localities,
-        &primary_namespace::localities
-      , threads::thread_priority_critical
-    > localities_action;
 };
 
 }}}

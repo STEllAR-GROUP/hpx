@@ -29,28 +29,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_ACTION_EX(
     primary_namespace::service_action,
     primary_namespace_service_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::bind_locality_action,
-    primary_namespace_bind_locality_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::bind_gid_action,
-    primary_namespace_bind_gid_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::page_fault_action,
-    primary_namespace_page_fault_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::unbind_locality_action,
-    primary_namespace_unbind_locality_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::unbind_gid_action,
-    primary_namespace_unbind_gid_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::localities_action,
-    primary_namespace_localities_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::increment_action,
-    primary_namespace_increment_action);
-HPX_REGISTER_ACTION_EX(
-    primary_namespace::decrement_action,
-    primary_namespace_decrement_action);
 

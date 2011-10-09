@@ -31,17 +31,71 @@ response symbol_namespace::service(
     request const& req
   , error_code& ec
     )
-{
-    // IMPLEMENT
-    return response();
-}
+{ // {{{
+    switch (req.get_action_code())
+    {
+        case symbol_ns_bind:
+            return bind(req, ec);
+        case symbol_ns_resolve:
+            return resolve(req, ec);
+        case symbol_ns_unbind:
+            return unbind(req, ec);
+        case symbol_ns_iterate:
+            return iterate(req, ec);
+
+        case primary_ns_bind_locality:
+        case primary_ns_bind_gid:
+        case primary_ns_page_fault:
+        case primary_ns_unbind_locality:
+        case primary_ns_unbind_gid:
+        case primary_ns_increment:
+        case primary_ns_decrement:
+        case primary_ns_localities:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "primary_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        case component_ns_bind_prefix:
+        case component_ns_bind_name:
+        case component_ns_resolve_id:
+        case component_ns_resolve_name:
+        case component_ns_unbind:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "component_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        default:
+        case component_ns_service:
+        case primary_ns_service:
+        case symbol_ns_service:
+        case invalid_request: 
+        {
+            HPX_THROWS_IF(ec, bad_action_code
+              , "component_namespace::service"
+              , boost::str(boost::format(
+                    "invalid action code encountered in request, "
+                    "action_code(%x)")
+                    % boost::uint16_t(req.get_action_code())));
+            return response();
+        }
+    };
+} // }}}
 
 response symbol_namespace::bind(
-    std::string const& key
-  , naming::gid_type const& gid
+    request const& req
   , error_code& ec
     )
 { // {{{ bind implementation
+    // parameters
+    std::string key = req.get_name();
+    naming::gid_type gid = req.get_gid();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key)
@@ -83,10 +137,13 @@ response symbol_namespace::bind(
 } // }}}
 
 response symbol_namespace::resolve(
-    std::string const& key
+    request const& req
   , error_code& ec
     )
 { // {{{ resolve implementation
+    // parameters
+    std::string key = req.get_name();
+
     database_mutex_type::scoped_lock l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key)
@@ -138,10 +195,13 @@ response symbol_namespace::resolve(
 } // }}}  
 
 response symbol_namespace::unbind(
-    std::string const& key
+    request const& req
   , error_code& ec
     )
 { // {{{ unbind implementation
+    // parameters
+    std::string key = req.get_name();
+
     database_mutex_type::scoped_lock l(mutex_);
     
     gid_table_type::iterator it = gids_.find(key)
@@ -174,10 +234,12 @@ response symbol_namespace::unbind(
 } // }}} 
 
 response symbol_namespace::iterate(
-    iterate_symbols_function_type const& f
+    request const& req
   , error_code& ec
     )
 { // {{{ iterate implementation
+    iterate_symbols_function_type f = req.get_iterate_symbols_function();
+
     database_mutex_type::scoped_lock l(mutex_);
     
     for (gid_table_type::iterator it = gids_.begin()

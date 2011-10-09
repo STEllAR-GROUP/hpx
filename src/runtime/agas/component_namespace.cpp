@@ -29,19 +29,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_ACTION_EX(
     component_namespace::service_action,
     component_namespace_service_action);
-HPX_REGISTER_ACTION_EX(
-    component_namespace::bind_prefix_action,
-    component_namespace_bind_prefix_action);
-HPX_REGISTER_ACTION_EX(
-    component_namespace::bind_name_action,
-    component_namespace_bind_name_action);
-HPX_REGISTER_ACTION_EX(
-    component_namespace::resolve_id_action,
-    component_namespace_resolve_id_action);
-HPX_REGISTER_ACTION_EX(
-    component_namespace::resolve_name_action,
-    component_namespace_resolve_name_action);
-HPX_REGISTER_ACTION_EX(
-    component_namespace::unbind_action,
-    component_namespace_unbind_action);
 

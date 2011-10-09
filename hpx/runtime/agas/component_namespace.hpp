@@ -37,76 +37,20 @@ struct component_namespace :
       : base_type(id)
     {}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // bind interface 
-    lcos::promise<response>
-    bind_async(std::string const& key, prefix_type prefix)
-    { return this->base_type::bind_prefix_async(this->gid_, key, prefix); }
-
-    response bind(std::string const& key, prefix_type prefix,
-                       error_code& ec = throws)
-    { return this->base_type::bind_prefix(this->gid_, key, prefix, ec); }
-
-    lcos::promise<response>
-    bind_async(std::string const& key, naming::gid_type const& prefix)
+    lcos::promise<response> service_async(
+        request const& req 
+        )
     {
-        return this->base_type::bind_prefix_async
-            (this->gid_, key, naming::get_prefix_from_gid(prefix));
+        return this->base_type::service_async(this->gid_, req);
     }
 
-    response bind(std::string const& key,
-                       naming::gid_type const& prefix,
-                       error_code& ec = throws)
+    response service(
+        request const& req 
+      , error_code& ec = throws
+        )
     {
-        return this->base_type::bind_prefix
-            (this->gid_, key, naming::get_prefix_from_gid(prefix), ec);
+        return this->base_type::service(this->gid_, req, ec);
     }
-    
-    lcos::promise<response> bind_async(std::string const& key)
-    { return this->base_type::bind_name_async(this->gid_, key); }
-    
-    response bind(std::string const& key, error_code& ec = throws)
-    { return this->base_type::bind_name(this->gid_, key, ec); }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // resolve_id and resolve_name interface 
-    lcos::promise<response> resolve_async(component_id_type key)
-    { return this->base_type::resolve_id_async(this->gid_, key); }
-    
-    response resolve(component_id_type key, error_code& ec = throws)
-    { return this->base_type::resolve_id(this->gid_, key, ec); }
-
-    lcos::promise<response>
-    resolve_async(components::component_type key)
-    {
-        return this->base_type::resolve_id_async
-            (this->gid_, component_id_type(key));
-    }
-    
-    response resolve(components::component_type key,
-                          error_code& ec = throws)
-    {
-        return this->base_type::resolve_id
-            (this->gid_, component_id_type(key), ec);
-    }
-
-    lcos::promise<response>
-    resolve_async(std::string const& key)
-    { return this->base_type::resolve_name_async(this->gid_, key); }
-    
-    response resolve(std::string const& key,
-                          error_code& ec = throws)
-    { return this->base_type::resolve_name(this->gid_, key, ec); }
- 
-    ///////////////////////////////////////////////////////////////////////////
-    // unbind interface 
-    lcos::promise<response>
-    unbind_async(std::string const& key)
-    { return this->base_type::unbind_async(this->gid_, key); }
-    
-    response unbind(std::string const& key,
-                         error_code& ec = throws)
-    { return this->base_type::unbind(this->gid_, key, ec); }
 };            
 
 }}

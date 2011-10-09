@@ -25,81 +25,23 @@ struct component_namespace
     typedef server_type::prefixes_type prefixes_type;
     // }}}
 
-    // {{{ bind_prefix dispatch
-    static lcos::promise<response>
-    bind_prefix_async(naming::id_type const& gid, std::string const& key,
-                      prefix_type prefix)
+    static lcos::promise<response> service_async(
+        naming::id_type const& gid
+      , request const& req
+        )
     {
-        typedef server_type::bind_prefix_action action_type;
-        return lcos::eager_future<action_type, response>
-            (gid, key, prefix);
+        typedef server_type::service_action action_type;
+        return lcos::eager_future<action_type, response>(gid, req);
     }
 
-    static response
-    bind_prefix(naming::id_type const& gid, std::string const& key,
-                prefix_type prefix, error_code& ec = throws)
+    static response service(
+        naming::id_type const& gid
+      , request const& req 
+      , error_code& ec = throws
+        )
     {
-        return bind_prefix_async(gid, key, prefix).get(ec);
+        return service_async(gid, req).get(ec);
     } 
-    // }}}
-    
-    // {{{ bind_name dispatch 
-    static lcos::promise<response>
-    bind_name_async(naming::id_type const& gid, std::string const& key)
-    {
-        typedef server_type::bind_name_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    bind_name(naming::id_type const& gid, std::string const& key,
-              error_code& ec = throws)
-    { return bind_name_async(gid, key).get(ec); } 
-    // }}}
-
-    // {{{ resolve_id dispatch
-    static lcos::promise<response>
-    resolve_id_async(naming::id_type const& gid, component_id_type key)
-    {
-        typedef server_type::resolve_id_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    resolve_id(naming::id_type const& gid, component_id_type key,
-               error_code& ec = throws)
-    { return resolve_id_async(gid, key).get(ec); } 
-    // }}}
-
-    // {{{ resolve_name dispatch 
-    static lcos::promise<response>
-    resolve_name_async(naming::id_type const& gid,
-                       std::string const& key)
-    {
-        typedef server_type::resolve_name_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    resolve_name(naming::id_type const& gid, std::string const& key,
-                 error_code& ec = throws)
-    { return resolve_name_async(gid, key).get(ec); } 
-    // }}}
-
-    // {{{ unbind dispatch 
-    static lcos::promise<response>
-    unbind_async(naming::id_type const& gid, std::string const& key,
-                 error_code& ec = throws)
-    {
-        typedef server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    unbind(naming::id_type const& gid, std::string const& key,
-           error_code& ec = throws)
-    { return unbind_async(gid, key).get(ec); } 
-    // }}}
 };            
 
 }}}

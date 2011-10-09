@@ -38,150 +38,19 @@ struct primary_namespace :
       : base_type(id)
     {}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // bind_locality and bind_gid interface 
-    lcos::promise<response> bind_async(
-        endpoint_type const& ep
-      , count_type count = 0
+    lcos::promise<response> service_async(
+        request const& req 
         )
     {
-        return this->base_type::bind_locality_async(this->gid_, ep, count);
+        return this->base_type::service_async(this->gid_, req);
     }
 
-    response bind(
-        endpoint_type const& ep
-      , count_type count = 0
+    response service(
+        request const& req 
       , error_code& ec = throws
         )
     {
-        return this->base_type::bind_locality(this->gid_, ep, count, ec);
-    }
-
-    response bind(
-        endpoint_type const& ep
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::bind_locality(this->gid_, ep, 0, ec);
-    }
-    
-    lcos::promise<response> bind_async(
-        naming::gid_type const& gid
-      , gva_type const& gva
-        )
-    {
-        return this->base_type::bind_gid_async(this->gid_, gid, gva);
-    }
-
-    response bind(
-        naming::gid_type const& gid
-      , gva_type const& gva
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::bind_gid(this->gid_, gid, gva);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // page_fault interface 
-    lcos::promise<response> page_fault_async(
-        naming::gid_type const& gid
-        )
-    {
-        return this->base_type::page_fault_async(this->gid_, gid);
-    }
-    
-    response page_fault(
-        naming::gid_type const& gid, error_code& ec = throws
-        )
-    {
-        return this->base_type::page_fault(this->gid_, gid, ec);
-    }
- 
-    ///////////////////////////////////////////////////////////////////////////
-    // unbind_locality and unbind_gid interface 
-    lcos::promise<response> unbind_async(
-        endpoint_type const& ep
-        )
-    {
-        return this->base_type::unbind_locality_async(this->gid_, ep);
-    }
-    
-    response unbind(
-        endpoint_type const& ep
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::unbind_locality(this->gid_, ep, ec);
-    }
-
-    lcos::promise<response> unbind_async(
-        naming::gid_type const& gid
-      , count_type count
-        )
-    {
-        return this->base_type::unbind_gid_async(this->gid_, gid, count);
-    }
-    
-    response unbind(
-        naming::gid_type const& gid
-      , count_type count
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::unbind_gid(this->gid_, gid, count, ec);
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // increment interface 
-    lcos::promise<response> increment_async(
-        naming::gid_type const& gid
-      , count_type credits
-        )
-    {
-        return this->base_type::increment_async(this->gid_, gid, credits);
-    }
-    
-    response increment(
-        naming::gid_type const& gid
-      , count_type credits
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::increment(this->gid_, gid, credits, ec);
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // decrement interface 
-    lcos::promise<response> decrement_async(
-        naming::gid_type const& gid
-      , count_type credits
-        )
-    {
-        return this->base_type::decrement_async(this->gid_, gid, credits);
-    }
-    
-    response decrement(
-        naming::gid_type const& gid
-      , count_type credits
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::decrement(this->gid_, gid, credits, ec);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // localities interface 
-    lcos::promise<response> localities_async()
-    {
-        return this->base_type::localities_async(this->gid_);
-    }
-    
-    response localities(
-        error_code& ec = throws
-        )
-    {
-        return this->base_type::localities(this->gid_, ec);
+        return this->base_type::service(this->gid_, req, ec);
     }
 }; 
 

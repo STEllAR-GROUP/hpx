@@ -27,7 +27,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 // The number of types that request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 9
+#define HPX_AGAS_REQUEST_SUBTYPES 11
 
 namespace hpx { namespace agas
 {
@@ -184,11 +184,8 @@ struct request
         request const& other
         )
     {
-        if (this != &other)
-        {
-            mc = other.mc;
-            data = other.data;
-        } 
+        mc = other.mc;
+        data = other.data;
         return *this;
     }
 
@@ -262,73 +259,54 @@ struct request
         error_code& ec = throws
         ) const
     { // {{{ 
-        naming::gid_type gid = naming::invalid_gid;
-
-        // Don't let any attempt except the last throw.
-        error_code try_;
-        gid = get_data<subtype_gid, 0>(try_);
-
-        // If the first try failed, check again.
-        if (try_)
-            gid = get_data<subtype_gid_gva, 0>(try_);
-
-        else if (&ec != &throws)
+        switch (data.which())
         {
-            ec = make_success_code();
-            return gid;
-        }
+            case subtype_gid:
+                return get_data<subtype_gid, 0>(ec);
 
-        // If the second try failed, check again.
-        if (try_)
-            gid = get_data<subtype_gid_count, 0>(try_);
+            case subtype_gid_gva:
+                return get_data<subtype_gid_gva, 0>(ec);
 
-        else if (&ec != &throws)
-        {
-            ec = make_success_code();
-            return gid;
-        }
- 
-        // If the third try failed, check again.
-        if (try_)
-            gid = get_data<subtype_name_gid, 1>(ec);
+            case subtype_gid_count:
+                return get_data<subtype_gid_count, 0>(ec);
 
-        else if (&ec != &throws)
-            ec = make_success_code();
+            case subtype_name_gid:
+                return get_data<subtype_name_gid, 1>(ec);
 
-        return gid;
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter, 
+                    "request::get_gid",
+                    "invalid operation for request type");
+                return naming::invalid_gid; 
+            }
+        };
     } // }}} 
 
     std::string get_name(
         error_code& ec = throws
         ) const
     { // {{{ 
-        std::string name = "";
-
-        // Don't let any attempt except the last throw.
-        error_code try_;
-        name = get_data<subtype_name, 0>(try_);
-
-        // If the first try failed, check again.
-        if (try_)
-            name = get_data<subtype_name_prefix, 0>(try_);
-
-        else if (&ec != &throws)
+        switch (data.which())
         {
-            ec = make_success_code();
-            return name;
-        }
+            case subtype_name:
+                return get_data<subtype_name, 0>(ec);
 
-        // If the second try failed, check again.
-        if (try_)
-            name = get_data<subtype_name_gid, 0>(ec);
+            case subtype_name_prefix:
+                return get_data<subtype_name_prefix, 0>(ec);
 
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return name;
+            case subtype_name_gid:
+                return get_data<subtype_name_gid, 0>(ec);
+                
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter, 
+                    "request::get_name",
+                    "invalid operation for request type");
+                return ""; 
+            }
+        };
     } // }}} 
 
-    namespace_action_code get_method() const
+    namespace_action_code get_action_code() const
     {
         return mc;
     }

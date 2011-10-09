@@ -24,63 +24,23 @@ struct symbol_namespace
         iterate_symbols_function_type;
     // }}}
 
-    // {{{ bind dispatch
-    static lcos::promise<response>
-    bind_async(naming::id_type const& gid, std::string const& key,
-               naming::gid_type const& value)
+    static lcos::promise<response> service_async(
+        naming::id_type const& gid
+      , request const& req
+        )
     {
-        typedef server_type::bind_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key, value);
+        typedef server_type::service_action action_type;
+        return lcos::eager_future<action_type, response>(gid, req);
     }
 
-    static response bind(naming::id_type const& gid, std::string const& key,
-                              naming::gid_type const& value,
-                              error_code& ec = throws)
-    { return bind_async(gid, key, value).get(ec); } 
-    // }}}
-    
-    // {{{ resolve dispatch 
-    static lcos::promise<response>
-    resolve_async(naming::id_type const& gid, std::string const& key)
+    static response service(
+        naming::id_type const& gid
+      , request const& req 
+      , error_code& ec = throws
+        )
     {
-        typedef server_type::resolve_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    resolve(naming::id_type const& gid, std::string const& key,
-            error_code& ec = throws)
-    { return resolve_async(gid, key).get(ec); } 
-    // }}}
-
-    // {{{ unbind dispatch 
-    static lcos::promise<response>
-    unbind_async(naming::id_type const& gid, std::string const& key)
-    {
-        typedef server_type::unbind_action action_type;
-        return lcos::eager_future<action_type, response>(gid, key);
-    }
-    
-    static response
-    unbind(naming::id_type const& gid, std::string const& key,
-           error_code& ec = throws)
-    { return unbind_async(gid, key).get(ec); } 
-    // }}}
-
-    // {{{ iterate dispatch 
-    static lcos::promise<response>
-    iterate_async(naming::id_type const& gid,
-                  iterate_symbols_function_type const& f)
-    {
-        typedef server_type::iterate_action action_type;
-        return lcos::eager_future<action_type, response>(gid, f);
-    }
-    
-    static response
-    iterate(naming::id_type const& gid, iterate_symbols_function_type const& f,
-            error_code& ec = throws)
-    { return iterate_async(gid, f).get(ec); } 
-    // }}}
+        return service_async(gid, req).get(ec);
+    } 
 };            
 
 }}}

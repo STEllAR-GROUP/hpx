@@ -80,162 +80,51 @@ struct component_namespace :
         );
 
     response bind_prefix(
-        std::string const& key
-      , naming::gid_type const& prefix
-        )
-    {
-        return bind_prefix(key, naming::get_prefix_from_gid(prefix), throws);
-    }
-
-    response bind_prefix(
-        std::string const& key
-      , prefix_type prefix
-        )
-    {
-        return bind_prefix(key, prefix, throws);
-    }
-
-    response bind_prefix(
-        std::string const& key
-      , naming::gid_type const& prefix
-      , error_code& ec
-        )
-    {
-        return bind_prefix(key, naming::get_prefix_from_gid(prefix), ec);
-    }
-
-    response bind_prefix(
-        std::string const& key
-      , prefix_type prefix
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response bind_name(
-        std::string const& key
-        )
-    {
-        return bind_name(key, throws);
-    }
-    
-    response bind_name(
-        std::string const& key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     response resolve_id(
-        components::component_type key
-        )
-    {
-        return resolve_id(component_id_type(key), throws);
-    }
-
-    response resolve_id(
-        component_id_type key
-        )
-    {
-        return resolve_id(key, throws);
-    }
-
-    response resolve_id(
-        components::component_type key
-      , error_code& ec
-        )
-    {
-        return resolve_id(component_id_type(key), ec);
-    }
-
-    response resolve_id(
-        component_id_type key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
-
-    response resolve_name(
-        std::string const& key
-        )
-    {
-        return resolve_name(key, throws);
-    }
     
     response resolve_name(
-        std::string const& key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
-
-    response unbind(
-        std::string const& key
-        )
-    {
-        return unbind(key, throws);
-    }
     
     response unbind(
-        std::string const& key
-      , error_code& ec
+        request const& req
+      , error_code& ec = throws
         );
 
     enum actions
     { // {{{ action enum
-        namespace_bind_prefix  = BOOST_BINARY_U(0100000),
-        namespace_bind_name    = BOOST_BINARY_U(0100001),
-        namespace_resolve_id   = BOOST_BINARY_U(0100010),
-        namespace_resolve_name = BOOST_BINARY_U(0100011),
-        namespace_unbind       = BOOST_BINARY_U(0100100),
-        namespace_service      = BOOST_BINARY_U(0100101)
+        // Actual actions
+        namespace_service      = BOOST_BINARY_U(0100000)
+
+        // Pseudo-actions
+      , namespace_bind_prefix  = BOOST_BINARY_U(0100001)
+      , namespace_bind_name    = BOOST_BINARY_U(0100010)
+      , namespace_resolve_id   = BOOST_BINARY_U(0100011)
+      , namespace_resolve_name = BOOST_BINARY_U(0100100)
+      , namespace_unbind       = BOOST_BINARY_U(0100101)
     }; // }}}
 
     typedef hpx::actions::result_action1<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_service,
-        /* arguments */   request const&,
-        &component_namespace::service
+        component_namespace
+      , /* return type */ response
+      , /* enum value */  namespace_service
+      , /* arguments */   request const&
+      , &component_namespace::service
       , threads::thread_priority_critical
     > service_action;
-    
-    typedef hpx::actions::result_action2<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_bind_prefix,
-        /* arguments */   std::string const&, prefix_type,
-        &component_namespace::bind_prefix
-      , threads::thread_priority_critical
-    > bind_prefix_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_bind_name,
-        /* arguments */   std::string const&,
-        &component_namespace::bind_name
-      , threads::thread_priority_critical
-    > bind_name_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_resolve_id,
-        /* arguments */   component_id_type,
-        &component_namespace::resolve_id
-      , threads::thread_priority_critical
-    > resolve_id_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_resolve_name,
-        /* arguments */   std::string const&,
-        &component_namespace::resolve_name
-      , threads::thread_priority_critical
-    > resolve_name_action;
-    
-    typedef hpx::actions::result_action1<
-        component_namespace,
-        /* return type */ response,
-        /* enum value */  namespace_unbind,
-        /* arguments */   std::string const&,
-        &component_namespace::unbind
-      , threads::thread_priority_critical
-    > unbind_action;
 };
 
 }}}

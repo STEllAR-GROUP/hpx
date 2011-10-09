@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 namespace hpx { namespace agas
 {
@@ -29,25 +30,82 @@ response primary_namespace::service(
     request const& req
   , error_code& ec
     )
-{
-    // IMPLEMENT
-    return response();
-}
+{ // {{{
+    switch (req.get_action_code())
+    {
+        case primary_ns_bind_locality:
+            return bind_locality(req, ec);
+        case primary_ns_bind_gid:
+            return bind_gid(req, ec);
+        case primary_ns_page_fault:
+            return page_fault(req, ec);
+        case primary_ns_unbind_locality:
+            return unbind_locality(req, ec);
+        case primary_ns_unbind_gid:
+            return unbind_gid(req, ec);
+        case primary_ns_increment:
+            return increment(req, ec);
+        case primary_ns_decrement:
+            return decrement(req, ec);
+        case primary_ns_localities:
+            return localities(req, ec);
+
+        case component_ns_bind_prefix:
+        case component_ns_bind_name:
+        case component_ns_resolve_id:
+        case component_ns_resolve_name:
+        case component_ns_unbind:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "component_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        case symbol_ns_bind:
+        case symbol_ns_resolve:
+        case symbol_ns_unbind:
+        case symbol_ns_iterate:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "symbol_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        default:
+        case component_ns_service:
+        case primary_ns_service:
+        case symbol_ns_service:
+        case invalid_request: 
+        {
+            HPX_THROWS_IF(ec, bad_action_code
+              , "component_namespace::service"
+              , boost::str(boost::format(
+                    "invalid action code encountered in request, "
+                    "action_code(%x)")
+                    % boost::uint16_t(req.get_action_code())));
+            return response();
+        }
+    };
+} // }}}
 
 response primary_namespace::bind_locality(
-    endpoint_type const& ep
-  , count_type count
+    request const& req
   , error_code& ec
     )
 { // {{{ bind_locality implementation
     using boost::fusion::at_c;
 
+    // parameters
+    naming::locality ep = req.get_locality();
+    count_type const count = req.get_count();
+    count_type const real_count = (count) ? (count - 1) : (0);
+
     database_mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator it = partitions_.find(ep)
                                  , end = partitions_.end(); 
-
-    count_type const real_count = (count) ? (count - 1) : (0);
 
     // If the endpoint is in the table, then this is a resize.
     if (it != end)
@@ -57,7 +115,8 @@ response primary_namespace::bind_locality(
         {
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_locality, ep(%1%), count(%2%), "
-                "lower(%3%), upper(%4%), prefix(%5%)")
+                "lower(%3%), upper(%4%), prefix(%5%), "
+                "response(repeated_request)")
                 % ep
                 % count
                 % at_c<1>(it->second)
@@ -68,10 +127,10 @@ response primary_namespace::bind_locality(
                 ec = make_success_code();
 
             return response(primary_ns_bind_locality
-                               , at_c<1>(it->second)
-                               , at_c<1>(it->second)
-                               , at_c<0>(it->second)
-                               , repeated_request);
+                          , at_c<1>(it->second)
+                          , at_c<1>(it->second)
+                          , at_c<0>(it->second)
+                          , repeated_request);
         }
 
         // Compute the new allocation.
@@ -104,17 +163,17 @@ response primary_namespace::bind_locality(
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::bind_locality, ep(%1%), count(%2%), "
-            "lower(%3%), upper(%4%), prefix(%5%)")
+            "lower(%3%), upper(%4%), prefix(%5%), response(repeated_request)")
             % ep % count % lower % upper % at_c<0>(it->second));
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return response(primary_ns_bind_locality
-                           , lower
-                           , upper
-                           , at_c<0>(it->second)
-                           , repeated_request);
+                      , lower
+                      , upper
+                      , at_c<0>(it->second)
+                      , repeated_request);
     }
 
     // If the endpoint isn't in the table, then we're registering it.
@@ -207,21 +266,22 @@ response primary_namespace::bind_locality(
             ec = make_success_code();
 
         return response(primary_ns_bind_locality
-            , lower, upper, prefix);
+                      , lower
+                      , upper
+                      , prefix);
     }
 } // }}}
 
 response primary_namespace::bind_gid(
-    naming::gid_type const& gid
-  , gva_type const& gva
+    request const& req
   , error_code& ec
     )
 { // {{{ bind_gid implementation
     using boost::fusion::at_c;
 
-    // TODO: Implement and use a non-mutating version of
-    // strip_credit_from_gid()
-    naming::gid_type id = gid;
+    // parameters
+    gva g = req.get_gva();
+    naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
 
     database_mutex_type::scoped_lock l(mutex_);
@@ -238,7 +298,7 @@ response primary_namespace::bind_gid(
         {
             // Check for count mismatch (we can't change block sizes of
             // existing bindings).
-            if (HPX_UNLIKELY(it->second.count != gva.count))
+            if (HPX_UNLIKELY(it->second.count != g.count))
             {
                 // REVIEW: Is this the right error code to use?
                 HPX_THROWS_IF(ec, bad_parameter
@@ -247,27 +307,27 @@ response primary_namespace::bind_gid(
                 return response();
             }
 
-            if (HPX_UNLIKELY(gva.type == components::component_invalid))
+            if (HPX_UNLIKELY(g.type == components::component_invalid))
             {
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::bind_gid" 
                   , boost::str(boost::format(
                         "attempt to update a GVA with an invalid type, "
                         "gid(%1%), gva(%2%)")
-                        % id % gva));
+                        % id % g));
                 return response();
             }
 
             // Store the new endpoint and offset
-            it->second.endpoint = gva.endpoint;
-            it->second.type = gva.type;
-            it->second.lva(gva.lva());
-            it->second.offset = gva.offset;
+            it->second.endpoint = g.endpoint;
+            it->second.type = g.type;
+            it->second.lva(g.lva());
+            it->second.offset = g.offset;
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
                 "response(repeated_request)")
-                % gid % gva);
+                % id % g);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -308,7 +368,7 @@ response primary_namespace::bind_gid(
         }
     }
 
-    naming::gid_type upper_bound(id + (gva.count - 1));
+    naming::gid_type upper_bound(id + (g.count - 1));
 
     if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
     {
@@ -318,33 +378,33 @@ response primary_namespace::bind_gid(
         return response();
     }
 
-    if (HPX_UNLIKELY(gva.type == components::component_invalid))
+    if (HPX_UNLIKELY(g.type == components::component_invalid))
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::bind_gid" 
           , boost::str(boost::format(
                 "attempt to insert a GVA with an invalid type, "
                 "gid(%1%), gva(%2%)")
-                % id % gva));
+                % id % g));
         return response();
     }
     
     // Insert a GID -> GVA entry into the GVA table. 
     if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-            std::make_pair(id, gva)))))
+            std::make_pair(id, g)))))
     {
         HPX_THROWS_IF(ec, lock_error 
           , "primary_namespace::bind_gid"
           , boost::str(boost::format(
                 "GVA table insertion failed due to a locking error or "
                 "memory corruption, gid(%1%), gva(%2%)")
-                % id % gva));
+                % id % g));
         return response();
     }
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::bind_gid, gid(%1%), gva(%2%)")
-        % gid % gva);
+        % id % g);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -353,13 +413,12 @@ response primary_namespace::bind_gid(
 } // }}}
 
 response primary_namespace::page_fault(
-    naming::gid_type const& gid
+    request const& req
   , error_code& ec
     )
 { // {{{ page_fault implementation 
-    // TODO: Implement and use a non-mutating version of
-    // strip_credit_from_gid()
-    naming::gid_type id = gid;
+    // parameters
+    naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
         
     database_mutex_type::scoped_lock l(mutex_);
@@ -376,14 +435,14 @@ response primary_namespace::page_fault(
             LAGAS_(info) << (boost::format(
                 "primary_namespace::page_fault, soft page fault, faulting "
                 "address %1%, gva(%2%)")
-                % gid % it->second);
+                % id % it->second);
 
             if (&ec != &throws)
                 ec = make_success_code();
 
             return response(primary_ns_page_fault
-                               , it->first
-                               , it->second);
+                          , it->first
+                          , it->second);
         }
 
         // We need to decrement the iterator, first we check that it's safe
@@ -407,14 +466,14 @@ response primary_namespace::page_fault(
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::page_fault, soft page fault, "
                     "faulting address %1%, gva(%2%)")
-                    % gid % it->second);
+                    % id % it->second);
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
                 return response(primary_ns_page_fault
-                                   , it->first
-                                   , it->second);
+                              , it->first
+                              , it->second);
             }
         }
     }
@@ -437,37 +496,40 @@ response primary_namespace::page_fault(
             LAGAS_(info) << (boost::format(
                 "primary_namespace::page_fault, soft page fault, faulting "
                 "address %1%, gva(%2%)")
-                % gid % it->second);
+                % id % it->second);
 
             if (&ec != &throws)
                 ec = make_success_code();
 
             return response(primary_ns_page_fault
-                               , it->first
-                               , it->second);
+                          , it->first
+                          , it->second);
         }
     }
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::page_fault, invalid page fault, faulting "
         "address %1%")
-        % gid);
+        % id);
 
     if (&ec != &throws)
         ec = make_success_code();
 
     return response(primary_ns_page_fault
-                       , naming::invalid_gid 
-                       , gva_type()
-                       , invalid_page_fault);
+                  , naming::invalid_gid 
+                  , gva_type()
+                  , invalid_page_fault);
 } // }}}
 
 response primary_namespace::unbind_locality(
-    endpoint_type const& ep
+    request const& req
   , error_code& ec
     )
 { // {{{ unbind_locality implementation
     using boost::fusion::at_c;
+
+    // parameters
+    naming::locality ep = req.get_locality();
 
     database_mutex_type::scoped_lock l(mutex_);
 
@@ -518,14 +580,13 @@ response primary_namespace::unbind_locality(
 } // }}}
 
 response primary_namespace::unbind_gid(
-    naming::gid_type const& gid
-  , count_type count
+    request const& req
   , error_code& ec
     )
 { // {{{ unbind_gid implementation
-    // TODO: Implement and use a non-mutating version of
-    // strip_credit_from_gid()
-    naming::gid_type id = gid;
+    // parameters
+    count_type count = req.get_count(); 
+    naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
     
     database_mutex_type::scoped_lock l(mutex_);
@@ -546,7 +607,7 @@ response primary_namespace::unbind_gid(
         response r(primary_ns_unbind_gid, it->second);
         LAGAS_(info) << (boost::format(
             "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%)")
-            % gid % count % it->second);
+            % id % count % it->second);
 
         gvas_.erase(it);
 
@@ -561,26 +622,25 @@ response primary_namespace::unbind_gid(
         LAGAS_(info) << (boost::format(
             "primary_namespace::unbind_gid, gid(%1%), count(%2%), "
             "response(no_success)")
-            % gid % count);
+            % id % count);
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return response(primary_ns_unbind_gid
-                           , gva_type()
-                           , no_success);
+                      , gva_type()
+                      , no_success);
     }
 } // }}}
 
 response primary_namespace::increment(
-    naming::gid_type const& gid
-  , count_type credits
+    request const& req
   , error_code& ec
     )
 { // {{{ increment implementation
-    // TODO: Implement and use a non-mutating version of
-    // strip_credit_from_gid()
-    naming::gid_type id = gid;
+    // parameters
+    count_type credits = req.get_count(); 
+    naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
     
     database_mutex_type::scoped_lock l(mutex_);
@@ -610,7 +670,7 @@ response primary_namespace::increment(
     LAGAS_(info) << (boost::format(
         "primary_namespace::increment, gid(%1%), credits(%2%), "
         "new_count(%3%)")
-        % gid % credits % (it->second + credits));
+        % id % credits % (it->second + credits));
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -619,14 +679,13 @@ response primary_namespace::increment(
 } // }}}
    
 response primary_namespace::decrement(
-    naming::gid_type const& gid
-  , count_type credits
+    request const& req
   , error_code& ec
     )
 { // {{{ decrement implementation
-    // TODO: Implement and use a non-mutating version of
-    // strip_credit_from_gid()
-    naming::gid_type id = gid;
+    // parameters
+    count_type credits = req.get_count(); 
+    naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
 
     if (HPX_UNLIKELY(credits > HPX_INITIAL_GLOBALCREDIT))
@@ -673,15 +732,15 @@ response primary_namespace::decrement(
                     LAGAS_(info) << (boost::format(
                         "primary_namespace::decrement, gid(%1%), "
                         "credits(%2%), new_total(0), type(%3%)")
-                        % gid % credits % git->second.type);
+                        % id % credits % git->second.type);
 
                     if (&ec != &throws)
                         ec = make_success_code();
 
                     // TODO: Check that git->second.type isn't invalid?
                     return response(primary_ns_decrement
-                                       , cnt
-                                       , git->second.type);
+                                  , cnt
+                                  , git->second.type);
                 }
 
                 // Check if we can safely decrement the iterator.
@@ -700,7 +759,7 @@ response primary_namespace::decrement(
                             LAGAS_(info) << (boost::format(
                                 "primary_namespace::decrement, gid(%1%), "
                                 "credits(%2%), new_total(0), type(%3%)")
-                                % gid % credits % git->second.type);
+                                % id % credits % git->second.type);
 
                             if (&ec != &throws)
                                 ec = make_success_code();
@@ -708,8 +767,8 @@ response primary_namespace::decrement(
                             // TODO: Check that git->second.type isn't
                             // invalid?
                             return response(primary_ns_decrement
-                                               , cnt
-                                               , git->second.type);
+                                          , cnt
+                                          , git->second.type);
                         }
                     } 
                 }
@@ -730,15 +789,15 @@ response primary_namespace::decrement(
                         LAGAS_(info) << (boost::format(
                             "primary_namespace::decrement, gid(%1%), "
                             "credits(%2%), new_total(0), type(%3%)")
-                            % gid % credits % git->second.type);
+                            % id % credits % git->second.type);
 
                         if (&ec != &throws)
                             ec = make_success_code();
 
                         // TODO: Check that git->second.type isn't invalid?
                         return response(primary_ns_decrement
-                                           , cnt
-                                           , git->second.type);
+                                      , cnt
+                                      , git->second.type);
                     }
                 } 
             }
@@ -757,14 +816,14 @@ response primary_namespace::decrement(
             LAGAS_(info) << (boost::format(
                 "primary_namespace::decrement, gid(%1%), credits(%2%), "
                 "new_total(%3%)")
-                % gid % credits % cnt);
+                % id % credits % cnt);
 
             if (&ec != &throws)
                 ec = make_success_code();
 
             return response(primary_ns_decrement
-                               , cnt
-                               , components::component_invalid);
+                          , cnt
+                          , components::component_invalid);
         }
     }
     
@@ -784,15 +843,15 @@ response primary_namespace::decrement(
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::decrement, gid(%1%), credits(%2%), "
                     "new_total(0), type(%3%)")
-                    % gid % credits % git->second.type);
+                    % id % credits % git->second.type);
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
                 // TODO: Check that git->second.type isn't invalid?
                 return response(primary_ns_decrement
-                                   , 0
-                                   , git->second.type);
+                              , 0
+                              , git->second.type);
             }
 
             // Check if we can safely decrement the iterator.
@@ -811,15 +870,15 @@ response primary_namespace::decrement(
                         LAGAS_(info) << (boost::format(
                             "primary_namespace::decrement, gid(%1%), "
                             "credits(%2%), new_total(0), type(%3%)")
-                            % gid % credits % git->second.type);
+                            % id % credits % git->second.type);
 
                         if (&ec != &throws)
                             ec = make_success_code();
 
                         // TODO: Check that git->second.type isn't invalid?
                         return response(primary_ns_decrement
-                                           , 0
-                                           , git->second.type);
+                                      , 0
+                                      , git->second.type);
                     }
                 } 
             }
@@ -840,15 +899,15 @@ response primary_namespace::decrement(
                     LAGAS_(info) << (boost::format(
                         "primary_namespace::decrement, gid(%1%), "
                         "credits(%2%), new_total(0), type(%3%)")
-                        % gid % credits % git->second.type);
+                        % id % credits % git->second.type);
 
                     if (&ec != &throws)
                         ec = make_success_code();
 
                     // TODO: Check that git->second.type isn't invalid?
                     return response(primary_ns_decrement
-                                       , 0
-                                       , git->second.type);
+                                  , 0
+                                  , git->second.type);
                 }
             } 
         }
@@ -892,19 +951,20 @@ response primary_namespace::decrement(
         LAGAS_(info) << (boost::format(
             "primary_namespace::decrement, gid(%1%), credits(%2%), "
             "new_total(%3%)")
-            % gid % credits % cnt);
+            % id % credits % cnt);
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return response(primary_ns_decrement
-                           , cnt
-                           , components::component_invalid);
+                      , cnt
+                      , components::component_invalid);
     }
 } // }}}
 
 response primary_namespace::localities(
-    error_code& ec
+    request const& req
+  , error_code& ec
     )
 { // {{{ localities implementation
     using boost::fusion::at_c;
