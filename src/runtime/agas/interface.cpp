@@ -68,28 +68,28 @@ bool unregister_name(
 }
 
 bool query_name(
-    std::string const& ns_name
+    std::string const& name
   , naming::id_type& gid
   , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(ns_name, gid.get_gid(), ec) && ec)
+    if (agas_.queryid(name, gid.get_gid(), ec) && ec)
         return true;
 
     return false;
 }
 
 bool query_name(
-    std::string const& ns_name
+    std::string const& name
   , naming::gid_type& gid
   , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(ns_name, gid, ec) && ec)
+    if (agas_.queryid(name, gid, ec) && ec)
         return true;
 
     return false;

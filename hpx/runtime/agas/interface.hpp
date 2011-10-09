@@ -38,13 +38,13 @@ HPX_EXPORT bool unregister_name(
     );
 
 HPX_EXPORT bool query_name(
-    std::string const& ns_name
+    std::string const& name
   , naming::id_type& gid
   , error_code& ec = throws
     );
 
 HPX_EXPORT bool query_name(
-    std::string const& ns_name
+    std::string const& name
   , naming::gid_type& gid
   , error_code& ec = throws
     );
