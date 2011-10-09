@@ -26,9 +26,16 @@ namespace hpx { namespace components
           : gid_(naming::invalid_id)
         {}
 
-        client_base(naming::id_type gid)
+        client_base(naming::id_type const& gid)
           : gid_(gid)
         {}
+
+        client_base& operator=(naming::id_type const& gid)
+        {
+            if (gid_ != gid)
+                gid_ = gid;
+            return this;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as 
