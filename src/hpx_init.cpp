@@ -415,9 +415,12 @@ namespace hpx
                      "configuration")
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
-                    ("debug-log", value<std::string>()->implicit_value("cout"),
+                    ("debug-hpx-log", value<std::string>()->implicit_value("cout"),
                      "enable all messages on the HPX log channel and send all "
                      "HPX logs to the target destination")
+                    ("debug-agas-log", value<std::string>()->implicit_value("cout"),
+                     "enable all messages on the AGAS log channel and send all "
+                     "AGAS logs to the target destination")
                     // enable debug output from command line handling
                     ("debug-clp", "debug command line processing")
                     ("exit", "exit after configuring the runtime")
@@ -981,15 +984,23 @@ namespace hpx
                     "can be specified only for the node running the AGAS server.");
             }
 
-            if (vm.count("debug-log")) {
+            if (vm.count("debug-hpx-log")) {
                 ini_config += "hpx.logging.console.destination=" + 
-                    vm["debug-log"].as<std::string>();
+                    vm["debug-hpx-log"].as<std::string>();
                 ini_config += "hpx.logging.destination=" + 
-                    vm["debug-log"].as<std::string>();
+                    vm["debug-hpx-log"].as<std::string>();
                 ini_config += "hpx.logging.console.level=5";
                 ini_config += "hpx.logging.level=5";
             }
 
+            if (vm.count("debug-agas-log")) {
+                ini_config += "hpx.logging.console.agas.destination=" + 
+                    vm["debug-agas-log"].as<std::string>();
+                ini_config += "hpx.logging.agas.destination=" + 
+                    vm["debug-agas-log"].as<std::string>();
+                ini_config += "hpx.logging.console.agas.level=5";
+                ini_config += "hpx.logging.agas.level=5";
+            }
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;
             for (int i = 0; i < argc; ++i)
