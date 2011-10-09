@@ -361,6 +361,7 @@ namespace hpx { namespace naming
         // custom deleter for id_type_impl above
         void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
         void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
+        void HPX_EXPORT gid_transmission_deleter (id_type_impl* p);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -369,8 +370,11 @@ namespace hpx { namespace naming
     {
         enum management_type
         {
-            unmanaged = 0,
-            managed = 1
+            unknown_deleter = -1,
+            unmanaged = 0,          // unmanaged GID
+            managed = 1,            // managed GID
+            transmission = 2        // special deleter for temporaries created
+                                    // inside the parcelhandler
         };
 
         typedef void (*deleter_type)(detail::id_type_impl*);
@@ -378,8 +382,17 @@ namespace hpx { namespace naming
     private:
         static deleter_type get_deleter(management_type t)
         {
-            return (t == managed) ? &detail::gid_managed_deleter : 
-                &detail::gid_unmanaged_deleter;
+            switch (t)
+            {
+                case unmanaged:
+                    return &detail::gid_unmanaged_deleter;
+                case managed:
+                    return &detail::gid_managed_deleter;
+                case transmission:
+                    return &detail::gid_transmission_deleter;
+                default:
+                    return 0;
+            };
         }
 
     public:
@@ -392,14 +405,16 @@ namespace hpx { namespace naming
         explicit id_type(gid_type const& gid, management_type t/* = unmanaged*/) 
           : gid_(new detail::id_type_impl(gid), get_deleter(t))
         {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
+            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
+                         t == transmission);
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id
                        , management_type t/* = unmanaged*/) 
           : gid_(new detail::id_type_impl(msb_id, lsb_id), get_deleter(t))
         {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
+            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
+                         t == transmission);
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, 
@@ -408,11 +423,14 @@ namespace hpx { namespace naming
           : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a), 
                          get_deleter(t))
         {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
+            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
+                         t == transmission);
         }
 
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
+
+        management_type get_management_type() const;
 
         id_type& operator++()       // pre-increment
         {
@@ -505,7 +523,7 @@ namespace hpx { namespace naming
         id_type split_credits(int fraction = 2) const
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
-            return id_type(split_credits_for_gid(*gid_, fraction), unmanaged);
+            return id_type(split_credits_for_gid(*gid_, fraction), transmission);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -584,6 +602,9 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////
     id_type const invalid_id = id_type();
+        
+    ///////////////////////////////////////////////////////////////////////
+    HPX_EXPORT char const* get_management_type_name(id_type::management_type m);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -596,3 +617,4 @@ BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif 
+

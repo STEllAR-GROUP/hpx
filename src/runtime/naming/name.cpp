@@ -92,6 +92,11 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
+        void gid_transmission_deleter (id_type_impl* p)
+        {
+            delete p;   // delete local gid representation only
+        }
+
         bool id_type_impl::is_local_cached() 
         {
             applier::applier& appl = applier::get_applier();
@@ -157,17 +162,24 @@ namespace hpx { namespace naming
         }
     }   // detail
 
-    static id_type::management_type get_management_type(
-        boost::shared_ptr<detail::id_type_impl> const& p)
+    id_type::management_type id_type::get_management_type() const
     {
-        BOOST_ASSERT(p);
+        if (!gid_)
+            return unknown_deleter;
 
-        id_type::deleter_type* d = boost::get_deleter<id_type::deleter_type>(p);
-        BOOST_ASSERT(d);
+        deleter_type* d = boost::get_deleter<deleter_type>(gid_);
+
+        if (!d)
+            return unknown_deleter;
 
         if (*d == &detail::gid_managed_deleter)
-            return id_type::managed;
-        return id_type::unmanaged;
+            return managed;
+        else if (*d == &detail::gid_unmanaged_deleter)
+            return unmanaged;
+        else if (*d == &detail::gid_transmission_deleter)
+            return transmission;
+        else
+            return unknown_deleter;
     }
 
     template <class Archive>
@@ -176,7 +188,7 @@ namespace hpx { namespace naming
         bool isvalid = gid_ ? true : false;
         ar << isvalid;
         if (isvalid) {
-            management_type m = get_management_type(gid_);
+            management_type m = get_management_type();
             gid_type const& g = *gid_;
             ar << m; 
             ar << g;
@@ -198,6 +210,16 @@ namespace hpx { namespace naming
             management_type m;
             gid_type g;
             ar >> m;
+
+            if (unknown_deleter == m)
+            {
+                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
+                    "trying to load id_type with unknown deleter");
+            }
+
+            if (transmission == m)
+                m = managed;
+
             ar >> g;
             gid_.reset(new detail::id_type_impl(g), get_deleter(m));
         }
@@ -218,6 +240,22 @@ namespace hpx { namespace naming
     template HPX_EXPORT void 
     id_type::load(boost::archive::binary_iarchive&, const unsigned int version);
 #endif
+    
+    ///////////////////////////////////////////////////////////////////////////
+    char const* const management_type_names[] = 
+    {
+        "unknown_deleter",    // -1
+        "unmanaged",          // 0
+        "managed",            // 1
+        "transmission",       // 2
+    };
+
+    char const* get_management_type_name(id_type::management_type m)
+    {
+        if (m < id_type::unknown_deleter || m > id_type::transmission)
+            return "invalid";
+        return management_type_names[m + 1];
+    }
 
 }}
 
