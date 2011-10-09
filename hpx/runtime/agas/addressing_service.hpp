@@ -897,6 +897,16 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool unregisterid(
         std::string const& name
       , error_code& ec = throws
+        )
+    {
+        naming::gid_type gid;
+        return unregisterid(name, gid, ec);
+    }
+
+    bool unregisterid(
+        std::string const& name
+      , naming::gid_type& id
+      , error_code& ec = throws
         );
 
     /// \brief Query for the global address associated with a given global name.

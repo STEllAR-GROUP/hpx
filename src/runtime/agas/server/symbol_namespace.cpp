@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
@@ -112,7 +113,28 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(symbol_ns_resolve, it->second);
+    naming::gid_type gid;
+
+    // Is this entry reference counted?
+    if (naming::get_credit_from_gid(it->second) != 0)
+    {
+        gid = split_credits_for_gid(it->second);
+
+        // Credit exhaustion - we need to get more.
+        if (0 == naming::get_credit_from_gid(gid)) 
+        {
+            BOOST_ASSERT(1 == naming::get_credit_from_gid(it->second));
+            naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT); 
+
+            naming::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+        }
+    }
+
+    else
+        gid = it->second;
+
+    return response(symbol_ns_resolve, gid);
 } // }}}  
 
 response symbol_namespace::unbind(
@@ -134,8 +156,10 @@ response symbol_namespace::unbind(
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(symbol_ns_unbind, no_success);
+        return response(symbol_ns_unbind, naming::invalid_gid, no_success);
     }
+
+    const naming::gid_type gid = it->second;
 
     gids_.erase(it);
 
@@ -146,7 +170,7 @@ response symbol_namespace::unbind(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(symbol_ns_unbind);
+    return response(symbol_ns_unbind, gid);
 } // }}} 
 
 response symbol_namespace::iterate(

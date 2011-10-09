@@ -372,6 +372,7 @@ struct response
             std::vector<boost::uint32_t> // prefixes
         >
         // 0x7 
+        // symbol_ns_unbind
         // symbol_ns_resolve
       , boost::fusion::vector1<
             naming::gid_type // gid
@@ -381,7 +382,6 @@ struct response
         // primary_ns_bind_gid
         // component_ns_unbind
         // symbol_ns_bind
-        // symbol_ns_unbind
         // symbol_ns_iterate
       , boost::fusion::vector0<
         >

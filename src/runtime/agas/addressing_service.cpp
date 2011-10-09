@@ -975,6 +975,7 @@ bool addressing_service::registerid(
 
 bool addressing_service::unregisterid(
     std::string const& name
+  , naming::gid_type& id
   , error_code& ec
     )
 { // {{{
@@ -986,12 +987,19 @@ bool addressing_service::unregisterid(
         else  
             r = hosted->symbol_ns_.unbind(name, ec);
     
-        return !ec && (success == r.get_status());
+        if (!ec && (success == r.get_status()))
+        {
+            id = r.get_gid();
+            return true;
+        }
+
+        return false;
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::unregisterid", 
-                e.what());
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::unregisterid"
+              , e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
