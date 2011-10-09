@@ -80,13 +80,7 @@ namespace hpx { namespace components
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         virtual naming::gid_type create_one (
-            components::constructor_argument const&) 
-        { 
-            HPX_THROW_EXCEPTION(bad_request, 
-                "component_factory_base::create_one", 
-                "create_one is not supported by this factory instance");
-            return naming::invalid_gid; 
-        }
+            components::constructor_argument const&) = 0;
 
         /// \brief Destroy one or more component instances
         ///

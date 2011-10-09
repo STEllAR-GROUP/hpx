@@ -164,6 +164,23 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
 
+        /// \brief Create one new component instance using the given constructor 
+        ///        argument.
+        ///
+        /// \param Arg0  [in] The type specific constructor argument
+        ///
+        /// \return Returns the GID of the first newly created component 
+        ///         instance. If more than one component instance has been 
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        naming::gid_type create_one (components::constructor_argument const&)
+        { 
+            HPX_THROW_EXCEPTION(bad_request, 
+                "derived_component_factory::create_one", 
+                "create_one is not supported by this factory instance");
+            return naming::invalid_gid; 
+        }
+
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to 
