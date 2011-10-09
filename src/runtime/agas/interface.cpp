@@ -75,7 +75,7 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(name, gid.get_gid(), ec) && ec)
+    if (agas_.queryid(ns_name, gid.get_gid(), ec) && ec)
         return true;
 
     return false;
@@ -89,7 +89,7 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(name, gid.get_gid(), ec) && ec)
+    if (agas_.queryid(ns_name, gid, ec) && ec)
         return true;
 
     return false;
