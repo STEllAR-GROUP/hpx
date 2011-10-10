@@ -137,6 +137,7 @@ namespace hpx { namespace performance_counters
             agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
+            id = naming::invalid_id;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -205,6 +206,7 @@ namespace hpx { namespace performance_counters
             agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
+            id = naming::invalid_id;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -269,6 +271,7 @@ namespace hpx { namespace performance_counters
             agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
+            id = naming::invalid_id;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
