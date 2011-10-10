@@ -46,15 +46,16 @@ namespace hpx
 namespace hpx { namespace detail
 {
     // forward declarations only
-    void print_counter(std::string const& name);
+    void console_print(std::string const& name);
     void list_counter(std::string const& name, naming::gid_type const& gid);
     void list_counter_info(std::string const& name, naming::gid_type const& gid);
+    void list_symbolic_name(std::string const& name, naming::gid_type const& gid);
 }}
 
 typedef hpx::actions::plain_action1<
-    std::string const&, hpx::detail::print_counter
-> print_counter_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(print_counter_action, print_counter_action, true);
+    std::string const&, hpx::detail::console_print
+> console_print_action;
+HPX_REGISTER_PLAIN_ACTION_EX2(console_print_action, console_print_action, true);
 
 typedef hpx::actions::plain_action2<
     std::string const&, hpx::naming::gid_type const&, 
@@ -68,10 +69,16 @@ typedef hpx::actions::plain_action2<
 > list_counter_info_action;
 HPX_REGISTER_PLAIN_ACTION_EX2(list_counter_info_action, list_counter_info_action, true);
 
+typedef hpx::actions::plain_action2<
+    std::string const&, hpx::naming::gid_type const&, 
+    hpx::detail::list_symbolic_name
+> list_symbolic_name_action;
+HPX_REGISTER_PLAIN_ACTION_EX2(list_symbolic_name_action, list_symbolic_name_action, true);
+
 namespace hpx { namespace detail
 {
-    // print counter value on the console
-    void print_counter(std::string const& name)
+    // print string on the console
+    void console_print(std::string const& name)
     {
         std::cout << name << std::endl;
     }
@@ -82,7 +89,7 @@ namespace hpx { namespace detail
         if (sizeof(hpx::performance_counters::counter_prefix)-1 <= name.size() && 
             0 == name.find(hpx::performance_counters::counter_prefix))
         {
-            typedef lcos::eager_future<print_counter_action> future_type;
+            typedef lcos::eager_future<console_print_action> future_type;
 
             naming::gid_type console;
             naming::get_agas_client().get_console_prefix(console);
@@ -117,7 +124,7 @@ namespace hpx { namespace detail
                         (info.version_ % 0x10000));
             strm << std::string(78, '-') << '\n';
 
-            typedef lcos::eager_future<print_counter_action> future_type;
+            typedef lcos::eager_future<console_print_action> future_type;
             naming::gid_type console;
             naming::get_agas_client().get_console_prefix(console);
             future_type(console, strm.str()).get();
@@ -132,6 +139,43 @@ namespace hpx { namespace detail
     {
         {
             std::cout << "registered performance counters" << std::endl; 
+            typedef void iter_func(std::string const&, naming::gid_type const&);
+
+            hpx::actions::function<iter_func> cb(new Action);
+            naming::get_agas_client().iterateids(cb);
+        }
+
+        if (0 != f)
+            return f(vm);
+
+        // we assume that we need to exit execution if no hpx_main is given
+        finalize();
+        return 0;
+    }
+
+    void list_symbolic_name(std::string const& name, naming::gid_type const& gid)
+    {
+        util::osstream strm;
+
+        strm << name << ", "
+             << gid << ", "
+             << ( naming::get_credit_from_gid(gid)
+                ? "managed"
+                : "unmanaged");
+
+        typedef lcos::eager_future<console_print_action> future_type;
+
+        naming::gid_type console;
+        naming::get_agas_client().get_console_prefix(console);
+        future_type(console, strm.str()).get();
+    }
+
+    template <typename Action>
+    int list_symbolic_names(boost::program_options::variables_map& vm, 
+        hpx_main_func f, std::string const& text)
+    {
+        {
+            std::cout << text << std::endl; 
             typedef void iter_func(std::string const&, naming::gid_type const&);
 
             hpx::actions::function<iter_func> cb(new Action);
@@ -413,6 +457,14 @@ namespace hpx
                     ("ini,I", value<std::vector<std::string> >()->composing(),
                      "add a configuration definition to the default runtime "
                      "configuration")
+                    ("exit", "exit after configuring the runtime")
+                ;
+                
+                options_description debugging_options(
+                    "HPX debugging options");
+                debugging_options.add_options()
+                    ("list-symbolic-names", "list all registered symbolic names"
+                     "after startup")
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
                     ("debug-hpx-log", value<std::string>()->implicit_value("cout"),
@@ -423,9 +475,8 @@ namespace hpx
                      "AGAS logs to the target destination")
                     // enable debug output from command line handling
                     ("debug-clp", "debug command line processing")
-                    ("exit", "exit after configuring the runtime")
                 ;
-                
+
                 options_description counter_options(
                     "HPX options related to performance counters");
                 counter_options.add_options()
@@ -448,7 +499,8 @@ namespace hpx
                 desc_cmdline
                     .add(app_options).add(cmdline_options)
                     .add(hpx_options).add(counter_options)
-                    .add(config_options).add(hidden_options)
+                    .add(config_options).add(debugging_options)
+                    .add(hidden_options)
                 ;
                 parsed_options opts(parse_command_line(argc, argv, 
                     desc_cmdline, unix_style, option_parser));
@@ -459,7 +511,7 @@ namespace hpx
                 desc_cfgfile
                     .add(app_options).add(hpx_options)
                     .add(counter_options).add(config_options)
-                    .add(hidden_options);
+                    .add(debugging_options).add(hidden_options);
 
                 handle_generic_config_options(argv[0], vm, desc_cfgfile);
                 handle_config_options(vm, desc_cfgfile);
@@ -474,7 +526,7 @@ namespace hpx
                     visible
                         .add(app_options).add(cmdline_options)
                         .add(hpx_options).add(counter_options)
-                        .add(config_options)
+                        .add(debugging_options).add(config_options)
                     ;
                     std::cout << visible;
                     return help;
@@ -591,23 +643,40 @@ namespace hpx
 
             // Dump the configuration after all components have been loaded.
             if (vm.count("dump-config")) 
+            {
+                if (vm.count("exit"))
+                    throw std::logic_error("--exit cannot be used in conjunction "
+                        "with --dump-config, try --dump-config-init --exit instead");
+
                 rt.add_startup_function(dump_config<Runtime>(rt));
+            }
 
             if (vm.count("exit")) { 
                 if (vm.count("list-counters")) {
                     // Print all available performance counter names and then 
                     // call hpx::finalize() and return 0.
                     return rt.run(
-                        boost::bind(&list_counters<list_counter_action>, 
-                            vm, hpx::hpx_main_func(0)),
+                        boost::bind(&list_symbolic_names<list_counter_action>, 
+                            vm, hpx::hpx_main_func(0),
+                            "registered performance counters"),
                         num_threads, num_localities);
                 }
                 else if (vm.count("list-counter-infos")) {
                     // Print all available performance counter infos and then 
                     // call hpx::finalize() and return 0.
                     return rt.run(
-                        boost::bind(&list_counters<list_counter_info_action>, 
-                            vm, hpx::hpx_main_func(0)),
+                        boost::bind(&list_symbolic_names<list_counter_info_action>, 
+                            vm, hpx::hpx_main_func(0),
+                            "registered performance counters"),
+                        num_threads, num_localities);
+                }
+                else if (vm.count("list-symbolic-names")) {
+                    // Print all registered symbolic names and then call
+                    // hpx::finalize() and return 0.
+                    return rt.run(
+                        boost::bind(&list_symbolic_names<list_symbolic_name_action>, 
+                            vm, hpx::hpx_main_func(0),
+                            "registered symbolic names"),
                         num_threads, num_localities);
                 }
                 return 0;
@@ -617,14 +686,23 @@ namespace hpx
                 // Print out all available performance counter names and then 
                 // call f.
                 return rt.run(
-                    boost::bind(&list_counters<list_counter_action>, vm, f),
+                    boost::bind(&list_symbolic_names<list_counter_action>, vm, f,
+                        "registered performance counters"),
                     num_threads, num_localities);
             }
             else if (vm.count("list-counter-infos")) {
                 // Print out all available performance counter infos and then 
                 // call f.
                 return rt.run(
-                    boost::bind(&list_counters<list_counter_info_action>, vm, f),
+                    boost::bind(&list_symbolic_names<list_counter_info_action>,
+                        vm, f, "registered performance counters"),
+                    num_threads, num_localities);
+            }
+            else if (vm.count("list-symbolic-names")) {
+                // Print out all available symbolic names and then call f.
+                return rt.run(
+                    boost::bind(&list_symbolic_names<list_symbolic_name_action>,
+                        vm, f, "registered symbolic names"),
                     num_threads, num_localities);
             }
 
