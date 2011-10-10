@@ -163,7 +163,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << " TEST A " << std::endl;
         const double dt = 0.025; // guess for start dt
         const double stop_time = 0.035;
-        const double time = 0.0;
+        double time = 0.0;
 
         while (time < stop_time) {
             //{
