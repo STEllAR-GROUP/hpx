@@ -28,6 +28,7 @@ namespace hpx { namespace util
     private:
         std::ostream& out_;
         std::vector<std::string> names_;
+        std::vector<naming::id_type> ids_;
         interval_timer timer_;
     };
 }}

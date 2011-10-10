@@ -10,6 +10,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 namespace hpx
 {
@@ -23,22 +24,19 @@ create_barrier(naming::resolver_client& agas_client,
     lcos::barrier barrier;
     barrier.create_one(agas_client.local_prefix(), num_localities);
 
-    naming::gid_type gid = barrier.get_gid().get_gid();
-    naming::strip_credit_from_gid(gid);
-
-    agas_client.registerid(symname, gid); 
+    agas::register_name(symname, barrier.get_gid()); 
     return barrier;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Find a registered barrier object from its symbolic name.
 inline lcos::barrier 
-find_barrier(naming::resolver_client& agas_client, char const* symname)
+find_barrier(char const* symname)
 {
-    naming::gid_type barrier_id;
+    naming::id_type barrier_id;
     for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
-        if (agas_client.queryid(symname, barrier_id))
+        if (agas::query_name(symname, barrier_id))
             break; 
 
         boost::this_thread::sleep(boost::get_system_time() + 
@@ -49,7 +47,7 @@ find_barrier(naming::resolver_client& agas_client, char const* symname)
         HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier", 
             std::string("couldn't find stage boot barrier ") + symname);
     }
-    return lcos::barrier(naming::id_type(barrier_id, naming::id_type::unmanaged));
+    return lcos::barrier(barrier_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,8 +126,8 @@ void pre_main(runtime_mode mode)
         else // Hosted. 
         {
             // Initialize the barrier clients (find them in AGAS)
-            second_stage = find_barrier(agas_client, second_barrier);
-            third_stage = find_barrier(agas_client, third_barrier);
+            second_stage = find_barrier(second_barrier);
+            third_stage = find_barrier(third_barrier);
         }
         // }}}
 
@@ -154,6 +152,13 @@ void pre_main(runtime_mode mode)
 
     // Enable logging.
     components::activate_logging();
+
+    // Teardown the second and third stage barriers.
+    if (agas_client.is_bootstrap())
+    {
+        agas::unregister_name(second_barrier);
+        agas::unregister_name(third_barrier);
+    }
 }
 
 }

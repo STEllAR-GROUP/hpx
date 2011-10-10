@@ -5,9 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/server/base_performance_counter.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -370,6 +371,85 @@ namespace hpx { namespace performance_counters
         if (type < counter_text || type > counter_elapsed_time)
             return "unknown";
         return strings::counter_type_names[type];
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    counter_status add_counter_type(
+        counter_info const& info, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().add_counter_type(info, ec);
+    }
+
+    counter_status remove_counter_type(
+        counter_info const& info, error_code& ec)
+    {
+        // the runtime might not be available any more
+        runtime* rt = get_runtime_ptr();
+        return rt ? rt->get_counter_registry().remove_counter_type(info, ec) : 
+            status_generic_error;
+    }
+
+    counter_status create_raw_counter(
+        counter_info const& info, boost::int64_t* countervalue,
+        naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().create_raw_counter(
+            info, countervalue, id, ec);
+    }
+
+    counter_status create_raw_counter(
+        counter_info const& info, boost::function<boost::int64_t()> f,
+        naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().create_raw_counter(
+            info, f, id, ec);
+    }
+
+    counter_status create_counter(
+        counter_info const& info, naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().create_counter(info, id, ec);
+    }
+
+    counter_status create_average_count_counter(
+        counter_info const& info, std::string const& base_counter_name,
+        std::size_t base_time_interval, naming::id_type& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().
+            create_average_count_counter(info, base_counter_name, 
+                base_time_interval, id, ec);
+    }
+
+    counter_status add_counter(
+        naming::id_type const& id, counter_info const& info, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().add_counter(id, info, ec);
+    }
+
+    counter_status remove_counter(
+        counter_info const& info, naming::id_type const& id, error_code& ec)
+    {
+        return get_runtime().get_counter_registry().remove_counter(
+            info, id, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::id_type get_counter(std::string name, error_code& ec)
+    {
+        ensure_counter_prefix(name);      // prepend prefix, if necessary
+
+        // ask AGAS for the id of the given counter
+        naming::id_type gid;
+        bool result = agas::query_name(name, gid, ec);
+        if (!result) {
+            HPX_THROWS_IF(ec, bad_parameter, "get_counter",
+                "performance counter not registered: " + name);
+            return naming::invalid_id;
+        }
+        if (ec) 
+            return naming::invalid_id;
+
+        return gid;
     }
 }}
 

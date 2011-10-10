@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/query_counters.hpp>
 
 namespace hpx { namespace util
@@ -18,32 +19,42 @@ namespace hpx { namespace util
     void query_counters::start() 
     {
         timer_.start();
-    }
 
-    void query_counters::evaluate()
-    {
+        ids_.reserve(names_.size());
+
         BOOST_FOREACH(std::string const& name, names_)
         {
             error_code ec;
-            naming::gid_type gid;
-            naming::get_agas_client().queryid(name, gid, ec);
+            ids_.push_back(naming::id_type());
+            agas::query_name(name, ids_.back(), ec);
 
-            if (HPX_UNLIKELY(ec || !gid))
+            if (HPX_UNLIKELY(ec || !ids_.back()))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "query_counters",
                     boost::str(boost::format(
                         "unknown performance counter: '%s'") % name))
             }
+        }
+    }
+
+    void query_counters::evaluate()
+    {
+        BOOST_ASSERT(ids_.size() == names_.size());
+
+        for (std::size_t i = 0; i < names_.size(); ++i) 
+        {
+            error_code ec;
 
             // Query the performance counter.
             using performance_counters::stubs::performance_counter;
             performance_counters::counter_value value = 
-                performance_counter::get_value(gid);
+                performance_counter::get_value(ids_[i]);
             double val = value.get_value<double>(ec);
+
             if (!ec)
-                out_ << name << "," << value.time_ << "," << val << "\n"; 
+                out_ << names_[i] << "," << value.time_ << "," << val << "\n"; 
             else
-                out_ << name << ",invalid\n"; 
+                out_ << names_[i] << ",invalid\n"; 
         }
     }
 }}

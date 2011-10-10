@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
@@ -123,15 +124,17 @@ namespace hpx { namespace performance_counters
         if (ec) return status_invalid_data;
 
         // create the counter as requested
-        naming::gid_type newid = naming::invalid_gid;
         try {
             typedef components::managed_component<server::raw_counter> counter_type;
-            newid = components::server::create_one<counter_type>(complemented_info, f);
+            naming::gid_type const newid =
+                components::server::create_one<counter_type>(complemented_info, f);
 
-            // register the canonical name with AGAS
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // prepend prefix, if necessary
-            agas_client_.registerid(name, newid);
+
+            // register the canonical name with AGAS
+            id = naming::id_type(newid, naming::id_type::managed);
+            agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -143,9 +146,7 @@ namespace hpx { namespace performance_counters
         }
 
         LPCS_(info) << (boost::format("counter %s created at %s") 
-            % complemented_info.fullname_ % newid);
-
-        id = naming::id_type(newid, naming::id_type::managed);
+            % complemented_info.fullname_ % id);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -174,8 +175,9 @@ namespace hpx { namespace performance_counters
         if (ec) return status_invalid_data;
         
         // create the counter as requested
-        naming::gid_type newid = naming::invalid_gid;
         try {
+            naming::gid_type newid = naming::invalid_gid;
+
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
@@ -195,10 +197,12 @@ namespace hpx { namespace performance_counters
                 return status_counter_type_unknown;
             }
 
-            // register the canonical name with AGAS
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // prepend prefix, if necessary
-            agas_client_.registerid(name, newid);
+
+            // register the canonical name with AGAS
+            id = naming::id_type(newid, naming::id_type::managed);
+            agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -210,9 +214,7 @@ namespace hpx { namespace performance_counters
         }
 
         LPCS_(info) << (boost::format("counter %s created at %s") 
-            % complemented_info.fullname_ % newid);
-
-        id = naming::id_type(newid, naming::id_type::managed);
+            % complemented_info.fullname_ % id);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -253,17 +255,18 @@ namespace hpx { namespace performance_counters
         if (ec) return status_invalid_data;
 
         // create the counter as requested
-        naming::gid_type newid = naming::invalid_gid;
         try {
             typedef components::managed_component<server::average_count_counter> 
                 counter_type;
-            newid = components::server::create_one<counter_type>(
+            naming::gid_type const newid = components::server::create_one<counter_type>(
                 complemented_info, base_counter_name, base_time_interval);
 
-            // register the canonical name with AGAS
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // prepend prefix, if necessary
-            agas_client_.registerid(name, newid);
+
+            // register the canonical name with AGAS
+            id = naming::id_type(newid, naming::id_type::managed);
+            agas::register_name(name, id);
         }
         catch (hpx::exception const& e) {
             if (&ec == &throws)
@@ -275,9 +278,7 @@ namespace hpx { namespace performance_counters
         }
 
         LPCS_(info) << (boost::format("counter %s created at %s") 
-            % complemented_info.fullname_ % newid);
-
-        id = naming::id_type(newid, naming::id_type::managed);
+            % complemented_info.fullname_ % id);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -311,7 +312,7 @@ namespace hpx { namespace performance_counters
         // register the canonical name with AGAS
         std::string name(complemented_info.fullname_);
         ensure_counter_prefix(name);      // prepend prefix, if necessary
-        agas_client_.registerid(name, id.get_gid(), ec);
+        agas::register_name(name, id, ec);
         if (ec) return status_invalid_data;
 
         if (&ec != &throws)
@@ -336,7 +337,7 @@ namespace hpx { namespace performance_counters
 
         // unregister this counter from AGAS
         ensure_counter_prefix(name);      // prepend prefix, if necessary
-        agas_client_.unregisterid(name, ec);
+        agas::unregister_name(name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to destroy counter %s")
                 % complemented_info.fullname_);
