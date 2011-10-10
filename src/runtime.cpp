@@ -14,6 +14,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
+#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/logging.hpp>
@@ -366,6 +367,18 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
+        // Early and late exceptions
+        if (!threads::threadmanager_is(running))
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (boost::exception const& be) {
+                std::cerr << hpx::diagnostic_information(be) << std::endl;
+                std::abort();
+            }
+        }
+
         // The console error sink is only applied at the console, so default
         // error sink never gets called on the locality, meaning that the user
         // never sees errors that kill the system before the error parcel gets
@@ -551,11 +564,35 @@ namespace hpx
 
     void report_error(std::size_t num_thread, boost::exception_ptr const& e) 
     {
+        // Early and late exceptions
+        if (!threads::threadmanager_is(running))
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (boost::exception const& be) {
+                std::cerr << hpx::diagnostic_information(be) << std::endl;
+                std::abort();
+            }
+        }
+
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
     void report_error(boost::exception_ptr const& e) 
     {
+        // Early and late exceptions
+        if (!threads::threadmanager_is(running))
+        {
+            try {
+                boost::rethrow_exception(e);
+            }
+            catch (boost::exception const& be) {
+                std::cerr << hpx::diagnostic_information(be) << std::endl;
+                std::abort();
+            }
+        }
+
         std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
