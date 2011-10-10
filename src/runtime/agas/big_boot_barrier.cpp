@@ -22,6 +22,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
 #include <boost/thread.hpp>
@@ -306,7 +307,7 @@ void register_console(registration_header const& header)
                          , header.response_heap_address
                          , header.response_heap_offset); 
 
-    agas_client.registerid("/locality(console)", prefix);
+    agas::register_name("/locality(console)", prefix);
 
     naming::address primary_addr(get_runtime().here(),
         server::primary_namespace::get_component_type(),
