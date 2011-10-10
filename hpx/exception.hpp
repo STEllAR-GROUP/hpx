@@ -60,7 +60,7 @@ namespace hpx
         null_thread_id = 26,
         invalid_data = 27,
         yield_aborted = 28,
-        invalid_page_fault = 29,
+        invalid_gid = 29,
         last_error
     };
 
@@ -95,7 +95,7 @@ namespace hpx
         "null_thread_id",
         "invalid_data",
         "yield_aborted",
-        "invalid_page_fault",
+        "invalid_gid",
         ""
     };
 
