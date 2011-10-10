@@ -13,7 +13,6 @@ if(NOT MSVC)
       dataflow
       heartbeat 
       hplpx
-      neutron_star
       nqueen
       object_semaphore
       performance_counters
