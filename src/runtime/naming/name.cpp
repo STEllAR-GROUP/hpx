@@ -178,8 +178,7 @@ namespace hpx { namespace naming
             return unmanaged;
         else if (*d == &detail::gid_transmission_deleter)
             return transmission;
-        else
-            return unknown_deleter;
+        return unknown_deleter;
     }
 
     template <class Archive>
@@ -247,7 +246,7 @@ namespace hpx { namespace naming
         "unknown_deleter",    // -1
         "unmanaged",          // 0
         "managed",            // 1
-        "transmission",       // 2
+        "transmission"        // 2
     };
 
     char const* get_management_type_name(id_type::management_type m)
