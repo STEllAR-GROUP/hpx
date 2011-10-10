@@ -280,7 +280,7 @@ namespace hpx { namespace detail
         strm << "[version]: " << build_string() << "\n"; 
         strm << "[boost]: " << boost_version() << "\n";
         strm << "[build-type]: " << HPX_BUILD_TYPE << "\n"; 
-        strm << "[date]: " << __DATE__ << "\n"; 
+        strm << "[date]: " << __DATE__ << " " << __TIME__ << "\n"; 
         strm << "[platform]: " << BOOST_PLATFORM << "\n"; 
         strm << "[compiler]: " << BOOST_COMPILER << "\n"; 
         strm << "[stdlib]: " << BOOST_STDLIB << "\n"; 

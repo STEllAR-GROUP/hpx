@@ -82,7 +82,7 @@ std::string complete_version()
         "\n"
         "Build:\n"
         "  Type: %s\n"
-        "  Date: %s\n" 
+        "  Date: %s %s\n" 
         "  Platform: %s\n"
         "  Compiler: %s\n"
         "  Standard Library: %s\n");
@@ -91,7 +91,7 @@ std::string complete_version()
         build_string() %
         boost_version() %
         HPX_BUILD_TYPE %
-        __DATE__ %
+        __DATE__ % __TIME__ %
         BOOST_PLATFORM %
         BOOST_COMPILER %
         BOOST_STDLIB);
