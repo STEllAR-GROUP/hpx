@@ -238,7 +238,7 @@ response symbol_namespace::iterate(
   , error_code& ec
     )
 { // {{{ iterate implementation
-    iterate_symbols_function_type f = req.get_iterate_symbols_function();
+    iterate_names_function_type f = req.get_iterate_names_function();
 
     mutex_type::scoped_lock l(mutex_);
     

@@ -42,7 +42,7 @@ bool register_name(
     else
         new_gid = mutable_gid;
 
-    if (agas_.registerid(name, new_gid, ec) && !ec)
+    if (agas_.register_name(name, new_gid, ec) && !ec)
         return true;
 
     return false;
@@ -57,7 +57,7 @@ bool unregister_name(
 
     naming::gid_type raw_gid;
 
-    if (agas_.unregisterid(name, raw_gid, ec) && !ec)
+    if (agas_.unregister_name(name, raw_gid, ec) && !ec)
     {
         // If the GID has a reference count, return it to AGAS.
         if (naming::get_credit_from_gid(raw_gid) != 0)
@@ -81,7 +81,7 @@ bool unregister_name(
 
     naming::gid_type raw_gid;
 
-    if (agas_.unregisterid(name, raw_gid, ec) && !ec)
+    if (agas_.unregister_name(name, raw_gid, ec) && !ec)
     {
         if (naming::get_credit_from_gid(raw_gid) != 0)
             gid = naming::id_type(raw_gid, naming::id_type::managed);
@@ -104,7 +104,7 @@ bool query_name(
 
     naming::gid_type raw_gid;
 
-    if (agas_.queryid(name, raw_gid, ec) && !ec)
+    if (agas_.query_name(name, raw_gid, ec) && !ec)
     {
         if (naming::get_credit_from_gid(raw_gid) != 0)
             gid = naming::id_type(raw_gid, naming::id_type::managed);
@@ -125,7 +125,7 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(name, gid, ec) && !ec)
+    if (agas_.query_name(name, gid, ec) && !ec)
         return true;
 
     return false;

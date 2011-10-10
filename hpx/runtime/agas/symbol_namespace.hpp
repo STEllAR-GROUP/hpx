@@ -24,8 +24,8 @@ struct symbol_namespace :
 
     typedef server::symbol_namespace server_type;
 
-    typedef server_type::iterate_symbols_function_type
-        iterate_symbols_function_type;
+    typedef server_type::iterate_names_function_type
+        iterate_names_function_type;
     // }}}
 
     symbol_namespace()

@@ -39,7 +39,7 @@ struct request
   public:
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
-    > iterate_symbols_function_type;
+    > iterate_names_function_type;
 
     request()
         : mc(invalid_request) 
@@ -154,7 +154,7 @@ struct request
 
     request(
         namespace_action_code type_
-      , iterate_symbols_function_type const& f_ 
+      , iterate_names_function_type const& f_ 
         )
       : mc(type_)
       , data(boost::fusion::make_vector(f_))
@@ -229,11 +229,11 @@ struct request
         return get_data<subtype_name_prefix, 1>(ec); 
     } 
 
-    iterate_symbols_function_type get_iterate_symbols_function(
+    iterate_names_function_type get_iterate_names_function(
         error_code& ec = throws
         ) const
     { 
-        return get_data<subtype_iterate_symbols_function, 0>(ec); 
+        return get_data<subtype_iterate_names_function, 0>(ec); 
     } 
 
     naming::locality get_locality(
@@ -316,17 +316,17 @@ struct request
 
     enum subtype
     {
-        subtype_gid_gva                     = 0x0
-      , subtype_gid_count                   = 0x1
-      , subtype_gid                         = 0x2
-      , subtype_locality_count              = 0x3
-      , subtype_locality                    = 0x4
-      , subtype_ctype                       = 0x5
-      , subtype_name_prefix                 = 0x6
-      , subtype_name_gid                    = 0x7
-      , subtype_name                        = 0x8
-      , subtype_iterate_symbols_function    = 0x9
-      , subtype_void                        = 0xa
+        subtype_gid_gva                 = 0x0
+      , subtype_gid_count               = 0x1
+      , subtype_gid                     = 0x2
+      , subtype_locality_count          = 0x3
+      , subtype_locality                = 0x4
+      , subtype_ctype                   = 0x5
+      , subtype_name_prefix             = 0x6
+      , subtype_name_gid                = 0x7
+      , subtype_name                    = 0x8
+      , subtype_iterate_names_function  = 0x9
+      , subtype_void                    = 0xa
     }; 
 
     // The order of the variant types is significant, and should not be changed
@@ -334,49 +334,49 @@ struct request
         // 0x0
         // primary_ns_bind_gid
         boost::fusion::vector2<
-            naming::gid_type                // gid
-          , gva                             // resolved address
+            naming::gid_type            // gid
+          , gva                         // resolved address
         >
         // 0x1
         // primary_ns_unbind_gid
         // primary_ns_increment
         // primary_ns_decrement
       , boost::fusion::vector2<
-            naming::gid_type                // gid
-          , boost::uint64_t                 // count
+            naming::gid_type            // gid
+          , boost::uint64_t             // count
         >
         // 0x2
         // primary_ns_page_fault
       , boost::fusion::vector1<
-            naming::gid_type                // gid
+            naming::gid_type            // gid
         >
         // 0x3
         // primary_ns_bind_locality
       , boost::fusion::vector2<
-            naming::locality                // locality
-          , boost::uint64_t                 // count
+            naming::locality            // locality
+          , boost::uint64_t             // count
         >
         // 0x4
         // primary_ns_unbind_locality
       , boost::fusion::vector1<
-            naming::locality                // locality
+            naming::locality            // locality
         >
         // 0x5
         // component_ns_resolve_id
       , boost::fusion::vector1<
-            boost::int32_t                  // ctype 
+            boost::int32_t              // ctype 
         >
         // 0x6
         // component_ns_bind_prefix
       , boost::fusion::vector2<
-            std::string                     // name 
-          , boost::uint32_t                 // prefix 
+            std::string                 // name 
+          , boost::uint32_t             // prefix 
         >
         // 0x7
         // symbol_ns_bind
       , boost::fusion::vector2<
-            std::string                     // name 
-          , naming::gid_type                // gid 
+            std::string                 // name 
+          , naming::gid_type            // gid 
         >
         // 0x8
         // component_ns_resolve_name
@@ -385,12 +385,12 @@ struct request
         // symbol_ns_resolve
         // symbol_ns_unbind
       , boost::fusion::vector1<
-            std::string                     // name 
+            std::string                 // name 
         >
         // 0x9
         // symbol_ns_iterate
       , boost::fusion::vector1<
-            iterate_symbols_function_type   // f
+            iterate_names_function_type // f
         >
         // 0xa
         // primary_ns_localities

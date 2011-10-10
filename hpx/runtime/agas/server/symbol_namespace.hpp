@@ -42,7 +42,7 @@ struct symbol_namespace :
 
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
-    > iterate_symbols_function_type;
+    > iterate_names_function_type;
 
     typedef std::map<std::string, naming::gid_type> gid_table_type; 
     // }}} 

@@ -989,7 +989,7 @@ boost::uint64_t addressing_service::decref(
     }
 } // }}}
 
-bool addressing_service::registerid(
+bool addressing_service::register_name(
     std::string const& name
   , naming::gid_type const& id
   , error_code& ec
@@ -1009,8 +1009,9 @@ bool addressing_service::registerid(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::registerid", 
-                e.what());
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::register_name"
+              , e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -1020,7 +1021,7 @@ bool addressing_service::registerid(
     }
 } // }}}
 
-bool addressing_service::unregisterid(
+bool addressing_service::unregister_name(
     std::string const& name
   , naming::gid_type& id
   , error_code& ec
@@ -1046,7 +1047,7 @@ bool addressing_service::unregisterid(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::unregisterid"
+              , "addressing_service::unregister_name"
               , e.what());
         }
         else {
@@ -1057,7 +1058,7 @@ bool addressing_service::unregisterid(
     }
 } // }}}
 
-bool addressing_service::queryid(
+bool addressing_service::query_name(
     std::string const& name
   , naming::gid_type& id
   , error_code& ec
@@ -1083,8 +1084,9 @@ bool addressing_service::queryid(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::queryid", 
-                e.what());
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::query_name"
+              , e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -1096,7 +1098,7 @@ bool addressing_service::queryid(
 
 /// Invoke the supplied hpx::function for every registered global name
 bool addressing_service::iterateids(
-    iterateids_function_type const& f
+    iterate_names_function_type const& f
   , error_code& ec
     ) 
 { // {{{
