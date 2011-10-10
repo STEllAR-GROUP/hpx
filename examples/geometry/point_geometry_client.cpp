@@ -83,7 +83,7 @@ int hpx_main(boost::program_options::variables_map &vm)
        high_resolution_timer t;
 
         // create some boxes to smash together
-        const std::size_t num_bodies = 148;
+        const std::size_t num_bodies = 16;
 
         namespace bg = boost::geometry;
 
@@ -102,7 +102,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // SIMPLE PROBLEM
         // create some boxes to smash together
-        const std::size_t numpoints = 800000;
+        const std::size_t numpoints = 80000;
 
         // NOTE: this puts appx 8k on the stack
         double bbox[num_bodies][4];
@@ -159,23 +159,25 @@ int hpx_main(boost::program_options::variables_map &vm)
         // We have to wait for the futures to finish before exiting.
 
         hpx::lcos::wait(initial_phase);
-#if 0
+
+        std::cout << " TEST A " << std::endl;
         const double dt = 0.025; // guess for start dt
         const double stop_time = 0.035;
         const double time = 0.0;
 
         while (time < stop_time) {
-            {
+            //{
               // Move bodies--------------------------------------------
-              std::vector<hpx::lcos::promise<void> > move_phase;
-              for (i=0;i<num_bodies;i++) {
-                move_phase.push_back(accu[i].move_async(dt,time));
-              }
-              hpx::lcos::wait(move_phase);
-            }
+            //  std::vector<hpx::lcos::promise<void> > move_phase;
+            //  for (i=0;i<num_bodies;i++) {
+            //    move_phase.push_back(accu[i].move_async(dt,time));
+            //  }
+            //  hpx::lcos::wait(move_phase);
+            //}
 
             time += dt;
 
+        std::cout << " TEST B " << std::endl;
             std::vector<int> search_vector;
             { 
               // Search for Contact------------------------------------
@@ -188,7 +190,9 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(search_phase,search_vector);
             }
+        std::cout << " TEST C " << std::endl;
 
+#if 0
             // Contact enforcement ----------------------------------
             BOOST_ASSERT(search_vector.size() == num_bodies);
 
@@ -224,9 +228,10 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               hpx::lcos::wait(recompute_phase);
             }
+#endif
           break;
         } // time loop
-#endif
+//#endif
 
       std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // ensure things are go out of scope 
