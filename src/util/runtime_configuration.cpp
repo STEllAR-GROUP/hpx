@@ -62,6 +62,11 @@ namespace hpx { namespace util
             "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
             "enabled = 1",
 
+            "[hpx.components.average_count_counter]",
+            "name = hpx",
+            "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "enabled = 1",
+
             "[hpx.components.elapsed_time_counter]",
             "name = hpx",
             "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
