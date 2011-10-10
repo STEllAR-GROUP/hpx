@@ -272,6 +272,8 @@
 #  define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
 #  if defined(BOOST_MSVC)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
+#  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
 #  elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__))
 #  endif
