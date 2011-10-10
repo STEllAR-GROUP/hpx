@@ -334,58 +334,57 @@ struct request
         // 0x0
         // primary_ns_bind_gid
         boost::fusion::vector2<
-            naming::gid_type            // gid
-          , gva                         // resolved address
+            naming::gid_type // gid
+          , gva              // resolved address
         >
         // 0x1
         // primary_ns_unbind_gid
         // primary_ns_increment
         // primary_ns_decrement
       , boost::fusion::vector2<
-            naming::gid_type            // gid
-          , boost::uint64_t             // count
+            naming::gid_type // gid
+          , boost::uint64_t  // count
         >
         // 0x2
-        // primary_ns_page_fault
+        // primary_ns_resolve_gid 
       , boost::fusion::vector1<
-            naming::gid_type            // gid
+            naming::gid_type // gid
         >
         // 0x3
-        // primary_ns_bind_locality
+        // primary_ns_allocate
       , boost::fusion::vector2<
-            naming::locality            // locality
-          , boost::uint64_t             // count
+            naming::locality // locality
+          , boost::uint64_t  // count
         >
         // 0x4
-        // primary_ns_unbind_locality
+        // primary_ns_free
       , boost::fusion::vector1<
-            naming::locality            // locality
+            naming::locality // locality
         >
         // 0x5
         // component_ns_resolve_id
       , boost::fusion::vector1<
-            boost::int32_t              // ctype 
+            boost::int32_t // ctype 
         >
         // 0x6
         // component_ns_bind_prefix
       , boost::fusion::vector2<
-            std::string                 // name 
-          , boost::uint32_t             // prefix 
+            std::string     // name 
+          , boost::uint32_t // prefix 
         >
         // 0x7
         // symbol_ns_bind
       , boost::fusion::vector2<
-            std::string                 // name 
-          , naming::gid_type            // gid 
+            std::string      // name 
+          , naming::gid_type // gid 
         >
         // 0x8
-        // component_ns_resolve_name
         // component_ns_bind_name
         // component_ns_unbind
         // symbol_ns_resolve
         // symbol_ns_unbind
       , boost::fusion::vector1<
-            std::string                 // name 
+            std::string // name 
         >
         // 0x9
         // symbol_ns_iterate

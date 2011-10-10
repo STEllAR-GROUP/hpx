@@ -138,7 +138,7 @@ struct primary_namespace :
       , error_code& ec
         );
 
-    response bind_locality(
+    response allocate(
         request const& req
       , error_code& ec = throws
         );
@@ -148,12 +148,12 @@ struct primary_namespace :
       , error_code& ec = throws
         );
 
-    response page_fault(
+    response resolve_gid(
         request const& req
       , error_code& ec = throws
         );
 
-    response unbind_locality(
+    response free(
         request const& req
       , error_code& ec = throws
         );
@@ -184,10 +184,10 @@ struct primary_namespace :
         namespace_service          = BOOST_BINARY_U(1000000)
 
         // Pseudo-actions
-      , namespace_bind_locality    = BOOST_BINARY_U(1000001)
+      , namespace_allocate         = BOOST_BINARY_U(1000001)
       , namespace_bind_gid         = BOOST_BINARY_U(1000010)
-      , namespace_page_fault       = BOOST_BINARY_U(1000011)
-      , namespace_unbind_locality  = BOOST_BINARY_U(1000100)
+      , namespace_resolve_gid      = BOOST_BINARY_U(1000011)
+      , namespace_free             = BOOST_BINARY_U(1000100)
       , namespace_unbind_gid       = BOOST_BINARY_U(1000101)
       , namespace_increment        = BOOST_BINARY_U(1000110)
       , namespace_decrement        = BOOST_BINARY_U(1000111)

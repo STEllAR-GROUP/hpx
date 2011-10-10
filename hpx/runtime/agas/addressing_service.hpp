@@ -959,14 +959,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_DEPRECATED("This function is deprecated; use "
-                   "hpx::agas::query_name instead.") 
+                   "hpx::agas::resolve_name instead.") 
     bool queryid(
         std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
         )
     {
-        return query_name(name, id, ec);
+        return resolve_name(name, id, ec);
     }
 #endif
 
@@ -1089,7 +1089,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   throw but returns the result code using the 
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool query_name(
+    bool resolve_name(
         std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws

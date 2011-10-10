@@ -93,11 +93,6 @@ struct component_namespace :
       , error_code& ec = throws
         );
     
-    response resolve_name(
-        request const& req
-      , error_code& ec = throws
-        );
-    
     response unbind(
         request const& req
       , error_code& ec = throws
@@ -112,8 +107,7 @@ struct component_namespace :
       , namespace_bind_prefix  = BOOST_BINARY_U(0100001)
       , namespace_bind_name    = BOOST_BINARY_U(0100010)
       , namespace_resolve_id   = BOOST_BINARY_U(0100011)
-      , namespace_resolve_name = BOOST_BINARY_U(0100100)
-      , namespace_unbind       = BOOST_BINARY_U(0100101)
+      , namespace_unbind       = BOOST_BINARY_U(0100100)
     }; // }}}
 
     typedef hpx::actions::result_action1<

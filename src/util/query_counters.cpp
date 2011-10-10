@@ -23,7 +23,7 @@ namespace hpx { namespace util
         {
             error_code ec;
             ids_.push_back(naming::invalid_id);
-            agas::query_name(name, ids_.back(), ec);
+            agas::resolve_name(name, ids_.back(), ec);
 
             if (HPX_UNLIKELY(ec || !ids_.back()))
             {

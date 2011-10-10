@@ -40,15 +40,13 @@ response component_namespace::service(
             return bind_name(req, ec);
         case component_ns_resolve_id:
             return resolve_id(req, ec);
-        case component_ns_resolve_name:
-            return resolve_name(req, ec);
         case component_ns_unbind:
             return unbind(req, ec);
 
-        case primary_ns_bind_locality:
+        case primary_ns_allocate:
         case primary_ns_bind_gid:
-        case primary_ns_page_fault:
-        case primary_ns_unbind_locality:
+        case primary_ns_resolve_gid:
+        case primary_ns_free:
         case primary_ns_unbind_gid:
         case primary_ns_increment:
         case primary_ns_decrement:
@@ -221,7 +219,7 @@ response component_namespace::resolve_id(
             ec = make_success_code();
 
         return response(component_ns_resolve_id
-                           , std::vector<boost::uint32_t>());
+                      , std::vector<boost::uint32_t>());
     }
 
     else
@@ -244,45 +242,6 @@ response component_namespace::resolve_id(
         return response(component_ns_resolve_id, p);
     } 
 } // }}}
-
-response component_namespace::resolve_name(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ resolve_name implementation
-    // parameters
-    std::string key = req.get_name();
-
-    mutex_type::scoped_lock l(mutex_);
-
-    component_id_table_type::iterator it = component_ids_.find(key)
-                                    , end = component_ids_.end();
-
-    if (it == end)
-    {
-        // REVIEW: Right response?
-        LAGAS_(info) << (boost::format(
-            "component_namespace::resolve_name, key(%1%), "
-            "response(no_success)")
-            % key);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(component_ns_resolve_name
-                           , components::component_invalid
-                           , no_success);
-    }
-
-    LAGAS_(info) << (boost::format(
-        "component_namespace::resolve_name, key(%1%), ctype(%2%)")
-        % key % it->second);
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_resolve_name, it->second);
-} // }}} 
 
 response component_namespace::unbind(
     request const& req

@@ -43,10 +43,10 @@ response symbol_namespace::service(
         case symbol_ns_iterate:
             return iterate(req, ec);
 
-        case primary_ns_bind_locality:
+        case primary_ns_allocate:
         case primary_ns_bind_gid:
-        case primary_ns_page_fault:
-        case primary_ns_unbind_locality:
+        case primary_ns_resolve_gid:
+        case primary_ns_free:
         case primary_ns_unbind_gid:
         case primary_ns_increment:
         case primary_ns_decrement:
@@ -61,7 +61,6 @@ response symbol_namespace::service(
         case component_ns_bind_prefix:
         case component_ns_bind_name:
         case component_ns_resolve_id:
-        case component_ns_resolve_name:
         case component_ns_unbind:
         {
             LAGAS_(warning) <<

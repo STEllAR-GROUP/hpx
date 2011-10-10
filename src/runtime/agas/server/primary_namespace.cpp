@@ -33,14 +33,14 @@ response primary_namespace::service(
 { // {{{
     switch (req.get_action_code())
     {
-        case primary_ns_bind_locality:
-            return bind_locality(req, ec);
+        case primary_ns_allocate:
+            return allocate(req, ec);
         case primary_ns_bind_gid:
             return bind_gid(req, ec);
-        case primary_ns_page_fault:
-            return page_fault(req, ec);
-        case primary_ns_unbind_locality:
-            return unbind_locality(req, ec);
+        case primary_ns_resolve_gid:
+            return resolve_gid(req, ec);
+        case primary_ns_free:
+            return free(req, ec);
         case primary_ns_unbind_gid:
             return unbind_gid(req, ec);
         case primary_ns_increment:
@@ -53,7 +53,6 @@ response primary_namespace::service(
         case component_ns_bind_prefix:
         case component_ns_bind_name:
         case component_ns_resolve_id:
-        case component_ns_resolve_name:
         case component_ns_unbind:
         {
             LAGAS_(warning) <<
@@ -90,11 +89,11 @@ response primary_namespace::service(
     };
 } // }}}
 
-response primary_namespace::bind_locality(
+response primary_namespace::allocate(
     request const& req
   , error_code& ec
     )
-{ // {{{ bind_locality implementation
+{ // {{{ allocate implementation
     using boost::fusion::at_c;
 
     // parameters
@@ -114,7 +113,7 @@ response primary_namespace::bind_locality(
         if (0 == count)
         {
             LAGAS_(info) << (boost::format(
-                "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+                "primary_namespace::allocate, ep(%1%), count(%2%), "
                 "lower(%3%), upper(%4%), prefix(%5%), "
                 "response(repeated_request)")
                 % ep
@@ -126,7 +125,7 @@ response primary_namespace::bind_locality(
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return response(primary_ns_bind_locality
+            return response(primary_ns_allocate
                           , at_c<1>(it->second)
                           , at_c<1>(it->second)
                           , at_c<0>(it->second)
@@ -144,7 +143,7 @@ response primary_namespace::bind_locality(
             if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFF))
             {
                 HPX_THROWS_IF(ec, internal_server_error
-                  , "primary_namespace::bind_locality" 
+                  , "primary_namespace::allocate" 
                   , "primary namespace has been exhausted");
                 return response();
             }
@@ -162,14 +161,14 @@ response primary_namespace::bind_locality(
         naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+            "primary_namespace::allocate, ep(%1%), count(%2%), "
             "lower(%3%), upper(%4%), prefix(%5%), response(repeated_request)")
             % ep % count % lower % upper % at_c<0>(it->second));
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(primary_ns_bind_locality
+        return response(primary_ns_allocate
                       , lower
                       , upper
                       , at_c<0>(it->second)
@@ -183,7 +182,7 @@ response primary_namespace::bind_locality(
         if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
         {
             HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::bind_locality" 
+              , "primary_namespace::allocate" 
               , "primary namespace has been exhausted");
             return response();
         }
@@ -220,7 +219,7 @@ response primary_namespace::bind_locality(
             // at some point after we first checked it, which would indicate
             // memory corruption or a locking failure.
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::bind_locality" 
+              , "primary_namespace::allocate" 
               , boost::str(boost::format(
                     "partition table insertion failed due to a locking "
                     "error or memory corruption, endpoint(%1%), "
@@ -238,7 +237,7 @@ response primary_namespace::bind_locality(
                 std::make_pair(id, g)))))
         {
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::bind_locality"  
+              , "primary_namespace::allocate"  
               , boost::str(boost::format(
                     "GVA table insertion failed due to a locking error "
                     "or memory corruption, gid(%1%), gva(%2%)")
@@ -257,14 +256,14 @@ response primary_namespace::bind_locality(
         naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::bind_locality, ep(%1%), count(%2%), "
+            "primary_namespace::allocate, ep(%1%), count(%2%), "
             "lower(%3%), upper(%4%), prefix(%5%)")
             % ep % count % lower % upper % prefix);
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(primary_ns_bind_locality
+        return response(primary_ns_allocate
                       , lower
                       , upper
                       , prefix);
@@ -411,11 +410,11 @@ response primary_namespace::bind_gid(
     return response(primary_ns_bind_gid);
 } // }}}
 
-response primary_namespace::page_fault(
+response primary_namespace::resolve_gid (
     request const& req
   , error_code& ec
     )
-{ // {{{ page_fault implementation 
+{ // {{{ resolve_gid  implementation 
     // parameters
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id); 
@@ -432,14 +431,13 @@ response primary_namespace::page_fault(
         if (it->first == id)
         {
             LAGAS_(info) << (boost::format(
-                "primary_namespace::page_fault, soft page fault, faulting "
-                "address %1%, gva(%2%)")
+                "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
                 % id % it->second);
 
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return response(primary_ns_page_fault
+            return response(primary_ns_resolve_gid
                           , it->first
                           , it->second);
         }
@@ -455,22 +453,21 @@ response primary_namespace::page_fault(
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
-                    HPX_THROWS_IF(ec, invalid_page_fault
-                      , "primary_namespace::page_fault" 
+                    HPX_THROWS_IF(ec, invalid_gid
+                      , "primary_namespace::resolve_gid" 
                       , "MSBs of lower and upper range bound do not match");
                     return response();
                 }
 
                 // Calculation of the lva address occurs in gva<>::resolve()
                 LAGAS_(info) << (boost::format(
-                    "primary_namespace::page_fault, soft page fault, "
-                    "faulting address %1%, gva(%2%)")
+                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
                     % id % it->second);
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return response(primary_ns_page_fault
+                return response(primary_ns_resolve_gid
                               , it->first
                               , it->second);
             }
@@ -486,45 +483,43 @@ response primary_namespace::page_fault(
         {
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
-                HPX_THROWS_IF(ec, invalid_page_fault
-                  , "primary_namespace::page_fault" 
+                HPX_THROWS_IF(ec, invalid_gid
+                  , "primary_namespace::resolve_gid" 
                   , "MSBs of lower and upper range bound do not match");
                 return response();
             }
 
             LAGAS_(info) << (boost::format(
-                "primary_namespace::page_fault, soft page fault, faulting "
-                "address %1%, gva(%2%)")
+                "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
                 % id % it->second);
 
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return response(primary_ns_page_fault
+            return response(primary_ns_resolve_gid
                           , it->first
                           , it->second);
         }
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::page_fault, invalid page fault, faulting "
-        "address %1%")
+        "primary_namespace::resolve_gid, gid(%1%), response(invalid_gid)")
         % id);
 
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(primary_ns_page_fault
+    return response(primary_ns_resolve_gid
                   , naming::invalid_gid 
                   , gva()
-                  , invalid_page_fault);
+                  , invalid_gid);
 } // }}}
 
-response primary_namespace::unbind_locality(
+response primary_namespace::free(
     request const& req
   , error_code& ec
     )
-{ // {{{ unbind_locality implementation
+{ // {{{ free implementation
     using boost::fusion::at_c;
 
     // parameters
@@ -544,7 +539,7 @@ response primary_namespace::unbind_locality(
         if (HPX_UNLIKELY(git == gend))
         {
             HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::unbind_locality" 
+              , "primary_namespace::free" 
               , boost::str(boost::format(
                     "partition table entry has no corresponding GVA table "
                     "entry, endpoint(%1%)")
@@ -557,24 +552,24 @@ response primary_namespace::unbind_locality(
         gvas_.erase(git);
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::unbind_locality, ep(%1%)")
+            "primary_namespace::free, ep(%1%)")
             % ep);
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return response(primary_ns_unbind_locality);
+        return response(primary_ns_free);
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::unbind_locality, ep(%1%), "
+        "primary_namespace::free, ep(%1%), "
         "response(no_success)")
         % ep);
 
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(primary_ns_unbind_locality
+    return response(primary_ns_free
                        , no_success);
 } // }}}
 

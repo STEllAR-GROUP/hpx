@@ -36,7 +36,7 @@ find_barrier(char const* symname)
     naming::id_type barrier_id;
     for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
-        if (agas::query_name(symname, barrier_id))
+        if (agas::resolve_name(symname, barrier_id))
             break; 
 
         boost::this_thread::sleep(boost::get_system_time() + 

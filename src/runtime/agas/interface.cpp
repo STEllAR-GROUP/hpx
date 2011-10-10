@@ -94,7 +94,7 @@ bool unregister_name(
     return false;
 }
 
-bool query_name(
+bool resolve_name(
     std::string const& name
   , naming::id_type& gid
   , error_code& ec
@@ -104,7 +104,7 @@ bool query_name(
 
     naming::gid_type raw_gid;
 
-    if (agas_.query_name(name, raw_gid, ec) && !ec)
+    if (agas_.resolve_name(name, raw_gid, ec) && !ec)
     {
         if (naming::get_credit_from_gid(raw_gid) != 0)
             gid = naming::id_type(raw_gid, naming::id_type::managed);
@@ -117,7 +117,7 @@ bool query_name(
     return false;
 }
 
-bool query_name(
+bool resolve_name(
     std::string const& name
   , naming::gid_type& gid
   , error_code& ec
@@ -125,7 +125,7 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.query_name(name, gid, ec) && !ec)
+    if (agas_.resolve_name(name, gid, ec) && !ec)
         return true;
 
     return false;

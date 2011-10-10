@@ -440,7 +440,7 @@ namespace hpx { namespace performance_counters
 
         // ask AGAS for the id of the given counter
         naming::id_type gid;
-        bool result = agas::query_name(name, gid, ec);
+        bool result = agas::resolve_name(name, gid, ec);
         if (!result) {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter",
                 "performance counter not registered: " + name);

@@ -67,7 +67,7 @@ void addressing_service::launch_bootstrap(
 
     request reqs[] =
     {
-        request(primary_ns_bind_locality, ep, 3)
+        request(primary_ns_allocate, ep, 3)
       , request(primary_ns_bind_gid, primary_gid, primary_gva)
       , request(primary_ns_bind_gid, component_gid, component_gva)
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
@@ -148,7 +148,7 @@ bool addressing_service::register_locality(
     )
 { // {{{
     try {
-        request req(primary_ns_bind_locality, ep, 0);
+        request req(primary_ns_allocate, ep, 0);
         response rep;
     
         if (is_bootstrap())
@@ -166,7 +166,7 @@ bool addressing_service::register_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::bind_locality", e.what());
+                "addressing_service::allocate", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -184,7 +184,7 @@ bool addressing_service::unregister_locality(
     )
 { // {{{
     try {
-        request req(primary_ns_unbind_locality, ep);
+        request req(primary_ns_free, ep);
         response rep;
     
         if (is_bootstrap())
@@ -200,7 +200,7 @@ bool addressing_service::unregister_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::unbind_locality", e.what());
+                "addressing_service::free", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 
@@ -482,7 +482,7 @@ bool addressing_service::get_id_range(
     allocate_response_future_type* f = 0;
 
     try {
-        request req(primary_ns_bind_locality, ep, count);
+        request req(primary_ns_allocate, ep, count);
         response rep;
     
         if (is_bootstrap())
@@ -754,7 +754,7 @@ bool addressing_service::resolve(
                 return false;
         }
  
-        request req(primary_ns_page_fault, id);
+        request req(primary_ns_resolve_gid, id);
         response rep; 
     
         if (is_bootstrap())
@@ -875,9 +875,9 @@ bool addressing_service::resolve_cached(
 
         if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
-            HPX_THROWS_IF(ec, invalid_page_fault
+            HPX_THROWS_IF(ec, invalid_gid
               , "addressing_service::resolve_cached" 
-              , "bad page in cache, MSBs of GID base and GID do not match");
+              , "bad entry in cache, MSBs of GID base and GID do not match");
             return false;
         }
 
@@ -1058,7 +1058,7 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
-bool addressing_service::query_name(
+bool addressing_service::resolve_name(
     std::string const& name
   , naming::gid_type& id
   , error_code& ec
@@ -1085,7 +1085,7 @@ bool addressing_service::query_name(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::query_name"
+              , "addressing_service::resolve_name"
               , e.what());
         }
         else {

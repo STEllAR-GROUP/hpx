@@ -330,14 +330,14 @@ struct response
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
         // 0x0
-        // primary_ns_bind_locality
+        // primary_ns_allocate
         boost::fusion::vector3<
             naming::gid_type // lower bound
           , naming::gid_type // upper bound 
           , boost::uint32_t  // prefix 
         >
         // 0x1
-        // primary_ns_page_fault
+        // primary_ns_resolve_gid 
       , boost::fusion::vector2<
             naming::gid_type // idbase
           , gva              // gva
@@ -345,7 +345,7 @@ struct response
         // 0x2
         // primary_ns_unbind_gid
       , boost::fusion::vector1<
-            gva             // gva
+            gva // gva
         >
         // 0x3
         // primary_ns_decrement
@@ -361,7 +361,6 @@ struct response
         // 0x5
         // component_ns_bind_prefix
         // component_ns_bind_name
-        // component_ns_resolve_name
       , boost::fusion::vector1<
             boost::int32_t // ctype
         > 
@@ -378,7 +377,7 @@ struct response
             naming::gid_type // gid
         >
         // 0x8
-        // primary_ns_unbind_locality
+        // primary_ns_free
         // primary_ns_bind_gid
         // component_ns_unbind
         // symbol_ns_bind
