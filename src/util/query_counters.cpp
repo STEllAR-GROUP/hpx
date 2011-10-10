@@ -18,14 +18,11 @@ namespace hpx { namespace util
 
     void query_counters::start() 
     {
-        timer_.start();
-
         ids_.reserve(names_.size());
-
         BOOST_FOREACH(std::string const& name, names_)
         {
             error_code ec;
-            ids_.push_back(naming::id_type());
+            ids_.push_back(naming::invalid_id);
             agas::query_name(name, ids_.back(), ec);
 
             if (HPX_UNLIKELY(ec || !ids_.back()))
@@ -35,6 +32,9 @@ namespace hpx { namespace util
                         "unknown performance counter: '%s'") % name))
             }
         }
+
+        // this will invoke the evaluate function for the first time
+        timer_.start();
     }
 
     void query_counters::evaluate()
