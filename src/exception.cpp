@@ -287,5 +287,18 @@ namespace hpx { namespace detail
 
         return util::osstream_get_string(strm);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // report an early or late exception and abort
+    void report_exception_and_abort(boost::exception_ptr const& e)
+    {
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            std::cerr << hpx::diagnostic_information(be) << std::endl;
+            std::abort();
+        }
+    }
 }}
 

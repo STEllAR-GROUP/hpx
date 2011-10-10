@@ -358,6 +358,10 @@ namespace hpx
         // Extract the diagnostic information embedded in the given exception and
         // return a string holding a formatted message.
         HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
+
+        // Report an early or late exception and locally abort execution. There
+        // isn't anything more we could do.
+        HPX_EXPORT void report_exception_and_abort(boost::exception_ptr const&);
     }
 
     ///////////////////////////////////////////////////////////////////////////

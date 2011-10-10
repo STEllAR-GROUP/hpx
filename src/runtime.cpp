@@ -370,13 +370,8 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            try {
-                boost::rethrow_exception(e);
-            }
-            catch (boost::exception const& be) {
-                std::cerr << hpx::diagnostic_information(be) << std::endl;
-                std::abort();
-            }
+            detail::report_exception_and_abort(e);
+            return;
         }
 
         // The console error sink is only applied at the console, so default
@@ -567,13 +562,8 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            try {
-                boost::rethrow_exception(e);
-            }
-            catch (boost::exception const& be) {
-                std::cerr << hpx::diagnostic_information(be) << std::endl;
-                std::abort();
-            }
+            detail::report_exception_and_abort(e);
+            return;
         }
 
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
@@ -584,13 +574,8 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            try {
-                boost::rethrow_exception(e);
-            }
-            catch (boost::exception const& be) {
-                std::cerr << hpx::diagnostic_information(be) << std::endl;
-                std::abort();
-            }
+            detail::report_exception_and_abort(e);
+            return;
         }
 
         std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
