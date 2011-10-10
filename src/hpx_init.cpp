@@ -1001,6 +1001,7 @@ namespace hpx
                 ini_config += "hpx.logging.console.agas.level=5";
                 ini_config += "hpx.logging.agas.level=5";
             }
+
             // Collect the command line for diagnostic purposes.
             std::string cmd_line;
             for (int i = 0; i < argc; ++i)
