@@ -6,8 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -27,10 +27,8 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
-using hpx::components::component_type;
-using hpx::components::get_component_type;
-
-using hpx::applier::get_applier;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 
 using hpx::test::simple_refcnt_checker;
 using hpx::test::managed_refcnt_checker;
@@ -51,49 +49,44 @@ void hpx_test_main(
     boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
 
     {
-        /// AGAS reference-counting test 4 (from #126):
+        /// AGAS reference-counting test 7 (from #126):
         ///
-        ///     Create two components, one locally and one one remotely.
-        ///     Have the local component store a reference to the remote
-        ///     component. Let the original references to both components go
-        ///     out of scope. Both components should be deleted. 
+        ///     Create a component locally, and register a symbolic name for it.
+        ///     Then, let all references to the component go out of scope. The
+        ///     component should still be alive. Finally, unregister the
+        ///     symbolic name. The component should be deleted after the
+        ///     symbolic name is unregistered.
 
-        std::vector<id_type> remote_localities;
+        char const name[] = "/tests(refcnt_checker#7)";
 
-        typedef typename Client::server_type server_type;
+        Client monitor(find_here());
 
-        component_type ctype = get_component_type<server_type>();
-
-        if (!get_applier().get_remote_prefixes(remote_localities, ctype))
-            throw std::logic_error("this test cannot be run on one locality");
-
-        Client monitor_remote(remote_localities[0]);
-        Client monitor_local(find_here());
-
-        cout << "id_remote: " << monitor_remote.get_gid() << " "
+        cout << "id: " << monitor.get_gid() << " "
              << get_management_type_name
-                    (monitor_remote.get_gid().get_management_type()) << "\n"
-             << "id_local:  " << monitor_local.get_gid() << " "
-             << get_management_type_name
-                    (monitor_local.get_gid().get_management_type()) << "\n"
+                    (monitor.get_gid().get_management_type()) << "\n"
              << flush;
 
-        {
-            // Have the local object store a reference to the remote object.
-            monitor_local.take_reference(monitor_remote.get_gid());
+        // Associate a symbolic name with the object.
+        HPX_TEST_EQ(true, register_name(name, monitor.get_gid()));
 
-            // Detach the references.
-            id_type id_remote = monitor_remote.detach()
-                  , id_local = monitor_local.detach();
-            
-            // Both components should still be alive.
-            HPX_TEST_EQ(false, monitor_remote.ready(milliseconds(delay))); 
-            HPX_TEST_EQ(false, monitor_local.ready(milliseconds(delay))); 
+        {
+            // Detach the reference.
+            id_type id = monitor.detach();
+
+            // The component should still be alive.
+            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay))); 
         }
 
-        // Both components should be out of scope now.
-        HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay))); 
-        HPX_TEST_EQ(true, monitor_local.ready(milliseconds(delay))); 
+        // The component should still be alive, as the symbolic binding holds
+        // a reference to it.
+        HPX_TEST_EQ(false, monitor.ready(milliseconds(delay))); 
+
+        // Remove the symbolic name. This should return the final credits
+        // to AGAS.
+        HPX_TEST_EQ(true, unregister_name(name));
+
+        // The component should be destroyed. 
+        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay))); 
     }
 }
 
@@ -131,7 +124,7 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<boost::uint64_t>()->default_value(500)
         , "number of milliseconds to wait for object destruction") 
         ;
 

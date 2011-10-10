@@ -42,7 +42,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    const boost::uint64_t delay = vm["delay"].as<boost::uint64_t>();
+    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
 
     {
         /// AGAS reference-counting test 1 (from #126):

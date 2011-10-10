@@ -12,6 +12,10 @@ set(tests
     local_embedded_ref_to_remote_object
     remote_embedded_ref_to_local_object
     remote_embedded_ref_to_remote_object
+    refcnted_symbol_to_local_object
+    refcnted_symbol_to_remote_object
+    uncounted_symbol_to_local_object
+    uncounted_symbol_to_remote_object
    )
 
 set(scoped_ref_to_local_object_FLAGS
@@ -35,6 +39,22 @@ set(remote_embedded_ref_to_local_object_FLAGS
                  managed_refcnt_checker_component)
 
 set(remote_embedded_ref_to_remote_object_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(refcnted_symbol_to_local_object_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(refcnted_symbol_to_remote_object_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(uncounted_symbol_to_local_object_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(uncounted_symbol_to_remote_object_FLAGS
     DEPENDENCIES simple_refcnt_checker_component
                  managed_refcnt_checker_component)
 
