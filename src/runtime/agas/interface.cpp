@@ -42,7 +42,7 @@ bool register_name(
     else
         new_gid = mutable_gid;
 
-    if (agas_.registerid(name, new_gid, ec) && ec)
+    if (agas_.registerid(name, new_gid, ec) && !ec)
         return true;
 
     return false;
@@ -55,12 +55,39 @@ bool unregister_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    naming::gid_type gid;
+    naming::gid_type raw_gid;
 
-    if (agas_.unregisterid(name, gid, ec) && ec)
+    if (agas_.unregisterid(name, raw_gid, ec) && !ec)
     {
-        // Let the GID go out of scope
-        naming::id_type id(gid, naming::id_type::managed);
+        // If the GID has a reference count, return it to AGAS.
+        if (naming::get_credit_from_gid(raw_gid) != 0)
+            // When this id_type goes out of scope, it's deleter will
+            // take care of the reference count.
+            naming::id_type gid(raw_gid, naming::id_type::managed);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool unregister_name(
+    std::string const& name
+  , naming::id_type& gid
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+
+    naming::gid_type raw_gid;
+
+    if (agas_.unregisterid(name, raw_gid, ec) && !ec)
+    {
+        if (naming::get_credit_from_gid(raw_gid) != 0)
+            gid = naming::id_type(raw_gid, naming::id_type::managed);
+        else
+            gid = naming::id_type(raw_gid, naming::id_type::unmanaged);
+
         return true;
     }
 
@@ -75,8 +102,17 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(name, gid.get_gid(), ec) && ec)
+    naming::gid_type raw_gid;
+
+    if (agas_.queryid(name, raw_gid, ec) && !ec)
+    {
+        if (naming::get_credit_from_gid(raw_gid) != 0)
+            gid = naming::id_type(raw_gid, naming::id_type::managed);
+        else
+            gid = naming::id_type(raw_gid, naming::id_type::unmanaged);
+
         return true;
+    }
 
     return false;
 }
@@ -89,7 +125,7 @@ bool query_name(
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
-    if (agas_.queryid(name, gid, ec) && ec)
+    if (agas_.queryid(name, gid, ec) && !ec)
         return true;
 
     return false;
