@@ -118,6 +118,7 @@
     <ClCompile Include="..\..\..\src\runtime\agas\component_namespace.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\interface.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\primary_namespace.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -159,7 +160,6 @@
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
     <ClCompile Include="..\..\..\src\util\map_hostnames.cpp" />
     <ClCompile Include="..\..\..\src\util\pbs_environment.cpp" />
-    <ClCompile Include="..\..\..\src\util\performance_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\query_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
     <ClCompile Include="..\..\..\src\runtime\actions\action_manager.cpp" />
@@ -234,6 +234,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\big_boot_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\component_namespace.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\gva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\interface.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\namespace_action_code.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\primary_namespace.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\request.hpp" />

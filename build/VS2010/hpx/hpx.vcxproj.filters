@@ -260,9 +260,6 @@
     <ClCompile Include="..\..\..\src\util\logging.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\performance_counters.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
@@ -364,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\version.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\interface.cpp">
+      <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -972,6 +972,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\component_namespace.hpp">
       <Filter>Header Files\Runtime\AGAS\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\agas\interface.hpp">
+      <Filter>Header Files\Runtime\AGAS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
