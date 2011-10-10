@@ -159,8 +159,8 @@ response symbol_namespace::resolve(
             ec = make_success_code();
 
         return response(symbol_ns_resolve
-                           , naming::invalid_gid
-                           , no_success);
+                       , naming::invalid_gid
+                       , no_success);
     }
 
     LAGAS_(info) << (boost::format(
@@ -224,8 +224,8 @@ response symbol_namespace::unbind(
     gids_.erase(it);
 
     LAGAS_(info) << (boost::format(
-        "symbol_namespace::unbind, key(%1%)")
-        % key);
+        "symbol_namespace::unbind, key(%1%), gid(%2%)")
+        % key % gid);
 
     if (&ec != &throws)
         ec = make_success_code();
