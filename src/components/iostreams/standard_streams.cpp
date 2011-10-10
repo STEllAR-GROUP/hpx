@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/eager_future.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
@@ -25,6 +26,9 @@ HPX_REGISTER_PLAIN_ACTION_EX2(create_cout_action, create_cout_action, true);
 HPX_REGISTER_PLAIN_ACTION_EX2(create_cerr_action, create_cerr_action, true);
 
 ///////////////////////////////////////////////////////////////////////////////
+// TODO: Use startup/shutdown functions to properly create hpx::cout and
+// hpx::cerr. Also, cleanup on shutdown.
+
 namespace hpx { namespace iostreams
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -63,13 +67,13 @@ namespace hpx { namespace iostreams
                         boost::ref(detail::get_outstream(Tag()))),
                     naming::id_type::managed);
                 client.reset(new lazy_ostream(cout_id));
-                agas_client.registerid (cout_name, client->get_raw_gid()); 
+                agas::register_name(cout_name, client->get_gid()); 
             }
 
             else
             {
                 naming::gid_type gid;
-                if (!agas_client.queryid(cout_name, gid))
+                if (!agas::resolve_name(cout_name, gid))
                 {
                     naming::gid_type console;
                     error_code ec;
@@ -82,7 +86,8 @@ namespace hpx { namespace iostreams
 
                     lcos::eager_future<create_cout_action>(console).get();
 
-                    bool r = agas_client.queryid(cout_name, gid, ec);
+                    // Try again
+                    bool r = agas::resolve_name(cout_name, gid, ec);
                     if (HPX_UNLIKELY(ec || !r || !gid))
                     {
                         HPX_THROW_EXCEPTION(service_unavailable,

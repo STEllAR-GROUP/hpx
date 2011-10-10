@@ -61,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         hpx::util::interval_timer timer_;  ///< base time interval in milliseconds
         std::string base_counter_name_;   ///< name of base counter to be queried
-        naming::gid_type base_counter_id_;
+        naming::id_type base_counter_id_;
         counter_value prev_value_;        ///< previous base counter value
         counter_value value_;             ///< current counter value
     };

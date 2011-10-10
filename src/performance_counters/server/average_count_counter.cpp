@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/performance_counters/server/average_count_counter.hpp>
@@ -104,12 +105,15 @@ namespace hpx { namespace performance_counters { namespace server
 
     void average_count_counter::evaluate_base_counter(counter_value& value)
     {
+        // lock here to avoid checking out multiple reference counted GIDS
+        // from AGAS
+        mutex_type::scoped_lock l(mtx_);
+
         if (!base_counter_id_) {
             // retrieve the base counter gid, if it's not know yet
             error_code ec;
-            naming::gid_type gid;
-            naming::get_agas_client().queryid(base_counter_name_, gid, ec);
-            if (HPX_UNLIKELY(ec || !gid))
+            agas::resolve_name(base_counter_name_, base_counter_id_, ec);
+            if (HPX_UNLIKELY(ec || !base_counter_id_))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, 
                     "average_count_counter::evaluate_base_counter",
@@ -117,9 +121,6 @@ namespace hpx { namespace performance_counters { namespace server
                         boost::format("unknown performance counter: '%s'") % 
                         base_counter_name_))
             }
-
-            mutex_type::scoped_lock l(mtx_);
-            base_counter_id_ = gid;
         }
 
         value = stubs::performance_counter::get_value(base_counter_id_);
