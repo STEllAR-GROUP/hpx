@@ -225,7 +225,7 @@ if(HPX_STACKTRACES)
 endif()
 
 ################################################################################
-# Backtrace configuration 
+# Native TLS configuration 
 ################################################################################
 hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)
 
