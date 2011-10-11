@@ -176,6 +176,38 @@ bool addressing_service::register_locality(
     }
 } // }}}
 
+boost::uint32_t addressing_service::resolve_locality(
+    naming::locality const& ep
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        request req(primary_ns_resolve_locality, ep);
+        response rep;
+    
+        if (is_bootstrap())
+            rep = bootstrap->primary_ns_server.service(req, ec);
+        else
+            rep = hosted->primary_ns_.service(req, ec);
+
+        if (ec || (success != rep.get_status()))
+            return 0;
+    
+        return rep.get_prefix();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "addressing_service::resolve_locality", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow); 
+        }
+
+        return 0;
+    }
+} // }}}
+
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
 bool addressing_service::unregister_locality(
@@ -200,7 +232,7 @@ bool addressing_service::unregister_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::free", e.what());
+                "addressing_service::unregister_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow); 

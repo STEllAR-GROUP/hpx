@@ -27,7 +27,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 9
+#define HPX_AGAS_RESPONSE_SUBTYPES 10
 
 namespace hpx { namespace agas
 {
@@ -43,7 +43,7 @@ struct response
         , data(boost::fusion::make_vector())
     {}
 
-    response(
+    explicit response(
         namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
@@ -57,7 +57,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
@@ -70,7 +70,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , gva const& gva_
       , error status_ = success
@@ -82,7 +82,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , boost::uint64_t count_
       , boost::int32_t ctype_
@@ -95,7 +95,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , boost::uint64_t count_
       , components::component_type ctype_
@@ -108,7 +108,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , boost::uint64_t count_
       , error status_ = success
@@ -120,7 +120,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
     
-    response(
+    explicit response(
         namespace_action_code type_
       , components::component_type ctype_
       , error status_ = success
@@ -132,7 +132,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , boost::int32_t ctype_
       , error status_ = success
@@ -144,7 +144,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , std::vector<boost::uint32_t> const& prefixes_
       , error status_ = success
@@ -156,7 +156,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
         namespace_action_code type_
       , naming::gid_type gid_
       , error status_ = success
@@ -168,7 +168,20 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    response(
+    explicit response(
+        namespace_action_code type_
+      , boost::uint32_t prefix_ 
+      , error status_ = success
+        )
+      : mc(type_)
+      , status(status_)
+      , data(boost::fusion::make_vector(prefix_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
+
+    explicit response(
         namespace_action_code type_
       , error status_ = success
         )
@@ -270,7 +283,19 @@ struct response
         error_code& ec = throws
         ) const
     { 
-        return get_data<subtype_gid_gid_prefix, 2>(ec); 
+        boost::uint32_t prefix;
+
+        // Don't let the first attempt throw.
+        error_code first_try;
+        prefix = get_data<subtype_gid_gid_prefix, 2>(first_try);
+
+        // If the first try failed, check again.
+        if (first_try)
+            prefix = get_data<subtype_prefix, 0>(ec);
+        else if (&ec != &throws)
+            ec = make_success_code();
+
+        return prefix; 
     } 
     
     naming::gid_type get_base_gid(
@@ -324,7 +349,8 @@ struct response
       , subtype_ctype           = 0x5
       , subtype_prefixes        = 0x6
       , subtype_gid             = 0x7
-      , subtype_void            = 0x8
+      , subtype_prefix          = 0x8
+      , subtype_void            = 0x9
     }; 
 
     // The order of the variant types is significant, and should not be changed
@@ -376,7 +402,12 @@ struct response
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
-        // 0x8
+        // 0x8 
+        // primary_ns_resolve_locality
+      , boost::fusion::vector1<
+            boost::uint32_t // prefix
+        >
+        // 0x9
         // primary_ns_free
         // primary_ns_bind_gid
         // component_ns_unbind

@@ -268,6 +268,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , error_code& ec = throws
         );
 
+    /// \brief Resolve a locality to it's prefix.
+    ///
+    /// \returns Returns 0 if the locality is not registered. 
+    boost::uint32_t resolve_locality(
+        naming::locality const& l
+      , error_code& ec = throws
+        );
+
     /// \brief Remove a locality from the runtime.
     bool unregister_locality(
         naming::locality const& l

@@ -153,6 +153,11 @@ struct primary_namespace :
       , error_code& ec = throws
         );
 
+    response resolve_locality(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response free(
         request const& req
       , error_code& ec = throws
@@ -187,11 +192,12 @@ struct primary_namespace :
       , namespace_allocate         = BOOST_BINARY_U(1000001)
       , namespace_bind_gid         = BOOST_BINARY_U(1000010)
       , namespace_resolve_gid      = BOOST_BINARY_U(1000011)
-      , namespace_free             = BOOST_BINARY_U(1000100)
-      , namespace_unbind_gid       = BOOST_BINARY_U(1000101)
-      , namespace_increment        = BOOST_BINARY_U(1000110)
-      , namespace_decrement        = BOOST_BINARY_U(1000111)
-      , namespace_localities       = BOOST_BINARY_U(1001000)
+      , namespace_resolve_locality = BOOST_BINARY_U(1000100)
+      , namespace_free             = BOOST_BINARY_U(1000101)
+      , namespace_unbind_gid       = BOOST_BINARY_U(1000110)
+      , namespace_increment        = BOOST_BINARY_U(1000111)
+      , namespace_decrement        = BOOST_BINARY_U(1001000)
+      , namespace_localities       = BOOST_BINARY_U(1001001)
     }; // }}}
     
     typedef hpx::actions::result_action1<

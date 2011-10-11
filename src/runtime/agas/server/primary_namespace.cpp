@@ -515,6 +515,46 @@ response primary_namespace::resolve_gid (
                   , no_success);
 } // }}}
 
+response primary_namespace::resolve_locality(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ resolve_locality implementation
+    using boost::fusion::at_c;
+
+    // parameters
+    naming::locality ep = req.get_locality();
+
+    mutex_type::scoped_lock l(mutex_);
+
+    partition_table_type::iterator pit = partitions_.find(ep)
+                                 , pend = partitions_.end(); 
+
+    if (pit != pend)
+    {
+        boost::uint32_t const prefix = at_c<0>(pit->second);
+
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_locality, ep(%1%), prefix(%2%)")
+            % ep % prefix);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return response(primary_ns_resolve_locality, prefix);
+    }
+
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::resolve_locality, ep(%1%), response(no_success)")
+        % ep);
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(primary_ns_resolve_locality, 0, no_success);
+} // }}}
+
+// {{{ free implementation
 response primary_namespace::free(
     request const& req
   , error_code& ec
