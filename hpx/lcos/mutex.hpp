@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace detail
                 hpx::util::osstream strm;
                 strm << "thread(" << id << ", " << threads::get_thread_description(id)
                       << ") aborted (yield returned wait_abort)";
-                HPX_THROW_EXCEPTION(no_success, "mutex::wait_for_single_object",
+                HPX_THROW_EXCEPTION(yield_aborted, "mutex::wait_for_single_object",
                     hpx::util::osstream_get_string(strm));
                 return result;
             }

@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace server
                     hpx::util::osstream strm;
                     strm << "thread(" << id << ", " << threads::get_thread_description(id)
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(no_success, "barrier::set_event",
+                    HPX_THROW_EXCEPTION(yield_aborted, "barrier::set_event",
                         hpx::util::osstream_get_string(strm));
                     return;
                 }                

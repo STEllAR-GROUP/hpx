@@ -226,7 +226,7 @@ namespace hpx { namespace lcos { namespace server
                         hpx::util::osstream strm;
                         strm << "thread(" << id << ", " << threads::get_thread_description(id)
                              << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(no_success, "queue::get_value",
+                        HPX_THROW_EXCEPTION(yield_aborted, "queue::get_value",
                             hpx::util::osstream_get_string(strm));
                         return ValueType();
                     }
@@ -236,7 +236,7 @@ namespace hpx { namespace lcos { namespace server
                     thread_queue_.erase(last);     // remove entry from queue
 
                 if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(no_success, "queue::get_value",
+                    HPX_THROW_EXCEPTION(yield_aborted, "queue::get_value",
                         "aborted wait on queue");
                     return ValueType();
                 }

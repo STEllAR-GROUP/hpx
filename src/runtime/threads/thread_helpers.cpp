@@ -218,7 +218,7 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
     }
@@ -240,7 +240,7 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
     }
@@ -262,7 +262,7 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(no_success, "threads::suspend",
+            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
     }

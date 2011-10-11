@@ -123,7 +123,7 @@ namespace hpx { namespace lcos
                     hpx::util::osstream strm;
                     strm << "thread(" << id << ", " << threads::get_thread_description(id)
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(no_success, "local_barrier::wait",
+                    HPX_THROW_EXCEPTION(yield_aborted, "local_barrier::wait",
                         hpx::util::osstream_get_string(strm));
                     return;
                 }

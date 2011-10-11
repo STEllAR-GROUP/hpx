@@ -83,7 +83,7 @@ namespace hpx { namespace lcos
                 strm << "thread(" << id << ", " 
                      << threads::get_thread_description(id)
                      << ") aborted (yield returned wait_abort)";
-                HPX_THROW_EXCEPTION(no_success, 
+                HPX_THROW_EXCEPTION(yield_aborted, 
                     "lcos::local_counting_semaphore::wait",
                     hpx::util::osstream_get_string(strm));
                 return;
