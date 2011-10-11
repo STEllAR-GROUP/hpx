@@ -54,13 +54,13 @@ void addressing_service::launch_bootstrap(
     const naming::gid_type symbol_gid = bootstrap_symbol_namespace_gid();
 
     gva primary_gva(ep,
-        primary_namespace_server_type::get_component_type(), 1U,
+        server::primary_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->primary_ns_server));
     gva component_gva(ep,
-        component_namespace_server_type::get_component_type(), 1U,
+        server::component_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->component_ns_server));
     gva symbol_gva(ep,
-        symbol_namespace_server_type::get_component_type(), 1U,
+        server::symbol_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
     local_prefix(here);
@@ -438,31 +438,31 @@ struct lock_semaphore
     lcos::local_counting_semaphore& sem_;
 };
 
-template <typename Pool, typename Future>
-struct checkout_future
+template <typename Pool, typename Future, typename Promise>
+struct checkout_promise
 {
-    checkout_future(Pool& pool, Future*& future) 
-      : result_ok_(false), pool_(pool), future_(future)
+    checkout_promise(Pool& pool, Promise*& promise) 
+      : result_ok_(false), pool_(pool), promise_(promise)
     {
-        pool_.dequeue(&future_);
-        BOOST_ASSERT(future_);    
+        pool_.dequeue(&promise_);
+        BOOST_ASSERT(promise_);    
         
-        future_->reset();     // reset the future
+        promise_->reset(); // reset the promise
     }
-    ~checkout_future()
+    ~checkout_promise()
     {
         // return the future to the pool
         if (result_ok_) 
-            pool_.enqueue(future_);
+            pool_.enqueue(promise_);
     }
 
-    Future* operator->() { return future_; }
+    Future* operator->() { return reinterpret_cast<Future*>(promise_); }
     void set_ok() { result_ok_ = true; }
 
 private:
     bool result_ok_;
     Pool& pool_;
-    Future*& future_;
+    Promise*& promise_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -474,12 +474,10 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::eager_future<
-        primary_namespace_server_type::service_action,
-        response
-    > allocate_response_future_type;
+    typedef lcos::eager_future<server::primary_namespace::service_action>
+        future_type;
 
-    allocate_response_future_type* f = 0;
+    lcos::promise<response>* f = 0;
 
     try {
         request req(primary_ns_allocate, ep, count);
@@ -494,18 +492,19 @@ bool addressing_service::get_id_range(
             // futures are checked out and pending.
     
             // wait for the semaphore to become available 
-            lock_semaphore lock(hosted->allocate_response_sema_);
+            lock_semaphore lock(hosted->promise_pool_semaphore_);
 
             // get a future
-            typedef checkout_future<allocate_response_pool_type, 
-                allocate_response_future_type> checkout_future_type;
-            checkout_future_type cf(hosted->allocate_response_pool_, f);
+            typedef checkout_promise<
+                promise_pool_type
+              , future_type
+              , lcos::promise<response>
+            > checkout_promise_type;
+
+            checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            cf->apply(
-                naming::id_type(primary_namespace_server_type::fixed_gid()
-                              , naming::id_type::unmanaged),
-                req);
+            cf->apply(bootstrap_primary_namespace_id(), req);
             rep = cf->get(ec);
 
             cf.set_ok();
@@ -531,8 +530,7 @@ bool addressing_service::get_id_range(
         // future for the pool, and let the old future stay in memory.
         if (!is_bootstrap() && f) 
         {
-            hosted->allocate_response_pool_.enqueue 
-                (new allocate_response_future_type);
+            hosted->promise_pool_.enqueue(new lcos::promise<response>);
             f->invalidate(boost::current_exception());
         }
 
@@ -557,12 +555,10 @@ bool addressing_service::bind_range(
   , error_code& ec
     ) 
 { // {{{ bind_range implementation
-    typedef lcos::eager_future<
-        primary_namespace_server_type::service_action,
-        response
-    > bind_response_future_type;
+    typedef lcos::eager_future<server::primary_namespace::service_action>
+        future_type;
 
-    bind_response_future_type* f = 0;
+    lcos::promise<response>* f = 0;
     
     try {
         naming::locality const& ep = baseaddr.locality_;
@@ -583,18 +579,19 @@ bool addressing_service::bind_range(
             // futures are checked out and pending.
 
             // wait for the semaphore to become available 
-            lock_semaphore lock(hosted->bind_response_sema_);
+            lock_semaphore lock(hosted->promise_pool_semaphore_);
 
             // get a future
-            typedef checkout_future<bind_response_pool_type, 
-                bind_response_future_type> checkout_future_type;
-            checkout_future_type cf(hosted->bind_response_pool_, f);
+            typedef checkout_promise<
+                promise_pool_type
+              , future_type
+              , lcos::promise<response>
+            > checkout_promise_type;
+
+            checkout_promise_type cf(hosted->promise_pool_, f);
     
             // execute the action (synchronously)
-            cf->apply(
-                naming::id_type(primary_namespace_server_type::fixed_gid()
-                              , naming::id_type::unmanaged),
-                req);
+            cf->apply(bootstrap_primary_namespace_id(), req);
             rep = cf->get(ec);
 
             cf.set_ok();
@@ -607,7 +604,7 @@ bool addressing_service::bind_range(
     
         if (!is_bootstrap())
         { 
-            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             gva_cache_key key(lower_id, count);
             hosted->gva_cache_.insert(key, g);
         }
@@ -619,7 +616,7 @@ bool addressing_service::bind_range(
         // explanation. 
         if (!is_bootstrap() && f) 
         {
-            hosted->bind_response_pool_.enqueue(new bind_response_future_type);
+            hosted->promise_pool_.enqueue(new lcos::promise<response>);
             f->invalidate(boost::current_exception());
         }
 
@@ -659,7 +656,7 @@ bool addressing_service::unbind_range(
         {
             // I'm afraid that this will break the first form of paged caching,
             // so it's commented out for now.
-            //cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            //mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             //gva_erase_policy ep(lower_id, count);
             //hosted->gva_cache_.erase(ep);
             addr.locality_ = rep.get_gva().endpoint;
@@ -719,7 +716,7 @@ bool addressing_service::resolve(
         }
 
         // authoritative AGAS component address resolution
-        else if (id == primary_namespace_server_type::fixed_gid())
+        else if (id == bootstrap_primary_namespace_gid())
         {
             addr = hosted->primary_ns_addr_;
             if (&ec != &throws)
@@ -727,7 +724,7 @@ bool addressing_service::resolve(
             return true;
         }
     
-        else if (id == component_namespace_server_type::fixed_gid())
+        else if (id == bootstrap_component_namespace_gid())
         {
             addr = hosted->component_ns_addr_;
             if (&ec != &throws)
@@ -735,7 +732,7 @@ bool addressing_service::resolve(
             return true;
         }
     
-        else if (id == symbol_namespace_server_type::fixed_gid())
+        else if (id == bootstrap_symbol_namespace_gid())
         {
             addr = hosted->symbol_ns_addr_;
             if (&ec != &throws)
@@ -760,11 +757,7 @@ bool addressing_service::resolve(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-        {
-            LHPX_(info, "  [AC] ") <<
-                (boost::format("soft page fault, faulting address %1%") % id);
             rep = hosted->primary_ns_.service(req, ec);
-        } 
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -780,7 +773,7 @@ bool addressing_service::resolve(
         if (!is_bootstrap())
         {
             // Put the page into the cache.
-            cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+            mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
             gva_cache_key key(rep.get_base_gid(), rep.get_gva().count);
             hosted->gva_cache_.insert(key, rep.get_gva());
         }
@@ -836,7 +829,7 @@ bool addressing_service::resolve_cached(
     }
 
     // authoritative AGAS component address resolution
-    else if (id == primary_namespace_server_type::fixed_gid())
+    else if (id == bootstrap_primary_namespace_gid())
     {
         addr = hosted->primary_ns_addr_;
         if (&ec != &throws)
@@ -844,7 +837,7 @@ bool addressing_service::resolve_cached(
         return true;
     }
     
-    else if (id == component_namespace_server_type::fixed_gid())
+    else if (id == bootstrap_component_namespace_gid())
     {
         addr = hosted->component_ns_addr_;
         if (&ec != &throws)
@@ -852,7 +845,7 @@ bool addressing_service::resolve_cached(
         return true;
     }
     
-    else if (id == symbol_namespace_server_type::fixed_gid())
+    else if (id == bootstrap_symbol_namespace_gid())
     {
         addr = hosted->symbol_ns_addr_;
         if (&ec != &throws)
@@ -863,7 +856,7 @@ bool addressing_service::resolve_cached(
 
     // first look up the requested item in the cache
     gva_cache_key k(id);
-    cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+    mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
     gva_cache_key idbase;
     gva_cache_type::entry_type e;
 
@@ -875,7 +868,7 @@ bool addressing_service::resolve_cached(
 
         if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
-            HPX_THROWS_IF(ec, invalid_gid
+            HPX_THROWS_IF(ec, internal_server_error
               , "addressing_service::resolve_cached" 
               , "bad entry in cache, MSBs of GID base and GID do not match");
             return false;
@@ -890,7 +883,7 @@ bool addressing_service::resolve_cached(
         if (&ec != &throws)
             ec = make_success_code();
 
-        LHPX_(debug, "  [AC] ") <<
+        LAS_(debug) << 
             ( boost::format("cache hit for address %1% (base %2%)")
             % id % idbase.get_gid());
     
@@ -900,8 +893,7 @@ bool addressing_service::resolve_cached(
     if (&ec != &throws)
         ec = make_success_code();
 
-    LHPX_(debug, "  [AC] ") <<
-        (boost::format("cache miss for address %1%") % id);
+    LAS_(debug) << (boost::format("cache miss for address %1%") % id);
 
     return false;
 } // }}}

@@ -49,21 +49,12 @@ namespace hpx { namespace agas
 struct HPX_EXPORT addressing_service : boost::noncopyable
 {
     // {{{ types 
-    typedef primary_namespace::server_type
-        primary_namespace_server_type; 
-
-    typedef component_namespace::server_type
-        component_namespace_server_type; 
-
-    typedef symbol_namespace::server_type
-        symbol_namespace_server_type; 
-
     typedef component_namespace::component_id_type component_id_type;
 
     typedef symbol_namespace::iterate_names_function_type
         iterate_names_function_type;
 
-    typedef hpx::lcos::mutex cache_mutex_type;
+    typedef hpx::lcos::mutex mutex_type;
 
     typedef boost::atomic<boost::uint32_t> console_cache_type;
     // }}}
@@ -163,27 +154,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    // {{{ future freelists
-    typedef boost::lockfree::fifo<
-        lcos::eager_future<
-            primary_namespace_server_type::service_action,
-            response
-        >*
-    > allocate_response_pool_type;
-
-    typedef boost::lockfree::fifo<
-        lcos::eager_future<
-            primary_namespace_server_type::service_action,
-            response
-        >*
-    > bind_response_pool_type;
-    // }}}
+    typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
 
     struct bootstrap_data_type
     { // {{{
-        primary_namespace_server_type primary_ns_server;
-        component_namespace_server_type component_ns_server;
-        symbol_namespace_server_type symbol_ns_server;
+        server::primary_namespace primary_ns_server;
+        server::component_namespace component_ns_server;
+        server::symbol_namespace symbol_ns_server;
     }; // }}}
 
     struct hosted_data_type
@@ -196,16 +173,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
 
-        cache_mutex_type gva_cache_mtx_;
+        mutex_type gva_cache_mtx_;
         gva_cache_type gva_cache_; 
 
         console_cache_type console_cache_;
 
-        hpx::lcos::local_counting_semaphore allocate_response_sema_;
-        allocate_response_pool_type allocate_response_pool_;
-
-        hpx::lcos::local_counting_semaphore bind_response_sema_;
-        bind_response_pool_type bind_response_pool_;
+        hpx::lcos::local_counting_semaphore promise_pool_semaphore_;
+        promise_pool_type promise_pool_;       
 
         naming::address primary_ns_addr_;
         naming::address component_ns_addr_;

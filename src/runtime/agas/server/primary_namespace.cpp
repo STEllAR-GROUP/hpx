@@ -453,7 +453,7 @@ response primary_namespace::resolve_gid (
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
-                    HPX_THROWS_IF(ec, invalid_gid
+                    HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::resolve_gid" 
                       , "MSBs of lower and upper range bound do not match");
                     return response();
@@ -483,7 +483,7 @@ response primary_namespace::resolve_gid (
         {
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
-                HPX_THROWS_IF(ec, invalid_gid
+                HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::resolve_gid" 
                   , "MSBs of lower and upper range bound do not match");
                 return response();
@@ -503,7 +503,7 @@ response primary_namespace::resolve_gid (
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::resolve_gid, gid(%1%), response(invalid_gid)")
+        "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
         % id);
 
     if (&ec != &throws)
@@ -512,7 +512,7 @@ response primary_namespace::resolve_gid (
     return response(primary_ns_resolve_gid
                   , naming::invalid_gid 
                   , gva()
-                  , invalid_gid);
+                  , no_success);
 } // }}}
 
 response primary_namespace::free(

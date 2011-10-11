@@ -389,23 +389,15 @@ void notify_console(notification_header const& header)
     response_heap_type::get_heap().add_heap(p); 
 
     // set up the future pools
-    naming::resolver_client::allocate_response_pool_type&
-        allocate_pool = agas_client.hosted->allocate_response_pool_;
-    naming::resolver_client::bind_response_pool_type&
-        bind_pool = agas_client.hosted->bind_response_pool_;
+    naming::resolver_client::promise_pool_type& promise_pool
+        = agas_client.hosted->promise_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
-    const std::size_t allocate_size =
-        ini_.get_agas_allocate_response_pool_size();
-    const std::size_t bind_size =
-        ini_.get_agas_bind_response_pool_size();
+    const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
-    for (std::size_t i = 0; i < allocate_size; ++i)
-        allocate_pool.enqueue(new allocate_response_future_type);     
-
-    for (std::size_t i = 0; i < bind_size; ++i)
-        bind_pool.enqueue(new bind_response_future_type);     
+    for (std::size_t i = 0; i < pool_size; ++i)
+        promise_pool.enqueue(new lcos::promise<response>);     
 }
 
 // remote call to AGAS
@@ -540,23 +532,15 @@ void notify_worker(notification_header const& header)
     response_heap_type::get_heap().add_heap(p); 
 
     // set up the future pools
-    naming::resolver_client::allocate_response_pool_type&
-        allocate_pool = agas_client.hosted->allocate_response_pool_;
-    naming::resolver_client::bind_response_pool_type&
-        bind_pool = agas_client.hosted->bind_response_pool_;
+    naming::resolver_client::promise_pool_type& promise_pool
+        = agas_client.hosted->promise_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
-    const std::size_t allocate_size =
-        ini_.get_agas_allocate_response_pool_size();
-    const std::size_t bind_size =
-        ini_.get_agas_bind_response_pool_size();
+    const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
-    for (std::size_t i = 0; i < allocate_size; ++i)
-        allocate_pool.enqueue(new allocate_response_future_type);     
-
-    for (std::size_t i = 0; i < bind_size; ++i)
-        bind_pool.enqueue(new bind_response_future_type);     
+    for (std::size_t i = 0; i < pool_size; ++i)
+        promise_pool.enqueue(new lcos::promise<response>);     
 }
 // }}}
 
