@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
@@ -29,28 +30,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(configuration_client_type);
 // Interpolation client
 namespace sheneos
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // AGAS helpers
-    inline void 
-    register_name(hpx::naming::gid_type const& gid, std::string const& name)
-    {
-        hpx::get_runtime().get_agas_client().registerid(name, gid); 
-    }
-
-    inline void unregister_name(std::string const& name)
-    {
-        hpx::get_runtime().get_agas_client().unregisterid(name); 
-    }
-
-    inline hpx::naming::id_type query_name(std::string const& name)
-    {
-        hpx::naming::gid_type gid;
-        if (hpx::get_runtime().get_agas_client().queryid(name, gid))
-          return hpx::naming::id_type(gid, hpx::naming::id_type::unmanaged);
-
-        return hpx::naming::invalid_id;
-    }
-
     // create one partition on each of the localities, initialize the partitions
     sheneos::sheneos()
       : num_partitions_per_dim_(0), 
@@ -71,11 +50,11 @@ namespace sheneos
 
             // unregister all symbolic names
             config_data data = cfg_.get();
-            unregister_name(data.symbolic_name_);   // unregister config data
+            hpx::agas::unregister_name(data.symbolic_name_);   // unregister config data
 
             for (std::size_t i = 0; i < partitions_.size(); ++i)
             {
-                unregister_name(data.symbolic_name_ + 
+                hpx::agas::unregister_name(data.symbolic_name_ + 
                     boost::lexical_cast<std::string>(i++));
             }
         }
@@ -115,7 +94,9 @@ namespace sheneos
         //        can be fixed.
 
         // connect to the config object 
-        cfg_ = configuration(query_name(symbolic_name_base));
+        hpx::naming::id_type cfg_gid;
+        hpx::agas::resolve_name(symbolic_name_base, cfg_gid);
+        cfg_ = configuration(cfg_gid);
         config_data data = cfg_.get();
 
         if (data.symbolic_name_[data.symbolic_name_.size()-1] != '/')
@@ -126,8 +107,9 @@ namespace sheneos
         for (std::size_t i = 0; i < data.num_instances_; ++i)
         {
             using boost::lexical_cast;
-            partitions_.push_back(query_name(
-                data.symbolic_name_ + lexical_cast<std::string>(i)));
+            partitions_.push_back(hpx::naming::id_type());
+            hpx::agas::resolve_name(data.symbolic_name_ + lexical_cast<std::string>(i),
+                             partitions_.back());
         }
 
         // read required data from given file
@@ -231,7 +213,7 @@ namespace sheneos
         hpx::naming::id_type config_id = 
             hpx::find_locality(configuration::get_component_type());
         cfg_ = configuration(config_id, datafilename, symbolic_name_base, num_localities);
-        register_name(cfg_.get_raw_gid(), symbolic_name_base);
+        hpx::agas::register_name(symbolic_name_base, cfg_.get_gid());
 
         if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
             symbolic_name_base += "/";
@@ -240,8 +222,9 @@ namespace sheneos
         BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
         {
             using boost::lexical_cast;
-            register_name(id.get_gid(), 
-                symbolic_name_base + lexical_cast<std::string>(i++));
+            hpx::agas::register_name(
+                symbolic_name_base + lexical_cast<std::string>(i++),
+                id);
         }
 
         // wait for initialization to finish
