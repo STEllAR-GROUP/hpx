@@ -44,9 +44,7 @@ namespace hpx { namespace util
         // AGAS server only: get number of localities served
         std::size_t get_num_localities() const;
 
-        std::size_t get_agas_allocate_response_pool_size() const;
-
-        std::size_t get_agas_bind_response_pool_size() const;
+        std::size_t get_agas_promise_pool_size() const;
 
         // Get the AGAS locality to use 
         naming::locality get_agas_locality() const;

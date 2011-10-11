@@ -88,9 +88,10 @@ namespace hpx { namespace util
     #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
     #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
     #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
-    #define LAUX_(lvl)  LHPX_(lvl, " [AUX] ")   /* auxiliary */
     #define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
     #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
+    #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
+    #define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
 
     ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,

@@ -23,6 +23,7 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -192,12 +193,25 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
         boost::function<runtime::hpx_main_function_type> func, int& result)
     {
-        // run global pre_main functionality
+        LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main"; 
+
+        // Change our thread description, as we're about to call pre_main 
+        threads::set_thread_description(threads::get_self_id(), "pre_main");
+
+        // Finish the bootstrap
         hpx::pre_main(mode_);
 
-        // now, execute the user supplied thread function
+        LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete"; 
+
+        // Now, execute the user supplied thread function (hpx_main)
         if (!func.empty()) 
+        {
+            // Change our thread description, as we're about to call hpx_main 
+            threads::set_thread_description(threads::get_self_id(), "hpx_main");
+
+            // Call hpx_main
             result = func();
+        }
 
         return threads::thread_state(threads::terminated);
     }
@@ -218,35 +232,40 @@ namespace hpx
         applier_.init_tss();
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line(); 
-        LRT_(info) << "runtime_impl: beginning startup sequence";
-        LRT_(info) << "runtime_impl: starting services";
 
-        // start services (service threads)
+        LBT_(info) << "(1st stage) runtime_impl::start: booting locality "
+                   << here() << " on " << num_threads << " OS-thread"
+                   << ((num_threads == 1) ? "" : "s");
+ 
+        // start runtime_support services  
         runtime_support_.run();
-        LRT_(info) << "runtime_impl: started runtime_support component";
+        LBT_(info) << "(1st stage) runtime_impl::start: started "
+                      "runtime_support component";
 
-        io_pool_.run(false); // start io pool
+        // start the io pool
+        io_pool_.run(false); 
+        LBT_(info) << "(1st stage) runtime_impl::start: started the application "
+                      "I/O service pool";
 
-        thread_manager_.run(num_threads);   // start the thread manager, timer_pool_ as well
-        LRT_(info) << "runtime_impl: started threadmanager";
+        // start the thread manager
+        thread_manager_.run(num_threads); 
+        LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
-        // {{{ late startup - distributed
         // invoke the AGAS v2 notifications, waking up the other localities
         agas::get_big_boot_barrier().trigger();  
-        // }}}
 
         // {{{ launch main 
         // register the given main function with the thread manager
+        LBT_(info) << "(1st stage) runtime_impl::start: launching run_helper "
+                      "pxthread";
+
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func, 
                 boost::ref(result_)), 
             "run_helper");
         thread_manager_.register_thread(data);
         this->runtime::start();
-
-        LRT_(info) << "runtime_impl: started using " << num_threads
-                   << " OS threads";
         // }}}
 
         // block if required
