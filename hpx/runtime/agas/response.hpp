@@ -43,7 +43,7 @@ struct response
         , data(boost::fusion::make_vector())
     {}
 
-    explicit response(
+    response(
         namespace_action_code type_
       , naming::gid_type lower_
       , naming::gid_type upper_
@@ -57,7 +57,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
@@ -70,7 +70,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , gva const& gva_
       , error status_ = success
@@ -82,7 +82,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , boost::uint64_t count_
       , boost::int32_t ctype_
@@ -95,7 +95,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , boost::uint64_t count_
       , components::component_type ctype_
@@ -108,7 +108,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , boost::uint64_t count_
       , error status_ = success
@@ -120,7 +120,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
     
-    explicit response(
+    response(
         namespace_action_code type_
       , components::component_type ctype_
       , error status_ = success
@@ -132,7 +132,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , boost::int32_t ctype_
       , error status_ = success
@@ -144,7 +144,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , std::vector<boost::uint32_t> const& prefixes_
       , error status_ = success
@@ -156,7 +156,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , naming::gid_type gid_
       , error status_ = success
@@ -168,7 +168,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-    explicit response(
+    response(
         namespace_action_code type_
       , boost::uint32_t prefix_ 
       , error status_ = success

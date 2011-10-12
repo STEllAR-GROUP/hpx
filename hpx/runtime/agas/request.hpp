@@ -47,7 +47,7 @@ struct request
     {}
 
     // REVIEW: Should the GVA here be a resolved address?
-    explicit request(
+    request(
         namespace_action_code type_
       , naming::gid_type const& gid_
       , gva const& gva_ 
@@ -58,7 +58,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , naming::gid_type const& gid_
       , boost::uint64_t count_  
@@ -69,7 +69,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , naming::gid_type const& gid_
         )
@@ -79,7 +79,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , naming::locality const& locality_
       , boost::uint64_t count_  
@@ -90,7 +90,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , naming::locality const& locality_
         )
@@ -100,7 +100,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , components::component_type ctype_ 
         )
@@ -110,7 +110,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , boost::int32_t ctype_ 
         )
@@ -120,7 +120,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , std::string const& name_
       , boost::uint32_t prefix_ 
@@ -131,7 +131,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , std::string const& name_
       , naming::gid_type const& gid_ 
@@ -142,7 +142,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , std::string const& name_
         )
@@ -152,7 +152,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-    explicit request(
+    request(
         namespace_action_code type_
       , iterate_names_function_type const& f_ 
         )
