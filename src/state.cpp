@@ -23,10 +23,10 @@ namespace hpx
             // This function is called (amongst other places) while an HPX 
             // exception is thrown. If this happens from a thread which is
             // not a HPX thread we will seg-fault here.
-            if (0 == get_self_ptr()) {
+            //if (0 == get_self_ptr()) {
                 // we're probably either  starting or stopping
-                return (mask & (starting | stopping)) ? true : false;
-            }
+            //    return (mask & (starting | stopping)) ? true : false;
+            //}
 
             hpx::applier::applier* p = applier::get_applier_ptr();
             if (NULL == p) {
