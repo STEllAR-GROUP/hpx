@@ -389,35 +389,42 @@ namespace hpx { namespace performance_counters
             status_generic_error;
     }
 
-    counter_status create_raw_counter(
+    naming::id_type create_raw_counter(
         counter_info const& info, boost::int64_t* countervalue,
-        naming::id_type& id, error_code& ec)
+        error_code& ec)
     {
-        return get_runtime().get_counter_registry().create_raw_counter(
+        naming::id_type id;
+        get_runtime().get_counter_registry().create_raw_counter(
             info, countervalue, id, ec);
+        return id;
     }
 
-    counter_status create_raw_counter(
+    naming::id_type create_raw_counter(
         counter_info const& info, boost::function<boost::int64_t()> f,
-        naming::id_type& id, error_code& ec)
+        error_code& ec)
     {
-        return get_runtime().get_counter_registry().create_raw_counter(
+        naming::id_type id;
+        get_runtime().get_counter_registry().create_raw_counter(
             info, f, id, ec);
+        return id;
     }
 
-    counter_status create_counter(
-        counter_info const& info, naming::id_type& id, error_code& ec)
+    naming::id_type create_counter(counter_info const& info, error_code& ec)
     {
-        return get_runtime().get_counter_registry().create_counter(info, id, ec);
+        naming::id_type id;
+        get_runtime().get_counter_registry().create_counter(info, id, ec);
+        return id;
     }
 
-    counter_status create_average_count_counter(
+    naming::id_type create_average_count_counter(
         counter_info const& info, std::string const& base_counter_name,
-        std::size_t base_time_interval, naming::id_type& id, error_code& ec)
+        std::size_t base_time_interval, error_code& ec)
     {
-        return get_runtime().get_counter_registry().
+        naming::id_type id;
+        get_runtime().get_counter_registry().
             create_average_count_counter(info, base_counter_name, 
                 base_time_interval, id, ec);
+        return id;
     }
 
     counter_status add_counter(

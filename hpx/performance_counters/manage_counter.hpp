@@ -35,7 +35,8 @@ namespace hpx { namespace performance_counters
             }
  
             info_.fullname_ = name;
-            return create_raw_counter(info_, f, counter_, ec);
+            counter_ = create_raw_counter(info_, f, ec);
+            return counter_ ? status_valid_data : status_generic_error;
         }
 
         // create and install a counter which calculates the average rate of 
@@ -51,8 +52,9 @@ namespace hpx { namespace performance_counters
             }
  
             info_.fullname_ = name;
-            return create_average_count_counter(info_, base_counter_name, 
-                base_time_interval, counter_, ec);
+            counter_ = create_average_count_counter(info_, base_counter_name, 
+                base_time_interval, ec);
+            return counter_ ? status_valid_data : status_generic_error;
         }
 
         // create and install a self-contained counter
@@ -65,7 +67,8 @@ namespace hpx { namespace performance_counters
             }
  
             info_.fullname_ = name;
-            return create_counter(info_, counter_, ec);
+            counter_ = create_counter(info_, ec);
+            return counter_ ? status_valid_data : status_generic_error;
         }
 
         // install an (existing) counter

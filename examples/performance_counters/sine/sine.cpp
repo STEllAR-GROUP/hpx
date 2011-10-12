@@ -46,7 +46,7 @@ namespace performance_counters { namespace sine
             "returns the averaged value of a sine wave calculated over "
             "an arbitrary time line");
 
-        // Second create and register the counter instance
+        // Second, create and register the counter instance
         boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
         boost::format sine_instance("/sine(locality#%d/instance#0)/average");
 
@@ -58,9 +58,9 @@ namespace performance_counters { namespace sine
 
         // create the 'sine' performance counter component locally
         boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
-        hpx::naming::id_type id;
-        hpx::performance_counters::create_average_count_counter(info, 
-            boost::str(base_instance % prefix), 100, id);
+        hpx::naming::id_type id = 
+            hpx::performance_counters::create_average_count_counter(info, 
+                boost::str(base_instance % prefix), 100);
 
         // install the counter instance
         hpx::performance_counters::install_counter(id, info);
