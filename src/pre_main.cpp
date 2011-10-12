@@ -183,14 +183,6 @@ void pre_main(runtime_mode mode)
     // Enable logging.
     components::activate_logging();
     LBT_(info) << "(3rd stage) pre_main: activated logging";
-
-    // Teardown the second and third stage barriers.
-    if (agas_client.is_bootstrap())
-    {
-        agas::unregister_name(second_barrier);
-        agas::unregister_name(third_barrier);
-        LBT_(info) << "(3rd stage) pre_main: destroyed 2nd and 3rd stage boot barriers";
-    }
 }
 
 }
