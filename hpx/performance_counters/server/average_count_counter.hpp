@@ -11,6 +11,8 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/spinlock.hpp>
 
+#include <boost/accumulators/statistics/mean.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
@@ -59,11 +61,15 @@ namespace hpx { namespace performance_counters { namespace server
         typedef util::spinlock mutex_type;
         mutable mutex_type mtx_;
 
-        hpx::util::interval_timer timer_;  ///< base time interval in milliseconds
+        hpx::util::interval_timer timer_; ///< base time interval in milliseconds
         std::string base_counter_name_;   ///< name of base counter to be queried
         naming::id_type base_counter_id_;
-        counter_value prev_value_;        ///< previous base counter value
-        counter_value value_;             ///< current counter value
+        typedef boost::accumulators::accumulator_set<
+            boost::int64_t, 
+            boost::accumulators::stats<boost::accumulators::tag::mean> 
+        > mean_accumulator_type;
+        mean_accumulator_type value_;
+        counter_value prev_value_;
     };
 }}}
 

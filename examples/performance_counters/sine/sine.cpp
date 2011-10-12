@@ -36,6 +36,36 @@ namespace performance_counters { namespace sine
         return std::sin(up_time.count() / 10.) * 100000.;
     }
 
+    // create an averaging performance counter based on the immediate sine 
+    // counter
+    void create_averaging_sine()
+    {
+        // First, register the counter type
+        hpx::performance_counters::install_counter_type(
+            "/sine/average", hpx::performance_counters::counter_average_count,
+            "returns the averaged value of a sine wave calculated over "
+            "an arbitrary time line");
+
+        // Second create and register the counter instance
+        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+        boost::format sine_instance("/sine(locality#%d/instance#0)/average");
+
+        // full info of the counter to create, help text and version will be
+        // complemented from counter type info as specified above
+        hpx::performance_counters::counter_info info(
+            hpx::performance_counters::counter_average_count, 
+            boost::str(sine_instance % prefix));
+
+        // create the 'sine' performance counter component locally
+        boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
+        hpx::naming::id_type id;
+        hpx::performance_counters::create_average_count_counter(info, 
+            boost::str(base_instance % prefix), 100, id);
+
+        // install the counter instance
+        hpx::performance_counters::install_counter(id, info);
+    }
+
     // This function will be registered as a startup function for HPX below. 
     // 
     // That means it will be executed in a px-thread before hpx_main, but after 
@@ -81,6 +111,10 @@ namespace performance_counters { namespace sine
         // to use a plain function to return the counter values. We do not need
         // to explicitly create the counter instance in this case.
         install_counter(boost::str(sine_instance % prefix % 1), immediate_sine);
+
+        // The third counter is an averaging performance counter based on the 
+        // first counter above
+        create_averaging_sine();
     }
 }}
 

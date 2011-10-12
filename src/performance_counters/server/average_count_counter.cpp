@@ -54,7 +54,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
-            prev_value_ = value_ = base_value;
+            value_(base_value.value_);
+            prev_value_ = base_value;
         }
 
         timer_.start();       // start interval timer
@@ -63,7 +64,15 @@ namespace hpx { namespace performance_counters { namespace server
     void average_count_counter::get_counter_value(counter_value& value)
     {
         mutex_type::scoped_lock l(mtx_);
-        value = value_;
+
+        value = prev_value_;                // return value
+        value.value_ = boost::accumulators::mean(value_);
+        value.status_ = status_valid_data;
+        value.time_ = boost::chrono::high_resolution_clock::now().
+            time_since_epoch().count();
+
+        value_ = mean_accumulator_type();   // reset accumulator
+        value_(prev_value_.value_);         // start off with last base value
     }
 
     void average_count_counter::evaluate()
@@ -72,7 +81,8 @@ namespace hpx { namespace performance_counters { namespace server
         counter_value base_value;
         evaluate_base_counter(base_value);
 
-        // use given time interval as the base unit
+        // simply average the measured base counter values since it got queried 
+        // for the last time
         counter_value value;
         if (base_value.scaling_ != prev_value_.scaling_ ||
             base_value.scale_inverse_ != prev_value_.scale_inverse_)
@@ -83,46 +93,34 @@ namespace hpx { namespace performance_counters { namespace server
                 "base counter should keep scaling constant over time");
         }
         else {
-            // get time interval since last query operation, assume time to be in 
-            // nanoseconds, base_time_interval is given in microseconds
-            boost::int64_t time_interval = (base_value.time_ - prev_value_.time_) / 1000;
-
-            value.value_ = ((base_value.value_ - prev_value_.value_) * 
-                timer_.get_interval()) / time_interval;
-            value.scaling_ = base_value.scaling_;
-            value.scale_inverse_ = base_value.scale_inverse_;
+            mutex_type::scoped_lock l(mtx_);
+            value_(base_value.value_);          // accumulate new value
         }
-
-        value.status_ = status_valid_data;
-        value.time_ = boost::chrono::high_resolution_clock::now().
-            time_since_epoch().count();
-
-        // store current values
-        mutex_type::scoped_lock l(mtx_);
-        value_ = value;
-        prev_value_ = base_value;
     }
 
     void average_count_counter::evaluate_base_counter(counter_value& value)
     {
-        // lock here to avoid checking out multiple reference counted GIDS
-        // from AGAS
-        mutex_type::scoped_lock l(mtx_);
+        {
+            // lock here to avoid checking out multiple reference counted GIDs
+            // from AGAS
+            mutex_type::scoped_lock l(mtx_);
 
-        if (!base_counter_id_) {
-            // retrieve the base counter gid, if it's not know yet
-            error_code ec;
-            agas::resolve_name(base_counter_name_, base_counter_id_, ec);
-            if (HPX_UNLIKELY(ec || !base_counter_id_))
-            {
-                HPX_THROW_EXCEPTION(bad_parameter, 
-                    "average_count_counter::evaluate_base_counter",
-                    boost::str(
-                        boost::format("unknown performance counter: '%s'") % 
-                        base_counter_name_))
+            if (!base_counter_id_) {
+                // retrieve the base counter gid, if it's not know yet
+                error_code ec;
+                agas::resolve_name(base_counter_name_, base_counter_id_, ec);
+                if (HPX_UNLIKELY(ec || !base_counter_id_))
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter, 
+                        "average_count_counter::evaluate_base_counter",
+                        boost::str(
+                            boost::format("unknown performance counter: '%s'") % 
+                            base_counter_name_))
+                }
             }
         }
 
+        // query the actual value
         value = stubs::performance_counter::get_value(base_counter_id_);
     }
 }}}

@@ -58,7 +58,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         set_thread_state(get_self_id(), boost::posix_time::milliseconds(pause),
             pending, wait_timeout, thread_priority_critical);
-        
+
         // give up control to the thread manager, we will be resumed after
         // 'pause' ms as specified above
         using hpx::threads::get_self;
@@ -69,45 +69,12 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     return 0;
 }
 
-// create an averaging performance counter based on the immediate sine 
-// counter
-void create_averaging_sine()
-{
-    // First, register the counter type
-    hpx::performance_counters::install_counter_type(
-        "/sine/average", hpx::performance_counters::counter_average_count,
-        "returns the averaged value of a sine wave calculated over "
-        "an arbitrary time line");
-
-    // Second create and register the counter instance
-    boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
-    boost::format sine_instance("/sine(locality#%d/instance#0)/average");
-
-    // full info of the counter to create, help text and version will be
-    // complemented from counter type info as specified above
-    hpx::performance_counters::counter_info info(
-        hpx::performance_counters::counter_average_count, 
-        boost::str(sine_instance % prefix));
-
-    // create the 'sine' performance counter component locally
-    boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
-    hpx::naming::id_type id;
-    hpx::performance_counters::create_average_count_counter(info, 
-        boost::str(base_instance % prefix), 1000, id);
-
-    // install the counter instance
-    hpx::performance_counters::install_counter(id, info);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // retrieve the command line arguments
     boost::uint64_t const pause = vm["pause"].as<boost::uint64_t>();
     boost::uint64_t const values = vm["values"].as<boost::uint64_t>();
-
-    // create and install averaging performance counter
-    create_averaging_sine();
 
     // do main work, i.e. query the performance counters
     std::cout << "starting sine monitoring..." << std::endl;
