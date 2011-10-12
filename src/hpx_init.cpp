@@ -584,6 +584,43 @@ namespace hpx
             Runtime const& rt_;
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Runtime>
+        int run_list_symbolic_names(Runtime& rt, hpx::hpx_main_func f, 
+            boost::program_options::variables_map& vm, std::size_t num_threads, 
+            std::size_t num_localities, int& result)
+        { 
+            if (vm.count("list-counters")) {
+                // Print all available performance counter names and then 
+                // call hpx::finalize() and return 0.
+                result = rt.run(
+                    boost::bind(&list_symbolic_names<list_counter_action>, 
+                        vm, f, "registered performance counters"),
+                    num_threads, num_localities);
+                return true;
+            }
+            else if (vm.count("list-counter-infos")) {
+                // Print all available performance counter infos and then 
+                // call hpx::finalize() and return 0.
+                result = rt.run(
+                    boost::bind(&list_symbolic_names<list_counter_info_action>, 
+                        vm, f, "registered performance counters"),
+                    num_threads, num_localities);
+                return true;
+            }
+            else if (vm.count("list-symbolic-names")) {
+                // Print all registered symbolic names and then call
+                // hpx::finalize() and return 0.
+                result = rt.run(
+                    boost::bind(&list_symbolic_names<list_symbolic_name_action>, 
+                        vm, f, "registered symbolic names"),
+                    num_threads, num_localities);
+                return true;
+            }
+            return false;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f, 
             boost::program_options::variables_map& vm, runtime_mode mode, 
@@ -651,65 +688,20 @@ namespace hpx
                 rt.add_startup_function(dump_config<Runtime>(rt));
             }
 
-            if (vm.count("exit")) { 
-                if (vm.count("list-counters")) {
-                    // Print all available performance counter names and then 
-                    // call hpx::finalize() and return 0.
-                    return rt.run(
-                        boost::bind(&list_symbolic_names<list_counter_action>, 
-                            vm, hpx::hpx_main_func(0),
-                            "registered performance counters"),
-                        num_threads, num_localities);
-                }
-                else if (vm.count("list-counter-infos")) {
-                    // Print all available performance counter infos and then 
-                    // call hpx::finalize() and return 0.
-                    return rt.run(
-                        boost::bind(&list_symbolic_names<list_counter_info_action>, 
-                            vm, hpx::hpx_main_func(0),
-                            "registered performance counters"),
-                        num_threads, num_localities);
-                }
-                else if (vm.count("list-symbolic-names")) {
-                    // Print all registered symbolic names and then call
-                    // hpx::finalize() and return 0.
-                    return rt.run(
-                        boost::bind(&list_symbolic_names<list_symbolic_name_action>, 
-                            vm, hpx::hpx_main_func(0),
-                            "registered symbolic names"),
-                        num_threads, num_localities);
-                }
-                return 0;
+            int result = 0;
+            if (vm.count("exit")) {
+                run_list_symbolic_names(rt, hpx::hpx_main_func(0), vm, num_threads, 
+                    num_localities, result);
+                return result;
             }
 
-            if (vm.count("list-counters")) {
-                // Print out all available performance counter names and then 
-                // call f.
-                return rt.run(
-                    boost::bind(&list_symbolic_names<list_counter_action>, vm, f,
-                        "registered performance counters"),
-                    num_threads, num_localities);
-            }
-            else if (vm.count("list-counter-infos")) {
-                // Print out all available performance counter infos and then 
-                // call f.
-                return rt.run(
-                    boost::bind(&list_symbolic_names<list_counter_info_action>,
-                        vm, f, "registered performance counters"),
-                    num_threads, num_localities);
-            }
-            else if (vm.count("list-symbolic-names")) {
-                // Print out all available symbolic names and then call f.
-                return rt.run(
-                    boost::bind(&list_symbolic_names<list_symbolic_name_action>,
-                        vm, f, "registered symbolic names"),
-                    num_threads, num_localities);
-            }
+            // Run this runtime instance listing names, returns false otherwise
+            if (run_list_symbolic_names(rt, f, vm, num_threads, num_localities, result))
+                return result;
 
-            if (0 != f) {
-                // Run this runtime instance using the given function f.
+            // Run this runtime instance using the given function f.
+            if (0 != f) 
                 return rt.run(boost::bind(f, vm), num_threads, num_localities);
-            }
 
             // Run this runtime instance without an hpx_main
             return rt.run(num_threads, num_localities);
