@@ -44,6 +44,7 @@ struct request
     request()
         : mc(invalid_request) 
         , data(boost::fusion::make_vector())
+        , source()
     {}
 
     // REVIEW: Should the GVA here be a resolved address?
@@ -54,6 +55,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, gva_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -65,6 +67,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, count_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -75,6 +78,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -86,6 +90,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(locality_, count_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -96,6 +101,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(locality_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -106,6 +112,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -116,6 +123,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(ctype_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -127,6 +135,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, prefix_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -138,6 +147,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, gid_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -148,6 +158,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -158,6 +169,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector(f_))
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -167,6 +179,7 @@ struct request
         )
       : mc(type_)
       , data(boost::fusion::make_vector())
+      , source(applier::get_prefix_id())
     {
         // TODO: verification of namespace_action_code
     }
@@ -177,6 +190,7 @@ struct request
         )
       : mc(other.mc)
       , data(other.data)
+      , source(other.source)
     {}   
 
     // copy assignment
@@ -186,6 +200,7 @@ struct request
     {
         mc = other.mc;
         data = other.data;
+        source = other.source;
         return *this;
     }
 
@@ -305,6 +320,11 @@ struct request
             }
         };
     } // }}} 
+
+    boost::uint32_t get_source_prefix() const
+    {
+        return source;
+    }
 
     namespace_action_code get_action_code() const
     {
@@ -490,6 +510,7 @@ struct request
 
         ar & which; 
         ar & mc;
+        ar & source;
         boost::apply_visitor(save_visitor<Archive>(ar), data);  
     } // }}}
 
@@ -518,6 +539,7 @@ struct request
 
         ar & which;
         ar & mc;
+        ar & source;
 
         // Build the jump table.
         switch (which)
@@ -539,6 +561,7 @@ struct request
 
     namespace_action_code mc;
     data_type data;
+    boost::uint32_t source;
 };
 
 }}
