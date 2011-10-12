@@ -204,9 +204,9 @@ namespace hpx { namespace threads
     /// (suspends the current thread). It sets the new state of this thread
     /// to the thread state passed as the parameter.
     ///
-    /// Normally, the return value is true. If the suspension was aborted, this 
-    /// function will throw a \a no_success exception.
-    void suspend(thread_state_enum state)
+    /// If the suspension was aborted, this function will throw a
+    /// \a yield_aborted exception.
+    void suspend(thread_state_enum state, error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
@@ -218,18 +218,24 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
-    void suspend(boost::posix_time::ptime const& at_time)
+    void suspend(boost::posix_time::ptime const& at_time, error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
         threads::set_thread_state(self.get_thread_id(), 
             at_time, threads::pending, threads::wait_signaled, 
-            threads::thread_priority_critical);
+            threads::thread_priority_critical, ec);
+
+        if (ec)
+            return;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
@@ -240,18 +246,25 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
-    void suspend(boost::posix_time::time_duration const& after_duration)
+    void suspend(boost::posix_time::time_duration const& after_duration,
+        error_code& ec)
     {
         // schedule a thread waking us up after_duration
         threads::thread_self& self = threads::get_self();
         threads::set_thread_state(self.get_thread_id(), 
             after_duration, threads::pending, threads::wait_signaled, 
-            threads::thread_priority_critical);
+            threads::thread_priority_critical, ec);
+
+        if (ec)
+            return;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
@@ -262,9 +275,12 @@ namespace hpx { namespace threads
             strm << "thread(" << id << ", " 
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
                 hpx::util::osstream_get_string(strm));
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 }}
 

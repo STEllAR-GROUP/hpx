@@ -190,19 +190,61 @@ namespace hpx { namespace threads
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to the thread state passed as the parameter.
-    HPX_API_EXPORT void suspend(thread_state_enum state = pending);
+    ///
+    /// \note Must be called from within a pxthread.
+    ///
+    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a pxthread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the threadmanager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.  
+    ///  
+    HPX_API_EXPORT void suspend(thread_state_enum state = pending,
+        error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to \a suspended and schedules a wakeup for this threads at the given 
     /// time.
-    HPX_API_EXPORT void suspend(boost::posix_time::ptime const&);
+    ///
+    /// \note Must be called from within a pxthread.
+    ///
+    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a pxthread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the threadmanager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.  
+    ///  
+    HPX_API_EXPORT void suspend(boost::posix_time::ptime const&,
+        error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to \a suspended and schedules a wakeup for this threads after the given
     /// duration.
-    HPX_API_EXPORT void suspend(boost::posix_time::time_duration const&);
+    ///
+    /// \note Must be called from within a pxthread.
+    ///
+    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a pxthread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the threadmanager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.  
+    ///  
+    HPX_API_EXPORT void suspend(boost::posix_time::time_duration const&,
+        error_code& ec = throws);
 }}
 
 #endif
