@@ -33,8 +33,12 @@ namespace hpx { namespace actions
                     boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
 
             // Give up if we're shutting down.
-//            if (threads::threadmanager_is(stopping))
-//                return;
+            if (threads::threadmanager_is(stopping))
+            {
+                LPT_(debug) << "action_manager: fetch_parcel: dropping late "
+                               "parcel " << p;
+                return;
+            }
 
         // write this parcel to the log
             LPT_(debug) << "action_manager: fetch_parcel: " << p;
