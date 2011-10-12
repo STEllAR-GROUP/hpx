@@ -8,6 +8,7 @@
 #include <hpx/state.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -35,9 +36,16 @@ namespace hpx { namespace components
         }
     }
 
-    // Stub function which applies the console_error_sink action.
+    /// Stub function which applies the console_error_sink action.
+    ///
+    /// \note Must be called from a pxthread.
     void console_error_sink(boost::exception_ptr const& e)
     {
+        if (HPX_UNLIKELY(!threads::get_self_ptr()))
+            HPX_THROW_EXCEPTION(null_thread_id
+              , "components::console_error_sink"
+              , "console_error_sink was not called from a pxthread"); 
+
         // retrieve console locality
         naming::gid_type console_gid;
         naming::get_agas_client().get_console_prefix(console_gid);
@@ -46,16 +54,8 @@ namespace hpx { namespace components
         // Report the error only if the thread-manager is up. 
         if (threads::threadmanager_is(running))
         {
-            if (threads::get_self_ptr())
-            {
-                lcos::eager_future<server::console_error_sink_action> f(dst, e);
-                f.get();
-            }
-            else
-            {
-                // FIXME: This should use a sync_put_parcel.
-                applier::apply<server::console_error_sink_action>(dst, e);
-            }
+            lcos::eager_future<server::console_error_sink_action> f(dst, e);
+            f.get();
         }
     }
 }}
