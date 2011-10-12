@@ -159,6 +159,9 @@
     <Filter Include="Source Files\Runtime\AGAS\Server">
       <UniqueIdentifier>{8f481286-a23b-4d82-8b2a-8030a8fadbce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Runtime\Parcelset\Policies">
+      <UniqueIdentifier>{f46e2b76-7119-467e-ab11-37fd0ba3b36b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -616,9 +619,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelport_connection.hpp">
       <Filter>Header Files\Runtime\Parcelset</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\runtime\parcelset\server\parcelhandler_queue.hpp">
-      <Filter>Header Files\Runtime\Parcelset\Server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\server\parcelport_queue.hpp">
       <Filter>Header Files\Runtime\Parcelset\Server</Filter>
     </ClInclude>
@@ -975,6 +975,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\agas\interface.hpp">
       <Filter>Header Files\Runtime\AGAS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelhandler_queue_base.hpp">
+      <Filter>Header Files\Runtime\Parcelset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\policies\global_parcelhandler_queue.hpp">
+      <Filter>Header Files\Runtime\Parcelset\Policies</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
