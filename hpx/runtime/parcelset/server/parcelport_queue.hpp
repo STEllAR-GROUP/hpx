@@ -19,7 +19,7 @@ namespace hpx { namespace parcelset { namespace server
         parcelport_queue(hpx::parcelset::parcelport& pp)
           : parcel_port_(pp)
         {}
-                
+
         /// add a new parcel to the end of the parcel queue
         void add_parcel(boost::shared_ptr<std::vector<char> > const& data,
                         threads::thread_priority priority)

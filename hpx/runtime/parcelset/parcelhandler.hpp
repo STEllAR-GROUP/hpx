@@ -289,6 +289,12 @@ namespace hpx { namespace parcelset
         /// performance counters 
         void install_counters();
 
+    protected:
+        boost::int64_t get_queue_length() const
+        {
+            return parcels_->get_queue_length();
+        }
+
     private:
         /// The AGAS client
         naming::resolver_client& resolver_;
@@ -299,7 +305,7 @@ namespace hpx { namespace parcelset
         /// the parcelport this handler is associated with
         parcelport& pp_;
 
-        /// the threadmanager to use (optional)
+        /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
 
         /// 

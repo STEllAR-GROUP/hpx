@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset
             hpx::report_error(boost::current_exception());
         }
 
-        // Prevent exceptions from boiling up into the threadmanager.
+        // Prevent exceptions from boiling up into the thread-manager.
         catch (...)
         {
             LPT_(error) 
@@ -148,7 +148,7 @@ namespace hpx { namespace parcelset
 
         return threads::thread_state(threads::terminated);
     }
-        
+
     parcelhandler::parcelhandler(naming::resolver_client& resolver, 
             parcelport& pp, threads::threadmanager_base* tm, 
             parcelhandler_queue_base* policy)
@@ -297,6 +297,9 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1 },
             { "/parcels/count/received", performance_counters::counter_raw,
               "returns the number of received parcels for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1 },
+            { "/parcelqueue/length/instantaneous", performance_counters::counter_raw,
+              "returns the number current length of the queue of incomming threads",
               HPX_PERFORMANCE_COUNTER_V1 }
         };
         performance_counters::install_counter_types(
@@ -304,6 +307,7 @@ namespace hpx { namespace parcelset
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
+        boost::format queue_length("/parcelqueue(locality#%d/total)/length/instantaneous");
 
         performance_counters::raw_counter_data const counters[] = 
         {
@@ -312,7 +316,10 @@ namespace hpx { namespace parcelset
               boost::bind(&parcelport::total_sends_completed, &pp_) },
             // Total parcels received (completed)
             { boost::str(parcel_count % prefix % "received"),
-              boost::bind(&parcelport::total_receives_completed, &pp_) }
+              boost::bind(&parcelport::total_receives_completed, &pp_) },
+            // Current length of incoming parcel queue
+            { boost::str(queue_length % prefix),
+              boost::bind(&parcelhandler::get_queue_length, this) }
         };
         performance_counters::install_counters(
             counters, sizeof(counters)/sizeof(counters[0]));
