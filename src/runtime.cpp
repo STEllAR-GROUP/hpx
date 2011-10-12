@@ -151,8 +151,8 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address()),
         agas_client_(parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_
-                       , new parcelset::policies::global_parcelhandler_queue),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_, 
+            new parcelset::policies::global_parcelhandler_queue),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()),
