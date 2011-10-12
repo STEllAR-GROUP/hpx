@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -1184,11 +1185,9 @@ namespace hpx
         if (shutdown_timeout == -1.0)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-        components::server::runtime_support* p = 
-            reinterpret_cast<components::server::runtime_support*>(
-                  get_runtime().get_runtime_support_lva());
-
-        p->shutdown_all(shutdown_timeout); 
+        components::stubs::runtime_support::shutdown_all(
+            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)
+          , shutdown_timeout);
     }
 
     ///////////////////////////////////////////////////////////////////////////

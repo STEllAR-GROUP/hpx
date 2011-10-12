@@ -386,8 +386,8 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
-        // Early and late exceptions
-        if (!threads::threadmanager_is(running))
+        // Early and late exceptions, errors outside of pxthreads
+        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
             detail::report_exception_and_abort(e);
             return;
@@ -411,13 +411,8 @@ namespace hpx
             }
         }
 
-        // Stop all services.
-        //stop(false);
-        components::server::runtime_support* p = 
-            reinterpret_cast<components::server::runtime_support*>(
-                  get_runtime_support_lva());
-
-        p->terminate_all();     // this does not return
+        components::stubs::runtime_support::terminate_all(
+            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy> 
