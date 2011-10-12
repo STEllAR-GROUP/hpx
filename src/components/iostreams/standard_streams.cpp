@@ -77,7 +77,7 @@ namespace hpx { namespace iostreams
                 {
                     naming::gid_type console;
                     error_code ec;
-                    agas_client.get_console_prefix_cached(console, ec);
+                    agas_client.get_console_prefix(console, ec);
                     if (HPX_UNLIKELY(ec || !console))
                     {
                         HPX_THROW_EXCEPTION(no_registered_console,

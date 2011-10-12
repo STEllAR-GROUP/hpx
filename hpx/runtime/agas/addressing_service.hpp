@@ -165,18 +165,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
-        hosted_data_type()
-          : console_cache_(0)
-        {}
-
         primary_namespace primary_ns_;
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
-
-        mutex_type gva_cache_mtx_;
-        gva_cache_type gva_cache_; 
-
-        console_cache_type console_cache_;
 
         hpx::lcos::local_counting_semaphore promise_pool_semaphore_;
         promise_pool_type promise_pool_;       
@@ -185,6 +176,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         naming::address component_ns_addr_;
         naming::address symbol_ns_addr_;
     }; // }}}
+
+    mutex_type gva_cache_mtx_;
+    gva_cache_type gva_cache_; 
+
+    console_cache_type console_cache_;
 
     const service_mode service_type;
     const runtime_mode runtime_type;
@@ -305,17 +301,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///                   of hpx#exception.
     bool get_console_prefix(
         naming::gid_type& prefix
-      , bool try_cache = true, 
-        error_code& ec = throws
-        );
-
-    bool get_console_prefix_cached(
-        naming::gid_type& prefix
       , error_code& ec = throws
-        )
-    {
-        return get_console_prefix(prefix, true, ec);
-    }
+        );
 
     /// \brief Query for the prefixes of all known localities.
     ///

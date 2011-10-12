@@ -32,6 +32,8 @@ addressing_service::addressing_service(
 
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
+    gva_cache_.reserve(ini_.get_agas_gva_cache_size());
+
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);
     else
@@ -98,8 +100,6 @@ void addressing_service::launch_hosted(
     )
 { // {{{
     hosted = boost::make_shared<hosted_data_type>();
-
-    hosted->gva_cache_.reserve(ini_.get_agas_gva_cache_size());
 
     get_big_boot_barrier().wait();
 
@@ -244,7 +244,6 @@ bool addressing_service::unregister_locality(
 
 bool addressing_service::get_console_prefix(
     naming::gid_type& prefix
-  , bool try_cache
   , error_code& ec
     )
 { // {{{
@@ -264,43 +263,28 @@ bool addressing_service::get_console_prefix(
             return true;
         }
      
-        if (try_cache && !is_bootstrap())
+        if (console_cache_)
         {
-            if (hosted->console_cache_)
-            {
-                prefix = naming::get_gid_from_prefix(hosted->console_cache_);
-                if (&ec != &throws)
-                    ec = make_success_code();
-                return true;
-            }
+            prefix = naming::get_gid_from_prefix(console_cache_);
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
         }
     
-        if (is_bootstrap()) {
-            request req(symbol_ns_resolve, "/locality(console)");
-            response rep = bootstrap->symbol_ns_server.service(req, ec);
+        request req(symbol_ns_resolve, "/locality(console)");
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->symbol_ns_server.service(req, ec);
+        else
+            rep = hosted->symbol_ns_.service(req, ec);
     
-            if (!ec &&
-                (rep.get_gid() != naming::invalid_gid) &&
-                (rep.get_status() == success))
-            {
-                prefix = rep.get_gid();
-                return true;
-            }
-        }
-    
-        else {
-            request req(symbol_ns_resolve, "/locality(console)");
-            response rep = hosted->symbol_ns_.service(req, ec);
-    
-            if (!ec &&
-                (rep.get_gid() != naming::invalid_gid) &&
-                (rep.get_status() == success))
-            {
-                prefix = rep.get_gid();
-                hosted->console_cache_.store
-                    (naming::get_prefix_from_gid(prefix));
-                return true;
-            }
+        if (!ec && (rep.get_gid() != naming::invalid_gid) &&
+            (rep.get_status() == success))
+        {
+            prefix = rep.get_gid();
+            console_cache_.store(naming::get_prefix_from_gid(prefix));
+            return true;
         }
     
         return false;
@@ -634,14 +618,11 @@ bool addressing_service::bind_range(
         if (ec || (success != s && repeated_request != s))
             return false;
     
-        if (!is_bootstrap())
-        { 
-            mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(lower_id, count);
-            hosted->gva_cache_.insert(key, g);
-        }
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+        gva_cache_key key(lower_id, count);
+        gva_cache_.insert(key, g);
 
-        return repeated_request != s;
+        return true;
     }
     catch (hpx::exception const& e) {
         // Replace the future in the pool. See get_id_range above for an
@@ -681,22 +662,19 @@ bool addressing_service::unbind_range(
         else
             rep = hosted->primary_ns_.service(req, ec);
 
-        if (ec)
+        if (ec || (success != rep.get_status()))
             return false;
  
-        if (!is_bootstrap() && (success == rep.get_status()))
-        {
-            // I'm afraid that this will break the first form of paged caching,
-            // so it's commented out for now.
-            //mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            //gva_erase_policy ep(lower_id, count);
-            //hosted->gva_cache_.erase(ep);
-            addr.locality_ = rep.get_gva().endpoint;
-            addr.type_ = rep.get_gva().type;
-            addr.address_ = rep.get_gva().lva();
-        }
+        // I'm afraid that this will break the first form of paged caching,
+        // so it's commented out for now.
+        //mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+        //gva_erase_policy ep(lower_id, count);
+        //hosted->gva_cache_.erase(ep);
+        addr.locality_ = rep.get_gva().endpoint;
+        addr.type_ = rep.get_gva().type;
+        addr.address_ = rep.get_gva().lva();
     
-        return success == rep.get_status(); 
+        return true; 
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -774,7 +752,7 @@ bool addressing_service::resolve(
         // }}}
 
         // Try the cache if applicable.
-        if (!is_bootstrap() && try_cache)
+        if (try_cache)
         {
             if (resolve_cached(id, addr, ec))
                 return true;
@@ -794,7 +772,7 @@ bool addressing_service::resolve(
         if (ec || (success != rep.get_status()))
             return false;
 
-        // Resolve the page to the real resolved address (which is just a page
+        // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and an offset of zero).
         const gva g = rep.get_gva().resolve(id, rep.get_base_gid());
 
@@ -802,13 +780,10 @@ bool addressing_service::resolve(
         addr.type_ = g.type;
         addr.address_ = g.lva();
     
-        if (!is_bootstrap())
-        {
-            // Put the page into the cache.
-            mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
-            gva_cache_key key(rep.get_base_gid(), rep.get_gva().count);
-            hosted->gva_cache_.insert(key, rep.get_gva());
-        }
+        // Put the gva into the cache.
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+        gva_cache_key key(rep.get_base_gid(), rep.get_gva().count);
+        gva_cache_.insert(key, rep.get_gva());
 
         return true;
     }
@@ -831,9 +806,6 @@ bool addressing_service::resolve_cached(
   , error_code& ec
     )
 { // {{{ resolve_cached implementation
-    if (is_bootstrap())
-        return resolve(id, addr, false, ec);
-
     // {{{ special cases
 
     // LVA-encoded GIDs 
@@ -888,12 +860,12 @@ bool addressing_service::resolve_cached(
 
     // first look up the requested item in the cache
     gva_cache_key k(id);
-    mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+    mutex_type::scoped_lock lock(gva_cache_mtx_);
     gva_cache_key idbase;
     gva_cache_type::entry_type e;
 
     // Check if the entry is currently in the cache
-    if (hosted->gva_cache_.get_entry(k, idbase, e))
+    if (gva_cache_.get_entry(k, idbase, e))
     {
         const boost::uint64_t id_msb
             = naming::strip_credit_from_gid(id.get_msb());

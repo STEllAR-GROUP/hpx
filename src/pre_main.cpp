@@ -126,7 +126,7 @@ void pre_main(runtime_mode mode)
         {
             naming::gid_type console_;
             
-            if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_, false)))
+            if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_)))
             {
                 HPX_THROW_EXCEPTION(network_error
                     , "pre_main"
