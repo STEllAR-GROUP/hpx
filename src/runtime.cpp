@@ -544,13 +544,8 @@ namespace hpx
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
-        performance_counters::raw_counter_data counters[] =
-        {
-            { boost::str(runtime_uptime % prefix),
-              boost::function<boost::int64_t()>() }
-        };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
+        performance_counters::install_counter(
+            boost::str(runtime_uptime % prefix));
 
         // install AGAS client counters as well
         get_agas_client().install_counters();
