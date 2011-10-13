@@ -256,6 +256,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelhandler_queue_base.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\policies\global_parcelhandler_queue.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />

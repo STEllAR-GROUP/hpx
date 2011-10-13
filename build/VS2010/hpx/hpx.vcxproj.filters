@@ -982,6 +982,9 @@
     <ClInclude Include="..\..\..\hpx\runtime\parcelset\policies\global_parcelhandler_queue.hpp">
       <Filter>Header Files\Runtime\Parcelset\Policies</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp">
+      <Filter>Header Files\Runtime\Naming</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
