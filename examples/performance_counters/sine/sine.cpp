@@ -75,7 +75,7 @@ namespace performance_counters { namespace sine
         using namespace hpx::performance_counters;
 
         // define the counter types
-        counter_type_data const counter_types[] = 
+        raw_counter_type_data const counter_types[] = 
         {
             { "/sine/immediate", counter_raw,
               "returns the current value of a sine wave calculated over "

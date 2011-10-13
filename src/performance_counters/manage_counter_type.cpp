@@ -33,8 +33,8 @@ namespace hpx { namespace performance_counters
             boost::bind(&counter_type_shutdown, p));
     }
 
-    void install_counter_types(counter_type_data const* data, std::size_t count, 
-        error_code& ec)
+    void install_counter_types(raw_counter_type_data const* data, 
+        std::size_t count, error_code& ec)
     {
         for (std::size_t i = 0; i < count; ++i) 
         {

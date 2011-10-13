@@ -290,7 +290,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::install_counters()
     {
-        performance_counters::counter_type_data const counter_types[] = 
+        performance_counters::raw_counter_type_data const counter_types[] = 
         {
             { "/parcels/count/sent", performance_counters::counter_raw,
               "returns the number of sent parcels for the referenced locality",
