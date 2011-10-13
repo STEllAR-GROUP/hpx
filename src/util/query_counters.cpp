@@ -8,6 +8,8 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/query_counters.hpp>
 
+#include <boost/assert.hpp>
+
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
@@ -17,8 +19,9 @@ namespace hpx { namespace util
             interval*1000, "query_counters", true)
     {}
 
-    void query_counters::find_counters_locked()
+    void query_counters::find_counters()
     {
+        mutex_type::scoped_lock l(mtx_);
         if (ids_.empty())
         {
             ids_.reserve(names_.size());
@@ -31,64 +34,50 @@ namespace hpx { namespace util
                     if (agas::resolve_name(name, ids_.back()))
                         break;
 
-                    threads::suspend(
-                        boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+                    using boost::posix_time::milliseconds;
+                    threads::suspend(milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
 
                 if (HPX_UNLIKELY(!ids_.back()))
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "query_counters::find_counters_locked",
+                        "query_counters::find_counters",
                         boost::str(boost::format(
                             "unknown performance counter: '%1%'") % name))
                 }
             }
         }
-
-        if (HPX_UNLIKELY(ids_.size() != names_.size()))
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "query_counters::find_counters_locked",
-                "couldn't find all target counters");
+        BOOST_ASSERT(ids_.size() == names_.size());
     }
 
     void query_counters::start()
     {
-        if (ids_.empty())
-        {
-            mutex_type::scoped_lock l(ids_mtx_);
-            find_counters_locked();
-        }
-
         // this will invoke the evaluate function for the first time
         timer_.start();
     }
 
     void query_counters::evaluate()
     {
-        if (ids_.empty())
-        {
-            mutex_type::scoped_lock l(ids_mtx_);
-            find_counters_locked();
-        }
+        find_counters();
 
         for (std::size_t i = 0; i < names_.size(); ++i)
         {
-            error_code ec;
-
             // Query the performance counter.
             using performance_counters::stubs::performance_counter;
             performance_counters::counter_value value =
                 performance_counter::get_value(ids_[i]);
+
+            error_code ec;        // do not throw
             double val = value.get_value<double>(ec);
 
-            {
-                mutex_type::scoped_lock l(io_mtx_);
+            // Output the performance counter value.
+            mutex_type::scoped_lock l(mtx_);
 
-                if (!ec)
-                    out_ << names_[i] << "," << value.time_ << "," << val << "\n";
-                else
-                    out_ << names_[i] << ",invalid\n";
-            }
+            out_ << names_[i] << ",";
+            if (!ec)
+                out_ << value.time_ << "," << val << "\n";
+            else
+                out_ << "invalid\n";
         }
     }
 }}

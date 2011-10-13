@@ -20,7 +20,6 @@ namespace hpx { namespace util
     class HPX_EXPORT query_counters
     {
     public:
-        typedef lcos::mutex mutex_type;
 
         query_counters(std::vector<std::string> const& names,
             std::size_t interval, std::ostream& out);
@@ -28,13 +27,15 @@ namespace hpx { namespace util
         void start();
         void evaluate();
 
-    private:
-        void find_counters_locked();
+    protected:
+        void find_counters();
 
-        mutex_type io_mtx_;
+    private:
+        typedef lcos::mutex mutex_type;
+
+        mutex_type mtx_;
         std::ostream& out_;
 
-        mutex_type ids_mtx_;
         std::vector<std::string> names_;
         std::vector<naming::id_type> ids_;
 
