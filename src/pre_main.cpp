@@ -57,6 +57,27 @@ const char* second_barrier = "/barrier(agas#0)/second_stage";
 const char* third_barrier = "/barrier(agas#0)/third_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
+// Install performance counter startup functions for core subsystems.
+void install_counters()
+{
+     naming::get_agas_client().install_counters();
+     LBT_(info) << "(3rd stage) pre_main: installed AGAS client-side "
+                   "performance counters";
+
+     get_runtime().install_counters();
+     LBT_(info) << "(3rd stage) pre_main: installed runtime performance "
+                   "counters";
+
+     threads::get_thread_manager().install_counters();
+     LBT_(info) << "(3rd stage) pre_main: installed threadmanager performance "
+                   "counters";
+
+     applier::get_applier().get_parcel_handler().install_counters();
+     LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
+                   "counters";
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
 void pre_main(runtime_mode mode)
 {
@@ -80,21 +101,7 @@ void pre_main(runtime_mode mode)
             (find_here());
         LBT_(info) << "(2nd stage) pre_main: loaded components";
 
-        // Install performance counter startup functions for core subsystems.
-        get_runtime().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed runtime performance "
-                      "counters";
-
-        threads::get_thread_manager().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed threadmanager performance "
-                      "counters";
-
-        applier::get_applier().get_parcel_handler().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
-                      "counters";
-
-        components::stubs::runtime_support::call_startup_functions(find_here());
-        LBT_(info) << "(3rd stage) pre_main: ran startup functions";
+        install_counters();
     }
 
     else
@@ -156,19 +163,6 @@ void pre_main(runtime_mode mode)
         second_stage.wait();
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
-        // Install performance counter startup functions for core subsystems.
-        get_runtime().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed runtime performance "
-                      "counters";
-
-        threads::get_thread_manager().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed threadmanager performance "
-                      "counters";
-
-        applier::get_applier().get_parcel_handler().install_counters();
-        LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
-                      "counters";
-
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
@@ -178,6 +172,8 @@ void pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+
+        install_counters();
     }
 
     // Enable logging.
