@@ -1,6 +1,6 @@
 //  Copyright (c) 2008-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(BOOST_CACHE_LOCAL_CACHE_NOV_17_2008_1003AM)
@@ -21,10 +21,10 @@ namespace boost { namespace cache
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // The UpdatePolicy Concept expects to get passed references to 
-        // instances of the Entry type. But our internal data structures hold 
-        // a pointer to the stored entry only. We use the \a adapt function 
-        // object to wrap any user supplied UpdatePolicy, dereferencing the 
+        // The UpdatePolicy Concept expects to get passed references to
+        // instances of the Entry type. But our internal data structures hold
+        // a pointer to the stored entry only. We use the \a adapt function
+        // object to wrap any user supplied UpdatePolicy, dereferencing the
         // pointers.
         template <typename Func, typename Iterator>
         struct adapt : std::binary_function<Iterator, Iterator, bool>
@@ -33,7 +33,7 @@ namespace boost { namespace cache
               : f_(f)
             {}
 
-            bool operator()(Iterator const& lhs, Iterator const& rhs) const 
+            bool operator()(Iterator const& lhs, Iterator const& rhs) const
             {
                 return f_((*lhs).second, (*rhs).second);
             }
@@ -45,43 +45,43 @@ namespace boost { namespace cache
     ///////////////////////////////////////////////////////////////////////////
     /// \class local_cache local_cache.hpp boost/cache/local_cache.hpp
     ///
-    /// \brief The \a local_cache implements the basic functionality needed for 
+    /// \brief The \a local_cache implements the basic functionality needed for
     ///        a local (non-distributed) cache.
     ///
-    /// \tparam Key           The type of the keys to use to identify the 
+    /// \tparam Key           The type of the keys to use to identify the
     ///                       entries stored in the cache
-    /// \tparam Entry         The type of the items to be held in the cache, 
+    /// \tparam Entry         The type of the items to be held in the cache,
     ///                       must model the CacheEntry concept
-    /// \tparam UpdatePolicy  A (optional) type specifying a (binary) function 
-    ///                       object used to sort the cache entries based on 
-    ///                       their 'age'. The 'oldest' entries (according to 
+    /// \tparam UpdatePolicy  A (optional) type specifying a (binary) function
+    ///                       object used to sort the cache entries based on
+    ///                       their 'age'. The 'oldest' entries (according to
     ///                       this sorting criteria) will be discarded first if
     ///                       the maximum capacity of the cache is reached.
-    ///                       The default is std::less<Entry>. The function 
-    ///                       object will be invoked using 2 entry instances of 
-    ///                       the type \a Entry. This type must model the 
+    ///                       The default is std::less<Entry>. The function
+    ///                       object will be invoked using 2 entry instances of
+    ///                       the type \a Entry. This type must model the
     ///                       UpdatePolicy model.
     /// \tparam InsertPolicy  A (optional) type specifying a (unary) function
     ///                       object used to allow global decisions whether a
-    ///                       particular entry should be added to the cache or 
+    ///                       particular entry should be added to the cache or
     ///                       not. The default is \a policies#always,
-    ///                       imposing no global insert related criteria on the 
+    ///                       imposing no global insert related criteria on the
     ///                       cache. The function object will be invoked using
     ///                       the entry instance to be inserted into the cache.
     ///                       This type must model the InsertPolicy model.
-    /// \tparam CacheStorage  A (optional) container type used to store the 
+    /// \tparam CacheStorage  A (optional) container type used to store the
     ///                       cache items. The container must be an associative
-    ///                       and STL compatible container.The default is a 
+    ///                       and STL compatible container.The default is a
     ///                       std::map<Key, Entry>.
-    /// \tparam Statistics    A (optional) allowing to collect some basic 
-    ///                       statistics about the operation of the cache 
-    ///                       instance. The type must conform to the 
-    ///                       CacheStatistics concept. The default value is 
+    /// \tparam Statistics    A (optional) allowing to collect some basic
+    ///                       statistics about the operation of the cache
+    ///                       instance. The type must conform to the
+    ///                       CacheStatistics concept. The default value is
     ///                       the type \a statistics#no_statistics which does
     ///                       not any numbers, but provides emty stubs allowing
     ///                       the code to compile.
     template <
-        typename Key, typename Entry, 
+        typename Key, typename Entry,
         typename UpdatePolicy = std::less<Entry>,
         typename InsertPolicy = policies::always<Entry>,
         typename CacheStorage = std::map<Key, Entry>,
@@ -114,24 +114,24 @@ namespace boost { namespace cache
         ///////////////////////////////////////////////////////////////////////
         /// \brief Construct an instance of a local_cache.
         ///
-        /// \param max_size   [in] The maximal size this cache is allowed to 
-        ///                   reach any time. The default is zero (no size 
-        ///                   limitation). The unit of this value is usually 
+        /// \param max_size   [in] The maximal size this cache is allowed to
+        ///                   reach any time. The default is zero (no size
+        ///                   limitation). The unit of this value is usually
         ///                   determined by the unit of the values returned by
         ///                   the entry's \a get_size function.
-        /// \param up         [in] An instance of the \a UpdatePolicy to use 
-        ///                   for this cache. The default is to use a default 
-        ///                   constructed instance of the type as defined by 
+        /// \param up         [in] An instance of the \a UpdatePolicy to use
+        ///                   for this cache. The default is to use a default
+        ///                   constructed instance of the type as defined by
         ///                   the \a UpdatePolicy template parameter.
         /// \param ip         [in] An instance of the \a InsertPolicy to use for
-        ///                   this cache. The default is to use a default 
-        ///                   constructed instance of the type as defined by 
+        ///                   this cache. The default is to use a default
+        ///                   constructed instance of the type as defined by
         ///                   the \a InsertPolicy template parameter.
         ///
         local_cache(size_type max_size = 0,
                 update_policy_type const& up = update_policy_type(),
                 insert_policy_type const& ip = insert_policy_type())
-          : max_size_(max_size), current_size_(0), 
+          : max_size_(max_size), current_size_(0),
             update_policy_(up), insert_policy_(ip)
         {}
 
@@ -147,12 +147,12 @@ namespace boost { namespace cache
         ///////////////////////////////////////////////////////////////////////
         /// \brief Access the maximum size the cache is allowed to grow to.
         ///
-        /// \note       The unit of this value is usually determined by the 
-        ///             unit of the return values of the entry's function 
+        /// \note       The unit of this value is usually determined by the
+        ///             unit of the return values of the entry's function
         ///             \a entry#get_size.
         ///
-        /// \returns    The maximum size this cache instance is currently 
-        ///             allowed to reach. If this number is zero the cache has 
+        /// \returns    The maximum size this cache instance is currently
+        ///             allowed to reach. If this number is zero the cache has
         ///             no limitation with regard to a maximum size.
         size_type capacity() const
         {
@@ -162,19 +162,19 @@ namespace boost { namespace cache
         ///////////////////////////////////////////////////////////////////////
         /// \brief Change the maximum size this cache can grow to
         ///
-        /// \param max_size    [in] The new maximum size this cache will be 
+        /// \param max_size    [in] The new maximum size this cache will be
         ///             allowed to grow to.
         ///
-        /// \returns    This function returns \a true if successful. It returns 
-        ///             \a false if the new \a max_size is smaller than the 
-        ///             current limit and the cache could not be shrinked to 
+        /// \returns    This function returns \a true if successful. It returns
+        ///             \a false if the new \a max_size is smaller than the
+        ///             current limit and the cache could not be shrinked to
         ///             the new maximum size.
         bool reserve(size_type max_size)
         {
-            // we need to shrink the cache if the new max size if smaller than 
+            // we need to shrink the cache if the new max size if smaller than
             // the old one
             bool retval = true;
-            if (max_size && max_size < max_size_ && 
+            if (max_size && max_size < max_size_ &&
                 !free_space(long(max_size_ - max_size)))
             {
                 retval = false;     // not able to shrink cache
@@ -185,17 +185,17 @@ namespace boost { namespace cache
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// \brief Check whether the cache currently holds an entry identified 
+        /// \brief Check whether the cache currently holds an entry identified
         ///        by the given key
         ///
-        /// \param k      [in] The key for the entry which should be looked up 
+        /// \param k      [in] The key for the entry which should be looked up
         ///               in the cache.
-        /// 
+        ///
         /// \note         This function does not call the entry's function
         ///               \a entry#touch. It just checks if the cache contains
         ///               an entry corresponding to the given key.
         ///
-        /// \returns      This function returns \a true if the cache holds the 
+        /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
         bool holds_key(key_type const& k) const
         {
@@ -205,17 +205,17 @@ namespace boost { namespace cache
         ///////////////////////////////////////////////////////////////////////
         /// \brief Get a specific entry identified by the given key.
         ///
-        /// \param k      [in] The key for the entry which should be retrieved 
+        /// \param k      [in] The key for the entry which should be retrieved
         ///               from the cache.
-        /// \param val    [out] If the entry indexed by the key is found in the 
-        ///               cache this value on successful return will be a copy 
+        /// \param val    [out] If the entry indexed by the key is found in the
+        ///               cache this value on successful return will be a copy
         ///               of the corresponding entry.
         ///
-        /// \note         The function will call the entry's \a entry#touch 
-        ///               function if the value corresponding to the provided 
+        /// \note         The function will call the entry's \a entry#touch
+        ///               function if the value corresponding to the provided
         ///               key is found in the cache.
-        /// 
-        /// \returns      This function returns \a true if the cache holds the 
+        ///
+        /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, key_type& realkey, entry_type& val)
         {
@@ -229,7 +229,7 @@ namespace boost { namespace cache
             // touch the found entry
             if ((*it).second.touch()) {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
@@ -244,17 +244,17 @@ namespace boost { namespace cache
 
         /// \brief Get a specific entry identified by the given key.
         ///
-        /// \param k      [in] The key for the entry which should be retrieved 
+        /// \param k      [in] The key for the entry which should be retrieved
         ///               from the cache.
-        /// \param val    [out] If the entry indexed by the key is found in the 
-        ///               cache this value on successful return will be a copy 
+        /// \param val    [out] If the entry indexed by the key is found in the
+        ///               cache this value on successful return will be a copy
         ///               of the corresponding entry.
         ///
-        /// \note         The function will call the entry's \a entry#touch 
-        ///               function if the value corresponding to the provided 
+        /// \note         The function will call the entry's \a entry#touch
+        ///               function if the value corresponding to the provided
         ///               key is found in the cache.
-        /// 
-        /// \returns      This function returns \a true if the cache holds the 
+        ///
+        /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, entry_type& val)
         {
@@ -268,7 +268,7 @@ namespace boost { namespace cache
             // touch the found entry
             if ((*it).second.touch()) {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
@@ -282,17 +282,17 @@ namespace boost { namespace cache
 
         /// \brief Get a specific entry identified by the given key.
         ///
-        /// \param k      [in] The key for the entry which should be retrieved 
+        /// \param k      [in] The key for the entry which should be retrieved
         ///               from the cache
-        /// \param val    [out] If the entry indexed by the key is found in the 
-        ///               cache this value on successful return will be a copy 
+        /// \param val    [out] If the entry indexed by the key is found in the
+        ///               cache this value on successful return will be a copy
         ///               of the corresponding value.
         ///
-        /// \note         The function will call the entry's \a entry#touch 
-        ///               function if the value corresponding to the provided 
+        /// \note         The function will call the entry's \a entry#touch
+        ///               function if the value corresponding to the provided
         ///               is found in the cache.
-        /// 
-        /// \returns      This function returns \a true if the cache holds the 
+        ///
+        /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, value_type& val)
         {
@@ -306,7 +306,7 @@ namespace boost { namespace cache
             // touch the found entry
             if ((*it).second.touch()) {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
@@ -321,25 +321,25 @@ namespace boost { namespace cache
         ///////////////////////////////////////////////////////////////////////
         /// \brief Insert a new element into this cache
         ///
-        /// \param k      [in] The key for the entry which should be added to 
+        /// \param k      [in] The key for the entry which should be added to
         ///               the cache.
         /// \param value  [in] The value which should be added to the cache.
         ///
         /// \note         This function invokes both, the insert policy as
         ///               provided to the constructor and the function
-        ///               \a entry#insert of the newly constructed entry 
+        ///               \a entry#insert of the newly constructed entry
         ///               instance. If either of these functions returns false
-        ///               the key/value pair doesn't get inserted into the 
-        ///               cache and the \a insert function will return 
+        ///               the key/value pair doesn't get inserted into the
+        ///               cache and the \a insert function will return
         ///               \a false. Other reasons for this function to fail
-        ///               (return \a false) are a) the key/value pair is 
-        ///               already held in the cache or b) inserting the new 
-        ///               value into the cache maxed out its capacity and 
-        ///               it was not possible to free any of the existing 
+        ///               (return \a false) are a) the key/value pair is
+        ///               already held in the cache or b) inserting the new
+        ///               value into the cache maxed out its capacity and
+        ///               it was not possible to free any of the existing
         ///               entries.
         ///
-        /// \returns      This function returns \a true if the entry has been 
-        ///               successfully added to the cache, otherwise it returns 
+        /// \returns      This function returns \a true if the entry has been
+        ///               successfully added to the cache, otherwise it returns
         ///               \a false.
         bool insert(key_type const& k, value_type const& val)
         {
@@ -349,36 +349,36 @@ namespace boost { namespace cache
 
         /// \brief Insert a new entry into this cache
         ///
-        /// \param k      [in] The key for the entry which should be added to 
+        /// \param k      [in] The key for the entry which should be added to
         ///               the cache.
         /// \param value  [in] The entry which should be added to the cache.
         ///
         /// \note         This function invokes both, the insert policy as
         ///               provided to the constructor and the function
-        ///               \a entry#insert of the provided entry instance. 
+        ///               \a entry#insert of the provided entry instance.
         ///               If either of these functions returns false
-        ///               the key/value pair doesn't get inserted into the 
-        ///               cache and the \a insert function will return 
+        ///               the key/value pair doesn't get inserted into the
+        ///               cache and the \a insert function will return
         ///               \a false. Other reasons for this function to fail
-        ///               (return \a false) are a) the key/value pair is 
-        ///               already held in the cache or b) inserting the new 
-        ///               value into the cache maxed out its capacity and 
-        ///               it was not possible to free any of the existing 
+        ///               (return \a false) are a) the key/value pair is
+        ///               already held in the cache or b) inserting the new
+        ///               value into the cache maxed out its capacity and
+        ///               it was not possible to free any of the existing
         ///               entries.
         ///
-        /// \returns      This function returns \a true if the entry has been 
-        ///               successfully added to the cache, otherwise it returns 
+        /// \returns      This function returns \a true if the entry has been
+        ///               successfully added to the cache, otherwise it returns
         ///               \a false.
         bool insert(key_type const& k, entry_type& e)
         {
             // ask entry if it really wants to be inserted
-            if (!insert_policy_(e) || !e.insert()) 
+            if (!insert_policy_(e) || !e.insert())
                 return false;
 
             // make sure cache doesn't get too large
             size_type entry_size = e.get_size();
-            if (0 != max_size_ && current_size_ + entry_size > max_size_ && 
-                !free_space(long(current_size_ - max_size_ + entry_size))) 
+            if (0 != max_size_ && current_size_ + entry_size > max_size_ &&
+                !free_space(long(current_size_ - max_size_ + entry_size)))
             {
                 return false;
             }
@@ -386,14 +386,14 @@ namespace boost { namespace cache
             // insert new entry to cache
             typedef typename storage_type::value_type storage_value_type;
             std::pair<iterator, bool> p = store_.insert(storage_value_type(k, e));
-            if (!p.second) 
+            if (!p.second)
                 return false;
 
             current_size_ += entry_size;
 
             // update the entry heap
             entry_heap_.push_back(p.first);
-            std::push_heap(entry_heap_.begin(), entry_heap_.end(), 
+            std::push_heap(entry_heap_.begin(), entry_heap_.end(),
                 update_policy_);
 
             // update statistics
@@ -407,22 +407,22 @@ namespace boost { namespace cache
         ///
         /// \param k      [in] The key for the value which should be updated in
         ///               the cache.
-        /// \param value  [in] The value which should be used as a replacement 
-        ///               for the existing value in the cache. Any existing 
+        /// \param value  [in] The value which should be used as a replacement
+        ///               for the existing value in the cache. Any existing
         ///               cache entry is not changed except for its value.
         ///
-        /// \note         The function will call the entry's \a entry#touch 
+        /// \note         The function will call the entry's \a entry#touch
         ///               function if the indexed value is found in the cache.
         /// \note         The difference to the other overload of the \a insert
-        ///               function is that this overload replaces the cached 
-        ///               value only, while the other overload replaces the 
-        ///               whole cache entry, updating the cache entry 
+        ///               function is that this overload replaces the cached
+        ///               value only, while the other overload replaces the
+        ///               whole cache entry, updating the cache entry
         ///               properties.
         ///
-        /// \returns      This function returns \a true if the entry has been 
+        /// \returns      This function returns \a true if the entry has been
         ///               successfully updated, otherwise it returns \a false.
-        ///               If the entry currently is not held by the cache it is 
-        ///               added and the return value reflects the outcome of 
+        ///               If the entry currently is not held by the cache it is
+        ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
         bool update(key_type const& k, value_type const& val)
         {
@@ -433,13 +433,13 @@ namespace boost { namespace cache
                 return insert(k, val);  // insert into cache
             }
 
-            // update cache entry 
+            // update cache entry
             (*it).second.get() = val;
 
             // touch the entry
             if ((*it).second.touch()) {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
@@ -453,22 +453,22 @@ namespace boost { namespace cache
         ///
         /// \param k      [in] The key for the entry which should be updated in
         ///               the cache.
-        /// \param value  [in] The entry which should be used as a replacement 
-        ///               for the existing entry in the cache. Any existing 
+        /// \param value  [in] The entry which should be used as a replacement
+        ///               for the existing entry in the cache. Any existing
         ///               entry is first removed and then this entry is added.
         ///
-        /// \note         The function will call the entry's \a entry#touch 
+        /// \note         The function will call the entry's \a entry#touch
         ///               function if the indexed value is found in the cache.
         /// \note         The difference to the other overload of the \a insert
-        ///               function is that this overload replaces the whole 
+        ///               function is that this overload replaces the whole
         ///               cache entry, while the other overload retplaces the
-        ///               cached value only, leaving the cache entry properties 
+        ///               cached value only, leaving the cache entry properties
         ///               untouched.
         ///
-        /// \returns      This function returns \a true if the entry has been 
+        /// \returns      This function returns \a true if the entry has been
         ///               successfully updated, otherwise it returns \a false.
-        ///               If the entry currently is not held by the cache it is 
-        ///               added and the return value reflects the outcome of 
+        ///               If the entry currently is not held by the cache it is
+        ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
         bool update(key_type const& k, entry_type& e)
         {
@@ -480,7 +480,7 @@ namespace boost { namespace cache
             }
 
             // make sure the old entry agrees to be removed
-            if (!(*it).second.remove()) 
+            if (!(*it).second.remove())
                 return false;           // entry doesn't want to be removed
 
             // make sure the new entry agrees to be inserted
@@ -493,7 +493,7 @@ namespace boost { namespace cache
             // touch the entry
             if ((*it).second.touch()) {
                 // reorder heap based on the changed entry attributes
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
@@ -507,39 +507,39 @@ namespace boost { namespace cache
         /// \brief Remove stored entries from the cache for which the supplied
         ///        function object returns true.
         ///
-        /// \param ep     [in] This parameter has to be a (unary) function 
-        ///               object. It is invoked for each of the entries 
-        ///               currently held in the cache. An entry is considered 
-        ///               for removal from the cache whenever the value 
+        /// \param ep     [in] This parameter has to be a (unary) function
+        ///               object. It is invoked for each of the entries
+        ///               currently held in the cache. An entry is considered
+        ///               for removal from the cache whenever the value
         ///               returned from this invocation is \a true. Even then
         ///               the entry might not be removed from the cache as its
         ///               \a entry#remove function might return false.
         ///
-        /// \returns      This function returns the overall size of the removed 
+        /// \returns      This function returns the overall size of the removed
         ///               entries (which is the sum of the values returned by
-        ///               the \a entry#get_size functions of the removed 
+        ///               the \a entry#get_size functions of the removed
         ///               entries).
         template <typename Func>
         size_type erase(Func const& ep = policies::always<storage_value_type>())
         {
             size_type erased = 0;
-            for (heap_iterator it = entry_heap_.begin(); 
+            for (heap_iterator it = entry_heap_.begin();
                  it != entry_heap_.end(); /**/)
             {
                 iterator sit = *it;
 
                 // check if this item needs to be erased
-                // do not remove this entry from the cache if either the 
+                // do not remove this entry from the cache if either the
                 // function object or the entries' remove function return false
                 typename storage_type::value_type& val = *sit;
                 if (ep(val) && val.second.remove()) {
-                    // update the current size and the overall size of the 
+                    // update the current size and the overall size of the
                     // removed items
                     size_type entry_size = (*(*it)).second.get_size();
                     current_size_ -= entry_size;
                     erased += entry_size;
 
-                    // we remove the element manually, forcing the heap to be 
+                    // we remove the element manually, forcing the heap to be
                     // rebuilt at the end
                     it = entry_heap_.erase(it);
 
@@ -556,25 +556,25 @@ namespace boost { namespace cache
             }
 
             // reorder heap based on the changed entry list
-            std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+            std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                 update_policy_);
 
             return erased;
         }
 
-        /// \brief Remove all stored entries from the cache 
+        /// \brief Remove all stored entries from the cache
         ///
-        /// \note         All entries are considered for removal, but in the 
-        ///               end an entry might not be removed from the cache as 
+        /// \note         All entries are considered for removal, but in the
+        ///               end an entry might not be removed from the cache as
         ///               its \a entry#remove function might return false.
-        ///               This function is very useful for instance in 
-        ///               conjunction with an entry's \a entry#remove function 
-        ///               enforcing additional criteria like entry expiration, 
+        ///               This function is very useful for instance in
+        ///               conjunction with an entry's \a entry#remove function
+        ///               enforcing additional criteria like entry expiration,
         ///               etc.
         ///
-        /// \returns      This function returns the overall size of the removed 
+        /// \returns      This function returns the overall size of the removed
         ///               entries (which is the sum of the values returned by
-        ///               the \a entry#get_size functions of the removed 
+        ///               the \a entry#get_size functions of the removed
         ///               entries).
         size_type erase()
         {
@@ -588,13 +588,14 @@ namespace boost { namespace cache
         {
             store_.clear();
             entry_heap_.clear();
+            statistics_.clear();
             current_size_ = 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow to access the embedded statistics instance
         ///
-        /// \returns      This function returns a reference to the statistics 
+        /// \returns      This function returns a reference to the statistics
         ///               instance embedded inside this cache
         statistics_type const& get_statistics() const
         {
@@ -604,13 +605,13 @@ namespace boost { namespace cache
     protected:
         ///////////////////////////////////////////////////////////////////////
         // Free some space in the cache
-        bool free_space (long num_free) 
+        bool free_space (long num_free)
         {
-            if (entry_heap_.empty()) 
+            if (entry_heap_.empty())
                 return false;
 
             bool is_heap = true;
-            for (heap_iterator it = entry_heap_.begin(); 
+            for (heap_iterator it = entry_heap_.begin();
                  num_free > 0 && it != entry_heap_.end(); /**/)
             {
                 iterator sit = *it;
@@ -624,7 +625,7 @@ namespace boost { namespace cache
                         // if we're at the top of the list, just pop the item
                         // this doesn't disturb the heap property of the heap
                         ++it;
-                        std::pop_heap(entry_heap_.begin(), entry_heap_.end(), 
+                        std::pop_heap(entry_heap_.begin(), entry_heap_.end(),
                             update_policy_);
                         entry_heap_.pop_back();
                     }
@@ -647,7 +648,7 @@ namespace boost { namespace cache
 
             // reorder heap based on the changed entry list
             if (!is_heap) {
-                std::make_heap(entry_heap_.begin(), entry_heap_.end(), 
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
                     update_policy_);
             }
 
