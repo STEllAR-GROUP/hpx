@@ -69,6 +69,8 @@ void addressing_service::launch_bootstrap(
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
     local_prefix(here);
+    get_runtime().get_config().parse("assigned locality",
+        boost::str(boost::format("hpx.locality=%1%") % here));
 
     request reqs[] =
     {
