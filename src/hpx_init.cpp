@@ -654,8 +654,7 @@ namespace hpx
                     boost::bind(&util::query_counters::evaluate, qc));
 
                 if (0 != interval) {
-                    result = rt.run(
-                        boost::bind(&print_counters, vm, f, qc),
+                    result = rt.run(boost::bind(&print_counters, vm, f, qc),
                         num_threads, num_localities);
                     return true;
                 }
