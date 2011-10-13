@@ -420,7 +420,7 @@ namespace hpx
 
                 case runtime_mode_invalid:
                 default:
-                    throw std::logic_error("invalid runtime mode specified");
+                    throw std::logic_error("Invalid runtime mode specified");
                 }
 
                 // general options definitions
@@ -607,6 +607,18 @@ namespace hpx
             boost::program_options::variables_map& vm, std::size_t num_threads,
             std::size_t num_localities, int& result)
         {
+            // sanity checking
+            int list_count = vm.count("list-counters") +
+                vm.count("list-counter-infos") + vm.count("list-symbolic-names");
+            int print_count = vm.count("print-counter") +
+                vm.count("print-counter-interval");
+
+            if (list_count && print_count) {
+                throw std::logic_error("The performance counter related "
+                    "--list-* options cannot be used in conjunction with any "
+                    " of the --print-* options.");
+            }
+
             if (vm.count("list-counters")) {
                 // Print all available performance counter names and then
                 // call hpx::finalize() and return 0.
@@ -660,8 +672,9 @@ namespace hpx
                 }
             }
             else if (vm.count("print-counter-interval")) {
-                throw std::logic_error("bad parameter --print-counter-interval, "
-                    "valid in conjunction with --print-counter only");
+                throw std::logic_error("Invalid command line option "
+                    "--print-counter-interval, valid in conjunction with "
+                    "--print-counter only");
             }
 
             return false;
@@ -698,10 +711,11 @@ namespace hpx
             // Dump the configuration after all components have been loaded.
             if (vm.count("dump-config"))
             {
-                if (vm.count("exit"))
-                    throw std::logic_error("--exit cannot be used in conjunction "
-                        "with --dump-config, try --dump-config-init --exit instead");
-
+                if (vm.count("exit")) {
+                    throw std::logic_error("The command line option --exit "
+                        "cannot be used in conjunction with --dump-config, try "
+                        "--dump-config-init --exit instead.");
+                }
                 rt.add_startup_function(dump_config<Runtime>(rt));
             }
 
@@ -734,8 +748,9 @@ namespace hpx
             std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
-                throw std::logic_error("bad parameter --high-priority-threads, "
-                    "valid for --queueing=priority_local only");
+                throw std::logic_error("Invalid command line option "
+                    "--high-priority-threads, valid for "
+                    "--queueing=priority_local only");
             }
 
             // scheduling policy
@@ -760,8 +775,9 @@ namespace hpx
             std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
-                throw std::logic_error("bad parameter --high-priority-threads, "
-                    "valid for --queueing=priority_local only");
+                throw std::logic_error("Invalid command line option "
+                    "--high-priority-threads, valid for "
+                    "--queueing=priority_local only.");
             }
 
             // scheduling policy
@@ -817,8 +833,9 @@ namespace hpx
             std::size_t num_localities)
         {
             if (vm.count("high-priority-threads")) {
-                throw std::logic_error("bad parameter --high-priority-threads, "
-                    "valid for --queueing=priority_local only");
+                throw std::logic_error("Invalid command line option "
+                    "--high-priority-threads, valid for "
+                    "--queueing=priority_local only.");
             }
 
             // scheduling policy
@@ -1149,7 +1166,8 @@ namespace hpx
                     startup, shutdown, num_threads, num_localities);
             }
             else {
-                throw std::logic_error("bad value for parameter --queueing/-q");
+                throw std::logic_error("Bad value for command line option "
+                    "--queueing/-q");
             }
         }
         catch (std::exception& e) {
