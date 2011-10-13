@@ -18,34 +18,34 @@ namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 // Create a new barrier and register its gid with the given symbolic name.
-inline lcos::barrier 
-create_barrier(naming::resolver_client& agas_client, 
+inline lcos::barrier
+create_barrier(naming::resolver_client& agas_client,
     std::size_t num_localities, char const* symname)
 {
     lcos::barrier barrier;
     barrier.create_one(agas_client.local_prefix(), num_localities);
 
-    agas::register_name(symname, barrier.get_gid()); 
+    agas::register_name(symname, barrier.get_gid());
     return barrier;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Find a registered barrier object from its symbolic name.
-inline lcos::barrier 
+inline lcos::barrier
 find_barrier(char const* symname)
 {
     naming::id_type barrier_id;
-    for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+    for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
         if (agas::resolve_name(symname, barrier_id))
-            break; 
+            break;
 
-        boost::this_thread::sleep(boost::get_system_time() + 
+        boost::this_thread::sleep(boost::get_system_time() +
             boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
     }
     if (HPX_UNLIKELY(!barrier_id))
     {
-        HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier", 
+        HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier",
             std::string("couldn't find stage boot barrier ") + symname);
     }
     return lcos::barrier(barrier_id);
@@ -92,7 +92,7 @@ void pre_main(runtime_mode mode)
         std::size_t const pool_size = cfg.get_agas_promise_pool_size();
 
         // Unblock the AGAS router by adding the initial pool size to the
-        // promise pool semaphores. 
+        // promise pool semaphores.
         agas_client.hosted->promise_pool_semaphore_.signal(pool_size);
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
@@ -106,7 +106,7 @@ void pre_main(runtime_mode mode)
 
     else
     {
-        // {{{ unblock addressing_service 
+        // {{{ unblock addressing_service
         if (!agas_client.is_bootstrap())
         {
             std::size_t const pool_size = cfg.get_agas_promise_pool_size();
@@ -132,12 +132,12 @@ void pre_main(runtime_mode mode)
         if (agas_client.is_bootstrap())
         {
             naming::gid_type console_;
-            
+
             if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_)))
             {
                 HPX_THROW_EXCEPTION(network_error
                     , "pre_main"
-                    , "no console locality registered"); 
+                    , "no console locality registered");
             }
 
             std::size_t const num_localities = cfg.get_num_localities();
@@ -147,12 +147,12 @@ void pre_main(runtime_mode mode)
             LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
         }
 
-        else // Hosted. 
+        else // Hosted.
         {
             // Initialize the barrier clients (find them in AGAS)
             second_stage = find_barrier(second_barrier);
             third_stage = find_barrier(third_barrier);
-        
+
             LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
         // }}}
