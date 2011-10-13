@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
@@ -46,7 +46,7 @@ namespace hpx
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
-    /// class \a hpx#applier#applier and its related functionality. This 
+    /// class \a hpx#applier#applier and its related functionality. This
     /// namespace is part of the HPX core module.
     namespace applier
     {
@@ -64,7 +64,7 @@ namespace hpx
     /// \namespace actions
     ///
     /// The namespace \a actions contains all definitions needed for the
-    /// class \a hpx#action_manager#action_manager and its related 
+    /// class \a hpx#action_manager#action_manager and its related
     /// functionality. This namespace is part of the HPX core module.
     namespace actions
     {
@@ -106,7 +106,7 @@ namespace hpx
         class HPX_API_EXPORT parcelport;
         class parcelport_connection;
         class HPX_API_EXPORT parcelhandler;
-        
+
         namespace server
         {
             class parcelport_queue;
@@ -125,8 +125,8 @@ namespace hpx
 
     /// \namespace threads
     ///
-    /// The namespace \a threadmanager contains all the definitions required 
-    /// for the scheduling, execution and general management of \a 
+    /// The namespace \a threadmanager contains all the definitions required
+    /// for the scheduling, execution and general management of \a
     /// hpx#threadmanager#thread's.
     namespace threads
     {
@@ -146,8 +146,8 @@ namespace hpx
         class HPX_API_EXPORT thread;
 
         template <
-            typename SchedulingPolicy, 
-            typename NotificationPolicy = threads::policies::callback_notifier> 
+            typename SchedulingPolicy,
+            typename NotificationPolicy = threads::policies::callback_notifier>
         class HPX_API_EXPORT threadmanager_impl;
 
         /// \enum thread_state_enum
@@ -176,7 +176,7 @@ namespace hpx
         enum thread_priority
         {
             thread_priority_default = 0,      ///< use default priority
-            thread_priority_low = 1,          ///< low thread priority 
+            thread_priority_low = 1,          ///< low thread priority
             thread_priority_normal = 2,       ///< normal thread priority (default)
             thread_priority_critical = 3      ///< high thread priority
         };
@@ -206,18 +206,18 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         namespace detail
         {
-            template <typename CoroutineImpl> struct coroutine_allocator; 
+            template <typename CoroutineImpl> struct coroutine_allocator;
         }
         typedef boost::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
 
-        /// The function \a get_self returns a reference to the (OS thread 
+        /// The function \a get_self returns a reference to the (OS thread
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self& get_self();
 
-        /// The function \a get_self_ptr returns a pointer to the (OS thread 
+        /// The function \a get_self_ptr returns a pointer to the (OS thread
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
 
@@ -229,22 +229,22 @@ namespace hpx
         /// thread (or zero if the current thread is not a PX thread).
         HPX_API_EXPORT thread_id_type get_self_id();
 
-        /// The function \a get_parent_id returns the PX thread id of the 
-        /// currents thread parent (or zero if the current thread is not a 
+        /// The function \a get_parent_id returns the PX thread id of the
+        /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
         HPX_API_EXPORT thread_id_type get_parent_id();
 
-        /// The function \a get_parent_phase returns the PX phase of the 
-        /// currents thread parent (or zero if the current thread is not a 
+        /// The function \a get_parent_phase returns the PX phase of the
+        /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_prefix returns the id of the locality of
-        /// the currents thread parent (or zero if the current thread is not a 
+        /// the currents thread parent (or zero if the current thread is not a
         /// PX thread).
         HPX_API_EXPORT boost::uint32_t get_parent_prefix();
 
-        /// The function \a get_self_component_id returns the lva of the 
+        /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
 
@@ -262,9 +262,9 @@ namespace hpx
         runtime_mode_invalid = -1,
         runtime_mode_console = 0,   ///< The runtime is the console locality
         runtime_mode_worker = 1,    ///< The runtime is a worker locality
-        runtime_mode_connect = 2,   ///< The runtime is a worker locality 
+        runtime_mode_connect = 2,   ///< The runtime is a worker locality
                                     ///< connecting late
-        runtime_mode_default = 3,   ///< The runtime mode will be determinded 
+        runtime_mode_default = 3,   ///< The runtime mode will be determinded
                                     ///< based on the command line arguments
         runtime_mode_last = 3
     };
@@ -285,10 +285,10 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Retrieve the string value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
+    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
         std::string const& dflt);
     /// Retrieve the integer value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key, 
+    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
         std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -305,8 +305,8 @@ namespace hpx
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
 
     template <
-        typename SchedulingPolicy, 
-        typename NotificationPolicy = threads::policies::callback_notifier> 
+        typename SchedulingPolicy,
+        typename NotificationPolicy = threads::policies::callback_notifier>
     class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread
@@ -340,8 +340,8 @@ namespace hpx
     /// \namespace components
     namespace components
     {
-        namespace detail 
-        { 
+        namespace detail
+        {
             struct this_type {};
             struct fixed_component_tag {};
             struct simple_component_tag {};
@@ -360,7 +360,7 @@ namespace hpx
             component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
             component_base_lco_with_value = 4,
                                             ///< base LCO's blocking on a value
-            component_future =              ///< a future executing the action and 
+            component_future =              ///< a future executing the action and
                                             ///< allowing to wait for the result
                 ((5 << 16) | component_base_lco_with_value),
             component_value_adaptor = 6,    ///< an adaptor to access specific slot of an LCO
@@ -385,13 +385,13 @@ namespace hpx
             typename Component = detail::this_type>
         struct fixed_component_base;
 
-        template <typename Component> 
+        template <typename Component>
         struct fixed_component;
 
         template <typename Component = detail::this_type>
-        class simple_component_base; 
+        class simple_component_base;
 
-        template <typename Component> 
+        template <typename Component>
         class simple_component;
 
         template <typename Component, typename Wrapper = detail::this_type>
@@ -402,14 +402,14 @@ namespace hpx
 
         struct HPX_API_EXPORT component_factory_base;
 
-        template <typename Component> 
+        template <typename Component>
         struct component_factory;
 
         class runtime_support;
         class memory;
         class memory_block;
 
-        namespace stubs 
+        namespace stubs
         {
             struct runtime_support;
             struct memory;
@@ -443,25 +443,25 @@ namespace hpx
     namespace lcos
     {
         class base_lco;
-        template <typename Result, typename RemoteResult = Result> 
+        template <typename Result, typename RemoteResult = Result>
         class base_lco_with_value;
 
-        template <typename Result, 
-            typename RemoteResult = 
-                typename traits::promise_remote_result<Result>::type, 
-            int N = 1> 
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type,
+            int N = 1>
         class promise;
 
-        template <typename Action, 
+        template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
-            typename DirectExecute = typename Action::direct_execution> 
+            typename DirectExecute = typename Action::direct_execution>
         class eager_future;
 
-        template <typename Action, 
+        template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
-            typename DirectExecute = typename Action::direct_execution> 
+            typename DirectExecute = typename Action::direct_execution>
         class lazy_future;
 
         template <typename ValueType>
@@ -490,12 +490,15 @@ namespace hpx
         class connection_cache;
     }
 
+    /// \brief Expand INI variables in a string
+    HPX_API_EXPORT std::string expand(std::string const& expand);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
 
-    /// \brief Return the list of prefixes of the localities supporting the 
-    ///        given component type. By default this function will return the 
+    /// \brief Return the list of prefixes of the localities supporting the
+    ///        given component type. By default this function will return the
     ///        list of all localities.
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(

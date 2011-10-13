@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2007 Andre Merzky 
+//  Copyright (c) 2005-2007 Andre Merzky
 //  Copyright (c) 2005-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -59,7 +59,7 @@ namespace hpx { namespace util
 
     protected:
         bool regex_init();
-        void line_msg(std::string const& msg, std::string const& file, 
+        void line_msg(std::string const& msg, std::string const& file,
             int lnum = 0);
 
     public:
@@ -70,14 +70,23 @@ namespace hpx { namespace util
 
         section& operator=(section const& rhs);
 
-        void parse(std::string const& sourcename, 
+        void parse(std::string const& sourcename,
             std::vector<std::string> const& lines);
+
+        void parse(std::string const& sourcename,
+            std::string const& line)
+        {
+            std::vector<std::string> lines;
+            lines.push_back(line);
+            parse(sourcename, lines);
+        }
+
         void read(std::string const& filename);
         void merge(std::string const& second);
         void merge(section& second);
         void dump(int ind = 0, std::ostream& strm = std::cout) const;
 
-        void add_section(std::string const& sec_name, section& sec, 
+        void add_section(std::string const& sec_name, section& sec,
             section* root = NULL);
         bool has_section(std::string const& sec_name) const;
 
@@ -87,10 +96,10 @@ namespace hpx { namespace util
         section_map const& get_sections() const
             { return sections_; }
 
-        void add_entry(std::string const& key, std::string val);
+        void add_entry(std::string const& key, std::string const& val);
         bool has_entry(std::string const& key) const;
         std::string get_entry(std::string const& key) const;
-        std::string get_entry(std::string key, std::string const& dflt) const;
+        std::string get_entry(std::string const& key, std::string const& dflt) const;
         template <typename T>
         std::string get_entry(std::string const& key, T dflt) const
         {
@@ -99,15 +108,15 @@ namespace hpx { namespace util
 
         entry_map const& get_entries() const
             { return entries_; }
-        std::string expand_entry(std::string in) const;
+        std::string expand(std::string in) const;
 
-        void expand_entry(std::string&, std::string::size_type) const;
+        void expand(std::string&, std::string::size_type) const;
         void expand_bracket(std::string&, std::string::size_type) const;
         void expand_brace(std::string&, std::string::size_type) const;
 
-        void set_root(section* r, bool recursive = false) 
-        { 
-            root_ = r; 
+        void set_root(section* r, bool recursive = false)
+        {
+            root_ = r;
             if (recursive) {
                 section_map::iterator send = sections_.end();
                 for (section_map::iterator si = sections_.begin(); si != send; ++si)

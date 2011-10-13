@@ -682,6 +682,11 @@ namespace hpx
     {
         get_runtime().add_shutdown_function(f);
     }
+
+    std::string expand(std::string const& in)
+    {
+        return get_runtime().get_config().expand(in);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

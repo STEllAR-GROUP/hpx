@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2007 Andre Merzky 
+//  Copyright (c) 2005-2007 Andre Merzky
 //  Copyright (c) 2005-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -58,7 +58,7 @@ const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace 
+namespace
 {
     ///////////////////////////////////////////////////////////////////////////
     inline std::string
@@ -160,7 +160,7 @@ void section::read (std::string const& filename)
     if (!regex_init())
         line_msg ("Cannot init regex for ", filename);
 
-    // read file 
+    // read file
     std::string line;
     std::vector <std::string> lines;
     while (std::getline(input, line))
@@ -171,7 +171,7 @@ void section::read (std::string const& filename)
 }
 
 // parse file
-void section::parse (std::string const& sourcename, 
+void section::parse (std::string const& sourcename,
     std::vector<std::string> const& lines)
 {
     int linenum = 0;
@@ -184,7 +184,7 @@ void section::parse (std::string const& sourcename,
     boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
 
     std::vector<std::string>::const_iterator end = lines.end();
-    for (std::vector<std::string>::const_iterator it = lines.begin(); 
+    for (std::vector<std::string>::const_iterator it = lines.begin();
          it != end; ++it)
     {
         ++linenum;
@@ -233,8 +233,8 @@ void section::parse (std::string const& sourcename,
             }
 
             current = add_section_if_new (current, sec_name.substr(pos));
-            
-            // add key/val to this section 
+
+            // add key/val to this section
             current->add_entry (what[2], what[3]);
 
             // restore the old section
@@ -311,7 +311,7 @@ bool section::has_section (std::string const& sec_name) const
     return sections_.find(sec_name) != sections_.end();
 }
 
-section* section::get_section (std::string const& sec_name) 
+section* section::get_section (std::string const& sec_name)
 {
     std::string::size_type i  = sec_name.find (".");
     if (i != std::string::npos)
@@ -328,7 +328,7 @@ section* section::get_section (std::string const& sec_name)
         if (name.empty())
             name = "<root>";
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
             "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
@@ -337,7 +337,7 @@ section* section::get_section (std::string const& sec_name)
     if (it != sections_.end())
         return &((*it).second);
 
-    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
         "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
@@ -359,7 +359,7 @@ section const* section::get_section (std::string const& sec_name) const
         if (name.empty())
             name = "<root>";
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
             "No such section (" + sec_name + ") in section: " + name);
         return NULL;
     }
@@ -368,13 +368,15 @@ section const* section::get_section (std::string const& sec_name) const
     if (it != sections_.end())
         return &((*it).second);
 
-    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section", 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
         "No such section (" + sec_name + ") in section: " + get_name());
     return NULL;
 }
 
-void section::add_entry (std::string const& key, std::string val)
-{ entries_[key] = val; }
+void section::add_entry (std::string const& key, std::string const& val)
+{
+    entries_[key] = val;
+}
 
 bool section::has_entry (std::string const& key) const
 {
@@ -408,7 +410,7 @@ std::string section::get_entry (std::string const& key) const
             return (*cit).second.get_entry(sub_key);
         }
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry", 
+        HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
             "No such key (" + key + ") in section: " + get_name());
         return "";
     }
@@ -417,23 +419,23 @@ std::string section::get_entry (std::string const& key) const
     {
         entry_map::const_iterator cit = entries_.find(key);
         BOOST_ASSERT(cit != entries_.end());
-        return expand_entry((*cit).second);
+        return this->expand((*cit).second);
     }
 
-    HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry", 
+    HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
         "No such section (" + key + ") in section: " + get_name());
     return "";
 }
 
-std::string 
-section::get_entry (std::string key, std::string const& default_val) const
+std::string
+section::get_entry (std::string const& key, std::string const& default_val) const
 {
     typedef std::vector<std::string> string_vector;
 
     string_vector split_key;
     boost::split(split_key, key, boost::is_any_of("."));
 
-    key = split_key.back();
+    std::string sk = split_key.back();
     split_key.pop_back();
 
     section const* cur_section = this;
@@ -442,15 +444,15 @@ section::get_entry (std::string key, std::string const& default_val) const
     {
         section_map::const_iterator next = cur_section->sections_.find(*iter);
         if (cur_section->sections_.end() == next)
-            return expand_entry(default_val);
+            return this->expand(default_val);
         cur_section = &next->second;
     }
 
-    entry_map::const_iterator entry = cur_section->entries_.find(key);
+    entry_map::const_iterator entry = cur_section->entries_.find(sk);
     if (cur_section->entries_.end() == entry)
-        return expand_entry(default_val);
+        return this->expand(default_val);
 
-    return expand_entry(entry->second);
+    return this->expand(entry->second);
 }
 
 section section::clone(section* root) const
@@ -474,7 +476,7 @@ section section::clone(section* root) const
     return out;
 }
 
-inline void indent (int ind, std::ostream& strm) 
+inline void indent (int ind, std::ostream& strm)
 {
     for (int i = 0; i < ind; ++i)
         strm << "  ";
@@ -503,7 +505,7 @@ void section::dump(int ind, std::ostream& strm) const
     {
         indent (ind, strm);
 
-        const std::string expansion = expand_entry(i->second);
+        const std::string expansion = this->expand(i->second);
 
         // Check if the expanded entry is different from the actual entry.
         if (expansion != i->second)
@@ -594,19 +596,19 @@ bool section::regex_init (void)
     return true;
 }
 
-void section::line_msg(std::string const& msg, std::string const& file, 
+void section::line_msg(std::string const& msg, std::string const& file,
     int lnum)
 {
     if (lnum > 0)
     {
-        HPX_THROW_EXCEPTION(no_success, "section::line_msg", 
+        HPX_THROW_EXCEPTION(no_success, "section::line_msg",
             msg + " " + file + ":" + boost::lexical_cast<std::string>(lnum));
     }
     HPX_THROW_EXCEPTION(no_success, "section::line_msg", msg + " " + file);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::expand_entry(std::string& value, std::string::size_type begin) const
+void section::expand(std::string& value, std::string::size_type begin) const
 {
     std::string::size_type p = value.find_first_of("$", begin+1);
     while (p != std::string::npos && value.size()-1 != p) {
@@ -619,10 +621,10 @@ void section::expand_entry(std::string& value, std::string::size_type begin) con
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// find the matching closing brace starting from 'begin', escaped braces will 
+// find the matching closing brace starting from 'begin', escaped braces will
 // be un-escaped
-inline std::string::size_type 
-find_next(char const* ch, std::string& value, 
+inline std::string::size_type
+find_next(char const* ch, std::string& value,
     std::string::size_type begin = (std::string::size_type)(-1))
 {
     std::string::size_type end = value.find_first_of(ch, begin+1);
@@ -631,7 +633,7 @@ find_next(char const* ch, std::string& value,
             break;
         value.replace(end-1, 2, ch);
         end = value.find_first_of(ch, end);
-    } 
+    }
     return end;
 }
 
@@ -639,11 +641,11 @@ find_next(char const* ch, std::string& value,
 void section::expand_bracket(std::string& value, std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
-    expand_entry(value, begin);
+    this->expand(value, begin);
 
     // now expand the key itself
     std::string::size_type end = find_next("]", value, begin+1);
-    if (end != std::string::npos) 
+    if (end != std::string::npos)
     {
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
@@ -651,7 +653,7 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
             value.replace(begin, end-begin+1, root_->get_entry(to_expand, std::string("")));
         }
         else {
-            value.replace(begin, end-begin+1, 
+            value.replace(begin, end-begin+1,
                 root_->get_entry(to_expand.substr(0, colon), to_expand.substr(colon+1)));
         }
     }
@@ -660,11 +662,11 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
 void section::expand_brace(std::string& value, std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
-    expand_entry(value, begin);
+    this->expand(value, begin);
 
     // now expand the key itself
     std::string::size_type end = find_next("}", value, begin+1);
-    if (end != std::string::npos) 
+    if (end != std::string::npos)
     {
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
@@ -674,15 +676,15 @@ void section::expand_brace(std::string& value, std::string::size_type begin) con
         }
         else {
             char* env = getenv(to_expand.substr(0, colon).c_str());
-            value.replace(begin, end-begin+1, 
+            value.replace(begin, end-begin+1,
                 0 != env ? std::string(env) : to_expand.substr(colon+1));
         }
     }
 }
 
-std::string section::expand_entry (std::string value) const
+std::string section::expand (std::string value) const
 {
-    expand_entry(value, (std::string::size_type)-1);
+    expand(value, std::string::size_type(-1));
     return value;
 }
 
@@ -713,16 +715,16 @@ void section::load(Archive& ar, const unsigned int version)
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-template HPX_EXPORT void 
+template HPX_EXPORT void
 section::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
-template HPX_EXPORT void 
+template HPX_EXPORT void
 section::load(util::portable_binary_iarchive&, const unsigned int version);
 #else
-template HPX_EXPORT void 
+template HPX_EXPORT void
 section::save(boost::archive::binary_oarchive&, const unsigned int version) const;
 
-template HPX_EXPORT void 
+template HPX_EXPORT void
 section::load(boost::archive::binary_iarchive&, const unsigned int version);
 #endif
 
