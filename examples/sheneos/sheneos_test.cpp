@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -18,6 +18,7 @@
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
+double elapsed = 0;
 char const* shen_symbolic_name = "/sheneos_test/test";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,12 +34,12 @@ void monitor_test_sheneos(
         for (std::size_t i = 0; i < tests.size(); ++i) {
 
             // loop over all lazy_values, executing the next as soon as its
-            // value gets available 
+            // value gets available
             if (!handled[i] && tests[i].ready()) {
                 handled[i] = true;
                 ++handled_count;
 
-                // give thread-manager a chance to look for more work while 
+                // give thread-manager a chance to look for more work while
                 // waiting
                 hpx::threads::suspend();
                 suspended = true;
@@ -46,14 +47,14 @@ void monitor_test_sheneos(
         }
 
         // suspend after one full loop over all values, 10ms should be fine
-        if (!suspended) 
+        if (!suspended)
             hpx::threads::suspend(boost::posix_time::milliseconds(50));
     }
 }
 
 typedef hpx::actions::plain_action1<
-    std::vector<hpx::lcos::promise<std::vector<double> > > const&, 
-    monitor_test_sheneos> 
+    std::vector<hpx::lcos::promise<std::vector<double> > > const&,
+    monitor_test_sheneos>
 monitor_test_action;
 
 HPX_REGISTER_PLAIN_ACTION(monitor_test_action);
@@ -61,25 +62,25 @@ HPX_REGISTER_PLAIN_ACTION(monitor_test_action);
 namespace boost { namespace serialization
 {
     template <typename Archive>
-    void serialize(Archive&, 
-        std::vector<hpx::lcos::promise<std::vector<double> > >&, 
+    void serialize(Archive&,
+        std::vector<hpx::lcos::promise<std::vector<double> > >&,
         unsigned int const)
     {
-        // dummy function, will never be called as the monitor is invoked 
+        // dummy function, will never be called as the monitor is invoked
         // locally only
         BOOST_ASSERT(true);
     }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// This is the test function, which will be invoked on all localities this 
+// This is the test function, which will be invoked on all localities this
 // test is run on.
 void test_sheneos(std::size_t num_test_points)
 {
     // cubic root
     const std::size_t num_points = std::exp(std::log(double(num_test_points)) / 3);
 
-    // create a client instance connected to the already existing interpolation 
+    // create a client instance connected to the already existing interpolation
     // object
     sheneos::sheneos shen;
     shen.connect(shen_symbolic_name);
@@ -96,10 +97,10 @@ void test_sheneos(std::size_t num_test_points)
     shen.get_dimension(sheneos::dimension::rho, min_rho, max_rho);
     double delta_rho = (max_rho - min_rho) / num_points;
 
-    // Do the required amount of test calls to the interpolator, using equally 
+    // Do the required amount of test calls to the interpolator, using equally
     // spaced data points. We want to avoid that the evaluation sequence of the
     // data points will be the same on all localities. For that reason we first
-    // generate vector's of the values, and a sequence vector, which will be 
+    // generate vector's of the values, and a sequence vector, which will be
     // randomly initialized.
     std::vector<double> values_ye(num_points);
     std::vector<std::size_t> sequence_ye(num_points);
@@ -156,8 +157,8 @@ void test_sheneos(std::size_t num_test_points)
 
     // wait for all of the tests to finish
     int count = 0;
-    hpx::lcos::wait(tests, [&](int, std::vector<double> const&) { 
-        ++count; 
+    hpx::lcos::wait(tests, [&](int, std::vector<double> const&) {
+        ++count;
     }, 50);
 
     // wait for the monitor to exit
@@ -195,12 +196,14 @@ int hpx_main(variables_map& vm)
         sheneos::sheneos shen;
         shen.create(datafilename, shen_symbolic_name, num_partitions);
 
-        double elapsed = t.elapsed();
-        std::cout << "Create interpolator: " << elapsed << " [s]" << std::endl;
+        double created = t.elapsed();
+
+        if (!vm.count("silent"))
+            std::cout << "Create interpolator: " << created << " [s]" << std::endl;
 
         // get list of locality prefixes
         using hpx::components::server::plain_function;
-        hpx::components::component_type type = 
+        hpx::components::component_type type =
             plain_function<test_action>::get_component_type();
 
         std::vector<hpx::naming::id_type> prefixes =
@@ -213,17 +216,17 @@ int hpx_main(variables_map& vm)
         BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
         {
             using hpx::lcos::async;
-            for (std::size_t i = 0; i < num_workers; ++i) 
+            for (std::size_t i = 0; i < num_workers; ++i)
                 tests.push_back(async<test_action>(id, num_test_points));
         }
 
         // use a dummy lambda to work around a race condition in HPX's code
-        hpx::lcos::wait(tests, [](int i) {
-            std::cout << "Finished task: " << i << std::endl;
+        hpx::lcos::wait(tests, [&](int i) {
+            if (!vm.count("silent"))
+                std::cout << "Finished task: " << i << std::endl;
         }, 50);
 
         elapsed = t.elapsed();
-        std::cout << "Running tests: " << elapsed << " [s]" << std::endl;
     }
 
     hpx::finalize();
@@ -238,17 +241,24 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     po::options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
     cmdline.add_options()
-        ("file", po::value<std::string>(), 
+        ("file", po::value<std::string>(),
             "name of HDF5 data file")
-        ("num_tests", po::value<std::size_t>(), 
+        ("num_tests", po::value<std::size_t>(),
             "number of data points to interpolate (default: 10000)")
-        ("num_partitions", po::value<std::size_t>(), 
+        ("num_partitions", po::value<std::size_t>(),
             "number of partitions to create (default: 27)")
-        ("num_workers", po::value<std::size_t>(), 
+        ("num_workers", po::value<std::size_t>(),
             "number of worker (measurement) threads to create (default: 1)")
+        ("silent", "suppress application output")
     ;
 
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv);
+    int r = hpx::init(cmdline, argc, argv);
+
+    // Print this last, after all performance counter output is done.
+    if (elapsed != 0)
+        std::cout << "Ran tests: " << elapsed << " [s]" << std::endl;
+
+    return r;
 }
 
