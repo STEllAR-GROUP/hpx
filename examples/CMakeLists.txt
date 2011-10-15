@@ -5,54 +5,40 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying 
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT MSVC)
-  set(subdirs
-      accumulator
-      adaptive1d
-      balancing
-      dataflow
-      heartbeat 
-      hplpx
-      nqueen
-      object_semaphore
-      performance_counters
-      queue
-      quickstart
-      random_mem_access
-      throttle
+set(subdirs
+    accumulator
+    adaptive1d
+    balancing
+    dataflow
+    heartbeat 
+    hplpx
+    nqueen
+    object_semaphore
+    performance_counters
+    queue
+    quickstart
+    random_mem_access
+    throttle
+   )
+
+if(${BOOST_MINOR_VERSION} GREATER 46)
+  set(subdirs ${subdirs}
+      geometry
      )
+endif() 
 
-  if(${BOOST_MINOR_VERSION} GREATER 46)
+if(HDF5_CPP_FOUND) 
+  if(HDF5_FOUND) 
     set(subdirs ${subdirs}
-        geometry
+        interpolate1d
+        interpolate3d
        )
-  endif() 
-
-  if(HDF5_CPP_FOUND) 
-    if(HDF5_FOUND) 
-      set(subdirs ${subdirs}
-          interpolate1d
-          interpolate3d
-         )
-    endif()
-    if(HPX_CXX11_LAMBDAS)
-      set(subdirs ${subdirs}
-          sheneos
-         )
-    endif()
   endif()
-else()
-  set(subdirs
-      accumulator
-      quickstart
-      queue
-     )
-
-  if(${BOOST_MINOR_VERSION} GREATER 46)
+  if(HPX_CXX11_LAMBDAS)
     set(subdirs ${subdirs}
-        geometry
+        sheneos
        )
-  endif() 
+  endif()
 endif()
 
 foreach(subdir ${subdirs})
