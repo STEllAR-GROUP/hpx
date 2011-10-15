@@ -20,13 +20,13 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 
 namespace hpx { namespace agas
 {
 
-HPX_EXPORT naming::gid_type bootstrap_symbol_namespace_gid(); 
-HPX_EXPORT naming::id_type bootstrap_symbol_namespace_id(); 
+HPX_EXPORT naming::gid_type bootstrap_symbol_namespace_gid();
+HPX_EXPORT naming::id_type bootstrap_symbol_namespace_id();
 
 namespace server
 {
@@ -38,19 +38,19 @@ struct symbol_namespace :
     >
 {
     // {{{ nested types
-    typedef util::spinlock mutex_type;
+    typedef lcos::local_mutex mutex_type;
 
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
 
-    typedef std::map<std::string, naming::gid_type> gid_table_type; 
-    // }}} 
- 
+    typedef std::map<std::string, naming::gid_type> gid_table_type;
+    // }}}
+
   private:
     mutex_type mutex_;
     gid_table_type gids_;
-  
+
   public:
     symbol_namespace()
       : mutex_()
@@ -78,7 +78,7 @@ struct symbol_namespace :
         request const& req
       , error_code& ec = throws
         );
-    
+
     response unbind(
         request const& req
       , error_code& ec = throws

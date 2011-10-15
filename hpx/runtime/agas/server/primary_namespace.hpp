@@ -25,13 +25,13 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 
 namespace hpx { namespace agas
 {
 
-HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid(); 
-HPX_EXPORT naming::id_type bootstrap_primary_namespace_id(); 
+HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid();
+HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
 
 namespace server
 {
@@ -42,14 +42,14 @@ namespace server
 /// \note The layout of the address space is implementation defined, and
 /// subject to change. Never write application code that relies on the internal
 /// layout of GIDs. AGAS only guarantees that all assigned GIDs will be unique.
-/// 
+///
 /// The following is the canonical description of the partitioning of AGAS's
 /// primary namespace.
 ///
 ///     |-----MSB------||------LSB-----|
 ///     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 ///     |prefix||RC||----identifier----|
-///     
+///
 ///     MSB        - Most significant bits (bit 64 to bit 127)
 ///     LSB        - Least significant bits (bit 0 to bit 63)
 ///     prefix     - Highest 32 bits (bit 96 to bit 127) of the MSB. Each
@@ -66,7 +66,7 @@ namespace server
 ///                  \a hpx#components#component_memory, the high 16 bits are
 ///                  zeroed and the low 64 bits hold the LVA of the component.
 ///
-/// The following address ranges are reserved. Some are either explicitly or 
+/// The following address ranges are reserved. Some are either explicitly or
 /// implicitly protected by AGAS. The letter x represents a single-byte
 /// wildcard.
 ///
@@ -79,21 +79,21 @@ namespace server
 ///     00000001000000010000000000000001
 ///         Address of the primary_namespace component on the bootstrap AGAS
 ///         locality.
-///     00000001000000010000000000000002 
+///     00000001000000010000000000000002
 ///         Address of the component_namespace component on the bootstrap AGAS
 ///         locality.
 ///     00000001000000010000000000000003
 ///         Address of the symbol_namespace component on the bootstrap AGAS
 ///         locality.
 ///
-struct primary_namespace : 
+struct primary_namespace :
     components::fixed_component_base<
         HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
         primary_namespace
     >
 {
     // {{{ nested types
-    typedef util::spinlock mutex_type;
+    typedef lcos::local_mutex mutex_type;
 
     typedef boost::int32_t component_type;
 
@@ -101,21 +101,21 @@ struct primary_namespace :
         partition_type;
 
     typedef std::map<naming::gid_type, gva>
-        gva_table_type; 
+        gva_table_type;
 
     typedef std::map<naming::locality, partition_type>
         partition_table_type;
-    
+
     typedef std::map<naming::gid_type, boost::uint64_t>
         refcnt_table_type;
     // }}}
- 
+
   private:
     mutex_type mutex_;
     gva_table_type gvas_;
     partition_table_type partitions_;
     refcnt_table_type refcnts_;
-    boost::uint32_t prefix_counter_; 
+    boost::uint32_t prefix_counter_;
 
   public:
     primary_namespace()
@@ -172,7 +172,7 @@ struct primary_namespace :
         request const& req
       , error_code& ec = throws
         );
-    
+
     response decrement(
         request const& req
       , error_code& ec = throws
@@ -183,7 +183,7 @@ struct primary_namespace :
       , error_code& ec = throws
         );
 
-    enum actions 
+    enum actions
     { // {{{ action enum
         // Actual actions
         namespace_service          = BOOST_BINARY_U(1000000)
@@ -199,7 +199,7 @@ struct primary_namespace :
       , namespace_decrement        = BOOST_BINARY_U(1001000)
       , namespace_localities       = BOOST_BINARY_U(1001001)
     }; // }}}
-    
+
     typedef hpx::actions::result_action1<
         primary_namespace
       , /* return type */ response

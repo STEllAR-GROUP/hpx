@@ -23,13 +23,13 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 
 namespace hpx { namespace agas
 {
 
-HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid(); 
-HPX_EXPORT naming::id_type bootstrap_component_namespace_id(); 
+HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
+HPX_EXPORT naming::id_type bootstrap_component_namespace_id();
 
 namespace server
 {
@@ -41,13 +41,13 @@ struct component_namespace :
     >
 {
     // {{{ nested types
-    typedef util::spinlock mutex_type;
+    typedef lcos::local_mutex mutex_type;
 
-    typedef int component_id_type;
+    typedef boost::int32_t component_id_type;
 
     typedef std::set<boost::uint32_t> prefixes_type;
 
-    typedef std::map<std::string, component_id_type> component_id_table_type; 
+    typedef std::map<std::string, component_id_type> component_id_table_type;
 
     typedef std::map<component_id_type, prefixes_type> factory_table_type;
     // }}}
@@ -56,8 +56,8 @@ struct component_namespace :
     mutex_type mutex_;
     component_id_table_type component_ids_;
     factory_table_type factories_;
-    component_id_type type_counter; 
- 
+    component_id_type type_counter;
+
   public:
     component_namespace()
       : mutex_()
@@ -92,7 +92,7 @@ struct component_namespace :
         request const& req
       , error_code& ec = throws
         );
-    
+
     response unbind(
         request const& req
       , error_code& ec = throws
