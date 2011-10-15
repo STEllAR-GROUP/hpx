@@ -1,10 +1,11 @@
 //  Copyright (c) 2005-2011 Hartmut Kaiser
-//  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/version.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
@@ -20,7 +21,7 @@ namespace hpx { namespace util
     void pre_initialize_ini(section& ini)
     {
         using namespace boost::assign;
-        std::vector<std::string> lines; 
+        std::vector<std::string> lines;
         lines +=
             // create an empty application section
             "[application]",
@@ -43,7 +44,7 @@ namespace hpx { namespace util
 
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
-            "port = ${HPX_AGAS_SERVER_PORT:" 
+            "port = ${HPX_AGAS_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "service_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
@@ -80,16 +81,16 @@ namespace hpx { namespace util
         std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>())
     {
         // add explicit configuration information if its provided
-        util::init_ini_data_base(ini, hpx_ini_file); 
+        util::init_ini_data_base(ini, hpx_ini_file);
 
-        // let the command line override the config file. 
+        // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
             ini.parse("command line definitions", cmdline_ini_defs);
     }
 
     void runtime_configuration::load_components()
     {
-        // try to build default ini structure from shared libraries in default 
+        // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
         // without the need to install an ini file
         std::string component_path(
@@ -99,11 +100,11 @@ namespace hpx { namespace util
         // merge all found ini files of all components
         util::merge_component_inis(*this);
 
-        // read system and user ini files _again_, to allow the user to 
-        // overwrite the settings from the default component ini's. 
+        // read system and user ini files _again_, to allow the user to
+        // overwrite the settings from the default component ini's.
         util::init_ini_data_base(*this, hpx_ini_file);
 
-        // let the command line override the config file. 
+        // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
             parse("command line definitions", cmdline_ini_defs);
     }
@@ -143,7 +144,7 @@ namespace hpx { namespace util
 
     // AGAS configuration information has to be stored in the global hpx.agas
     // configuration section:
-    // 
+    //
     //    [hpx.agas]
     //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
     //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
@@ -166,9 +167,9 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
-    // HPX network address configuration information has to be stored in the 
+    // HPX network address configuration information has to be stored in the
     // global hpx configuration section:
-    // 
+    //
     //    [hpx]
     //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
     //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
@@ -207,7 +208,7 @@ namespace hpx { namespace util
                 else {
                     // REVIEW: exception type is overused
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "runtime_configuration::get_agas_service_mode", 
+                        "runtime_configuration::get_agas_service_mode",
                         std::string("invalid AGAS router mode \"") + m + "\"");
                 }
             }
@@ -312,6 +313,16 @@ namespace hpx { namespace util
             return false;
         }
         return true;
+    }
+
+    std::string expand(std::string const& in)
+    {
+        return get_runtime().get_config().expand(in);
+    }
+
+    void expand(std::string& in)
+    {
+        get_runtime().get_config().expand(in, std::string::size_type(-1));
     }
 }}
 
