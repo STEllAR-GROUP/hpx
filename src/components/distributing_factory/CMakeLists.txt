@@ -40,7 +40,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(distributing_factory 
-  MODULE core
   SOURCES ${sources} 
   HEADERS ${headers})
 

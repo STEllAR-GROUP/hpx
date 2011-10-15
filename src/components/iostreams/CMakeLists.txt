@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_component(iostreams 
-  MODULE core
   SOURCES component_module.cpp
           manipulators.cpp
           standard_streams.cpp
