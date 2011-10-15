@@ -7,7 +7,7 @@
 #if !defined(HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F)
 #define HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F
 
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
@@ -24,39 +24,33 @@ class local_shared_mutex
         bool upgrade;
         bool exclusive_waiting_blocked;
     };
-    
+
     state_data state;
-    lcos::mutex state_change;
+    lcos::local_mutex state_change;
     lcos::local_counting_semaphore shared_cond;
     lcos::local_counting_semaphore exclusive_cond;
     lcos::local_counting_semaphore upgrade_cond;
-
-    typedef lcos::mutex::scoped_lock scoped_lock; 
 
     void release_waiters()
     {
         exclusive_cond.signal(1);
         shared_cond.signal_all();
     }
-    
+
   public:
     local_shared_mutex()
     {
-        state_data state_={0,0,0,0};
-        state=state_;
-    }
-
-    ~local_shared_mutex()
-    {
+        state_data state_ = {0,0,0,0};
+        state = state_;
     }
 
     void lock_shared()
     {
-        scoped_lock lk(state_change);
-            
+        lcos::local_mutex::scoped_lock lk(state_change);
+
         while (state.exclusive || state.exclusive_waiting_blocked)
         {
-            util::unlock_the_lock<scoped_lock> ul(lk);
+            util::unlock_the_lock<lcos::local_mutex::scoped_lock> ul(lk);
             shared_cond.wait();
         }
 
@@ -65,8 +59,8 @@ class local_shared_mutex
 
     bool try_lock_shared()
     {
-        scoped_lock lk(state_change);
-            
+        lcos::local_mutex::scoped_lock lk(state_change);
+
         if (state.exclusive || state.exclusive_waiting_blocked)
             return false;
 
@@ -79,10 +73,10 @@ class local_shared_mutex
 
     void unlock_shared()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
 
         bool const last_reader = !--state.shared_count;
-            
+
         if (last_reader)
         {
             if (state.upgrade)
@@ -103,12 +97,12 @@ class local_shared_mutex
 
     void lock()
     {
-        scoped_lock lk(state_change);
-            
+        lcos::local_mutex::scoped_lock lk(state_change);
+
         while (state.shared_count || state.exclusive)
         {
             state.exclusive_waiting_blocked = true;
-            util::unlock_the_lock<scoped_lock> ul(lk);
+            util::unlock_the_lock<lcos::local_mutex::scoped_lock> ul(lk);
             exclusive_cond.wait();
         }
 
@@ -117,8 +111,8 @@ class local_shared_mutex
 
     bool try_lock()
     {
-        scoped_lock lk(state_change);
-            
+        lcos::local_mutex::scoped_lock lk(state_change);
+
         if (state.shared_count || state.exclusive)
             return false;
 
@@ -127,12 +121,11 @@ class local_shared_mutex
             state.exclusive = true;
             return true;
         }
-            
     }
 
     void unlock()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         state.exclusive = false;
         state.exclusive_waiting_blocked = false;
         release_waiters();
@@ -140,11 +133,11 @@ class local_shared_mutex
 
     void lock_upgrade()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
 
         while (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
         {
-            util::unlock_the_lock<scoped_lock> ul(lk);
+            util::unlock_the_lock<lcos::local_mutex::scoped_lock> ul(lk);
             shared_cond.wait();
         }
 
@@ -154,7 +147,7 @@ class local_shared_mutex
 
     bool try_lock_upgrade()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
 
         if (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
             return false;
@@ -169,10 +162,10 @@ class local_shared_mutex
 
     void unlock_upgrade()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         state.upgrade = false;
         bool const last_reader = !--state.shared_count;
-            
+
         if (last_reader)
         {
             state.exclusive_waiting_blocked = false;
@@ -182,12 +175,12 @@ class local_shared_mutex
 
     void unlock_upgrade_and_lock()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         --state.shared_count;
 
         while (state.shared_count)
         {
-            util::unlock_the_lock<scoped_lock> ul(lk);
+            util::unlock_the_lock<lcos::local_mutex::scoped_lock> ul(lk);
             upgrade_cond.wait();
         }
 
@@ -197,26 +190,26 @@ class local_shared_mutex
 
     void unlock_and_lock_upgrade()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         state.exclusive = false;
         state.upgrade = true;
         ++state.shared_count;
         state.exclusive_waiting_blocked = false;
         release_waiters();
     }
-    
+
     void unlock_and_lock_shared()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         state.exclusive = false;
         ++state.shared_count;
         state.exclusive_waiting_blocked = false;
         release_waiters();
     }
-    
+
     void unlock_upgrade_and_lock_shared()
     {
-        scoped_lock lk(state_change);
+        lcos::local_mutex::scoped_lock lk(state_change);
         state.upgrade = false;
         state.exclusive_waiting_blocked = false;
         release_waiters();
