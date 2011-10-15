@@ -70,7 +70,8 @@ void addressing_service::launch_bootstrap(
 
     local_prefix(here);
     get_runtime().get_config().parse("assigned locality",
-        boost::str(boost::format("hpx.locality=%1%") % here));
+        boost::str(boost::format("hpx.locality=%1%")
+                  % naming::get_prefix_from_gid(here)));
 
     request reqs[] =
     {

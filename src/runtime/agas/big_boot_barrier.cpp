@@ -363,7 +363,8 @@ void notify_console(notification_header const& header)
     // set our prefix
     agas_client.local_prefix(header.prefix);
     get_runtime().get_config().parse("assigned locality",
-        boost::str(boost::format("hpx.locality=%1%") % header.prefix));
+        boost::str(boost::format("hpx.locality=%1%")
+                  % naming::get_prefix_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local router
     agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
@@ -508,7 +509,8 @@ void notify_worker(notification_header const& header)
     // set our prefix
     agas_client.local_prefix(header.prefix);
     get_runtime().get_config().parse("assigned locality",
-        boost::str(boost::format("hpx.locality=%1%") % header.prefix));
+        boost::str(boost::format("hpx.locality=%1%")
+                  % naming::get_prefix_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
     agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
