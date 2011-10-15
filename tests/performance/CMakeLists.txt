@@ -37,7 +37,6 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}
-                     MODULE performance
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS})
 

@@ -17,7 +17,6 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}
-                     MODULE abi
                      SOURCES ${sources}
                      ${${test}_FLAGS})
 

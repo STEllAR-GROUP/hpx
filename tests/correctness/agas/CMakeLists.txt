@@ -66,7 +66,6 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}
-                     MODULE agas
                      SOURCES ${sources}
                      ${${test}_FLAGS})
 
