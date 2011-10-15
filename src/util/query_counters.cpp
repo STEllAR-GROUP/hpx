@@ -22,6 +22,11 @@ namespace hpx { namespace util
     void query_counters::find_counters()
     {
         mutex_type::scoped_lock l(mtx_);
+
+        // do INI expansion on all counter names
+        for (std::size_t i = 0; i < names_.size(); ++i)
+            expand(names_[i]);
+
         if (ids_.empty())
         {
             ids_.reserve(names_.size());
