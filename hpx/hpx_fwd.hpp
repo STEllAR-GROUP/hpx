@@ -486,15 +486,15 @@ namespace hpx
         class HPX_API_EXPORT section;
         class runtime_configuration;
 
+        /// \brief Expand INI variables in a string
+        HPX_API_EXPORT std::string expand(std::string const& expand);
+
+        /// \brief Expand INI variables in a string
+        HPX_API_EXPORT void expand(std::string& expand);
+
         template <typename Connection, typename Key = boost::uint32_t>
         class connection_cache;
     }
-
-    /// \brief Expand INI variables in a string
-    HPX_API_EXPORT std::string expand(std::string const& expand);
-
-    /// \brief Expand INI variables in a string
-    HPX_API_EXPORT void expand(std::string& expand);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
