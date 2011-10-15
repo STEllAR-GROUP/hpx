@@ -11,6 +11,7 @@
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/pbs_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
+#include <hpx/util/sed_transform.hpp>
 
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -450,6 +451,9 @@ namespace hpx
                     ("ifprefix", value<std::string>(),
                       "prefix to prepend to host names in order to resolve them "
                       "to the proper network interconnect")
+                    ("iftransform", value<std::string>(),
+                      "sed-style search and replace (s/search/replace/) used to "
+                      "transform host names to the proper network interconnect")
                     ("localities,l", value<std::size_t>(),
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -924,6 +928,22 @@ namespace hpx
 
             // Check command line arguments.
             util::pbs_environment env(debug_clp);
+
+            if (vm.count("iftransform")) {
+                util::sed_transform iftransform(vm["iftransform"].as<std::string>());
+
+                // Check for parsing failures
+                if (!iftransform) {
+                    throw std::logic_error(boost::str(boost::format(
+                        "Could not parse --iftransform argument '%1%'")
+                        % vm["iftransform"].as<std::string>())); 
+                } 
+
+                typedef util::pbs_environment::transform_function_type
+                    transform_function_type;
+                env.use_transform(transform_function_type(iftransform));
+            }
+
             if (vm.count("nodefile")) {
                 if (vm.count("nodes")) {
                     throw std::logic_error("Ambiguous command line options. "

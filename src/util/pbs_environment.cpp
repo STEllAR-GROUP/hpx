@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -17,13 +17,13 @@ namespace hpx { namespace util
 {
     // this function tries to read from a PBS node-file, filling our
     // map of nodes and thread counts
-    std::string pbs_environment::init_from_file(std::string nodefile, 
+    std::string pbs_environment::init_from_file(std::string nodefile,
         std::string const& agas_host)
     {
         // read node file
         if (nodefile.empty()) {
             char* pbs_nodefile_env = std::getenv("PBS_NODEFILE");
-            if (pbs_nodefile_env) 
+            if (pbs_nodefile_env)
                 nodefile = pbs_nodefile_env;
         }
 
@@ -43,7 +43,7 @@ namespace hpx { namespace util
 
                         if (!found_agas_host &&
                             ((agas_host.empty() && nodes_.empty()) ||
-                             line == agas_host)) 
+                             line == agas_host))
                         {
                             agas_node_ = line;
                             found_agas_host = true;
@@ -65,11 +65,11 @@ namespace hpx { namespace util
                 // if an AGAS host is specified, it needs to be in the list
                 // of nodes participating in this run
                 if (!agas_host.empty() && !found_agas_host) {
-                    throw std::logic_error("Requested AGAS host (" + 
+                    throw std::logic_error("Requested AGAS host (" +
                         agas_host + ") not found in node list");
                 }
 
-                if (debug_ && !agas_node_.empty()) 
+                if (debug_ && !agas_node_.empty())
                     std::cerr << "using AGAS host: '" << agas_node_
                               << "' (node number " << agas_node_num_ << ")"
                               << std::endl;
@@ -82,10 +82,10 @@ namespace hpx { namespace util
         return nodefile;
     }
 
-    // this function initializes the map of nodes from the given (space 
+    // this function initializes the map of nodes from the given (space
     // separated) list of nodes
     std::string pbs_environment::init_from_nodelist(
-        std::vector<std::string> const& nodes, 
+        std::vector<std::string> const& nodes,
         std::string const& agas_host)
     {
         if (debug_)
@@ -94,14 +94,14 @@ namespace hpx { namespace util
         bool found_agas_host = false;
         std::size_t agas_node = 0;
         std::string nodes_list;
-        BOOST_FOREACH(std::string const& s, nodes) 
+        BOOST_FOREACH(std::string const& s, nodes)
         {
             if (!s.empty()) {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
 
                 if (!found_agas_host &&
-                    ((agas_host.empty() && nodes_.empty()) || s == agas_host)) 
+                    ((agas_host.empty() && nodes_.empty()) || s == agas_host))
                 {
                     agas_node_ = s;
                     found_agas_host = true;
@@ -136,8 +136,8 @@ namespace hpx { namespace util
         return nodes_list;
     }
 
-    // The number of threads is either one (if no PBS information was 
-    // found), or it is the same as the number of times this node has 
+    // The number of threads is either one (if no PBS information was
+    // found), or it is the same as the number of times this node has
     // been listed in the node file.
     std::size_t pbs_environment::retrieve_number_of_threads() const
     {
@@ -149,7 +149,7 @@ namespace hpx { namespace util
                 std::string value(pbs_num_ppn);
                 std::size_t result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_number_of_threads (PBS_NUM_PPN): " << result 
+                    std::cerr << "retrieve_number_of_threads (PBS_NUM_PPN): " << result
                               << std::endl;
                 }
                 return result;
@@ -160,25 +160,25 @@ namespace hpx { namespace util
         }
         */
 
-        // fall back to counting the number of occurrences of this node 
+        // fall back to counting the number of occurrences of this node
         // in the node-file
         node_map_type::const_iterator it = nodes_.find(host_name());
         std::size_t result = it != nodes_.end() ? (*it).second : 1;
         if (debug_) {
-            std::cerr << "retrieve_number_of_threads: " << result 
+            std::cerr << "retrieve_number_of_threads: " << result
                       << std::endl;
         }
         return result;
     }
 
-    // The number of localities is either one (if no PBS information 
-    // was found), or it is the same as the number of distinct node 
+    // The number of localities is either one (if no PBS information
+    // was found), or it is the same as the number of distinct node
     // names listed in the node file.
     std::size_t pbs_environment::retrieve_number_of_localities() const
     {
         std::size_t result = nodes_.empty() ? 1 : nodes_.size();
         if (debug_) {
-            std::cerr << "retrieve_number_of_localities: " << result 
+            std::cerr << "retrieve_number_of_localities: " << result
                       << std::endl;
         }
         return result;
@@ -193,7 +193,7 @@ namespace hpx { namespace util
                 std::string value(pbs_nodenum);
                 std::size_t result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_node_number (PBS_NODENUM): " << result 
+                    std::cerr << "retrieve_node_number (PBS_NODENUM): " << result
                               << std::endl;
                 }
                 return result;
@@ -207,29 +207,25 @@ namespace hpx { namespace util
         return std::size_t(-1);
     }
 
-    // This helper function returns the host name of this node.
-    std::string pbs_environment::strip_local(std::string const& name)
+    std::string pbs_environment::host_name() const
     {
-        std::string::size_type pos = name.find(".local");
-        if (pos != std::string::npos)
-            return name.substr(0, pos);
-        return name;
+        return transform_(boost::asio::ip::host_name());
     }
 
     std::string pbs_environment::host_name(std::string const& def_hpx_name) const
     {
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
-        if (debug_) 
+        if (debug_)
             std::cerr << "host_name: " << host << std::endl;
         return host;
     }
 
-    // We either select the first host listed in the node file or a given 
+    // We either select the first host listed in the node file or a given
     // host name to host the AGAS server.
     std::string pbs_environment::agas_host_name(std::string const& def_agas) const
     {
-        std::string host = agas_node_.empty() ? def_agas : agas_node_; 
-        if (debug_) 
+        std::string host = agas_node_.empty() ? def_agas : agas_node_;
+        if (debug_)
             std::cerr << "agas host_name: " << host << std::endl;
         return host;
     }
