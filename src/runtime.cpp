@@ -687,6 +687,11 @@ namespace hpx
     {
         return get_runtime().get_config().expand(in);
     }
+
+    void expand(std::string& in)
+    {
+        get_runtime().get_config().expand(in, std::string::size_type(-1));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

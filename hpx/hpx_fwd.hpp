@@ -493,6 +493,9 @@ namespace hpx
     /// \brief Expand INI variables in a string
     HPX_API_EXPORT std::string expand(std::string const& expand);
 
+    /// \brief Expand INI variables in a string
+    HPX_API_EXPORT void expand(std::string& expand);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
