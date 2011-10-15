@@ -102,6 +102,9 @@ void pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components";
 
         install_counters();
+
+        components::stubs::runtime_support::call_startup_functions(find_here());
+        LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
 
     else
@@ -163,6 +166,8 @@ void pre_main(runtime_mode mode)
         second_stage.wait();
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
+        install_counters();
+
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
@@ -172,8 +177,6 @@ void pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
-
-        install_counters();
     }
 
     // Enable logging.
