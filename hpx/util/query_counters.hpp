@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <string>
@@ -31,7 +31,7 @@ namespace hpx { namespace util
         void find_counters();
 
     private:
-        typedef lcos::mutex mutex_type;
+        typedef lcos::local_mutex mutex_type;
 
         mutex_type mtx_;
         std::ostream& out_;

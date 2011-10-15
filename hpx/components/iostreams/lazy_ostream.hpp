@@ -33,8 +33,8 @@ struct lazy_ostream
     typedef components::client_base<lazy_ostream, stubs::output_stream>
         base_type;
 
-    typedef lcos::mutex mutex_type;
-    typedef std::back_insert_iterator<std::deque<char> > iterator_type; 
+    typedef lcos::local_mutex mutex_type;
+    typedef std::back_insert_iterator<std::deque<char> > iterator_type;
     typedef util::iterator_sink<iterator_type> device_type;
     typedef boost::iostreams::stream<device_type> stream_type;
     // }}}
@@ -82,7 +82,7 @@ struct lazy_ostream
             boost::swap(next, data);
 
             // Perform the write operation, then destroy the old buffer and
-            // stream. 
+            // stream.
             this->base_type::write_async(gid_, next->out_buffer);
 
             // Unlock the mutex before we cleanup.
@@ -112,7 +112,7 @@ struct lazy_ostream
             boost::swap(next, data);
 
             // Perform the write operation, then destroy the old buffer and
-            // stream. 
+            // stream.
             this->base_type::write_sync(gid_, next->out_buffer);
 
             // Unlock the mutex before we cleanup.
@@ -129,7 +129,7 @@ struct lazy_ostream
     lazy_ostream(naming::id_type const& gid = naming::invalid_id)
       : base_type(gid)
       , data(new data_type)
-    {} 
+    {}
 
     lazy_ostream(BOOST_RV_REF(lazy_ostream) other)
     {
@@ -155,7 +155,7 @@ struct lazy_ostream
         if (threads::threadmanager_is(running))
         {
             mutex_type::scoped_lock l(mtx, boost::try_to_lock);
-            if (l && data)   
+            if (l && data)
             {
                 streaming_operator_sync(hpx::sync_flush, l);
             }
@@ -211,7 +211,7 @@ struct lazy_ostream
     {
         mutex_type::scoped_lock l(mtx);
         return streaming_operator_lazy(subject);
-    } 
+    }
 };
 
 }}

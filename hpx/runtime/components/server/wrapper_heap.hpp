@@ -1,7 +1,7 @@
 //  Copyright (c) 1998-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM)
@@ -17,7 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -26,14 +26,14 @@
 #include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail 
+namespace hpx { namespace components { namespace detail
 {
 #if HPX_DEBUG_WRAPPER_HEAP != 0
     namespace debug
     {
         ///////////////////////////////////////////////////////////////////////
         // Test memory area for being filled as expected
-        inline 
+        inline
         bool test_fill_bytes (void *p, unsigned char c, std::size_t cnt)
         {
             unsigned char* uc = (unsigned char*)p;
@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // Fill memory area
-        inline 
+        inline
         void fill_bytes (void *p, unsigned char c, int cnt)
         {
             using namespace std;    // some systems have memset in namespace std
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-        typedef hpx::lcos::mutex mutex_type;
+        typedef hpx::lcos::local_mutex mutex_type;
 
         typedef typename mutex_type::scoped_lock scoped_lock;
 
@@ -79,25 +79,25 @@ namespace hpx { namespace components { namespace detail
             boost::alignment_of<value_type>::value> storage_type;
 //         storage_type data;
 
-        enum { 
+        enum {
             heap_step = 0xFFFF,               // default initial number of elements
             heap_size = sizeof(storage_type)  // size of one element in the heap
         };
 
     public:
-        explicit wrapper_heap(char const* class_name, 
+        explicit wrapper_heap(char const* class_name,
                 std::size_t count, std::size_t step = static_cast<std::size_t>(-1))
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_gid), 
+            base_gid_(naming::invalid_gid),
             class_name_(class_name), alloc_count_(0), free_count_(0),
             heap_count_(count)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
-            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step) 
+            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step)
                 step_ = heap_step;
-            else 
+            else
                 step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
 
             if (!init_pool())
@@ -105,9 +105,9 @@ namespace hpx { namespace components { namespace detail
         }
 
         wrapper_heap()
-          : pool_(NULL), first_free_(NULL), 
+          : pool_(NULL), first_free_(NULL),
             step_(heap_step), size_(0), free_size_(0),
-            base_gid_(naming::invalid_gid), 
+            base_gid_(naming::invalid_gid),
             alloc_count_(0), free_count_(0), heap_count_(0)
         {
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
             BOOST_ASSERT(free_size_ + count <= size_);
             // make sure this has not been freed yet
-            BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value, 
+            BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value,
                 count*sizeof(storage_type)));
 
             // give memory back to pool
@@ -184,14 +184,14 @@ namespace hpx { namespace components { namespace detail
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
-        /// \brief Get the global id of the managed_component instance 
-        ///        given by the parameter \a p. 
+        /// \brief Get the global id of the managed_component instance
+        ///        given by the parameter \a p.
         ///
         ///
-        /// \note  The pointer given by the parameter \a p must have been 
+        /// \note  The pointer given by the parameter \a p must have been
         ///        allocated by this instance of a \a wrapper_heap
-        naming::gid_type 
-        get_gid(util::unique_id_ranges& ids, void* p) 
+        naming::gid_type
+        get_gid(util::unique_id_ranges& ids, void* p)
         {
             BOOST_ASSERT(did_alloc(p));
 
@@ -202,17 +202,17 @@ namespace hpx { namespace components { namespace detail
                 // store a pointer to the AGAS client
                 hpx::applier::applier& appl = hpx::applier::get_applier();
 
-                // this is the first call to get_gid() for this heap - allocate 
+                // this is the first call to get_gid() for this heap - allocate
                 // a sufficiently large range of global ids
                 base_gid_ = ids.get_id(appl.here(), appl.get_agas_client(), step_);
 
                 // register the global ids and the base address of this heap
                 // with the AGAS
-                if (!applier::bind_range(base_gid_, step_, 
+                if (!applier::bind_range(base_gid_, step_,
                       naming::address(appl.here(),
-                          components::get_component_type<typename value_type::type_holder>(), 
+                          components::get_component_type<typename value_type::type_holder>(),
                           addr),
-                      sizeof(value_type))) 
+                      sizeof(value_type)))
                 {
                     return naming::invalid_gid;
                 }
@@ -224,14 +224,14 @@ namespace hpx { namespace components { namespace detail
         {
             scoped_lock l(mtx_);
             base_gid_ = g;
-        } 
+        }
 
         naming::address get_address()
         {
             value_type* addr = static_cast<value_type*>(pool_->address());
-            return naming::address  
+            return naming::address
                 (get_locality(),
-                 components::get_component_type<typename value_type::type_holder>(), 
+                 components::get_component_type<typename value_type::type_holder>(),
                  addr);
         }
 
@@ -242,7 +242,7 @@ namespace hpx { namespace components { namespace detail
                 return false;
             BOOST_ASSERT(free_size_ == size_);
 
-            // unbind in AGAS service 
+            // unbind in AGAS service
             if (base_gid_) {
                 applier::unbind_range(base_gid_, step_);
                 base_gid_ = naming::invalid_gid;
@@ -256,7 +256,7 @@ namespace hpx { namespace components { namespace detail
         {
             if (NULL == pool_)
                 return false;
-            if (first_free_ + count > pool_+size_) 
+            if (first_free_ + count > pool_+size_)
                 return false;
             return true;
         }
@@ -268,17 +268,17 @@ namespace hpx { namespace components { namespace detail
 
             std::size_t s = step_ * heap_size;
             pool_ = (storage_type*)Allocator::alloc(s);
-            if (NULL == pool_) 
+            if (NULL == pool_)
                 return false;
 
             first_free_ = pool_;
             size_ = s / heap_size;
             free_size_ = size_;
 
-            LOSH_(info) 
-                << "wrapper_heap (" 
+            LOSH_(info)
+                << "wrapper_heap ("
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                << "): init_pool (" << std::hex << pool_ << ")" 
+                << "): init_pool (" << std::hex << pool_ << ")"
                 << " size: " << s << ".";
 
             return true;
@@ -287,17 +287,17 @@ namespace hpx { namespace components { namespace detail
         void tidy()
         {
             if (pool_ != NULL) {
-                LOSH_(debug) 
-                    << "wrapper_heap (" 
+                LOSH_(debug)
+                    << "wrapper_heap ("
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                    << "): releasing heap: alloc count: " << alloc_count_ 
+                    << "): releasing heap: alloc count: " << alloc_count_
                     << ", free count: " << free_count_ << ".";
 
                 if (free_size_ != size_ || alloc_count_ != free_count_) {
-                    LOSH_(warning) 
-                        << "wrapper_heap (" 
+                    LOSH_(warning)
+                        << "wrapper_heap ("
                         << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
-                        << "): releasing heap (" << std::hex << pool_ << ")" 
+                        << "): releasing heap (" << std::hex << pool_ << ")"
                         << " with " << size_-free_size_ << " allocated object(s)!";
                 }
                 Allocator::free(pool_);
@@ -336,20 +336,20 @@ namespace hpx { namespace components { namespace detail
         //
         // simple allocator which gets the memory from the default malloc,
         // but which does not reallocate the heap (it doesn't grow)
-        struct fixed_mallocator  
+        struct fixed_mallocator
         {
-            static void* alloc(std::size_t& size) 
-            { 
-                return ::malloc(size); 
+            static void* alloc(std::size_t& size)
+            {
+                return ::malloc(size);
             }
-            static void free(void* p) 
-            { 
-                ::free(p); 
+            static void free(void* p)
+            {
+                ::free(p);
             }
             static void* realloc(std::size_t &size, void *p)
-            { 
-                // normally this should return ::realloc(p, size), but we are 
-                // not interested in growing the allocated heaps, so we just 
+            {
+                // normally this should return ::realloc(p, size), but we are
+                // not interested in growing the allocated heaps, so we just
                 // return NULL
                 return NULL;
             }
@@ -359,18 +359,18 @@ namespace hpx { namespace components { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     // heap using malloc and friends
     template<typename T>
-    class fixed_wrapper_heap : 
+    class fixed_wrapper_heap :
         public wrapper_heap<T, one_size_heap_allocators::fixed_mallocator>
     {
     private:
-        typedef 
-            wrapper_heap<T, one_size_heap_allocators::fixed_mallocator> 
+        typedef
+            wrapper_heap<T, one_size_heap_allocators::fixed_mallocator>
         base_type;
 
     public:
-        explicit fixed_wrapper_heap(char const* class_name = "<Unknown>", 
+        explicit fixed_wrapper_heap(char const* class_name = "<Unknown>",
                 std::size_t count = 0, std::size_t step = (std::size_t)-1)
-          : base_type(class_name, count, step) 
+          : base_type(class_name, count, step)
         {}
     };
 

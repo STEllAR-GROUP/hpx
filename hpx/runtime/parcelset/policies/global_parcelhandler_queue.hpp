@@ -42,7 +42,7 @@ namespace hpx { namespace parcelset { namespace policies
 
             // do some work (notify event handlers)
             BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, tmp->get_destination_addr()); 
+            notify_(*ph_, tmp->get_destination_addr());
         }
 
         bool get_parcel(parcel& p)
@@ -54,23 +54,23 @@ namespace hpx { namespace parcelset { namespace policies
             {
                 std::swap(p, *tmp);
                 delete tmp;
-                --queue_length; 
+                --queue_length;
                 return true;
             }
 
             return false;
         }
 
-        bool register_event_handler(callback_type const& sink) 
-        { 
+        bool register_event_handler(callback_type const& sink)
+        {
             return notify_.connect(sink).connected();
         }
 
         bool register_event_handler(callback_type const& sink
-          , connection_type& conn) 
+          , connection_type& conn)
         {
             return (conn = notify_.connect(sink)).connected();
-        } 
+        }
 
         void set_parcelhandler(parcelhandler* ph)
         {
@@ -92,7 +92,7 @@ namespace hpx { namespace parcelset { namespace policies
 
         boost::signals2::signal_type<
             void(parcelhandler&, naming::address const&)
-          , boost::signals2::keywords::mutex_type<lcos::mutex>
+          , boost::signals2::keywords::mutex_type<lcos::local_mutex>
         >::type notify_;
     };
 }}}

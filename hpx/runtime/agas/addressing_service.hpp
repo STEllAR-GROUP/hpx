@@ -26,7 +26,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -55,7 +55,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef symbol_namespace::iterate_names_function_type
         iterate_names_function_type;
 
-    typedef hpx::lcos::mutex mutex_type;
+    typedef hpx::lcos::local_mutex mutex_type;
 
     typedef boost::atomic<boost::uint32_t> console_cache_type;
     // }}}

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_SERVER_BARRIER_MAR_10_2010_0310PM)
@@ -11,7 +11,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -20,16 +20,16 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace server 
+namespace hpx { namespace lcos { namespace server
 {
     /// \class barrier barrier.hpp hpx/lcos/server/barrier.hpp
     ///
-    /// A barrier can be used to synchronize a specific number of threads, 
-    /// blocking all of the entering threads until all of the threads have 
+    /// A barrier can be used to synchronize a specific number of threads,
+    /// blocking all of the entering threads until all of the threads have
     /// entered the barrier.
-    class barrier 
+    class barrier
       : public lcos::base_lco
-      , public components::managed_component_base<barrier> 
+      , public components::managed_component_base<barrier>
     {
     public:
         typedef lcos::base_lco base_type_holder;
@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace server
     private:
         typedef components::managed_component_base<barrier> base_type;
 
-        typedef hpx::lcos::mutex mutex_type;
+        typedef hpx::lcos::local_mutex mutex_type;
         mutex_type mtx_;
 
         // define data structures needed for intrusive slist container used for
@@ -62,8 +62,8 @@ namespace hpx { namespace lcos { namespace server
         > slist_option_type;
 
         typedef boost::intrusive::slist<
-            barrier_queue_entry, slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            barrier_queue_entry, slist_option_type,
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -95,17 +95,17 @@ namespace hpx { namespace lcos { namespace server
 
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
-                    LERR_(fatal) << "~barrier: pending thread: " 
-                            << get_thread_state_name(thrd->get_state()) 
+                    LERR_(fatal) << "~barrier: pending thread: "
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec;
-                    threads::set_thread_state(id, threads::pending, 
+                    threads::set_thread_state(id, threads::pending,
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
                         LERR_(fatal) << "~barrier: could not abort thread"
-                            << get_thread_state_name(thrd->get_state()) 
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
                     }
                 }
@@ -116,16 +116,16 @@ namespace hpx { namespace lcos { namespace server
         using base_type::finalize;
         typedef base_type::wrapping_type wrapping_type;
 
-        static components::component_type get_component_type() 
-        { 
-            return components::component_barrier; 
+        static components::component_type get_component_type()
+        {
+            return components::component_barrier;
         }
         static void set_component_type(components::component_type type) {}
 
         // standard LCO action implementations
 
-        /// The function \a set_event will block the number of entering 
-        /// \a threads (as given by the constructor parameter \a number_of_threads), 
+        /// The function \a set_event will block the number of entering
+        /// \a threads (as given by the constructor parameter \a number_of_threads),
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void set_event()
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos { namespace server
                     HPX_THROW_EXCEPTION(yield_aborted, "barrier::set_event",
                         hpx::util::osstream_get_string(strm));
                     return;
-                }                
+                }
             }
             else {
             // slist::swap has a bug in Boost 1.35.0
@@ -186,12 +186,12 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a 
-        /// \a set_error_action is applied on an instance of a LCO. This 
-        /// function just forwards to the virtual function \a set_error, which 
+        /// The \a function set_error is called whenever a
+        /// \a set_error_action is applied on an instance of a LCO. This
+        /// function just forwards to the virtual function \a set_error, which
         /// is overloaded by the derived concrete LCO.
         ///
-        /// \param e      [in] The exception encapsulating the error to report 
+        /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
         void set_error(boost::exception_ptr const& e)
         {
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos { namespace server
                     queue_.front().id_ = 0;
                     queue_.pop_front();
 
-                    threads::set_thread_state(id, threads::pending, 
+                    threads::set_thread_state(id, threads::pending,
                         threads::wait_abort);
                 }
 
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace server
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics
-                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_error", 
+                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_error",
                     boost::diagnostic_information(be));
             }
         }
