@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # Abusive hacks that allow us to have installable targets that are not built
-# by default. FIXME: do stuff with MODULE.
+# by default. 
 
 set(HPX_INSTALL_LOADED TRUE)
 
@@ -20,7 +20,7 @@ macro(hpx_symlink source destination)
 endmacro()
 
 macro(hpx_executable_install name)
-  hpx_parse_arguments(${name} "MODULE" "ESSENTIAL" ${ARGN})
+  hpx_parse_arguments(${name} "" "ESSENTIAL" ${ARGN})
 
   set(optional "OPTIONAL")
 
@@ -38,10 +38,10 @@ macro(hpx_executable_install name)
             PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                         GROUP_READ GROUP_EXECUTE
                         WORLD_READ WORLD_EXECUTE)")
-  install(CODE "${install_code}" COMPONENT ${${name}_MODULE})
+  install(CODE "${install_code}")
 endmacro()
 
-macro(hpx_library_install module lib)
+macro(hpx_library_install lib)
   if(UNIX)
     set(targets ${lib} ${lib}.${HPX_SOVERSION} ${lib}.${HPX_VERSION})
   else()
@@ -57,11 +57,11 @@ macro(hpx_library_install module lib)
             PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                         GROUP_READ GROUP_EXECUTE
                         WORLD_READ WORLD_EXECUTE)")
-    install(CODE "${install_code}" COMPONENT ${module})
+    install(CODE "${install_code}")
   endforeach()
 endmacro()
 
-macro(hpx_archive_install module lib)
+macro(hpx_archive_install lib)
   set(install_code
     "file(INSTALL FILES ${CMAKE_BINARY_DIR}/bin/${lib}
           DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
@@ -69,10 +69,10 @@ macro(hpx_archive_install module lib)
           PERMISSIONS OWNER_READ OWNER_READ OWNER_READ
                       GROUP_READ GROUP_READ
                       WORLD_READ WORLD_READ)")
-  install(CODE "${install_code}" COMPONENT ${module})
+  install(CODE "${install_code}")
 endmacro()
 
-macro(hpx_ini_install module name ini)
+macro(hpx_ini_install name ini)
   set(install_code
       "if(EXISTS \"${name}\")
           file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
@@ -82,6 +82,6 @@ macro(hpx_ini_install module name ini)
                            GROUP_READ 
                            WORLD_READ)
        endif()")
-  install(CODE "${install_code}" COMPONENT ${module})
+  install(CODE "${install_code}")
 endmacro()
 

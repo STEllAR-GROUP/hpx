@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "MODULE;SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -76,16 +76,11 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_EXPORTS")
 
   hpx_mangle_name(install_target ${name}_component)
-   
-  if(NOT ${name}_MODULE)
-    set(${name}_MODULE "Unspecified")
-    hpx_debug("add_component.${name}" "Module was not specified for component.")
-  endif()
 
-  hpx_library_install(${${name}_MODULE} ${install_target})
+  hpx_library_install(${install_target})
 
   foreach(target ${${name}_INI})
-    hpx_ini_install(${${name}_MODULE} ${install_target} ${target})
+    hpx_ini_install(${install_target} ${target})
   endforeach()
 endmacro()
 

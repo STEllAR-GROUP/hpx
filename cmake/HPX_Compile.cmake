@@ -11,7 +11,7 @@ hpx_include(ParseArguments)
 
 macro(hpx_compile_object name)
   hpx_parse_arguments(${name}
-    "MODULE;SOURCE;LANGUAGE;FLAGS;OUTPUT" "ESSENTIAL" ${ARGN})
+    "SOURCE;LANGUAGE;FLAGS;OUTPUT" "ESSENTIAL" ${ARGN})
 
   get_directory_property(definitions DEFINITIONS)
 

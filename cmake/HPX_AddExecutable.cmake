@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "MODULE;SOURCES;HEADERS;DEPENDENCIES" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -35,9 +35,7 @@ macro(add_hpx_executable name)
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
-  if(NOT MSVC)
-    set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
-  endif()
+  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
   set_property(TARGET ${name}_exe APPEND
                PROPERTY COMPILE_DEFINITIONS
@@ -46,6 +44,7 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_EXPORTS")
 
   set(libs "")
+
   if(NOT MSVC)
     set(libs ${BOOST_FOUND_LIBRARIES})
   endif()
@@ -56,8 +55,7 @@ macro(add_hpx_executable name)
       ${${name}_DEPENDENCIES} 
       ${hpx_LIBRARIES}
       hpx_init
-      ${libs}
-      ${pxaccel_LIBRARIES})
+      ${libs})
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "BOOST_ENABLE_ASSERT_HANDLER")
@@ -66,23 +64,10 @@ macro(add_hpx_executable name)
       ${${name}_DEPENDENCIES})
   endif()
 
-  if(NOT ${name}_MODULE)
-    set(${name}_MODULE "Unspecified")
-    hpx_debug("add_executable.${name}" "Module was not specified for executable.")
-  endif()
-
-  if(NOT MSVC)
-    if(${name}_ESSENTIAL)
-      hpx_executable_install(${name}_exe MODULE ${${name}_MODULE} ESSENTIAL)
-    else()
-      hpx_executable_install(${name}_exe MODULE ${${name}_MODULE})
-    endif() 
+  if(${name}_ESSENTIAL)
+    hpx_executable_install(${name}_exe ESSENTIAL)
   else()
-    install(TARGETS ${name}_exe
-      RUNTIME DESTINATION bin
-      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                  GROUP_READ GROUP_EXECUTE
-                  WORLD_READ WORLD_EXECUTE)
-  endif()
+    hpx_executable_install(${name}_exe)
+  endif() 
 endmacro()
 
