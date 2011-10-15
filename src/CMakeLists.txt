@@ -157,7 +157,7 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_EXPORTS"
   "BOOST_COROUTINE_EXPORTS")
 
-hpx_library_install(core ${name})
+hpx_library_install(${name})
 
 ################################################################################
 # libhpx
@@ -185,7 +185,7 @@ set_property(TARGET hpx APPEND
   "BOOST_ENABLE_ASSERT_HANDLER"
   "BOOST_COROUTINE_EXPORTS") # Do we still need this?
 
-hpx_library_install(core ${name})
+hpx_library_install(${name})
 
 ################################################################################
 # libhpx_init
@@ -199,5 +199,5 @@ set_property(TARGET hpx_init APPEND
 
 hpx_mangle_name(name hpx_init)
 
-hpx_archive_install(core ${name})
+hpx_archive_install(${name})
 
