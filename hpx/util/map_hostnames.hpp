@@ -28,9 +28,16 @@ namespace hpx { namespace util
             suffix_ = suffix;
         }
 
+        void use_prefix(std::string const& prefix)
+        {
+            prefix_ = prefix;
+        }
+
         std::string map(std::string const& host_name, boost::uint16_t port) const;
 
+      private:
         std::string suffix_;
+        std::string prefix_;
         bool debug_;
     };
 }}

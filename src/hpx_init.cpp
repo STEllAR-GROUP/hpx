@@ -447,6 +447,9 @@ namespace hpx
                     ("ifsuffix", value<std::string>(),
                       "suffix to append to host names in order to resolve them "
                       "to the proper network interconnect")
+                    ("ifprefix", value<std::string>(),
+                      "prefix to prepend to host names in order to resolve them "
+                      "to the proper network interconnect")
                     ("localities,l", value<std::size_t>(),
                      "the number of localities to wait for at application "
                      "startup (default: 1)")
@@ -904,6 +907,8 @@ namespace hpx
             util::map_hostnames mapnames(debug_clp);
             if (vm.count("ifsuffix"))
                 mapnames.use_suffix(vm["ifsuffix"].as<std::string>());
+            if (vm.count("ifprefix"))
+                mapnames.use_prefix(vm["ifprefix"].as<std::string>());
 
             // The AGAS host name and port number are pre-initialized from
             //the command line
