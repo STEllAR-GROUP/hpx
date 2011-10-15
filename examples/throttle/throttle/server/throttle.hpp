@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_THROTTLE_SERVER_AUG_09_2011_0702PM)
@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/promise.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
@@ -22,7 +22,7 @@ namespace throttle { namespace server
     {
     private:
         typedef hpx::components::simple_component_base<throttle> base_type;
-        typedef hpx::lcos::mutex mutex_type;
+        typedef hpx::lcos::local_mutex mutex_type;
 
     public:
         throttle();
@@ -33,7 +33,7 @@ namespace throttle { namespace server
         typedef throttle wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -66,7 +66,7 @@ namespace throttle { namespace server
         > is_suspended_action;
 
     private:
-        // this function is periodically scheduled as a worker thread with the 
+        // this function is periodically scheduled as a worker thread with the
         // aim of blocking the execution of its shepherd thread
         void throttle_controller(std::size_t shepherd);
 
@@ -74,7 +74,7 @@ namespace throttle { namespace server
         void register_thread(std::size_t shepherd);
         void register_suspend_thread(std::size_t shepherd);
 
-        // this is a bit mask where any set bit means the corresponding 
+        // this is a bit mask where any set bit means the corresponding
         // shepherd is to be blocked
         boost::dynamic_bitset<> blocked_os_threads_;
         mutable mutex_type mtx_;

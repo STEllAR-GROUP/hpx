@@ -28,7 +28,6 @@ source_group("Source Files\\Client" FILES ${sources})
 
 
 add_hpx_component(nqueen
-  MODULE nqueen
   SOURCES ${client_sources}
   HEADERS ${headers})
 
@@ -39,7 +38,6 @@ if(MSVC)
 endif()
  
 add_hpx_executable(nqueen_client
-  MODULE nqueen
   SOURCES ${sources}
   DEPENDENCIES nqueen_component)
    

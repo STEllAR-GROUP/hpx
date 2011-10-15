@@ -12,11 +12,9 @@ foreach(type ${types})
   source_group("Source Files" FILES ${type}_object_semaphore_client.cpp)
 
   add_hpx_component(${type}_object_semaphore
-    MODULE object_semaphore
     SOURCES ${type}_object_semaphore/${type}_object_semaphore.cpp)
 
   add_hpx_executable(${type}_object_semaphore_client
-    MODULE object_semaphore
     SOURCES ${type}_object_semaphore_client.cpp
     DEPENDENCIES ${type}_object_semaphore_component)
 

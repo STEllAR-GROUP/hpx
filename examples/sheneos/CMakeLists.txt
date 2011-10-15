@@ -12,7 +12,6 @@ source_group("Source Files" FILES sheneos_client.cpp sheneos_test.cpp)
 
 # add example executable
 add_hpx_executable(sheneos_client 
-  MODULE sheneos
   SOURCES sheneos_client.cpp  
   DEPENDENCIES sheneos_component)
 
@@ -20,7 +19,6 @@ add_hpx_executable(sheneos_client
 add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe) 
 
 add_hpx_executable(sheneos_test 
-  MODULE sheneos
   SOURCES sheneos_test.cpp 
   DEPENDENCIES sheneos_component)
 

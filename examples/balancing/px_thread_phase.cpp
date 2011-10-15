@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
@@ -12,7 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/local_barrier.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 
 using boost::lockfree::fifo;
 
@@ -23,7 +23,7 @@ using boost::program_options::value;
 using boost::posix_time::milliseconds;
 
 using hpx::lcos::local_barrier;
-using hpx::lcos::mutex;
+using hpx::lcos::local_mutex;
 
 using hpx::applier::register_thread;
 
@@ -42,7 +42,7 @@ typedef fifo<std::pair<thread_id_type, std::size_t>*> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 void lock_and_wait(
-    mutex& m
+    local_mutex& m
   , local_barrier& b0
   , local_barrier& b1
   , fifo_type& pxthreads
@@ -56,7 +56,7 @@ void lock_and_wait(
     while (true)
     {
         // Try to acquire the mutex.
-        mutex::scoped_try_lock l(m);
+        local_mutex::scoped_try_lock l(m);
 
         if (l.owns_lock())
         {
@@ -73,7 +73,7 @@ void lock_and_wait(
     }
 
     // Make hpx_main wait for us to finish.
-    b1.wait(); 
+    b1.wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("mutexes"))
         mutex_count = vm["mutexes"].as<std::size_t>();
-    
+
     std::size_t iterations = 0;
 
     if (vm.count("iterations"))
@@ -104,21 +104,21 @@ int hpx_main(variables_map& vm)
         std::cout << "iteration: " << i << "\n";
 
         // Have the fifo preallocate storage.
-        fifo_type pxthreads(pxthread_count); 
+        fifo_type pxthreads(pxthread_count);
 
-        std::vector<mutex*> m(mutex_count, 0);
+        std::vector<local_mutex*> m(mutex_count, 0);
         local_barrier b0(pxthread_count + 1), b1(pxthread_count + 1);
 
         // Allocate the mutexes.
         for (std::size_t j = 0; j < mutex_count; ++j)
-            m[j] = new mutex;
+            m[j] = new local_mutex;
 
         for (std::size_t j = 0; j < pxthread_count; ++j)
         {
             // Compute the mutex to be used for this thread.
             const std::size_t index = j % mutex_count;
 
-            register_thread(boost::bind 
+            register_thread(boost::bind
                 (&lock_and_wait, boost::ref(*m[index])
                                , boost::ref(b0)
                                , boost::ref(b1)
@@ -128,10 +128,10 @@ int hpx_main(variables_map& vm)
         }
 
         // Tell all pxthreads that they can start running.
-        b0.wait(); 
+        b0.wait();
 
         // Wait for all pxthreads to finish.
-        b1.wait(); 
+        b1.wait();
 
         // {{{ Print results for this iteration.
         std::pair<thread_id_type, std::size_t>* entry = 0;
@@ -139,7 +139,7 @@ int hpx_main(variables_map& vm)
         while (pxthreads.dequeue(&entry))
         {
             BOOST_ASSERT(entry);
-            std::cout << "  " << entry->first << "," << entry->second << "\n"; 
+            std::cout << "  " << entry->first << "," << entry->second << "\n";
             delete entry;
         }
         // }}}
@@ -148,7 +148,7 @@ int hpx_main(variables_map& vm)
         for (std::size_t j = 0; j < mutex_count; ++j)
         {
             BOOST_ASSERT(m[j]);
-            delete m[j]; 
+            delete m[j];
         }
     }
 
@@ -165,14 +165,14 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(128), 
+        ("pxthreads,T", value<std::size_t>()->default_value(128),
             "the number of PX threads to invoke")
-        ("mutexes,M", value<std::size_t>()->default_value(1), 
+        ("mutexes,M", value<std::size_t>()->default_value(1),
             "the number of mutexes to use")
-        ("wait", value<std::size_t>()->default_value(30), 
-            "the number of milliseconds to wait between each lock attempt") 
-        ("iterations", value<std::size_t>()->default_value(1), 
-            "the number of times to repeat the test") 
+        ("wait", value<std::size_t>()->default_value(30),
+            "the number of milliseconds to wait between each lock attempt")
+        ("iterations", value<std::size_t>()->default_value(1),
+            "the number of times to repeat the test")
         ;
 
     // Initialize and run HPX.

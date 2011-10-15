@@ -18,7 +18,7 @@ a destructor, and access operators.
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -34,7 +34,7 @@ using namespace boost::posix_time;
 
 namespace hpx { namespace components { namespace server
 {
-    class HPX_COMPONENT_EXPORT smphplmatrex : 
+    class HPX_COMPONENT_EXPORT smphplmatrex :
           public simple_component_base<smphplmatrex>
     {
     public:
@@ -92,13 +92,13 @@ namespace hpx { namespace components { namespace server
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
     int* tempivotarr;     //temporary copy of pivotarr
-    lcos::mutex mtex;     //mutex
+    lcos::local_mutex mtex;     //mutex
 
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_construct, 
-        naming::id_type, int, int, int, &smphplmatrex::construct> 
+    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_construct,
+        naming::id_type, int, int, int, &smphplmatrex::construct>
         construct_action;
     //the destruct function
     typedef hpx::actions::action0<smphplmatrex, hpl_destruct,
@@ -213,7 +213,7 @@ namespace hpx { namespace components { namespace server
     The idea behind this algorithm is that the initial thread produces
     threads with offsets of each power of 2 less than (or equal to) the
     number of rows in the matrix.  Each of the generated threads repeats
-    the process using its assigned row as the base and the new set of 
+    the process using its assigned row as the base and the new set of
     offsets is each power of two that will not overlap with other threads'
     assigned rows. After each thread has produced all of its child threads,
     that thread initializes the data of its assigned row and waits for the
@@ -456,7 +456,7 @@ namespace hpx { namespace components { namespace server
     for(i = 0; i < brows-1; i++){
         leftFutures = new gmain_future
         for(j = 0; j < brows-1; j++){
-        
+
     }
 */
     int iter = 0, i, j;
@@ -546,7 +546,7 @@ namespace hpx { namespace components { namespace server
             factor = fFactor*datablock[iter][iter]->data[j][i];
             factorData[j+offset][i+offset] = factor;
             for(k=i+1;k<datablock[iter][iter]->columns;k++){
-            datablock[iter][iter]->data[j][k] -= 
+            datablock[iter][iter]->data[j][k] -=
                 factor*datablock[iter][iter]->data[i][k];
     }   }   }
     }
@@ -563,7 +563,7 @@ namespace hpx { namespace components { namespace server
         for(j=i+1;j<datablock[iter][bcol]->rows;j++){
             factor = factorData[j+offset][i+offset];
             for(k=0;k<datablock[iter][bcol]->columns;k++){
-            datablock[iter][bcol]->data[j][k] -= 
+            datablock[iter][bcol]->data[j][k] -=
                 factor*datablock[iter][bcol]->data[i][k];
     }   }   }
     }
@@ -586,7 +586,7 @@ namespace hpx { namespace components { namespace server
         factor = fFactor[i]*datablock[brow][iter]->data[0][i];
         factorData[offset][i+offsetCol] = factor;
         for(k=i+1;k<datablock[brow][iter]->columns;k++){
-            datablock[brow][iter]->data[0][k] -= 
+            datablock[brow][iter]->data[0][k] -=
                 factor*datablock[iter][iter]->data[i][k];
     }   }
     for(j=1;j<datablock[brow][iter]->rows;j++){
@@ -594,14 +594,14 @@ namespace hpx { namespace components { namespace server
             factor = fFactor[i]*datablock[brow][iter]->data[j][i];
             factorData[j+offset][i+offsetCol] = factor;
             for(k=i+1;k<datablock[brow][iter]->columns;k++){
-            datablock[brow][iter]->data[j][k] -= 
+            datablock[brow][iter]->data[j][k] -=
                 factor*datablock[iter][iter]->data[i][k];
     }    }   }
     }
 
     //LUgausstrail performs gaussian elimination on the trailing submatrix of
     //the blocks operated on during the current iteration of the Gaussian
-    //elimination computations. These blocks will still require further 
+    //elimination computations. These blocks will still require further
     //computations to be performed in future iterations.
     void smphplmatrex::LU_gauss_trail(const int brow, const int bcol,
         const int iter){
@@ -610,7 +610,7 @@ namespace hpx { namespace components { namespace server
     const int offsetCol = iter*blocksize;
     double factor,temp;
 
-    //outermost loop: iterates over the fFactors of the most recent corner 
+    //outermost loop: iterates over the fFactors of the most recent corner
     //block (fFactors are used indirectly through factorData)
     //middle loop: iterates over the rows of the current block
     //inner loop: iterates across the columns of the current block
@@ -639,7 +639,7 @@ namespace hpx { namespace components { namespace server
         temp = i*blocksize;
         for(k=0;k<datablock[i][0]->rows;k++){
             for(l=0;l<brows;l++){solution[temp+k][l] = 0;}
-            solution[temp+k][brows] = 
+            solution[temp+k][brows] =
             datablock[i][brows-1]->data[k][datablock[i][brows-1]->columns-1];
     }   }
 
@@ -650,7 +650,7 @@ namespace hpx { namespace components { namespace server
         temp = row+k;
         solution[temp][brows]/=datablock[i][i]->data[k][k];
         for(l=k-1;l>=0;l--){
-            solution[row+l][brows] -= 
+            solution[row+l][brows] -=
                 datablock[i][i]->data[l][k]*solution[temp][brows];
     }   }
     neededFuture[0] = futures.size();
@@ -691,7 +691,7 @@ namespace hpx { namespace components { namespace server
 
         for(i=0;i<blocksize;i++){
             for(j=0;j<cols;j++){
-                solution[row+i][bcol] -= 
+                solution[row+i][bcol] -=
                     datablock[brow][bcol]->data[i][j]*solution[col+j][brows];
             }
         }
@@ -702,7 +702,7 @@ namespace hpx { namespace components { namespace server
     //rows at a time
     double smphplmatrex::checksolve(int row, int offset, bool complete){
     double toterror = 0;    //total error from all checks
-        //futures is used to allow this thread to continue spinning off new 
+        //futures is used to allow this thread to continue spinning off new
         //thread while other threads work, and is checked at the end to make
         // certain all threads are completed before returning.
         std::vector<check_future> futures;

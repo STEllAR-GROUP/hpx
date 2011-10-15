@@ -34,7 +34,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(throttle 
-  MODULE throttle
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
   DEPENDENCIES distributing_factory_component)

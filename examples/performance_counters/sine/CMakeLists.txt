@@ -6,14 +6,12 @@
 ###############################################################################
 # add component
 add_hpx_component(sine 
-  MODULE sine
   SOURCES sine.cpp server/sine.cpp 
   HEADERS server/sine.cpp)
 
 ###############################################################################
 # add example executable
 add_hpx_executable(sine_client 
-  MODULE sine_client
   SOURCES sine_client.cpp 
   DEPENDENCIES sine_component)
 

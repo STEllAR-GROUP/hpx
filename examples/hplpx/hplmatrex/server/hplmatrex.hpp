@@ -19,7 +19,7 @@ a destructor, and access operators.
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -35,7 +35,7 @@ using namespace boost::posix_time;
 
 namespace hpx { namespace components { namespace server
 {
-    class HPX_COMPONENT_EXPORT hplmatrex : 
+    class HPX_COMPONENT_EXPORT hplmatrex :
           public simple_component_base<hplmatrex>
     {
     public:
@@ -86,13 +86,13 @@ namespace hpx { namespace components { namespace server
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
     int* tempivotarr;     //temporary copy of pivotarr
-    lcos::mutex mtex;     //mutex
+    lcos::local_mutex mtex;     //mutex
 
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef hpx::actions::result_action4<hplmatrex, int, hpl_construct, 
-        naming::id_type, int, int, int, &hplmatrex::construct> 
+    typedef hpx::actions::result_action4<hplmatrex, int, hpl_construct,
+        naming::id_type, int, int, int, &hplmatrex::construct>
         construct_action;
     //the assign function
     typedef hpx::actions::result_action4<hplmatrex, int, hpl_assign, int,
@@ -202,7 +202,7 @@ namespace hpx { namespace components { namespace server
     The idea behind this algorithm is that the initial thread produces
     threads with offsets of each power of 2 less than (or equal to) the
     number of rows in the matrix.  Each of the generated threads repeats
-    the process using its assigned row as the base and the new set of 
+    the process using its assigned row as the base and the new set of
     offsets is each power of two that will not overlap with other threads'
     assigned rows. After each thread has produced all of its child threads,
     that thread initializes the data of its assigned row and waits for the
@@ -471,7 +471,7 @@ namespace hpx { namespace components { namespace server
         temp = row+k;
         solution[temp][brows]/=tempData[k][k];
         for(l=k-1;l>=0;l--){
-            solution[row+l][brows] -= 
+            solution[row+l][brows] -=
                 tempData[l][k]*solution[temp][brows];
     }   }
     neededFuture[0] = futures.size();
@@ -525,7 +525,7 @@ namespace hpx { namespace components { namespace server
     //rows at a time
     double hplmatrex::checksolve(int row, int offset, bool complete){
     double toterror = 0;    //total error from all checks
-        //futures is used to allow this thread to continue spinning off new 
+        //futures is used to allow this thread to continue spinning off new
         //thread while other threads work, and is checked at the end to make
         // certain all threads are completed before returning.
         std::vector<check_future> futures;

@@ -20,7 +20,6 @@ foreach(subdir ${subdirs})
 
   # add example executable
   add_hpx_executable(${subdir}_client 
-    MODULE accumulator
     SOURCES ${sources} 
     DEPENDENCIES ${subdir}_component)
 

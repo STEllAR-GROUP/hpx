@@ -23,7 +23,6 @@ if(MSVC)
 endif()
 
 add_hpx_executable(heartbeat
-                   MODULE heartbeat 
                    SOURCES ${heartbeat_SOURCES}
                    HEADERS ${heartbeat_HEADERS}
                    DEPENDENCIES iostreams_component)

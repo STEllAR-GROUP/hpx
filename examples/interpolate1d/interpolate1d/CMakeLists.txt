@@ -44,7 +44,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(interpolate1d 
-  MODULE interpolate1d
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
   DEPENDENCIES ${dependencies})

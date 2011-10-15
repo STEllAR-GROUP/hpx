@@ -11,11 +11,9 @@ foreach(type ${types})
   source_group("Source Files" FILES queue_of_${type}_client.cpp)
 
   add_hpx_component(queue_of_${type}
-                    MODULE queue
                     SOURCES queue_of_${type}/queue_of_${type}.cpp)
 
   add_hpx_executable(queue_of_${type}_client
-                     MODULE queue
                      SOURCES queue_of_${type}_client.cpp
                      DEPENDENCIES queue_of_${type}_component)
 

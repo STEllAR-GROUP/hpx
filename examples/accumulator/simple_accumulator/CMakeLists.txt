@@ -31,7 +31,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(simple_accumulator 
-  MODULE accumulator
   SOURCES ${client_sources} 
   HEADERS ${headers})
 

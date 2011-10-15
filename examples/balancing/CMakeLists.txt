@@ -16,7 +16,6 @@ foreach(example_program ${example_programs})
 
   # add example executable
   add_hpx_executable(${example_program}
-                     MODULE balancing
                      SOURCES ${sources}
                      ${${example_program}_FLAGS})
 

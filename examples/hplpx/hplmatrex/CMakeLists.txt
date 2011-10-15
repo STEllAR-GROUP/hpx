@@ -13,7 +13,6 @@ set(hplmatrex_SOURCES
     hplmatrex.cpp)
 
 add_hpx_component(hplmatrex 
-    MODULE hplmatrex
     SOURCES ${hplmatrex_SOURCES} 
     HEADERS ${hplmatrex_HEADERS})
 
@@ -26,7 +25,6 @@ set(lublock_SOURCES
     lublock.cpp)
 
 add_hpx_component(lublock 
-    MODULE hplmatrex
     SOURCES ${lublock_SOURCES} 
     HEADERS ${lublock_HEADERS})
 

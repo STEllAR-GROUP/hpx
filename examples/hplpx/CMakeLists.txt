@@ -14,12 +14,10 @@ set(hplpx_DEPENDENCIES
     lublock_component)
 
 add_hpx_executable(hplpx
-  MODULE hplmatrex
   SOURCES hplpx.cpp
   DEPENDENCIES ${hplpx_DEPENDENCIES})
 
 add_hpx_executable(smphplpx
-  MODULE smphplmatrex
   SOURCES smphplpx.cpp
   DEPENDENCIES smphplmatrex_component)
 

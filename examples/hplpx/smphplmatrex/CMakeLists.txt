@@ -13,7 +13,6 @@ set(smphplmatrex_SOURCES
     smphplmatrex.cpp)
 
 add_hpx_component(smphplmatrex 
-    MODULE smphplmatrex
     SOURCES ${smphplmatrex_SOURCES} 
     HEADERS ${smphplmatrex_HEADERS})
 

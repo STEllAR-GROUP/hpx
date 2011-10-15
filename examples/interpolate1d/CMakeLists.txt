@@ -22,7 +22,6 @@ foreach(subdir ${subdirs})
 
   # add example executable
   add_hpx_executable(${subdir}_client 
-    MODULE interpolate1d
     SOURCES ${sources} 
     DEPENDENCIES ${subdir}_component)
 
@@ -39,7 +38,6 @@ foreach(subdir ${subdirs})
 endforeach()
 
 add_hpx_executable(create_1d_testdata
-  MODULE interpolate1d
   SOURCES create_testdata.cpp
   DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
   NOLIBS)
