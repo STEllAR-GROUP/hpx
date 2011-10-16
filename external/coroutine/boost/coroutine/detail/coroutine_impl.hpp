@@ -406,7 +406,7 @@ private:
       wrapper_type* wrapper = wrapper_type::allocate(
           (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
       if (NULL == wrapper) {
-          context_base<ContextImpl>::incrememnt_count();
+          context_base<ContextImpl>::increment_count();
           return new wrapper_type(f, id, stack_size);
       }
 

@@ -351,7 +351,7 @@ namespace boost { namespace coroutines { namespace detail {
     {
         return m_allocation_counter;
     }
-    static boost::uint64_t incrememnt_count()
+    static boost::uint64_t increment_count()
     {
         return ++m_allocation_counter;
     }
