@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -69,7 +69,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    boost::asio::ip::tcp::endpoint 
+    boost::asio::ip::tcp::endpoint
     resolve_hostname(std::string const& hostname, boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
@@ -81,7 +81,7 @@ namespace hpx { namespace util
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
-            if (util::get_endpoint(hostname, port, ep)) 
+            if (util::get_endpoint(hostname, port, ep))
                 return ep;
         }
         catch (boost::system::system_error const& e) {
@@ -92,10 +92,10 @@ namespace hpx { namespace util
         try {
             // resolve the given address
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(hostname, 
+            tcp::resolver::query query(hostname,
                 boost::lexical_cast<std::string>(port));
 
-            boost::asio::ip::tcp::resolver::iterator it = 
+            boost::asio::ip::tcp::resolver::iterator it =
                 resolver.resolve(query);
             BOOST_ASSERT(it != boost::asio::ip::tcp::resolver::iterator());
             return *it;
@@ -106,10 +106,43 @@ namespace hpx { namespace util
 
         // report errors
         hpx::util::osstream strm;
-        strm << errors.get_message() << " (while trying to resolve: " 
+        strm << errors.get_message() << " (while trying to resolve: "
              << hostname << ":" << port << ")";
-        HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname", 
+        HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname",
             hpx::util::osstream_get_string(strm));
         return tcp::endpoint();
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // Addresses are supposed to have the format <hostname>[:port]
+    void split_ip_address(std::string const& v, std::string& host,
+        boost::uint16_t& port)
+    {
+        std::string::size_type p = v.find_first_of(":");
+
+        std::string tmp_host;
+        boost::uint16_t tmp_port = HPX_INITIAL_IP_PORT;
+
+        try {
+            if (p != std::string::npos) {
+                tmp_host = v.substr(0, p);
+                tmp_port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
+            }
+            else {
+                tmp_host = v;
+            }
+
+            if (!tmp_host.empty()) {
+                host = tmp_host;
+                if (tmp_port)
+                    port = tmp_port;
+            }
+        }
+        catch (boost::bad_lexical_cast const& /*e*/) {
+            std::cerr << "hpx::init: illegal port number given: "
+                      << v.substr(p+1)
+                      << ", using default value instead: "
+                      << port << std::endl;
+        }
     }
 }}
