@@ -566,32 +566,6 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Addresses are supposed to have the format <hostname>[:port]
-        inline void
-        split_ip_address(std::string const& v, std::string& addr,
-            boost::uint16_t& port)
-        {
-            std::string::size_type p = v.find_first_of(":");
-
-            try {
-                if (p != std::string::npos) {
-                    addr = v.substr(0, p);
-                    port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
-                }
-                else {
-                    addr = v;
-                }
-            }
-            catch (boost::bad_lexical_cast const& /*e*/) {
-                std::cerr << "hpx::init: illegal port number given: "
-                          << v.substr(p+1)
-                          << "           using default value instead: "
-                          << port
-                          << std::endl;
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
         struct dump_config
         {
@@ -918,13 +892,8 @@ namespace hpx
             //the command line
             std::string agas_host;
             boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
-            if (vm.count("agas")) {
-                std::string host;
-                boost::uint16_t port = HPX_INITIAL_IP_PORT;
-                detail::split_ip_address(vm["agas"].as<std::string>(), host, port);
-                if (!host.empty()) agas_host = host;
-                if (port) agas_port = port;
-            }
+            if (vm.count("agas"))
+                util::split_ip_address(vm["agas"].as<std::string>(), agas_host, agas_port);
 
             // Check command line arguments.
             util::pbs_environment env(debug_clp);
@@ -935,9 +904,9 @@ namespace hpx
                 // Check for parsing failures
                 if (!iftransform) {
                     throw std::logic_error(boost::str(boost::format(
-                        "Could not parse --iftransform argument '%1%'")
-                        % vm["iftransform"].as<std::string>())); 
-                } 
+                        "Could not parse --iftransform argument '%1%'") %
+                        vm["iftransform"].as<std::string>()));
+                }
 
                 typedef util::pbs_environment::transform_function_type
                     transform_function_type;
@@ -1014,13 +983,8 @@ namespace hpx
                 std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
             }
 
-            if (vm.count("hpx")) {
-                std::string host;
-                boost::uint16_t port = HPX_INITIAL_IP_PORT;
-                detail::split_ip_address(vm["hpx"].as<std::string>(), host, port);
-                if (!host.empty()) hpx_host = host;
-                if (port) hpx_port = port;
-            }
+            if (vm.count("hpx"))
+                util::split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
             if (vm.count("threads"))
                 num_threads = vm["threads"].as<std::size_t>();
