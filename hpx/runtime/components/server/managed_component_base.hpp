@@ -233,7 +233,7 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
-                     << ")";
+                     << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 
                     hpx::util::osstream_get_string(strm));
@@ -248,7 +248,7 @@ namespace hpx { namespace components
                 strm << "component is NULL (" 
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
-                     << ")";
+                     << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status, 
                     "managed_component<Component, Derived>::get_checked", 
                     hpx::util::osstream_get_string(strm));
