@@ -133,7 +133,7 @@ hpx_include(GCCVersion)
 if(GCC_VERSION)
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
-  if(040000 GREATER ${GCC_VERSION})
+  if(040400 GREATER ${GCC_VERSION})
     hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
   endif()
 elseif(NOT MSVC10 OR NOT CMAKE_CL_64)
