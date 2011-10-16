@@ -712,8 +712,8 @@ void section::load(Archive& ar, const unsigned int version)
     set_root(this, true);     // make this the current root
 }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
+///////////////////////////////////////////////////////////////////////////
+// explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
 template HPX_EXPORT void
 section::save(util::portable_binary_oarchive&, const unsigned int version) const;
