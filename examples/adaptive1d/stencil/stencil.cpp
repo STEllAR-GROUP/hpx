@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Matthew Anderson
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -70,32 +70,32 @@ HPX_COMPONENT_EXPORT int floatcmp(double const& x1, double const& x2) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
     ///////////////////////////////////////////////////////////////////////////
     // memory block support for config data needed for serialization of
     // stencil_data
     typedef hpx::actions::manage_object_action<server::stencil_config_data>
         manage_object_config_data_action;
-    manage_object_config_data_action const manage_stencil_config_data = 
+    manage_object_config_data_action const manage_stencil_config_data =
         manage_object_config_data_action();
 
     // memory block support for stencil data (user defined data)
     typedef hpx::actions::manage_object_action<
         stencil_data, server::stencil_config_data> manage_object_data_action;
-    manage_object_data_action const manage_stencil_data = 
+    manage_object_data_action const manage_stencil_data =
         manage_object_data_action();
 
 //     // memory block support for stencil data (user defined data)
-//     typedef hpx::actions::manage_object_action<stencil_data> 
+//     typedef hpx::actions::manage_object_action<stencil_data>
 //         manage_object_data_action_simple;
-//     manage_object_data_action_simple const manage_stencil_data_simple = 
+//     manage_object_data_action_simple const manage_stencil_data_simple =
 //         manage_object_data_action_simple();
 
     ///////////////////////////////////////////////////////////////////////////
     memory_block_data stencil_config_data::create_and_resolve_target()
     {
-        mem_block.create(hpx::find_here(), sizeof(server::stencil_config_data), 
+        mem_block.create(hpx::find_here(), sizeof(server::stencil_config_data),
             manage_stencil_config_data);
         return mem_block.get();
     }
@@ -125,7 +125,7 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
 //     dataflow_manage_object_action_stencil_data_simple)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
     ///////////////////////////////////////////////////////////////////////////
     stencil::stencil()
@@ -143,7 +143,7 @@ namespace hpx { namespace components { namespace adaptive1d
       return result;
     }
 
-    void stencil::interpolate(double x, double minx,double h, 
+    void stencil::interpolate(double x, double minx,double h,
                               access_memory_block<stencil_data> &val,
                               nodedata &result, parameter const& par) {
       int num_eqns = NUM_EQUATIONS;
@@ -152,7 +152,7 @@ namespace hpx { namespace components { namespace adaptive1d
       int ii = (int) ( (x-minx)/h );
 
       bool no_interp_x = false;
-      
+
       if ( floatcmp(h*ii + minx,x) ) {
         no_interp_x = true;
       }
@@ -180,7 +180,7 @@ namespace hpx { namespace components { namespace adaptive1d
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    int stencil::eval(naming::id_type const& result, 
+    int stencil::eval(naming::id_type const& result,
         std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
         double cycle_time, parameter const& par)
     {
@@ -215,24 +215,24 @@ namespace hpx { namespace components { namespace adaptive1d
             // get all input memory_block_data instances
             typedef std::vector<lcos::promise<memory_block_data> >
               lazy_results_type;
-              
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
-            
+
             namespace s = hpx::components::stubs;
             lazy_results.push_back(s::memory_block::get_async(gids[0]));
-            
+
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-            
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
               val.push_back(f.get());
-              
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-            
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[1]->max_index_ = val[0]->max_index_;
             val[1]->index_ = val[0]->index_;
             val[1]->value_.resize(val[0]->value_.size());
@@ -252,7 +252,7 @@ namespace hpx { namespace components { namespace adaptive1d
             // get all input memory_block_data instances
             typedef std::vector<lcos::promise<memory_block_data> >
               lazy_results_type;
-              
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
             namespace s = hpx::components::stubs;
@@ -270,15 +270,15 @@ namespace hpx { namespace components { namespace adaptive1d
             }
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-            
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
               val.push_back(f.get());
-              
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-            
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[2]->max_index_ = val[0]->max_index_;
             val[2]->index_ = val[0]->index_;
             val[2]->value_.resize(val[0]->value_.size());
@@ -306,44 +306,44 @@ namespace hpx { namespace components { namespace adaptive1d
             stencil_config_data cfg1(1,3*par->num_neighbors);  // serializes the left face coming from the right
 
             // get all input memory_block_data instances
-            typedef std::vector<lcos::promise<memory_block_data> > 
+            typedef std::vector<lcos::promise<memory_block_data> >
                 lazy_results_type;
-    
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
-    
+
             namespace s = hpx::components::stubs;
             lazy_results.push_back(
                 s::memory_block::get_async(gids[0], cfg0.get_memory_block()));
             lazy_results.push_back(s::memory_block::get_async(gids[1]));
             lazy_results.push_back(
                 s::memory_block::get_async(gids[2], cfg1.get_memory_block()));
-    
+
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-    
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
               val.push_back(f.get());
-    
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-    
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[3]->max_index_ = val[1]->max_index_;
             val[3]->index_ = val[1]->index_;
             val[3]->value_.resize(val[1]->value_.size());
             for (std::size_t i=0;i<val[1]->value_.size();i++) {
               val[3]->value_[i].x = val[1]->value_[i].x;
             }
-    
+
             double t = val[1]->timestep_*par->h*par->cfl + cycle_time;
             rkupdate3(val,t,*par.p);
 
             val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
-            //std::cout << " row " << row << " column " << column 
-            //    << " timestep " << val[3]->timestep_ 
+            //std::cout << " row " << row << " column " << column
+            //    << " timestep " << val[3]->timestep_
             //    << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
             //    << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
             //    << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
@@ -364,24 +364,24 @@ namespace hpx { namespace components { namespace adaptive1d
             // get all input memory_block_data instances
             typedef std::vector<lcos::promise<memory_block_data> >
               lazy_results_type;
-              
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
-            
+
             namespace s = hpx::components::stubs;
             lazy_results.push_back(s::memory_block::get_async(gids[0]));
-            
+
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-            
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
               val.push_back(f.get());
-              
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-            
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[1].get() = val[0].get();
 
             if (val[1]->timestep_ >= par->nt0-1) {
@@ -393,7 +393,7 @@ namespace hpx { namespace components { namespace adaptive1d
             // get all input memory_block_data instances
             typedef std::vector<lcos::promise<memory_block_data> >
               lazy_results_type;
-              
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
             namespace s = hpx::components::stubs;
@@ -403,15 +403,15 @@ namespace hpx { namespace components { namespace adaptive1d
 
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-            
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
               val.push_back(f.get());
-              
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-            
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[2].get() = val[0].get();
 
             // ghostwidth interpolation
@@ -449,7 +449,7 @@ namespace hpx { namespace components { namespace adaptive1d
             // get all input memory_block_data instances
             typedef std::vector<lcos::promise<memory_block_data> >
               lazy_results_type;
-              
+
             // first invoke all remote operations
             lazy_results_type lazy_results;
             namespace s = hpx::components::stubs;
@@ -460,22 +460,22 @@ namespace hpx { namespace components { namespace adaptive1d
 
             //  invoke the operation for the result gid as well
             lazy_results.push_back(s::memory_block::get_async(result));
-            
+
             // then wait for all results to get back to us
             std::vector<access_memory_block<stencil_data> > val;
             BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
-              val.push_back(f.get());
-              
+                val.push_back(f.get());
+
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::mutex> l(val); 
-            
+            scoped_values_lock<lcos::local_mutex> l(val);
+
             val[3].get() = val[0].get();
 
             // ghostwidth interpolation
             // left end
             for (std::size_t i=0;i<par->ghostwidth;i++) {
               double x = val[3]->value_[i].x;
-             
+
               double minx = val[1]->value_[0].x;
               double h = val[1]->value_[1].x-val[1]->value_[0].x;
 
@@ -515,10 +515,10 @@ namespace hpx { namespace components { namespace adaptive1d
             here, sizeof(stencil_data), manage_stencil_data);
 
         if (-1 != item) {
-            // provide initial data for the given data value 
+            // provide initial data for the given data value
             access_memory_block<stencil_data> val(
                 components::stubs::memory_block::checkout(result));
-          
+
             if ( time < 1.e-8 ) {
               // call provided (external) function
               generate_initial_data(val.get_ptr(), item, maxitems, row, *par.p);
@@ -531,7 +531,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val->max_index_ = maxitems;
               val->index_ = item;
               val->timestep_ = 0;
-            } 
+            }
 
             //if (log_ && par->loglevel > 1)         // send initial value to logging instance
             //    stubs::logging::logentry(log_, val.get(), row,item, par);
