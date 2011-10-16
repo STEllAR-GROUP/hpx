@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/version.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
@@ -313,16 +312,6 @@ namespace hpx { namespace util
             return false;
         }
         return true;
-    }
-
-    std::string expand(std::string const& in)
-    {
-        return get_runtime().get_config().expand(in);
-    }
-
-    void expand(std::string& in)
-    {
-        get_runtime().get_config().expand(in, std::string::size_type(-1));
     }
 }}
 

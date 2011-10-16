@@ -685,6 +685,20 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    std::string expand(std::string const& in)
+    {
+        return get_runtime().get_config().expand(in);
+    }
+
+    void expand(std::string& in)
+    {
+        get_runtime().get_config().expand(in, std::string::size_type(-1));
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
     // shortcut for get_runtime().get_agas_client()
