@@ -12,34 +12,32 @@
 
 namespace hpx { namespace lcos
 {
-
-bool local_recursive_mutex::try_lock()
-{
-    threads::thread_id_type const current_thread_id = threads::get_self_id();
-
-    return try_recursive_lock(current_thread_id) ||
-           try_basic_lock(current_thread_id);
-}
-
-void local_recursive_mutex::lock()
-{
-    threads::thread_id_type const current_thread_id = threads::get_self_id();
-
-    if (!try_recursive_lock(current_thread_id))
+    bool local_recursive_mutex::try_lock()
     {
-        mutex.lock();
-        locking_thread_id.exchange(current_thread_id);
-        recursion_count = 1;
+        threads::thread_id_type const current_thread_id = threads::get_self_id();
+
+        return try_recursive_lock(current_thread_id) ||
+            try_basic_lock(current_thread_id);
     }
-}
 
-bool local_recursive_mutex::timed_lock(::boost::system_time const& wait_until)
-{
-    threads::thread_id_type const current_thread_id = threads::get_self_id();
+    void local_recursive_mutex::lock()
+    {
+        threads::thread_id_type const current_thread_id = threads::get_self_id();
 
-    return try_recursive_lock(current_thread_id) ||
-           try_timed_lock(current_thread_id, wait_until);
-}
+        if (!try_recursive_lock(current_thread_id))
+        {
+            mutex.lock();
+            locking_thread_id.exchange(current_thread_id);
+            recursion_count = 1;
+        }
+    }
 
+    bool local_recursive_mutex::timed_lock(::boost::system_time const& wait_until)
+    {
+        threads::thread_id_type const current_thread_id = threads::get_self_id();
+
+        return try_recursive_lock(current_thread_id) ||
+            try_timed_lock(current_thread_id, wait_until);
+    }
 }}
 
