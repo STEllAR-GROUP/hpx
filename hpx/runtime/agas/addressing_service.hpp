@@ -1077,6 +1077,12 @@ public:
       , naming::gid_type& id
       , error_code& ec = throws
         );
+
+    void update_cache(
+        naming::gid_type const& gid
+      , gva const& gva
+      , error_code& ec = throws
+        );
 };
 
 }}

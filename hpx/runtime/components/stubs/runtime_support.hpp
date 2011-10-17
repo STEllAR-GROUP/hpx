@@ -403,6 +403,15 @@ namespace hpx { namespace components { namespace stubs
                     hpx::naming::id_type::unmanaged));
         }
 
+        static void 
+        update_agas_cache(naming::id_type const& targetgid,
+            naming::gid_type const& gid, agas::gva const& g)
+        {
+            typedef server::runtime_support::update_agas_cache_action
+                action_type;
+            hpx::applier::apply<action_type>(targetgid, gid, g);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         static lcos::promise<util::section> get_config_async(

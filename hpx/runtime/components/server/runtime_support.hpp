@@ -16,6 +16,7 @@
 #include <boost/plugin.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/constructor_argument.hpp>
@@ -72,6 +73,7 @@ namespace hpx { namespace components { namespace server
             runtime_support_load_components = 10,
             runtime_support_call_startup_functions = 11,
             runtime_support_call_shutdown_functions = 12,
+            runtime_support_update_agas_cache = 13,
         };
 
         static component_type get_component_type() 
@@ -126,21 +128,23 @@ namespace hpx { namespace components { namespace server
         void free_component(components::component_type type, 
             naming::gid_type const& gid); 
 
-        /// \brief Action shut down this runtime system instance
+        /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout,
-            naming::id_type respond_to = naming::invalid_id);
+            naming::id_type const& respond_to = naming::invalid_id);
 
-        /// \brief Action shut down runtime system instances on all localities
+        /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
 
-        /// \brief Action shut down this runtime system instance
-        void terminate(naming::id_type respond_to = naming::invalid_id);
+        /// \brief Shutdown this runtime system instance
+        void terminate(naming::id_type const& respond_to = naming::invalid_id);
 
-        /// \brief Action shut down runtime system instances on all localities
+        /// \brief Shutdown runtime system instances on all localities
         void terminate_all();
 
         /// \brief Retrieve configuration information
         util::section get_config();
+
+        void update_agas_cache(naming::gid_type const&, agas::gva const&);
 
         void load_components();
 
@@ -198,7 +202,7 @@ namespace hpx { namespace components { namespace server
         > free_component_action;
 
         typedef hpx::actions::action2<
-            runtime_support, runtime_support_shutdown, double, naming::id_type,
+            runtime_support, runtime_support_shutdown, double, naming::id_type const&,
             &runtime_support::shutdown
         > shutdown_action;
 
@@ -208,7 +212,7 @@ namespace hpx { namespace components { namespace server
         > shutdown_all_action;
 
         typedef hpx::actions::action1<
-            runtime_support, runtime_support_terminate, naming::id_type,
+            runtime_support, runtime_support_terminate, naming::id_type const&,
             &runtime_support::terminate
         > terminate_action;
 
@@ -226,6 +230,12 @@ namespace hpx { namespace components { namespace server
             &runtime_support::get_config
         > get_config_action;
 
+        typedef hpx::actions::action2<
+            runtime_support, runtime_support_update_agas_cache,
+            naming::gid_type const&, agas::gva const&,
+            &runtime_support::update_agas_cache
+        > update_agas_cache_action;
+
         /// \brief Start the runtime_support component
         void run();
 
@@ -242,7 +252,7 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type respond_to);
+        void stop(double timeout, naming::id_type const& respond_to);
 
         /// called locally only
         void stopped();

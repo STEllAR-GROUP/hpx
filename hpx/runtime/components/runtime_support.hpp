@@ -182,6 +182,11 @@ namespace hpx { namespace components
             this->base_type::terminate_all(gid_);
         }
 
+        void update_agas_cache(naming::gid_type const& gid, agas::gva const& g)
+        {
+            this->base_type::update_agas_cache(gid_, gid, g);
+        }
+
         /// \brief Retrieve configuration information
         void get_config(util::section& ini)
         {

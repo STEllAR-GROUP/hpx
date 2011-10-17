@@ -80,6 +80,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::update_agas_cache_action,
+    update_agas_cache_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -301,14 +304,14 @@ namespace hpx { namespace components { namespace server
 
     // function to be called during shutdown
     // Action: shut down this runtime system instance
-    void runtime_support::shutdown(double timeout, naming::id_type respond_to)
+    void runtime_support::shutdown(double timeout, naming::id_type const& respond_to)
     {
         // initiate system shutdown
         stop(timeout, respond_to);
     }
 
     // function to be called to terminate this locality immediately
-    void runtime_support::terminate(naming::id_type respond_to)
+    void runtime_support::terminate(naming::id_type const& respond_to)
     {
         // push pending logs
         components::cleanup_logging();
@@ -426,6 +429,12 @@ namespace hpx { namespace components { namespace server
         return *(get_runtime().get_config().get_section("application"));
     }
 
+    void runtime_support::update_agas_cache(naming::gid_type const& gid,
+        agas::gva const& g)
+    {
+        naming::get_agas_client().update_cache(gid, g);
+    }
+
     void runtime_support::tidy()
     {
         mutex_type::scoped_lock l(mtx_);
@@ -490,7 +499,7 @@ namespace hpx { namespace components { namespace server
         tm.cleanup_terminated();
     }
 
-    void runtime_support::stop(double timeout, naming::id_type respond_to)
+    void runtime_support::stop(double timeout, naming::id_type const& respond_to)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {

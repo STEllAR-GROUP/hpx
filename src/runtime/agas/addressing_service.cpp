@@ -624,9 +624,10 @@ bool addressing_service::bind_range(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
-        gva_cache_key key(lower_id, count);
-        gva_cache_.insert(key, g);
+        update_cache(lower_id, g, ec);
+
+        if (ec)
+            return false;
 
         return true;
     }
@@ -787,9 +788,10 @@ bool addressing_service::resolve(
         addr.address_ = g.lva();
 
         // Put the gva into the cache.
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
-        gva_cache_key key(rep.get_base_gid(), rep.get_gva().count);
-        gva_cache_.insert(key, rep.get_gva());
+        update_cache(rep.get_base_gid(), rep.get_gva(), ec);
+
+        if (ec)
+            return false;
 
         return true;
     }
@@ -1155,10 +1157,9 @@ std::size_t addressing_service::get_cache_insertions() const
     return gva_cache_.get_statistics().insertions();
 }
 
-/// \brief Install performance counters exposing properties from the
-///        local cache.
+/// Install performance counters exposing properties from the local cache.
 void addressing_service::install_counters()
-{
+{ // {{{
     // install
     performance_counters::raw_counter_type_data const counter_types[] =
     {
@@ -1195,7 +1196,34 @@ void addressing_service::install_counters()
 
     performance_counters::install_counters(
         counters, sizeof(counters)/sizeof(counters[0]));
-}
+} // }}}
+
+void addressing_service::update_cache(
+    naming::gid_type const& gid
+  , gva const& g
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_key key(gid, g.count);
+        gva_cache_.insert(key, g);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::update_cache"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+} // }}}
 
 }}
 
