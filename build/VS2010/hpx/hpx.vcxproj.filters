@@ -368,6 +368,15 @@
     <ClCompile Include="..\..\..\src\runtime\agas\interface.cpp">
       <Filter>Source Files\Runtime\AGAS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\sed_transform.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lcos\local_mutex.cpp">
+      <Filter>Source Files\LCOs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lcos\local_recursive_mutex.cpp">
+      <Filter>Source Files\LCOs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -452,9 +461,6 @@
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results_direct.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\mutex.hpp">
       <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\recursive_mutex.hpp">
@@ -984,6 +990,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp">
       <Filter>Header Files\Runtime\Naming</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\sed_transform.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp">
+      <Filter>Header Files\LCOs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

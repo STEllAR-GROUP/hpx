@@ -103,6 +103,8 @@
     <ClCompile Include="..\..\..\src\exception_list.cpp" />
     <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
     <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\local_mutex.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\local_recursive_mutex.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\server\average_count_counter.cpp" />
@@ -186,7 +188,9 @@
     <ClCompile Include="..\..\..\src\lcos\base_lco.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\performance_counters\counters.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\counters.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\performance_counters\registry.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\stubs\performance_counter.cpp" />
     <ClCompile Include="..\..\..\src\performance_counters\server\raw_counter.cpp" />
@@ -194,6 +198,7 @@
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\process_clock.cpp" />
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer.cpp" />
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer_static.cpp" />
+    <ClCompile Include="..\..\..\src\util\sed_transform.cpp" />
     <ClCompile Include="..\..\..\src\util\serialize_exception.cpp" />
     <ClCompile Include="..\..\..\src\version.cpp" />
   </ItemGroup>
@@ -209,6 +214,7 @@
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
@@ -282,6 +288,7 @@
     <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
     <ClInclude Include="..\..\..\hpx\util\query_counters.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\sed_transform.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp" />
     <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp" />
@@ -382,7 +389,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results_direct.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\mutex.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\recursive_mutex.hpp" />
     <ClInclude Include="..\..\..\hpx\config\defaults.hpp" />
     <ClInclude Include="..\..\..\hpx\config\export_definitions.hpp" />
