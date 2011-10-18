@@ -34,7 +34,7 @@
 namespace boost { namespace coroutines { namespace detail {
 
   /*
-   * Inokes mark_wait('how') on the 'Idx'th element of 't'
+   * Invokes mark_wait('how') on the 'Idx'th element of 't'
    * then calls marker::wait<Idx-1> with the same arguments.
    * returns the result of marker::wait<Idx-1>(...) plus 1 if
    * the 'Idx'th.pending() is true or plus 0 otherwise.
