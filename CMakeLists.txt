@@ -482,6 +482,8 @@ else()
     hpx_check_for_cxx11_unique_ptr(HPX_CXX11_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR
                   BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+
+    hpx_check_for_cxx11_auto(HPX_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
   endif()
 
   ##############################################################################
