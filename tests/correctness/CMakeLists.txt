@@ -5,6 +5,7 @@
 
 set(subdirs
     agas
+    actions
    )
 
 foreach(subdir ${subdirs})
