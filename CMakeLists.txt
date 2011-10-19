@@ -487,6 +487,8 @@ else()
                   BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
 
     hpx_check_for_cxx11_auto(HPX_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
+
+    hpx_check_for_cxx11_tuple(HPX_CXX11_TUPLE DEFINITIONS HPX_HAVE_CXX11_TUPLE)
   endif()
 
   ##############################################################################
