@@ -97,6 +97,7 @@ endif()
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
+include_directories(${hpx_SOURCE_DIR}/external/serialization)
 include_directories(${BOOST_INCLUDE_DIR})
 link_directories(${BOOST_LIBRARY_DIR})
 
