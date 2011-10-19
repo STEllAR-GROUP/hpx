@@ -34,7 +34,7 @@ if(HDF5_CPP_FOUND)
         interpolate3d
        )
   endif()
-  if(HPX_CXX11_LAMBDAS)
+  if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO)
     set(subdirs ${subdirs}
         sheneos
        )
