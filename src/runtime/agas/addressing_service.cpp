@@ -333,6 +333,7 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
+            prefixes.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
                 prefixes.push_back(naming::get_gid_from_prefix(p[i]));
 
@@ -357,6 +358,7 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
+            prefixes.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
                 prefixes.push_back(naming::get_gid_from_prefix(p[i]));
 
