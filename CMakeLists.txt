@@ -369,6 +369,9 @@ if(MSVC)
     set(HPX_CXX11_UNIQUE_PTR)
     add_definitions(-DHPX_CXX11_HAVE_UNIQUE_PTR)
     add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+
+    set(HPX_CXX11_AUTO)
+    add_definitions(-DHPX_CXX11_HAVE_AUTO)
   endif()
 
   ##############################################################################
