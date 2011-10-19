@@ -54,6 +54,22 @@ endif()
 include(HPX_FortranCompiler)
 
 ################################################################################
+# search path configuration
+################################################################################
+include_directories(${hpx_SOURCE_DIR})
+include_directories(${hpx_SOURCE_DIR}/external/move)
+include_directories(${hpx_SOURCE_DIR}/external/atomic)
+include_directories(${hpx_SOURCE_DIR}/external/cache)
+include_directories(${hpx_SOURCE_DIR}/external/coroutine)
+include_directories(${hpx_SOURCE_DIR}/external/endian)
+include_directories(${hpx_SOURCE_DIR}/external/logging)
+include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+include_directories(${hpx_SOURCE_DIR}/external/plugin)
+include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+include_directories(${hpx_SOURCE_DIR}/external/serialization)
+link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+
+################################################################################
 # Boost configuration
 ################################################################################
 # Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
@@ -107,22 +123,6 @@ add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-
-################################################################################
-# search path configuration
-################################################################################
-include_directories(${hpx_SOURCE_DIR})
-include_directories(${hpx_SOURCE_DIR}/external/move)
-include_directories(${hpx_SOURCE_DIR}/external/atomic)
-include_directories(${hpx_SOURCE_DIR}/external/cache)
-include_directories(${hpx_SOURCE_DIR}/external/coroutine)
-include_directories(${hpx_SOURCE_DIR}/external/endian)
-include_directories(${hpx_SOURCE_DIR}/external/logging)
-include_directories(${hpx_SOURCE_DIR}/external/lockfree)
-include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-include_directories(${hpx_SOURCE_DIR}/external/serialization)
-link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
 # Compiler detection code
