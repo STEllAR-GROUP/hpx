@@ -3,22 +3,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -58,8 +58,8 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
-  inline 
-  void * 
+  inline
+  void *
   alloc_stack(std::size_t size) {
     void * stack = ::mmap(NULL,
                           size,
@@ -82,7 +82,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     // Fill the bottom 8 bytes of the first page with 1s.
     void** watermark = (void**) stack + ((size - EXEC_PAGESIZE) / sizeof(void*));
     *watermark = (void*) ~0;
-  }  
+  }
 
   inline
   bool reset_stack(void* stack, std::size_t size) {
@@ -90,10 +90,10 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
     // If the watermark has been overwritten, then we've gone past the first
     // page.
-    if(((void*) ~0) != *watermark) 
+    if(((void*) ~0) != *watermark)
     {
-      // We never free up the first page, as it's initialized only when the 
-      // stack is created.  
+      // We never free up the first page, as it's initialized only when the
+      // stack is created.
       ::madvise(stack, size - EXEC_PAGESIZE, MADV_DONTNEED);
       return true;
     }
@@ -107,7 +107,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   }
 
 #else  // non-mmap()
-  
+
   //this should be a fine default.
   static const std::size_t stack_alignment = sizeof(void*) > 16? sizeof(void*): 16;
 
@@ -132,7 +132,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   inline
   void watermark_stack(void* stack, std::size_t size) {
     // no-op
-  }  
+  }
 
   inline
   bool reset_stack(void* stack, std::size_t size) {
@@ -147,7 +147,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 #endif  // non-mmap() implementation of alloc_stack()/free_stack()
 
   /**
-   * The splitter is needed for 64 bit systems. 
+   * The splitter is needed for 64 bit systems.
    * @note The current implementation does NOT use
    * (for debug reasons).
    * Thus it is not 64 bit clean.
@@ -206,8 +206,8 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 //#endif
 //
 //namespace boost { namespace coroutines { namespace detail { namespace posix {
-//  inline 
-//  void * 
+//  inline
+//  void *
 //  alloc_stack_mmap(std::size_t size) {
 //    void * stack = ::mmap(NULL,
 //                          size,
