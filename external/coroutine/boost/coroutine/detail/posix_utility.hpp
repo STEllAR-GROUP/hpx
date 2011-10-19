@@ -1,4 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
+//  Copyright (c) 2011, Bryce Adelstein-Lelbach
 //
 //  This code may be used under either of the following two licences:
 //
@@ -38,11 +39,16 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
+
+#include <new>
 #include <iostream>
 #include <boost/type_traits.hpp>
-#include <cstring>
+#include <boost/assert.hpp>
+
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
+#include <sys/param.h>
 #endif
 
 /**
@@ -58,19 +64,41 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     void * stack = ::mmap(NULL,
                           size,
                           PROT_EXEC|PROT_READ|PROT_WRITE,
-#if defined(__APPLE__)
-                          MAP_PRIVATE|MAP_ANON,
-#else // ! __APPLE__
-                          MAP_PRIVATE|MAP_ANONYMOUS,
-#endif // ! __APPLE__
+                          MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
                           -1,
                           0
                           );
+
     if(stack == MAP_FAILED) {
-      std::cerr <<strerror(errno)<<"\n";
-      abort();
+      throw std::bad_alloc();
     }
     return stack;
+  }
+
+  inline
+  void watermark_stack(void* stack, std::size_t size) {
+    BOOST_ASSERT(size > EXEC_PAGESIZE);
+
+    // Fill the bottom 8 bytes of the first page with 1s.
+    void** watermark = (void**) stack + ((size - EXEC_PAGESIZE) / sizeof(void*));
+    *watermark = (void*) ~0;
+  }  
+
+  inline
+  bool reset_stack(void* stack, std::size_t size) {
+    void** watermark = (void**) stack + ((size - EXEC_PAGESIZE) / sizeof(void*));
+
+    // If the watermark has been overwritten, then we've gone past the first
+    // page.
+    if(((void*) ~0) != *watermark) 
+    {
+      // We never free up the first page, as it's initialized only when the 
+      // stack is created.  
+      ::madvise(stack, size - EXEC_PAGESIZE, MADV_DONTNEED);
+      return true;
+    }
+
+    return false;
   }
 
   inline
@@ -99,6 +127,16 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   inline
   void* alloc_stack(std::size_t size) {
     return new stack_aligner[size/sizeof(stack_aligner)];
+  }
+
+  inline
+  void watermark_stack(void* stack, std::size_t size) {
+    // no-op
+  }  
+
+  inline
+  bool reset_stack(void* stack, std::size_t size) {
+    return false;
   }
 
   inline

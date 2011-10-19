@@ -28,6 +28,7 @@
 
 #ifndef BOOST_COROUTINE_DEFAULT_CONTEXT_IMPL_HPP_20060601
 #define BOOST_COROUTINE_DEFAULT_CONTEXT_IMPL_HPP_20060601
+
 #include <boost/config.hpp>
 /* 
    ContextImpl concept documentation.
@@ -94,43 +95,12 @@
      make copyable.
 */
 
-#if BOOST_COROUTINE_USE_GENERIC_CONTEXT != 0
-
-#include <boost/coroutine/detail/context_generic_context.hpp>
-namespace boost { namespace coroutines { namespace detail {
-  typedef generic_context::context_impl default_context_impl;
-}}}
-
-#else
-
-// #if defined(COROUTINE_STACKLESS_VERSION)
-// 
-// #include <boost/coroutine/detail/context_stackless.hpp>
-// namespace boost { namespace coroutines { namespace detail {
-//   typedef stackless::context_impl default_context_impl;
-// } } }
-// 
-// #else
-
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-#if defined(__x86_64__)
-// 64 bit systems, use appropriate context switching
-
-#include <boost/coroutine/detail/context_linux64.hpp>
+#include <boost/coroutine/detail/context_linux_x86.hpp>
 namespace boost { namespace coroutines { namespace detail {
-  typedef oslinux64::context_impl default_context_impl;
+  typedef linux::context_impl default_context_impl;
 } } }
-
-#else
-// use 32 bit context switching
-
-#include <boost/coroutine/detail/context_linux.hpp>
-namespace boost { namespace coroutines { namespace detail {
-  typedef oslinux::context_impl default_context_impl;
-} } }
-
-#endif
 
 #elif defined(_POSIX_VERSION)
 
@@ -141,30 +111,15 @@ namespace boost { namespace coroutines { namespace detail {
 
 #elif defined(BOOST_WINDOWS)
 
-#if (defined(_M_IA64) || defined(_WIN64)) && !defined(BOOST_COROUTINE_USE_FIBERS)
-
-#include <boost/coroutine/detail/context_windows64.hpp>
-namespace boost { namespace coroutines { namespace detail {
-  typedef windows64::context_impl default_context_impl;
-} } }
-
-#else
-
-#include <boost/coroutine/detail/context_windows.hpp>
+#include <boost/coroutine/detail/context_windows_fibers.hpp>
 namespace boost { namespace coroutines { namespace detail {
   typedef windows::context_impl default_context_impl;
 } } }
-
-#endif  // _WIN64
 
 #else 
 
 #error No default_context_impl available for this system
 
 #endif
-
-// #endif
-
-#endif // BOOST_COROUTINE_USE_GENERIC_CONTEXT
 
 #endif

@@ -28,6 +28,15 @@
 
 #ifndef BOOST_COROUTINE_CONTEXT_WINDOWS_HPP_20060625
 #define BOOST_COROUTINE_CONTEXT_WINDOWS_HPP_20060625
+
+#if !defined(BOOST_COROUTINE_USE_ATOMIC_COUNT)
+#  define BOOST_COROUTINE_USE_ATOMIC_COUNT
+#endif
+
+#ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
+#  include <boost/detail/atomic_count.hpp>
+#endif
+
 #include <windows.h>
 #include <winnt.h>
 #include <boost/config.hpp>
@@ -37,6 +46,8 @@
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/coroutine/detail/config.hpp>
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
@@ -203,11 +214,7 @@ namespace boost {namespace coroutines {
           boost::throw_exception(boost::system::system_error(
               boost::system::error_code(
                   GetLastError(), 
-#if BOOST_VERSION >= 104400
                   boost::system::system_category()
-#else
-                  boost::system::system_category
-#endif
               )
           ));
         }
@@ -219,7 +226,30 @@ namespace boost {namespace coroutines {
           DeleteFiber(m_ctx);
       }
 
+      void reset_stack()
+      {
+        increment_stack_recycle_count();
+      }
+
+      static boost::uint64_t get_stack_recycle_count()
+      {
+        static_<counter_type, stack_recycle> counter(0);
+        return counter.get();
+      }
+      static boost::uint64_t increment_stack_recycle_count()
+      {
+        static_<counter_type, stack_recycle> counter(0);
+        return ++counter.get();
+      }
+
+#ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
+      typedef std::size_t counter_type;
+#else
+      typedef boost::detail::atomic_count counter_type;
+#endif
+
     private:
+      struct stack_recycle {};
     };
 
     typedef fibers_context_impl context_impl;

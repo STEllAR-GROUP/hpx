@@ -347,13 +347,13 @@ namespace boost { namespace coroutines { namespace detail {
       } catch(...) {}
     }
 
-    static boost::uint64_t get_count()
+    static boost::uint64_t get_allocation_count()
     {
-        return m_allocation_counter;
+      return m_allocation_counter;
     }
-    static boost::uint64_t increment_count()
+    static boost::uint64_t increment_allocation_count()
     {
-        return ++m_allocation_counter;
+      return ++m_allocation_counter;
     }
 
   protected:
@@ -454,9 +454,11 @@ namespace boost { namespace coroutines { namespace detail {
     boost::exception_ptr m_type_info;
   };
 
+#ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
   // initialize static allocation counter
   template <typename ContextImpl>
   boost::detail::atomic_count context_base<ContextImpl>::m_allocation_counter(0);
+#endif
 
 } } }
 #endif

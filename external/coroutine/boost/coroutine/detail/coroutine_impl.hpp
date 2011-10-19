@@ -35,6 +35,7 @@
 
 #include <cstddef>
 #include <boost/optional.hpp>
+#include <boost/coroutine/detail/config.hpp>
 #include <boost/coroutine/detail/argument_unpacker.hpp>
 #include <boost/coroutine/detail/coroutine_accessor.hpp>
 #include <boost/coroutine/detail/context_base.hpp>
@@ -43,28 +44,7 @@
 
 #include <boost/config.hpp>
 
-# include <hpx/util/thread_specific_ptr.hpp>
-
-#if defined(BOOST_WINDOWS)
-# define BOOST_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
-# define BOOST_COROUTINE_SYMBOL_IMPORT      __declspec(dllimport)
-#elif defined(BOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-# define BOOST_COROUTINE_SYMBOL_EXPORT      __attribute__((visibility("default")))
-# define BOOST_COROUTINE_SYMBOL_IMPORT      __attribute__((visibility("default")))
-#else
-# define BOOST_COROUTINE_SYMBOL_EXPORT      /* empty */
-# define BOOST_COROUTINE_SYMBOL_IMPORT      /* empty */
-#endif
-
-#if defined(BOOST_COROUTINE_EXPORTS)
-# define BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_EXPORT
-#else
-# define BOOST_COROUTINE_EXPORT       BOOST_COROUTINE_SYMBOL_IMPORT
-#endif
-
-#if !defined(BOOST_COROUTINE_NUM_HEAPS)
-# define BOOST_COROUTINE_NUM_HEAPS    41
-#endif
+#include <hpx/util/thread_specific_ptr.hpp>
 
 namespace boost { namespace coroutines { namespace detail 
 {
@@ -359,6 +339,7 @@ private:
 
     void reset()
     {
+        this->reset_stack();
         m_fun = FunctorType();    // just reset the bound function
     }
 
@@ -406,7 +387,7 @@ private:
       wrapper_type* wrapper = wrapper_type::allocate(
           (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
       if (NULL == wrapper) {
-          context_base<ContextImpl>::increment_count();
+          context_base<ContextImpl>::increment_allocation_count();
           return new wrapper_type(f, id, stack_size);
       }
 
