@@ -105,7 +105,7 @@ void gs(
 
     high_resolution_timer t;
 
-    for(unsigned iter = 0; iter < max_iterations; iter += iteration_block)
+    for(unsigned iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
     {
         // split up iterations so we don't need to check the residual every iteration
         //for(unsigned jter = 0; jter < iteration_block; ++jter)

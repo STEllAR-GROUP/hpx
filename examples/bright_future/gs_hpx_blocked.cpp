@@ -29,6 +29,9 @@ using hpx::util::high_resolution_timer;
 using hpx::cout;
 using hpx::flush;
 
+// this is just a simple base class for my functors to be serializable
+// this is required by my function implementation, because arguments to hpx
+// actions need to be serializable
 struct fun_base
 {
     virtual ~fun_base() {}
@@ -39,21 +42,14 @@ struct fun_base
     }
 };
 
+// various typedefs:
+// remote_lse_type is a hpx component to hold the grid, rhs and the other
+// parameters of our PDE, for example the step size.
 typedef bright_future::server::remote_lse<double> remote_lse_type;
 typedef bright_future::lse_config<double> lse_config;
 typedef bright_future::server::remote_lse<double>::range_type range_type;
 
-/*
-#include <boost/phoenix.hpp>
-#include <boost/phoenix/stl/cmath.hpp>
-using boost::phoenix::placeholders::arg1;
-using boost::phoenix::placeholders::arg2;
-using boost::phoenix::local_names::_a;
-using boost::phoenix::local_names::_x;
-using boost::phoenix::local_names::_y;
-using boost::phoenix::sin;
-*/
-
+// this is the functor to initialize the RHS of my partial differential equation
 struct init_rhs_fun
     : fun_base
 {
@@ -61,52 +57,43 @@ struct init_rhs_fun
     {
         return
             39.478 * sin((x * c.hx) * 6.283) * sinh((y * c.hy) * 6.283);
-            /*
-            let(
-                _x = (arg1) * c.hx  // actual x coordinate
-              , _y = (arg2) * c.hy  // actual y coordinate
-            )
-            [
-                39.478 * sin(_x * 6.283) * sinh(_y * 6.283)
-            ]
-            (x, y);
-            */
     }
 };
 
+// functor to initialize the grid with boundary conditions
 struct init_u_fun
     : fun_base
 {
     double operator()(size_type x, size_type y, lse_config const & c)
     {
-        //cout << "hx " << c.hx << "hy " << c.hy << "\n" << flush;
-        //return
         double value =
             y == (c.n_y - 1) ? sin((x * c.hx) * 6.283) * sinh(6.283) : 0.0;
-            /*
-            let(
-                _x = arg1 * c.hx  // actual x coordinate
-            )
-            [
-                if_else(
-                    arg2 == 0u
-                  , sin(_x * 6.283) * sinh(6.283)
-                  , 0.0
-                )
-            ]
-            (x, y);
-        */
 
         return value;
     }
 };
 
+// the stencil code
 struct update_fun
     : fun_base
 {
     double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
     {
-        return update(u, rhs, x, y, c.hx_sq, c.hy_sq, c.div, c.relaxation);
+        return
+            u(x, y)
+            + (
+                (
+                    (
+                        (u(x - 1, y) + u(x - 1, y)) / c.hx_sq
+                      + (u(x, y - 1) + u(x, y + 1)) / c.hy_sq
+                      + rhs(x, y)
+                    )
+                    / c.div
+                )
+                - u(x, y)
+            )
+            * c.relaxation
+            ;
     }
 };
 
@@ -119,6 +106,7 @@ struct identity_fun
     }
 };
 
+// apply function to output our result
 struct output_fun
     : fun_base
 {
@@ -134,21 +122,17 @@ struct output_fun
     }
 };
 
+// not used currently
 struct update_residuum_fun
     : fun_base
 {
     void operator()(grid_type & u, size_type x, size_type y)
     {
-        cout << "init!\n" << flush;
     }
 };
 
 
 void gs(
-  /*
-    bright_future::grid<double> & u
-  , bright_future::grid<double> const & rhs
-  */
     size_type n_x
   , size_type n_y
   , double hx
@@ -162,6 +146,11 @@ void gs(
 )
 {
     {
+        // initialization of hox component. this can be hidden nicely
+        // this is not something to worry about right now.
+        // it creates the remote_lse_type and registers it with the hpx agas
+        // server. a remote_id is created, this is a "pointer" to our (possibly)
+        // remotely created LSE. 
         hpx::components::component_type type
             = hpx::components::get_component_type<remote_lse_type>();
 
@@ -183,39 +172,64 @@ void gs(
 
         hpx::naming::id_type remote_id = *parts.first;
 
+        // initalization of hpx component ends here.
+
         typedef promise_wrapper<hpx::lcos::promise<void> > promise_type;
 
+        // The init future:
+        // a hpx future takes an action. this action is a remotely callable
+        // member function on an instance of remote_lse_type
+        // the init function has the signature
+        // void(unsigned n_x, unsigned n_y, double hx, double hy)
         typedef
             hpx::lcos::eager_future<remote_lse_type::init_action>
             init_future;
 
+        // we create a temporary init_future object. the first parameter is the
+        // id on which object we want to call the action. the remaining
+        // parameters are the parameters to be passed to the action, see comment
+        // above
         init_future(remote_id, n_x, n_y, hx, hy).get();
 
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_rhs_blocked_action>
-            init_rhs_future;
-
+        // this type represents our grid, instead of doubles, we just use
+        // promises as value types.
         typedef bright_future::grid<promise_type> promise_grid_type;
-
-        //size_type block_size = 64;
-        size_type n_x_block = n_x/block_size+1;
-        size_type n_y_block = n_y/block_size+1;
-        //cout << n_x << " " << n_x_block << " | " << n_y << " " << n_y_block << "\n" << flush;
-
+        // this type is used to hold the promise grids of the different iterations
         typedef std::vector<promise_grid_type> iteration_dependencies_type;
 
-        iteration_dependencies_type iteration_dependencies(max_iterations+1, promise_grid_type(n_x_block, n_y_block));
+        size_type n_x_block = n_x/block_size+1;
+        size_type n_y_block = n_y/block_size+1;
+
+        // initialize the iteration dependencies:
+        // we need max_iterations+1 elements in that vector. The 0th entry
+        // is used for the initialization of the grid.
+        iteration_dependencies_type
+            iteration_dependencies(
+                max_iterations+1
+              , promise_grid_type(n_x_block, n_y_block)
+            );
 
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
         {
+            typedef
+                hpx::lcos::eager_future<remote_lse_type::init_rhs_blocked_action>
+                init_rhs_future;
+            
+            // we opened another scope to just have this vector temporarily, we
+            // won't need it after the initializiation
             promise_grid_type init_rhs_promises(n_x_block, n_y_block);
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
             {
                 for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
                     init_rhs_promises(x_block, y_block) =
-                        init_rhs_future(remote_id, init_rhs_fun(), range_type(x, x+block_size), range_type(y, y + block_size));
+                        init_rhs_future(
+                            remote_id
+                          , init_rhs_fun()
+                          , range_type(x, x+block_size)
+                          , range_type(y, y + block_size)
+                        );
                 }
             }
 
@@ -223,14 +237,24 @@ void gs(
                 hpx::lcos::eager_future<remote_lse_type::init_u_blocked_action>
                 init_u_future;
 
+            // initialize our grid. This will serve as the dependency of the
+            // first loop below.
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
             {
                 for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
+                    // set the promise of the initialization.
                     iteration_dependencies[0](x_block, y_block) =
-                        init_u_future(remote_id, init_u_fun(), range_type(x, x + block_size), range_type(y, y + block_size));
+                        init_u_future(   // invoke the init future.
+                            remote_id
+                          , init_u_fun() // pass the initialization function
+                          , range_type(x, x + block_size) // and the ranges
+                          , range_type(y, y + block_size)
+                        );
                 }
             }
+
+            // wait for the rhs initialization to finish.
             BOOST_FOREACH(promise_type & promise, init_rhs_promises)
             {
                 promise.get();
@@ -246,21 +270,21 @@ void gs(
             apply_region_future;
 
         high_resolution_timer t;
-        for(unsigned iter = 0; iter < max_iterations; iter++)// += iteration_block)
-        {
-            unsigned const jter = 0;
-            // split up iterations so we don't need to check the residual every iteration
-            //for(unsigned jter = 0; jter < iteration_block; ++jter)
-            {
-                // update the "red" points
-                //size_type y, x;
-                promise_grid_type & current = iteration_dependencies[iter + jter + 1];
-                promise_grid_type & prev = iteration_dependencies[iter + jter];
 
+        // our real work starts here.
+        for(unsigned iter = 0; iter < max_iterations; ++iter)
+        {
+            {
+                promise_grid_type & prev = iteration_dependencies[iter];
+                promise_grid_type & current = iteration_dependencies[iter + 1];
+
+                // in every iteration we want to compute this:
                 for(size_type y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
                 {
                     for(size_type x_block = 0, x = 0; x_block < n_x; x_block += block_size, ++x)
                     {
+                        // set up the x and y ranges, this takes care of the
+                        // boundaries, so we don't access invalid rgid points.
                         range_type
                             x_range(
                                 x == 0             ? 1     : x_block
@@ -273,17 +297,43 @@ void gs(
                               );
 
                         std::vector<promise_type *> deps;
+                        // these are our dependencies to update this specific
+                        // block
+                        
+                        // we need to be sure to wait for the previous iteration.
                         deps.push_back(&prev(x,y));
-                        if(x + 1 < n_x_block)
+
+                        // keep in mind, our loop goes from top-left to bottom
+                        // right.
+
+                        if(x + 1 < n_x_block) // are we on the boundary?
+                            // add the right block of the previous iteration
+                            // to our list of dependencies
                             deps.push_back(&prev(x+1,y));
-                        if(y + 1 < n_y_block)
+
+                        if(y + 1 < n_y_block) // are we on the boundary?
+                            // add the upper block of the previous iteration
+                            // to our list of dependencies
                             deps.push_back(&prev(x,y+1));
-                        if(x > 0)
+
+                        if(x > 0) // are we on the boundary?
+                            // add the upper block of the current iteration
+                            // to our list of dependencies
                             deps.push_back(&current(x-1,y));
-                        if(y > 0)
+
+                        if(y > 0) // are we on the boundary?
+                            // add the upper block of the current iteration
+                            // to our list of dependencies
                             deps.push_back(&current(x,y-1));
 
                         current(x, y) =
+                            // call the update action
+                            // this will exectue a loop like this:
+                            // for(size_type y = x_range.first; y < y_range.second; ++y)
+                            //     for(size_type x = x_range.first; x < x_range.second; ++x)
+                            //         u(x, y) = update_fun()(x, y, u, rhs, ...)
+                            // the loop will be executed after all the dependencies
+                            // are finished.
                             apply_region_future(
                                 remote_id
                               , update_fun()
@@ -294,38 +344,13 @@ void gs(
                     }
                 }
             }
-            /*
-            // check if we converged yet
-            grid_type residuum(u.x(), u.y());
-            size_type y, x;
-#pragma omp parallel for private(x, y)
-            for(y = 1; y < n_y - 1; ++y)
-            {
-                for(x = 1; x < n_x - 1; ++x)
-                {
-                    residuum(x, y) = update_residuum(u, rhs, x, y, hx_sq, hy_sq, k);
-                }
-            }
-            double r = 0.0;
-#pragma omp parallel for reduction(+:r)
-            for(unsigned i = 0; i < residuum.size(); ++i)
-            {
-                r = r + residuum[i] * residuum[i];
-            }
-
-            if(std::sqrt(r) <= 1e-10)
-            {
-                break;
-            }
-            */
         }
-        //cout << "finished ...\n" << flush;
 
+        // wait for the last iteration to finish.
         BOOST_FOREACH(promise_type & promise, iteration_dependencies[max_iterations])
         {
             promise.get();
         }
-        //cout << "finished for real...\n" << flush;
 
         double time_elapsed = t.elapsed();
         cout << (n_x*n_y) << " " << time_elapsed << "\n" << flush;
